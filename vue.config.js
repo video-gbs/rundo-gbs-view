@@ -6,7 +6,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || 'vue Admin Template' // page title
+const name = defaultSettings.title || '后台管理系统' // page title
 
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
@@ -14,6 +14,35 @@ const name = defaultSettings.title || 'vue Admin Template' // page title
 // You can change the port by the following methods:
 // port = 9528 npm run dev OR npm run dev --port = 9528
 const port = process.env.port || process.env.npm_config_port || 9528 // dev port
+
+// 转发配置数组
+const urls = [
+  // 本地
+  {
+    target: 'http://221.7.133.178:8111',
+    proxy: '/dev-api'
+  }
+]
+
+/**
+ * 遍历转发数组，生成转发json，在vue.config.js中调用
+ * @returns {Object} 转发配置
+ */
+function getProxys() {
+  const proxys = {}
+  urls.forEach(item => {
+    if (item.proxy && item.proxy !== '') {
+      proxys[item.proxy] = {
+        target: item.target,
+        changeOrigin: true,
+        pathRewrite: {
+          [`^` + item.proxy]: '/'
+        }
+      }
+    }
+  })
+  return proxys
+}
 
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
@@ -36,6 +65,7 @@ module.exports = {
       warnings: false,
       errors: true
     },
+    proxy: getProxys(),
     before: require('./mock/mock-server.js')
   },
   configureWebpack: {
