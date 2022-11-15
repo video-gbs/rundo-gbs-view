@@ -1,8 +1,17 @@
 <template>
   <section class="app-main">
-    <transition name="fade-transform" mode="out-in">
-      <router-view :key="key" />
-    </transition>
+    <el-scrollbar
+      style="height: 100%;"
+    >
+      <transition name="fade-transform1" mode="out-in">
+        <keep-alive>
+          <router-view v-if="$route.meta.keepAlive" :key="key" />
+        </keep-alive>
+      </transition>
+      <transition name="fade-transform2" mode="out-in">
+        <router-view v-if="!$route.meta.keepAlive" :key="key" />
+      </transition>
+    </el-scrollbar>
   </section>
 </template>
 
