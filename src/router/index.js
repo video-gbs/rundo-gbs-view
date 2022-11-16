@@ -67,35 +67,121 @@ export const constantRoutes = [
       component: () => import('@/views/leftMenus/workTable/index'),
       meta: { title: '综合工作台', icon: 'dashboard' }
     }]
+
   },
+  // component: () => import('@/views/leftMenus/workTable/index'),
+  // children: [
+  // {
+  //   path: '/workTable',
+  //   name: '综合工作台',
+  //   component: () => import('@/views/leftMenus/workTable/index'),
+  //   meta: { title: '综合工作台', icon: 'dashboard' }
+  // },
   {
     path: '/politicalInquiryManagement',
     name: '问政管理',
     meta: { title: '问政管理' },
-    component: () => import('@/views/leftMenus/politicalInquiryManagement/index'),
-    meta: { title: '问政管理', icon: 'dashboard' }
+    component: Layout,
+    redirect: '/politicalList',
+    // component: () => import('@/views/leftMenus/politicalInquiryManagement/index'),
+    meta: { title: '问政管理', icon: 'dashboard' },
+    children: [
+      {
+        path: '/politicalList',
+        name: '问政列表',
+        component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalList/index'),
+        meta: { title: '问政列表', icon: 'dashboard' }
+      },
+      {
+        path: '/politicalAudit',
+        name: '问政转移审核',
+        component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalAudit/index'),
+        meta: { title: '问政转移审核', icon: 'dashboard' }
+      },
+      {
+        path: '/politicalReply',
+        name: '邀请回复审核',
+        component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalReply/index'),
+        meta: { title: '邀请回复审核', icon: 'dashboard' }
+      },
+    ]
   },
   {
     path: '/informationManagement',
     name: '展示信息管理',
+    component: Layout,
     meta: { title: '展示信息管理' },
-    component: () => import('@/views/leftMenus/informationManagement/index'),
-    meta: { title: '展示信息管理', icon: 'dashboard' }
+    redirect: '/roundChart',
+    meta: { title: '展示信息管理', icon: 'dashboard' },
+    children: [
+      {
+        path: '/roundChart',
+        name: '轮播图管理',
+        component: () => import('@/views/leftMenus/informationManagement/roundChart/index'),
+        meta: { title: '轮播图管理', icon: 'dashboard' }
+      },
+      {
+        path: '/publicManagement',
+        name: '公共管理',
+        component: () => import('@/views/leftMenus/informationManagement/publicManagement/index'),
+        meta: { title: '公共管理', icon: 'dashboard' }
+      },
+      {
+        path: '/advertisementPicture',
+        name: '广告图管理',
+        component: () => import('@/views/leftMenus/informationManagement/advertisementPicture/index'),
+        meta: { title: '广告图管理', icon: 'dashboard' }
+      },
+    ]
   },
   {
     path: '/userManagement',
     name: '用户管理',
+    component: Layout,
     meta: { title: '用户管理' },
-    component: () => import('@/views/leftMenus/userManagement/index'),
-    meta: { title: '用户管理', icon: 'dashboard' }
+    redirect: '/userManagement',
+    // component: () => import('@/views/leftMenus/userManagement/index'),
+    meta: { title: '用户管理', icon: 'dashboard' },
+    children: [
+      {
+        path: '/userManagement',
+        name: '用户管理',
+        component: () => import('@/views/leftMenus/userManagement/index'),
+        meta: { title: '用户管理', icon: 'dashboard' }
+      },
+    ]
   },
   {
     path: '/systemManagement',
     name: '系统管理',
     meta: { title: '系统管理' },
-    component: () => import('@/views/leftMenus/systemManagement/index'),
-    meta: { title: '系统管理', icon: 'dashboard' }
+    component: Layout,
+    redirect: '/accountManagement',
+    meta: { title: '系统管理', icon: 'dashboard' },
+    children: [
+      {
+        path: '/accountManagement',
+        name: '账号管理',
+        component: () => import('@/views/leftMenus/systemManagement/accountManagement/index'),
+        meta: { title: '账号管理', icon: 'dashboard' }
+      },
+      {
+        path: '/roleManagement',
+        name: '角色管理',
+        component: () => import('@/views/leftMenus/systemManagement/roleManagement/index'),
+        meta: { title: '角色管理', icon: 'dashboard' }
+      },
+      {
+        path: '/unitManagement',
+        name: '单位管理',
+        component: () => import('@/views/leftMenus/systemManagement/unitManagement/index'),
+        meta: { title: '单位管理', icon: 'dashboard' }
+      },
+    ]
   },
+  // ]
+  // },
+
 
   {
     path: '/404',
