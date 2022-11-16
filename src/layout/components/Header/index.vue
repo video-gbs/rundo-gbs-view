@@ -1,7 +1,10 @@
 <template>
   <div class="app-header">
     <div class="app-header">
-      <h2>梧州问政后台系统</h2>
+      <div class="app-header-left">
+        <svg-icon icon-class="logo" class="logo"/>
+        <h2>梧州问政后台系统</h2>
+      </div>
       <div class="header-menu">
         <router-link
           v-for="(item, index) in routes"
@@ -16,7 +19,8 @@
         <div class="menu-user">
           <el-dropdown class="" trigger="click">
             <div class="user-info">
-              <span>{{ toGreet }}，11111</span>
+              <svg-icon icon-class="user1" class="user"/>
+              <span>管理员</span>
               <i class="el-icon-caret-bottom" />
             </div>
             <el-dropdown-menu slot="dropdown">
@@ -163,7 +167,23 @@ export default {
   align-items: center;
   justify-content: space-between;
   background-color: $bg-color;
+  box-shadow: 0px 3px 6px 1px rgba(51,51,51,0.16);
+  .app-header-left{
+    position:relative;
 
+    .logo{
+      position:absolute;
+      top:10px;
+      width:1.75rem;
+      height:1.75rem;
+    }
+    h2{
+      font-size: 18px;
+      font-weight: bold;
+      color: $font-color;
+      margin-left:2rem;
+    }
+  }
   .header-menu {
     display: flex;
     position: relative;
@@ -200,14 +220,25 @@ export default {
       align-items: center;
       font-size: 0.5rem;
       margin-left: 20px;
+      position:relative;
+      .user{
+        width:2rem;
+        height:2rem;
+        margin-right:1rem;
+        position:absolute;
+        top:-0.75rem;
+        left:-2.5rem;
+      }
       span{
         color:$font-color;
       }
+
       .el-avatar {
         margin-right: 10px;
       }
       i {
-        font-size: 1.8rem;
+        font-size: 0.625rem;
+        color:$font-color;
       }
     }
   }

@@ -1,6 +1,11 @@
 <template>
-  <div class="noticeList-container">
+  <!-- <div class="noticeList-container"> -->
+  <el-card class="box-card">
     <div class="notice-box" @click="showNoticeDiaog">
+      <div slot="header" class="clearfix">
+        <svg-icon icon-class="tzgg" class="tzgg_svg"/>
+        <span>通知公告</span>
+      </div>
       <vue-seamless-scroll :data="noticeList" :class-option="defaultOption">
         <ul class="ul-scoll">
           <li v-for="(item, index) in noticeList" :key="index">
@@ -15,7 +20,7 @@
     </div>
 
     <!-- 查看公文弹窗 start -->
-    <el-dialog
+    <!-- <el-dialog
       :visible.sync="newsPopup.isShow"
       class="new-dialog"
       top="5vh"
@@ -23,14 +28,18 @@
       style="height: 90vh;"
     >
       <NoticeDetail :data="newsPopup.data" />
-    </el-dialog>
+    </el-dialog> -->
     <!-- 查看公文弹窗 end -->
-  </div>
+
+      </el-card>
+  <!-- </div> -->
 </template>
 
 <script>
+import LineFont from '@/components/LineFont'
+
 import vueSeamlessScroll from 'vue-seamless-scroll'
-import NoticeDetail from '@/components/NoticeDetail/index.vue'
+// import NoticeDetail from '@/components/NoticeDetail/index.vue'
 import { Local } from '@/utils/storage'
 import { parseTime } from '@/utils'
 
@@ -38,11 +47,32 @@ export default {
   name: 'NoticeList',
   components: {
     vueSeamlessScroll,
-    NoticeDetail
+    LineFont
+    // NoticeDetail
   },
   data() {
     return {
-      noticeList: [],
+      lineTitle:{
+        title:'通知公告',
+        notShowSmallTitle:false
+      },
+      noticeList: [
+        {
+          title:'1111',
+          date:'1111',
+          type:2222
+        },
+        {
+          title:'1111',
+          date:'1111',
+          type:2222
+        },
+        {
+          title:'1111',
+          date:'1111',
+          type:2222
+        }
+      ],
       newsPopup: {
         isShow: false,
         data: null
@@ -65,7 +95,7 @@ export default {
 
   },
   created() {
-    this.getNews()
+    // this.getNews()
   },
   mounted() {
 
@@ -97,13 +127,28 @@ export default {
 <style lang="scss" scoped>
   .noticeList-container {
     width: 100%;
-    height: 100%;
-    padding: 8px 0;
+    height: 50%;
+    padding: 8px;
+    border:1px solid #ccc;
+    border-radius:4px;
+    margin:10px 0px;
+    background-color:#fff;
     .notice-box {
       height: 100%;
       width: 100%;
       overflow: hidden;
     }
+    .clearfix{
+      height:80px;
+      line-height:80px;
+      .tzgg_svg{
+        width:1.5rem;
+        height:1.5rem;
+        position:relative;
+        top:5px;
+        left:-3px;
+      }
+  }
   }
   .ul-scoll {
     padding: 0 16px;

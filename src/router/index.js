@@ -65,7 +65,7 @@ export const constantRoutes = [
       path: '/workTable',
       name: '综合工作台',
       component: () => import('@/views/leftMenus/workTable/index'),
-      meta: { title: '综合工作台', icon: 'dashboard' }
+      meta: { title: '综合工作台', icon: 'zhgzt' }
     }]
 
   },
@@ -84,7 +84,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/politicalList',
     // component: () => import('@/views/leftMenus/politicalInquiryManagement/index'),
-    meta: { title: '问政管理', icon: 'dashboard' },
+    meta: { title: '问政管理', icon: 'wzgl' },
     children: [
       {
         path: '/politicalList',
@@ -112,7 +112,7 @@ export const constantRoutes = [
     component: Layout,
     meta: { title: '展示信息管理' },
     redirect: '/roundChart',
-    meta: { title: '展示信息管理', icon: 'dashboard' },
+    meta: { title: '展示信息管理', icon: 'zsxxgl' },
     children: [
       {
         path: '/roundChart',
@@ -141,7 +141,7 @@ export const constantRoutes = [
     meta: { title: '用户管理' },
     redirect: '/userManagement',
     // component: () => import('@/views/leftMenus/userManagement/index'),
-    meta: { title: '用户管理', icon: 'dashboard' },
+    meta: { title: '用户管理', icon: 'role' },
     children: [
       {
         path: '/userManagement',
@@ -157,7 +157,7 @@ export const constantRoutes = [
     meta: { title: '系统管理' },
     component: Layout,
     redirect: '/accountManagement',
-    meta: { title: '系统管理', icon: 'dashboard' },
+    meta: { title: '系统管理', icon: 'sys' },
     children: [
       {
         path: '/accountManagement',

@@ -8,10 +8,10 @@
       @click="checkItem(item.status)"
     >
       <div class="item-img">
-        <!-- <img :src="imgSrc(item)" alt="" /> -->
+        <svg-icon :icon-class="item.imgSrcName" class="svg"/>
       </div>
-      <div class="value">{{ item.value }}</div>
-      <div class="title">{{ item.title }}</div>
+      <!-- <div class="value">{{ item.value }}</div>
+      <div class="title">{{ item.title }}</div> -->
     </div>
   </div>
 </template>
@@ -26,11 +26,13 @@ export default {
           title: "平台用户",
           value: 0,
           color: "red",
+          imgSrcName:'ptyh'
         },
         {
           title: "单位部门",
           value: 0,
           color: "blue",
+          imgSrcName:'dwbm'
         }
       ],
     };
@@ -85,56 +87,34 @@ export default {
         }
       });
     },
-    /**
-     * @description: 返回加载图片路径
-     * @param {*} item
-     * @return {*}
-     */
-    // imgSrc(item) {
-    //   return require(`@/assets/workbench/overview_${item.color}.png`);
-    // },
-    /**
-     * @description: 跳转我的工作台列表页
-     * @param {*} data
-     * @return {*}
-     */
-    // toPath(data) {
-    //   const queryData = {
-    //     docType: 0,
-    //   };
-    //   this.$router.push({
-    //     path: "/workbench/mine",
-    //     query: queryData,
-    //   });
-    // },
-    // checkItem(status) {
-    //   this.$router.push({
-    //     path: "/workbench/mine",
-    //     query: {
-    //       status,
-    //     },
-    //   });
-    // },
   },
 };
 </script>
 
 <style lang="scss" scoped>
 .overview-container {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-top:20px;
-  padding:20px;
+  padding:0;
+  margin:0;
+  width: 1070px;
+  height:152px;
+  background: url(../../../../assets/imgs/logo1.png) no-repeat;
+  background-size:100% 100%;
+  position:relative;
+  // border:1px solid red;
 
   .view-item {
-    flex: 1;
-    // display: flex;
     padding: 10px;
     background: #fff;
     margin-right: 16px;
     border-radius: 4px;
     cursor: pointer;
+    z-index:2;
+    position: absolute;
+    right:20px;
+    width:310px;
+    height:105px;
+    top:50%;
+    transform: translate(0%,-50%);
 
     .item-img {
       height: 100%;
@@ -154,21 +134,19 @@ export default {
       font-weight: bold;
       font-size: 28px;
       line-height: 36px;
-      text-align: center;
+      text-align: left;
       color: #ffab3c;
     }
 
     .title {
       line-height: 28px;
       font-size: 14px;
-      text-align: center;
+      text-align: left;
       color: #333;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
     }
-
-    border-left: solid 8px #ffab3c;
 
     &:last-of-type {
       margin-right: 0;
@@ -176,6 +154,9 @@ export default {
 
     &.item-color0 {
       border-color: #ec2f2f;
+      right:300px;
+      background: url(../../../../assets/imgs/logo3.png) no-repeat;
+      background-size:100% 100%;
 
       .value {
         color: #ec2f2f;
@@ -183,7 +164,8 @@ export default {
     }
 
     &.item-color1 {
-      // border-color: #FF5B5F;
+      background: url(../../../../assets/imgs/logo4.png) no-repeat;
+      background-size:100% 100%;
       border-color: #104ecb;
 
       .value {
@@ -192,29 +174,15 @@ export default {
       }
     }
 
-    &.item-color2 {
-      // border-color: #61D7B4;
-      border-color: #18c394;
-
-      .value {
-        // color: #61D7B4;
-        color: #18c394;
-      }
-    }
-
-    &.item-color3 {
-      // border-color: #ADA1ED;
-      border-color: #e78d06;
-
-      .value {
-        // color: #ADA1ED;
-        color: #e78d06;
-      }
-    }
-
     &:hover {
       font-weight: bold;
     }
   }
+}
+.svg{
+  position:absolute;
+  right:40px;
+  width:54px;
+  height:54px;
 }
 </style>

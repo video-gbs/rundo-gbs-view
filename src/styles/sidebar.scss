@@ -11,10 +11,10 @@
     transition: width 0.28s;
     width: $sideBarWidth !important;
     background-color: $bg-color1;
-    height: calc(100% - 4rem);
+    height: calc(100% - 3.5rem);
     position: fixed;
     font-size: 0px;
-    top: 4rem;
+    top: 3.5rem;
     bottom: 0;
     left: 0;
     z-index: 1001;
@@ -54,7 +54,9 @@
     }
 
     .svg-icon {
-      margin-right: 16px;
+      margin-right: 10px;
+      position: relative;
+      top: 3px;
     }
 
     .sub-el-icon {
@@ -77,16 +79,26 @@
     }
 
     .is-active>.el-submenu__title {
-      color: $subMenuActiveText !important;
+      color: #1E56A0 !important;
     }
 
     & .nest-menu .el-submenu>.el-submenu__title,
     & .el-submenu .el-menu-item {
       min-width: $sideBarWidth !important;
-      background-color: $subMenuBg !important;
+      // background-color: $subMenuBg !important;
 
       &:hover {
         background-color: $subMenuHover !important;
+
+        .svg-icon {
+          margin-right: 10px;
+          position: relative;
+          top: 3px;
+          color:#1E56A0 !important;
+        }
+        span{
+          color:#1E56A0 !important;
+        }
       }
     }
   }
@@ -223,4 +235,32 @@
       border-radius: 20px;
     }
   }
+}
+
+
+.el-menu-item{
+  position: relative;
+}
+.el-menu-item:after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top:50%;
+  height: 2rem;
+  transform: translate(0%,-50%);
+}
+
+.el-menu-item:hover.el-menu-item:after {
+  border: 2px solid #1E56A0;
+}
+
+.is-active>.svg-icon {
+  margin-right: 10px;
+  position: relative;
+  top: 3px;
+  color:#1E56A0 !important;
+}
+
+.is-active{
+  background-color: $menuHover !important;
 }

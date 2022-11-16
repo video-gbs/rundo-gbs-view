@@ -1,32 +1,30 @@
 // 主题色
-$theme: var(--theme, #C86411);
+$theme: var(--theme, #D8711C);
 $theme-1: var(--theme-1, #D8711C);
-$theme-2: var(--theme-2, #FFF2E9);
-// $theme: var(--themeColor, #00B690);
-// $theme-2: var(--themeColorBg, rgba(0, 182, 144, 0.2));
+$theme-2: var(--theme-2, #333);
 
 // header
 $headerBg: var(--headerBg, #fff);
 $headerText: var(--headerText, #333);
 
 // sidebar
-$menuBg: var(--menuBg, rgba(1,1,1,1));
-$menuText: var(--menuText, #fff);
-$menuHover: var(--menuHover, #B15206);
-$menuActive: var(--menuActive, #B15206);
-$menuActiveText:#fff;
+$menuBg: var(--menuBg, #fff);
+$menuText: var(--menuText, #333333);
+$menuHover: var(--menuHover, #E9F4FF);
+$menuActive: var(--menuActive, #E9F4FF);
+$menuActiveText:#1E56A0;
 
-$subMenuBg: var(--subMenuBg, rgba(1,1,1,1));
-$subMenuHover: var(--subMenuHover, #B15206);
-$subMenuActiveText:#fff;
+$subMenuBg: var(--subMenuBg, #fff);
+$subMenuHover: var(--subMenuHover, #E9F4FF);
+$subMenuActiveText:#333333;
 
 $sideBarWidth: 13.75rem;
 
 // tags
 $tagBg: var(--tagBg, #fff);
 $tagText: var(--tagText, #333333);
-$tagActive: var(--tagActive, #C86411);
-$tagActiveText: var(--tagActiveText, #fff);
+$tagActive: var(--tagActive, #E9F4FF);
+$tagActiveText: var(--tagActiveText, #333333);
 
 // main
 $mainBg: var(--mainBg, #EEEEEE);

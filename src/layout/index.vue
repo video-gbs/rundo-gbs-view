@@ -5,7 +5,7 @@
     <sidebar class="sidebar-container" />
     <div class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
-        <!-- <tags-view /> -->
+        <tags-view />
       </div>
       <app-main />
     </div>
@@ -67,17 +67,17 @@ export default {
       top: 0;
     }
     .wrapper-header {
-      height: 4rem;
+      height: 3.5rem;
     }
     .sidebar-container {
-      top: 4rem;
-      height: calc(100% - 4rem);
+      top: 3.5rem;
+      height: calc(100% - 3.5rem);
       background-color:$bg-color1;
     }
     .main-container {
       height: 100%;
-      padding-top: 4rem;
-      overflow: hidden;
+      padding-top: 3.5rem;
+      overflow: auto;
       background-color: rgba(242, 242, 242, 1);
     }
   }

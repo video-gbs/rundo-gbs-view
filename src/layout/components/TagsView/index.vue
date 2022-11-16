@@ -5,6 +5,18 @@
       class="tags-view-wrapper"
       @scroll="handleScroll"
     >
+      <!-- <div class="tabs">
+        <el-tabs v-model="editableTabsValue" type="card" closable @tab-remove="removeTab">
+          <el-tab-pane
+            v-for="(item, index) in editableTabs"
+            :key="item.name"
+            :label="item.title"
+            :name="item.name"
+          >
+            {{item.content}}
+          </el-tab-pane>
+        </el-tabs>
+      </div> -->
       <router-link
         v-for="tag in visitedViews"
         ref="tag"
@@ -44,7 +56,6 @@
 <script>
 import ScrollPane from './ScrollPane'
 import path from 'path'
-
 export default {
   components: { ScrollPane },
   data() {
@@ -53,16 +64,24 @@ export default {
       top: 0,
       left: 0,
       selectedTag: {},
-      affixTags: []
+      affixTags: [],
+      visitedViews:[],
+      editableTabs: [{
+          title: '问政管理',
+          name: '1',
+          content: 'Tab 1 content'
+        }],
     }
   },
   computed: {
-    visitedViews() {
-      return this.$store.state.tagsView.visitedViews
-    },
-    routes() {
-      return this.$store.state.permission.routes
-    }
+    // visitedViews() {
+    //   console.log('this.$store.state', this.$store.state.tagsView)
+    //   return this.$store.state.tagsView.visitedViews
+    // },
+    // routes() {
+    //   console.log('this.$store.state', this.$store.state.permission)
+    //   return this.$store.state.permission.routes
+    // }
   },
   watch: {
     $route() {
@@ -78,9 +97,9 @@ export default {
     }
   },
   mounted() {
-    console.log('this.$store.state', this.$store.state)
-    this.initTags()
-    this.addTags()
+
+    // this.initTags()
+    // this.addTags()
   },
   methods: {
     isActive(route) {
@@ -222,103 +241,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// .tags-view-container {
-//   height: 34px;
-//   width: 100%;
-//   background: #fff;
-//   border-bottom: 1px solid #d8dce5;
-//   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 0 3px 0 rgba(0, 0, 0, 0.04);
-//   .tags-view-wrapper {
-//     .tags-view-item {
-//       display: inline-block;
-//       position: relative;
-//       cursor: pointer;
-//       // height: 26px;
-//       line-height: 24px;
-//       // border: 1px solid #d8dce5;
-//       color: #495060;
-//       // background: #fff;
-//       padding: 0 0 0 15px;
-//       font-size: 12px;
-//       margin-top: 10px;
-//       margin-right: -8px;
-//       border-top-right-radius: 3px;
-//       border-bottom: 24px solid rgb(228, 228, 228);
-//       border-left: 15px solid transparent;
-//       height: 0px;
-//       &:first-of-type {
-//         margin-left: 15px;
-//       }
-//       &:last-of-type {
-//         margin-right: 15px;
-//       }
-//       &.active {
+::v-deep .el-tabs--card > .el-tabs__header{
+  border:0 none;
+}
+.tags-view-container {
+  height: 3rem;
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #d8dce5;
+  box-shadow: 0px 1px 2px 1px rgba(0,0,0,0.16);
+  .tabs{
 
-//       border-bottom: 24px solid rgb(204,204,204);
-//         // background-color: #42b983;
-//         // color: #fff;
-//         // border-color: #42b983;
-//         // &::before {
-//         //   content: "";
-//         //   background: #fff;
-//         //   display: inline-block;
-//         //   width: 8px;
-//         //   height: 8px;
-//         //   border-radius: 50%;
-//         //   position: relative;
-//         //   margin-right: 2px;
-//         // }
-//       }
-//     }
-//   }
-//   .contextmenu {
-//     margin: 0;
-//     background: #fff;
-//     z-index: 3000;
-//     position: absolute;
-//     list-style-type: none;
-//     padding: 5px 0;
-//     border-radius: 4px;
-//     font-size: 12px;
-//     font-weight: 400;
-//     color: #333;
-//     box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
-//     li {
-//       margin: 0;
-//       padding: 7px 16px;
-//       cursor: pointer;
-//       &:hover {
-//         background: #eee;
-//       }
-//     }
-//   }
-// }
-</style>
-
-<style lang="scss">
-//reset element css of el-icon-close
-// .tags-view-wrapper {
-//   .tags-view-item {
-//     .el-icon-close {
-//       width: 16px;
-//       height: 16px;
-//       margin-left: 10px;
-//       margin-right: 5px;
-//       vertical-align: 2px;
-//       border-radius: 50%;
-//       text-align: center;
-//       transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-//       transform-origin: 100% 50%;
-//       &:before {
-//         transform: scale(0.6);
-//         display: inline-block;
-//         vertical-align: -3px;
-//       }
-//       &:hover {
-//         background-color: #b4bccc;
-//         color: #fff;
-//       }
-//     }
-//   }
-// }
+  }
+}
 </style>
