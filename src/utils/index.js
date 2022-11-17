@@ -115,3 +115,16 @@ export function param2Obj(url) {
   })
   return obj
 }
+
+
+/* Echarts图表字体、间距自适应 */
+export const fitChartSize = (size,defalteWidth = 1920) => {
+  let clientWidth = window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
+  // console.log('clientWidth', clientWidth);
+  if (!clientWidth) return size;
+  // let scale = (defalteWidth / clientWidth);
+  let scale = (clientWidth / defalteWidth);
+  // console.log('Number((size*scale).toFixed(3)', Number((size*scale).toFixed(3)));
+  return Number((size*scale).toFixed(3));
+}
+

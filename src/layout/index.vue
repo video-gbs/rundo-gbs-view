@@ -5,7 +5,7 @@
     <sidebar class="sidebar-container" />
     <div class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
-        <tags-view />
+        <!-- <tags-view /> -->
       </div>
       <app-main />
     </div>

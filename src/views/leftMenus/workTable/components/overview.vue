@@ -10,8 +10,8 @@
       <div class="item-img">
         <svg-icon :icon-class="item.imgSrcName" class="svg"/>
       </div>
-      <!-- <div class="value">{{ item.value }}</div>
-      <div class="title">{{ item.title }}</div> -->
+      <div class="value">{{ item.value }}</div>
+      <div class="title">{{ item.title }}</div>
     </div>
   </div>
 </template>
@@ -24,13 +24,13 @@ export default {
       pageData: [
         {
           title: "平台用户",
-          value: 0,
+          value: 123,
           color: "red",
           imgSrcName:'ptyh'
         },
         {
           title: "单位部门",
-          value: 0,
+          value: 2122,
           color: "blue",
           imgSrcName:'dwbm'
         }
@@ -94,7 +94,7 @@ export default {
 <style lang="scss" scoped>
 .overview-container {
   padding:0;
-  margin:0;
+  margin:-5px -8px 10px;
   width: 1070px;
   height:152px;
   background: url(../../../../assets/imgs/logo1.png) no-repeat;
@@ -140,12 +140,13 @@ export default {
 
     .title {
       line-height: 28px;
-      font-size: 14px;
+      font-size: 1rem;
       text-align: left;
       color: #333;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
+      font-weight: 400;
     }
 
     &:last-of-type {
@@ -155,22 +156,31 @@ export default {
     &.item-color0 {
       border-color: #ec2f2f;
       right:300px;
-      background: url(../../../../assets/imgs/logo3.png) no-repeat;
+      background: url(../../../../assets/imgs/logo4.png) no-repeat;
       background-size:100% 100%;
 
       .value {
-        color: #ec2f2f;
+        color: #1E56A0;
+        font-size: 2.75rem;
+        margin-top:0.5rem;
+        font-weight: bold;
+        text-shadow: 0px 3px 6px rgba(0,0,0,0.16);
+        font-family: DIN-Bold, DIN;
       }
     }
 
     &.item-color1 {
-      background: url(../../../../assets/imgs/logo4.png) no-repeat;
+      background: url(../../../../assets/imgs/logo3.png) no-repeat;
       background-size:100% 100%;
       border-color: #104ecb;
 
       .value {
-        // color: #FF5B5F;
-        color: #104ecb;
+        color: #008C96;
+        font-size: 2.75rem;
+        margin-top:0.5rem;
+        font-weight: bold;
+        text-shadow: 0px 3px 6px rgba(0,0,0,0.16);
+        font-family: DIN-Bold, DIN;
       }
     }
 
@@ -181,7 +191,7 @@ export default {
 }
 .svg{
   position:absolute;
-  right:40px;
+  right:58px;
   width:54px;
   height:54px;
 }

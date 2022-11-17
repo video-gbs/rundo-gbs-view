@@ -94,6 +94,10 @@ export default {
 
 <style lang="scss" scoped>
 .todo-container {
+  height:100%;
+  .box-card{
+    height:100%;
+  }
   .clearfix{
     height:80px;
     line-height:80px;
@@ -109,6 +113,7 @@ export default {
     display:flex;
     flex-wrap:wrap;
     justify-content: flex-start;
+    margin-left: -4rem;
   }
   .todo-ul-scoll>li{
     width: 240px;

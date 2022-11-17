@@ -9,9 +9,9 @@
       </div>
     </div>
     <div class="container-right">
-        <Test />
-        <NoticeList />
-        <Test />
+        <Test style="height:152px;"/>
+        <NoticeList style="margin:5px 0 20px 0;"/>
+        <Statistical />
     </div>
   </div>
 </template>
@@ -20,6 +20,7 @@
 import Overview from "./components/overview.vue";
 import TodoList from "./components/todoList.vue";
 import Test from "./components/test.vue";
+import Statistical from "./components/statistical.vue";
 
 import NoticeList from './components/noticeList.vue'
 // import PCard from '@/components/pCard.vue'
@@ -29,7 +30,8 @@ export default {
     Overview,
     TodoList,
     Test,
-    NoticeList
+    NoticeList,
+    Statistical
     // PCard
   }
 };
@@ -46,6 +48,9 @@ export default {
   .container-left {
     width: 1070px;
     margin-right: 20px;
+  }
+  .container-left-top-bottom{
+    height:calc(100% - 152px);
   }
   .container-right {
     width: calc(100% - 1070px);
