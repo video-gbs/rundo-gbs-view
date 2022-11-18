@@ -179,6 +179,12 @@ export const constantRoutes = [
       },
     ]
   },
+  // {
+  //   path: '/politicalDetail',
+  //   // component: Layout,
+  //   // meta: { title: '问政详情' },
+  //   component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalList/politicalDetail/index')
+  // },
   // ]
   // },
 

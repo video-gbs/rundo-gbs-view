@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="container-right">
-        <Test style="height:152px;"/>
+        <Weather/>
         <NoticeList style="margin:5px 0 20px 0;"/>
         <Statistical />
     </div>
@@ -19,7 +19,7 @@
 <script>
 import Overview from "./components/overview.vue";
 import TodoList from "./components/todoList.vue";
-import Test from "./components/test.vue";
+import Weather from "./components/Weather.vue";
 import Statistical from "./components/statistical.vue";
 
 import NoticeList from './components/noticeList.vue'
@@ -29,7 +29,7 @@ export default {
   components: {
     Overview,
     TodoList,
-    Test,
+    Weather,
     NoticeList,
     Statistical
     // PCard

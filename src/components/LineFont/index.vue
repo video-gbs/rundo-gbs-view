@@ -2,7 +2,7 @@
   <div class="line-title-box" :style="{height:height +'px',lineHeight:lineHeight + 'px'}">
     <div class="title-left">
       <span class="line-blue" />
-      <span class="line-text">{{ lineTitle.title }}</span>
+      <span class="line-text" :style="testStyle">{{ lineTitle.title }}</span>
     </div>
     <div class="title-right">
       <span v-if="!lineTitle.notShowSmallTitle" class="font-gray">{{ lineTitle.smallTitle ? lineTitle.smallTitle : '' }}</span>
@@ -14,6 +14,12 @@ export default {
   name: 'LineTitle',
   props: {
     lineTitle: {
+      type: Object,
+      default: function() {
+        return {}
+      }
+    },
+    testStyle: {
       type: Object,
       default: function() {
         return {}

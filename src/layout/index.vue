@@ -73,6 +73,7 @@ export default {
       top: 3.5rem;
       height: calc(100% - 3.5rem);
       background-color:$bg-color1;
+      position:relative;
     }
     .main-container {
       height: 100%;

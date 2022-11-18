@@ -1,6 +1,6 @@
 <template>
   <!-- <div class="noticeList-container"> -->
-  <el-card class="box-card">
+  <el-card class="box-card tzgg-scroll">
     <div slot="header" class="clearfix">
       <svg-icon icon-class="tzgg" class="tzgg_svg" />
       <span>通知公告</span>
@@ -55,19 +55,19 @@ export default {
       },
       noticeList: [
         {
-          title: "1111",
+          title: "广西区数字乡村建设方案实例",
           date: "1111",
-          type: 2222
+          type: "2022-11-15 09:13"
         },
         {
-          title: "1111",
+          title: "广西区数字乡村建设方案实例",
           date: "1111",
-          type: 2222
+          type: "2022-11-15 09:13"
         },
         {
-          title: "1111",
+          title: "广西区数字乡村建设方案实例",
           date: "1111",
-          type: 2222
+          type: "2022-11-15 09:13"
         }
       ],
       newsPopup: {
@@ -122,6 +122,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.tzgg-scroll>::v-deep .el-card__body{
+  padding:0 !important;
+}
 .notice-box {
   height: 100%;
   width: 100%;
@@ -144,6 +147,7 @@ export default {
   li {
     // line-height: 38px;
     padding: 10px 0;
+    border-bottom: 1px solid #EAEAEA;
     cursor: pointer;
     &:hover {
       font-weight: bold;
@@ -156,16 +160,34 @@ export default {
         text-overflow: ellipsis;
         width: 80%;
         margin-right: 10px;
+        font-size: 16px;
+        font-family: Microsoft YaHei-Bold, Microsoft YaHei;
+        font-weight: bold;
+        color: #333333;
       }
       .date {
+        display: inline-block;
         font-size: 14px;
         color: #999;
+        width: 66px;
+        height: 28px;
+        text-align: center;
+        line-height: 28px;
+        background: #fcf4ea;
+        border-radius: 4px 4px 4px 4px;
+        opacity: 1;
+        border: 1px solid #ff9f00;
       }
     }
     .type {
-      font-size: 14px;
-      color: #999;
       margin-top: 8px;
+      font-size: 14px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #8b8b8b;
+    }
+    &:hover{
+      background: rgba(30,86,160,0.06);
     }
   }
 }

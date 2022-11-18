@@ -1,5 +1,5 @@
 <template>
-  <div class="projectManagement">
+  <div class="projectManagement" v-if="!this.showDetails">
     <div class="seach">
       <Seach
         :FormList="FormList"
@@ -53,6 +53,7 @@ export default {
   name: "projectManagement",
   data() {
     return {
+      showDetails: false,
       headerStyle: {
         background: "#EAEAEA",
         fontsize: "14px",
@@ -64,17 +65,17 @@ export default {
         {
           poro: "projectName",
           type: "input",
-          label: "项目名称搜索："
+          label: "标题："
         },
         {
           poro: "projectSubName",
           type: "input",
-          label: "子项目名称："
+          label: "分类："
         },
         {
           poro: "area",
           type: "addressCascader",
-          label: "所属地市：",
+          label: "领域：",
           propsConfig: {
             checkStrictly: true,
             multiple: true
@@ -84,7 +85,7 @@ export default {
         {
           poro: "renovateType",
           type: "addressCascader",
-          label: "修复类型：",
+          label: "留言对象：",
           propsConfig: {
             checkStrictly: true,
             multiple: true
@@ -95,7 +96,7 @@ export default {
         {
           poro: "projectState",
           type: "addressCascader",
-          label: "项目状态是：",
+          label: "显示状态：",
           propsConfig: {
             checkStrictly: true,
             multiple: true
@@ -104,7 +105,7 @@ export default {
         },
         {
           poro: "declareYear",
-          label: "申报年份：",
+          label: "发布账号：",
           type: "addressCascader",
           propsConfig: {
             checkStrictly: true,
@@ -115,7 +116,7 @@ export default {
         {
           poro: "moneySource",
           type: "addressCascader",
-          label: "资金来源：",
+          label: "电话：",
           propsConfig: {
             checkStrictly: true,
             multiple: true
@@ -144,86 +145,97 @@ export default {
       leftTitle: "",
       tableItems: [
         {
-          label: "项目名称",
+          label: "编号",
           name: "projectName",
-          width: "400",
+          width: "100",
           isShow: true,
           isBold: false
         },
         {
-          label: "子项目名称",
+          label: "标题",
           name: "projectSubName",
           width: "200",
           isShow: true
         },
         {
-          label: "所属地市",
+          label: "分类",
           name: "area",
           isShow: true
         },
-        // {
-        //   label: "责任单位名称",
-        //   name: "accountabilityUnit",
-        //   isShow: true
-        // },
         {
-          label: "申报年份",
+          label: "留言对象",
           name: "declareYear",
           isShow: true
         },
         {
-          label: "资金来源",
+          label: "发布账号",
           name: "moneySourceName",
           isShow: true
         },
-        // {
-        //   label: "绩效目标",
-        //   name: "perfTarget",
-        //   isShow: true
-        // },
         {
-          label: "实施年限",
+          label: "电话",
           name: "carryTerm",
           isShow: true
         },
-        // {
-        //   label: "项目位置",
-        //   name: "projectPlace",
-        //   isShow: true
-        // },
-        // {
-        //   label: "经纬度",
-        //   name: "coordinate",
-        //   isShow: true
-        // },
         {
-          label: "修复类型",
+          label: "提交时间",
           name: "renovateTypeName",
           isShow: true
         },
-        // {
-        //   label: "修复内容",
-        //   name: "restoreContent",
-        //   isShow: true
-        // },
-        // {
-        //   label: "工作进度安排",
-        //   name: "workPlan",
-        //   isShow: true
-        // },
         {
-          label: "项目状态",
+          label: "状态",
           name: "projectStateName",
           isShow: true
+        },
+        {
+          label: "受理单位",
+          name: "contacts",
+          isShow: true
+        },
+        {
+          label: "是否可见",
+          name: "restoreContent",
+          isShow: true,
+          content:'test'
+        },
+        {
+          label: "评论区",
+          name: "workPlan",
+          isShow: true,
+          content:'test1'
         }
-        // {
-        //   label: "联系人",
-        //   name: "contacts",
-        //   isShow: true
-        // }
       ],
       isFullscreen: false,
-      tableData: [],
+      tableData: [
+        {
+          label: "编号",
+          projectName: "测试",
+          label: "标题",
+          projectSubName: "测试",
+
+          label: "分类",
+          area: "测试",
+          label: "留言对象",
+          declareYear: "测试",
+          label: "发布账号",
+          moneySourceName: "测试",
+          label: "电话",
+          carryTerm: "测试",
+          label: "提交时间",
+          renovateTypeName: "测试",
+
+          label: "状态",
+          projectStateName: "测试",
+
+          label: "受理单位",
+          contacts: "测试",
+          label: "是否可见",
+          restoreContent: "测试",
+
+          label: "评论区",
+          workPlan: "测试"
+        }
+      ],
       // 分页器内容
       pagesData: {
         pageNum: 1,

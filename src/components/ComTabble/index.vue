@@ -40,7 +40,6 @@
       <!-- 内容项 -->
       <el-table-column
         v-for="(item, index) in tableItems"
-        v-if="item.isShow"
         :prop="item.name"
         :label="item.label"
         :key="item.name + index"
@@ -52,6 +51,22 @@
         :class-name="item.isBold ? 'project-name-bold' : ''"
         show-overflow-tooltip
       >
+        <template slot-scope="scope">
+          <el-switch
+            v-if="item.content === 'test'"
+            v-model="value"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+          >
+          </el-switch>
+          <el-switch
+            v-else-if="item.content === 'test1'"
+            v-model="value1"
+            disabled
+          >
+          </el-switch>
+          <span v-else>{{ scope.row[item.name] }}</span>
+        </template>
       </el-table-column>
 
       <el-table-column
@@ -188,7 +203,9 @@ export default {
     return {
       // 显示的头部
       checkedHeaderData: [],
-      isClicked: false
+      isClicked: false,
+      value: true,
+      value1: false
     };
   },
   watch: {

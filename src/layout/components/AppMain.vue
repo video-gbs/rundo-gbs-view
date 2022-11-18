@@ -1,8 +1,6 @@
 <template>
   <section class="app-main">
-    <el-scrollbar
-      style="height: 100%;"
-    >
+    <el-scrollbar style="height: 100%;">
       <transition name="fade-transform1" mode="out-in">
         <keep-alive>
           <router-view v-if="$route.meta.keepAlive" :key="key" />
@@ -12,18 +10,19 @@
         <router-view v-if="!$route.meta.keepAlive" :key="key" />
       </transition>
     </el-scrollbar>
+    <h2 class="company-title">©2022 润建股份有限公司 版权所有</h2>
   </section>
 </template>
 
 <script>
 export default {
-  name: 'AppMain',
+  name: "AppMain",
   computed: {
     key() {
-      return this.$route.path
+      return this.$route.path;
     }
   }
-}
+};
 </script>
 
 <style scoped>
@@ -34,7 +33,14 @@ export default {
   position: relative;
   overflow: auto;
 }
-.fixed-header+.app-main {
+.company-title {
+  text-align:center;
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #8b8b8b;
+}
+.fixed-header + .app-main {
   padding-top: 50px;
 }
 </style>
