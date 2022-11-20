@@ -1,0 +1,297 @@
+
+$--font-color:var(--font-color, #1E56A0);//文字颜色 蓝
+$--font-color-1:var(--font-color-1, #A40A3C);//文字颜色 玫红
+$--font-color-2:var(--font-color-2, #333); //文字颜色 深黑
+$--font-color-3:var(--font-color-3, #B8B8B8); //浅灰
+$--font-color-4:var(--font-color-4, #163172); //文字颜色 版块标题蓝
+$--font-color-5:var(--font-color-5, #E4E7EF); //文字颜色 版块标题浅灰
+$--bg-color:var(--bg-color, #1E56A0); //背景色 -蓝
+$--bg-color-1:var(--font-color-1, #A40A3C);//背景色 - 玫红
+
+
+$--border-color:var(--border-color, #ECECEC);//边框色 
+
+
+div{
+  box-sizing: border-box;
+}
+
+
+.bg-w{
+	 background-color: #fff;
+}
+.bg-g{
+	background-color: #ECECECFF;
+}
+
+.success-color {
+  color: #1E56A0;
+}
+
+.fail-color {
+  color: #A40A3C;
+}
+
+.title-c-1 {
+  //主标题
+  color: #333;
+}
+
+.title-c-2 {
+  //次标题
+  color: #666;
+}
+
+.title-c-3 {
+  //三级标题
+  color: #999;
+}
+
+.title-c-4{
+	//蓝色
+}
+
+
+
+//hover 悬停的文字颜色
+.hc-n:hover {
+  //灰色
+  color: #B8B8B8
+}
+.hc-s:hover {
+  //蓝色
+  color: #1E56A0
+}
+
+.hc-e:hover {
+  //橙色
+  color: orange;
+
+}
+
+.hc-w:hover {
+  //红色
+  color: #DE2525
+}
+
+//hover 悬停的边框颜色
+
+.hbc-s:hover {
+  //蓝色
+  border: 1px solid $--font-color-1;
+
+}
+
+.hbc-e:hover {
+  //橙色
+  border: 1px solid orange;
+
+}
+
+.hbc-w:hover {
+  //红色
+  border: 1px solid #DE2525;
+
+}
+
+
+.bgImg{
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+//弹性布局
+//双轴
+.f{display: flex; display:-webkit-flex;}
+.fd-r{flex-direction: row;}
+.fd-rr{flex-direction: row-reverse;}
+.fd-c{flex-direction: column;}
+.fd-cr{flex-direction: column-reverse;}
+//轴换行
+.fw-w{flex-wrap:wrap;}
+.fw-wr{flex-wrap:wrap-reverse;}
+//主轴对齐方式
+.jc-s{justify-content:flex-start}
+.jc-e{justify-content:flex-end}
+.jc-c{justify-content:center}
+.jc-sa{justify-content:space-around}
+.jc-sb{justify-content:space-between}
+//交叉轴对齐方式
+.ai-s{align-items: flex-start;}
+.ai-e{align-items: flex-end;}
+.ai-c{align-items:center;}
+//多主轴对齐方式
+.ac-s{align-content: flex-start;}
+.ac-e{align-content: flex-end;}
+.ac-c{align-content: center;}
+.ac-sa{align-content: space-around;}
+.ac-sb{align-content: space-between;}
+//子项目尺寸自适应
+.f1{flex:1}
+//网格布局
+.g{display:grid; display:-moz-grid;} 
+
+//圆角
+.rh{border-radius: 50%;}
+
+//光标
+.cursor-p{cursor: pointer;}
+.cursor-nd{cursor: no-drop}
+
+@for $v from 5 through 30{
+	.gg#{$v}{
+		grid-gap:#{$v}px;
+	}
+}
+
+@mixin gtc($v){
+	grid-template-columns: $v;
+}
+@mixin gtr($v){
+	grid-template-rows: $v;
+}
+
+// $range:(5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100);
+
+ //间隔
+$marginandpadding:(m:margin,p:padding);
+$direction:(t:top,r:right,b:bottom,l:left);
+
+@for $r from 0 to 100{
+	//按数字范围循环 间隔
+	@each $key,$map in $marginandpadding{
+		//遍历$marginandpadding  m5{ maring:5px}  p5{padding:5px}
+		 .#{$key}#{$r}{
+			 #{$map}:#{$r}px
+		 }
+		//mh= margin在水平间隔  mv=margin在垂直间隔  padding同理
+		 .#{$key}h#{$r}{
+			 #{$map}-left:#{$r}px;
+			 #{$map}-right:#{$r}px;
+		 }
+		 .#{$key}v#{$r}{
+		 			 #{$map}-top:#{$r}px;
+		 			 #{$map}-bottom:#{$r}px;
+		 }
+
+	  @each $dkey,$d in $direction{
+		  //遍历$direction    mt5{ maring-top:5px}  pt5{padding-top:5px}
+	  	 .#{$key}#{$dkey}#{$r}{
+	  		 #{$map}-#{$d}:#{$r}px
+	  	 }
+	  }   
+
+	}
+	
+ 	//按数字范围循环 圆角
+	.r#{$r}{
+		border-radius: #{$r}px;
+	}
+}
+
+@for $var from 1 to 50 {
+	//字体大小
+	 .fs#{$var}{
+		font-size: #{$var}px ;
+	 }
+	 //行间距
+	 .lh#{$var}{
+		line-height: #{$var}px ;
+	 }
+	 //首行缩进
+	 .ti#{$var}{
+		text-indent: #{$var}px ;
+	 }
+}
+
+
+$fontWeight: (
+  100,
+  200,
+  300,
+  400,
+  500,
+  600,
+  700,
+  800,
+  900,
+  bold,
+  bolder,
+  lighter
+);
+
+//字体粗细
+@each $var in $fontWeight {
+  .fw#{$var} {
+    font-weight: $var;
+  }
+}
+
+// //背景图片
+@mixin bgImg($w,$h,$url){
+	width: $w;
+	height: $h;
+	background-image: url($url);
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ellipsis2 {
+display: -webkit-box;
+-webkit-box-orient: vertical;
+-webkit-line-clamp: 2;
+overflow: hidden;
+}
+
+.ellipsis3 {
+display: -webkit-box;
+-webkit-box-orient: vertical;
+-webkit-line-clamp: 3;
+overflow: hidden;
+}
+
+.ellipsis4 {
+display: -webkit-box;
+-webkit-box-orient: vertical;
+-webkit-line-clamp: 4;
+overflow: hidden;
+}
+
+
+.row-box{
+	width: 100%;
+	background-color: #fff;
+	padding: 30px 0px;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	>div{
+        width: 1280px;
+	}
+}
+.row-box-grey{
+	background-color: #f9f9f9;
+}
+
+
+
+
+//自定义样式 
+//面板头部样式
+.panel-header-box{
+	width: 100%;
+	border-bottom: 1px solid #ECECEC;
+	padding: 15px;
+	.title-css{
+		 border-left: 4px solid $--bg-color;
+		 text-indent:10px;
+	}
+}
+
