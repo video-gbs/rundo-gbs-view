@@ -44,7 +44,7 @@ export default {
   },
   data() {
     return {
-      showDetails: false,
+      showDetails: true,
       activeName: "全部",
       tabpaneList: [
         {
