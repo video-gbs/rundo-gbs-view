@@ -55,12 +55,12 @@ export default {
     return {
       title: '新增公告',
       params: {
-        title: '',
-        file: null,
-        sort: 0,
-        link: 0,
-        linkUrl: '',
-        content: ''
+        'content': '展示内容',
+        'isShow': 0,
+        'orderValue': 0,
+        'pageUrl': 'http://www.baidu.com',
+        'related': 0,
+        'title': 'xxxxxx'
       }
     }
   },

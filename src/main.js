@@ -16,12 +16,11 @@ import '@/icons' // icon
 import '@/permission' // permission control
 
 import '@/plugin'
-import * as echarts from "echarts"
-Vue.prototype.$echarts = echarts;
+import * as echarts from 'echarts'
+Vue.prototype.$echarts = echarts
 
 import API from '@/api'
 Vue.prototype.$api = API
-
 
 import * as moment from 'moment'
 

@@ -10,16 +10,16 @@
     </div>
     <div class="p30">
       <el-form :model="params" label-width="100px" label-position="left">
-        <el-form-item label="展示标题">
+        <el-form-item label="展示标题" prop="title">
           <el-input v-model="params.title" clearable size="mini" placeholder="请输入标题" />
         </el-form-item>
-        <el-form-item label="轮播图图片">
+        <el-form-item label="轮播图图片" prop="fileName">
           <div>
             <el-upload
               size="mini"
               drag
-              action="https://jsonplaceholder.typicode.com/posts/"
-              multiple
+              :http-request="uploadFn"
+              @before-upload="beforeUpload"
             >
               <i class="el-icon-upload" />
               <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -28,13 +28,14 @@
           </div>
         </el-form-item>
         <el-form-item label="显示顺序">
-          <el-input-number v-model="params.sort" size="mini" :min="1" :max="10000" label="描述文字" @change="handleChange" />
+          <el-input-number v-model="params.orderValue" size="mini" :min="0" :max="10000" label="描述文字" @change="handleChange" />
         </el-form-item>
         <el-form-item label="关联内容">
           <el-row>
-            <el-col :span="24"> <el-radio v-model="params.link" size="mini" :label="0">内容展示</el-radio>
-              <el-radio v-model="params.link" size="mini" :label="1">关联外部链接</el-radio>
-              <el-input v-if="params.link" v-model="params.linkUrl" size="mini" placeholder="请输入外链地址" />
+            <el-col :span="24">
+              <el-radio v-model="params.related" size="mini" :label="0">内容展示</el-radio>
+              <el-radio v-model="params.related" size="mini" :label="1">关联外部链接</el-radio>
+              <el-input v-if="params.related" v-model="params.pageUrl" size="mini" placeholder="请输入外链地址" />
 
             </el-col>
 
@@ -45,27 +46,54 @@
           <PEditor @change="contentChange" />
         </el-form-item>
       </el-form>
+      <div>
+        <el-button size="mini" type="primary" @click="submitFn">
+          提交
+        </el-button>
+      </div>
     </div>
   </div>
 </template>
 <script>
+import { uploadFiles } from '@/api/method/files'
+import { addRoundChart, editRoundChart } from '@/api/method/roundChart'
 export default {
   name: 'RoundChartManage',
   data() {
     return {
       title: '新增轮播图',
       params: {
-        title: '',
-        file: null,
-        sort: 0,
-        link: 0,
-        linkUrl: '',
-        content: ''
+        'content': '', // 展示内容
+        'fileName': '', // fileName
+        'isShow': 0, // 是否显示，0显示，1不显示
+        'orderValue': 0, // 显示顺序
+        'pageUrl': '', // 外部链接url
+        'related': 0, // 关联选项: 0:内容展示，关联外部链接
+        'title': ''// 展示标题,示例值(xxxxxx)
+      },
+      aciton: 'add', // 判断是新增还是编辑
+      uploadData: {
+        // file: null,
+        fileBatchId: ''
+      },
+      rules: {
+        content: [
+          { required: true, message: '请输入提交的内容', trigger: 'blur' }
+        ], title: [
+          { required: true, message: '请输入标题', trigger: 'blur' },
+          { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+        ],
+        pageUrl: [
+          { required: true, message: '请输入连接地址', trigger: 'blur' },
+          { min: 10, max: 200, message: '长度在 10 到 200 个字符', trigger: 'blur' }
+        ]
       }
     }
   },
   mounted() {
+    console.log()
     if (this.$route.params.id !== 'add') {
+      this.aciton = 'edit'
       this.title = '编辑轮播图'
       this.getChartById()
     }
@@ -78,6 +106,16 @@ export default {
     },
     getChartById() {
       // 获取单个轮播图数据
+    },
+    beforeUpload(file) {
+      console.log('file', file)
+    },
+    uploadFn(file) {
+      console.log('zidingyi', file)
+      uploadFiles({ file: file.file })
+    },
+    submitFn() {
+      const fn = this.aciton === 'add' ? addRoundChart(this.params) : editRoundChart({ id: 0, parapms: this.params })
     }
   }
 }

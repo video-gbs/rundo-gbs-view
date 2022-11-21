@@ -69,7 +69,6 @@ export default {
       },
       tableData: [
 
-        { id: 1, label: 'afsdf', sort: 1, state: 1, createTime: '2022-11-11 15:25:14' }
       ]
     }
   },

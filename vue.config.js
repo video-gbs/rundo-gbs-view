@@ -154,7 +154,7 @@ module.exports = {
     loaderOptions: {
       // 全局引入src/styles/variables.scss文件下的变量
       scss: {
-        prependData: [`@import "~@/styles/variables.scss";`, `@import "~@/styles/dom.scss";`]
+        prependData: `@import "~@/styles/variables.scss";@import "~@/styles/dom.scss";`
       }
     }
   }
