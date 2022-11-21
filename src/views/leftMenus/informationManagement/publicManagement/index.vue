@@ -10,26 +10,29 @@
       >
         <el-table-column>
           <template slot="header">
-
             <div class="f ai-c jc-sb">
               <div>数据列表</div>
               <el-button size="mini" type="primary" @click="goPage('/publicManagement/add')">新增</el-button>
             </div>
           </template>
           <el-table-column
-            prop="label"
+            prop="title"
             label="标题"
           />
           <el-table-column
-            prop="sort"
+            prop="orderValue"
             label="显示顺序"
             width="80"
           />
           <el-table-column
-            prop="state"
+            prop="isShow"
             label="显示状态"
             width="80"
-          />
+          >
+            <template slot-scope="scope">
+              {{ dict.isShow[scope.row.isShow] }}
+            </template>
+          </el-table-column>
           <el-table-column
             prop="createTime"
             label="创建时间"
@@ -49,36 +52,57 @@
         </el-table-column>
 
       </el-table>
-      <pagination :pages-data="params" @size-change="sizeChange" @current-change="currentChange" />
+      <el-pagination
+        class="pagination-div"
+        background
+        border
+        layout="total, sizes, prev, pager, next, jumper"
+        :current-page.sync="params.current"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="params.size"
+        :total="params.total"
+        @size-change="handleSizeChange"
+        @current-change="paginationCurrentChange"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import pagination from '@/components/Pagination/index.vue'
+import _dict from '@/dict/index'
+import { getAfficheList } from '@/api/method/affiche'
 export default {
   name: '',
-  components: { pagination },
+
   data() {
     return {
       params: {
-        pageNum: 1,
-        pageSize: 10,
-        total: 0,
-        proCount: 0
+        'current': 1,
+        'size': 10,
+        'total': 0
       },
+      dict: _dict,
       tableData: [
-
-        { id: 1, label: 'afsdf', sort: 1, state: 1, createTime: '2022-11-11 15:25:14' }
       ]
     }
   },
+  mounted() {
+    this.getListFn()
+  },
   methods: {
-    sizeChange(v) {
+    getListFn() {
+      getAfficheList(this.params).then(res => {
+        if (res.code === 10000) {
+          this.tableData = res.data.records
+          this.params.total = res.data.total
+        }
+      })
+    },
+    handleSizeChange(v) {
       console.log('v')
       // 执行搜索
     },
-    currentChange(v) {
+    paginationCurrentChange(v) {
       console.log('v2')
       // 执行搜索
     },
