@@ -16,11 +16,17 @@
 </template>
 
 <script>
-import DetailList from "../components/DetailList";
+import BasicInformation from "../components/DetailList"
+import PoliticalReply from "../components/PoliticalReply"
+import ReviewResults from "../components/ReviewResults"
+import PoliticalRecord from "../components/PoliticalRecord"
 
 export default {
   components: {
-    DetailList
+    BasicInformation,
+    PoliticalReply,
+    ReviewResults,
+    PoliticalRecord
   },
   data() {
     return {
@@ -28,22 +34,22 @@ export default {
       tabpaneList: [
         {
           label: "基本信息",
-          content: DetailList,
+          content: BasicInformation,
           isShow: true
         },
         {
           label: "问政回复",
-          content: '',
+          content: PoliticalReply,
           isShow: false
         },
         {
           label: "评价结果",
-          content: '',
+          content: ReviewResults,
           isShow: false
         },
         {
           label: "问政记录",
-          content: '',
+          content: PoliticalRecord,
           isShow: false
         }
       ]

@@ -103,7 +103,7 @@ export const constantRoutes = [
         name: '邀请回复审核',
         component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalReply/index'),
         meta: { title: '邀请回复审核', icon: 'dashboard' }
-      },
+      }
     ]
   },
   {
@@ -121,10 +121,24 @@ export const constantRoutes = [
         meta: { title: '轮播图管理', icon: 'dashboard' }
       },
       {
+        path: '/roundChart/:id',
+        name: '轮播图管理',
+        component: () => import('@/views/leftMenus/informationManagement/roundChart/addOrEdit.vue'),
+        hidden: true,
+        meta: { title: '轮播图管理', icon: 'dashboard' }
+      },
+      {
         path: '/publicManagement',
-        name: '公共管理',
+        name: '公告管理',
         component: () => import('@/views/leftMenus/informationManagement/publicManagement/index'),
-        meta: { title: '公共管理', icon: 'dashboard' }
+        meta: { title: '公告管理', icon: 'dashboard' }
+      },
+      {
+        path: '/publicManagement/:id',
+        name: '公告管理',
+        component: () => import('@/views/leftMenus/informationManagement/publicManagement/addOrEdit'),
+        hidden: true,
+        meta: { title: '公告管理', icon: 'dashboard' }
       },
       {
         path: '/advertisementPicture',
@@ -132,6 +146,13 @@ export const constantRoutes = [
         component: () => import('@/views/leftMenus/informationManagement/advertisementPicture/index'),
         meta: { title: '广告图管理', icon: 'dashboard' }
       },
+      {
+        path: '/advertisementPicture/:id',
+        name: '广告图管理',
+        component: () => import('@/views/leftMenus/informationManagement/advertisementPicture/addOrEdit'),
+        hidden: true,
+        meta: { title: '广告图管理', icon: 'dashboard' }
+      }
     ]
   },
   {
@@ -148,7 +169,7 @@ export const constantRoutes = [
         name: '用户管理',
         component: () => import('@/views/leftMenus/userManagement/index'),
         meta: { title: '用户管理', icon: 'dashboard' }
-      },
+      }
     ]
   },
   {
@@ -176,7 +197,7 @@ export const constantRoutes = [
         name: '单位管理',
         component: () => import('@/views/leftMenus/systemManagement/unitManagement/index'),
         meta: { title: '单位管理', icon: 'dashboard' }
-      },
+      }
     ]
   },
   // {
@@ -187,7 +208,6 @@ export const constantRoutes = [
   // },
   // ]
   // },
-
 
   {
     path: '/404',

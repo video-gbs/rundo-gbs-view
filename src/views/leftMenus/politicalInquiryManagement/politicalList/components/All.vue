@@ -65,17 +65,20 @@ export default {
         {
           poro: "projectName",
           type: "input",
-          label: "标题："
+          label: "标题：",
+          size: "small"
         },
         {
           poro: "projectSubName",
           type: "input",
-          label: "分类："
+          label: "分类：",
+          size: "small"
         },
         {
           poro: "area",
           type: "addressCascader",
           label: "领域：",
+          size: "small",
           propsConfig: {
             checkStrictly: true,
             multiple: true
@@ -86,6 +89,7 @@ export default {
           poro: "renovateType",
           type: "addressCascader",
           label: "留言对象：",
+          size: "small",
           propsConfig: {
             checkStrictly: true,
             multiple: true
@@ -97,6 +101,7 @@ export default {
           poro: "projectState",
           type: "addressCascader",
           label: "显示状态：",
+          size: "small",
           propsConfig: {
             checkStrictly: true,
             multiple: true
@@ -106,6 +111,7 @@ export default {
         {
           poro: "declareYear",
           label: "发布账号：",
+          size: "small",
           type: "addressCascader",
           propsConfig: {
             checkStrictly: true,
@@ -117,6 +123,7 @@ export default {
           poro: "moneySource",
           type: "addressCascader",
           label: "电话：",
+          size: "small",
           propsConfig: {
             checkStrictly: true,
             multiple: true
@@ -196,13 +203,13 @@ export default {
           label: "是否可见",
           name: "restoreContent",
           isShow: true,
-          content:'test'
+          content: "test"
         },
         {
           label: "评论区",
           name: "workPlan",
           isShow: true,
-          content:'test1'
+          content: "test1"
         }
       ],
       isFullscreen: false,

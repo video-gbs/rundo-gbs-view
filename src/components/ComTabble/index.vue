@@ -65,7 +65,7 @@
             disabled
           >
           </el-switch>
-          <span v-else>{{ scope.row[item.name] }}</span>
+          <span v-else class="column-span">{{ scope.row[item.name] }}</span>
         </template>
       </el-table-column>
 
@@ -315,5 +315,11 @@ export default {
 }
 .selection-item {
   text-align: center !important;
+}
+.column-span {
+  font-size: 14px;
+  font-family: Microsoft YaHei-Bold, Microsoft YaHei;
+  font-weight: bold;
+  color: #333333;
 }
 </style>
