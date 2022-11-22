@@ -17,6 +17,7 @@ const dict = {
   isShow: {
     0: '显示',
     1: '不显示'
-  }
+  },
+  photoUrlApi:'/politics/file/showImg/'
 }
 export default dict

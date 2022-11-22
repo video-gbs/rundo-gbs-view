@@ -22,9 +22,18 @@ Vue.prototype.$echarts = echarts
 import API from '@/api'
 Vue.prototype.$api = API
 
+
+
+
 import * as moment from 'moment'
 
 Vue.prototype.$moment = moment
+
+//引入字典
+import _dict from '@/dict/index'
+
+Vue.prototype.$dict=_dict
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
