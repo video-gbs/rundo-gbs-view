@@ -16,10 +16,10 @@
 </template>
 
 <script>
-import BasicInformation from "../components/DetailList"
-import PoliticalReply from "../components/PoliticalReply"
-import ReviewResults from "../components/ReviewResults"
-import PoliticalRecord from "../components/PoliticalRecord"
+import BasicInformation from "../components/DetailList";
+import PoliticalReply from "../components/PoliticalReply";
+import ReviewResults from "../components/ReviewResults";
+import PoliticalRecord from "../components/PoliticalRecord";
 
 export default {
   components: {
@@ -79,8 +79,39 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.detail_container{
-  background: #ECECEC;
-  margin:20px;
+::v-deep .el-tabs__item.is-active {
+  border: 0 none;
+}
+::v-deep .el-tabs--border-card > .el-tabs__content {
+  padding: 20px 24px;
+}
+::v-deep .el-tabs--border-card {
+  background: #f9f9f9;
+  border-top: 0 none;
+}
+::v-deep .el-tabs--border-card > .el-tabs__header {
+  border: 0 none;
+  background: #ececec;
+}
+::v-deep .el-tabs--border-card > .el-tabs__header .el-tabs__item {
+  border: 0 none;
+  height: 36px;
+  margin: 0 4px 4px 0;
+  border-radius: 2px;
+  background: #f6f6f6 !important;
+}
+
+::v-deep .el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active {
+  position:relative;
+  top:4px;
+}
+::v-deep .el-tabs__nav > .is-active {
+  background: #f9f9f9 !important;
+}
+::v-deep .el-tabs__item {
+}
+.detail_container {
+  background: #ececec;
+  margin: 20px;
 }
 </style>

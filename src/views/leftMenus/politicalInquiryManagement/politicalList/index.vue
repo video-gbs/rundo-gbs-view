@@ -1,5 +1,5 @@
 <template>
-  <div class="router_container2">
+  <div class="detail_container">
     <el-tabs
       type="border-card"
       v-model="activeName"
@@ -17,6 +17,14 @@
         </el-tab-pane>
       </template>
     </el-tabs>
+    <ul class="right-btns-ul" v-if="this.showDetails">
+      <li v-for="(btn, i) in btnLists" :key="i" class="right-btns-li">
+        <el-button type="primary" class="right-btns-button" size="mini"
+          ><svg-icon :icon-class="btn.iconName" class="btn_svg" />{{ btn.name
+          }}</el-button
+        >
+      </li>
+    </ul>
     <div v-if="this.showDetails">
       <DetailView ref="details" />
     </div>
@@ -46,6 +54,49 @@ export default {
     return {
       showDetails: true,
       activeName: "全部",
+      btnLists:[
+        {
+          name:'审核问政',
+          iconName:'right1'
+        },
+        {
+          name:'审核补充说明',
+          iconName:'right2'
+        },
+        {
+          name:'受理问政',
+          iconName:'right3'
+        },
+        {
+          name:'回复问政',
+          iconName:'right4'
+        },
+        {
+          name:'问政转移',
+          iconName:'right5'
+        },
+        {
+          name:'邀请回复',
+          iconName:'right6'
+        },
+        {
+          name:'设为可见',
+          iconName:'right7'
+        },
+        {
+          name:'开启评论',
+          iconName:'right8'
+        },
+        // {
+        //   name:'设为隐藏',
+        //   iconName:'right9'
+        // },
+        // {
+        //   name:'开启评论',
+        //   iconName:'right10'
+        // }
+
+      ],
       tabpaneList: [
         {
           label: "全部",
@@ -104,8 +155,69 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.router_container2 {
+::v-deep .el-tabs__item.is-active {
+  border: 0 none;
+}
+::v-deep .el-tabs--border-card > .el-tabs__content {
+  padding: 20px 24px;
+}
+::v-deep .el-tabs--border-card {
+  background: #f9f9f9;
+  border-top: 0 none;
+}
+::v-deep .el-tabs--border-card > .el-tabs__header {
+  border: 0 none;
+  background: #ececec;
+}
+::v-deep .el-tabs--border-card > .el-tabs__header .el-tabs__item {
+  border: 0 none;
+  height: 36px;
+  margin: 0 4px 4px 0;
+  border-radius: 2px;
+  background: #f6f6f6 !important;
+}
+
+::v-deep .el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active {
+  position: relative;
+  top: 4px;
+}
+::v-deep .el-tabs__nav > .is-active {
+  background: #f9f9f9 !important;
+}
+::v-deep .el-tabs__item {
+}
+.detail_container {
   background: #ececec;
   margin: 20px;
+  position: relative;
+  .right-btns-ul {
+    position: absolute;
+    right: 10px;
+    top:4px;
+    margin: 0;
+    padding: 0;
+    z-index:99;
+
+    .right-btns-li {
+      float:left;
+      margin:0 8px;
+
+        height: 32px;
+        line-height:32px;
+      .right-btns-button{
+
+        height: 32px;
+        background: #1E56A0;
+        border-radius:1px;
+      }
+      .btn_svg {
+        width: 1rem;
+        height: 1rem;
+        position: relative;
+        top: 1px;
+        left:-2px;
+      }
+    }
+  }
 }
 </style>

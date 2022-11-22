@@ -44,6 +44,10 @@
 
 <script>
 import LineFont from "@/components/LineFont";
+import {
+  getAffairsrecordList,
+  getAffairsrecordPage
+} from "@/api/method/affairsrecord";
 export default {
   name: "",
   components: {
@@ -109,6 +113,20 @@ export default {
   watch: {},
   mounted() {},
   methods: {
+    getAffairsrecordList() {
+      getAffairsrecordList(this.params).then(res => {
+        if (res.code === 10000) {
+          console.log("res", res);
+        }
+      });
+    },
+    getAffairsrecordPage() {
+      getAffairsrecordPage(this.params).then(res => {
+        if (res.code === 10000) {
+          console.log("res", res);
+        }
+      });
+    }
   }
 };
 </script>
@@ -147,7 +165,7 @@ export default {
   }
 }
 ::v-deep .el-timeline-item__content {
-  box-shadow: 0px 3px 12px 1px rgba(22,49,114,0.2);
+  box-shadow: 0px 3px 12px 1px rgba(22, 49, 114, 0.2);
   &:after {
     position: absolute;
     top: 20px;
