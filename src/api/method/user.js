@@ -1,7 +1,7 @@
 import request from '@/api/fetch'
 
 export function login(data) {
-  return request.post('/vue-admin-template/user/login', data)
+  return request.post('/politics/sys/login', data)
 }
 
 export function getInfo(params) {
@@ -9,5 +9,5 @@ export function getInfo(params) {
 }
 
 export function logout() {
-  return request.post('/vue-admin-template/user/logout')
+  return request.post('/politics/sys/logout')
 }

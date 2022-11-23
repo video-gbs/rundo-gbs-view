@@ -1,5 +1,5 @@
 <template>
-  <div class="detail_container">
+  <div class="politicalDetail_container">
     <el-tabs type="border-card" v-model="activeName" @tab-click="handleClick">
       <template>
         <el-tab-pane
@@ -110,8 +110,7 @@ export default {
 }
 ::v-deep .el-tabs__item {
 }
-.detail_container {
+.politicalDetail_container {
   background: #ececec;
-  margin: 20px;
 }
 </style>

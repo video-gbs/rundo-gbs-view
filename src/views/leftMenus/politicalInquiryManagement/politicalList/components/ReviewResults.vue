@@ -2,14 +2,17 @@
   <div class="reviewResults-container">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <LineFont :lineTitle="lineTitle" :testStyle="testStyle" />
+        <LineFont :lineTitle="lineTitle" :textStyle="textStyle" :lineBlueStyle="lineBlueStyle"/>
       </div>
       <div class="text item">
-        <el-form ref="form" :model="form" label-width="90px" :label-position="labelPosition">
+        <el-form
+          ref="form"
+          :model="form"
+          label-width="90px"
+          :label-position="labelPosition"
+        >
           <el-form-item label="满意度：">
-            <span class="span-text"
-              >非常满意</span
-            >
+            <span class="span-text">非常满意</span>
           </el-form-item>
           <el-form-item label="评价时间：">
             <span class="span-text">2022-06-30 12:00:56</span>
@@ -29,12 +32,16 @@ export default {
   },
   data() {
     return {
-      labelPosition: 'left',
-      testStyle: {
+      labelPosition: "left",
+      textStyle: {
         fontSize: "20px",
         fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
         fontWeight: "bold",
         color: "#333333"
+      },
+      lineBlueStyle: {
+        background: "rgba(30, 86, 160, 1)",
+        borderRadius: "0px 4px 4px 0px"
       },
       form: {
         content: "",
@@ -71,7 +78,7 @@ export default {
   .box-card {
     height: 100%;
   }
-  .text{
+  .text {
     // margin-left:-2rem;
   }
   .span-text {
