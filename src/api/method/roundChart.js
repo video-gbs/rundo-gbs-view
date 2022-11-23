@@ -15,7 +15,7 @@ export function addRoundChart(params) {
 
 export function editRoundChart(params) {
   // 编辑轮播图
-  return request.post(`/politics/slideshow/add/${params.id}`, params.params)
+  return request.post(`/politics/slideshow/eidt/${params.id}`, params.params)
 }
 
 export function slideShowOrder(id, order) {

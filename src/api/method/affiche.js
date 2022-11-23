@@ -19,7 +19,7 @@ export function editAffiche(id, params) {
 
 export function editAfficheOrder(id, orderValue) {
   // 修改公告顺序
-  return request.get(`/politics/affiche/order/${id}/${orderValue}`)
+  return request.post(`/politics/affiche/order/${id}/${orderValue}`)
 }
 
 export function deleteAffiche(id) {

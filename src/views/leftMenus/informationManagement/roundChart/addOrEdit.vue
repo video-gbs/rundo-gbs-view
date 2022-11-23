@@ -4,12 +4,12 @@
     <div class="panel-header-box f jc-sb ai-c">
       <div class="title-css">{{ title }}</div>
       <div class="f ai-c">
-        <el-button size="mini" type="primary">保存</el-button>
+        <el-button size="mini" type="primary"  @click="submitFn">保存</el-button>
         <el-button size="mini" @click="$router.push('/roundChart')">返回</el-button>
       </div>
     </div>
     <div class="p30">
-      <el-form :model="params" label-width="100px" label-position="left">
+      <el-form :rules="rules" :model="params" label-width="100px" label-position="left">
         <el-form-item label="展示标题" prop="title">
           <el-input v-model="params.title" clearable size="mini" placeholder="请输入标题" />
         </el-form-item>
@@ -18,6 +18,7 @@
             <el-upload
               size="mini"
               drag
+              action=""
               :http-request="uploadFn"
               @before-upload="beforeUpload"
             >
@@ -43,14 +44,10 @@
 
         </el-form-item>
         <el-form-item label="描述">
-          <PEditor @change="contentChange" />
+          <PEditor id="roundChart" :value="editorCxt" @change="contentChange" />
         </el-form-item>
       </el-form>
-      <div>
-        <el-button size="mini" type="primary" @click="submitFn">
-          提交
-        </el-button>
-      </div>
+      
     </div>
   </div>
 </template>
@@ -64,18 +61,19 @@ export default {
       title: '新增轮播图',
       params: {
         'content': '', // 展示内容
-        'fileName': '', // fileName
+        'fileName': '文件名哦', // fileName
         'isShow': 0, // 是否显示，0显示，1不显示
         'orderValue': 0, // 显示顺序
         'pageUrl': '', // 外部链接url
         'related': 0, // 关联选项: 0:内容展示，关联外部链接
         'title': ''// 展示标题,示例值(xxxxxx)
       },
-      aciton: 'add', // 判断是新增还是编辑
+      action: 'add', // 判断是新增还是编辑
       uploadData: {
         // file: null,
         fileBatchId: ''
       },
+      editorCxt:'',
       rules: {
         content: [
           { required: true, message: '请输入提交的内容', trigger: 'blur' }
@@ -91,11 +89,13 @@ export default {
     }
   },
   mounted() {
-    console.log()
+    console.log(this.$route.params)
     if (this.$route.params.id !== 'add') {
-      this.aciton = 'edit'
+      console.log('sd')
+      this.action = 'edit'
       this.title = '编辑轮播图'
       this.getChartById()
+      
     }
   },
   methods: {
@@ -106,6 +106,18 @@ export default {
     },
     getChartById() {
       // 获取单个轮播图数据
+      const one = {
+        content: '展示内容11111',
+        createTime: '2022-11-17 15:42:51',
+        id: 1593147638770516000,
+        isShow: 0,
+        orderValue: 4,
+        pageUrl: 'http://www.baidu.com',
+        related: 1,
+        title: '标题1'
+      }
+      Object.assign(this.params, one)
+      this.editorCxt = this.params.content
     },
     beforeUpload(file) {
       console.log('file', file)
@@ -115,7 +127,15 @@ export default {
       uploadFiles({ file: file.file })
     },
     submitFn() {
-      const fn = this.aciton === 'add' ? addRoundChart(this.params) : editRoundChart({ id: 0, parapms: this.params })
+      const fn = this.action === 'add' ? addRoundChart(this.params) : editRoundChart({ id: 0, params: this.params })
+      fn.then(res=>{
+        if(res.code===10000)
+        {
+          this.$message.success(`${this.action === 'add'?'新增':'编辑'}成功`)
+          setTimeout(()=>{this.$router.push('/roundChart')},500)
+        }
+        
+      })
     }
   }
 }
