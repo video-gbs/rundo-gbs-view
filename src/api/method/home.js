@@ -1,7 +1,7 @@
 import request from '@/api/fetch'
 
-export function homeLists(params) {
-  return request.get('/politics/index/index',params)
+export function homeLists(params,headers) {
+  return request.get('/politics/index/index',params,headers)
 }
 
 

@@ -2,9 +2,9 @@
 // 公告管理
 import request from '@/api/fetch'
 
-export function getAfficheList(params) {
+export function getAfficheList(params,headers) {
   // 获取公告列表
-  return request.post(`/politics/affiche/list`, params)
+  return request.post(`/politics/affiche/list`, params,headers)
 }
 
 export function addAffiche(params) {

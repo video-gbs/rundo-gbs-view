@@ -6,15 +6,15 @@
         <h3 class="title">梧州问政平台</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="account">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
+          ref="account"
+          v-model="loginForm.account"
           placeholder="Username"
-          name="username"
+          name="account"
           type="text"
           tabindex="1"
           auto-complete="on"
@@ -54,7 +54,8 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
-
+import { login } from "@/api/method/user";
+import { Local } from '@/utils/storage'
 export default {
   name: 'Login',
   data() {
@@ -74,11 +75,12 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        // adminsuper/123456
+        account: '',
+        password: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        account: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
@@ -107,9 +109,12 @@ export default {
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
-        if (valid) {
+        console.log('valid',valid,this.loginForm)
+        if (!valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
+          login(this.loginForm).then((res) => {
+            const access_token = res.data.token;
+            Local.setToken(access_token)
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
           }).catch(() => {
