@@ -2,7 +2,7 @@
   <div class="detail-container">
     <el-card class="box-card1">
       <div slot="header" class="clearfix">
-        <LineFont :lineTitle="lineTitle" :testStyle="testStyle" />
+        <LineFont :lineTitle="lineTitle" :textStyle="textStyle" :lineBlueStyle="lineBlueStyle"/>
       </div>
       <div class="text item">
         <el-form ref="form" :model="form" label-width="120px">
@@ -19,7 +19,7 @@
     </el-card>
     <el-card class="box-card2">
       <div slot="header" class="clearfix">
-        <LineFont :lineTitle="lineTitle1" :testStyle="testStyle" />
+        <LineFont :lineTitle="lineTitle1" :textStyle="textStyle" :lineBlueStyle="lineBlueStyle"/>
       </div>
       <div class="text item">
         <el-form ref="form" :model="form" label-width="120px">
@@ -58,7 +58,7 @@
     </el-card>
     <el-card class="box-card3">
       <div slot="header" class="clearfix">
-        <LineFont :lineTitle="lineTitle2" :testStyle="testStyle" />
+        <LineFont :lineTitle="lineTitle2" :textStyle="textStyle" :lineBlueStyle="lineBlueStyle"/>
       </div>
       <div class="text item">
         <el-form ref="form" :model="form" label-width="120px">
@@ -99,11 +99,15 @@ export default {
   },
   data() {
     return {
-      testStyle: {
+      textStyle: {
         fontSize: "20px",
         fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
         fontWeight: "bold",
         color: "#333333"
+      },
+      lineBlueStyle: {
+        background: "rgba(30, 86, 160, 1)",
+        borderRadius: "0px 4px 4px 0px"
       },
       form: {
         content: "",

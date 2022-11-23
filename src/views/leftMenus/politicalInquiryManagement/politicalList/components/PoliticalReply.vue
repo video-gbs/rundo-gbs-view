@@ -2,7 +2,7 @@
   <div class="reviewResults-container">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <LineFont :lineTitle="lineTitle" :testStyle="testStyle" />
+        <LineFont :lineTitle="lineTitle" :textStyle="textStyle" :lineBlueStyle="lineBlueStyle"/>
       </div>
       <div class="text item">
         <div class="reviewResults—timeline">
@@ -76,11 +76,15 @@ export default {
         }
       ],
       labelPosition: "left",
-      testStyle: {
+      textStyle: {
         fontSize: "20px",
         fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
         fontWeight: "bold",
         color: "#333333"
+      },
+            lineBlueStyle: {
+        background: "rgba(30, 86, 160, 1)",
+        borderRadius: "0px 4px 4px 0px"
       },
       form: {
         content: "",

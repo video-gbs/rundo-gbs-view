@@ -78,7 +78,7 @@ export default {
     /**
      * 工作平台和系统管理菜单
      */
-    routes() {console.log(this.$router.options.routes)
+    routes() {
       const routes = this.$router.options.routes.filter((route) => {
         return route.systemCode;
       });

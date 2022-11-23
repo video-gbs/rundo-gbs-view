@@ -2,16 +2,20 @@
   <div class="page-container">
     <div class="container-left">
       <div class="container-left-top">
-        <Overview />
+        <Overview :homeLists="homeLists" v-if="overviewShow" />
       </div>
       <div class="container-left-top-bottom">
-        <TodoList />
+        <TodoList :homeLists="homeLists" v-if="todoListShow" />
       </div>
     </div>
     <div class="container-right">
-      <Weather />
-      <NoticeList style="margin:5px 0 20px 0;" />
-      <Statistical />
+      <Weather :weatherList="weatherList" v-if="weatherListShow" />
+      <NoticeList
+        style="margin:5px 0 20px 0;"
+        :notification="notification"
+        v-if="notificationShow"
+      />
+      <Statistical :homeLists="homeLists" />
     </div>
   </div>
 </template>
@@ -24,7 +28,9 @@ import Statistical from "./components/statistical.vue";
 import NoticeList from "./components/noticeList.vue";
 
 import { editAffiche } from "@/api/method/appraise";
-import { getAfficheList } from '@/api/method/affiche'
+import { getAfficheList } from "@/api/method/affiche";
+import { areaWeather } from "@/api/method/weather";
+import { homeLists } from "@/api/method/home";
 
 export default {
   components: {
@@ -37,15 +43,37 @@ export default {
   },
   data() {
     return {
-      params: {}
+      params: {},
+      weatherListShow: false,
+      notificationShow: false,
+      todoListShow: false,
+      overviewShow: false,
+      weatherList: {},
+      homeLists: {},
+      notification: []
     };
   },
   watch: {},
+  created() {
+    this.getWeather();
+  },
   mounted() {
+    this.getHomeLists();
     this.editAffiche();
-    this.getAfficheList();
+    // this.getAfficheList();
   },
   methods: {
+    getHomeLists() {
+      homeLists(this.params).then(res => {
+        if (res.code === 10000) {
+          this.homeLists = res.data;
+          this.notification = res.data.notification;
+          this.notificationShow = true;
+          this.todoListShow = true;
+          this.overviewShow = true;
+        }
+      });
+    },
     editAffiche() {
       editAffiche(this.params).then(res => {
         if (res.code === 10000) {
@@ -61,6 +89,19 @@ export default {
           console.log("res", res);
           // this.tableData = res.data.records
           // this.params.total = res.data.total
+        }
+      });
+    },
+    getWeather() {
+      let weatherParams = {
+        area: "梧州",
+        from: "5",
+        needIndex: "1"
+      };
+      areaWeather(weatherParams).then(res => {
+        if (res.code === 10000) {
+          this.weatherList = res.data.showapi_res_body;
+          this.weatherListShow = true;
         }
       });
     }

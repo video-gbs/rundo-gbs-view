@@ -8,7 +8,7 @@
       @click="checkItem(item.status)"
     >
       <div class="item-img">
-        <svg-icon :icon-class="item.imgSrcName" class="svg"/>
+        <svg-icon :icon-class="item.imgSrcName" class="svg" />
       </div>
       <div class="value">{{ item.value }}</div>
       <div class="title">{{ item.title }}</div>
@@ -19,28 +19,36 @@
 <script>
 export default {
   name: "Overview",
+  props: {
+    homeLists: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    }
+  },
   data() {
     return {
       pageData: [
         {
           title: "平台用户",
-          value: 123,
+          value: this.homeLists.num,
           color: "red",
-          imgSrcName:'ptyh'
+          imgSrcName: "ptyh"
         },
         {
           title: "单位部门",
-          value: 2122,
+          value: this.homeLists.deptNum,
           color: "blue",
-          imgSrcName:'dwbm'
+          imgSrcName: "dwbm"
         }
-      ],
+      ]
     };
   },
   watch: {
     "$store.getters.plateId"(n, o) {
       this.getTopStatic();
-    },
+    }
   },
   mounted() {
     if (this.$store.getters.plateId) {
@@ -55,7 +63,7 @@ export default {
      */
     getTopStatic() {
       // {} 用于触发板块ID写入
-      this.$api.document.getTopStatic({}).then((res) => {
+      this.$api.document.getTopStatic({}).then(res => {
         const data = res.data.data;
         if (data) {
           this.pageData = [
@@ -63,43 +71,43 @@ export default {
               title: "即将到期",
               value: data.prepareToExpireCount || 0,
               color: "red",
-              status: 7,
+              status: 7
             },
             {
               title: "已超时未完成",
               value: data.timeoutCount || 0,
               color: "blue",
-              status: 8,
+              status: 8
             },
             {
               title: "已完成",
               value: data.finishCount || 0,
               color: "green",
-              status: 6,
+              status: 6
             },
             {
               title: "特急公文",
               value: data.keyCount || 0,
               color: "orange",
-              status: 9,
-            },
+              status: 9
+            }
           ];
         }
       });
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
 .overview-container {
-  padding:0;
-  margin:-5px -8px 10px;
+  padding: 0;
+  margin: -5px -8px 10px;
   width: 1070px;
-  height:152px;
+  height: 152px;
   background: url(../../../../assets/imgs/logo1.png) no-repeat;
-  background-size:100% 100%;
-  position:relative;
+  background-size: 100% 100%;
+  position: relative;
   // border:1px solid red;
 
   .view-item {
@@ -108,13 +116,13 @@ export default {
     margin-right: 16px;
     border-radius: 4px;
     cursor: pointer;
-    z-index:2;
+    z-index: 2;
     position: absolute;
-    right:20px;
-    width:310px;
-    height:105px;
-    top:50%;
-    transform: translate(0%,-50%);
+    right: 20px;
+    width: 310px;
+    height: 105px;
+    top: 50%;
+    transform: translate(0%, -50%);
 
     .item-img {
       height: 100%;
@@ -155,31 +163,31 @@ export default {
 
     &.item-color0 {
       border-color: #ec2f2f;
-      right:300px;
+      right: 300px;
       background: url(../../../../assets/imgs/logo4.png) no-repeat;
-      background-size:100% 100%;
+      background-size: 100% 100%;
 
       .value {
-        color: #1E56A0;
+        color: #1e56a0;
         font-size: 2.75rem;
-        margin-top:0.5rem;
+        margin-top: 0.5rem;
         font-weight: bold;
-        text-shadow: 0px 3px 6px rgba(0,0,0,0.16);
+        text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
         font-family: DIN-Bold, DIN;
       }
     }
 
     &.item-color1 {
       background: url(../../../../assets/imgs/logo3.png) no-repeat;
-      background-size:100% 100%;
+      background-size: 100% 100%;
       border-color: #104ecb;
 
       .value {
-        color: #008C96;
+        color: #008c96;
         font-size: 2.75rem;
-        margin-top:0.5rem;
+        margin-top: 0.5rem;
         font-weight: bold;
-        text-shadow: 0px 3px 6px rgba(0,0,0,0.16);
+        text-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
         font-family: DIN-Bold, DIN;
       }
     }
@@ -189,10 +197,10 @@ export default {
     }
   }
 }
-.svg{
-  position:absolute;
-  right:58px;
-  width:54px;
-  height:54px;
+.svg {
+  position: absolute;
+  right: 58px;
+  width: 54px;
+  height: 54px;
 }
 </style>

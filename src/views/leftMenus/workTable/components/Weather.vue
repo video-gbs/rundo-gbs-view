@@ -15,21 +15,44 @@
         }}
         {{ week }}
       </h2>
-      <div class="main-weather">多云转阴 16℃~26℃ 东北风3~4级</div>
+      <div class="main-weather">
+        {{ resWeatherList.now.weather }}
+        {{ resWeatherList.f1.night_air_temperature }}℃~{{
+          resWeatherList.f1.day_air_temperature
+        }}℃ {{ resWeatherList.now.wind_direction }}
+        {{ resWeatherList.now.wind_power }}
+      </div>
     </div>
-    <svg-icon icon-class="weather" class="weather_svg" />
+    <img :src="resWeatherList.now.weather_pic" class="weather_svg" />
   </div>
 </template>
 
 <script>
 export default {
   name: "",
+  props: {
+    weatherList: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    }
+  },
   data() {
     return {
-      week: ""
+      week: "",
+      resWeatherList: this.weatherList
     };
   },
-  watch: {},
+  watch: {
+    weatherList(newValue, oldValue) {
+      this.resWeatherList = newValue;
+    },
+    deep: true,
+    immediate: true
+  },
+  created() {
+  },
   mounted() {
     this.getdataTime();
   },
@@ -70,7 +93,7 @@ export default {
     .loaction_svg {
       width: 1rem;
       height: 1rem;
-      margin:0 0.5rem;
+      margin: 0 0.5rem;
     }
     .main-text {
       font-size: 16px;
@@ -87,7 +110,7 @@ export default {
       font-size: 16px;
       font-weight: bold;
       color: #333333;
-      padding:20px 0 0 1rem;
+      padding: 20px 0 0 1rem;
     }
   }
   .weather_svg {

@@ -202,8 +202,8 @@ export default {
                     fontWeight: 400,
                     color: "red",
                     // padding:20,
-                    verticalAlign: 'top',
-                    align: 'right',
+                    verticalAlign: "top",
+                    align: "right"
                   },
                   d: {
                     fontSize: 14,
@@ -212,7 +212,7 @@ export default {
                     fontWeight: 400
                   }
                 },
-                formatter:'{b}{d}%',
+                formatter: "{b}{d}%"
                 // formatter: function(params, ticket, callback) {
                 //   console.log('params',params)
                 //   return `{b|${params.name}}{d|${params.value}}%`

@@ -1,28 +1,39 @@
 <template>
-  <div class="line-title-box" :style="{height:height +'px',lineHeight:lineHeight + 'px'}">
+  <div
+    class="line-title-box"
+    :style="{ height: height + 'px', lineHeight: lineHeight + 'px' }"
+  >
     <div class="title-left">
-      <span class="line-blue" />
-      <span class="line-text" :style="testStyle">{{ lineTitle.title }}</span>
+      <span class="line-blue" :style="lineBlueStyle" />
+      <span class="line-text" :style="textStyle">{{ lineTitle.title }}</span>
     </div>
     <div class="title-right">
-      <span v-if="!lineTitle.notShowSmallTitle" class="font-gray">{{ lineTitle.smallTitle ? lineTitle.smallTitle : '' }}</span>
+      <span v-if="!lineTitle.notShowSmallTitle" class="font-gray">{{
+        lineTitle.smallTitle ? lineTitle.smallTitle : ""
+      }}</span>
     </div>
   </div>
 </template>
 <script>
 export default {
-  name: 'LineTitle',
+  name: "LineTitle",
   props: {
     lineTitle: {
       type: Object,
       default: function() {
-        return {}
+        return {};
       }
     },
-    testStyle: {
+    textStyle: {
       type: Object,
       default: function() {
-        return {}
+        return {};
+      }
+    },
+    lineBlueStyle: {
+      type: Object,
+      default: function() {
+        return {};
       }
     },
     height: {
@@ -33,14 +44,12 @@ export default {
       type: Number,
       default: 56
     }
-
   },
-  methods: {
-  },
+  methods: {},
   created() {
     // document.title = this.lineTitle.title
   }
-}
+};
 </script>
 <style lang="scss" scoped>
 .line-title-box {
@@ -56,9 +65,10 @@ export default {
     .line-blue {
       display: inline-block;
       width: 4px;
-      height: 16px;
+      height: 24px;
       margin-right: 12px;
-      background: #0376f7;
+      background: rgba(30, 86, 160, 1);
+      // border-radius: 0px 4px 4px 0px;
     }
     .title-text {
       font-size: 18px;
