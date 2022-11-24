@@ -1,6 +1,5 @@
 <template>
   <div class="router_container4 m20 bg-w">
-
     <div class="panel-header-box f jc-sb ai-c fw-w">
       <div class="title-css">账号管理</div>
     </div>
@@ -8,10 +7,11 @@
       <el-table :data="tableData" style="width: 100%">
         <el-table-column>
           <template slot="header">
-
             <div class="f ai-c jc-sb">
               <div>数据列表</div>
-              <el-button size="mini" type="primary" @click="dialogShow(1)">新增</el-button>
+              <el-button size="mini" type="primary" @click="dialogShow(1)"
+                >新增</el-button
+              >
             </div>
           </template>
           <el-table-column prop="label" label="账号" />
@@ -22,108 +22,266 @@
           <el-table-column prop="state" label="所属角色" />
           <el-table-column prop="state" label="帐号状态" />
           <el-table-column prop="createTime" label="创建时间" width="160" />
-          <el-table-column width="200" label="操作" fixed="right"> <template slot-scope="scope">
-            <el-button type="text" @click="dialogShow(0, scope.row)">修改密码</el-button>
-            <el-button type="text" @click="dialogShow(0, scope.row)">编辑</el-button>
-            <el-button type="text">删除</el-button>
-
-          </template>
+          <el-table-column width="200" label="操作" fixed="right">
+            <template slot-scope="scope">
+              <el-button type="text" @click="dialogShow(0, scope.row)"
+                >修改密码</el-button
+              >
+              <el-button type="text" @click="dialogShow(0, scope.row)"
+                >编辑</el-button
+              >
+              <el-button type="text">删除</el-button>
+            </template>
           </el-table-column>
         </el-table-column>
-
       </el-table>
-      <pagination :pages-data="params" @size-change="sizeChange" @current-change="currentChange" />
+      <pagination
+        :pages-data="params"
+        @size-change="sizeChange"
+        @current-change="currentChange"
+      />
     </div>
-    <el-dialog :title="dialog.title" :visible.sync="dialog.show" width="700px" :before-close="handleClose">
+    <el-dialog
+      :title="dialog.title"
+      :visible.sync="dialog.show"
+      width="700px"
+      :before-close="handleClose"
+    >
       <div>
-        <el-form class="params-form" size="mini" label-position="left" label-width="80px" :model="dialog.params">
+        <el-form
+          class="params-form"
+          size="mini"
+          label-position="left"
+          label-width="80px"
+          :model="dialog.params"
+          :rules="rules"
+          ref="accountForm"
+          @keyup.enter="submit('accountForm')"
+        >
           <el-row>
             <el-col :span="12">
-              <el-form-item label="名称">
-                <el-input v-model="dialog.params.name" placeholder="6~20字符" />
+              <el-form-item label="账号" prop="account">
+                <el-input
+                  v-model="dialog.params.account"
+                  placeholder="6~20字符"
+                />
               </el-form-item>
-              <el-form-item label="密码">
+              <el-form-item label="密码" prop="password">
                 <div class="f fd-c mr30">
-                  <el-input v-model="dialog.params.password" placeholder="6~20字符" @input="checkPassworLevel" />
-                  <span class="fs12 mt10">请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span>
+                  <el-input
+                    v-model="dialog.params.password"
+                    placeholder="6~20字符"
+                  />
+                  <span class="fs12 mt10"
+                    >请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span
+                  >
                 </div>
-
               </el-form-item>
               <el-form-item label="密码强度">
                 <el-row>
                   <el-col :span="24">
                     <div class="password-level-box f ai-c">
                       <div class="password-level f ai-c">
-                        <div :style="{'background-color':passwordLevel>0?'#00d000':''}" />
-                        <div :style="{'background-color':passwordLevel>1?'orange':''}" />
-                        <div :style="{'background-color':passwordLevel>2?'red':''}" />
+                        <div
+                          :style="{
+                            'background-color':
+                              passwordLevel > 0 ? '#00d000' : ''
+                          }"
+                        />
+                        <div
+                          :style="{
+                            'background-color':
+                              passwordLevel > 1 ? 'orange' : ''
+                          }"
+                        />
+                        <div
+                          :style="{
+                            'background-color': passwordLevel > 2 ? 'red' : ''
+                          }"
+                        />
 
-                        <span v-if="passwordLevel===1" class=" fs12 ml5" style="color:#00d000">
+                        <span
+                          v-if="passwordLevel === 1"
+                          class=" fs12 ml5"
+                          style="color:#00d000"
+                        >
                           弱
                         </span>
-                        <span v-if="passwordLevel===2" class=" fs12 ml5" style="color:orange">
+                        <span
+                          v-if="passwordLevel === 2"
+                          class=" fs12 ml5"
+                          style="color:orange"
+                        >
                           中
                         </span>
-                        <span v-if="passwordLevel===3" class=" fs12 ml5" style="color:red">
+                        <span
+                          v-if="passwordLevel === 3"
+                          class=" fs12 ml5"
+                          style="color:red"
+                        >
                           强
                         </span>
                       </div>
-
                     </div>
-
                   </el-col>
                 </el-row>
+              </el-form-item>
+              <el-form-item label="确认密码" prop="rePassword">
+                <el-input v-model="dialog.params.rePassword" />
+              </el-form-item>
+              <el-form-item label="所属角色" prop="roleId">
+                <el-select v-model="dialog.params.roleId" placeholder="请选择">
+                  <el-option
+                    v-for="i in gender"
+                    :key="i.id"
+                    :label="i.label"
+                    :value="i.id"
+                  />
+                </el-select>
               </el-form-item>
               <el-form-item label="账号状态">
                 <el-row>
                   <el-col>
-                    <el-radio v-model="dialog.params.state" :label="1">启用</el-radio>
-                    <el-radio v-model="dialog.params.state" :label="0">禁用</el-radio>
+                    <el-radio v-model="dialog.params.status" :label="1"
+                      >启用</el-radio
+                    >
+                    <el-radio v-model="dialog.params.status" :label="0"
+                      >禁用</el-radio
+                    >
                   </el-col>
                 </el-row>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="昵称">
-                <el-input v-model="dialog.params.nickName" placeholder="最多40个字符" />
+              <el-form-item label="昵称" prop="nickName">
+                <el-input
+                  v-model="dialog.params.nickName"
+                  placeholder="最多40个字符"
+                />
               </el-form-item>
-              <el-form-item label="性别">
-                <el-select v-model="dialog.params.gender" placeholder="请选择性别">
-                  <el-option v-for="i in gender" :key="i.id" :label="i.label" :value="i.id" />
-                </el-select>
-
+              <el-form-item label="姓名" prop="name">
+                <el-input
+                  v-model="dialog.params.name"
+                  placeholder="最多20个字符"
+                />
               </el-form-item>
-              <el-form-item label="手机号">
-                <el-input v-model="dialog.params.phone" />
+              <el-form-item label="手机号" prop="mobile">
+                <el-input v-model="dialog.params.mobile" />
               </el-form-item>
-              <el-form-item label="邮箱">
+              <el-form-item label="邮箱" prop="email">
                 <el-input v-model="dialog.params.email" />
               </el-form-item>
             </el-col>
           </el-row>
-
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="dialog.show = false">确 定</el-button>
+        <el-button type="primary" @click="submit('accountForm')"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
   </div>
-
 </template>
 
 <script>
-import pagination from '@/components/Pagination/index.vue'
+import pagination from "@/components/Pagination/index.vue";
+import {
+  accountAdd,
+  accountEdit,
+  accountEditPassword,
+  accountList,
+  accountDelete
+} from "@/api/method/accountManage";
+import { Local } from "@/utils/storage";
+
 export default {
-  name: '',
+  name: "",
   components: { pagination },
   data() {
     return {
       search: {
-        userName: '',
-        phone: '',
-        time: ''
+        userName: "",
+        phone: "",
+        time: ""
+      },
+      rules: {
+        account: [
+          { required: true, message: "不能为空", trigger: "blur" },
+          {
+            min: 6,
+            max: 20,
+            message: "6-20个字符",
+            trigger: "blur"
+          }
+          // {
+          //   validator: (rule, value, callback) => {
+          //     if (!this.role.roleId) {
+          //       this.$api.role.check(value).then((r) => {
+          //         if (!r.data) {
+          //           callback('该角色名称已存在')
+          //         } else {
+          //           callback()
+          //         }
+          //       })
+          //     } else {
+          //       callback()
+          //     }
+          //   },
+          //   trigger: 'blur'
+          // }
+        ],
+        name: {
+          required: true,
+          message: "不能为空",
+          trigger: "change",
+          max: 20
+        },
+        mobile: {
+          pattern: /^(1[3-9]\d{9})$/,
+          message: "请输入正确的手机号码",
+          trigger: "blur",
+          required: true
+        },
+        password: [
+          {
+            required: true,
+            message: "不能为空",
+            trigger: "change"
+          },
+          {
+            validator: (rule, value, callback) => {
+              if (this.handlePasswordLevel(value)) {
+                callback();
+              } else {
+                callback("密码强度不够，至少包含数字/字母/字符两种组合");
+              }
+            },
+            trigger: "blur"
+          }
+        ],
+        rePassword: {
+          required: true,
+          message: "不能为空",
+          trigger: "change"
+        },
+        nickName: {
+          required: true,
+          message: "不能为空",
+          trigger: "change",
+          max: 40
+        },
+        email: {
+          required: true,
+          message: "不能为空",
+          trigger: "change"
+        },
+        roleId: {
+          required: true,
+          message: "不能为空",
+          trigger: "change"
+        }
       },
       params: {
         pageNum: 1,
@@ -132,71 +290,178 @@ export default {
         proCount: 0
       },
       tableData: [
-
-        { id: 1, label: 'afsdf', sort: 1, state: 1, createTime: '2022-11-11 15:25:14' }
       ],
       dialog: {
         show: false,
-        title: '新增用户',
+        title: "新增用户",
         params: {
-          name: '',
-          gender: 1,
-          state: 1,
-          password: 'aZ1',
-          nickName: '',
-          phone: '',
-          email: ''
+          account: "",
+          roleId: 1,
+          status: 1,
+          password: "",
+          rePassword: "",
+          nickName: "",
+          name: "",
+          email: "",
+          jobId: 1
         }
       },
       gender: [
-        { id: 1, label: '男' },
-        { id: 2, label: '女' }
+        { id: 1, label: "男" },
+        { id: 2, label: "女" }
       ],
       state: [
-        { id: 1, label: '启用' },
-        { id: 0, label: '禁用' }
+        { id: 1, label: "启用" },
+        { id: 0, label: "禁用" }
       ],
-      passwordLevel: 0
-    }
+      passwordLevel: 0,
+      headers: {
+        Authorization: Local.getToken()
+      }
+    };
   },
   mounted() {
-    this.checkPassworLevel()
+    // this.checkPassworLevel();
+    this.getAccountList();
   },
   methods: {
+    /**
+     * 校验密码强度
+     * @param {password} 密码
+     */
+    handlePasswordLevel(password) {
+      let level = 0;
+      // 判断这个字符串中有没有数字
+      if (/[0-9]/.test(password)) {
+        level++;
+      }
+      // 判断字符串中有没有字母
+      if (/[a-zA-Z]/.test(password)) {
+        level++;
+      }
+      // 判断字符串中有没有特殊符号
+      if (/[^0-9a-zA-Z_]/.test(password)) {
+        level++;
+      }
+      if (level >= 2) {
+        return true;
+      } else {
+        this.$message.error("密码强度不够，至少包含数字/字母/字符两种组合");
+        return false;
+      }
+    },
+    /**
+     * 校验密码
+     * @param {password} 新密码
+     * @param {rePassword} 确认密码
+     */
+    handlePasswordCheck(password, rePassword) {
+      if (!password) {
+        this.$message.error("请输入密码");
+        return false;
+      }
+      if (!rePassword) {
+        this.$message.error("请确认新密码");
+        return false;
+      }
+      if (password && rePassword && password.trim() !== rePassword.trim()) {
+        this.$message.error("两次输入的密码不一致");
+        return false;
+      }
+      return true;
+    },
     sizeChange(v) {
-      console.log('v')
+      console.log("v");
       // 执行搜索
     },
     currentChange(v) {
-      console.log('v2')
+      console.log("v2");
       // 执行搜索
     },
     goPage(path, query) {
-      this.$router.push(path)
+      this.$router.push(path);
     },
     dialogShow(act, data) {
-      this.dialog.title = act ? '新增用户' : `编辑用户 - ${data.name}`
-      this.dialog.show = !this.dialog.show
+      this.dialog.title = act ? "添加账号" : "编辑用户";
+      this.dialog.show = !this.dialog.show;
+    },
+    getAccountList() {
+      accountList(this.params, this.headers).then(res => {
+        if (res.code === 10000) {
+          console.log('res',res)
+          this.tableData=res.data.records;
+        }
+      });
+    },
+
+    submit(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          switch (this.dialog.title) {
+            case "添加账号":
+              if (
+                !this.handlePasswordCheck(
+                  this.dialog.params.password,
+                  this.dialog.params.rePassword
+                )
+              ) {
+                return;
+              }
+              accountAdd(this.dialog.params, this.headers).then(res => {
+                if (res.code === 10000) {
+                  this.$message({
+                    type: "success",
+                    message: "账号新增成功"
+                  });
+                  this.dialog.show = false;
+                }
+              });
+              break;
+            case "编辑用户":
+              if (
+                !this.handlePasswordCheck(
+                  this.dialog.params.password,
+                  this.dialog.params.rePassword
+                )
+              ) {
+                return;
+              }
+              accountEdit(this.dialog.params, this.headers).then(res => {
+                if (res.code === 10000) {
+                  this.$message({
+                    type: "success",
+                    message: "账号修改成功"
+                  });
+                  this.dialog.show = false;
+                }
+              });
+              break;
+
+            default:
+              break;
+          }
+        }
+      });
     },
     handleClose(done) {
-      done()
+      done();
     },
-    checkPassworLevel() {
-      const reg = /[A-Z]/
-      const reg2 = /[a-z]/
-      const reg3 = /[0-9]/
-      this.passwordLevel = 0
-      reg.test(this.dialog.params.password) && (this.passwordLevel += 1)
-      reg2.test(this.dialog.params.password) && (this.passwordLevel += 1)
-      reg3.test(this.dialog.params.password) && (this.passwordLevel += 1)
+    // checkPassworLevel() {
+    //   const reg = /[A-Z]/;
+    //   const reg2 = /[a-z]/;
+    //   const reg3 = /[0-9]/;
+    //   this.passwordLevel = 0;
+    //   reg.test(this.dialog.params.password) && (this.passwordLevel += 1);
+    //   reg2.test(this.dialog.params.password) && (this.passwordLevel += 1);
+    //   reg3.test(this.dialog.params.password) && (this.passwordLevel += 1);
 
-      const l = this.dialog.params.password.length
-      if (l < 5 || l > 20) {
-        this.passwordLevel = 0
-      }
-    }
+    //   const l = this.dialog.params.password.length;
+    //   if (l < 5 || l > 20) {
+    //     this.passwordLevel = 0;
+    //   }
+    // }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -204,33 +469,34 @@ export default {
   width: 120px;
 }
 
-.params-form{
-  .el-input,.el-select{
+.params-form {
+  .el-input,
+  .el-select {
     width: 100%;
     margin-right: 30px;
   }
 }
-.password-level-box{
+.password-level-box {
   height: 28px !important;
-   width: 100px;
-  .password-level {
-  height: 10px;
   width: 100px;
+  .password-level {
+    height: 10px;
+    width: 100px;
 
-  >div {
-    height: inherit;
-    width: 33%;
-    border: 1px solid #eee;
-    margin-right: 5px;
+    > div {
+      height: inherit;
+      width: 33%;
+      border: 1px solid #eee;
+      margin-right: 5px;
 
-    &:last-child {
-      margin-right: 0px;
+      &:last-child {
+        margin-right: 0px;
+      }
     }
   }
 }
-}
 
-::v-deep .el-form-item__content{
+::v-deep .el-form-item__content {
   // height: 28px;
   display: flex;
   align-items: center;

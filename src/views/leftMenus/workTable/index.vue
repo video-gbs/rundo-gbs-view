@@ -11,7 +11,7 @@
     <div class="container-right">
       <Weather :weatherList="weatherList" v-if="weatherListShow" />
       <NoticeList
-        style="margin:5px 0 20px 0;"
+        style="margin: 5px 0 20px 0"
         :notification="notification"
         v-if="notificationShow"
       />
@@ -31,14 +31,14 @@ import { editAffiche } from "@/api/method/appraise";
 import { getAfficheList } from "@/api/method/affiche";
 import { areaWeather } from "@/api/method/weather";
 import { homeLists } from "@/api/method/home";
-
+import { Local } from "@/utils/storage";
 export default {
   components: {
     Overview,
     TodoList,
     Weather,
     NoticeList,
-    Statistical
+    Statistical,
     // PCard
   },
   data() {
@@ -50,7 +50,10 @@ export default {
       overviewShow: false,
       weatherList: {},
       homeLists: {},
-      notification: []
+      notification: [],
+      headers: {
+        Authorization: Local.getToken(),
+      },
     };
   },
   watch: {},
@@ -64,7 +67,7 @@ export default {
   },
   methods: {
     getHomeLists() {
-      homeLists(this.params).then(res => {
+      homeLists(this.params, this.headers).then((res) => {
         if (res.code === 10000) {
           this.homeLists = res.data;
           this.notification = res.data.notification;
@@ -75,7 +78,7 @@ export default {
       });
     },
     editAffiche() {
-      editAffiche(this.params).then(res => {
+      editAffiche(this.params, this.headers).then((res) => {
         if (res.code === 10000) {
           console.log("res", res);
           // this.tableData = res.data.records
@@ -84,7 +87,7 @@ export default {
       });
     },
     getAfficheList() {
-      getAfficheList(this.params).then(res => {
+      getAfficheList(this.params, this.headers).then((res) => {
         if (res.code === 10000) {
           console.log("res", res);
           // this.tableData = res.data.records
@@ -96,16 +99,16 @@ export default {
       let weatherParams = {
         area: "梧州",
         from: "5",
-        needIndex: "1"
+        needIndex: "1",
       };
-      areaWeather(weatherParams).then(res => {
+      areaWeather(weatherParams, this.headers).then((res) => {
         if (res.code === 10000) {
           this.weatherList = res.data.showapi_res_body;
           this.weatherListShow = true;
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
