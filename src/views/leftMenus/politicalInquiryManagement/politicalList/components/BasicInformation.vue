@@ -105,7 +105,7 @@ export default {
         fontWeight: "bold",
         color: "#333333"
       },
-            lineBlueStyle: {
+      lineBlueStyle: {
         background: "rgba(30, 86, 160, 1)",
         borderRadius: "0px 4px 4px 0px"
       },

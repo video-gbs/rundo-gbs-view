@@ -5,14 +5,14 @@
       <svg-icon icon-class="tzgg" class="tzgg_svg" />
       <span>通知公告</span>
     </div>
-    <vue-seamless-scroll :data="noticeList" :class-option="defaultOption">
+    <vue-seamless-scroll :data="notification" :class-option="defaultOption">
       <ul class="ul-scoll">
-        <li v-for="(item, index) in noticeList" :key="index">
+        <li v-for="(item, index) in notification" :key="index">
           <div class="row">
             <span class="title" :data-index="index">{{ item.title }}</span>
-            <span class="date" :data-index="index">{{ item.date }}</span>
+            <span class="date" :data-index="index">工作通告</span>
           </div>
-          <div class="type" :data-index="index">{{ item.type }}</div>
+          <div class="type" :data-index="index">{{ item.createTime }}</div>
         </li>
       </ul>
     </vue-seamless-scroll>
@@ -47,29 +47,37 @@ export default {
     LineFont
     // NoticeDetail
   },
+  props: {
+    notification: {
+      type: Array,
+      default: () => {
+        return [];
+      }
+    }
+  },
   data() {
     return {
       lineTitle: {
         title: "通知公告",
         notShowSmallTitle: false
       },
-      noticeList: [
-        {
-          title: "广西区数字乡村建设方案实例",
-          date: "1111",
-          type: "2022-11-15 09:13"
-        },
-        {
-          title: "广西区数字乡村建设方案实例",
-          date: "1111",
-          type: "2022-11-15 09:13"
-        },
-        {
-          title: "广西区数字乡村建设方案实例",
-          date: "1111",
-          type: "2022-11-15 09:13"
-        }
-      ],
+      // noticeList: [
+      //   {
+      //     title: "广西区数字乡村建设方案实例",
+      //     date: "1111",
+      //     type: "2022-11-15 09:13"
+      //   },
+      //   {
+      //     title: "广西区数字乡村建设方案实例",
+      //     date: "1111",
+      //     type: "2022-11-15 09:13"
+      //   },
+      //   {
+      //     title: "广西区数字乡村建设方案实例",
+      //     date: "1111",
+      //     type: "2022-11-15 09:13"
+      //   }
+      // ],
       newsPopup: {
         isShow: false,
         data: null
@@ -122,8 +130,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tzgg-scroll>::v-deep .el-card__body{
-  padding:0 !important;
+.tzgg-scroll > ::v-deep .el-card__body {
+  padding: 0 !important;
 }
 .notice-box {
   height: 100%;
@@ -147,7 +155,7 @@ export default {
   li {
     // line-height: 38px;
     padding: 10px 0;
-    border-bottom: 1px solid #EAEAEA;
+    border-bottom: 1px solid #eaeaea;
     cursor: pointer;
     &:hover {
       font-weight: bold;
@@ -186,8 +194,8 @@ export default {
       font-weight: 400;
       color: #8b8b8b;
     }
-    &:hover{
-      background: rgba(30,86,160,0.06);
+    &:hover {
+      background: rgba(30, 86, 160, 0.06);
     }
   }
 }

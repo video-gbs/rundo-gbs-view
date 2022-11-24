@@ -14,6 +14,7 @@
             v-if="item.type === 'input'"
             v-model="query[item.poro]"
             clearable
+            :size="item.size"
             tooltip-effect="dark"
             :placeholder="item.placeholder||'请输入'"
             :style="{ width: item.width || '272px' }"
@@ -24,6 +25,7 @@
             v-model="query[item.poro]"
             :placeholder="'请选择'"
             clearable
+            :size="item.size"
             :style="{ width: item.width || '272px' }"
           >
             <el-option
@@ -132,6 +134,7 @@
             v-model="query[item.poro]"
             :options="item.optionsList"
             clearable
+            :size="item.size"
             :disabled="item.disabled"
             :style="{ width: item.width || '272px' }"
             :props="{ ...item.propsConfig }"
@@ -142,8 +145,8 @@
     </div>
 
     <div class="search-btn" v-if="isSearch">
-      <el-button class="cz-btn" @click="submitReset">重置</el-button>
-      <el-button class="cx-btn save_btn" @click="submitSearch">查询</el-button>
+      <el-button class="cz-btn" @click="submitReset" size="small">重置</el-button>
+      <el-button class="cx-btn save_btn" @click="submitSearch" size="small">查询</el-button>
     </div>
   </div>
 </template>

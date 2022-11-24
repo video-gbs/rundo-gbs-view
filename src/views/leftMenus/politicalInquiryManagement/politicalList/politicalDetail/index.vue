@@ -1,5 +1,5 @@
 <template>
-  <div class="detail_container">
+  <div class="politicalDetail_container">
     <el-tabs type="border-card" v-model="activeName" @tab-click="handleClick">
       <template>
         <el-tab-pane
@@ -16,11 +16,17 @@
 </template>
 
 <script>
-import DetailList from "../components/DetailList";
+import BasicInformation from "../components/DetailList";
+import PoliticalReply from "../components/PoliticalReply";
+import ReviewResults from "../components/ReviewResults";
+import PoliticalRecord from "../components/PoliticalRecord";
 
 export default {
   components: {
-    DetailList
+    BasicInformation,
+    PoliticalReply,
+    ReviewResults,
+    PoliticalRecord
   },
   data() {
     return {
@@ -28,22 +34,22 @@ export default {
       tabpaneList: [
         {
           label: "基本信息",
-          content: DetailList,
+          content: BasicInformation,
           isShow: true
         },
         {
           label: "问政回复",
-          content: '',
+          content: PoliticalReply,
           isShow: false
         },
         {
           label: "评价结果",
-          content: '',
+          content: ReviewResults,
           isShow: false
         },
         {
           label: "问政记录",
-          content: '',
+          content: PoliticalRecord,
           isShow: false
         }
       ]
@@ -73,8 +79,38 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.detail_container{
-  background: #ECECEC;
-  margin:20px;
+::v-deep .el-tabs__item.is-active {
+  border: 0 none;
+}
+::v-deep .el-tabs--border-card > .el-tabs__content {
+  padding: 20px 24px;
+}
+::v-deep .el-tabs--border-card {
+  background: #f9f9f9;
+  border-top: 0 none;
+}
+::v-deep .el-tabs--border-card > .el-tabs__header {
+  border: 0 none;
+  background: #ececec;
+}
+::v-deep .el-tabs--border-card > .el-tabs__header .el-tabs__item {
+  border: 0 none;
+  height: 36px;
+  margin: 0 4px 4px 0;
+  border-radius: 2px;
+  background: #f6f6f6 !important;
+}
+
+::v-deep .el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active {
+  position:relative;
+  top:4px;
+}
+::v-deep .el-tabs__nav > .is-active {
+  background: #f9f9f9 !important;
+}
+::v-deep .el-tabs__item {
+}
+.politicalDetail_container {
+  background: #ececec;
 }
 </style>
