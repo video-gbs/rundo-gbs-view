@@ -19,7 +19,7 @@
           <el-table-column width="200" label="操作" fixed="right"> <template slot-scope="scope">
             <el-button type="text" @click="dialogShow(0, scope.row)">权限设置 </el-button>
             <el-button type="text" @click="dialogShow(0, scope.row)">编辑</el-button>
-            <el-button type="text">删除</el-button>
+            <el-button type="text" @click="deleteFn(scope.row,remove,getList)">删除</el-button>
 
           </template>
           </el-table-column>
@@ -28,79 +28,36 @@
       </el-table>
       <pagination :pages-data="params" @size-change="sizeChange" @current-change="currentChange" />
     </div>
-    <el-dialog :title="dialog.title" :visible.sync="dialog.show" width="700px" :before-close="handleClose">
+    <el-dialog :title="dialog.title" :visible.sync="dialog.show" width="400px" :before-close="handleClose">
       <div>
-        <el-form class="params-form" size="mini" label-position="left" label-width="80px" :model="dialog.params">
-          <el-row>
-            <el-col :span="12">
-              <el-form-item label="名称">
-                <el-input v-model="dialog.params.name" placeholder="6~20字符" />
-              </el-form-item>
-              <el-form-item label="密码">
-                <div class="f fd-c mr30">
-                  <el-input v-model="dialog.params.password" placeholder="6~20字符" @input="checkPassworLevel" />
-                  <span class="fs12 mt10">请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span>
-                </div>
+        <el-form ref="roleForm" class="params-form" size="mini" :rules="rules" label-position="left" label-width="80px" :model="dialog.params">
+          <el-form-item label="角色名称" prop="name">
+            <el-input v-model="dialog.params.name" clearable :maxlength="15" />
+          </el-form-item>
+          <el-form-item label="角色说明">
+            <el-input
+              v-model="dialog.params.detail"
+              type="textarea"
+              :rows="2"
+              :maxlength="50"
+            />
+          </el-form-item>
+          <el-form-item label="角色状态">
 
-              </el-form-item>
-              <el-form-item label="密码强度">
-                <el-row>
-                  <el-col :span="24">
-                    <div class="password-level-box f ai-c">
-                      <div class="password-level f ai-c">
-                        <div :style="{'background-color':passwordLevel>0?'#00d000':''}" />
-                        <div :style="{'background-color':passwordLevel>1?'orange':''}" />
-                        <div :style="{'background-color':passwordLevel>2?'red':''}" />
+            <el-row>
+              <el-col>
+                <el-radio v-model="dialog.params.status" :label="1">启用</el-radio>
+                <el-radio v-model="dialog.params.status" :label="0">禁用</el-radio>
+              </el-col>
+            </el-row>
 
-                        <span v-if="passwordLevel===1" class=" fs12 ml5" style="color:#00d000">
-                          弱
-                        </span>
-                        <span v-if="passwordLevel===2" class=" fs12 ml5" style="color:orange">
-                          中
-                        </span>
-                        <span v-if="passwordLevel===3" class=" fs12 ml5" style="color:red">
-                          强
-                        </span>
-                      </div>
-
-                    </div>
-
-                  </el-col>
-                </el-row>
-              </el-form-item>
-              <el-form-item label="账号状态">
-                <el-row>
-                  <el-col>
-                    <el-radio v-model="dialog.params.state" :label="1">启用</el-radio>
-                    <el-radio v-model="dialog.params.state" :label="0">禁用</el-radio>
-                  </el-col>
-                </el-row>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="昵称">
-                <el-input v-model="dialog.params.nickName" placeholder="最多40个字符" />
-              </el-form-item>
-              <el-form-item label="性别">
-                <el-select v-model="dialog.params.gender" placeholder="请选择性别">
-                  <el-option v-for="i in gender" :key="i.id" :label="i.label" :value="i.id" />
-                </el-select>
-
-              </el-form-item>
-              <el-form-item label="手机号">
-                <el-input v-model="dialog.params.phone" />
-              </el-form-item>
-              <el-form-item label="邮箱">
-                <el-input v-model="dialog.params.email" />
-              </el-form-item>
-            </el-col>
-          </el-row>
+          </el-form-item>
 
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="dialog.show = false">确 定</el-button>
+        <el-button type="primary" @click="addFn">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -108,10 +65,13 @@
 </template>
 
 <script>
+import _mixins from '@/mixins/index'
+import { addRoles, editRoles, deleteRoles, setDataAuth, setAppAuth } from '@/api/method/role'
 import pagination from '@/components/Pagination/index.vue'
 export default {
   name: '',
   components: { pagination },
+  mixins: [_mixins],
   data() {
     return {
       search: {
@@ -122,39 +82,32 @@ export default {
       params: {
         pageNum: 1,
         pageSize: 10,
-        total: 0,
-        proCount: 0
+        total: 0
       },
       tableData: [
-
         { id: 1, label: 'afsdf', sort: 1, state: 1, createTime: '2022-11-11 15:25:14' }
       ],
       dialog: {
         show: false,
-        title: '新增用户',
+        title: '新增角色',
         params: {
+          detail: '',
           name: '',
-          gender: 1,
-          state: 1,
-          password: 'aZ1',
-          nickName: '',
-          phone: '',
-          email: ''
+          status: 1
         }
       },
-      gender: [
-        { id: 1, label: '男' },
-        { id: 2, label: '女' }
-      ],
-      state: [
-        { id: 1, label: '启用' },
-        { id: 0, label: '禁用' }
-      ],
-      passwordLevel: 0
+      rules: {
+        name: [
+          { required: true, message: '请输入角色名称', trigger: 'blur' },
+          { min: 0, max: 15, message: '长度在 3 到 15 个字符', trigger: 'blur' }
+        ]
+      },
+      remove: deleteRoles
+
     }
   },
   mounted() {
-    this.checkPassworLevel()
+    this.getList()
   },
   methods: {
     sizeChange(v) {
@@ -175,19 +128,31 @@ export default {
     handleClose(done) {
       done()
     },
-    checkPassworLevel() {
-      const reg = /[A-Z]/
-      const reg2 = /[a-z]/
-      const reg3 = /[0-9]/
-      this.passwordLevel = 0
-      reg.test(this.dialog.params.password) && (this.passwordLevel += 1)
-      reg2.test(this.dialog.params.password) && (this.passwordLevel += 1)
-      reg3.test(this.dialog.params.password) && (this.passwordLevel += 1)
-
-      const l = this.dialog.params.password.length
-      if (l < 5 || l > 20) {
-        this.passwordLevel = 0
-      }
+    getList() {
+      // getRolesList(this.params)
+    },
+    addFn() {
+      this.$refs['roleForm'].validate(v => {
+        if (v) {
+          addRoles(this.dialog.params).then(res => {
+            if (res.code === 10000) {
+              this.$message.success('添加成功')
+              this.dialog.show = !this.dialog.show
+              this.getList()
+            }
+          })
+          return
+        }
+      })
+    },
+    editFn() {
+      editRoles(this.dialog.params).then(res => {
+        if (res.code === 10000) {
+          this.$message.success('编辑成功')
+          this.dialog.show = !this.dialog.show
+          this.getList()
+        }
+      })
     }
   }
 }
@@ -195,7 +160,7 @@ export default {
 
 <style lang="scss" scoped>
 .el-input {
-  width: 120px;
+  width: 100%;
 }
 
 .params-form{

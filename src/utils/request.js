@@ -14,17 +14,17 @@ const service = axios.create({
 // request interceptor
 service.interceptors.request.use(
   config => {
+    config.headers = { ...config.headers, ...{}}// 不知为何 这里的headers是undefined,所以需要设置成{}
     // do something before request is sent
-    const token= Local.getToken()
+    const token = Local.getToken()
     // config.headers.Authorization= token;
     if (token) {
-      // config.headers.Authorization = token;
+      config.headers.Authorization = token
       // config.headers['X-Token'] = getToken()
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
       return config
-
     }
     return config
   },
