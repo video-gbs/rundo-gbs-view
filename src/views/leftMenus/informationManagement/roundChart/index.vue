@@ -17,73 +17,129 @@
             </div>
           </template>
           <el-table-column
-            prop="label"
+            prop="title"
             label="标题"
           />
           <el-table-column
-            prop="sort"
+            prop="orderValue"
             label="显示顺序"
             width="80"
           />
           <el-table-column
-            prop="state"
+           
             label="显示状态"
             width="80"
-          />
+          >
+          <template slot-scope="scope">
+            {{$dict.isShow[scope.row.isShow]}}
+          </template>
+        </el-table-column>
+        <el-table-column
+            prop="isShow"
+            label="是否显示"
+            width="100"
+          >
+            <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.isShow"
+                active-color="#4caf50"
+                inactive-color="#eeeeee"
+                :active-value="0"
+                :inactive-value="1"
+                @change="editShowFn(scope.row,editShow)"
+              />
+              <!-- {{ dict.isShow[scope.row.isShow] }} -->
+            </template>
+          </el-table-column>
           <el-table-column
             prop="createTime"
             label="创建时间"
             width="180"
           />
           <el-table-column
-            width="280"
+            width="200"
             label="操作"
           > <template slot-scope="scope">
-            <el-button type="text">显示顺序</el-button>
-            <el-button type="text">设为可见</el-button>
+            <el-button type="text" @click="orderDialogFn(scope.row)">显示顺序</el-button>
+            <!-- <el-button type="text">设为可见</el-button> -->
             <el-button type="text" @click="goPage(`/roundChart/${scope.row.id}`)">编辑</el-button>
-            <el-button type="text">删除</el-button>
+            <el-button type="text" @click="deleteFn(scope.row,remove,getList)">删除</el-button>
 
           </template>
           </el-table-column>
         </el-table-column>
 
       </el-table>
-      <pagination :pages-data="params" @size-change="sizeChange" @current-change="currentChange" />
-    </div>
+      <el-pagination class="pagination-div mt10" background border layout="total, sizes, prev, pager, next, jumper"
+        :current-page.sync="params.current" :page-sizes="[10, 20, 50, 100]" :page-size="params.size"
+        :total="params.total" @size-change="handleSizeChange" @current-change="paginationCurrentChange" />    </div>
+    <setOrderVue ref="orderDialog" @refreshFn="getList"  :config="one" :fn="editOrder"></setOrderVue>
   </div>
 </template>
 
 <script>
+import { getRoundChartList,deleteRoundChart,editRoundChart,slideShowOrder} from '@/api/method/roundChart'
+import _mixins from '@/mixins/index'
 import pagination from '@/components/Pagination/index.vue'
+import setOrderVue from '@/components/setOrder/setOrder.vue'
 export default {
   name: '',
-  components: { pagination },
+  components: { pagination,setOrderVue },
+  mixins:[_mixins],
   data() {
     return {
       params: {
-        pageNum: 1,
-        pageSize: 10,
+        current: 1,
+        size: 10,
         total: 0,
-        proCount: 0
       },
       tableData: [
-
-      ]
+      ],  
+      show:false,
+      one:{},
+      remove:deleteRoundChart,
+      editShow:editRoundChart,
     }
   },
+  mounted(){
+   this.getList()
+  },
   methods: {
-    sizeChange(v) {
-      console.log('v')
-      // 执行搜索
-    },
-    currentChange(v) {
-      console.log('v2')
-      // 执行搜索
-    },
+    // handleSizeChange(v) {
+    //   console.log('v')
+    //   this.params.size=v
+    //   this.getList()
+    //   // 执行搜索
+    // },
+    // paginationCurrentChange(v) {
+    //   console.log('v2')
+    //   this.params.current=v
+    //   this.getList()
+    //   // 执行搜索
+    // },
     goPage(path, query) {
       this.$router.push(path)
-    }
+    },
+    getList(){
+      getRoundChartList(this.params).then(res=>{
+        res.code===10000&&(this.tableData=res.data.records,this.params.total=res.data.total)
+      })
+    },
+    orderDialogFn(v) {
+      this.one = v
+      this.$refs['orderDialog'].visible = true
+    },
+    editOrder(v) {
+      console.log('vv',v);
+      slideShowOrder(v.id, v.orderValue).then(res => {
+        res.code === 1000 && (this.$message.success('修改成功'), this.$refs['orderDialog'].visible = false)
+      }).catch(() => {
+
+      })
+    },
+    
+  
+    
   }
 }
 </script>

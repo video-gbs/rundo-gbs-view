@@ -17,32 +17,48 @@
             </div>
           </template>
           <el-table-column
-            prop="label"
+            prop="title"
             label="标题"
           />
           <el-table-column
-            prop="sort"
-            label="显示顺序"
-            width="80"
-          />
-          <el-table-column
-            prop="state"
+            prop="isShow"
             label="显示状态"
             width="80"
-          />
+          >
+            <template slot-scope="scope">
+              {{ $dict.isShow[scope.row.isShow] }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="isShow"
+            label="是否显示"
+            width="100"
+          >
+            <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.isShow"
+                active-color="#4caf50"
+                inactive-color="#eeeeee"
+                :active-value="0"
+                :inactive-value="1"
+                @change="editShowFn(scope.row,editShow)"
+              />
+              <!-- {{ dict.isShow[scope.row.isShow] }} -->
+            </template>
+          </el-table-column>
           <el-table-column
             prop="createTime"
             label="创建时间"
             width="180"
           />
           <el-table-column
-            width="280"
+            width="200"
             label="操作"
           > <template slot-scope="scope">
-            <el-button type="text">显示顺序</el-button>
-            <el-button type="text">设为可见</el-button>
+            <el-button type="text" @click="orderDialogFn(scope.row)">显示顺序</el-button>
+            <!-- <el-button type="text">设为可见</el-button> -->
             <el-button type="text" @click="goPage(`/advertisementPicture/${scope.row.id}`)">编辑</el-button>
-            <el-button type="text">删除</el-button>
+            <el-button type="text" @click=deleteFn(scope.row,remove,getAdvertisingListFn)>删除</el-button>
 
           </template>
           </el-table-column>
@@ -50,28 +66,39 @@
 
       </el-table>
       <pagination :pages-data="params" @size-change="sizeChange" @current-change="currentChange" />
+      <setOrderVue ref="orderDialog" @refreshFn="getAdvertisingListFn"  :config="one" :fn="editOrder"></setOrderVue>
+
     </div>
   </div>
 </template>
 
 <script>
 import pagination from '@/components/Pagination/index.vue'
+import _mixins from '@/mixins/index'
+import {getAdvertisingList,editAdvertising,editAdvertisingOrder,deleteAdvertising}  from '@/api/method/advertising'
+import setOrderVue from '@/components/setOrder/setOrder.vue'
 export default {
   name: '',
-  components: { pagination },
+  components: { pagination,setOrderVue },
+  mixins:[_mixins],
   data() {
     return {
       params: {
-        pageNum: 1,
-        pageSize: 10,
+        current: 1,
+        size: 10,
         total: 0,
-        proCount: 0
+       
       },
       tableData: [
 
-        { id: 1, label: 'afsdf', sort: 1, state: 1, createTime: '2022-11-11 15:25:14' }
-      ]
+      ],
+      one:{},
+      remove:deleteAdvertising,
+      editShow:editAdvertising,
     }
+  },
+  mounted(){
+    this.getAdvertisingListFn()
   },
   methods: {
     sizeChange(v) {
@@ -84,7 +111,26 @@ export default {
     },
     goPage(path, query) {
       this.$router.push(path)
-    }
+    },
+    getAdvertisingListFn(){
+      getAdvertisingList(this.params).then(res=>{
+      res.code===10000&&(this.tableData=res.data.records,this.params.total=res.data.total)
+    })
+    },
+
+    orderDialogFn(v) {
+      this.one = v
+      this.$refs['orderDialog'].visible = true
+    },
+    editOrder(v) {
+      console.log('vv',v);
+      editAdvertisingOrder(v.id, v.orderValue).then(res => {
+        res.code === 1000 && (this.$message.success('修改成功'), this.$refs['orderDialog'].visible = false)
+      }).catch(() => {
+
+      })
+    },
+
   }
 }
 </script>

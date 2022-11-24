@@ -4,13 +4,13 @@
     <div class="panel-header-box f jc-sb ai-c">
       <div class="title-css">{{ title }}</div>
       <div class="f ai-c">
-        <el-button size="mini" type="primary">保存</el-button>
+        <el-button size="mini" type="primary" @click="submitFn">保存</el-button>
         <el-button size="mini" @click="$router.push('/publicManagement')">返回</el-button>
       </div>
     </div>
     <div class="p30">
-      <el-form :model="params" label-width="100px" label-position="left">
-        <el-form-item label="展示标题">
+      <el-form ref="form" :model="params" label-width="100px" label-position="left" :rules="rules">
+        <el-form-item label="展示标题" prop="title">
           <el-input v-model="params.title" clearable size="mini" placeholder="请输入标题" />
         </el-form-item>
         <!-- <el-form-item label="公告">
@@ -28,44 +28,76 @@
           </div>
         </el-form-item> -->
         <el-form-item label="显示顺序">
-          <el-input-number v-model="params.sort" size="mini" :min="1" :max="10000" label="描述文字" @change="handleChange" />
+          <el-input-number v-model="params.orderValue" size="mini" :min="0" :max="10000" label="描述文字" @change="handleChange" />
         </el-form-item>
-        <el-form-item label="关联内容">
+        <el-form-item label="关联内容" prop="pageUrl">
           <el-row>
-            <el-col :span="24"> <el-radio v-model="params.link" size="mini" :label="0">内容展示</el-radio>
-              <el-radio v-model="params.link" size="mini" :label="1">关联外部链接</el-radio>
-              <el-input v-if="params.link" v-model="params.linkUrl" size="mini" placeholder="请输入外链地址" />
+            <el-col :span="24">
+              <el-radio v-model="params.related" size="mini" :label="0">内容展示</el-radio>
+              <el-radio v-model="params.related" size="mini" :label="1">关联外部链接</el-radio>
+              <el-input v-if="params.related" v-model="params.pageUrl" size="mini" placeholder="请输入外链地址" />
 
             </el-col>
 
           </el-row>
 
         </el-form-item>
-        <el-form-item label="描述">
-          <PEditor @change="contentChange" />
+        <el-form-item label="描述" prop="content">
+          <PEditor id="publicManagement" :value="editorCxt" @change="contentChange" />
         </el-form-item>
       </el-form>
     </div>
   </div>
 </template>
 <script>
+import { addAffiche, editAffiche } from '@/api/method/affiche'
 export default {
   name: 'RoundChartManage',
+
   data() {
+    const checkPageUrl = (rule, value, callback) => {
+      if (value === '') {
+        if (this.params.related === 0) {
+          callback()
+        } else {
+          callback(new Error('请输入连接地址'))
+        }
+      } else {
+        callback()
+      }
+    }
+
     return {
       title: '新增公告',
+      action: 'add',
+      editorCxt: '',
       params: {
-        'content': '展示内容',
+        'content': '',
         'isShow': 0,
         'orderValue': 0,
-        'pageUrl': 'http://www.baidu.com',
+        'pageUrl': '',
         'related': 0,
-        'title': 'xxxxxx'
+        'title': ''
+      },
+      rules: {
+        content: [
+          { required: true, message: '请输入提交的内容', trigger: 'blur' }
+        ],
+        title: [
+          { required: true, message: '请输入标题', trigger: 'blur' },
+          { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+        ],
+        pageUrl: [{ required: false, message: '请输入连接地址', trigger: 'blur' },
+          { min: 10, max: 200, message: '长度在 10 到 200 个字符', trigger: 'blur' },
+          { validator: checkPageUrl, trigger: ['blur', 'change'] }
+        ]
       }
     }
   },
   mounted() {
+    console.log(this.$route.params)
     if (this.$route.params.id !== 'add') {
+      this.action = 'edit'
       this.title = '编辑公告'
       this.getNoticeById()
     }
@@ -78,6 +110,30 @@ export default {
     },
     getNoticeById() {
       // 获取单个公告数据
+      const one = {
+        content: '展示内容11111',
+        createTime: '2022-11-17 15:42:51',
+        id: 1593147638770516000,
+        isShow: 0,
+        orderValue: 4,
+        pageUrl: 'http://www.baidu.com',
+        related: 1,
+        title: '标题1'
+      }
+      Object.assign(this.params, one)
+      console.log('this.params', this.params)
+      this.editorCxt = this.params.content
+    },
+    submitFn() {
+      this.$refs['form'].validate(v => {
+        if (v) {
+          const fn = this.action === 'add' ? addAffiche(this.params) : editAffiche(this.params.id, this.params)
+          fn.then(res => {
+            res.code === 10000 && (this.$message.success('添加成功'), this.$router.push('/publicManagement'))
+          })
+          return
+        }
+      })
     }
   }
 }
