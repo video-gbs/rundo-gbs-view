@@ -26,15 +26,15 @@
             width="80"
           />
           <el-table-column
-           
+
             label="显示状态"
             width="80"
           >
-          <template slot-scope="scope">
-            {{$dict.isShow[scope.row.isShow]}}
-          </template>
-        </el-table-column>
-        <el-table-column
+            <template slot-scope="scope">
+              {{ $dict.isShow[scope.row.isShow] }}
+            </template>
+          </el-table-column>
+          <el-table-column
             prop="isShow"
             label="是否显示"
             width="100"
@@ -70,39 +70,48 @@
         </el-table-column>
 
       </el-table>
-      <el-pagination class="pagination-div mt10" background border layout="total, sizes, prev, pager, next, jumper"
-        :current-page.sync="params.current" :page-sizes="[10, 20, 50, 100]" :page-size="params.size"
-        :total="params.total" @size-change="handleSizeChange" @current-change="paginationCurrentChange" />    </div>
-    <setOrderVue ref="orderDialog" @refreshFn="getList"  :config="one" :fn="editOrder"></setOrderVue>
+      <el-pagination
+        class="pagination-div mt10"
+        background
+        border
+        layout="total, sizes, prev, pager, next, jumper"
+        :current-page.sync="params.current"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="params.size"
+        :total="params.total"
+        @size-change="handleSizeChange"
+        @current-change="paginationCurrentChange"
+      />    </div>
+    <setOrderVue ref="orderDialog" :config="one" :fn="editOrder" @refreshFn="getList" />
   </div>
 </template>
 
 <script>
-import { getRoundChartList,deleteRoundChart,editRoundChart,slideShowOrder} from '@/api/method/roundChart'
+import { getRoundChartList, deleteRoundChart, editRoundChart, slideShowOrder } from '@/api/method/roundChart'
 import _mixins from '@/mixins/index'
 import pagination from '@/components/Pagination/index.vue'
 import setOrderVue from '@/components/setOrder/setOrder.vue'
 export default {
   name: '',
-  components: { pagination,setOrderVue },
-  mixins:[_mixins],
+  components: { pagination, setOrderVue },
+  mixins: [_mixins],
   data() {
     return {
       params: {
         current: 1,
         size: 10,
-        total: 0,
+        total: 0
       },
       tableData: [
-      ],  
-      show:false,
-      one:{},
-      remove:deleteRoundChart,
-      editShow:editRoundChart,
+      ],
+      show: false,
+      one: {},
+      remove: deleteRoundChart,
+      editShow: editRoundChart
     }
   },
-  mounted(){
-   this.getList()
+  mounted() {
+    this.getList()
   },
   methods: {
     // handleSizeChange(v) {
@@ -120,9 +129,9 @@ export default {
     goPage(path, query) {
       this.$router.push(path)
     },
-    getList(){
-      getRoundChartList(this.params).then(res=>{
-        res.code===10000&&(this.tableData=res.data.records,this.params.total=res.data.total)
+    getList() {
+      getRoundChartList(this.params).then(res => {
+        res.code === 10000 && (this.tableData = res.data.records, this.params.total = res.data.total)
       })
     },
     orderDialogFn(v) {
@@ -130,16 +139,14 @@ export default {
       this.$refs['orderDialog'].visible = true
     },
     editOrder(v) {
-      console.log('vv',v);
+      console.log('vv', v)
       slideShowOrder(v.id, v.orderValue).then(res => {
         res.code === 1000 && (this.$message.success('修改成功'), this.$refs['orderDialog'].visible = false)
       }).catch(() => {
 
       })
-    },
-    
-  
-    
+    }
+
   }
 }
 </script>
