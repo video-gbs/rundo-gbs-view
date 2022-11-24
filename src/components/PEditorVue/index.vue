@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { uploadImg } from '@/api/method/files'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import API from '@/api'
 import { trim } from 'zrender/lib/core/util'
@@ -51,10 +52,13 @@ export default {
             async customUpload(file, insertFn) {
               console.log(file, insertFn)
               var form = new FormData()
-              form.append('file', file)
-              API.file.upload(form).then((res) => {
-                const { url, name } = res.data.data
-                insertFn(url, name, url)
+              form.append('files', file)
+              uploadImg(form).then((res) => {
+                res.data.forEach(i => {
+                  insertFn(i.url, i.name, i.url)
+                })
+                // const { url, name } = res.data
+                // insertFn(url, name, url)
               })
             }
           },

@@ -43,17 +43,19 @@
 
         </el-form-item>
         <el-form-item label="描述" prop="content">
-          <PEditor id="publicManagement" :value="editorCxt" @change="contentChange" />
+          <!-- <PEditor id="publicManagement" :value="editorCxt" @change="contentChange" /> -->
+          <PEditorVue :value="editorCxt" @input="contentChange" />
         </el-form-item>
       </el-form>
     </div>
   </div>
 </template>
 <script>
+import PEditorVue from '@/components/PEditorVue/index.vue'
 import { addAffiche, editAffiche } from '@/api/method/affiche'
 export default {
   name: 'RoundChartManage',
-
+  components: { PEditorVue },
   data() {
     const checkPageUrl = (rule, value, callback) => {
       if (value === '') {
