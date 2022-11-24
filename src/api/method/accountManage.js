@@ -25,5 +25,5 @@ export function accountList(params, headers) {
 
 export function accountDelete(id, headers) {
   // 删除
-  return request.delete(`/politics/sys/users/del/${id}`, headers)
+  return request.delete(`/politics/sys/users/del/`,id, headers)
 }

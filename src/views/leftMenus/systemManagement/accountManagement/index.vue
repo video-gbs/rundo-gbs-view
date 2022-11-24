@@ -14,13 +14,23 @@
               >
             </div>
           </template>
-          <el-table-column prop="label" label="账号" />
-          <el-table-column prop="sort" label="昵称" />
-          <el-table-column prop="state" label="姓名" />
-          <el-table-column prop="state" label="手机号" />
-          <el-table-column prop="state" label="邮箱" />
-          <el-table-column prop="state" label="所属角色" />
-          <el-table-column prop="state" label="帐号状态" />
+          <el-table-column prop="account" label="账号" />
+          <el-table-column prop="nickName" label="昵称" />
+          <el-table-column prop="name" label="姓名" />
+          <el-table-column prop="mobile" label="手机号" />
+          <el-table-column prop="email" label="邮箱" />
+          <el-table-column prop="roleId" label="所属角色" />
+          <el-table-column prop="status" label="帐号状态">
+            <template slot-scope="scope">
+              <span>{{
+                scope.row.status === "1"
+                  ? "启用"
+                  : scope.row.status === "0"
+                  ? "禁用"
+                  : "-"
+              }}</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="createTime" label="创建时间" width="160" />
           <el-table-column width="200" label="操作" fixed="right">
             <template slot-scope="scope">
@@ -30,7 +40,9 @@
               <el-button type="text" @click="dialogShow(0, scope.row)"
                 >编辑</el-button
               >
-              <el-button type="text">删除</el-button>
+              <el-button type="text" @click="deleteAccount(scope.row)"
+                ><span class="delete-button">删除</span></el-button
+              >
             </template>
           </el-table-column>
         </el-table-column>
@@ -289,8 +301,7 @@ export default {
         total: 0,
         proCount: 0
       },
-      tableData: [
-      ],
+      tableData: [],
       dialog: {
         show: false,
         title: "新增用户",
@@ -370,13 +381,13 @@ export default {
       }
       return true;
     },
-    sizeChange(v) {
-      console.log("v");
-      // 执行搜索
+    sizeChange(pageSize) {
+      this.params.pageSize = pageSize;
+      this.getAccountList();
     },
-    currentChange(v) {
-      console.log("v2");
-      // 执行搜索
+    currentChange(proCount) {
+      this.params.proCount = proCount;
+      this.getAccountList();
     },
     goPage(path, query) {
       this.$router.push(path);
@@ -385,11 +396,31 @@ export default {
       this.dialog.title = act ? "添加账号" : "编辑用户";
       this.dialog.show = !this.dialog.show;
     },
+
+    deleteAccount(row) {
+      this.$confirm("删除后数据无法恢复，是否确认删除？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        accountDelete(row.id,this.headers).then(res => {
+          if (res.code === 10000) {
+            this.$message({
+              type: "success",
+              message: "删除成功"
+            });
+            this.getAccountList();
+          }
+        });
+      });
+    },
     getAccountList() {
-      accountList(this.params, this.headers).then(res => {
+      accountList({...this.params,current:this.params.pageNum,size:this.params.pageSize}, this.headers).then(res => {
         if (res.code === 10000) {
-          console.log('res',res)
-          this.tableData=res.data.records;
+          this.tableData = res.data.records;
+          this.params.total = res.data.total;
+          this.params.pages = res.data.pages;
+          this.params.current = res.data.current;
         }
       });
     },
@@ -445,7 +476,7 @@ export default {
     },
     handleClose(done) {
       done();
-    },
+    }
     // checkPassworLevel() {
     //   const reg = /[A-Z]/;
     //   const reg2 = /[a-z]/;
@@ -500,5 +531,8 @@ export default {
   // height: 28px;
   display: flex;
   align-items: center;
+}
+.delete-button {
+  color: red !important;
 }
 </style>
