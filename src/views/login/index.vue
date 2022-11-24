@@ -110,7 +110,7 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         console.log('valid',valid,this.loginForm)
-        if (!valid) {
+        if (valid) {
           this.loading = true
           login(this.loginForm).then((res) => {
             const access_token = res.data.token;

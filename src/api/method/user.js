@@ -1,7 +1,7 @@
 import request from '@/api/fetch'
 
 export function login(data) {
-  return request.postLogin('/politics/sys/login', data)
+  return request.post('/politics/sys/login', data)
 }
 
 export function getInfo(params) {
