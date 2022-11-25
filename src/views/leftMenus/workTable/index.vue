@@ -15,7 +15,7 @@
         :notification="notification"
         v-if="notificationShow"
       />
-      <Statistical :homeLists="homeLists" />
+      <Statistical :statisticalData="statisticalData" />
     </div>
   </div>
 </template>
@@ -54,6 +54,7 @@ export default {
       headers: {
         Authorization: Local.getToken(),
       },
+      statisticalData:{}
     };
   },
   watch: {},
@@ -80,9 +81,9 @@ export default {
     editAffiche() {
       editAffiche(this.params, this.headers).then((res) => {
         if (res.code === 10000) {
-          console.log("res", res);
-          // this.tableData = res.data.records
-          // this.params.total = res.data.total
+
+          this.statisticalData=res.data;
+          console.log("this.statisticalData", this.statisticalData);
         }
       });
     },
@@ -90,8 +91,6 @@ export default {
       getAfficheList(this.params, this.headers).then((res) => {
         if (res.code === 10000) {
           console.log("res", res);
-          // this.tableData = res.data.records
-          // this.params.total = res.data.total
         }
       });
     },
