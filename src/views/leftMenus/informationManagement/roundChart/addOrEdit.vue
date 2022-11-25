@@ -45,7 +45,9 @@
 
         </el-form-item>
         <el-form-item label="描述">
-          <PEditor id="roundChart" :value="editorCxt" @change="contentChange" />
+          <!-- <PEditor id="roundChart" :value="editorCxt" @change="contentChange" /> -->
+
+          <PEditorVue :value="editorCxt" @input="contentChange" />
         </el-form-item>
       </el-form>
 
@@ -53,10 +55,12 @@
   </div>
 </template>
 <script>
+import PEditorVue from '@/components/PEditorVue/index.vue'
 import { uploadImg } from '@/api/method/files'
 import { addRoundChart, editRoundChart } from '@/api/method/roundChart'
 export default {
   name: 'RoundChartManage',
+  components: { PEditorVue },
   data() {
     return {
       title: '新增轮播图',
@@ -126,11 +130,12 @@ export default {
     beforeUpload(file) {
       console.log('file', file)
     },
-    uploadFn(file) {
-      const fd = new FormData()
-      fd.append('files', file.file)
-      uploadImg(fd).then(res => {
-        res.code === 10000 && (this.params.fileName = res.data.name)
+    uploadFn(files) {
+      console.log('sdf', files.raw)
+      const obj = new FormData()
+      obj.append('files', files.file)
+      uploadImg(obj).then(res => {
+        res.code === 10000 && (this.params.fileName = res.data[0].name)
         res.code !== 10000 && this.$refs['uploadRef'].clearFiles()
       }).catch(() => {
         this.$refs['uploadRef'].clearFiles()
