@@ -54,7 +54,7 @@ export default {
       headers: {
         Authorization: Local.getToken(),
       },
-      statisticalData:{}
+      statisticalData:[]
     };
   },
   watch: {},
@@ -83,7 +83,6 @@ export default {
         if (res.code === 10000) {
 
           this.statisticalData=res.data;
-          console.log("this.statisticalData", this.statisticalData);
         }
       });
     },

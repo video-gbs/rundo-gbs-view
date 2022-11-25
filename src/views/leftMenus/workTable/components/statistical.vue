@@ -22,9 +22,9 @@ export default {
   },
    props: {
     statisticalData: {
-      type: Object,
+      type: Array,
       default: () => {
-        return {};
+        return [];
       }
     }
   },
