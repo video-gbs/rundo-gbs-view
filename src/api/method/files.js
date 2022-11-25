@@ -2,8 +2,9 @@
 // 文件管理
 import request from '@/api/fetch'
 
-export function uploadFiles(params) {
-  return request.put(`/politics/file/upload${params.id || ''}`, params.file)
+export function uploadImg(params) {
+  // 图片上传 可批量
+  return request.post(`/politics/v1/file/batchUploadImg`, params)
 }
 
 export function showImg(fileName) {

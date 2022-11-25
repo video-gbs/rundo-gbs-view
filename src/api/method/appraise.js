@@ -6,9 +6,9 @@ export function addAppraise(params) {
   return request.put(`/politics/appraise`, params)
 }
 
-export function editAffiche() {
+export function editAffiche(params, headers) {
   // 获取评价统计情况
-  return request.get(`/politics/appraise/stat`)
+  return request.get(`/politics/appraise/stat`,params, headers)
 }
 
 export function getAppraiseByOne(id) {
