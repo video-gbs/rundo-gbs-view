@@ -20,6 +20,14 @@ export default {
     PieEchart,
     LineFont
   },
+   props: {
+    statisticalData: {
+      type: Array,
+      default: () => {
+        return [];
+      }
+    }
+  },
   data() {
     return {
       lineTitle: {

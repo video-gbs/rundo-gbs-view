@@ -2,7 +2,7 @@
   <div class="app-header">
     <div class="app-header">
       <div class="app-header-left">
-        <svg-icon icon-class="logo" class="logo"/>
+        <svg-icon icon-class="logo" class="logo" />
         <h2>梧州问政后台系统</h2>
       </div>
       <div class="header-menu">
@@ -19,7 +19,7 @@
         <div class="menu-user">
           <el-dropdown class="" trigger="click">
             <div class="user-info">
-              <svg-icon icon-class="user1" class="user"/>
+              <svg-icon icon-class="user1" class="user" />
               <span>管理员</span>
               <i class="el-icon-caret-bottom" />
             </div>
@@ -52,6 +52,7 @@ import { mapGetters } from "vuex";
 // import Message from "../Message/index.vue";
 import { Local } from "@/utils/storage";
 // import NotTips from "@/components/NotTips";
+import { logout } from "@/api/method/user";
 export default {
   components: {
     // Message,
@@ -63,7 +64,7 @@ export default {
       messageData: {},
       messageCount: 0,
       lastCount: 0,
-      show: false,
+      show: false
     };
   },
   computed: {
@@ -79,7 +80,7 @@ export default {
      * 工作平台和系统管理菜单
      */
     routes() {
-      const routes = this.$router.options.routes.filter((route) => {
+      const routes = this.$router.options.routes.filter(route => {
         return route.systemCode;
       });
       return routes;
@@ -90,7 +91,7 @@ export default {
     toGreet() {
       const now = new Date().getHours();
       return now < 12 ? "上午好" : now > 2 ? "下午好" : "中午好";
-    },
+    }
   },
   created() {
     // if (Local.getToken()) {
@@ -109,9 +110,17 @@ export default {
     /**
      * 退出登录
      */
-    async logout() {
-      await this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    logout() {
+      // Local.
+      logout({}, { Authorization: Local.getToken() })
+        .then(res => {
+          console.log(res, 11111);
+          if (res.code === 10000) {
+            Local.setToken("");
+            this.$router.push({ path: "/login" });
+          }
+        })
+        .catch(() => {});
     },
     setTheme() {
       this.$utils.setTheme("theme-blue");
@@ -120,13 +129,13 @@ export default {
       this.$socket.create();
     },
     initNotice() {
-      this.$api.message.list().then((res) => {
+      this.$api.message.list().then(res => {
         if (res.data.data) {
           this.messageData = {
-            rows: res.data.data,
+            rows: res.data.data
           };
           let count = this.messageData.rows.length;
-          this.messageData.rows.forEach((item) => {
+          this.messageData.rows.forEach(item => {
             if (item.isRead) {
               count--;
             }
@@ -149,12 +158,12 @@ export default {
     },
     closeTips() {
       this.show = false;
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="scss">
-  @import "~@/styles/element-variables.scss";
+@import "~@/styles/element-variables.scss";
 .app-header {
   width: 100%;
   color: #fff;
@@ -167,21 +176,21 @@ export default {
   align-items: center;
   justify-content: space-between;
   background-color: $bg-color;
-  box-shadow: 0px 3px 6px 1px rgba(51,51,51,0.16);
-  .app-header-left{
-    position:relative;
+  box-shadow: 0px 3px 6px 1px rgba(51, 51, 51, 0.16);
+  .app-header-left {
+    position: relative;
 
-    .logo{
-      position:absolute;
-      top:10px;
-      width:1.75rem;
-      height:1.75rem;
+    .logo {
+      position: absolute;
+      top: 10px;
+      width: 1.75rem;
+      height: 1.75rem;
     }
-    h2{
+    h2 {
       font-size: 18px;
       font-weight: bold;
       color: $font-color;
-      margin-left:2rem;
+      margin-left: 2rem;
     }
   }
   .header-menu {
@@ -220,17 +229,17 @@ export default {
       align-items: center;
       font-size: 0.5rem;
       margin-left: 20px;
-      position:relative;
-      .user{
-        width:2rem;
-        height:2rem;
-        margin-right:1rem;
-        position:absolute;
-        top:-0.75rem;
-        left:-2.5rem;
+      position: relative;
+      .user {
+        width: 2rem;
+        height: 2rem;
+        margin-right: 1rem;
+        position: absolute;
+        top: -0.75rem;
+        left: -2.5rem;
       }
-      span{
-        color:$font-color;
+      span {
+        color: $font-color;
       }
 
       .el-avatar {
@@ -238,7 +247,7 @@ export default {
       }
       i {
         font-size: 0.625rem;
-        color:$font-color;
+        color: $font-color;
       }
     }
   }

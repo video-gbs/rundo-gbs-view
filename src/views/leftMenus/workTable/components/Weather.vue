@@ -51,12 +51,27 @@ export default {
     deep: true,
     immediate: true
   },
-  created() {
-  },
+  created() {},
   mounted() {
     this.getdataTime();
   },
   methods: {
+    // getImg(val) {
+    //   switch (val) {
+    //     case value:
+    //       return: require('../../../../assets/imgs/中雪.png')
+    //       break;
+    //     case value:
+    //       break;
+    //     case value:
+    //       break;
+    //     case value:
+    //       break;
+
+    //     default:
+    //       break;
+    //   }
+    // },
     getdataTime() {
       let wk = new Date().getDay();
       let yy = new Date().getFullYear();

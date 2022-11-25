@@ -52,7 +52,7 @@ export default {
   },
   data() {
     return {
-      showDetails: true,
+      showDetails: false,
       activeName: "全部",
       btnLists:[
         {

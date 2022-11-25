@@ -8,6 +8,6 @@ export function getInfo(params) {
   return request.get('/vue-admin-template/user/info', params)
 }
 
-export function logout() {
-  return request.post('/politics/sys/logout')
+export function logout(params,headers) {
+  return request.get('/politics/sys/logout',params,headers)
 }

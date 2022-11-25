@@ -4,6 +4,8 @@ const getters = {
   token: state => state.user.token,
   avatar: state => state.user.avatar,
   name: state => state.user.name,
-  visitedViews: state => state.tagsView.visitedViews,
+  menuModule: state => state.tabs.menuModule,
+  activeTabsName: state => state.tabs.activeTabsName,
+  tabList: state => state.tabs.tabList,
 }
 export default getters

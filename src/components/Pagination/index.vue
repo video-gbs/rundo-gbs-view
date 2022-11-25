@@ -1,6 +1,6 @@
 <template>
   <div :class="pagesData.proCount?'EcologyPagination':'EcologyPagination-has'">
-    <span class="EcologyPagination-span" v-show="pagesData.proCount">项目个数共计[{{pagesData.proCount?pagesData.proCount:0}}]个,项目个数(含子项目)共计[{{pagesData.total}}]个。</span>
+    <span class="EcologyPagination-span" v-show="false">项目个数共计[{{pagesData.proCount?pagesData.proCount:0}}]个,项目个数(含子项目)共计[{{pagesData.total}}]个。</span>
       <el-pagination
         class="pagination-div"
         background
