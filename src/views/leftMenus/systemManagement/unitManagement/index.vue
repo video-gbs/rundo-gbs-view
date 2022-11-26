@@ -15,8 +15,8 @@
             </div>
           </template>
           <el-table-column label="序号" type="index" width="60" />
-          <el-table-column prop="label" label="单位名称" />
-          <el-table-column prop="sort" label="账号数量" />
+          <el-table-column prop="name" label="单位名称" />
+          <el-table-column prop="accountNum" label="账号数量" />
           <el-table-column width="100" label="操作" fixed="right">
             <template slot-scope="scope">
               <el-button type="text" @click="dialogShow(0, scope.row)"
@@ -49,15 +49,20 @@
           label-width="80px"
           :model="dialog.params"
           :rules="rules"
+          ref="unitForm"
+          @keyup.enter="submit('unitForm')"
         >
           <el-form-item label="单位名称" prop="unitName">
             <el-input
-              v-model="dialog.params.unitName"
+              v-model="dialog.params.name"
               placeholder="最多可输入40个字符"
             />
           </el-form-item>
           <el-form-item label="单位分类" prop="unitType">
-            <el-select v-model="dialog.params.unitType" placeholder="请选择分类">
+            <el-select
+              v-model="dialog.params.unitType"
+              placeholder="请选择分类"
+            >
               <el-option
                 v-for="i in gender"
                 :key="i.id"
@@ -71,7 +76,7 @@
               type="textarea"
               :rows="2"
               placeholder="最多可输入4000个字符"
-              v-model="dialog.params.unitDescribe"
+              v-model="dialog.params.detail"
             >
             </el-input>
           </el-form-item>
@@ -79,7 +84,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="dialog.show = false">确 定</el-button>
+        <el-button type="primary" @click="submit('unitForm')">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -91,7 +96,7 @@ import {
   unitAdd,
   unitEdit,
   unitList,
-  unitDelete
+  unitDelete,
 } from "@/api/method/unitManagement";
 import { Local } from "@/utils/storage";
 
@@ -103,66 +108,58 @@ export default {
       search: {
         userName: "",
         phone: "",
-        time: ""
+        time: "",
       },
       params: {
         pageNum: 1,
         pageSize: 10,
         total: 0,
-        proCount: 0
+        proCount: 0,
       },
-      tableData: [
-        {
-          id: 1,
-          label: "afsdf",
-          sort: 1,
-          state: 1,
-          createTime: "2022-11-11 15:25:14"
-        }
-      ],
+      tableData: [],
       dialog: {
         show: false,
         title: "新增用户",
         params: {
-          unitName: "",
+          name: "",
           unitType: 1,
-          unitDescribe: ""
-        }
+          detail: "",
+        },
       },
       gender: [
         { id: 1, label: "男" },
-        { id: 2, label: "女" }
+        { id: 2, label: "女" },
       ],
       state: [
         { id: 1, label: "启用" },
-        { id: 0, label: "禁用" }
+        { id: 0, label: "禁用" },
       ],
       passwordLevel: 0,
       editId: "",
       headers: {
-        Authorization: Local.getToken()
+        Authorization: Local.getToken(),
       },
       rules: {
-        unitName: [
+        name: [
           { required: true, message: "不能为空", trigger: "blur" },
           {
             max: 40,
             message: "40个字符",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         unitType: {
           required: true,
           message: "不能为空",
-          trigger: "change"
+          trigger: "change",
         },
-        unitDescribe: {
+        detail: {
           required: true,
           message: "不能为空",
           trigger: "blur",
-          max: 40
-        }
-      }
+          max: 40,
+        },
+      },
     };
   },
   mounted() {
@@ -178,10 +175,10 @@ export default {
       this.dialog.title = act ? "新增单位" : "编辑单位";
       this.dialog.show = !this.dialog.show;
       if (act === 0) {
-        const { unitName, unitType, unitDescribe } = data;
-        this.dialog.params.unitName = unitName;
-        this.dialog.params.unitType = unitType;
-        this.dialog.params.unitDescribe = unitDescribe;
+        const { name, unitType, detail } = data;
+        this.dialog.params.name = name;
+        // this.dialog.params.unitType = unitType;
+        this.dialog.params.detail = detail;
         this.editId = data.id;
       }
     },
@@ -191,10 +188,10 @@ export default {
         {
           ...this.params,
           current: this.params.pageNum,
-          size: this.params.pageSize
-        },
-        this.headers
-      ).then(res => {
+          size: this.params.pageSize,
+        }
+        
+      ).then((res) => {
         if (res.code === 10000) {
           this.tableData = res.data.records;
           this.params.total = res.data.total;
@@ -207,13 +204,13 @@ export default {
       this.$confirm("删除后数据无法恢复，是否确认删除？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       }).then(() => {
-        unitDelete(row.id, this.headers).then(res => {
+        unitDelete(row.id).then((res) => {
           if (res.code === 10000) {
             this.$message({
               type: "success",
-              message: "删除成功"
+              message: "删除成功",
             });
             this.getUnitList();
           }
@@ -222,15 +219,15 @@ export default {
     },
 
     submit(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
             case "新增单位":
-              unitAdd(this.dialog.params, this.headers).then(res => {
+              unitAdd(this.dialog.params).then((res) => {
                 if (res.code === 10000) {
                   this.$message({
                     type: "success",
-                    message: "单位新增成功"
+                    message: "单位新增成功",
                   });
                   this.dialog.show = false;
                   this.getAccountList();
@@ -239,13 +236,12 @@ export default {
               break;
             case "编辑单位":
               unitEdit(
-                { id: this.editId, ...this.dialog.params },
-                this.headers
-              ).then(res => {
+                { id: this.editId, ...this.dialog.params }
+              ).then((res) => {
                 if (res.code === 10000) {
                   this.$message({
                     type: "success",
-                    message: "单位修改成功"
+                    message: "单位修改成功",
                   });
                   this.dialog.show = false;
                   this.getAccountList();
@@ -261,8 +257,8 @@ export default {
     },
     handleClose(done) {
       done();
-    }
-  }
+    },
+  },
 };
 </script>
 

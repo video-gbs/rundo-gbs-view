@@ -197,6 +197,12 @@ export const constantRoutes = [
         name: '单位管理',
         component: () => import('@/views/leftMenus/systemManagement/unitManagement/index'),
         meta: { title: '单位管理', icon: 'dashboard' }
+      },
+      {
+        path: '/otherUnitManagement',
+        name: '其他单位管理',
+        component: () => import('@/views/leftMenus/systemManagement/otherUnitManagement/index'),
+        meta: { title: '其他单位管理', icon: 'dashboard' }
       }
     ]
   },

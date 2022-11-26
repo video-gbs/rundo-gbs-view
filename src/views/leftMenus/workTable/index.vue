@@ -68,7 +68,7 @@ export default {
   },
   methods: {
     getHomeLists() {
-      homeLists(this.params, this.headers).then((res) => {
+      homeLists(this.params).then((res) => {
         if (res.code === 10000) {
           this.homeLists = res.data;
           this.notification = res.data.notification;
@@ -79,7 +79,7 @@ export default {
       });
     },
     editAffiche() {
-      editAffiche(this.params, this.headers).then((res) => {
+      editAffiche(this.params).then((res) => {
         if (res.code === 10000) {
 
           this.statisticalData=res.data;
@@ -87,7 +87,7 @@ export default {
       });
     },
     getAfficheList() {
-      getAfficheList(this.params, this.headers).then((res) => {
+      getAfficheList(this.params).then((res) => {
         if (res.code === 10000) {
           console.log("res", res);
         }
@@ -99,7 +99,7 @@ export default {
         from: "5",
         needIndex: "1",
       };
-      areaWeather(weatherParams, this.headers).then((res) => {
+      areaWeather(weatherParams).then((res) => {
         if (res.code === 10000) {
           this.weatherList = res.data.showapi_res_body;
           this.weatherListShow = true;
