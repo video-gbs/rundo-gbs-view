@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'has-logo': showLogo }">
-    <el-scrollbar wrap-class="scrollbar-wrapper">
+    <el-scrollbar wrap-class="scrollbar-wrapper" style="height: calc(100% - 62px);">
       <el-menu
         :default-active="activeMenu"
         :background-color="variables.menuBg"
@@ -72,6 +72,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+
 .bottom-logo {
   position: absolute;
   height: 62px;

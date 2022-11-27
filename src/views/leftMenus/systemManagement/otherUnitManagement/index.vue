@@ -419,7 +419,7 @@ export default {
           nickName: "",
           name: "",
           email: "",
-          jobId: 1
+          deptId: 1
         }
       },
       gender: [
@@ -542,14 +542,14 @@ export default {
     dialogShow(act, data) {
       this.dialog.params = {
         account: "",
-        roleId: 1,
+        roleId: 10000001,
         status: 1,
         password: "",
         rePassword: "",
         nickName: "",
         name: "",
         email: "",
-        jobId: 1
+        deptId: 1
       };
       this.editShow = true;
       if (act === 0) {
@@ -623,7 +623,7 @@ export default {
                 if (res.code === 10000) {
                   this.$message({
                     type: "success",
-                    message: "账号新增成功"
+                    message: "其他单位账号新增成功"
                   });
                   this.dialog.show = false;
                   this.getOtherUnitList();

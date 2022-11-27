@@ -52,7 +52,7 @@
           ref="unitForm"
           @keyup.enter="submit('unitForm')"
         >
-          <el-form-item label="单位名称" prop="unitName">
+          <el-form-item label="单位名称" prop="name">
             <el-input
               v-model="dialog.params.name"
               placeholder="最多可输入40个字符"
@@ -64,14 +64,14 @@
               placeholder="请选择分类"
             >
               <el-option
-                v-for="i in gender"
+                v-for="i in types"
                 :key="i.id"
                 :label="i.label"
                 :value="i.id"
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="单位描述" prop="unitDescribe">
+          <el-form-item label="单位描述" prop="detail">
             <el-input
               type="textarea"
               :rows="2"
@@ -122,13 +122,14 @@ export default {
         title: "新增用户",
         params: {
           name: "",
-          unitType: 1,
+          unitType: '',
           detail: "",
         },
       },
-      gender: [
-        { id: 1, label: "男" },
-        { id: 2, label: "女" },
+      types: [
+        { id: 2, label: "市直" },
+        { id: 3, label: "县直" },
+        { id: 4, label: "其他" },
       ],
       state: [
         { id: 1, label: "启用" },
@@ -230,7 +231,7 @@ export default {
                     message: "单位新增成功",
                   });
                   this.dialog.show = false;
-                  this.getAccountList();
+                  this.getUnitList();
                 }
               });
               break;
@@ -244,7 +245,7 @@ export default {
                     message: "单位修改成功",
                   });
                   this.dialog.show = false;
-                  this.getAccountList();
+                  this.getUnitList();
                 }
               });
               break;
