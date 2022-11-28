@@ -23,7 +23,7 @@
                 >编辑</el-button
               >
               <el-button type="text" @click="deleteUnit(scope.row)"
-                >删除</el-button
+                ><span class="delete-button">删除</span></el-button
               >
             </template>
           </el-table-column>
@@ -58,9 +58,9 @@
               placeholder="最多可输入40个字符"
             />
           </el-form-item>
-          <el-form-item label="单位分类" prop="unitType">
+          <el-form-item label="单位分类" prop="deptType">
             <el-select
-              v-model="dialog.params.unitType"
+              v-model="dialog.params.deptType"
               placeholder="请选择分类"
             >
               <el-option
@@ -122,7 +122,7 @@ export default {
         title: "新增用户",
         params: {
           name: "",
-          unitType: '',
+          deptType: '',
           detail: "",
         },
       },
@@ -149,7 +149,7 @@ export default {
             trigger: "blur",
           },
         ],
-        unitType: {
+        deptType: {
           required: true,
           message: "不能为空",
           trigger: "change",
@@ -176,9 +176,9 @@ export default {
       this.dialog.title = act ? "新增单位" : "编辑单位";
       this.dialog.show = !this.dialog.show;
       if (act === 0) {
-        const { name, unitType, detail } = data;
+        const { name, deptType, detail } = data;
         this.dialog.params.name = name;
-        // this.dialog.params.unitType = unitType;
+        this.dialog.params.deptType = deptType;
         this.dialog.params.detail = detail;
         this.editId = data.id;
       }
@@ -295,5 +295,8 @@ export default {
   // height: 28px;
   display: flex;
   align-items: center;
+}
+.delete-button {
+  color: red !important;
 }
 </style>

@@ -44,11 +44,16 @@
 import Seach from "@/components/Seach/index.vue";
 import ComTabble from "@/components/ComTabble/index.vue";
 import Pagination from "@/components/Pagination/index.vue";
+import {
+  affairsInfoList,
+  affairsInfoDelete,
+  affairsInfoSearch,
+} from "@/api/method/politicalList";
 export default {
   components: {
     Seach,
     ComTabble,
-    Pagination
+    Pagination,
   },
   name: "projectManagement",
   data() {
@@ -58,7 +63,7 @@ export default {
         background: "#EAEAEA",
         fontsize: "14px",
         fontWeight: 400,
-        color: "#333333"
+        color: "#333333",
       },
       // 搜索栏配置
       FormList: [
@@ -66,13 +71,13 @@ export default {
           poro: "projectName",
           type: "input",
           label: "标题：",
-          size: "small"
+          size: "small",
         },
         {
           poro: "projectSubName",
           type: "input",
           label: "分类：",
-          size: "small"
+          size: "small",
         },
         {
           poro: "area",
@@ -81,9 +86,9 @@ export default {
           size: "small",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+            multiple: true,
           },
-          optionsList: []
+          optionsList: [],
         },
         {
           poro: "renovateType",
@@ -92,9 +97,9 @@ export default {
           size: "small",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+            multiple: true,
           },
-          optionsList: []
+          optionsList: [],
         },
 
         {
@@ -104,9 +109,9 @@ export default {
           size: "small",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+            multiple: true,
           },
-          optionsList: []
+          optionsList: [],
         },
         {
           poro: "declareYear",
@@ -115,9 +120,9 @@ export default {
           type: "addressCascader",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+            multiple: true,
           },
-          optionsList: []
+          optionsList: [],
         },
         {
           poro: "moneySource",
@@ -126,174 +131,150 @@ export default {
           size: "small",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+            multiple: true,
           },
-          optionsList: []
-        }
+          optionsList: [],
+        },
       ],
       // 搜索from
       query: {
-        projectName: "",
-        projectState: "",
-        renovateType: "",
-        declareYear: "",
-        areaCounty: "",
-        moneySource: "",
-        areaCity: "",
-        area: "",
-        radio: ""
+        deptId: 0,
+        deptType: 0,
+        domain: "",
+        endTime: "",
+        field: [],
+        fileBatchId: 0,
+        isDeleted: 0,
+        isReview: 0,
+        isShow: 0,
+        order: true,
+        phone: "",
+        pubUsername: "",
+        realName: "",
+        startTime: "",
+        status: 0,
+        title: "",
+        type: "",
       },
       // 高级搜索
       isLoading: false,
-      maxHeight: "430",
       // 表单数据
       index: true,
-      selection: true,
-      leftTitle: "",
       tableItems: [
         {
           label: "编号",
           name: "projectName",
           width: "100",
           isShow: true,
-          isBold: false
+          isBold: false,
         },
         {
           label: "标题",
-          name: "projectSubName",
+          name: "title",
           width: "200",
-          isShow: true
+          isShow: true,
         },
         {
           label: "分类",
-          name: "area",
-          isShow: true
+          name: "type",
+          isShow: true,
+          width: "80",
         },
         {
           label: "留言对象",
-          name: "declareYear",
-          isShow: true
+          name: "deptName",
+          isShow: true,
         },
         {
           label: "发布账号",
-          name: "moneySourceName",
-          isShow: true
+          name: "account",
+          isShow: true,
         },
         {
           label: "电话",
-          name: "carryTerm",
-          isShow: true
+          name: "phone",
+          isShow: true,
         },
         {
           label: "提交时间",
-          name: "renovateTypeName",
-          isShow: true
+          name: "createTime",
+          isShow: true,
+          width: "120",
         },
         {
           label: "状态",
-          name: "projectStateName",
-          isShow: true
+          name: "status",
+          isShow: true,
+          width: "80",
         },
         {
           label: "受理单位",
           name: "contacts",
-          isShow: true
+          isShow: true,
         },
         {
           label: "是否可见",
-          name: "restoreContent",
+          name: "isShow",
           isShow: true,
-          content: "test"
+          content: "test",
+          width: "80",
         },
         {
           label: "评论区",
-          name: "workPlan",
+          name: "isReview",
           isShow: true,
-          content: "test1"
-        }
+          content: "test1",
+          width: "80",
+        },
       ],
-      isFullscreen: false,
-      tableData: [
-        {
-          label: "编号",
-          projectName: "测试",
-          label: "标题",
-          projectSubName: "测试",
-
-          label: "分类",
-          area: "测试",
-          label: "留言对象",
-          declareYear: "测试",
-          label: "发布账号",
-          moneySourceName: "测试",
-          label: "电话",
-          carryTerm: "测试",
-          label: "提交时间",
-          renovateTypeName: "测试",
-
-          label: "状态",
-          projectStateName: "测试",
-
-          label: "受理单位",
-          contacts: "测试",
-          label: "是否可见",
-          restoreContent: "测试",
-
-          label: "评论区",
-          workPlan: "测试"
-        }
-      ],
+      maxHeight:800,
+      tableData: [],
       // 分页器内容
       pagesData: {
         pageNum: 1,
         pageSize: 10,
         total: 0,
-        proCount: 0
+        proCount: 0,
       },
       buttonItems: {
         options: [
           {
             text: "详情",
             cb: "verify",
-            icon: "el-icon-view"
+            icon: "el-icon-view",
           },
           {
             text: "删除",
             cb: "delect",
             icon: "el-icon-delete",
-            className: "isRed"
-          }
+            className: "isRed",
+          },
         ],
         label: "操作",
-        width: "200px"
+        width: "200px",
       },
-      activeName: "first",
+      activeName: "",
       dialogVisible: false,
       dialogTitle: "项目详情",
-      projectId: "",
-      projectObj: {},
-      projectName: "",
-      acceptanceRules: {},
-      baseForm: {},
       baseList: [
         {
           label: "项目名称 ",
           prop: "projectName",
-          type: "input"
+          type: "input",
         },
         {
           label: "子项目名称",
           prop: "projectSubName",
-          type: "input"
+          type: "input",
         },
         {
           label: "所属地市",
           prop: "area",
           type: "addressCascader",
           propsConfig: {
-            checkStrictly: true
+            checkStrictly: true,
           },
-          optionsList: []
+          optionsList: [],
         },
         {
           label: "修复类型 ",
@@ -301,40 +282,40 @@ export default {
           type: "addressCascader",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+            multiple: true,
           },
           optionsList: [],
           onlyLast: false,
-          collapseTags: true
+          collapseTags: true,
         },
         {
           label: "资金来源 ",
           prop: "moneySource",
           type: "addressCascader",
           propsConfig: {
-            checkStrictly: true
+            checkStrictly: true,
           },
-          optionsList: []
+          optionsList: [],
         },
         {
           label: "下达资金(万元) ",
           prop: "issuedMoeny",
-          type: "input"
+          type: "input",
         },
         {
           label: "项目状态 ",
           prop: "projectState",
           type: "addressCascader",
           propsConfig: {
-            checkStrictly: true
+            checkStrictly: true,
           },
-          optionsList: []
+          optionsList: [],
         },
         {
           label: "项目位置 ",
           prop: "projectPlace",
           type: "input",
-          optionsList: []
+          optionsList: [],
         },
         {
           label: "申报年份 ",
@@ -342,33 +323,33 @@ export default {
           type: "datePicker",
           dateType: "year",
           fromat: "yyyy",
-          valueFromat: "yyyy"
+          valueFromat: "yyyy",
         },
         {
           label: "承接单位 ",
           prop: "assumeUnit",
-          type: "input"
+          type: "input",
         },
         {
           label: "经纬度 ",
           prop: "coordinate",
-          type: "input"
+          type: "input",
         },
         {
           label: "实施年限 ",
           prop: "carryTerm",
           type: "input",
-          optionsList: []
+          optionsList: [],
         },
         {
           label: "联系人 ",
           prop: "contacts",
-          type: "input"
+          type: "input",
         },
         {
           label: "责任单位 ",
           prop: "accountabilityUnit",
-          type: "input"
+          type: "input",
         },
         {
           label: "开始时间 ",
@@ -376,7 +357,7 @@ export default {
           type: "datePicker",
           dateType: "date",
           fromat: "yyyy-MM-dd HH:mm:ss",
-          valueFromat: "yyyy-MM-dd HH:mm:ss"
+          valueFromat: "yyyy-MM-dd HH:mm:ss",
         },
         {
           label: "验收时间 ",
@@ -384,123 +365,75 @@ export default {
           type: "datePicker",
           dateType: "date",
           fromat: "yyyy-MM-dd ",
-          valueFromat: "yyyy-MM-dd"
+          valueFromat: "yyyy-MM-dd",
         },
         {
           label: "资金支出进度 ",
           prop: "moneyExpPlan",
-          type: "input"
+          type: "input",
         },
         {
           prop: "isTypical",
           type: "radio",
           label: "是否典型案例：",
-          optionsList: []
+          optionsList: [],
         },
         {
           label: "项目完成进度 ",
           prop: "workPlan",
           type: "textarea",
-          itemWidth: "1045px"
+          itemWidth: "1045px",
         },
         {
           label: "绩效目标 ",
           prop: "perfTarget",
           type: "textarea",
-          itemWidth: "1045px"
+          itemWidth: "1045px",
         },
         {
           label: "修复内容 ",
           prop: "restoreContent",
           type: "textarea",
-          itemWidth: "1045px"
-        }
-        // {
-        //   label: "修复成效 ",
-        //   prop: "restoreResult",
-        //   type: "textarea",
-        //   itemWidth: "1045px"
-        // }
+          itemWidth: "1045px",
+        },
       ],
       btnItems: [
         {
           text: "保存",
-          cb: "submitPreservation"
+          cb: "submitPreservation",
         },
         {
           text: "重置",
-          cb: "submitReset"
-        }
+          cb: "submitReset",
+        },
       ],
       selectionList: [],
       checkedHeader: [],
       isCheckedHeader: true,
-      headerBtn: [
-        // {
-        //   label: "删除",
-        //   cb: "delectitem",
-        //   type: ""
-        // },
-        // {
-        //   label: "上传",
-        //   cb: "addExect",
-        //   type: "save_btn"
-        // },
-        // {
-        //   label: "新增",
-        //   cb: "addItem",
-        //   type: "save_btn"
-        // },
-        // {
-        //   label: "导出",
-        //   cb: "downloadExect",
-        //   type: "save_btn"
-        // }
-      ],
+      headerBtn: [],
       fileList: [],
-      isLoding: false
+      isLoding: false,
     };
   },
 
   computed: {},
   mounted() {
-    // this.init();
-    // this.getCheckItem();
-    // this.getRedis();
+    this.init();
   },
 
   methods: {
-    showTable() {},
-    getCheckItem() {
-      let list = [];
-      this.tableItems.map(item => {
-        list.push(item.label);
-        return item;
+    init() {
+      affairsInfoList({
+        pageNum: this.pagesData.pageNum,
+        pageSize: this.pagesData.pageSize,
+      }).then((res) => {
+        if (res.code === 10000) {
+          this.tableData = res.data.rows;
+          this.pagesData.total = res.data.total;
+          this.pagesData.pages = res.data.pages;
+          this.pagesData.current = res.data.current;
+        }
       });
-      this.checkedHeader = list;
-    },
-    changeTableHeader(val) {
-      let list = val;
-      let restList = [];
-      restList = this.tableItems.map(item => {
-        item.isShow = false;
-        list.map(obj => {
-          if (item.label === obj) {
-            item.isShow = true;
-            return obj;
-          }
-          // restList.push(item)
-        });
-        return item;
-      });
-      this.tableItems = restList;
-      this.getDataList();
-    },
-    submitSearch(val) {
-      this.query = val;
-      setTimeout(() => {
-        this.getDataList();
-      }, 200);
     },
     toReset(val) {
       this.query = val;
@@ -510,181 +443,32 @@ export default {
         this.getDataList();
       }, 200);
     },
-    delect(val) {
-      this.$confirm("此操作将删除该项目, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(async () => {
-          let params = {
-            ids: val.projectId
-          };
-          let rest = await removeProject(params);
-          this.$message.success("删除成功!");
-          setTimeout(() => {
-            this.getDataList();
-          }, 200);
-        })
-        .catch(() => {
-          this.$message.info("已取消删除!");
-          setTimeout(() => {
-            this.getDataList();
-          }, 200);
-        });
-    },
-    searchValMapType(val, resArray) {
-      val.map(item => {
-        if (item.length > 1 && Array.isArray(val[0])) {
-          resArray.push(JSON.parse(JSON.stringify(item[1])));
-        } else {
-          resArray.push(item);
-        }
-      });
-    },
-    searchValMap(val, resArray) {
-      val.map(item => {
-        if (item.length > 1) {
-          resArray.push(JSON.parse(JSON.stringify(item)).join("-"));
-        } else {
-          resArray.push(JSON.parse(JSON.stringify(item)).join(","));
-        }
-      });
-    },
-    saveValMap(val, resArray) {
-      val.map(item => {
-        if (item.length > 1 && Array.isArray(val[0])) {
-          resArray.push(JSON.parse(JSON.stringify(item)).join(","));
-        } else {
-          resArray.push(item);
-        }
-      });
-    },
-    selectsValMap(val, resArray) {
-      val.map(item => {
-        resArray.push(JSON.parse(JSON.stringify(item))[0]);
-      });
-    },
-    async getDataList() {
-      this.isLoading = true;
-      this.tableData = [];
-      this.pagesData.total = 0;
-      let params = {
-        ...this.query,
-        pageNum: this.pagesData.pageNum,
-        pageSize: this.pagesData.pageSize,
-        sortField: "input_time",
-        sortOrder: "desc"
-      };
-      if (params.area) {
-        // params.areaCity = this.query.area[0];
-        // if (this.query.area.length === 2) {
-        //   params.areaCounty = this.query.area[1];
-        // }
 
-        var resCityArray = [];
-        var resCountyArray = [];
-        // this.searchValMap(params.area, resArray);
-        params.area.map(item => {
-          if (item.length > 1) {
-            resCountyArray.push(JSON.parse(JSON.stringify(item[1])));
-          } else {
-            resCityArray.push(JSON.parse(JSON.stringify(item[0])));
-          }
-        });
-        params.areaCity = resCityArray.join("-");
-        params.areaCounty = resCountyArray.join("-");
-      }
-      if (params.projectState.length !== 0) {
-        var projectStateArray = [];
-        this.searchValMap(params.projectState, projectStateArray);
-        params.projectState = projectStateArray.join(",");
-      }
-      // if (params.renovateType.length !== 0) {
-      //   var renovateTypeArray = [];
-      //   this.searchValMap(params.renovateType, renovateTypeArray);
-      //   params.renovateType = renovateTypeArray.join(",");
-      // }
-      if (params.renovateType !== 0) {
-        var renovateTypeArray = [];
-        if (params.renovateType.length > 0) {
-          this.searchValMapType(params.renovateType, renovateTypeArray);
-          params.renovateType = renovateTypeArray.join(",");
-        }
-      }
-      if (params.moneySource.length !== 0) {
-        var moneySourceArray = [];
-        this.searchValMap(params.moneySource, moneySourceArray);
-        params.moneySource = moneySourceArray.join(",");
-      }
-      if (params.declareYear.length !== 0) {
-        var declareYearSourceArray = [];
-        this.selectsValMap(params.declareYear, declareYearSourceArray);
-        params.declareYear = declareYearSourceArray.join(",");
-      }
-      let listJbxxaa = await ecologicalRenovateBasicInfoList(params);
-      if (listJbxxaa.code === 200) {
-        let data = listJbxxaa.data;
-        this.tableData = data.rows;
-
-        this.pagesData.total = data.total;
-        this.pagesData.proCount = data.proCount;
-        this.pagesData.pageNum = data.pageNum;
-      }
-      // this.getRedis()
-      this.isLoading = false;
-    },
-    addExect() {
-      this.dialogTitle = "数据导入";
-      this.dialogVisible = true;
-    },
-    async downloadMb() {
-      let rest = await ecolImportTemplate();
-    },
     deletItem(val) {
       this.$confirm("此操作将删除该附件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(() => {
-          this.fileList = this.fileList.filter(item => item.uid !== val.uid);
+          this.fileList = this.fileList.filter((item) => item.uid !== val.uid);
           this.$message.success("删除成功!");
         })
         .catch(() => {
           console.log("取消");
         });
     },
-    previewFile(val) {},
-    async toSaveExect() {
-      const formData = new FormData();
-      if (this.fileList.length > 0) {
-        formData.append("file", this.fileList[0].raw);
-        formData.append("username", this.fileList[0].name);
-        let rest = await ecolImportInfo(formData);
-        if (rest) {
-          this.$message.success("导入数据成功!");
-        }
-      }
-      this.handleClose();
-    },
-    async onFilesChange(file, filelist) {
-      this.fileList.push(file);
-      this.$message.success("上传附件成功!");
-    },
+
     async downloadExect() {
       let parms = {
-        ...this.query
+        ...this.query,
       };
       let rest = await projectExport(parms);
     },
-    addItem() {
-      this.dialogTitle = "新增项目";
-      this.dialogVisible = true;
-    },
+
     async delectitem() {
       let list = [];
-      this.selectionList.map(item => {
+      this.selectionList.map((item) => {
         list.push(item.projectId);
       });
       if (list.length === 0) {
@@ -694,11 +478,11 @@ export default {
       this.$confirm("此操作将删除选中的项目, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       })
         .then(async () => {
           let params = {
-            ids: list.join(",")
+            ids: list.join(","),
           };
           let rest = await removeProject(params);
           this.$message.success("删除成功!");
@@ -713,34 +497,12 @@ export default {
           }, 200);
         });
     },
-    // 按钮操作
-    handleClick(val) {
-      this[val.cb](val.row);
-    },
-    // 头部按钮
-    haederBtnClick(val) {
-      this[val.cb]();
-    },
     // 查看详情
     verify(val) {
       this.dialogTitle = "项目详情";
       this.projectId = val.projectId;
       this.projectObj = val;
       this.isFullscreen = true;
-    },
-    handleClose() {
-      this.dialogVisible = false;
-      this.isFullscreen = false;
-      this.projectObj = {};
-      this.projectId = "";
-      this.baseForm = {};
-      setTimeout(() => {
-        this.getDataList();
-      }, 200);
-    },
-    handleSelectionChange(val) {
-      this.selectionList = [];
-      this.selectionList = val;
     },
     // 每页显示条目个数
     sizeChange(val) {
@@ -760,59 +522,7 @@ export default {
       this.pagesData.pageNum = val;
       this.getDataList();
     },
-    async submitPreservation(val) {
-      let params = {
-        ...val
-      };
-      if (params.area) {
-        params.areaCity = params.area[0];
-        if (params.area.length === 2) {
-          params.areaCounty = params.area[1];
-        }
-        params.area = params.area.join(",");
-      }
-      if (params.projectState) {
-        params.projectState = params.projectState.join(",");
-      }
-      // if (params.renovateType) {
-      //   params.renovateType = params.renovateType.join(",");
-      // }
-      if (params.renovateType) {
-        var renovateTypeArray = [];
-        this.saveValMap(params.renovateType, renovateTypeArray);
-        params.renovateType = renovateTypeArray.join("-");
-      }
-      if (params.moneySource) {
-        params.moneySource = params.moneySource.join(",");
-      }
-      let rest = await saveProject(params);
-      if (rest.data.code === 200) {
-        this.$message.success("新增项目成功!");
-        this.handleClose();
-      } else {
-        this.$message.error("新增项目失败!");
-        // this.handleClose();
-      }
-    },
-    submitDelect(val) {
-      this.$confirm("此操作将删除基本, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(async () => {
-          let params = {
-            ids: val.projectId
-          };
-          let rest = await removeProject(params);
-          this.$message.success("删除成功!");
-        })
-        .catch(() => {
-          this.$message.info("已取消删除!");
-        });
-    },
-    submitReset(val) {}
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>

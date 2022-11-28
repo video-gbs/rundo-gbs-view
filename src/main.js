@@ -11,6 +11,7 @@ import '@/styles/index.scss' // global css
 import App from './App'
 import store from './store'
 import router from './router'
+import { Local } from './utils/storage'
 
 import '@/icons' // icon
 import '@/permission' // permission control
@@ -43,9 +44,16 @@ Vue.prototype.$dict=_dict
  * please remove it before going online ! ! !
  */
 if (process.env.NODE_ENV === 'production') {
-  const { mockXHR } = require('../mock')
-  mockXHR()
+  // const { mockXHR } = require('../mock')
+  // mockXHR()
 }
+
+// 退出登录
+Vue.prototype.$logout = () => {
+  Local.logout()
+  window.location.reload()
+}
+
 
 // set ElementUI lang to EN
 Vue.use(ElementUI)

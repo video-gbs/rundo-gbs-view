@@ -9,7 +9,7 @@
       <template>
         <el-tab-pane
           v-for="(item, index) in tabpaneList"
-          :key="item.name"
+          :key="index"
           :label="item.label"
           :name="item.label"
         >
@@ -20,7 +20,8 @@
     <ul class="right-btns-ul" v-if="this.showDetails">
       <li v-for="(btn, i) in btnLists" :key="i" class="right-btns-li">
         <el-button type="primary" class="right-btns-button" size="mini"
-          ><svg-icon :icon-class="btn.iconName" class="btn_svg" />{{ btn.name
+          ><svg-icon :icon-class="btn.iconName" class="btn_svg" />{{
+            btn.name
           }}</el-button
         >
       </li>
@@ -48,44 +49,44 @@ export default {
     Whf,
     Yhf,
     Ysl,
-    DetailView
+    DetailView,
   },
   data() {
     return {
       showDetails: false,
       activeName: "全部",
-      btnLists:[
+      btnLists: [
         {
-          name:'审核问政',
-          iconName:'right1'
+          name: "审核问政",
+          iconName: "right1",
         },
         {
-          name:'审核补充说明',
-          iconName:'right2'
+          name: "审核补充说明",
+          iconName: "right2",
         },
         {
-          name:'受理问政',
-          iconName:'right3'
+          name: "受理问政",
+          iconName: "right3",
         },
         {
-          name:'回复问政',
-          iconName:'right4'
+          name: "回复问政",
+          iconName: "right4",
         },
         {
-          name:'问政转移',
-          iconName:'right5'
+          name: "问政转移",
+          iconName: "right5",
         },
         {
-          name:'邀请回复',
-          iconName:'right6'
+          name: "邀请回复",
+          iconName: "right6",
         },
         {
-          name:'设为可见',
-          iconName:'right7'
+          name: "设为可见",
+          iconName: "right7",
         },
         {
-          name:'开启评论',
-          iconName:'right8'
+          name: "开启评论",
+          iconName: "right8",
         },
         // {
         //   name:'设为隐藏',
@@ -95,47 +96,55 @@ export default {
         //   name:'开启评论',
         //   iconName:'right10'
         // }
-
       ],
       tabpaneList: [
         {
           label: "全部",
           content: All,
-          isShow: true
+          isShow: true,
         },
         {
           label: "待审核",
           content: Dsh,
-          isShow: false
+          isShow: false,
         },
         {
           label: "未回复",
           content: Whf,
-          isShow: false
+          isShow: false,
         },
         {
           label: "已受理",
           content: Ysl,
-          isShow: false
+          isShow: false,
         },
         {
           label: "已回复",
           content: Yhf,
-          isShow: false
+          isShow: false,
         },
         {
           label: "审核未通过",
           content: Shwtg,
-          isShow: false
-        }
-      ]
+          isShow: false,
+        },
+      ],
     };
   },
   watch: {},
-  mounted() {},
+  mounted() {
+    this.getAffairsInfoList();
+  },
   methods: {
+    getAffairsInfoList() {
+      affairsInfoList(this.pages).then((res) => {
+        if (res.code === 10000) {
+          this.tableData = res.data.rows;
+        }
+      });
+    },
     handleClick(val, event) {
-      this.tabpaneList = this.tabpaneList.map(item => {
+      this.tabpaneList = this.tabpaneList.map((item) => {
         if (item.label === val.label) {
           item.isShow = true;
         } else {
@@ -149,8 +158,8 @@ export default {
       //     block: "start"
       //   });
       // });
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -193,29 +202,28 @@ export default {
   .right-btns-ul {
     position: absolute;
     right: 10px;
-    top:4px;
+    top: 4px;
     margin: 0;
     padding: 0;
-    z-index:99;
+    z-index: 99;
 
     .right-btns-li {
-      float:left;
-      margin:0 8px;
+      float: left;
+      margin: 0 8px;
 
+      height: 32px;
+      line-height: 32px;
+      .right-btns-button {
         height: 32px;
-        line-height:32px;
-      .right-btns-button{
-
-        height: 32px;
-        background: #1E56A0;
-        border-radius:1px;
+        background: #1e56a0;
+        border-radius: 1px;
       }
       .btn_svg {
         width: 1rem;
         height: 1rem;
         position: relative;
         top: 1px;
-        left:-2px;
+        left: -2px;
       }
     }
   }

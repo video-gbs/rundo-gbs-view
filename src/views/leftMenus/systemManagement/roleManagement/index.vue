@@ -25,7 +25,7 @@
                 >编辑</el-button
               >
               <el-button type="text" @click="deleteRole(scope.row)"
-                >删除</el-button
+                ><span class="delete-button">删除</span></el-button
               >
             </template>
           </el-table-column>
@@ -88,20 +88,21 @@
 </template>
 
 <script>
-import _mixins from "@/mixins/index";
 import {
   addRoles,
   editRoles,
   deleteRoles,
   setDataAuth,
   setAppAuth,
-  rolesList,
+  getRolesList,
 } from "@/api/method/role";
+import {
+  accountList
+} from "@/api/method/accountManage";
 import pagination from "@/components/Pagination/index.vue";
 export default {
   name: "",
   components: { pagination },
-  mixins: [_mixins],
   data() {
     return {
       search: {
@@ -168,8 +169,7 @@ export default {
       done();
     },
     getList() {
-      rolesList({
-        ...this.params,
+      getRolesList({
         current: this.params.pageNum,
         size: this.params.pageSize,
       }).then((res) => {
@@ -272,5 +272,8 @@ export default {
   // height: 28px;
   display: flex;
   align-items: center;
+}
+.delete-button {
+  color: red !important;
 }
 </style>

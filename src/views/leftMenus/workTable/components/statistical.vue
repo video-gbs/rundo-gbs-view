@@ -5,7 +5,7 @@
       <span>评价情况统计</span>
     </div>
     <div class="text item">
-      <PieEchart :chartData="chartData" width="100%" height="200px"/>
+      <PieEchart :chartData="chartData" width="100%" height="200px" />
     </div>
   </el-card>
 </template>
@@ -18,45 +18,61 @@ export default {
   name: "",
   components: {
     PieEchart,
-    LineFont
+    LineFont,
   },
-   props: {
+  props: {
     statisticalData: {
       type: Array,
       default: () => {
         return [];
-      }
-    }
+      },
+    },
+  },
+  watch: {
+    statisticalData(newValue, oldValue) {
+      console.log(111111, newValue, oldValue);
+      this.$props.statisticalData.map((item) => {
+        this.chartData.series.name = item.resultName;
+        this.chartData.series.value = item.resultCount;
+      });
+    },
   },
   data() {
     return {
       lineTitle: {
         title: "问政待办",
-        notShowSmallTitle: false
+        notShowSmallTitle: false,
       },
       chartData: {
         showLegend: "",
         title: {
           isShow: true,
-          x: '34%',
-          y: '45%',
+          x: "34%",
+          y: "45%",
           text: "评价统计",
         },
-        color: ['#2796FF ','#FED023','#A0791E'],
-        radius: ['58%', '70%'],
-        center: ['35%', '50%'],
-        series: [
-          { value: 70, name: "非常满意" },
-          { value: 20, name: "满意" },
-          { value: 10, name: "不满意" }
-        ]
-      }
+        color: ["#2796FF ", "#FED023", "#A0791E"],
+        radius: ["58%", "70%"],
+        center: ["35%", "50%"],
+        series: [],
+      },
     };
   },
   computed: {},
-  created() {},
+  created() {
+    this.$props.statisticalData.map((item) => {
+      let obj = {
+        name: "",
+        value: "",
+      };
+      obj.name = item.resultName;
+      obj.value = item.resultCount;
+      this.chartData.series.push(obj);
+    });
+    console.log(this.chartData);
+  },
   mounted() {},
-  methods: {}
+  methods: {},
 };
 </script>
 

@@ -1,29 +1,26 @@
+import Vue from 'vue'
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
 import { Local } from '@/utils/storage'
+
+const requestTimeOut = 20 * 100000
+let isShowLogin = false
 
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: requestTimeOut // request timeout
 })
 
 // request interceptor
 service.interceptors.request.use(
   config => {
     config.headers = { ...config.headers, ...{}}// 不知为何 这里的headers是undefined,所以需要设置成{}
-    // do something before request is sent
     const token = Local.getToken()
-    // config.headers.Authorization= token;
     if (token) {
       config.headers.Authorization = token
-      // config.headers['X-Token'] = getToken()
-      // let each request carry token
-      // ['X-Token'] is a custom headers key
-      // please modify it according to the actual situation
       return config
     }
     return config
@@ -86,5 +83,6 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
 
 export default service

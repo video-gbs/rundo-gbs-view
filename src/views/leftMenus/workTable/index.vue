@@ -15,7 +15,7 @@
         :notification="notification"
         v-if="notificationShow"
       />
-      <Statistical :statisticalData="statisticalData" />
+      <Statistical :statisticalData="statisticalData" v-if="statisticalShow" />
     </div>
   </div>
 </template>
@@ -48,13 +48,14 @@ export default {
       notificationShow: false,
       todoListShow: false,
       overviewShow: false,
+      statisticalShow: false,
       weatherList: {},
       homeLists: {},
       notification: [],
       headers: {
         Authorization: Local.getToken(),
       },
-      statisticalData:[]
+      statisticalData: [],
     };
   },
   watch: {},
@@ -81,8 +82,8 @@ export default {
     editAffiche() {
       editAffiche(this.params).then((res) => {
         if (res.code === 10000) {
-
-          this.statisticalData=res.data;
+          this.statisticalData = res.data;
+          this.statisticalShow = true;
         }
       });
     },

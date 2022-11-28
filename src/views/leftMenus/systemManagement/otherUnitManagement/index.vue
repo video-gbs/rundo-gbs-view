@@ -437,13 +437,6 @@ export default {
       }
     };
   },
-  watch: {
-      'editShow'(){
-        this.$nextTick(() =>{
-          // this.dialogShow();
-        })
-      }
-    },
   mounted() {
     this.checkPassworLevel();
     this.getOtherUnitList();
