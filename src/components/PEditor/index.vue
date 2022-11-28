@@ -35,7 +35,7 @@ export default {
   watch: {
     value(n, o) {
       console.log('nnnnn', n)
-      if (this.id === this.editorId) { // 原本是!==
+      if (this.id !== this.editorId) {
         console.log('????')
         document.getElementById(this.editor.textElemId).innerHTML = n
         this.editorId = this.id

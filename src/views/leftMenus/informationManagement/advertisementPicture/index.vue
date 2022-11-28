@@ -20,6 +20,7 @@
             prop="title"
             label="标题"
           />
+          <el-table-column prop="orderValue" label="显示顺序" width="80" />
           <el-table-column
             prop="isShow"
             label="显示状态"
@@ -58,7 +59,7 @@
             <el-button type="text" @click="orderDialogFn(scope.row)">显示顺序</el-button>
             <!-- <el-button type="text">设为可见</el-button> -->
             <el-button type="text" @click="goPage(`/advertisementPicture/${scope.row.id}`)">编辑</el-button>
-            <el-button type="text" @click=deleteFn(scope.row,remove,getAdvertisingListFn)>删除</el-button>
+            <el-button type="text" @click="deleteFn(scope.row,remove,getAdvertisingListFn)">删除</el-button>
 
           </template>
           </el-table-column>
@@ -66,7 +67,7 @@
 
       </el-table>
       <pagination :pages-data="params" @size-change="sizeChange" @current-change="currentChange" />
-      <setOrderVue ref="orderDialog" @refreshFn="getAdvertisingListFn"  :config="one" :fn="editOrder"></setOrderVue>
+      <setOrderVue ref="orderDialog" :config="one" :fn="editOrder" @refreshFn="getAdvertisingListFn" />
 
     </div>
   </div>
@@ -75,29 +76,29 @@
 <script>
 import pagination from '@/components/Pagination/index.vue'
 import _mixins from '@/mixins/index'
-import {getAdvertisingList,editAdvertising,editAdvertisingOrder,deleteAdvertising}  from '@/api/method/advertising'
+import { getAdvertisingList, editAdvertisingOrder, editAdvertisingShow, deleteAdvertising } from '@/api/method/advertising'
 import setOrderVue from '@/components/setOrder/setOrder.vue'
 export default {
   name: '',
-  components: { pagination,setOrderVue },
-  mixins:[_mixins],
+  components: { pagination, setOrderVue },
+  mixins: [_mixins],
   data() {
     return {
       params: {
         current: 1,
         size: 10,
-        total: 0,
-       
+        total: 0
+
       },
       tableData: [
 
       ],
-      one:{},
-      remove:deleteAdvertising,
-      editShow:editAdvertising,
+      one: {},
+      remove: deleteAdvertising,
+      editShow: editAdvertisingShow
     }
   },
-  mounted(){
+  mounted() {
     this.getAdvertisingListFn()
   },
   methods: {
@@ -112,10 +113,10 @@ export default {
     goPage(path, query) {
       this.$router.push(path)
     },
-    getAdvertisingListFn(){
-      getAdvertisingList(this.params).then(res=>{
-      res.code===10000&&(this.tableData=res.data.records,this.params.total=res.data.total)
-    })
+    getAdvertisingListFn() {
+      getAdvertisingList(this.params).then(res => {
+        res.code === 10000 && (this.tableData = res.data.records, this.params.total = res.data.total)
+      })
     },
 
     orderDialogFn(v) {
@@ -123,13 +124,13 @@ export default {
       this.$refs['orderDialog'].visible = true
     },
     editOrder(v) {
-      console.log('vv',v);
+      console.log('vv', v)
       editAdvertisingOrder(v.id, v.orderValue).then(res => {
         res.code === 1000 && (this.$message.success('修改成功'), this.$refs['orderDialog'].visible = false)
       }).catch(() => {
 
       })
-    },
+    }
 
   }
 }

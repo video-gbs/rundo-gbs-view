@@ -1,7 +1,7 @@
 <!--设置显示顺序,传入参数和方法-->
 <template>
   <el-dialog title="编辑显示顺序" :visible.sync="visible" width="30%">
-    <el-form label-width="80px" :model="orderForm" v-if="orderForm">
+    <el-form v-if="orderForm" label-width="80px" :model="orderForm">
       <el-form-item label="标题">
         {{ orderForm.title }}
       </el-form-item>
@@ -18,28 +18,28 @@
 </template>
 <script>
 export default {
-  name: "",
+  name: '',
   props: {
     config: {
-      type: Object,
-     
+      type: Object
+
     },
     fn: {
       type: Function
-    },
-  },
-  watch:{
-    config:{
-      handler:function(n){
-        console.log('n',n);
-        this.orderForm=n
-      }
     }
   },
   data() {
     return {
       visible: false,
       orderForm: null
+    }
+  },
+  watch: {
+    config: {
+      handler: function(n) {
+        console.log('n', n)
+        this.orderForm = n
+      }
     }
   },
   mounted() {
@@ -50,7 +50,7 @@ export default {
       this.visible = !this.visible
     },
     refreshData() {
-      //更新数据，一般用于更新列表数据等
+      // 更新数据，一般用于更新列表数据等
       this.$emit('refreshFn')
     },
     submitFn() {
