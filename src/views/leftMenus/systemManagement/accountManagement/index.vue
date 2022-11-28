@@ -83,7 +83,7 @@
                 v-if="editShowChild"
                 label="密码"
                 prop="password"
-                :rules="editShowChild ? rules.password : [{ required:false}]"
+                :rules="editShowChild ? rules.password : [{ required: false }]"
               >
                 <div class="f fd-c mr30">
                   <el-input
@@ -104,39 +104,39 @@
                         <div
                           :style="{
                             'background-color':
-                              passwordLevel > 0 ? '#00d000' : ''
+                              passwordLevel > 0 ? '#00d000' : '',
                           }"
                         />
                         <div
                           :style="{
                             'background-color':
-                              passwordLevel > 1 ? 'orange' : ''
+                              passwordLevel > 1 ? 'orange' : '',
                           }"
                         />
                         <div
                           :style="{
-                            'background-color': passwordLevel > 2 ? 'red' : ''
+                            'background-color': passwordLevel > 2 ? 'red' : '',
                           }"
                         />
 
                         <span
                           v-if="passwordLevel === 1"
-                          class=" fs12 ml5"
-                          style="color:#00d000"
+                          class="fs12 ml5"
+                          style="color: #00d000"
                         >
                           弱
                         </span>
                         <span
                           v-if="passwordLevel === 2"
-                          class=" fs12 ml5"
-                          style="color:orange"
+                          class="fs12 ml5"
+                          style="color: orange"
                         >
                           中
                         </span>
                         <span
                           v-if="passwordLevel === 3"
-                          class=" fs12 ml5"
-                          style="color:red"
+                          class="fs12 ml5"
+                          style="color: red"
                         >
                           强
                         </span>
@@ -149,14 +149,16 @@
                 v-if="editShowChild"
                 label="确认密码"
                 prop="rePassword"
-                :rules="editShowChild ? rules.rePassword : [{ required:false}]"
+                :rules="
+                  editShowChild ? rules.rePassword : [{ required: false }]
+                "
               >
                 <el-input v-model="dialog.params.rePassword" />
               </el-form-item>
               <el-form-item label="所属角色" prop="roleId">
                 <el-select v-model="dialog.params.roleId" placeholder="请选择">
                   <el-option
-                    v-for="i in gender"
+                    v-for="i in selectList"
                     :key="i.id"
                     :label="i.label"
                     :value="i.id"
@@ -235,38 +237,38 @@
                 <div class="password-level f ai-c">
                   <div
                     :style="{
-                      'background-color': passwordLevel1 > 0 ? '#00d000' : ''
+                      'background-color': passwordLevel1 > 0 ? '#00d000' : '',
                     }"
                   />
                   <div
                     :style="{
-                      'background-color': passwordLevel1 > 1 ? 'orange' : ''
+                      'background-color': passwordLevel1 > 1 ? 'orange' : '',
                     }"
                   />
                   <div
                     :style="{
-                      'background-color': passwordLevel1 > 2 ? 'red' : ''
+                      'background-color': passwordLevel1 > 2 ? 'red' : '',
                     }"
                   />
 
                   <span
                     v-if="passwordLevel1 === 1"
-                    class=" fs12 ml5"
-                    style="color:#00d000"
+                    class="fs12 ml5"
+                    style="color: #00d000"
                   >
                     弱
                   </span>
                   <span
                     v-if="passwordLevel1 === 2"
-                    class=" fs12 ml5"
-                    style="color:orange"
+                    class="fs12 ml5"
+                    style="color: orange"
                   >
                     中
                   </span>
                   <span
                     v-if="passwordLevel1 === 3"
-                    class=" fs12 ml5"
-                    style="color:red"
+                    class="fs12 ml5"
+                    style="color: red"
                   >
                     强
                   </span>
@@ -299,8 +301,9 @@ import {
   accountEdit,
   accountList,
   accountEditPassword,
-  accountDelete
+  accountDelete,
 } from "@/api/method/accountManage";
+import { getRolesList } from "@/api/method/role";
 import { Local } from "@/utils/storage";
 
 export default {
@@ -311,12 +314,12 @@ export default {
       search: {
         userName: "",
         phone: "",
-        time: ""
+        time: "",
       },
       passwordForm: {
         password: "",
         rePassword: "",
-        id: ""
+        id: "",
       },
       passwordVisible: false,
       rules: {
@@ -326,42 +329,26 @@ export default {
             min: 6,
             max: 20,
             message: "6-20个字符",
-            trigger: "blur"
-          }
-          // {
-          //   validator: (rule, value, callback) => {
-          //     if (!this.role.roleId) {
-          //       this.$api.role.check(value).then((r) => {
-          //         if (!r.data) {
-          //           callback('该角色名称已存在')
-          //         } else {
-          //           callback()
-          //         }
-          //       })
-          //     } else {
-          //       callback()
-          //     }
-          //   },
-          //   trigger: 'blur'
-          // }
+            trigger: "blur",
+          },
         ],
         name: {
           required: true,
           message: "不能为空",
           trigger: "blur",
-          max: 20
+          max: 20,
         },
         mobile: {
           pattern: /^(1[3-9]\d{9})$/,
           message: "请输入正确的手机号码",
           trigger: "blur",
-          required: true
+          required: true,
         },
         password: [
           {
             required: true,
             message: "不能为空",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             validator: (rule, value, callback) => {
@@ -371,81 +358,79 @@ export default {
                 callback("密码强度不够，至少包含数字/字母/字符两种组合");
               }
             },
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         rePassword: {
           required: true,
           message: "不能为空",
-          trigger: "blur"
+          trigger: "blur",
         },
         nickName: {
           required: true,
           message: "不能为空",
           trigger: "blur",
-          max: 40
+          max: 40,
         },
         email: {
           required: true,
           message: "不能为空",
-          trigger: "blur"
+          trigger: "blur",
         },
         roleId: {
           required: true,
           message: "不能为空",
-          trigger: "blur"
-        }
+          trigger: "blur",
+        },
       },
       params: {
         pageNum: 1,
         pageSize: 10,
         total: 0,
-        proCount: 0
+        proCount: 0,
       },
       tableData: [],
       editShow: true,
-      editShowChild:true,
-      editId:'',
+      editShowChild: true,
+      editId: "",
       dialog: {
         show: false,
         title: "新增用户",
         params: {
           account: "",
-          roleId: 1,
+          roleId: '',
           status: 1,
           password: "",
           rePassword: "",
           nickName: "",
           name: "",
           email: "",
-          jobId: 1
-        }
+          jobId: 1,
+        },
       },
-      gender: [
-        { id: 1, label: "男" },
-        { id: 2, label: "女" }
-      ],
+      selectList: [],
       state: [
         { id: 1, label: "启用" },
-        { id: 0, label: "禁用" }
+        { id: 0, label: "禁用" },
       ],
       passwordLevel: 0,
       passwordLevel1: 0,
       headers: {
-        Authorization: Local.getToken()
-      }
+        Authorization: Local.getToken(),
+      },
     };
   },
   watch: {
-      'editShow'(){
-        this.$nextTick(() =>{
-          // this.dialogShow();
-        })
-      }
+    editShow() {
+      this.$nextTick(() => {
+        // this.dialogShow();
+      });
     },
+  },
   mounted() {
     this.checkPassworLevel();
     this.getAccountList();
+    this.getList();
   },
   methods: {
     /**
@@ -456,8 +441,27 @@ export default {
       this.passwordForm.id = row.id;
     },
 
+    getList() {
+      getRolesList({
+        current: this.params.pageNum,
+        size: this.params.pageSize,
+      }).then((res) => {
+        if (res.code === 10000) {
+          res.data.rows.map((item) => {
+            let obj = {
+              id: "",
+              label: "",
+            };
+            obj.id = item.id;
+            obj.label = item.name;
+            this.selectList.push(obj);
+          });
+        }
+      });
+    },
+
     savePassword(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           if (
             !this.handlePasswordCheck(
@@ -467,14 +471,14 @@ export default {
           ) {
             return;
           }
-          accountEditPassword(
-            { id: this.passwordForm.id, password: this.passwordForm.password }
-            
-          ).then(res => {
+          accountEditPassword({
+            id: this.passwordForm.id,
+            password: this.passwordForm.password,
+          }).then((res) => {
             if (res.code === 10000) {
               this.$message({
                 type: "success",
-                message: "修改成功"
+                message: "修改成功",
               });
               this.passwordVisible = false;
               this.getAccountList();
@@ -542,18 +546,17 @@ export default {
     dialogShow(act, data) {
       this.dialog.params = {
         account: "",
-        roleId: 1,
+        roleId: '',
         status: 1,
         password: "",
         rePassword: "",
         nickName: "",
         name: "",
         email: "",
-        jobId: 1
+        jobId: 1,
       };
       this.editShow = true;
       if (act === 0) {
-
         // this.editShow = false;
         this.editShowChild = false;
         const { account, email, mobile, name, nickName, status, roleId } = data;
@@ -564,8 +567,8 @@ export default {
         this.dialog.params.nickName = nickName;
         this.dialog.params.status = Number(status);
         this.dialog.params.roleId = roleId;
-        this.editId=data.id;
-      }else{
+        this.editId = data.id;
+      } else {
         this.editShowChild = true;
       }
       this.dialog.title = act ? "添加账号" : "编辑用户";
@@ -576,27 +579,26 @@ export default {
       this.$confirm("删除后数据无法恢复，是否确认删除？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       }).then(() => {
-        accountDelete(row.id).then(res => {
+        accountDelete(row.id).then((res) => {
           if (res.code === 10000) {
             this.$message({
               type: "success",
-              message: "删除成功"
+              message: "删除成功",
             });
+            this.params.pageNum = 1;
             this.getAccountList();
           }
         });
       });
     },
     getAccountList() {
-      accountList(
-        {
-          ...this.params,
-          current: this.params.pageNum,
-          size: this.params.pageSize
-        }
-      ).then(res => {
+      accountList({
+        ...this.params,
+        current: this.params.pageNum,
+        size: this.params.pageSize,
+      }).then((res) => {
         if (res.code === 10000) {
           this.tableData = res.data.records;
           this.params.total = res.data.total;
@@ -607,7 +609,7 @@ export default {
     },
 
     submit(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
             case "添加账号":
@@ -619,11 +621,11 @@ export default {
               ) {
                 return;
               }
-              accountAdd(this.dialog.params).then(res => {
+              accountAdd(this.dialog.params).then((res) => {
                 if (res.code === 10000) {
                   this.$message({
                     type: "success",
-                    message: "账号新增成功"
+                    message: "账号新增成功",
                   });
                   this.dialog.show = false;
                   this.getAccountList();
@@ -631,17 +633,18 @@ export default {
               });
               break;
             case "编辑用户":
-
-              accountEdit({id:this.editId,...this.dialog.params}).then(res => {
-                if (res.code === 10000) {
-                  this.$message({
-                    type: "success",
-                    message: "账号修改成功"
-                  });
-                  this.dialog.show = false;
-                  this.getAccountList();
+              accountEdit({ id: this.editId, ...this.dialog.params }).then(
+                (res) => {
+                  if (res.code === 10000) {
+                    this.$message({
+                      type: "success",
+                      message: "账号修改成功",
+                    });
+                    this.dialog.show = false;
+                    this.getAccountList();
+                  }
                 }
-              });
+              );
               break;
 
             default:
@@ -680,8 +683,8 @@ export default {
       if (l < 5 || l > 20) {
         this.passwordLevel1 = 0;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
