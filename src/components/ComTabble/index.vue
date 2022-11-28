@@ -5,10 +5,9 @@
     </div> -->
     <el-table
       ref="comTable"
-      :data="tableData"
-      v-on="$listeners"
-      v-bind="$attrs"
       v-loading="isLoading"
+      :data="tableData"
+      v-bind="$attrs"
       :show-summary="showSummary"
       :header-cell-style="headerStyle"
       highlight-current-row
@@ -16,6 +15,7 @@
       :style="{ height: heightTable, width: '100%' }"
       :height="MaxHeight"
       :cell-style="changeCellStyle"
+      v-on="$listeners"
     >
       <!-- 多选框 -->
       <!-- <el-table-column
@@ -40,9 +40,9 @@
       <!-- 内容项 -->
       <el-table-column
         v-for="(item, index) in tableItems"
+        :key="item.name + index"
         :prop="item.name"
         :label="item.label"
-        :key="item.name + index"
         :width="item.width"
         min-width="120"
         :style="{
@@ -54,17 +54,21 @@
         <template slot-scope="scope">
           <el-switch
             v-if="item.content === 'test'"
-            v-model="value"
+            v-model="scope.row.isShow"
+            :active-value="0"
+            :inactive-value="1"
             active-color="#13ce66"
-            inactive-color="#ff4949"
-          >
-          </el-switch>
+            inactive-color="#eeeeee"
+          />
           <el-switch
             v-else-if="item.content === 'test1'"
-            v-model="value1"
+            v-model="scope.row.isReview"
+            :active-value="0"
+            :inactive-value="1"
+            active-color="#13ce66"
+            inactive-color="#eeeeee"
             disabled
-          >
-          </el-switch>
+          />
           <span v-else class="column-span">{{ scope.row[item.name] }}</span>
         </template>
       </el-table-column>
@@ -77,16 +81,16 @@
         :width="buttonItems.width"
       >
         <template slot-scope="scope">
-          <slot name="buttonItem" v-bind:row="scope.row">
+          <slot name="buttonItem" :row="scope.row">
             <div class="table-button">
               <el-button
-                :type="item.type || 'text'"
                 v-for="item in buttonItems.options"
-                :class="item.className"
                 :key="item.text || item.icon"
+                :type="item.type || 'text'"
+                :class="item.className"
                 @click="handleClick(item.cb, scope.row)"
               >
-                <i :class="item.icon"></i>
+                <i :class="item.icon" />
                 {{ distinguishCode(scope.row, item) }}
               </el-button>
             </div>
@@ -99,7 +103,7 @@
 
 <script>
 export default {
-  name: "ComTabble",
+  name: 'ComTabble',
   props: {
     // 是否显示合计行
     showSummary: {
@@ -109,7 +113,7 @@ export default {
     // 项目列表fitstColumn
     leftTitle: {
       type: String,
-      default: () => ""
+      default: () => ''
     },
     // 固定行
     isFixed: {
@@ -127,12 +131,12 @@ export default {
     // 表格整体高度
     heightTable: {
       type: String,
-      default: () => "100%"
+      default: () => '100%'
     },
     // 表格内容高度
     MaxHeight: {
       type: String,
-      default: () => "auto"
+      default: () => 'auto'
       // default: () => '650'
     },
     // 是否多选
@@ -178,7 +182,7 @@ export default {
     buttonItems: {
       type: Object
     },
-    //头部样式
+    // 头部样式
     headerStyle: {
       type: Object
     },
@@ -195,7 +199,7 @@ export default {
     distinguishCode: {
       type: Function,
       default: (tableData, itemData) => {
-        return itemData.text;
+        return itemData.text
       }
     }
   },
@@ -206,14 +210,14 @@ export default {
       isClicked: false,
       value: true,
       value1: false
-    };
+    }
   },
   watch: {
-    "$props.checkedHeader": {
+    '$props.checkedHeader': {
       handler: function(params) {
         this.$nextTick(() => {
-          this.checkedHeaderData = params;
-        });
+          this.checkedHeaderData = params
+        })
       },
       deep: true
     }
@@ -224,60 +228,60 @@ export default {
   methods: {
     // 获取当前
     table_index(index) {
-      return (this.pageNum - 1) * this.pageSize + index + 1;
+      return (this.pageNum - 1) * this.pageSize + index + 1
     },
     getCheckItem() {
-      let list = [];
+      const list = []
       this.tableItems.map(item => {
         if (item.isShow) {
-          list.push(item.label);
+          list.push(item.label)
         }
-        return item;
-      });
+        return item
+      })
       this.$nextTick(() => {
-        this.checkedHeader = list;
-      });
+        this.checkedHeader = list
+      })
     },
     // 更改头部显示
     changeTableHeader(val) {
-      this.$emit("changeTableHeader", val);
+      this.$emit('changeTableHeader', val)
     },
     // 头部按钮
     haederBtnClick(val) {
-      this.$emit("haederBtnClick", val);
+      this.$emit('haederBtnClick', val)
     },
     // 操作按钮回调
     handleClick(cb, row) {
-      this.$emit("handleClick", { cb: cb, row: row });
+      this.$emit('handleClick', { cb: cb, row: row })
     },
     handleSizeChange(val) {
-      this.$emit("size-changes", val);
+      this.$emit('size-changes', val)
     },
     // 页码选中
     paginationCurrentChange(val) {
-      this.$emit("current-changes", val);
+      this.$emit('current-changes', val)
     },
     // 列表选中改变
     tableCurrentChanges(val) {
-      this.$emit("tableCurrentChanges", val);
+      this.$emit('tableCurrentChanges', val)
     },
     // 排序操作
     sortChange({ prop, order }) {
-      this.$emit("sortChange", prop, order);
+      this.$emit('sortChange', prop, order)
     },
     changeCellStyle(row, column, rowIndex, columnIndex) {
       if (
-        row.column.label === "项目名称" &&
+        row.column.label === '项目名称' &&
         row.row.projectSubName &&
         row.row.projectSubName.length !== 0
       ) {
-        return "font-weight: 900"; // 修改的样式
+        return 'font-weight: 900' // 修改的样式
       } else {
-        return "";
+        return ''
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

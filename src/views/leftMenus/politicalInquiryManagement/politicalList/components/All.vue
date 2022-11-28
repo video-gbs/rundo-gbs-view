@@ -1,8 +1,8 @@
 <template>
-  <div class="projectManagement" v-if="!this.showDetails">
+  <div v-if="!this.showDetails" class="projectManagement">
     <div class="seach">
       <Seach
-        :FormList="FormList"
+        :form-list="FormList"
         :query="query"
         @submitSearch="submitSearch"
         @submitReset="toReset"
@@ -12,26 +12,26 @@
       <div class="tab-table">
         <ComTabble
           :index="index"
-          :pageSize="pagesData.pageSize"
-          :pageNum="pagesData.pageNum"
+          :page-size="pagesData.pageSize"
+          :page-num="pagesData.pageNum"
           :selection="selection"
-          :headerStyle="headerStyle"
-          :isLoading="isLoading"
-          :MaxHeight="maxHeight"
-          :leftTitle="leftTitle"
-          :tableItems="tableItems"
-          :tableData="tableData"
-          :buttonItems="buttonItems"
-          :isCheckedHeader="isCheckedHeader"
-          :headerBtn="headerBtn"
-          :checkedHeader.sync="checkedHeader"
+          :header-style="headerStyle"
+          :is-loading="isLoading"
+          :max-height="maxHeight"
+          :left-title="leftTitle"
+          :table-items="tableItems"
+          :table-data="tableData"
+          :button-items="buttonItems"
+          :is-checked-header="isCheckedHeader"
+          :header-btn="headerBtn"
+          :checked-header.sync="checkedHeader"
           @haederBtnClick="haederBtnClick"
           @handleClick="handleClick"
           @changeTableHeader="changeTableHeader"
           @selection-change="handleSelectionChange"
         />
         <Pagination
-          :pagesData="pagesData"
+          :pages-data="pagesData"
           @size-change="sizeChange"
           @current-change="currentChange"
         />
@@ -41,120 +41,120 @@
 </template>
 
 <script>
-import Seach from "@/components/Seach/index.vue";
-import ComTabble from "@/components/ComTabble/index.vue";
-import Pagination from "@/components/Pagination/index.vue";
+import Seach from '@/components/Seach/index.vue'
+import ComTabble from '@/components/ComTabble/index.vue'
+import Pagination from '@/components/Pagination/index.vue'
 import {
   affairsInfoList,
   affairsInfoDelete,
-  affairsInfoSearch,
-} from "@/api/method/politicalList";
+  affairsInfoSearch
+} from '@/api/method/politicalList'
 export default {
+  name: 'ProjectManagement',
   components: {
     Seach,
     ComTabble,
-    Pagination,
+    Pagination
   },
-  name: "projectManagement",
   data() {
     return {
       showDetails: false,
       headerStyle: {
-        background: "#EAEAEA",
-        fontsize: "14px",
+        background: '#EAEAEA',
+        fontsize: '14px',
         fontWeight: 400,
-        color: "#333333",
+        color: '#333333'
       },
       // 搜索栏配置
       FormList: [
         {
-          poro: "projectName",
-          type: "input",
-          label: "标题：",
-          size: "small",
+          poro: 'projectName',
+          type: 'input',
+          label: '标题：',
+          size: 'small'
         },
         {
-          poro: "projectSubName",
-          type: "input",
-          label: "分类：",
-          size: "small",
+          poro: 'projectSubName',
+          type: 'input',
+          label: '分类：',
+          size: 'small'
         },
         {
-          poro: "area",
-          type: "addressCascader",
-          label: "领域：",
-          size: "small",
+          poro: 'area',
+          type: 'addressCascader',
+          label: '领域：',
+          size: 'small',
           propsConfig: {
             checkStrictly: true,
-            multiple: true,
+            multiple: true
           },
-          optionsList: [],
+          optionsList: []
         },
         {
-          poro: "renovateType",
-          type: "addressCascader",
-          label: "留言对象：",
-          size: "small",
+          poro: 'renovateType',
+          type: 'addressCascader',
+          label: '留言对象：',
+          size: 'small',
           propsConfig: {
             checkStrictly: true,
-            multiple: true,
+            multiple: true
           },
-          optionsList: [],
+          optionsList: []
         },
 
         {
-          poro: "projectState",
-          type: "addressCascader",
-          label: "显示状态：",
-          size: "small",
+          poro: 'projectState',
+          type: 'addressCascader',
+          label: '显示状态：',
+          size: 'small',
           propsConfig: {
             checkStrictly: true,
-            multiple: true,
+            multiple: true
           },
-          optionsList: [],
+          optionsList: []
         },
         {
-          poro: "declareYear",
-          label: "发布账号：",
-          size: "small",
-          type: "addressCascader",
+          poro: 'declareYear',
+          label: '发布账号：',
+          size: 'small',
+          type: 'addressCascader',
           propsConfig: {
             checkStrictly: true,
-            multiple: true,
+            multiple: true
           },
-          optionsList: [],
+          optionsList: []
         },
         {
-          poro: "moneySource",
-          type: "addressCascader",
-          label: "电话：",
-          size: "small",
+          poro: 'moneySource',
+          type: 'addressCascader',
+          label: '电话：',
+          size: 'small',
           propsConfig: {
             checkStrictly: true,
-            multiple: true,
+            multiple: true
           },
-          optionsList: [],
-        },
+          optionsList: []
+        }
       ],
       // 搜索from
       query: {
         deptId: 0,
         deptType: 0,
-        domain: "",
-        endTime: "",
+        domain: '',
+        endTime: '',
         field: [],
         fileBatchId: 0,
         isDeleted: 0,
         isReview: 0,
         isShow: 0,
         order: true,
-        phone: "",
-        pubUsername: "",
-        realName: "",
-        startTime: "",
+        phone: '',
+        pubUsername: '',
+        realName: '',
+        startTime: '',
         status: 0,
-        title: "",
-        type: "",
+        title: '',
+        type: ''
       },
       // 高级搜索
       isLoading: false,
@@ -162,368 +162,368 @@ export default {
       index: true,
       tableItems: [
         {
-          label: "编号",
-          name: "projectName",
-          width: "100",
+          label: '编号',
+          name: 'projectName',
+          width: '100',
           isShow: true,
-          isBold: false,
+          isBold: false
         },
         {
-          label: "标题",
-          name: "title",
-          width: "200",
-          isShow: true,
+          label: '标题',
+          name: 'title',
+          width: '200',
+          isShow: true
         },
         {
-          label: "分类",
-          name: "type",
+          label: '分类',
+          name: 'type',
           isShow: true,
-          width: "80",
+          width: '80'
         },
         {
-          label: "留言对象",
-          name: "deptName",
-          isShow: true,
+          label: '留言对象',
+          name: 'deptName',
+          isShow: true
         },
         {
-          label: "发布账号",
-          name: "account",
-          isShow: true,
+          label: '发布账号',
+          name: 'account',
+          isShow: true
         },
         {
-          label: "电话",
-          name: "phone",
-          isShow: true,
+          label: '电话',
+          name: 'phone',
+          isShow: true
         },
         {
-          label: "提交时间",
-          name: "createTime",
+          label: '提交时间',
+          name: 'createTime',
           isShow: true,
-          width: "120",
+          width: '120'
         },
         {
-          label: "状态",
-          name: "status",
+          label: '状态',
+          name: 'status',
           isShow: true,
-          width: "80",
+          width: '80'
         },
         {
-          label: "受理单位",
-          name: "contacts",
-          isShow: true,
+          label: '受理单位',
+          name: 'contacts',
+          isShow: true
         },
         {
-          label: "是否可见",
-          name: "isShow",
+          label: '是否可见',
+          name: 'isShow',
           isShow: true,
-          content: "test",
-          width: "80",
+          content: 'test',
+          width: '80'
         },
         {
-          label: "评论区",
-          name: "isReview",
+          label: '评论区',
+          name: 'isReview',
           isShow: true,
-          content: "test1",
-          width: "80",
-        },
+          content: 'test1',
+          width: '80'
+        }
       ],
-      maxHeight:800,
+      maxHeight: 800,
       tableData: [],
       // 分页器内容
       pagesData: {
         pageNum: 1,
         pageSize: 10,
         total: 0,
-        proCount: 0,
+        proCount: 0
       },
       buttonItems: {
         options: [
           {
-            text: "详情",
-            cb: "verify",
-            icon: "el-icon-view",
+            text: '详情',
+            cb: 'verify',
+            icon: 'el-icon-view'
           },
           {
-            text: "删除",
-            cb: "delect",
-            icon: "el-icon-delete",
-            className: "isRed",
-          },
+            text: '删除',
+            cb: 'delect',
+            icon: 'el-icon-delete',
+            className: 'isRed'
+          }
         ],
-        label: "操作",
-        width: "200px",
+        label: '操作',
+        width: '200px'
       },
-      activeName: "",
+      activeName: '',
       dialogVisible: false,
-      dialogTitle: "项目详情",
+      dialogTitle: '项目详情',
       baseList: [
         {
-          label: "项目名称 ",
-          prop: "projectName",
-          type: "input",
+          label: '项目名称 ',
+          prop: 'projectName',
+          type: 'input'
         },
         {
-          label: "子项目名称",
-          prop: "projectSubName",
-          type: "input",
+          label: '子项目名称',
+          prop: 'projectSubName',
+          type: 'input'
         },
         {
-          label: "所属地市",
-          prop: "area",
-          type: "addressCascader",
+          label: '所属地市',
+          prop: 'area',
+          type: 'addressCascader',
           propsConfig: {
-            checkStrictly: true,
+            checkStrictly: true
           },
-          optionsList: [],
+          optionsList: []
         },
         {
-          label: "修复类型 ",
-          prop: "renovateType",
-          type: "addressCascader",
+          label: '修复类型 ',
+          prop: 'renovateType',
+          type: 'addressCascader',
           propsConfig: {
             checkStrictly: true,
-            multiple: true,
+            multiple: true
           },
           optionsList: [],
           onlyLast: false,
-          collapseTags: true,
+          collapseTags: true
         },
         {
-          label: "资金来源 ",
-          prop: "moneySource",
-          type: "addressCascader",
+          label: '资金来源 ',
+          prop: 'moneySource',
+          type: 'addressCascader',
           propsConfig: {
-            checkStrictly: true,
+            checkStrictly: true
           },
-          optionsList: [],
+          optionsList: []
         },
         {
-          label: "下达资金(万元) ",
-          prop: "issuedMoeny",
-          type: "input",
+          label: '下达资金(万元) ',
+          prop: 'issuedMoeny',
+          type: 'input'
         },
         {
-          label: "项目状态 ",
-          prop: "projectState",
-          type: "addressCascader",
+          label: '项目状态 ',
+          prop: 'projectState',
+          type: 'addressCascader',
           propsConfig: {
-            checkStrictly: true,
+            checkStrictly: true
           },
-          optionsList: [],
+          optionsList: []
         },
         {
-          label: "项目位置 ",
-          prop: "projectPlace",
-          type: "input",
-          optionsList: [],
+          label: '项目位置 ',
+          prop: 'projectPlace',
+          type: 'input',
+          optionsList: []
         },
         {
-          label: "申报年份 ",
-          prop: "declareYear",
-          type: "datePicker",
-          dateType: "year",
-          fromat: "yyyy",
-          valueFromat: "yyyy",
+          label: '申报年份 ',
+          prop: 'declareYear',
+          type: 'datePicker',
+          dateType: 'year',
+          fromat: 'yyyy',
+          valueFromat: 'yyyy'
         },
         {
-          label: "承接单位 ",
-          prop: "assumeUnit",
-          type: "input",
+          label: '承接单位 ',
+          prop: 'assumeUnit',
+          type: 'input'
         },
         {
-          label: "经纬度 ",
-          prop: "coordinate",
-          type: "input",
+          label: '经纬度 ',
+          prop: 'coordinate',
+          type: 'input'
         },
         {
-          label: "实施年限 ",
-          prop: "carryTerm",
-          type: "input",
-          optionsList: [],
+          label: '实施年限 ',
+          prop: 'carryTerm',
+          type: 'input',
+          optionsList: []
         },
         {
-          label: "联系人 ",
-          prop: "contacts",
-          type: "input",
+          label: '联系人 ',
+          prop: 'contacts',
+          type: 'input'
         },
         {
-          label: "责任单位 ",
-          prop: "accountabilityUnit",
-          type: "input",
+          label: '责任单位 ',
+          prop: 'accountabilityUnit',
+          type: 'input'
         },
         {
-          label: "开始时间 ",
-          prop: "startDate",
-          type: "datePicker",
-          dateType: "date",
-          fromat: "yyyy-MM-dd HH:mm:ss",
-          valueFromat: "yyyy-MM-dd HH:mm:ss",
+          label: '开始时间 ',
+          prop: 'startDate',
+          type: 'datePicker',
+          dateType: 'date',
+          fromat: 'yyyy-MM-dd HH:mm:ss',
+          valueFromat: 'yyyy-MM-dd HH:mm:ss'
         },
         {
-          label: "验收时间 ",
-          prop: "acceptDate",
-          type: "datePicker",
-          dateType: "date",
-          fromat: "yyyy-MM-dd ",
-          valueFromat: "yyyy-MM-dd",
+          label: '验收时间 ',
+          prop: 'acceptDate',
+          type: 'datePicker',
+          dateType: 'date',
+          fromat: 'yyyy-MM-dd ',
+          valueFromat: 'yyyy-MM-dd'
         },
         {
-          label: "资金支出进度 ",
-          prop: "moneyExpPlan",
-          type: "input",
+          label: '资金支出进度 ',
+          prop: 'moneyExpPlan',
+          type: 'input'
         },
         {
-          prop: "isTypical",
-          type: "radio",
-          label: "是否典型案例：",
-          optionsList: [],
+          prop: 'isTypical',
+          type: 'radio',
+          label: '是否典型案例：',
+          optionsList: []
         },
         {
-          label: "项目完成进度 ",
-          prop: "workPlan",
-          type: "textarea",
-          itemWidth: "1045px",
+          label: '项目完成进度 ',
+          prop: 'workPlan',
+          type: 'textarea',
+          itemWidth: '1045px'
         },
         {
-          label: "绩效目标 ",
-          prop: "perfTarget",
-          type: "textarea",
-          itemWidth: "1045px",
+          label: '绩效目标 ',
+          prop: 'perfTarget',
+          type: 'textarea',
+          itemWidth: '1045px'
         },
         {
-          label: "修复内容 ",
-          prop: "restoreContent",
-          type: "textarea",
-          itemWidth: "1045px",
-        },
+          label: '修复内容 ',
+          prop: 'restoreContent',
+          type: 'textarea',
+          itemWidth: '1045px'
+        }
       ],
       btnItems: [
         {
-          text: "保存",
-          cb: "submitPreservation",
+          text: '保存',
+          cb: 'submitPreservation'
         },
         {
-          text: "重置",
-          cb: "submitReset",
-        },
+          text: '重置',
+          cb: 'submitReset'
+        }
       ],
       selectionList: [],
       checkedHeader: [],
       isCheckedHeader: true,
       headerBtn: [],
       fileList: [],
-      isLoding: false,
-    };
+      isLoding: false
+    }
   },
 
   computed: {},
   mounted() {
-    this.init();
+    this.init()
   },
 
   methods: {
     init() {
       affairsInfoList({
         pageNum: this.pagesData.pageNum,
-        pageSize: this.pagesData.pageSize,
+        pageSize: this.pagesData.pageSize
       }).then((res) => {
         if (res.code === 10000) {
-          this.tableData = res.data.rows;
-          this.pagesData.total = res.data.total;
-          this.pagesData.pages = res.data.pages;
-          this.pagesData.current = res.data.current;
+          this.tableData = res.data.rows
+          this.pagesData.total = res.data.total
+          this.pagesData.pages = res.data.pages
+          this.pagesData.current = res.data.current
         }
-      });
+      })
     },
     toReset(val) {
-      this.query = val;
-      this.pagesData.pageNum = 1;
-      this.pagesData.pageSize = 10;
+      this.query = val
+      this.pagesData.pageNum = 1
+      this.pagesData.pageSize = 10
       setTimeout(() => {
-        this.getDataList();
-      }, 200);
+        this.getDataList()
+      }, 200)
     },
 
     deletItem(val) {
-      this.$confirm("此操作将删除该附件, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('此操作将删除该附件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
         .then(() => {
-          this.fileList = this.fileList.filter((item) => item.uid !== val.uid);
-          this.$message.success("删除成功!");
+          this.fileList = this.fileList.filter((item) => item.uid !== val.uid)
+          this.$message.success('删除成功!')
         })
         .catch(() => {
-          console.log("取消");
-        });
+          console.log('取消')
+        })
     },
 
     async downloadExect() {
-      let parms = {
-        ...this.query,
-      };
-      let rest = await projectExport(parms);
+      const parms = {
+        ...this.query
+      }
+      const rest = await projectExport(parms)
     },
 
     async delectitem() {
-      let list = [];
+      const list = []
       this.selectionList.map((item) => {
-        list.push(item.projectId);
-      });
-      if (list.length === 0) {
-        this.$message.error("选中的项目不能为空!");
-        return false;
-      }
-      this.$confirm("此操作将删除选中的项目, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+        list.push(item.projectId)
       })
-        .then(async () => {
-          let params = {
-            ids: list.join(","),
-          };
-          let rest = await removeProject(params);
-          this.$message.success("删除成功!");
+      if (list.length === 0) {
+        this.$message.error('选中的项目不能为空!')
+        return false
+      }
+      this.$confirm('此操作将删除选中的项目, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async() => {
+          const params = {
+            ids: list.join(',')
+          }
+          const rest = await removeProject(params)
+          this.$message.success('删除成功!')
           setTimeout(() => {
-            this.getDataList();
-          }, 200);
+            this.getDataList()
+          }, 200)
         })
         .catch(() => {
-          this.$message.info("已取消删除!");
+          this.$message.info('已取消删除!')
           setTimeout(() => {
-            this.getDataList();
-          }, 200);
-        });
+            this.getDataList()
+          }, 200)
+        })
     },
     // 查看详情
     verify(val) {
-      this.dialogTitle = "项目详情";
-      this.projectId = val.projectId;
-      this.projectObj = val;
-      this.isFullscreen = true;
+      this.dialogTitle = '项目详情'
+      this.projectId = val.projectId
+      this.projectObj = val
+      this.isFullscreen = true
     },
     // 每页显示条目个数
     sizeChange(val) {
-      this.pagesData.pageSize = val;
-      this.getDataList();
+      this.pagesData.pageSize = val
+      this.getDataList()
     },
     // 当前页数
     currentChange(val) {
-      this.pagesData.pageNum = val;
-      this.getDataList();
+      this.pagesData.pageNum = val
+      this.getDataList()
     },
     handleSizeChange(val) {
-      this.pagesData.pageSize = val;
-      this.getDataList();
+      this.pagesData.pageSize = val
+      this.getDataList()
     },
     handleCurrentChange(val) {
-      this.pagesData.pageNum = val;
-      this.getDataList();
-    },
-  },
-};
+      this.pagesData.pageNum = val
+      this.getDataList()
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 ::v-deep .el-form-item__label {

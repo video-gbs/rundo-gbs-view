@@ -1,10 +1,10 @@
 <template>
   <div class="detail_container">
     <el-tabs
-      type="border-card"
-      v-model="activeName"
-      @tab-click="handleClick"
       v-if="!this.showDetails"
+      v-model="activeName"
+      type="border-card"
+      @tab-click="handleClick"
     >
       <template>
         <el-tab-pane
@@ -13,17 +13,19 @@
           :label="item.label"
           :name="item.label"
         >
-          <component :is="item.content" v-if="item.isShow"></component>
+          <component :is="item.content" v-if="item.isShow" />
         </el-tab-pane>
       </template>
     </el-tabs>
-    <ul class="right-btns-ul" v-if="this.showDetails">
+    <ul v-if="this.showDetails" class="right-btns-ul">
       <li v-for="(btn, i) in btnLists" :key="i" class="right-btns-li">
-        <el-button type="primary" class="right-btns-button" size="mini"
-          ><svg-icon :icon-class="btn.iconName" class="btn_svg" />{{
-            btn.name
-          }}</el-button
-        >
+        <el-button
+          type="primary"
+          class="right-btns-button"
+          size="mini"
+        ><svg-icon :icon-class="btn.iconName" class="btn_svg" />{{
+          btn.name
+        }}</el-button>
       </li>
     </ul>
     <div v-if="this.showDetails">
@@ -33,13 +35,13 @@
 </template>
 
 <script>
-import All from "./components/All.vue";
-import Dsh from "./components/Dsh.vue";
-import Shwtg from "./components/Shwtg.vue";
-import Whf from "./components/Whf.vue";
-import Yhf from "./components/Yhf.vue";
-import Ysl from "./components/Ysl.vue";
-import DetailView from "./politicalDetail/index.vue";
+import All from './components/All.vue'
+import Dsh from './components/Dsh.vue'
+import Shwtg from './components/Shwtg.vue'
+import Whf from './components/Whf.vue'
+import Yhf from './components/Yhf.vue'
+import Ysl from './components/Ysl.vue'
+import DetailView from './politicalDetail/index.vue'
 
 export default {
   components: {
@@ -49,45 +51,45 @@ export default {
     Whf,
     Yhf,
     Ysl,
-    DetailView,
+    DetailView
   },
   data() {
     return {
       showDetails: false,
-      activeName: "全部",
+      activeName: '全部',
       btnLists: [
         {
-          name: "审核问政",
-          iconName: "right1",
+          name: '审核问政',
+          iconName: 'right1'
         },
         {
-          name: "审核补充说明",
-          iconName: "right2",
+          name: '审核补充说明',
+          iconName: 'right2'
         },
         {
-          name: "受理问政",
-          iconName: "right3",
+          name: '受理问政',
+          iconName: 'right3'
         },
         {
-          name: "回复问政",
-          iconName: "right4",
+          name: '回复问政',
+          iconName: 'right4'
         },
         {
-          name: "问政转移",
-          iconName: "right5",
+          name: '问政转移',
+          iconName: 'right5'
         },
         {
-          name: "邀请回复",
-          iconName: "right6",
+          name: '邀请回复',
+          iconName: 'right6'
         },
         {
-          name: "设为可见",
-          iconName: "right7",
+          name: '设为可见',
+          iconName: 'right7'
         },
         {
-          name: "开启评论",
-          iconName: "right8",
-        },
+          name: '开启评论',
+          iconName: 'right8'
+        }
         // {
         //   name:'设为隐藏',
         //   iconName:'right9'
@@ -99,68 +101,68 @@ export default {
       ],
       tabpaneList: [
         {
-          label: "全部",
+          label: '全部',
           content: All,
-          isShow: true,
+          isShow: true
         },
         {
-          label: "待审核",
+          label: '待审核',
           content: Dsh,
-          isShow: false,
+          isShow: false
         },
         {
-          label: "未回复",
+          label: '未回复',
           content: Whf,
-          isShow: false,
+          isShow: false
         },
         {
-          label: "已受理",
+          label: '已受理',
           content: Ysl,
-          isShow: false,
+          isShow: false
         },
         {
-          label: "已回复",
+          label: '已回复',
           content: Yhf,
-          isShow: false,
+          isShow: false
         },
         {
-          label: "审核未通过",
+          label: '审核未通过',
           content: Shwtg,
-          isShow: false,
-        },
-      ],
-    };
+          isShow: false
+        }
+      ]
+    }
   },
   watch: {},
   mounted() {
-    this.getAffairsInfoList();
+    this.getAffairsInfoList()
   },
   methods: {
     getAffairsInfoList() {
       affairsInfoList(this.pages).then((res) => {
         if (res.code === 10000) {
-          this.tableData = res.data.rows;
+          this.tableData = res.data.rows
         }
-      });
+      })
     },
     handleClick(val, event) {
       this.tabpaneList = this.tabpaneList.map((item) => {
         if (item.label === val.label) {
-          item.isShow = true;
+          item.isShow = true
         } else {
-          item.isShow = false;
+          item.isShow = false
         }
-        return item;
-      });
+        return item
+      })
       // this.$nextTick(() => {
       //   document.getElementById("tab").scrollIntoView({
       //     behavior: "smooth",
       //     block: "start"
       //   });
       // });
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
