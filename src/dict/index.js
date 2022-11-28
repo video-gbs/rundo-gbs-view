@@ -8,12 +8,12 @@ const dict = {
     '5': '其他'
   },
   _type: [
-    { id: '', value: '全部分类' },
-    { id: 1, value: '建议' },
-    { id: 2, value: '诉求' },
-    { id: 3, value: '举报' },
-    { id: 4, value: '咨询' },
-    { id: 5, value: '其他' }
+    { value: '', label: '全部分类' },
+    { value: 1, label: '建议' },
+    { value: 2, label: '诉求' },
+    { value: 3, label: '举报' },
+    { value: 4, label: '咨询' },
+    { value: 5, label: '其他' }
   ],
   status: {
     '': '全部状态',
@@ -24,12 +24,12 @@ const dict = {
     '6': '审核回复'
   },
   _status: [
-    { id: '', value: '全部状态' },
-    { id: 1, value: '已撤回' },
-    { id: 2, value: '未通过' },
-    { id: 3, value: '未回复' },
-    { id: 4, value: '已受理' },
-    { id: 5, value: '审核回复' }
+    { value: '', label: '全部状态' },
+    { value: 1, label: '已撤回' },
+    { value: 2, label: '未通过' },
+    { value: 3, label: '未回复' },
+    { value: 4, label: '已受理' },
+    { value: 5, label: '审核回复' }
   ],
   domain: {
     '': '全部领域',
@@ -57,29 +57,37 @@ const dict = {
     '22': '其他'
   },
   _domain: [
-    { id: '', value: '全部领域' },
-    { id: 1, value: '住建' },
-    { id: 2, value: '公安' },
-    { id: 3, value: '交通运输' },
-    { id: 4, value: '教育' },
-    { id: 5, value: '民政' },
-    { id: 6, value: '人社' },
-    { id: 7, value: '医疗保障' },
-    { id: 8, value: '卫生健康' },
-    { id: 9, value: '生态环境' },
-    { id: 10, value: '市场监管' },
-    { id: 11, value: '农业农村' },
-    { id: 12, value: '城管' },
-    { id: 13, value: '财政税收' },
-    { id: 14, value: '电力' },
-    { id: 15, value: '物价' },
-    { id: 16, value: '通信' },
-    { id: 17, value: '商务' },
-    { id: 18, value: '水利' },
-    { id: 19, value: '自然资源' },
-    { id: 20, value: '司法' },
-    { id: 21, value: '金融' },
-    { id: 22, value: '其他' }
+    { value: '', label: '全部领域' },
+    { value: 1, label: '住建' },
+    { value: 2, label: '公安' },
+    { value: 3, label: '交通运输' },
+    { value: 4, label: '教育' },
+    { value: 5, label: '民政' },
+    { value: 6, label: '人社' },
+    { value: 7, label: '医疗保障' },
+    { value: 8, label: '卫生健康' },
+    { value: 9, label: '生态环境' },
+    { value: 10, label: '市场监管' },
+    { value: 11, label: '农业农村' },
+    { value: 12, label: '城管' },
+    { value: 13, label: '财政税收' },
+    { value: 14, label: '电力' },
+    { value: 15, label: '物价' },
+    { value: 16, label: '通信' },
+    { value: 17, label: '商务' },
+    { value: 18, label: '水利' },
+    { value: 19, label: '自然资源' },
+    { value: 20, label: '司法' },
+    { value: 21, label: '金融' },
+    { value: 22, label: '其他' }
+  ],
+  isShow: {
+    '0': '显示',
+    '1': '不显示'
+  },
+  _isShow: [
+    { value: 0, label: '显示' },
+    { value: 1, label: '不显示' }
   ],
   appraise: {
     '1': '非常满意',

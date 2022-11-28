@@ -52,8 +52,9 @@
         show-overflow-tooltip
       >
         <template slot-scope="scope">
+
           <el-switch
-            v-if="item.content === 'test'"
+            v-if="item.content === 'isShow'"
             v-model="scope.row.isShow"
             :active-value="0"
             :inactive-value="1"
@@ -61,7 +62,7 @@
             inactive-color="#eeeeee"
           />
           <el-switch
-            v-else-if="item.content === 'test1'"
+            v-else-if="item.content === 'isReview'"
             v-model="scope.row.isReview"
             :active-value="0"
             :inactive-value="1"
@@ -69,6 +70,8 @@
             inactive-color="#eeeeee"
             disabled
           />
+          <span v-else-if="item.content==='type'" class="column-span">{{ $dict.type[scope.row[item.name]] }}</span>
+          <span v-else-if="item.content==='status'" class="column-span">{{ $dict.status[scope.row[item.name]] }}</span>
           <span v-else class="column-span">{{ scope.row[item.name] }}</span>
         </template>
       </el-table-column>
@@ -224,6 +227,7 @@ export default {
   },
   mounted() {
     // this.getCheckItem();
+    console.log('tableItems', this.tableItems)
   },
   methods: {
     // 获取当前

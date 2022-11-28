@@ -3,7 +3,7 @@
     <div class="seach">
       <Seach
         :form-list="FormList"
-        :query="query"
+        :query="pagesData"
         @submitSearch="submitSearch"
         @submitReset="toReset"
       />
@@ -44,6 +44,7 @@
 import Seach from '@/components/Seach/index.vue'
 import ComTabble from '@/components/ComTabble/index.vue'
 import Pagination from '@/components/Pagination/index.vue'
+import { unitList } from '@/api/method/unitManagement'
 import {
   affairsInfoList,
   affairsInfoDelete,
@@ -66,33 +67,35 @@ export default {
         color: '#333333'
       },
       // 搜索栏配置
+
       FormList: [
         {
-          poro: 'projectName',
+          poro: 'title',
           type: 'input',
           label: '标题：',
           size: 'small'
         },
         {
-          poro: 'projectSubName',
-          type: 'input',
+          poro: 'type',
+          type: 'select',
           label: '分类：',
-          size: 'small'
+          size: 'small',
+          optionsList: this.$dict._type
         },
         {
-          poro: 'area',
-          type: 'addressCascader',
+          poro: 'domain',
+          type: 'select',
           label: '领域：',
           size: 'small',
           propsConfig: {
             checkStrictly: true,
             multiple: true
           },
-          optionsList: []
+          optionsList: this.$dict._domain
         },
         {
-          poro: 'renovateType',
-          type: 'addressCascader',
+          poro: 'deptId',
+          type: 'select',
           label: '留言对象：',
           size: 'small',
           propsConfig: {
@@ -103,21 +106,21 @@ export default {
         },
 
         {
-          poro: 'projectState',
-          type: 'addressCascader',
+          poro: 'isShow',
+          type: 'select',
           label: '显示状态：',
           size: 'small',
           propsConfig: {
             checkStrictly: true,
             multiple: true
           },
-          optionsList: []
+          optionsList: this.$dict._isShow
         },
         {
-          poro: 'declareYear',
+          poro: 'pubUsername',
           label: '发布账号：',
           size: 'small',
-          type: 'addressCascader',
+          type: 'input',
           propsConfig: {
             checkStrictly: true,
             multiple: true
@@ -125,8 +128,8 @@ export default {
           optionsList: []
         },
         {
-          poro: 'moneySource',
-          type: 'addressCascader',
+          poro: 'phone',
+          type: 'input',
           label: '电话：',
           size: 'small',
           propsConfig: {
@@ -154,7 +157,11 @@ export default {
         startTime: '',
         status: 0,
         title: '',
-        type: ''
+        type: '',
+        pageNum: 1,
+        pageSize: 10,
+        total: 0,
+        proCount: 0
       },
       // 高级搜索
       isLoading: false,
@@ -177,6 +184,7 @@ export default {
         {
           label: '分类',
           name: 'type',
+          content: 'type',
           isShow: true,
           width: '80'
         },
@@ -205,6 +213,7 @@ export default {
           label: '状态',
           name: 'status',
           isShow: true,
+          content: 'status',
           width: '80'
         },
         {
@@ -216,14 +225,14 @@ export default {
           label: '是否可见',
           name: 'isShow',
           isShow: true,
-          content: 'test',
+          content: 'isShow',
           width: '80'
         },
         {
           label: '评论区',
           name: 'isReview',
           isShow: true,
-          content: 'test1',
+          content: 'isReview',
           width: '80'
         }
       ],
@@ -231,10 +240,28 @@ export default {
       tableData: [],
       // 分页器内容
       pagesData: {
-        pageNum: 1,
-        pageSize: 10,
-        total: 0,
-        proCount: 0
+        'account': '',
+        'deptId': '',
+        'deptType': 0,
+        'domain': '',
+        'endTime': '',
+        'field': [],
+        'fileBatchId': 0,
+        'isDeleted': 0,
+        'isReview': 0,
+        'isShow': 0,
+        'order': true,
+        'pageNum': 1,
+        'pageSize': 10,
+        'phone': '',
+        'pubUsername': '',
+        'realName': '',
+        'startTime': '',
+        'status': '',
+        'title': '',
+        'type': '',
+        'total': 0,
+        'proCount': 0
       },
       buttonItems: {
         options: [
@@ -423,18 +450,35 @@ export default {
 
   methods: {
     init() {
-      affairsInfoList({
-        pageNum: this.pagesData.pageNum,
-        pageSize: this.pagesData.pageSize
-      }).then((res) => {
+      this.getDataList()
+      this.getDeptFn()
+    },
+    getDataList() {
+      affairsInfoList(this.pagesData).then((res) => {
         if (res.code === 10000) {
-          this.tableData = res.data.rows
+          this.tableData = res.data ? res.data.rows : []
           this.pagesData.total = res.data.total
           this.pagesData.pages = res.data.pages
           this.pagesData.current = res.data.current
         }
       })
     },
+    getDeptFn() {
+      // 获取部门
+      unitList({ 'current': 1, 'size': 3000 }).then(res => {
+        if (res.code === 10000) {
+          0
+          this.FormList.forEach(i => {
+            if (i.poro === 'deptId') {
+              i.optionsList = res.data.records.map(l => {
+                return { value: l.id, label: l.name }
+              })
+            }
+          })
+        }
+      })
+    },
+    submitSearch() { this.getDataList() },
     toReset(val) {
       this.query = val
       this.pagesData.pageNum = 1
