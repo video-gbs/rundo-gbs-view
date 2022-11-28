@@ -26,7 +26,7 @@ export function setAppAuth(params) {
   return request.post(`/politics/sys/roles/perm/save`, params)
 }
 
-export function rolesList(params) {
-  // 设置功能权限
+export function getRolesList(params) {
+  // 角色列表
   return request.post(`/politics/sys/roles/list`, params)
 }
