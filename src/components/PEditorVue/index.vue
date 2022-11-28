@@ -85,6 +85,7 @@ export default {
   watch: {
     value(val) {
       if (!this.changeStatus) {
+        console.log('vsal', val)
         this.html = val
       }
     }
@@ -92,6 +93,9 @@ export default {
   mounted() {
     // 模拟 ajax 请求，异步渲染编辑器
     console.log('value', this.value)
+    setTimeout(() => {
+      this.html = this.value
+    }, 0)
   },
   beforeDestroy() {
     const editor = this.editor

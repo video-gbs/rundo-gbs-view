@@ -15,11 +15,30 @@
         </el-form-item>
         <el-form-item label="轮播图图片" prop="fileName">
           <div>
-            <el-upload ref="uploadRef" size="mini" drag action="" :http-request="uploadFn" :on-change="onChange" :limit="1" @before-upload="beforeUpload">
-              <i class="el-icon-upload" />
-              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-              <div slot="tip" class="el-upload__tip">{{ `① 支持上传图片格式："*.jpg"、"*.jpeg"、"*.png"； ② 单张图片大小不超过50M；` }}</div>
-            </el-upload>
+            <el-row>
+              <el-col :span="16">
+                <el-upload
+                  ref="uploadRef"
+                  size="mini"
+                  drag
+                  action=""
+                  :http-request="uploadFn"
+                  :on-change="onChange"
+                  :limit="1"
+                  @before-upload="beforeUpload"
+                >
+                  <i class="el-icon-upload" />
+                  <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                  <div slot="tip" class="el-upload__tip">{{ `① 支持上传图片格式："*.jpg"、"*.jpeg"、"*.png"； ② 单张图片大小不超过50M；` }}
+                  </div>
+                </el-upload>
+              </el-col>
+              <el-col :span="8">
+                <div>当前轮播图</div>
+                <img :src="params.fileName ? `${$filePreview}/${params.fileName}` : ''">
+              </el-col>
+            </el-row>
+
           </div>
         </el-form-item>
         <el-form-item label="显示顺序">
@@ -57,7 +76,7 @@
 <script>
 import PEditorVue from '@/components/PEditorVue/index.vue'
 import { uploadImg } from '@/api/method/files'
-import { addRoundChart, editRoundChart } from '@/api/method/roundChart'
+import { addRoundChart, editRoundChart, getRoundChartOne } from '@/api/method/roundChart'
 export default {
   name: 'RoundChartManage',
   components: { PEditorVue },
@@ -65,13 +84,13 @@ export default {
     return {
       title: '新增轮播图',
       params: {
-        'content': '', // 展示内容
-        'fileName': '', // fileName
-        'isShow': 0, // 是否显示，0显示，1不显示
-        'orderValue': 0, // 显示顺序
-        'pageUrl': '', // 外部链接url
-        'related': 0, // 关联选项: 0:内容展示，关联外部链接
-        'title': ''// 展示标题,示例值(xxxxxx)
+        content: '', // 展示内容
+        fileName: '', // fileName
+        isShow: 0, // 是否显示，0显示，1不显示
+        orderValue: 0, // 显示顺序
+        pageUrl: '', // 外部链接url
+        related: 0, // 关联选项: 0:内容展示，关联外部链接
+        title: ''// 展示标题,示例值(xxxxxx)
       },
       action: 'add', // 判断是新增还是编辑
       uploadData: {
@@ -97,13 +116,21 @@ export default {
       }
     }
   },
+  created() {
+    // if (this.$route.params.id !== 'add') {
+    //   console.log('sd')
+    //   this.action = 'edit'
+    //   this.title = '编辑轮播图'
+    //   this.getChartById()
+    // }
+  },
   mounted() {
     console.log(this.$route.params)
     if (this.$route.params.id !== 'add') {
       console.log('sd')
       this.action = 'edit'
       this.title = '编辑轮播图'
-      this.getChartById()
+      this.getChartById(this.$route.params.id)
     }
   },
   methods: {
@@ -112,20 +139,14 @@ export default {
       // 监听富文本内容变化并赋值
       this.params.content = v
     },
-    getChartById() {
+    getChartById(v) {
       // 获取单个轮播图数据
-      const one = {
-        content: '展示内容11111',
-        createTime: '2022-11-17 15:42:51',
-        id: 1593147638770516000,
-        isShow: 0,
-        orderValue: 4,
-        pageUrl: 'http://www.baidu.com',
-        related: 1,
-        title: '标题1'
-      }
-      Object.assign(this.params, one)
-      this.editorCxt = this.params.content
+      getRoundChartOne(v).then(res => {
+        if (res.code === 10000) {
+          Object.assign(this.params, res.data)
+          this.editorCxt = this.params.content
+        }
+      })
     },
     beforeUpload(file) {
       console.log('file', file)
@@ -147,7 +168,7 @@ export default {
     submitFn() {
       this.$refs['roundChartForm'].validate(v => {
         if (v) {
-          const fn = this.action === 'add' ? addRoundChart(this.params) : editRoundChart({ id: 0, params: this.params })
+          const fn = this.action === 'add' ? addRoundChart(this.params) : editRoundChart(this.params)
           fn.then(res => {
             if (res.code === 10000) {
               this.$message.success(`${this.action === 'add' ? '新增' : '编辑'}成功`)

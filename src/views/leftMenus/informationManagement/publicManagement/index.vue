@@ -21,25 +21,40 @@
           </el-table-column>
           <el-table-column prop="isShow" label="是否显示" width="100">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.isShow" active-color="#4caf50" inactive-color="#eeeeee" :active-value="0"
-                :inactive-value="1" @change="editShow(scope.row)" />
+              <el-switch
+                v-model="scope.row.isShow"
+                active-color="#4caf50"
+                inactive-color="#eeeeee"
+                :active-value="0"
+                :inactive-value="1"
+                @change="editShowFn(scope.row,editShow)"
+              />
               <!-- {{ dict.isShow[scope.row.isShow] }} -->
             </template>
           </el-table-column>
           <el-table-column prop="createTime" label="创建时间" width="180" />
           <el-table-column width="200" label="操作"> <template slot-scope="scope">
-              <el-button type="text" @click="orderDialogFn(scope.row)">显示顺序</el-button>
-              <!-- <el-button type="text">设为可见</el-button> -->
-              <el-button type="text" @click="goPage(`/publicManagement/${scope.row.id}`)">编辑</el-button>
-              <el-button type="text" @click="deleteFn(scope.row, remove, getListFn)">删除</el-button>
-            </template>
+            <el-button type="text" @click="orderDialogFn(scope.row)">显示顺序</el-button>
+            <!-- <el-button type="text">设为可见</el-button> -->
+            <el-button type="text" @click="goPage(`/publicManagement/${scope.row.id}`)">编辑</el-button>
+            <el-button type="text" @click="deleteFn(scope.row, remove, getListFn)">删除</el-button>
+          </template>
           </el-table-column>
         </el-table-column>
 
       </el-table>
-      <el-pagination class="pagination-div" background border layout="total, sizes, prev, pager, next, jumper"
-        :current-page.sync="params.current" :page-sizes="[10, 20, 50, 100]" :page-size="params.size"
-        :total="params.total" @size-change="handleSizeChange" @current-change="paginationCurrentChange" />
+      <el-pagination
+        class="pagination-div"
+        background
+        border
+        layout="total, sizes, prev, pager, next, jumper"
+        :current-page.sync="params.current"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="params.size"
+        :total="params.total"
+        @size-change="handleSizeChange"
+        @current-change="paginationCurrentChange"
+      />
     </div>
     <PDialog ref="orderDialog" @submit="editOrder">
       <template slot="main">
@@ -58,8 +73,8 @@
 
 <script>
 import _dict from '@/dict/index'
-import _mixins from "@/mixins/index"
-import { getAfficheList, deleteAffiche, editAffiche, editAfficheOrder } from '@/api/method/affiche'
+import _mixins from '@/mixins/index'
+import { getAfficheList, deleteAffiche, editAffiche, editAfficheOrder, editAfficheIsShow } from '@/api/method/affiche'
 export default {
   name: '',
   mixins: [_mixins],
@@ -75,7 +90,8 @@ export default {
       ],
       one: {},
       orderForm: { order: 0 },
-      remove: deleteAffiche
+      remove: deleteAffiche,
+      editShow: editAfficheIsShow
     }
   },
   mounted() {
@@ -117,16 +133,12 @@ export default {
     // },
     editOrder() {
       editAfficheOrder(this.one.id, this.one.orderValue).then(res => {
-        res.code === 1000 && (this.$message.success('修改成功'), this.$refs['orderDialog'].visible = false)
+        res.code === 10000 && (this.$message.success('修改成功'), this.$refs['orderDialog'].visible = false)
       }).catch(() => {
 
       })
     },
-    editShow(v) {
-      editAffiche(v.id, { isShow: v.isShow }).then(res => { }).catch(() => {
-        v.isShow = v.isShow ? 0 : 1
-      })
-    },
+
     orderDialogFn(v) {
       this.one = v
       this.$refs['orderDialog'].visible = true

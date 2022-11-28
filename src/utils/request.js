@@ -3,8 +3,11 @@ import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 import { Local } from '@/utils/storage'
-
+// import jb from '@/utils/jsonBigint'
+// console.log(jb)
 // create an axios instance
+
+// axios.defaults.transformResponse = jb
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
@@ -18,6 +21,11 @@ service.interceptors.request.use(
     // do something before request is sent
     const token = Local.getToken()
     // config.headers.Authorization= token;
+    if (config.url.indexOf('/politics/v1/file/batchUploadImg') !== -1) {
+      // 图片上传不传token
+      delete config.headers.Authorization
+      return config
+    }
     if (token) {
       config.headers.Authorization = token
       // config.headers['X-Token'] = getToken()
