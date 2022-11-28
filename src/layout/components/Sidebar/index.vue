@@ -1,16 +1,15 @@
 <template>
   <div :class="{ 'has-logo': showLogo }">
-    <logo v-if="showLogo" :collapse="isCollapse" />
-    <el-scrollbar wrap-class="scrollbar-wrapper">
+    <el-scrollbar wrap-class="scrollbar-wrapper" style="height: calc(100% - 62px);">
       <el-menu
         :default-active="activeMenu"
-        :collapse="isCollapse"
         :background-color="variables.menuBg"
         :text-color="variables.menuText"
         :unique-opened="false"
         :active-text-color="variables.menuActiveText"
         :collapse-transition="false"
         mode="vertical"
+        ref="leftNavigation"
       >
         <sidebar-item
           v-for="route in routes"
@@ -41,31 +40,45 @@ export default {
     activeMenu() {
       const route = this.$route;
       const { meta, path } = route;
-      // if set path, the sidebar will highlight the path you set
       if (meta.activeMenu) {
         return meta.activeMenu;
       }
       return path;
     },
-    showLogo() {
-      return this.$store.state.settings.sidebarLogo;
-    },
     variables() {
       return variables;
     },
-    isCollapse() {
-      return !this.sidebar.opened;
+    showLogo() {
+      return this.$store.state.settings.sidebarLogo;
+    }
+  },
+  mounted() {
+    this.select(this.$route.path);
+  },
+  methods: {
+    select(index) {
+      if (this.$route.path !== index) this.$router.push(index);
+      if (
+        this.$store.state.tabs.tabList.every(
+          item => item.path !== this.$route.path
+        )
+      ) {
+        this.$store.state.tabs.tabList.push(this.$route);
+        // this.$store.commit("tabList", this.$store.state.tabs.tabList);
+        console.log("~~~~~~~~~~~~~", this.$store.state);
+      }
     }
   }
 };
 </script>
 <style lang="scss" scoped>
+
 .bottom-logo {
   position: absolute;
-  height:62px;
-  width:100%;
+  height: 62px;
+  width: 100%;
   bottom: 0;
-  background: url('../../../assets/imgs/logoBottom.png') no-repeat;
+  background: url("../../../assets/imgs/logoBottom.png") no-repeat;
   background-size: 100% 100%;
 }
 </style>

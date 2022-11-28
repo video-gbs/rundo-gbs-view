@@ -7,32 +7,35 @@ import { Local } from '@/utils/storage'
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 let asyncRouter
 const whiteList = ['/login'] // no redirect whitelist
-router.beforeEach(async(to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   NProgress.start()
   const hasToken = Local.getToken()
-if (whiteList.indexOf(to.path) !== -1 && !hasToken) {
-  asyncRouter = null
-  next()
-} else {
+  // if (whiteList.indexOf(to.path) !== -1 && !hasToken) {
+  //   asyncRouter = null
+  //   next()
+  // } else {
   // token存在-
-  if (hasToken) {
-    if (to.path == '/404') {
-      Message({
-        message: '页面不存在',
-        type: 'error'
-      })
-      NProgress.done()
-      next('/')
-    } else {
-      isLogin(to, next, () => {
-        next()
-      })
-    }
+
+  if (to.path === "/login") {
+    next()
+  } else if (to.path == '/404') {
+    Message({
+      message: '页面不存在',
+      type: 'error'
+    })
+    NProgress.done()
+    next('/404')
   } else {
-    asyncRouter = null
-    next('/login')
+    if (hasToken) {
+      next()
+    } else {
+      console.log('4021')
+      asyncRouter = null
+      next('/login')
+    }
   }
-}
+
+  // }
 
 })
 

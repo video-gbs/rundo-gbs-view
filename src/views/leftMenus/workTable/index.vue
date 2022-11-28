@@ -15,7 +15,7 @@
         :notification="notification"
         v-if="notificationShow"
       />
-      <Statistical :homeLists="homeLists" />
+      <Statistical :statisticalData="statisticalData" v-if="statisticalShow" />
     </div>
   </div>
 </template>
@@ -48,12 +48,14 @@ export default {
       notificationShow: false,
       todoListShow: false,
       overviewShow: false,
+      statisticalShow: false,
       weatherList: {},
       homeLists: {},
       notification: [],
       headers: {
         Authorization: Local.getToken(),
       },
+      statisticalData: [],
     };
   },
   watch: {},
@@ -67,7 +69,7 @@ export default {
   },
   methods: {
     getHomeLists() {
-      homeLists(this.params, this.headers).then((res) => {
+      homeLists(this.params).then((res) => {
         if (res.code === 10000) {
           this.homeLists = res.data;
           this.notification = res.data.notification;
@@ -78,20 +80,17 @@ export default {
       });
     },
     editAffiche() {
-      editAffiche(this.params, this.headers).then((res) => {
+      editAffiche(this.params).then((res) => {
         if (res.code === 10000) {
-          console.log("res", res);
-          // this.tableData = res.data.records
-          // this.params.total = res.data.total
+          this.statisticalData = res.data;
+          this.statisticalShow = true;
         }
       });
     },
     getAfficheList() {
-      getAfficheList(this.params, this.headers).then((res) => {
+      getAfficheList(this.params).then((res) => {
         if (res.code === 10000) {
           console.log("res", res);
-          // this.tableData = res.data.records
-          // this.params.total = res.data.total
         }
       });
     },
@@ -101,7 +100,7 @@ export default {
         from: "5",
         needIndex: "1",
       };
-      areaWeather(weatherParams, this.headers).then((res) => {
+      areaWeather(weatherParams).then((res) => {
         if (res.code === 10000) {
           this.weatherList = res.data.showapi_res_body;
           this.weatherListShow = true;

@@ -50,13 +50,6 @@ export const constantRoutes = [
       }
     ]
   },
-  // {
-  //   path: '/workTable',
-  //   name: '综合工作台',
-  //   meta: { title: '综合工作台' },
-  //   component: () => import('@/views/leftMenus/workTable/index')
-  // },
-
   {
     path: '/',
     component: Layout,
@@ -67,16 +60,7 @@ export const constantRoutes = [
       component: () => import('@/views/leftMenus/workTable/index'),
       meta: { title: '综合工作台', icon: 'zhgzt' }
     }]
-
   },
-  // component: () => import('@/views/leftMenus/workTable/index'),
-  // children: [
-  // {
-  //   path: '/workTable',
-  //   name: '综合工作台',
-  //   component: () => import('@/views/leftMenus/workTable/index'),
-  //   meta: { title: '综合工作台', icon: 'dashboard' }
-  // },
   {
     path: '/politicalInquiryManagement',
     name: '问政管理',
@@ -197,18 +181,15 @@ export const constantRoutes = [
         name: '单位管理',
         component: () => import('@/views/leftMenus/systemManagement/unitManagement/index'),
         meta: { title: '单位管理', icon: 'dashboard' }
+      },
+      {
+        path: '/otherUnitManagement',
+        name: '单位账号管理',
+        component: () => import('@/views/leftMenus/systemManagement/otherUnitManagement/index'),
+        meta: { title: '单位账号管理', icon: 'dashboard' }
       }
     ]
   },
-  // {
-  //   path: '/politicalDetail',
-  //   // component: Layout,
-  //   // meta: { title: '问政详情' },
-  //   component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalList/politicalDetail/index')
-  // },
-  // ]
-  // },
-
   {
     path: '/404',
     component: () => import('@/views/404'),

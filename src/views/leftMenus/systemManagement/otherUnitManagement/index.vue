@@ -1,7 +1,7 @@
 <template>
   <div class="router_container4 m20 bg-w">
     <div class="panel-header-box f jc-sb ai-c fw-w">
-      <div class="title-css">账号管理</div>
+      <div class="title-css">其他单位账号管理</div>
     </div>
     <div class="p10">
       <el-table :data="tableData" style="width: 100%">
@@ -295,12 +295,13 @@
 <script>
 import pagination from "@/components/Pagination/index.vue";
 import {
-  accountAdd,
-  accountEdit,
-  accountList,
-  accountEditPassword,
-  accountDelete
-} from "@/api/method/accountManage";
+  otherUnitAdd,
+  otherUnitEdit,
+  otherUnitList,
+  otherUnitDelete,
+  otherUnitEditPassword,
+  otherUnitRoleId
+} from "@/api/method/otherUnitManagement";
 import { Local } from "@/utils/storage";
 
 export default {
@@ -418,7 +419,7 @@ export default {
           nickName: "",
           name: "",
           email: "",
-          jobId: 1
+          deptId: 1
         }
       },
       gender: [
@@ -436,16 +437,9 @@ export default {
       }
     };
   },
-  watch: {
-      'editShow'(){
-        this.$nextTick(() =>{
-          // this.dialogShow();
-        })
-      }
-    },
   mounted() {
     this.checkPassworLevel();
-    this.getAccountList();
+    this.getOtherUnitList();
   },
   methods: {
     /**
@@ -467,9 +461,8 @@ export default {
           ) {
             return;
           }
-          accountEditPassword(
+          otherUnitEditPassword(
             { id: this.passwordForm.id, password: this.passwordForm.password }
-            
           ).then(res => {
             if (res.code === 10000) {
               this.$message({
@@ -477,7 +470,7 @@ export default {
                 message: "修改成功"
               });
               this.passwordVisible = false;
-              this.getAccountList();
+              this.getOtherUnitList();
             }
           });
         }
@@ -530,11 +523,11 @@ export default {
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize;
-      this.getAccountList();
+      this.getOtherUnitList();
     },
     currentChange(proCount) {
       this.params.proCount = proCount;
-      this.getAccountList();
+      this.getOtherUnitList();
     },
     goPage(path, query) {
       this.$router.push(path);
@@ -542,14 +535,14 @@ export default {
     dialogShow(act, data) {
       this.dialog.params = {
         account: "",
-        roleId: 1,
+        roleId: 10000001,
         status: 1,
         password: "",
         rePassword: "",
         nickName: "",
         name: "",
         email: "",
-        jobId: 1
+        deptId: 1
       };
       this.editShow = true;
       if (act === 0) {
@@ -578,19 +571,19 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        accountDelete(row.id).then(res => {
+        otherUnitDelete(row.id).then(res => {
           if (res.code === 10000) {
             this.$message({
               type: "success",
               message: "删除成功"
             });
-            this.getAccountList();
+            this.getOtherUnitList();
           }
         });
       });
     },
-    getAccountList() {
-      accountList(
+    getOtherUnitList() {
+      otherUnitList(
         {
           ...this.params,
           current: this.params.pageNum,
@@ -619,27 +612,27 @@ export default {
               ) {
                 return;
               }
-              accountAdd(this.dialog.params).then(res => {
+              otherUnitAdd(this.dialog.params).then(res => {
                 if (res.code === 10000) {
                   this.$message({
                     type: "success",
-                    message: "账号新增成功"
+                    message: "其他单位账号新增成功"
                   });
                   this.dialog.show = false;
-                  this.getAccountList();
+                  this.getOtherUnitList();
                 }
               });
               break;
             case "编辑用户":
 
-              accountEdit({id:this.editId,...this.dialog.params}).then(res => {
+              otherUnitEdit({id:this.editId,...this.dialog.params}).then(res => {
                 if (res.code === 10000) {
                   this.$message({
                     type: "success",
                     message: "账号修改成功"
                   });
                   this.dialog.show = false;
-                  this.getAccountList();
+                  this.getOtherUnitList();
                 }
               });
               break;
