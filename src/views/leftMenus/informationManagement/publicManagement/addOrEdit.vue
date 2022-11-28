@@ -52,7 +52,7 @@
 </template>
 <script>
 import PEditorVue from '@/components/PEditorVue/index.vue'
-import { addAffiche, editAffiche } from '@/api/method/affiche'
+import { addAffiche, editAffiche, getAfficheOne } from '@/api/method/affiche'
 export default {
   name: 'RoundChartManage',
   components: { PEditorVue },
@@ -74,12 +74,12 @@ export default {
       action: 'add',
       editorCxt: '',
       params: {
-        'content': '',
-        'isShow': 0,
-        'orderValue': 0,
-        'pageUrl': '',
-        'related': 0,
-        'title': ''
+        content: '',
+        isShow: 0,
+        orderValue: 0,
+        pageUrl: '',
+        related: 0,
+        title: ''
       },
       rules: {
         content: [
@@ -98,40 +98,31 @@ export default {
   },
   mounted() {
     console.log(this.$route.params)
-    if (this.$route.params.id !== 'add') {
+    if (this.$route.params.id && this.$route.params.id !== 'add') {
       this.action = 'edit'
       this.title = '编辑公告'
-      this.getNoticeById()
+      this.getNoticeById(this.$route.params.id)
     }
   },
   methods: {
     handleChange() {},
     contentChange(v) {
       // 监听富文本内容变化并赋值
+      console.log('onchangevvvvv', v)
       this.params.content = v
     },
-    getNoticeById() {
+    getNoticeById(v) {
       // 获取单个公告数据
-      const one = {
-        content: '展示内容11111',
-        createTime: '2022-11-17 15:42:51',
-        id: 1593147638770516000,
-        isShow: 0,
-        orderValue: 4,
-        pageUrl: 'http://www.baidu.com',
-        related: 1,
-        title: '标题1'
-      }
-      Object.assign(this.params, one)
-      console.log('this.params', this.params)
-      this.editorCxt = this.params.content
+      getAfficheOne(v).then(res => {
+        res.code === 10000 && (this.params = Object.assign(this.params, res.data), this.editorCxt = this.params.content)
+      })
     },
     submitFn() {
       this.$refs['form'].validate(v => {
         if (v) {
           const fn = this.action === 'add' ? addAffiche(this.params) : editAffiche(this.params.id, this.params)
           fn.then(res => {
-            res.code === 10000 && (this.$message.success('添加成功'), this.$router.push('/publicManagement'))
+            res.code === 10000 && (this.$message.success((this.action === 'add' ? '添加' : '编辑') + '成功'), this.$router.push('/publicManagement'))
           })
           return
         }

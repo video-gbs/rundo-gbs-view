@@ -10,7 +10,6 @@
       >
         <el-table-column>
           <template slot="header">
-
             <div class="f ai-c jc-sb">
               <div>数据列表</div>
               <el-button size="mini" type="primary" @click="goPage('/roundChart/add')">新增</el-button>
@@ -87,27 +86,31 @@
 </template>
 
 <script>
-import { getRoundChartList, deleteRoundChart, editRoundChart, slideShowOrder } from '@/api/method/roundChart'
+import { getRoundChartList, deleteRoundChart, editRoundChart, slideShowOrder, slideIsShow } from '@/api/method/roundChart'
 import _mixins from '@/mixins/index'
-import pagination from '@/components/Pagination/index.vue'
+
 import setOrderVue from '@/components/setOrder/setOrder.vue'
 export default {
   name: '',
-  components: { pagination, setOrderVue },
+  components: { setOrderVue },
   mixins: [_mixins],
   data() {
     return {
       params: {
-        current: 1,
-        size: 10,
-        total: 0
+        'current': 1,
+        // 'isShow': 0,
+        // 'orderValue': 0,
+        // 'related': 0,
+        'size': 10
+        // 'title': '',
+        // 'total': 0
       },
       tableData: [
       ],
       show: false,
       one: {},
       remove: deleteRoundChart,
-      editShow: editRoundChart
+      editShow: slideIsShow
     }
   },
   mounted() {
@@ -131,6 +134,7 @@ export default {
     },
     getList() {
       getRoundChartList(this.params).then(res => {
+        console.log('754', res)
         res.code === 10000 && (this.tableData = res.data.records, this.params.total = res.data.total)
       })
     },
@@ -141,7 +145,7 @@ export default {
     editOrder(v) {
       console.log('vv', v)
       slideShowOrder(v.id, v.orderValue).then(res => {
-        res.code === 1000 && (this.$message.success('修改成功'), this.$refs['orderDialog'].visible = false)
+        res.code === 10000 && (this.$message.success('修改成功'), this.$refs['orderDialog'].visible = false)
       }).catch(() => {
 
       })

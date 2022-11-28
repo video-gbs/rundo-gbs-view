@@ -8,6 +8,8 @@ const requestTimeOut = 20 * 100000
 let isShowLogin = false
 
 // create an axios instance
+
+// axios.defaults.transformResponse = jb
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
@@ -19,6 +21,12 @@ service.interceptors.request.use(
   config => {
     config.headers = { ...config.headers, ...{}}// 不知为何 这里的headers是undefined,所以需要设置成{}
     const token = Local.getToken()
+    // config.headers.Authorization= token;
+    if (config.url.indexOf('/politics/v1/file/batchUploadImg') !== -1) {
+      // 图片上传不传token
+      delete config.headers.Authorization
+      return config
+    }
     if (token) {
       config.headers.Authorization = token
       return config

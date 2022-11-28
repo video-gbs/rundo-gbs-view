@@ -15,16 +15,32 @@
         </el-form-item>
         <el-form-item label="广告图图片">
           <div>
-            <el-upload size="mini" drag action="https://jsonplaceholder.typicode.com/posts/" multiple>
+            <el-upload
+              ref="uploadRef"
+              size="mini"
+              drag
+              action=""
+              :http-request="uploadFn"
+              :on-change="onChange"
+              :limit="1"
+              @before-upload="beforeUpload"
+            >
               <i class="el-icon-upload" />
               <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-              <div slot="tip" class="el-upload__tip">{{ `① 支持上传图片格式："*.jpg"、"*.jpeg"、"*.png"； ② 单张图片大小不超过50M；` }}</div>
+              <div slot="tip" class="el-upload__tip">{{ `① 支持上传图片格式："*.jpg"、"*.jpeg"、"*.png"； ② 单张图片大小不超过50M；` }}
+              </div>
             </el-upload>
           </div>
         </el-form-item>
         <el-form-item label="显示顺序">
-          <el-input-number v-model="params.orderValue" size="mini" :min="1" :max="10000" label="描述文字"
-            @change="handleChange" />
+          <el-input-number
+            v-model="params.orderValue"
+            size="mini"
+            :min="1"
+            :max="10000"
+            label="描述文字"
+            @change="handleChange"
+          />
         </el-form-item>
         <el-form-item label="关联外部链接">
           <el-row>
@@ -44,7 +60,8 @@
   </div>
 </template>
 <script>
-import { addAdvertising, editAdvertising } from '@/api/method/advertising'
+import { addAdvertising, editAdvertising, getAdvertisingOne } from '@/api/method/advertising'
+import { uploadImg } from '@/api/method/files'
 export default {
   name: 'RoundChartManage',
   data() {
@@ -52,14 +69,14 @@ export default {
       action: 'add',
       title: '新增广告图',
       params: {
-        createTime: "",
-        fileName: "",
+        createTime: '',
+        fileName: '',
         id: 0,
         isShow: 0,
         orderValue: 4,
-        pageUrl: "",
+        pageUrl: '',
         related: 0,
-        title: ""
+        title: ''
       },
       rules: {
         content: [
@@ -79,7 +96,7 @@ export default {
     if (this.$route.params.id !== 'add') {
       this.action = 'edit'
       this.title = '编辑广告图'
-      this.getNoticeById()
+      this.getNoticeById(this.$route.params.id)
     }
   },
   methods: {
@@ -88,19 +105,12 @@ export default {
       // 监听富文本内容变化并赋值
       this.params.content = v
     },
-    getNoticeById() {
+    getNoticeById(v) {
       // 获取单个公告数据
-      const one = {
-        content: '展示内容11111',
-        createTime: '2022-11-17 15:42:51',
-        id: 1593147638770516000,
-        isShow: 0,
-        orderValue: 4,
-        pageUrl: 'http://www.baidu.com',
-        related: 1,
-        title: '标题1'
-      }
-      Object.assign(this.params, one)
+      getAdvertisingOne(v).then(res => {
+        res.code === 10000 && (Object.assign(this.params, res.data))
+      })
+
       console.log('this.params', this.params)
     },
     submitFn() {
@@ -108,10 +118,21 @@ export default {
         if (v) {
           const fn = this.action === 'add' ? addAdvertising(this.params) : editAdvertising(this.params.id, this.params)
           fn.then(res => {
-            res.code === 10000 && (this.$message.success('添加成功'), this.$router.push('/publicManagement'))
+            res.code === 10000 && (this.$message.success('添加成功'), this.$router.push('/advertisementPicture'))
           })
           return
         }
+      })
+    },
+    uploadFn(files) {
+      console.log('sdf', files.raw)
+      const obj = new FormData()
+      obj.append('files', files.file)
+      uploadImg(obj).then(res => {
+        res.code === 10000 && (this.params.fileName = res.data[0].name)
+        res.code !== 10000 && this.$refs['uploadRef'].clearFiles()
+      }).catch(() => {
+        this.$refs['uploadRef'].clearFiles()
       })
     }
   }
