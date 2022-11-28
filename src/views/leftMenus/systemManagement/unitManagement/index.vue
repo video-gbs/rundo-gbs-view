@@ -213,6 +213,7 @@ export default {
               type: "success",
               message: "删除成功",
             });
+            this.params.pageNum=1;
             this.getUnitList();
           }
         });
