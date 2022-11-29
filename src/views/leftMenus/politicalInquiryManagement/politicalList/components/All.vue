@@ -1,12 +1,7 @@
 <template>
   <div v-if="!this.showDetails" class="projectManagement">
     <div class="seach">
-      <Seach
-        :form-list="FormList"
-        :query="pagesData"
-        @submitSearch="submitSearch"
-        @submitReset="toReset"
-      />
+      <Seach :form-list="FormList" :query="pagesData" @submitSearch="submitSearch" @submitReset="toReset" />
     </div>
     <div class="footer-table">
       <div class="tab-table">
@@ -30,11 +25,7 @@
           @changeTableHeader="changeTableHeader"
           @selection-change="handleSelectionChange"
         />
-        <Pagination
-          :pages-data="pagesData"
-          @size-change="sizeChange"
-          @current-change="currentChange"
-        />
+        <Pagination :pages-data="pagesData" @size-change="sizeChange" @current-change="currentChange" />
       </div>
     </div>
   </div>
@@ -149,7 +140,7 @@ export default {
         fileBatchId: 0,
         isDeleted: 0,
         isReview: 0,
-        isShow: 0,
+        isShow: '',
         order: true,
         phone: '',
         pubUsername: '',
@@ -242,14 +233,14 @@ export default {
       pagesData: {
         'account': '',
         'deptId': '',
-        'deptType': 0,
+        'deptType': '',
         'domain': '',
         'endTime': '',
         'field': [],
         'fileBatchId': 0,
         'isDeleted': 0,
         'isReview': 0,
-        'isShow': 0,
+        'isShow': '',
         'order': true,
         'pageNum': 1,
         'pageSize': 10,
@@ -265,6 +256,11 @@ export default {
       },
       buttonItems: {
         options: [
+          {
+            text: '问政转移',
+            cb: 'isShow',
+            icon: 'el-icon-view'
+          },
           {
             text: '详情',
             cb: 'verify',
@@ -442,8 +438,15 @@ export default {
       isLoding: false
     }
   },
-
   computed: {},
+  watch: {
+    // ??????
+    pagesData: {
+      handler: function(n) {
+        this.getDataList()
+      }
+    }
+  },
   mounted() {
     this.init()
   },
@@ -541,12 +544,13 @@ export default {
           }, 200)
         })
     },
+    handleClick(v) {
+      this[v.cb](v.row)
+    },
     // 查看详情
     verify(val) {
-      this.dialogTitle = '项目详情'
-      this.projectId = val.projectId
-      this.projectObj = val
-      this.isFullscreen = true
+      console.log('xq', val)
+      this.$router.push(`/politicalList/${val.id}`)
     },
     // 每页显示条目个数
     sizeChange(val) {
@@ -576,10 +580,12 @@ export default {
   font-family: Microsoft YaHei-Bold, Microsoft YaHei;
   font-weight: bold;
 }
+
 .projectManagement {
   position: relative;
   text-align: left;
   height: 100%;
+
   .top-title {
     position: relative;
     height: 60px;
@@ -590,6 +596,7 @@ export default {
     font-size: 18px;
     font-family: "Source Han Sans CN", "Source Han Sans CN-Medium";
     font-weight: 500;
+
     &::before {
       position: absolute;
       display: block;
@@ -601,6 +608,7 @@ export default {
       background: #0080e2;
     }
   }
+
   .seach {
     margin: 20px 24px;
     padding: 32px 20px 10px 20px;
@@ -608,22 +616,27 @@ export default {
     border-radius: 2px;
     background: #ffffff;
   }
+
   .footer-table {
     margin: 20px;
     background: #ffffff;
+
     .btn-content {
       height: 80px;
       line-height: 80px;
       padding: 0 20px 0 40px;
     }
+
     .tab-table {
       // padding: 0 20px 20px 20px;
     }
   }
+
   .top-exect {
     height: 50px;
     line-height: 50px;
   }
+
   .projectDetai {
     position: fixed;
     top: 82px;
@@ -632,6 +645,7 @@ export default {
     height: calc(100vh - 84px);
     background: #f6f6f6;
     z-index: 11;
+
     .breadcrumb-top {
       height: 60px;
       line-height: 60px;
@@ -644,9 +658,11 @@ export default {
         font-size: 16px;
         font-family: "Source Han Sans CN, Source Han Sans CN-Regular";
         font-weight: 400;
+
         .el-breadcrumb__item {
           &:first-child {
             color: #9e9e9e;
+
             .el-breadcrumb__inner {
               color: #9e9e9e !important;
               cursor: pointer;
@@ -654,6 +670,7 @@ export default {
           }
         }
       }
+
       :last-child {
         span {
           font-size: 25px;
@@ -662,6 +679,7 @@ export default {
         }
       }
     }
+
     .projectDetai-content {
       margin: 20px;
       // padding: 0 20px 20px 20px;
@@ -670,6 +688,7 @@ export default {
       // overflow: hidden;
       // overflow-x: auto;
     }
+
     // .footer-btn {
     //   position: fixed;
     //   left: 20px;
@@ -693,33 +712,41 @@ export default {
     // }
   }
 }
+
 .top-exect {
   height: 50px;
   line-height: 50px;
 }
+
 .left_title {
   margin-right: 20px;
 }
+
 .exect_file {
   margin-bottom: 20px;
 }
+
 .upload-file {
   margin-left: 75px;
 }
+
 .item-list {
   font-family: "Source Han Sans CN", "Source Han Sans CN-Regular";
   font-weight: 400;
   font-size: 16px;
   line-height: 40px;
   margin-bottom: 20px;
+
   .title {
     // display: inline-block;
     vertical-align: top;
     color: #666666;
     padding-right: 20px;
   }
+
   .list {
     display: inline-block;
+
     .item {
       font-size: 16px;
       margin-top: 5px;
@@ -727,9 +754,11 @@ export default {
       font-weight: 400;
       height: 30px;
       line-height: 30px;
+
       .el-icon-picture-outline {
         color: rgba(0, 129, 227, 1);
       }
+
       .item-name {
         color: #666666;
         display: inline-block;
@@ -737,11 +766,13 @@ export default {
         padding-left: 10px;
         vertical-align: bottom;
       }
+
       .item-edit {
         color: rgba(0, 129, 227, 1);
         padding-right: 10px;
         cursor: pointer;
       }
+
       .item-delect {
         color: rgba(230, 65, 65, 1);
         cursor: pointer;

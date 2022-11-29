@@ -1,6 +1,6 @@
 <template>
   <div class="politicalDetail_container">
-    <el-tabs type="border-card" v-model="activeName" @tab-click="handleClick">
+    <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
       <template>
         <el-tab-pane
           v-for="(item, index) in tabpaneList"
@@ -8,7 +8,7 @@
           :label="item.label"
           :name="item.label"
         >
-          <component :is="item.content" v-if="item.isShow"></component>
+          <component :is="item.content" v-if="item.isShow" :one="one" />
         </el-tab-pane>
       </template>
     </el-tabs>
@@ -16,10 +16,14 @@
 </template>
 
 <script>
-import BasicInformation from "../components/DetailList";
-import PoliticalReply from "../components/PoliticalReply";
-import ReviewResults from "../components/ReviewResults";
-import PoliticalRecord from "../components/PoliticalRecord";
+import BasicInformation from '../components/DetailList'
+import PoliticalReply from '../components/PoliticalReply'
+import ReviewResults from '../components/ReviewResults'
+import PoliticalRecord from '../components/PoliticalRecord'
+import {
+
+  affairsInfoSearch
+} from '@/api/method/politicalList'
 
 export default {
   components: {
@@ -30,52 +34,63 @@ export default {
   },
   data() {
     return {
-      activeName: "基本信息",
+      activeName: '基本信息',
       tabpaneList: [
         {
-          label: "基本信息",
+          label: '基本信息',
           content: BasicInformation,
           isShow: true
         },
         {
-          label: "问政回复",
+          label: '问政回复',
           content: PoliticalReply,
           isShow: false
         },
         {
-          label: "评价结果",
+          label: '评价结果',
           content: ReviewResults,
           isShow: false
         },
         {
-          label: "问政记录",
+          label: '问政记录',
           content: PoliticalRecord,
           isShow: false
         }
-      ]
-    };
+      ],
+      one: {}
+    }
   },
   watch: {},
-  mounted() {},
+  created() {
+    this.$route.params.id && this.getOne(this.$route.params.id)
+  },
+  mounted() {
+
+  },
   methods: {
     handleClick(val, event) {
       this.tabpaneList = this.tabpaneList.map(item => {
         if (item.label === val.label) {
-          item.isShow = true;
+          item.isShow = true
         } else {
-          item.isShow = false;
+          item.isShow = false
         }
-        return item;
-      });
+        return item
+      })
       // this.$nextTick(() => {
       //   document.getElementById("tab").scrollIntoView({
       //     behavior: "smooth",
       //     block: "start"
       //   });
       // });
+    },
+    getOne(v) {
+      affairsInfoSearch(v).then(res => {
+        res.code === 10000 && (this.one = res.data)
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

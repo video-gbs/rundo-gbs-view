@@ -13,8 +13,9 @@
           :label="item.label"
           :name="item.label"
         >
-          <component :is="item.content" v-if="item.isShow" />
+          <!-- <component :is="item.content" v-if="item.isShow" /> -->
         </el-tab-pane>
+        <All ref="listRef" />
       </template>
     </el-tabs>
     <ul v-if="this.showDetails" class="right-btns-ul">
@@ -35,22 +36,23 @@
 </template>
 
 <script>
+
 import All from './components/All.vue'
-import Dsh from './components/Dsh.vue'
-import Shwtg from './components/Shwtg.vue'
-import Whf from './components/Whf.vue'
-import Yhf from './components/Yhf.vue'
-import Ysl from './components/Ysl.vue'
+// import Dsh from './components/Dsh.vue'
+// import Shwtg from './components/Shwtg.vue'
+// import Whf from './components/Whf.vue'
+// import Yhf from './components/Yhf.vue'
+// import Ysl from './components/Ysl.vue'
 import DetailView from './politicalDetail/index.vue'
 
 export default {
   components: {
     All,
-    Dsh,
-    Shwtg,
-    Whf,
-    Yhf,
-    Ysl,
+    // Dsh,
+    // Shwtg,
+    // Whf,
+    // Yhf,
+    // Ysl,
     DetailView
   },
   data() {
@@ -99,35 +101,43 @@ export default {
         //   iconName:'right10'
         // }
       ],
+      tabDict: {
+        '0': '',
+        '1': 2,
+        '2': 4,
+        '3': 5,
+        '4': 7,
+        '5': 3
+      },
       tabpaneList: [
         {
           label: '全部',
-          content: All,
+          value: '',
           isShow: true
         },
         {
           label: '待审核',
-          content: Dsh,
+          value: 2,
           isShow: false
         },
         {
           label: '未回复',
-          content: Whf,
+          value: 4,
           isShow: false
         },
         {
           label: '已受理',
-          content: Ysl,
+          value: 5,
           isShow: false
         },
         {
           label: '已回复',
-          content: Yhf,
+          value: 7,
           isShow: false
         },
         {
           label: '审核未通过',
-          content: Shwtg,
+          value: 3,
           isShow: false
         }
       ]
@@ -139,21 +149,24 @@ export default {
   },
   methods: {
     getAffairsInfoList() {
-      affairsInfoList(this.pages).then((res) => {
-        if (res.code === 10000) {
-          this.tableData = res.data.rows
-        }
-      })
+      // affairsInfoList(this.pages).then((res) => {
+      //   if (res.code === 10000) {
+      //     this.tableData = res.data.rows
+      //   }
+      // })
     },
     handleClick(val, event) {
-      this.tabpaneList = this.tabpaneList.map((item) => {
-        if (item.label === val.label) {
-          item.isShow = true
-        } else {
-          item.isShow = false
-        }
-        return item
-      })
+      // 切换 tabs
+      this.$refs['listRef'].pagesData.status = this.tabDict[val.index]
+      this.$refs['listRef'].getDataList()
+      // this.tabpaneList = this.tabpaneList.map((item) => {
+      //   if (item.label === val.label) {
+      //     item.isShow = true
+      //   } else {
+      //     item.isShow = false
+      //   }
+      //   return item
+      // })
       // this.$nextTick(() => {
       //   document.getElementById("tab").scrollIntoView({
       //     behavior: "smooth",

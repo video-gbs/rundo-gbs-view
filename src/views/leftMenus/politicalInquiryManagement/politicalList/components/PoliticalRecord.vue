@@ -2,40 +2,41 @@
   <div class="reviewResults-container">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <LineFont :lineTitle="lineTitle" :textStyle="textStyle" :lineBlueStyle="lineBlueStyle"/>
+        <LineFont :line-title="lineTitle" :text-style="textStyle" :line-blue-style="lineBlueStyle" />
       </div>
       <div class="text item">
         <div class="reviewResults—timeline">
-          <el-timeline>
+          <el-timeline v-if="activities.length">
             <el-timeline-item
-              v-for="(activity, index) in activities"
+              v-for="(i, index) in activities"
               :key="index"
               :hide-timestamp="true"
-              :size="activity.size"
-              :timestamp="activity.timestamp"
+              :size="i.size"
+              :timestamp="i.timestamp"
               placement="top"
             >
-              <svg-icon :icon-class="activity.myIcon" class="myIcon_svg" />
+              <svg-icon :icon-class="i.myIcon" class="myIcon_svg" />
 
               <div>
-                <slot name="timestamp" v-if="index % 2 === 0">
+                <slot v-if="index % 2 === 0" name="timestamp">
                   <svg-icon icon-class="line1" class="line1_svg" />
                 </slot>
-                <slot name="timestamp" v-else>
+                <slot v-else name="timestamp">
                   <svg-icon icon-class="line2" class="line2_svg" />
                 </slot>
               </div>
               <el-card>
                 <h4 class="reviewResults-h4">
-                  {{ activity.content }}
+                  {{ i.content }}
                 </h4>
-                <p class="reviewResults-p">王小虎 提交于 2018/4/12 20:46</p>
-                <p class="reviewResults-p" v-if="activity.shyj">
+                <p class="reviewResults-p">{{ `${i.updateBy} 提交于 ${i.updateTime}` }}</p>
+                <!-- <p v-if="i.shyj" class="reviewResults-p">
                   【审核意见】照片拍摄不清晰；需增加描述内容。
-                </p>
+                </p> -->
               </el-card>
             </el-timeline-item>
           </el-timeline>
+          <div v-else class="fs12">暂无记录</div>
         </div>
       </div>
     </el-card>
@@ -43,96 +44,97 @@
 </template>
 
 <script>
-import LineFont from "@/components/LineFont";
+import LineFont from '@/components/LineFont'
 import {
   getAffairsrecordList,
   getAffairsrecordPage
-} from "@/api/method/affairsrecord";
+} from '@/api/method/affairsrecord'
 export default {
-  name: "",
+  name: '',
   components: {
     LineFont
   },
   data() {
     return {
-      activities: [
-        {
-          content: "支持使用图标",
-          timestamp: "2018-04-12 20:46",
-          size: "large",
-          type: "primary",
-          myIcon: "wzjl1"
-        },
-        {
-          content: "支持自定义颜色",
-          timestamp: "2018-04-03 20:46",
-          color: "#0bbd87",
-          myIcon: "wzjl2",
-          shyj: true
-        },
-        {
-          content: "支持自定义尺寸",
-          timestamp: "2018-04-03 20:46",
-          size: "large",
-          myIcon: "wzjl3"
-        },
-        {
-          content: "默认样式的节点",
-          timestamp: "2018-04-03 20:46",
-          myIcon: "wzjl4",
-          shyj: true
-        },
-        {
-          content: "默认样式的节点",
-          timestamp: "2018-04-03 20:46",
-          myIcon: "wzjl5"
-        },
-        {
-          content: "默认样式的节点",
-          timestamp: "2018-04-03 20:46",
-          myIcon: "wzjl6"
-        }
-      ],
-      labelPosition: "left",
-      textStyle: {
-        fontSize: "20px",
-        fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
-        fontWeight: "bold",
-        color: "#333333"
+      actCss: {
+        size: 'large',
+        type: 'primary',
+        myIcon: 'wzjl1'
       },
-            lineBlueStyle: {
-        background: "rgba(30, 86, 160, 1)",
-        borderRadius: "0px 4px 4px 0px"
+      activities: [
+        // {
+        //   content: '支持使用图标',
+        //   timestamp: '2018-04-12 20:46',
+        //   size: 'large',
+        //   type: 'primary',
+        //   myIcon: 'wzjl1'
+        // },
+      ],
+      labelPosition: 'left',
+      textStyle: {
+        fontSize: '20px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#333333'
+      },
+      lineBlueStyle: {
+        background: 'rgba(30, 86, 160, 1)',
+        borderRadius: '0px 4px 4px 0px'
       },
       form: {
-        content: "",
-        content1: ""
+        content: '',
+        content1: ''
       },
       lineTitle: {
-        title: "问政记录",
+        title: '问政记录',
         notShowSmallTitle: false
+      },
+      params: {
+        'affairsId': '',
+        'content': '',
+        'createBy': '',
+        'createTime': '',
+        'id': '',
+        'title': '',
+        'type': '',
+        'updateBy': '',
+        'updateTime': ''
       }
-    };
+    }
   },
   watch: {},
-  mounted() {},
+  created() {
+    if (this.$route.params.id) {
+      this.params.affairsId = this.$route.params.id
+      this.getAffairsrecordList()
+    }
+  },
+  mounted() {
+
+  },
   methods: {
     getAffairsrecordList() {
       getAffairsrecordList(this.params).then(res => {
         if (res.code === 10000) {
-          console.log("res", res);
+          const r = res.data
+          r.forEach(i => {
+            i = { ...i, ...this.actCss }
+            // 可以根据其他字段设置不同的icon
+            // fn...
+          })
+          this.activities = r
         }
-      });
+      })
     },
     getAffairsrecordPage() {
       getAffairsrecordPage(this.params).then(res => {
         if (res.code === 10000) {
-          console.log("res", res);
+          console.log('res', res)
         }
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

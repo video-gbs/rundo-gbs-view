@@ -82,10 +82,12 @@ const dict = {
     { value: 22, label: '其他' }
   ],
   isShow: {
+    '': '全部',
     '0': '显示',
     '1': '不显示'
   },
   _isShow: [
+    { value: '', label: '全部' },
     { value: 0, label: '显示' },
     { value: 1, label: '不显示' }
   ],
