@@ -1,77 +1,50 @@
 <template>
-  <div class="router_container2 m20 bg-w">
-    <div class="panel-header-box">
+  <div class="router_container2 m20">
+    <div class="panel-header-box bg-w">
       <div class="title-css">问政转移审核列表</div>
     </div>
-    <div class="p20 border-bottom">
+    <div class="p20 border-bottom bg-w">
       <PControlGroup
         v-if="queryControlData"
         :data="queryControlData"
         @onBtnClick="queryData"
       ></PControlGroup>
     </div>
-    <div class="p10 mt10">
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column>
-          <template slot="header">
-            <div class="f ai-c jc-sb">
-              <div>数据列表</div>
-              <el-button size="mini" type="primary" @click="dialogShow(1)"
-                >新增</el-button
-              >
-            </div>
+    <div class="p20 mt20 bg-w">
+      <el-table border :data="tableData" max-height="500" :header-cell-style="{background: '#EAEAEA'}" style="width: 100%">
+        <el-table-column prop="label" label="编号" />
+        <el-table-column prop="sort" label="标题" />
+        <el-table-column prop="state" label="分类" />
+        <el-table-column prop="state" label="领域" />
+        <el-table-column prop="state" label="留言对象" />
+        <el-table-column prop="state" label="发布账号" />
+        <el-table-column prop="tel" label="电话" />
+        <el-table-column prop="createTime" label="提交时间" />
+        <el-table-column prop="createTime" label="状态" />
+        <el-table-column prop="createTime" label="是否可见" >
+          <template slot-scope="scope">
+              {{scope.row.isAvavle ? '是':'否'  }}
           </template>
-          <el-table-column prop="label" label="编号" />
-          <el-table-column prop="sort" label="标题" />
-          <el-table-column prop="state" label="分类" />
-          <el-table-column prop="state" label="领域" />
-          <el-table-column prop="state" label="留言对象" />
-          <el-table-column prop="state" label="发布账号" />
-          <el-table-column prop="tel" label="电话" />
-          <el-table-column prop="createTime" label="提交时间" />
-          <el-table-column prop="createTime" label="状态" />
-          <el-table-column prop="createTime" label="是否可见" >
-            <template slot-scope="scope">
-                {{scope.row.isAvavle ? '是':'否'  }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="state" label="申请单位" />
-          <el-table-column width="200" label="操作" fixed="right" >
-            <template slot-scope="scope">
-              <el-button type="text" @click="dialogShow(0, scope.row)">转移审核</el-button>
-              <el-button type="text">查看详情</el-button>
-            </template>
-          </el-table-column>
+        </el-table-column>
+        <el-table-column prop="state" label="申请单位" />
+        <el-table-column width="200" label="操作" fixed="right" >
+          <template slot-scope="scope">
+            <el-button type="text" @click="dialogShow(0, scope.row)">转移审核</el-button>
+            <el-button type="text">查看详情</el-button>
+          </template>
         </el-table-column>
       </el-table>
       <pagination
         :pages-data="params"
         @size-change="sizeChange" @current-change="currentChange"/>
     </div>
-    <el-dialog :title="dialog.title" :visible.sync="dialog.show" width="700px" :before-close="handleClose">
-      <div>
-        <el-form class="params-form" size="mini" label-position="left" label-width="80px" :model="dialog.params">
-          <el-form-item label="审核结果" required>
-             <el-radio-group v-model="dialog.params.auditRes">
-              <el-radio label="同意"></el-radio>
-              <el-radio label="驳回"></el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="受理单位" required>
-            <el-select v-model="dialog.params.acceptUnit" placeholder="">
-              <el-option label="梧州市教育局" value="0"></el-option>
-              <el-option label="梧州市教育局2" value="1"></el-option>
-            </el-select> 
-          </el-form-item>
-          <el-form-item label="审核说明">
-            <el-input type="textarea" v-model="dialog.params.auditDec" placeholder="最多可输入1000个字"></el-input>
-          </el-form-item>
-        </el-form>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="dialog.show = false">确 定</el-button>
-      </span>
+    <el-dialog title="审核登记" :visible.sync="auditPopData.show" width="30%">
+      <PControlGroup
+        v-if="auditPopData.show"
+        :data="auditPopData.controlData"
+        @onBtnClick="comfirmAudit"
+        @onBtnCancel="auditPopData.show = false"
+      ></PControlGroup>
     </el-dialog>
   </div>
 </template>
@@ -93,15 +66,10 @@ export default {
       tableData: [
         { id: 1, label: 'afsdf', sort: 1, state: 1, tel: '19113250259', isAvavle: 0 ,createTime: '2022-11-11 15:25:14' }
       ],
-      dialog: {
+      auditPopData: {
         show: false,
-        title: '审核登记',
-        params: {
-          auditRes: 0,
-          acceptUnit: "0",
-          auditDec: " ",
-        }
-      },
+        controlData: null,
+      }
     };
   },
   components: {
@@ -202,12 +170,44 @@ export default {
 
     },
     dialogShow(){
-      this.dialog.title = '审核登记'
-      this.dialog.show = true;
-    },
-    handleClose(done) {
-      done()
-    },
+      this.auditPopData.controlData = {
+        layout: 'vertical',
+        controls: [
+          {
+            label: '审核结果',
+            type: 'radio',
+            key: 'f1',
+            isRequired: true,
+            value: '',
+            options: [
+              { label: '同意', value: '1' },
+              { label: '驳回', value: '0' },
+            ]
+          },
+          {
+            label: "受理单位",
+            type: "select",
+            key: "f2",
+            isRequired: true,
+            value: "",
+            options: [
+              { label: "梧州教育局", value: "1" },
+              { label: "钦州教育局", value: "2" },
+            ],
+          },
+          {
+            label: '审核说明',
+            type: 'textarea',
+            key: 'f3',
+            autosize: { minRows: 3, maxRows: 5},
+            maxlength: 1000,
+            value: '',
+          }
+        ]
+      };
+
+      this.auditPopData.show = true;
+    }
   },
 };
 </script>

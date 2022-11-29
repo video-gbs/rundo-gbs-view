@@ -69,6 +69,21 @@
                         end-placeholder="结束日期"
                       ></el-date-picker>
                     </template>
+                    <template v-if="item.type === 'radio'">
+                      <el-radio-group v-model="ruleForm[item.key]">
+                        <el-radio v-for="o in item.options" :label="o.value">{{o.label}}</el-radio>
+                      </el-radio-group>
+                    </template>
+                    <template v-if="item.type === 'textarea'">
+                      <el-input
+                        type="textarea"
+                        :autosize="item.autosize || { minRows: 2, maxRows: 4}"
+                        :placeholder="item.placeholder || '请输入'"
+                        :maxlength="item.maxlength || 120"
+                        v-model="ruleForm[item.key]"
+                        show-word-limit>
+                      </el-input>
+                    </template>
                   </el-form-item>
                 </el-col>
               </template>
@@ -153,6 +168,21 @@
                   :type="item.dateType || 'date'"
                   :placeholder="item.placeholder || '请选择'"
                 ></el-date-picker>
+              </template>
+              <template v-if="item.type === 'radio'">
+                <el-radio-group v-model="ruleForm[item.key]">
+                  <el-radio v-for="o in item.options" :label="o.value">{{o.label}}</el-radio>
+                </el-radio-group>
+              </template>
+              <template v-if="item.type === 'textarea'">
+                <el-input
+                  type="textarea"
+                  :autosize="item.autosize || { minRows: 2, maxRows: 4}"
+                  :placeholder="item.placeholder || '请输入'"
+                  :maxlength="item.maxlength || 120"
+                  v-model="ruleForm[item.key]"
+                  show-word-limit>
+                </el-input>
               </template>
             </el-form-item>
           </template>
