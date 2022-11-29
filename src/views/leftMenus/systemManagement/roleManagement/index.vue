@@ -21,7 +21,7 @@
               <el-button
                 type="text"
                 @click="getPermissionTableData(scope.row.id)"
-                >数据列表
+                >权限设置
               </el-button>
               <el-button type="text" @click="dialogShow(0, scope.row)"
                 >编辑</el-button
@@ -100,7 +100,12 @@
           </div>
           <div style="display: flex">
             <div class="perms-operation">
-              <el-button type="primary" @click="submit">保存设置</el-button>
+              <el-button
+                type="primary"
+                :loading="buttonLoading"
+                @click="savePermission()"
+                >保存设置</el-button
+              >
             </div>
             <el-button
               @click="permissionDialog.show = false"
@@ -156,6 +161,7 @@ import {
   deleteRoles,
   permissionTree,
   getRolesList,
+  setAppAuth,
 } from "@/api/method/role";
 
 import pagination from "@/components/Pagination/index.vue";
@@ -206,6 +212,9 @@ export default {
         ],
       },
       remove: deleteRoles,
+      roleId: "",
+      checkList: [],
+      buttonLoading: false,
     };
   },
   mounted() {
@@ -247,31 +256,39 @@ export default {
     },
     getPermissionTableData(id) {
       this.permissionDialog.show = !this.permissionDialog.show;
+      this.roleId = id;
       permissionTree(id).then((res) => {
         if (res.code === 10000) {
           this.permissionTableData = res.data;
         }
       });
     },
-    submit() {
+    checkMenu(list) {
+      list.forEach((item) => {
+        if (item.permissionType === 1) {
+          item.ifPublic = this.checkList.indexOf(String(item.id)) != -1;
+        } else {
+          item.children && this.checkMenu(item.children);
+        }
+      });
+    },
+    savePermission() {
       this.buttonLoading = true;
       this.checkList = [];
       this.getCkeckList(this.permsTree);
-      this.$api.role
-        .editPerms({
-          roleId: this.role.roleId,
-          permissionIds: this.checkList,
-        })
-        .then((res) => {
-          this.buttonLoading = false;
-          if (res.data.data) {
-            this.$message({
-              message: "保存成功！",
-              type: "success",
-            });
-            this.$router.go(-1);
-          }
-        });
+      setAppAuth({
+        roleId,
+        permissionIds: this.checkList,
+      }).then((res) => {
+        this.buttonLoading = false;
+        if (res.data.data) {
+          this.$message({
+            message: "保存成功！",
+            type: "success",
+          });
+          this.$router.go(-1);
+        }
+      });
     },
     getList() {
       getRolesList({
