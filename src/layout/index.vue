@@ -99,20 +99,20 @@ export default {
     background-color: rgba(242, 242, 242, 1);
   }
 }
-// 滚动条
+
+/*滚动条样式*/
 .main-container::-webkit-scrollbar {
   width: 6px;
-  height: 1px;
 }
 .main-container::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  background: #e5e5e5;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.2);
 }
 .main-container::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  background: #ffffff;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.1);
 }
 .drawer-bg {
   background: #000;

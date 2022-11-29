@@ -70,29 +70,10 @@ export default {
   },
   watch: {
     $route(val) {
-      let flag = false;
-      this.tabList.forEach((tab) => {
-        if (val.path == tab.name) {
-          // store.commit("SET_TABLIST", val.path);
-          flag = true;
-          return;
-        }
-      });
-      if (!flag) {
-        // store.commit("SET_TABLIST", {
-        //   name: val.path,
-        //   title: val.meta.title,
-        // });
-        // store.commit("SET_ACTIVETABNAME", val.path);
-      }
+      
     },
   },
   mounted() {
-    // store.commit("SET_TABLIST", {
-    //   name: this.$route.path,
-    //   title: this.$route.meta.title,
-    // });
-    // store.commit("SET_ACTIVETABNAME", this.$route.path);
     window.addEventListener("resize", () => {
       this.$nextTick(() => {
         this.isScrollBar = this.$refs.scrollPane.isScrollBar();

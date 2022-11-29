@@ -27,9 +27,7 @@ import Weather from "./components/Weather.vue";
 import Statistical from "./components/statistical.vue";
 import NoticeList from "./components/noticeList.vue";
 
-import { editAffiche } from "@/api/method/appraise";
-import { getAfficheList } from "@/api/method/affiche";
-import { areaWeather } from "@/api/method/weather";
+import { areaWeather,editAfficheWork } from "@/api/method/weather";
 import { homeLists } from "@/api/method/home";
 import { Local } from "@/utils/storage";
 export default {
@@ -64,7 +62,7 @@ export default {
   },
   mounted() {
     this.getHomeLists();
-    this.editAffiche();
+    this.editAfficheWork();
     // this.getAfficheList();
   },
   methods: {
@@ -79,21 +77,21 @@ export default {
         }
       });
     },
-    editAffiche() {
-      editAffiche(this.params).then((res) => {
+    editAfficheWork() {
+      editAfficheWork().then((res) => {
         if (res.code === 10000) {
           this.statisticalData = res.data;
           this.statisticalShow = true;
         }
       });
     },
-    getAfficheList() {
-      getAfficheList(this.params).then((res) => {
-        if (res.code === 10000) {
-          console.log("res", res);
-        }
-      });
-    },
+    // getAfficheList() {
+    //   getAfficheList(this.params).then((res) => {
+    //     if (res.code === 10000) {
+    //       console.log("res", res);
+    //     }
+    //   });
+    // },
     getWeather() {
       let weatherParams = {
         area: "梧州",
