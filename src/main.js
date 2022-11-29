@@ -15,6 +15,7 @@ import { Local } from './utils/storage'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+import '@/utils/extends'
 
 import '@/plugin'
 import * as echarts from 'echarts'
