@@ -17,11 +17,12 @@
           :key="item.path"
           :label="item.name"
           :name="item.name"
+          class="router-tab"
         >
         </el-tab-pane>
       </el-tabs>
     </scroll-pane>
-    <ul
+    <!-- <ul
       v-show="visible"
       :style="{ left: left + 'px', top: top + 'px' }"
       class="contextmenu"
@@ -32,13 +33,14 @@
       </li>
       <li @click="closeOthersTags">关闭其它</li>
       <li @click="closeAllTags(selectedTag)">关闭所有</li>
-    </ul>
+    </ul> -->
   </div>
 </template>
 
 <script>
 import ScrollPane from "./ScrollPane";
-import path from "path";
+import { mapGetters } from "vuex";
+import store from "@/store/index";
 
 export default {
   components: { ScrollPane },
@@ -49,35 +51,48 @@ export default {
       left: 0,
       selectedTag: {},
       affixTags: [],
-      isScrollBar: false
+      isScrollBar: false,
     };
   },
   computed: {
+    ...mapGetters(["activeTabsName", "tabList"]),
     tabList() {
       return this.$store.state.tabs.tabList;
     },
     activeTabsName: {
       get() {
-
         return this.$store.state.tabs.activeTabsName;
       },
       set(val) {
-        console.log(1111111,val)
-        this.$store.commit("activeTabsName", val);
-      }
+        // store.commit("SET_ACTIVETABNAME", val);
+      },
     },
-    activeIndex() {
-      let temIndex = null;
-      this.tabList.forEach((item, index) => {
-        if (item.name === this.activeTabsName) {
-          temIndex = index;
+  },
+  watch: {
+    $route(val) {
+      let flag = false;
+      this.tabList.forEach((tab) => {
+        if (val.path == tab.name) {
+          // store.commit("SET_TABLIST", val.path);
+          flag = true;
+          return;
         }
       });
-      return temIndex;
-    }
+      if (!flag) {
+        // store.commit("SET_TABLIST", {
+        //   name: val.path,
+        //   title: val.meta.title,
+        // });
+        // store.commit("SET_ACTIVETABNAME", val.path);
+      }
+    },
   },
-  watch: {},
   mounted() {
+    // store.commit("SET_TABLIST", {
+    //   name: this.$route.path,
+    //   title: this.$route.meta.title,
+    // });
+    // store.commit("SET_ACTIVETABNAME", this.$route.path);
     window.addEventListener("resize", () => {
       this.$nextTick(() => {
         this.isScrollBar = this.$refs.scrollPane.isScrollBar();
@@ -97,19 +112,21 @@ export default {
             }
           }
         });
-        this.$store.commit("activeTabsName", activeName);
-        this.$store.commit("tabList",
-          tabs.filter(tab => tab.name !== targetName)
+        store.commit("SET_ACTIVETABNAME", activeName);
+        store.commit(
+          "SET_TABLIST",
+          tabs.filter((tab) => tab.name !== targetName)
         );
         this.tabClick();
       } else {
-        this.$store.commit("tabList",
-          tabs.filter(tab => tab.name !== targetName)
+        store.commit(
+          "SET_TABLIST",
+          tabs.filter((tab) => tab.name !== targetName)
         );
       }
     },
     tabClick() {
-      const { path } = this.tabList[this.activeIndex];
+      const { path } = this.tabList[this.activeTabsName];
       if (this.$route.path !== path) this.$router.push(path);
     },
     moveToCurrentTag() {
@@ -127,79 +144,79 @@ export default {
         }
       });
     },
-    refreshSelectedTag(view) {
-      this.$store.dispatch("tagsView/delCachedView", view).then(() => {
-        const { fullPath } = view;
-        this.$nextTick(() => {
-          this.$router.replace({
-            path: "/redirect" + fullPath
-          });
-        });
-      });
-    },
-    closeSelectedTag(view) {
-      this.$store
-        .dispatch("tagsView/delView", view)
-        .then(({ visitedViews }) => {
-          if (this.isActive(view)) {
-            this.toLastView(visitedViews, view);
-          }
-        });
-    },
-    closeOthersTags() {
-      this.$router.push(this.selectedTag);
-      this.$store
-        .dispatch("tagsView/delOthersViews", this.selectedTag)
-        .then(() => {
-          this.moveToCurrentTag();
-        });
-    },
-    closeAllTags(view) {
-      this.$store.dispatch("tagsView/delAllViews").then(({ visitedViews }) => {
-        if (this.affixTags.some(tag => tag.path === view.path)) {
-          return;
-        }
-        this.toLastView(visitedViews, view);
-      });
-    },
-    toLastView(visitedViews, view) {
-      const latestView = visitedViews.slice(-1)[0];
-      if (latestView) {
-        this.$router.push(latestView.fullPath);
-      } else {
-        // 现在默认是在没有标签视图的情况下重定向到主页，
-        // 你可以根据自己的需要进行调整。
-        if (view.name === "Dashboard") {
-          // 重新加载主页
-          this.$router.replace({ path: "/redirect" + view.fullPath });
-        } else {
-          this.$router.push("/");
-        }
-      }
-    },
-    openMenu(tag, e) {
-      console.log(tag, e);
-      const menuMinWidth = 105;
-      const offsetLeft = this.$el.getBoundingClientRect().left; // container margin left
-      const offsetWidth = this.$el.offsetWidth; // container width
-      const maxLeft = offsetWidth - menuMinWidth; // left boundary
-      const left = e.clientX - offsetLeft + 15; // 15: margin right
+    // refreshSelectedTag(view) {
+    //   this.$store.dispatch("tagsView/delCachedView", view).then(() => {
+    //     const { fullPath } = view;
+    //     this.$nextTick(() => {
+    //       this.$router.replace({
+    //         path: "/redirect" + fullPath
+    //       });
+    //     });
+    //   });
+    // },
+    // closeSelectedTag(view) {
+    //   this.$store
+    //     .dispatch("tagsView/delView", view)
+    //     .then(({ visitedViews }) => {
+    //       if (this.isActive(view)) {
+    //         this.toLastView(visitedViews, view);
+    //       }
+    //     });
+    // },
+    // closeOthersTags() {
+    //   this.$router.push(this.selectedTag);
+    //   this.$store
+    //     .dispatch("tagsView/delOthersViews", this.selectedTag)
+    //     .then(() => {
+    //       this.moveToCurrentTag();
+    //     });
+    // },
+    // closeAllTags(view) {
+    //   this.$store.dispatch("tagsView/delAllViews").then(({ visitedViews }) => {
+    //     if (this.affixTags.some(tag => tag.path === view.path)) {
+    //       return;
+    //     }
+    //     this.toLastView(visitedViews, view);
+    //   });
+    // },
+    // toLastView(visitedViews, view) {
+    //   const latestView = visitedViews.slice(-1)[0];
+    //   if (latestView) {
+    //     this.$router.push(latestView.fullPath);
+    //   } else {
+    //     // 现在默认是在没有标签视图的情况下重定向到主页，
+    //     // 你可以根据自己的需要进行调整。
+    //     if (view.name === "Dashboard") {
+    //       // 重新加载主页
+    //       this.$router.replace({ path: "/redirect" + view.fullPath });
+    //     } else {
+    //       this.$router.push("/");
+    //     }
+    //   }
+    // },
+    // openMenu(tag, e) {
+    //   console.log(tag, e);
+    //   const menuMinWidth = 105;
+    //   const offsetLeft = this.$el.getBoundingClientRect().left; // container margin left
+    //   const offsetWidth = this.$el.offsetWidth; // container width
+    //   const maxLeft = offsetWidth - menuMinWidth; // left boundary
+    //   const left = e.clientX - offsetLeft + 15; // 15: margin right
 
-      if (left > maxLeft) {
-        this.left = maxLeft;
-      } else {
-        this.left = left;
-      }
+    //   if (left > maxLeft) {
+    //     this.left = maxLeft;
+    //   } else {
+    //     this.left = left;
+    //   }
 
-      this.top = e.clientY;
-      this.visible = true;
-      this.selectedTag = tag;
-    },
+    //   this.top = e.clientY;
+    //   this.visible = true;
+    //   this.selectedTag = tag;
+    // },
     closeMenu() {
       this.visible = false;
     },
     handleScroll() {
-      this.closeMenu();
+      // this.closeMenu();
     },
     /**
      * @description: 手动触发滚轮滑动方法
@@ -211,7 +228,7 @@ export default {
       const deltaY = -225;
       this.$refs.scrollPane.handleScroll({
         wheelDelta: wheelDelta * type,
-        deltaY: deltaY * type
+        deltaY: deltaY * type,
       });
     },
     /**
@@ -221,7 +238,7 @@ export default {
      */
     toScrollView(type) {
       const tags = this.$refs.tag;
-      const currentIndex = tags.findIndex(tag => {
+      const currentIndex = tags.findIndex((tag) => {
         return tag.to.path === this.$route.path;
       });
       if (type === 1) {
@@ -233,7 +250,7 @@ export default {
           this.$router.push(tags[currentIndex - 1].to);
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>

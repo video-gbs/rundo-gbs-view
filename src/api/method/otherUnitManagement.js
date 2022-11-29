@@ -28,8 +28,14 @@ export function otherUnitDelete(id) {
     return request.delete(`/politics/sys/dept/user/del/${id}`)
 }
 
-
+// 权限模板id列表
 export function otherUnitRoleId(params) {
     return request.get('/politics/sys/dept/user/roleIds', params)
 }
+
+// 获取单位员工角色列表
+export function otherUnitDeptRoleList(params) {
+    return request.get('/politics/sys/dept/user/deptRoleList', params)
+}
+
 

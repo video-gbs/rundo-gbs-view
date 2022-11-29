@@ -131,18 +131,14 @@ export default {
           this.loading = true;
           login(this.loginForm)
             .then((res) => {
-              console.log("res", res);
               if (res.code === 10000) {
-                console.log("10000", res);
                 const access_token = res.data.token;
                 Local.setToken(access_token);
-                console.log("this.redirect", this.redirect);
                 this.$router.push({ path: "/workTable" });
                 this.loading = false;
               }
             })
             .catch(() => {
-              console.log("111111111111111");
               this.loading = false;
             });
         } else {
