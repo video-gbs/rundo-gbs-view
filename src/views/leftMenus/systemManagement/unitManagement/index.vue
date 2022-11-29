@@ -265,6 +265,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-dialog__header {
+  border-bottom: 1px solid #eaeaea;
+}
 .params-form {
   .el-input,
   .el-select {
