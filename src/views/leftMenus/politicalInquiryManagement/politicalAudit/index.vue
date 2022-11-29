@@ -188,7 +188,8 @@ export default {
         layoutConfig: {
           contentSpan: 20,
           buttonSpan: 4,
-        },
+          showColon: false
+        }
       };
     },
     queryData(data) {
