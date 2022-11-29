@@ -312,8 +312,6 @@ import {
   otherUnitRoleId,
   otherUnitDeptRoleList
 } from '@/api/method/otherUnitManagement'
-// import { getRolesList } from "@/api/method/role";
-
 import { Local } from '@/utils/storage'
 
 export default {
@@ -435,6 +433,10 @@ export default {
           deptId: 1
         }
       },
+      gender: [
+        { id: 1, label: '男' },
+        { id: 2, label: '女' }
+      ],
       state: [
         { id: 1, label: '启用' },
         { id: 0, label: '禁用' }
@@ -449,7 +451,6 @@ export default {
   mounted() {
     this.checkPassworLevel()
     this.getOtherUnitList()
-    this.getList()
   },
   methods: {
     /**
@@ -458,6 +459,22 @@ export default {
     editPassword(row) {
       this.passwordVisible = true
       this.passwordForm.id = row.id
+    },
+
+    getList() {
+      otherUnitDeptRoleList().then((res) => {
+        if (res.code === 10000) {
+          res.data.map((item) => {
+            const obj = {
+              id: '',
+              label: ''
+            }
+            obj.id = item.roleId
+            obj.label = item.roleName
+            this.selectList.push(obj)
+          })
+        }
+      })
     },
 
     savePassword(formName) {
