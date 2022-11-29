@@ -99,6 +99,21 @@ export default {
     background-color: rgba(242, 242, 242, 1);
   }
 }
+// 滚动条
+.main-container::-webkit-scrollbar {
+  width: 6px;
+  height: 1px;
+}
+.main-container::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  background: #e5e5e5;
+}
+.main-container::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  background: #ffffff;
+}
 .drawer-bg {
   background: #000;
   opacity: 0.3;
