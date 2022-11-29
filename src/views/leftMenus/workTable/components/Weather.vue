@@ -125,7 +125,7 @@ export default {
       font-size: 16px;
       font-weight: bold;
       color: #333333;
-      padding: 20px 0 0 1rem;
+      padding: 20px 0 0 2rem;
     }
   }
   .weather_svg {

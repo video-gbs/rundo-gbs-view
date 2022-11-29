@@ -44,7 +44,7 @@ export default {
   name: "NoticeList",
   components: {
     vueSeamlessScroll,
-    LineFont
+    LineFont,
     // NoticeDetail
   },
   props: {
@@ -52,14 +52,14 @@ export default {
       type: Array,
       default: () => {
         return [];
-      }
-    }
+      },
+    },
   },
   data() {
     return {
       lineTitle: {
         title: "通知公告",
-        notShowSmallTitle: false
+        notShowSmallTitle: false,
       },
       // noticeList: [
       //   {
@@ -80,8 +80,8 @@ export default {
       // ],
       newsPopup: {
         isShow: false,
-        data: null
-      }
+        data: null,
+      },
     };
   },
   computed: {
@@ -94,9 +94,9 @@ export default {
         openWatch: true, // 开启数据实时监控刷新dom
         singleHeight: 38 * 5, // 单步运动停止的高度(默认值0是无缝不停止的滚动) direction => 0/1
         singleWidth: 0, // 单步运动停止的宽度(默认值0是无缝不停止的滚动) direction => 2/3
-        waitTime: 2000 // 单步运动停止的时间(默认值1000ms)
+        waitTime: 2000, // 单步运动停止的时间(默认值1000ms)
       };
-    }
+    },
   },
   created() {
     // this.getNews()
@@ -106,12 +106,12 @@ export default {
     getNews() {
       this.$api.notice
         .all({
-          currentDatetime: parseTime(new Date())
+          currentDatetime: parseTime(new Date()),
         })
-        .then(res => {
+        .then((res) => {
           this.noticeList = res.data.data;
           this.noticeList &&
-            this.noticeList.forEach(item => {
+            this.noticeList.forEach((item) => {
               item.date = item.createTime.split(" ")[0];
               item.type = this.$dict("notice.type:" + item.newsTag);
             });
@@ -124,12 +124,16 @@ export default {
         this.newsPopup.isShow = true;
         this.newsDialogVisible = true;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-card__header {
+  padding: 0 16px;
+  height: 79px;
+}
 .tzgg-scroll > ::v-deep .el-card__body {
   padding: 0 !important;
 }
@@ -141,6 +145,12 @@ export default {
 .clearfix {
   height: 80px;
   line-height: 80px;
+  span {
+    font-size: 20px;
+    font-family: Microsoft YaHei-Bold, Microsoft YaHei;
+    font-weight: bold;
+    color: #333333;
+  }
   .tzgg_svg {
     width: 1.5rem;
     height: 1.5rem;

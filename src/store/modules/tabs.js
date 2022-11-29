@@ -1,11 +1,11 @@
 const state = {
-  menuModule: 'home',
+  menuModule: 'workTable',
   activeTabsName: '',
   tabList: [],
 }
 
-const mutations = {
-  GET_TABLIST: (state, value )=> {
+const mutations  = {
+  SET_TABLIST: (state, value )=> {
     state.tabList = value;
   },
   SET_ACTIVETABNAME: (state, value) => {
@@ -17,8 +17,8 @@ const mutations = {
 }
 
 const actions = {
-  getTabList({ commit },tabList) {
-    commit('GET_TABLIST',tabList)
+  setTabList({ commit },tabList) {
+    commit('SET_TABLIST',tabList)
   },
   setActiveTabName({ commit },activeTabsName) {
     commit('SET_ACTIVETABNAME',activeTabsName)

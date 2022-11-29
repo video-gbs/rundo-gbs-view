@@ -16,6 +16,11 @@ export function deleteRoles(id) {
   return request.delete(`/politics/sys/roles/del/${id}`)
 }
 
+export function permissionTree(id) {
+  // 权限树
+  return request.get(`/politics/sys/perms/listPermsStatusByRoleId?roleId=${id}`)
+}
+
 export function setDataAuth(params) {
   // 设置数据权限
   return request.post(`/politics/sys/roles/dataPerm/save`, params)

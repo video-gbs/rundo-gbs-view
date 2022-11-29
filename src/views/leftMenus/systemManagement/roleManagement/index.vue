@@ -18,8 +18,10 @@
           <el-table-column prop="detail" label="角色说明" />
           <el-table-column width="200" label="操作" fixed="right">
             <template slot-scope="scope">
-              <el-button type="text" @click="dialogShow(0, scope.row)"
-                >权限设置
+              <el-button
+                type="text"
+                @click="getPermissionTableData(scope.row.id)"
+                >数据列表
               </el-button>
               <el-button type="text" @click="dialogShow(0, scope.row)"
                 >编辑</el-button
@@ -84,6 +86,66 @@
         <el-button type="primary" @click="submit('roleForm')">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog
+      :title="permissionDialog.title"
+      :visible.sync="permissionDialog.show"
+      width="1200px"
+      :before-close="permissionHandleClose"
+    >
+      <div class="page-main">
+        <div class="main-operation">
+          <div class="title">
+            <span>功能权限</span>
+          </div>
+          <div style="display: flex">
+            <div class="perms-operation">
+              <el-button type="primary" @click="submit">保存设置</el-button>
+            </div>
+            <el-button
+              @click="permissionDialog.show = false"
+              class="button-back"
+              >返回</el-button
+            >
+          </div>
+        </div>
+        <div class="main-content">
+          <div class="perms-tree">
+            <div class="tree-title">
+              <div class="title">一级功能</div>
+              <div class="title">二级功能</div>
+              <div class="title">操作权限</div>
+            </div>
+            <div v-if="permissionTableData && permissionTableData.length > 0">
+              <div
+                v-for="item in permissionTableData"
+                :key="item.id"
+                class="tree-item item-border"
+              >
+                <div class="item-title">{{ item.title }}</div>
+                <div class="item-children">
+                  <template>
+                    <div
+                      v-for="child in item.childs"
+                      :key="child.id"
+                      class="tree-item"
+                    >
+                      <div class="item-title">{{ child.title }}</div>
+                      <div class="tree-operation">
+                        <template v-for="op in child.childs">
+                          <el-checkbox :key="op.id">{{ op.title }}</el-checkbox>
+                        </template>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+            <div v-else class="tree-empty item-border">暂无数据</div>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -92,13 +154,10 @@ import {
   addRoles,
   editRoles,
   deleteRoles,
-  setDataAuth,
-  setAppAuth,
+  permissionTree,
   getRolesList,
 } from "@/api/method/role";
-import {
-  accountList
-} from "@/api/method/accountManage";
+
 import pagination from "@/components/Pagination/index.vue";
 export default {
   name: "",
@@ -116,9 +175,19 @@ export default {
         total: 0,
       },
       tableData: [],
+      permissionTableData: [],
       dialog: {
         show: false,
         title: "新增角色",
+        params: {
+          detail: "",
+          name: "",
+          status: 1,
+        },
+      },
+      permissionDialog: {
+        show: false,
+        title: "编辑权限",
         params: {
           detail: "",
           name: "",
@@ -154,6 +223,11 @@ export default {
     goPage(path, query) {
       this.$router.push(path);
     },
+    isShowChildren(data) {
+      return data.find((res) => {
+        return res.childs.length !== 0;
+      });
+    },
     dialogShow(act, data) {
       if (act === 0) {
         const { name, detail, status } = data;
@@ -167,6 +241,37 @@ export default {
     },
     handleClose(done) {
       done();
+    },
+    permissionHandleClose(done) {
+      done();
+    },
+    getPermissionTableData(id) {
+      this.permissionDialog.show = !this.permissionDialog.show;
+      permissionTree(id).then((res) => {
+        if (res.code === 10000) {
+          this.permissionTableData = res.data;
+        }
+      });
+    },
+    submit() {
+      this.buttonLoading = true;
+      this.checkList = [];
+      this.getCkeckList(this.permsTree);
+      this.$api.role
+        .editPerms({
+          roleId: this.role.roleId,
+          permissionIds: this.checkList,
+        })
+        .then((res) => {
+          this.buttonLoading = false;
+          if (res.data.data) {
+            this.$message({
+              message: "保存成功！",
+              type: "success",
+            });
+            this.$router.go(-1);
+          }
+        });
     },
     getList() {
       getRolesList({
@@ -193,7 +298,7 @@ export default {
               type: "success",
               message: "删除成功",
             });
-            this.params.pageNum=1;
+            this.params.pageNum = 1;
             this.getList();
           }
         });
@@ -276,5 +381,79 @@ export default {
 }
 .delete-button {
   color: red !important;
+}
+
+.page-main {
+  background: $mainBg;
+  .main-operation {
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $mainBg;
+    .title {
+      padding-left: 20px;
+      position: relative;
+    }
+  }
+
+  .main-content {
+    background: #fff;
+    .perms-tree {
+      .tree-title {
+        height: 56px;
+        line-height: 56px;
+        background: rgba(245, 245, 245, 0.39);
+        display: flex;
+        .title {
+          width: 120px;
+          font-size: 14px;
+          text-align: center;
+          &:last-child {
+            flex: 1;
+          }
+        }
+      }
+      .tree-item {
+        display: flex;
+        .item-title {
+          width: 120px;
+          // height: 56px;
+          line-height: 24px;
+          font-size: 14px;
+          text-align: center;
+          padding: 12px;
+          white-space: nowrap;
+        }
+        .item-children {
+          flex: 1;
+        }
+      }
+      .item-border {
+        // border-bottom: 1px solid #CCCCCC;
+        border-bottom: 1px solid #ebeef5;
+      }
+      .tree-operation {
+        display: flex;
+        flex: 1;
+        flex-wrap: wrap;
+        padding: 12px;
+        display: flex;
+        margin-left: 140px;
+      }
+      .tree-empty {
+        line-height: 24px;
+        padding: 12px;
+        text-align: center;
+        color: #909399;
+      }
+    }
+  }
+}
+.perms-operation {
+  margin-right: 20px;
+}
+.button-back {
+  margin-right: 20px;
 }
 </style>

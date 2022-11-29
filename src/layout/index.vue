@@ -9,7 +9,7 @@
     <sidebar class="sidebar-container" />
     <div class="main-container">
       <div :class="{ 'fixed-header': fixedHeader }">
-        <Navbar/>
+        <Navbar />
       </div>
       <app-main />
     </div>
@@ -17,8 +17,9 @@
 </template>
 
 <script>
-import { Header, Sidebar, AppMain,Navbar } from "./components";
+import { Header, Sidebar, AppMain, Navbar, TagsView } from "./components";
 import ResizeMixin from "./mixin/ResizeHandler";
+import store from "@/store/index";
 
 export default {
   name: "Layout",
@@ -26,7 +27,8 @@ export default {
     Sidebar,
     AppMain,
     Header,
-    Navbar
+    Navbar,
+    TagsView,
   },
   mixins: [ResizeMixin],
   created() {
@@ -47,38 +49,23 @@ export default {
         hideSidebar: !this.sidebar.opened,
         openSidebar: this.sidebar.opened,
         withoutAnimation: this.sidebar.withoutAnimation,
-        mobile: this.device === "mobile"
+        mobile: this.device === "mobile",
       };
     },
 
     // 当前所在模块
     menuModule() {
-      return this.$store.state.menuModule;
+      return this.$store.state.tabs.menuModule;
     },
     tabList() {
-      return this.$store.state.tabList;
-    }
+      return this.$store.state.tabs.tabList;
+    },
   },
   methods: {
     initTabList() {
-      console.log(this.$route.path);
-      // 获取匹配到的路由对象
-      const firstRoute = this.$router.options.routes.filter(
-        item => item.name === this.menuModule
-      )[0];
-      // 循环该路由对象的children
-      const { redirect } = firstRoute;
-      if (firstRoute && redirect) {
-        const saveRoute = firstRoute.children.filter(
-          item => item.path === redirect
-        )[0];
-        if (saveRoute) {
-          this.tabList.push(saveRoute);
-          this.$store.commit("tabList", this.tabList);
-        }
-      }
-    }
-  }
+      this.tabList.push(this.$route.path);
+    },
+  },
 };
 </script>
 
