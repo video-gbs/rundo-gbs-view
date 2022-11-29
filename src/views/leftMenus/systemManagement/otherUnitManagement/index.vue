@@ -1,7 +1,7 @@
 <template>
   <div class="router_container4 m20 bg-w">
     <div class="panel-header-box f jc-sb ai-c fw-w">
-      <div class="title-css">其他单位账号管理</div>
+      <div class="title-css">单位账号管理</div>
     </div>
     <div class="p10">
       <el-table :data="tableData" style="width: 100%">
@@ -156,7 +156,7 @@
               <el-form-item label="所属角色" prop="roleId">
                 <el-select v-model="dialog.params.roleId" placeholder="请选择">
                   <el-option
-                    v-for="i in gender"
+                    v-for="i in selectList"
                     :key="i.id"
                     :label="i.label"
                     :value="i.id"
@@ -300,8 +300,11 @@ import {
   otherUnitList,
   otherUnitDelete,
   otherUnitEditPassword,
-  otherUnitRoleId
+  otherUnitRoleId,
+  otherUnitDeptRoleList
 } from "@/api/method/otherUnitManagement";
+// import { getRolesList } from "@/api/method/role";
+
 import { Local } from "@/utils/storage";
 
 export default {
@@ -319,6 +322,7 @@ export default {
         rePassword: "",
         id: ""
       },
+      selectList: [],
       passwordVisible: false,
       rules: {
         account: [
@@ -422,10 +426,6 @@ export default {
           deptId: 1
         }
       },
-      gender: [
-        { id: 1, label: "男" },
-        { id: 2, label: "女" }
-      ],
       state: [
         { id: 1, label: "启用" },
         { id: 0, label: "禁用" }
@@ -440,6 +440,7 @@ export default {
   mounted() {
     this.checkPassworLevel();
     this.getOtherUnitList();
+    this.getList();
   },
   methods: {
     /**
@@ -449,6 +450,23 @@ export default {
       this.passwordVisible = true;
       this.passwordForm.id = row.id;
     },
+
+    getList() {
+      otherUnitDeptRoleList().then((res) => {
+        if (res.code === 10000) {
+          res.data.map((item) => {
+            let obj = {
+              id: "",
+              label: "",
+            };
+            obj.id = item.roleId;
+            obj.label = item.roleName;
+            this.selectList.push(obj);
+          });
+        }
+      });
+    },
+
 
     savePassword(formName) {
       this.$refs[formName].validate(valid => {

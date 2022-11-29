@@ -54,7 +54,20 @@ export default {
         color: ["#2796FF ", "#FED023", "#A0791E"],
         radius: ["58%", "70%"],
         center: ["35%", "50%"],
-        series: [],
+        series: [
+          {
+            name: "满意",
+            value: 1,
+          },
+          {
+            name: "非常满意",
+            value: 2,
+          },
+          {
+            name: "不满意",
+            value: 9,
+          },
+        ],
       },
     };
   },
@@ -69,7 +82,6 @@ export default {
       obj.value = item.resultCount;
       this.chartData.series.push(obj);
     });
-    console.log(this.chartData);
   },
   mounted() {},
   methods: {},
@@ -77,14 +89,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.notice-box {
-  height: 100%;
+::v-deep .el-card__header {
+  padding: 0 16px;
+  height: 79px;
+}
+.box-card {
   width: 100%;
   overflow: hidden;
+  position: relative;
+  top: 5px;
 }
 .clearfix {
   height: 80px;
   line-height: 80px;
+  span {
+    font-size: 20px;
+    font-family: Microsoft YaHei-Bold, Microsoft YaHei;
+    font-weight: bold;
+    color: #333333;
+  }
   .pjqktj_svg {
     width: 1.5rem;
     height: 1.5rem;

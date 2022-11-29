@@ -24,8 +24,8 @@ export default {
       type: Object,
       default: () => {
         return {};
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -34,21 +34,21 @@ export default {
           title: "平台用户",
           value: this.homeLists.num,
           color: "red",
-          imgSrcName: "ptyh"
+          imgSrcName: "ptyh",
         },
         {
           title: "单位部门",
           value: this.homeLists.deptNum,
           color: "blue",
-          imgSrcName: "dwbm"
-        }
-      ]
+          imgSrcName: "dwbm",
+        },
+      ],
     };
   },
   watch: {
     "$store.getters.plateId"(n, o) {
       this.getTopStatic();
-    }
+    },
   },
   mounted() {
     if (this.$store.getters.plateId) {
@@ -63,7 +63,7 @@ export default {
      */
     getTopStatic() {
       // {} 用于触发板块ID写入
-      this.$api.document.getTopStatic({}).then(res => {
+      this.$api.document.getTopStatic({}).then((res) => {
         const data = res.data.data;
         if (data) {
           this.pageData = [
@@ -71,31 +71,31 @@ export default {
               title: "即将到期",
               value: data.prepareToExpireCount || 0,
               color: "red",
-              status: 7
+              status: 7,
             },
             {
               title: "已超时未完成",
               value: data.timeoutCount || 0,
               color: "blue",
-              status: 8
+              status: 8,
             },
             {
               title: "已完成",
               value: data.finishCount || 0,
               color: "green",
-              status: 6
+              status: 6,
             },
             {
               title: "特急公文",
               value: data.keyCount || 0,
               color: "orange",
-              status: 9
-            }
+              status: 9,
+            },
           ];
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -155,6 +155,7 @@ export default {
       white-space: nowrap;
       overflow: hidden;
       font-weight: 400;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
     }
 
     &:last-of-type {

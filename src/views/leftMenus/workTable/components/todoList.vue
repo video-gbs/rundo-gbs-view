@@ -6,13 +6,13 @@
         <span>待办事项</span>
       </div>
       <div class="text item">
-        <LineFont :lineTitle="lineTitle" />
+        <span class="under_line">问政待办</span>
         <ul class="todo-ul-scoll">
           <li v-for="(item, index) in noticeList" :key="index">
             <LineFont
               :lineTitle="item.name"
               :textStyle="textStyle"
-              :lineBlueStyle="lineBlueStyle"
+              :lineBlueStyle="index < 3 ? lineBlueStyle : lineBlueStyle1"
             />
             <div class="type" :data-index="index">{{ item.num }}</div>
             <div class="go-router">
@@ -22,8 +22,8 @@
         </ul>
       </div>
 
-      <div class="text item">
-        <LineFont :lineTitle="lineTitle1" />
+      <div class="text item" style="margin-top: 40px">
+        <span class="under_line">综合处理</span>
         <ul class="todo-ul-scoll">
           <li v-for="(item1, index) in noticeList1" :key="index">
             <LineFont
@@ -47,15 +47,15 @@ import LineFont from "@/components/LineFont";
 export default {
   name: "",
   components: {
-    LineFont
+    LineFont,
   },
   props: {
     homeLists: {
       type: Object,
       default: () => {
         return {};
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -63,67 +63,87 @@ export default {
         fontSize: "14px",
         fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
         fontWeight: "bold",
-        color: "#333333"
+        color: "#333333",
+      },
+      textStyle1: {
+        fontSize: "16px",
+        fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
+        fontWeight: "bold",
+        color: "#1E56A0",
       },
       lineBlueStyle: {
         background: "rgba(30, 86, 160, 1)",
         width: "2px",
-        height: "19px"
+        height: "19px",
+      },
+      lineBlueStyle1: {
+        background: "#A0791E",
+        width: "2px",
+        height: "19px",
+      },
+      lineBlueStyleNone: {
+        background: "rgba(30, 86, 160, 1)",
+        width: "0px",
+        height: "19px",
       },
 
       lineTitle: {
         title: "问政待办",
-        notShowSmallTitle: false
+        notShowSmallTitle: false,
       },
       lineTitle1: {
         title: "综合处理",
-        notShowSmallTitle: false
+        notShowSmallTitle: false,
       },
       noticeList: [
         {
           name: { title: "待审核问政", notShowSmallTitle: false },
-          num: this.homeLists.auditNum
+          num: this.homeLists.auditNum,
         },
         {
           name: { title: "待受理问政", notShowSmallTitle: false },
-          num: this.homeLists.acceptNum
+          num: this.homeLists.acceptNum,
         },
         {
           name: { title: "待回复问政", notShowSmallTitle: false },
-          num: this.homeLists.replyNum
+          num: this.homeLists.replyNum,
         },
         {
           name: { title: "逾期未审核", notShowSmallTitle: false },
-          num: this.homeLists.overdueAuditNum
+          num: this.homeLists.overdueAuditNum,
         },
         {
           name: { title: "逾期未受理", notShowSmallTitle: false },
-          num: this.homeLists.overdueAcceptNum
+          num: this.homeLists.overdueAcceptNum,
         },
         {
           name: { title: "逾期未回复", notShowSmallTitle: false },
-          num: this.homeLists.overdueReplyNum
-        }
+          num: this.homeLists.overdueReplyNum,
+        },
       ],
       noticeList1: [
         {
           name: { title: "转移审核", notShowSmallTitle: false },
-          num: this.homeLists.moveAuditNum
+          num: this.homeLists.moveAuditNum,
         },
         {
           name: { title: "邀请审核", notShowSmallTitle: false },
-          num: this.homeLists.inviteAuditNum
-        }
-      ]
+          num: this.homeLists.inviteAuditNum,
+        },
+      ],
     };
   },
   watch: {},
   mounted() {},
-  methods: {}
+  methods: {},
 };
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-card__header {
+  padding: 0 16px;
+  height: 79px;
+}
 .todo-container {
   height: 100%;
   .box-card {
@@ -132,6 +152,12 @@ export default {
   .clearfix {
     height: 80px;
     line-height: 80px;
+    span {
+      font-size: 20px;
+      font-family: Microsoft YaHei-Bold, Microsoft YaHei;
+      font-weight: bold;
+      color: #333333;
+    }
     .dbsx_svg {
       width: 1.5rem;
       height: 1.5rem;
@@ -150,7 +176,7 @@ export default {
     width: 240px;
     margin: 10px 2rem;
     height: 108px;
-    background: rgba(0, 0, 0, 0.1);
+    background: #f8f8f8;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     position: relative;
     .type {
@@ -169,13 +195,22 @@ export default {
       position: absolute;
       bottom: 20px;
       right: 20px;
-      cursor:pointer;
-      .rightArrow_svg{
-        width:14px;
-        height:14px;
-        color:#4b8afe;
+      cursor: pointer;
+      .rightArrow_svg {
+        width: 14px;
+        height: 14px;
+        color: #4b8afe;
       }
     }
+  }
+  .under_line {
+    padding-bottom: 5px;
+    margin-left: 10px;
+    border-bottom: 1px solid #1e56a0;
+    font-size: 16px;
+    font-family: Microsoft YaHei-Bold, Microsoft YaHei;
+    font-weight: bold;
+    color: #1e56a0;
   }
 }
 </style>

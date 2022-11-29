@@ -65,7 +65,6 @@ export default {
       ) {
         this.$store.state.tabs.tabList.push(this.$route);
         // this.$store.commit("tabList", this.$store.state.tabs.tabList);
-        console.log("~~~~~~~~~~~~~", this.$store.state);
       }
     }
   }
