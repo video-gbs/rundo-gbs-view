@@ -2,61 +2,79 @@
   <div class="reviewResults-container">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <LineFont :lineTitle="lineTitle" :textStyle="textStyle" :lineBlueStyle="lineBlueStyle"/>
+        <LineFont :line-title="lineTitle" :text-style="textStyle" :line-blue-style="lineBlueStyle" />
       </div>
       <div class="text item">
         <el-form
+          v-if="one"
           ref="form"
           :model="form"
           label-width="90px"
           :label-position="labelPosition"
         >
           <el-form-item label="满意度：">
-            <span class="span-text">非常满意</span>
+            <span class="span-text">{{ $dict.appraise[one.result] }}</span>
+          </el-form-item>
+          <el-form-item label="评价内容">
+            <span class="span-text">{{ one.content }}</span>
           </el-form-item>
           <el-form-item label="评价时间：">
-            <span class="span-text">2022-06-30 12:00:56</span>
+            <span class="span-text">{{ one.updateTime }}</span>
           </el-form-item>
         </el-form>
+        <div v-else class="fs12">暂无评价</div>
+        <!-- <el-empty v-else description="暂无评价" /> -->
       </div>
     </el-card>
   </div>
 </template>
 
 <script>
-import LineFont from "@/components/LineFont";
+import LineFont from '@/components/LineFont'
+import { getAppraiseByOne } from '@/api/method/appraise'
 export default {
-  name: "",
+  name: '',
   components: {
     LineFont
   },
   data() {
     return {
-      labelPosition: "left",
+      labelPosition: 'left',
       textStyle: {
-        fontSize: "20px",
-        fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
-        fontWeight: "bold",
-        color: "#333333"
+        fontSize: '20px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#333333'
       },
       lineBlueStyle: {
-        background: "rgba(30, 86, 160, 1)",
-        borderRadius: "0px 4px 4px 0px"
+        background: 'rgba(30, 86, 160, 1)',
+        borderRadius: '0px 4px 4px 0px'
       },
       form: {
-        content: "",
-        content1: ""
+        content: '',
+        content1: ''
       },
       lineTitle: {
-        title: "评价信息",
+        title: '评价信息',
         notShowSmallTitle: false
-      }
-    };
+      },
+      one: null
+    }
   },
   watch: {},
-  mounted() {},
-  methods: {}
-};
+  mounted() {
+    this.$route.params.id && this.getAppraiseBy(this.$route.params.id)
+  },
+  methods: {
+    getAppraiseBy(v) {
+      getAppraiseByOne(v).then(res => {
+        if (res.code === 10000) {
+          this.one = res.data
+        }
+      })
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

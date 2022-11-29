@@ -77,6 +77,13 @@ export const constantRoutes = [
         meta: { title: '问政列表', icon: 'dashboard' }
       },
       {
+        path: '/politicalList/:id',
+        name: '问政详情',
+        component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalList/politicalDetail/index'),
+        meta: { title: '问政列表', icon: 'dashboard' },
+        hidden: true
+      },
+      {
         path: '/politicalAudit',
         name: '问政转移审核',
         component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalAudit/index'),

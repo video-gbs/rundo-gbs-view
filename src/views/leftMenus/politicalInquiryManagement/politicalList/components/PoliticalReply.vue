@@ -2,11 +2,11 @@
   <div class="reviewResults-container">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <LineFont :lineTitle="lineTitle" :textStyle="textStyle" :lineBlueStyle="lineBlueStyle"/>
+        <LineFont :line-title="lineTitle" :text-style="textStyle" :line-blue-style="lineBlueStyle" />
       </div>
       <div class="text item">
         <div class="reviewResults—timeline">
-          <el-timeline>
+          <el-timeline v-if="activities.length">
             <el-timeline-item
               v-for="(activity, index) in activities"
               :key="index"
@@ -30,12 +30,13 @@
                   {{ activity.content }}
                 </h4>
                 <p class="reviewResults-p">王小虎 提交于 2018/4/12 20:46</p>
-                <p class="reviewResults-p" v-if="activity.shyj">
+                <p v-if="activity.shyj" class="reviewResults-p">
                   【审核意见】照片拍摄不清晰；需增加描述内容。
                 </p>
               </el-card>
             </el-timeline-item>
           </el-timeline>
+          <div v-else class="fs12">暂无记录</div>
         </div>
       </div>
     </el-card>
@@ -43,63 +44,74 @@
 </template>
 
 <script>
-import LineFont from "@/components/LineFont";
+import LineFont from '@/components/LineFont'
+import { getReplyList } from '@/api/method/reply'
 export default {
-  name: "",
+  name: '',
   components: {
     LineFont
   },
   data() {
     return {
-      activities: [
-        {
-          content: "支持使用图标",
-          timestamp: "2018-04-12 20:46",
-          size: "large",
-          type: "primary",
-          myIcon: "wzjl1",
-          color: 'rgba(30, 86, 160, 1)'
-        },
-        {
-          content: "支持自定义颜色",
-          timestamp: "2018-04-03 20:46",
-          myIcon: "wzjl2",
-          shyj: true,
-          color: 'rgba(30, 86, 160, 1)'
-        },
-        {
-          content: "支持自定义尺寸",
-          timestamp: "2018-04-03 20:46",
-          size: "large",
-          myIcon: "wzjl3",
-          color: 'rgba(30, 86, 160, 1)'
-        }
-      ],
-      labelPosition: "left",
-      textStyle: {
-        fontSize: "20px",
-        fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
-        fontWeight: "bold",
-        color: "#333333"
+      actCss: {
+        size: 'large',
+        type: 'primary',
+        myIcon: 'wzjl1',
+        color: 'rgba(30, 86, 160, 1)'
       },
-            lineBlueStyle: {
-        background: "rgba(30, 86, 160, 1)",
-        borderRadius: "0px 4px 4px 0px"
+      activities: [
+        // {
+        //   content: '支持使用图标',
+        //   timestamp: '2018-04-12 20:46',
+        //   size: 'large',
+        //   type: 'primary',
+        //   myIcon: 'wzjl1',
+        //   color: 'rgba(30, 86, 160, 1)'
+        // },
+
+      ],
+      labelPosition: 'left',
+      textStyle: {
+        fontSize: '20px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#333333'
+      },
+      lineBlueStyle: {
+        background: 'rgba(30, 86, 160, 1)',
+        borderRadius: '0px 4px 4px 0px'
       },
       form: {
-        content: "",
-        content1: ""
+        content: '',
+        content1: ''
       },
       lineTitle: {
-        title: "官方回复",
+        title: '官方回复',
         notShowSmallTitle: false
       }
-    };
+    }
   },
   watch: {},
-  mounted() {},
-  methods: {}
-};
+  created() {
+    this.$route.params.id && this.getReply(this.$route.params.id)
+  },
+  mounted() {
+
+  },
+  methods: {
+    getReply(v) {
+      getReplyList(v).then(res => {
+        if (res.code === 10000) {
+          const r = Object.assign({}, res.data)
+          r.forEach(i => {
+            i = { ...i, ...this.actCss }
+          })
+          this.activities = r
+        }
+      })
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -126,7 +138,6 @@ export default {
 ::v-deep .el-timeline-item__node {
   box-shadow: 0px 0px 0px 3px rgba(30, 86, 160, 0.12);
 }
-
 
 ::v-deep .el-card__body {
   padding: 0 1rem;
