@@ -3,75 +3,74 @@
 </template>
 
 <script>
-import echarts from "echarts";
-require("echarts/theme/macarons");
-import { fitChartSize } from "../../../../utils/index.js";
+require('echarts/theme/macarons')
+import { fitChartSize } from '../../../../utils/index.js'
 export default {
   props: {
     className: {
       type: String,
-      default: "chart"
+      default: 'chart'
     },
     width: {
       type: String,
-      default: "100%"
+      default: '100%'
     },
     height: {
       type: String,
-      default: "100%"
+      default: '100%'
     },
     chartData: {
       type: Object,
       default: () => {
-        return {};
+        return {}
       }
     }
   },
   data() {
     return {
-      chart: null
-    };
-  },
-  beforeDestroy() {
-    if (!this.chart) {
-      return;
+      chart: null,
+      target: ''
     }
-    this.chart.dispose();
-    this.chart = null;
   },
   watch: {
     chartData: {
       handler(val) {
-        this.$nextTick(() => this.initChart(val));
+        this.$nextTick(() => this.initChart(val))
       },
       deep: true
     }
   },
+  beforeDestroy() {
+    if (!this.chart) {
+      return
+    }
+    this.chart.dispose()
+    this.chart = null
+  },
   mounted() {
     this.$nextTick(() => {
-      this.initChart();
-    });
+      this.initChart()
+    })
   },
   methods: {
     initChart() {
-      if (this.chartData == null || this.chartData == undefined) return;
-      this.chart = this.$echarts.init(this.$el, "macarons");
-      var datas = this.chartData;
+      if (this.chartData === null || this.chartData === undefined) return
+      this.chart = this.$echarts.init(this.$el, 'macarons')
+      var datas = this.chartData
       this.chart.setOption(
         {
           tooltip: {
-            trigger: "item",
-            formatter: "{b} : {c} ({d}%)",
+            trigger: 'item',
+            formatter: '{b} : {c} ({d}%)',
             show: true,
-            // trigger: "axis", //axis , item
-            backgroundColor: "#fff",
-            borderColor: "rgba(0, 151, 251, 1)",
+            backgroundColor: '#fff',
+            borderColor: 'rgba(0, 151, 251, 1)',
             borderWidth: 1,
             borderRadius: 0,
             textStyle: {
-              color: "#BCE9FC",
+              color: '#BCE9FC',
               fontSize: fitChartSize(16),
-              align: "left"
+              align: 'left'
             },
             formatter: function(params) {
               return (
@@ -79,90 +78,88 @@ export default {
                 '<span style="color:' +
                 params.color +
                 '">' +
-                params.data["name"] +
-                "\n" +
-                params.data["value"] +
-                "</span>"
-              );
+                params.data['name'] +
+                '\n' +
+                params.data['value'] +
+                '</span>'
+              )
             }
           },
           legend: {
-            orient: "vertical",
-            icon: "circle",
-            left: "70%",
-            top: "40%",
+            orient: 'vertical',
+            icon: 'circle',
+            left: '70%',
+            top: '40%',
             // itemWidth: 8, // 设置宽度
             // itemHeight: 8, // 设置高度、
             itemGap: 10, // 设置间距
             itemWidth: 8,
             borderWidth: 2,
             borderRadius: 4,
-            borderColor: "#ECECEC",
+            borderColor: '#ECECEC',
             padding: [15, 10, 15, 5],
             textStyle: {
               rich: {
                 a: {
-                  color: "#333",
+                  color: '#333',
                   fontSize: fitChartSize(12),
                   padding: [0, 10, 0, 0]
                 },
                 b: {
-                  color: "#333",
+                  color: '#333',
                   fontSize: fitChartSize(12),
                   padding: [0, 10, 0, 10]
                 }
               }
             },
             formatter: function(name) {
-              var target;
               for (var i = 0, l = datas.series.length; i < l; i++) {
-                if (datas.series[i].name == name) {
-                  target = datas.series[i].value;
+                if (datas.series[i].name === name) {
+                  this.target = datas.series[i].value
                 }
               }
-              return `{a| ${name}}`;
+              return `{a| ${name}}`
             }
           },
           title: {
             show: this.chartData.title.isShow,
             text: this.chartData.title.text,
-            textAlign: "center",
+            textAlign: 'center',
             x: this.chartData.title.x,
             y: this.chartData.title.y,
             textStyle: {
-              align: "center",
-              fontSize: "16px",
-              color: "#333",
-              fontWeight: "bold"
+              align: 'center',
+              fontSize: '16px',
+              color: '#333',
+              fontWeight: 'bold'
             },
             subtext: this.chartData.title.subtext,
             subtextStyle: {
-              align: "center",
+              align: 'center',
               fontSize: fitChartSize(16),
               height: fitChartSize(30),
-              color: "#000000"
+              color: '#000000'
             }
           },
           color: this.chartData.color,
           graphic: {
-            type: "text",
-            left: "0%",
-            top: "10%",
+            type: 'text',
+            left: '0%',
+            top: '10%',
             style: {
               // text: this.chartData.graphic,
-              textAlign: "center",
+              textAlign: 'center',
               fontSize: fitChartSize(16)
             }
           },
           series: [
             {
-              name: "border",
-              type: "pie",
+              name: 'border',
+              type: 'pie',
               clockWise: false,
-              radius: "75%",
-              center: ["35%", "50%"],
+              radius: '75%',
+              center: ['35%', '50%'],
               animation: false,
-              hoverAnimation: false,
               hoverAnimation: false,
               legendHoverLink: false,
               // 图形是否不影响和触发鼠标事件
@@ -182,8 +179,8 @@ export default {
               },
               itemStyle: {
                 normal: {
-                  color: "#fff",
-                  shadowColor: "#E0ECFE",
+                  color: '#fff',
+                  shadowColor: '#E0ECFE',
                   shadowBlur: 15,
                   shadowOffsetX: 2,
                   shadowOffsetY: 2
@@ -192,32 +189,27 @@ export default {
               data: [0]
             },
             {
-              type: "pie",
+              type: 'pie',
               label: {
                 show: true,
                 rich: {
                   b: {
                     fontSize: 12,
-                    fontFamily: "PingFang SC",
+                    fontFamily: 'PingFang SC',
                     fontWeight: 400,
-                    color: "red",
+                    color: 'red',
                     // padding:20,
-                    verticalAlign: "top",
-                    align: "right"
+                    verticalAlign: 'top',
+                    align: 'right'
                   },
                   d: {
                     fontSize: 14,
-                    fontFamily: "Source Han Sans CN",
-                    color: "#E7B943",
+                    fontFamily: 'Source Han Sans CN',
+                    color: '#E7B943',
                     fontWeight: 400
                   }
                 },
-                formatter: "{b}{d}%"
-                // formatter: function(params, ticket, callback) {
-                //   console.log('params',params)
-                //   return `{b|${params.name}}{d|${params.value}}%`
-                //   // <div style="position:relative;top:-10px;left:20px;">${params.name}</div>`
-                // }
+                formatter: '{b}{d}%'
               },
               labelLine: {
                 normal: {
@@ -229,24 +221,24 @@ export default {
                 }
               },
               itemStyle: {
-                borderColor: "#fff",
+                borderColor: '#fff',
                 borderWidth: 2,
                 emphasis: {
-                  color: "#f9b762"
+                  color: '#f9b762'
                 }
               },
 
               radius: this.chartData.radius,
               center: this.chartData.center,
               data: this.chartData.series,
-              animationEasing: "cubicInOut",
+              animationEasing: 'cubicInOut',
               animationDuration: 2600
             }
           ]
         },
         true
-      );
+      )
     }
   }
-};
+}
 </script>

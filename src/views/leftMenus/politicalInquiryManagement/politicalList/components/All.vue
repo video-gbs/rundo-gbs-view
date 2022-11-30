@@ -161,7 +161,7 @@ export default {
       tableItems: [
         {
           label: '编号',
-          name: 'projectName',
+          name: 'id',
           width: '100',
           isShow: true,
           isBold: false
@@ -186,7 +186,7 @@ export default {
         },
         {
           label: '发布账号',
-          name: 'account',
+          name: 'username',
           isShow: true
         },
         {
@@ -209,7 +209,7 @@ export default {
         },
         {
           label: '受理单位',
-          name: 'contacts',
+          name: 'processingDeptName',
           isShow: true
         },
         {
@@ -256,11 +256,6 @@ export default {
       },
       buttonItems: {
         options: [
-          {
-            text: '问政转移',
-            cb: 'isShow',
-            icon: 'el-icon-view'
-          },
           {
             text: '详情',
             cb: 'verify',

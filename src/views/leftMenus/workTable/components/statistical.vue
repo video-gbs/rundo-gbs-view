@@ -5,87 +5,84 @@
       <span>评价情况统计</span>
     </div>
     <div class="text item">
-      <PieEchart :chartData="chartData" width="100%" height="200px" />
+      <PieEchart :chart-data="chartData" width="100%" height="200px" />
     </div>
   </el-card>
 </template>
 
 <script>
-import PieEchart from "./pieEchart.vue";
-import LineFont from "@/components/LineFont";
+import PieEchart from './pieEchart.vue'
 
 export default {
-  name: "",
+  name: '',
   components: {
-    PieEchart,
-    LineFont,
+    PieEchart
   },
   props: {
     statisticalData: {
       type: Array,
       default: () => {
-        return [];
-      },
-    },
-  },
-  watch: {
-    statisticalData(newValue, oldValue) {
-      console.log(111111, newValue, oldValue);
-      this.$props.statisticalData.map((item) => {
-        this.chartData.series.name = item.resultName;
-        this.chartData.series.value = item.resultCount;
-      });
-    },
+        return []
+      }
+    }
   },
   data() {
     return {
       lineTitle: {
-        title: "问政待办",
-        notShowSmallTitle: false,
+        title: '问政待办',
+        notShowSmallTitle: false
       },
       chartData: {
-        showLegend: "",
+        showLegend: '',
         title: {
           isShow: true,
-          x: "34%",
-          y: "45%",
-          text: "评价统计",
+          x: '34%',
+          y: '45%',
+          text: '评价统计'
         },
-        color: ["#2796FF ", "#FED023", "#A0791E"],
-        radius: ["58%", "70%"],
-        center: ["35%", "50%"],
+        color: ['#2796FF ', '#FED023', '#A0791E'],
+        radius: ['58%', '70%'],
+        center: ['35%', '50%'],
         series: [
           {
-            name: "满意",
-            value: 1,
+            name: '满意',
+            value: 1
           },
           {
-            name: "非常满意",
-            value: 2,
+            name: '非常满意',
+            value: 2
           },
           {
-            name: "不满意",
-            value: 9,
-          },
-        ],
-      },
-    };
+            name: '不满意',
+            value: 9
+          }
+        ]
+      }
+    }
   },
-  computed: {},
+  watch: {
+    statisticalData(newValue, oldValue) {
+      console.log(newValue, oldValue)
+      this.$props.statisticalData.map((item) => {
+        this.chartData.series.name = item.resultName
+        this.chartData.series.value = item.resultCount
+      })
+    }
+  },
   created() {
     this.$props.statisticalData.map((item) => {
-      let obj = {
-        name: "",
-        value: "",
-      };
-      obj.name = item.resultName;
-      obj.value = item.resultCount;
-      this.chartData.series.push(obj);
-    });
+      const obj = {
+        name: '',
+        value: ''
+      }
+      obj.name = item.resultName
+      obj.value = item.resultCount
+      this.chartData.series.push(obj)
+    })
   },
   mounted() {},
-  methods: {},
-};
+  methods: {}
+}
 </script>
 
 <style lang="scss" scoped>
