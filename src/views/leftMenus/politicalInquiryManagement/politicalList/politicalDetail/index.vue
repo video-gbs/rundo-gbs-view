@@ -53,11 +53,11 @@
 
     <!--受理部门-->
     <PDialog ref="deptRef" @submit="deptFn">
-      <template slot="title">补充说明审核</template>
+      <template slot="title">受理部门</template>
       <template slot="main">
         <el-form label-width="80px" :model="deptForm">
           <el-form-item label="选择单位">
-            <el-select v-model="deptForm.deptId" placeholder="请选择">
+            <el-select v-model="deptForm.processingDeptId" placeholder="请选择">
               <el-option
                 v-for="i in deptList"
                 :key="i.id"
@@ -75,7 +75,7 @@
 
     <!--受理问政-->
     <PDialog ref="acceptRef" @submit="acceptFn">
-      <template slot="title">补充说明审核</template>
+      <template slot="title">受理问政</template>
       <template slot="main">
         <el-form label-width="80px" :model="acceptForm">
           <el-form-item label="选择单位">
@@ -97,7 +97,7 @@
 
     <!--问政回复-->
     <PDialog ref="replyRef" @submit="replyFn">
-      <template slot="title">补充说明审核</template>
+      <template slot="title">问政回复</template>
       <template slot="main">
         <el-form label-width="80px" :model="replyForm">
           <el-form-item label="回复说明">
@@ -124,6 +124,27 @@
           </el-form-item>
           <el-form-item label="审核说明">
             <el-input v-model="transferForm.content" />
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
+    <!--邀请回复-->
+    <PDialog ref="inviteRef" @submit="inviteFn">
+      <template slot="title">邀请回复</template>
+      <template slot="main">
+        <el-form label-width="80px" :model="transferForm">
+          <el-form-item label="邀请单位">
+            <el-select v-model="inviteForm.deptId" placeholder="请选择">
+              <el-option
+                v-for="i in deptList"
+                :key="i.id"
+                :label="i.name"
+                :value="i.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="审核说明">
+            <el-input v-model="inviteForm.content" />
           </el-form-item>
         </el-form>
       </template>
@@ -183,10 +204,10 @@ export default {
         { id: 4, label: '受理问政', dialog: 'acceptRef' },
         { id: 5, label: '回复问政', dialog: 'replyRef' },
         { id: 6, label: '问政转移', dialog: 'transferRef' },
-        { id: 7, label: '邀请回复' },
-        { id: 8, label: '审核回复' },
-        { id: 9, label: '设为可见' },
-        { id: 10, label: '开启评论' },
+        { id: 7, label: '邀请回复', dialog: 'inviteRef' },
+        { id: 8, label: '审核回复', dialog: 'replyCheckRef' },
+        { id: 9, label: '设为可见', dialog: 'isShowRef' },
+        { id: 10, label: '开启评论', dialog: 'openCommentRef' },
         { id: 11, label: '删除' },
         { id: 12, label: '返回' }
 
@@ -208,13 +229,21 @@ export default {
         'content': '',
         // 'createBy': '',
         // 'createTime': '',
-        'deptId': ''
+        'processingDeptId': '',
+        'processingDeptName': ''
         // 'id': '',
         // 'result': '',
         // 'status': '',
         // 'updateBy': '',
         // 'updateTime': '',
         // 'userId': ''
+      },
+      acceptForm: {
+        'affairsId': '',
+        'content': '',
+        // 'createBy': '',
+        // 'createTime': '',
+        'deptId': ''
       },
       replyContent: '',
       replyForm: {
@@ -292,23 +321,35 @@ export default {
     comDialog(v) {
       this.$refs[v].visible = true
     },
-    // 审核问政
+
     examineFn() {
+      // 审核问政
       examineAffairs(this.examineForm).then(res => {
 
       })
     },
-    moreFn() {},
+    moreFn() {
+      // 补充说明审核
+    },
     deptFn() {
+      // 受理部门
+      this.deptForm.processingDeptName = this.deptList.filter(i => {
+        i.id === this.deptForm.processingDeptId
+      })
       acceptAffairs(this.deptForm).then(res => {
       })
     },
     acceptFn() {
+      // 受理问政
       acceptAffairs(this.acceptForm).then(res => {
       })
     },
     replyChange(v) {
+      // 回复问政的编辑器内容同步
       this.replyForm.content = v
+    },
+    replyFn() {
+      // 回复问政
     },
     transferFn() {
       transfer(this.transferForm).then(res => {
