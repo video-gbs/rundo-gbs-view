@@ -81,17 +81,7 @@
       <template slot="title">受理问政</template>
       <template slot="main">
         <el-form label-width="80px" :model="acceptForm">
-          <el-form-item label="选择单位">
-            <el-select v-model="acceptForm.deptId" placeholder="请选择">
-              <el-option
-                v-for="i in deptList"
-                :key="i.id"
-                :label="i.name"
-                :value="i.id"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="审核说明">
+          <el-form-item label="受理说明">
             <el-input v-model="acceptForm.content" />
           </el-form-item>
         </el-form>
@@ -271,10 +261,9 @@ export default {
       },
       acceptForm: {
         'affairsId': '',
-        'content': '',
+        'content': ''
         // 'createBy': '',
-        // 'createTime': '',
-        'deptId': ''
+        // 'createTime': ''
       },
       replyContent: '',
       replyForm: {
