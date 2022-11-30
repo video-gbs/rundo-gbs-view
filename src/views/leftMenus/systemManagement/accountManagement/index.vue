@@ -109,7 +109,7 @@
               <span class="fs12 mt10">请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span>
             </div>
           </el-form-item>
-          <el-form-item v-if="editShowChild" label="密码强度">
+          <el-form-item v-if="editShowChild" style="position: absolute;right: 50px;top: 185px;">
             <el-row>
               <el-col :span="24">
                 <div class="password-level-box f ai-c">
@@ -201,7 +201,7 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="修改密码" :visible.sync="passwordVisible" width="550px">
+    <el-dialog title="修改密码" :visible.sync="passwordVisible" width="748px">
       <el-form
         ref="savePasswordForm"
         :model="passwordForm"
@@ -220,7 +220,7 @@
             <span class="fs12 mt10">请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span>
           </div>
         </el-form-item>
-        <el-form-item label="密码强度">
+        <el-form-item style="position: absolute;right: 35px;top: 105px;">
           <el-row>
             <el-col :span="24">
               <div class="password-level-box f ai-c">
@@ -673,6 +673,9 @@ export default {
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid #eaeaea;
 }
+::v-deep .el-dialog__footer {
+  border-top: 1px solid #eaeaea;
+}
 ::v-deep .el-dialog__body {
   padding: 30px 108px;
 }
@@ -717,5 +720,8 @@ export default {
 }
 .delete-button {
   color: red !important;
+}
+.mr30{
+  width: calc(100% - 30px);
 }
 </style>

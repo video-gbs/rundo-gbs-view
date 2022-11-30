@@ -28,8 +28,7 @@ export default {
   },
   data() {
     return {
-      chart: null,
-      target: ''
+      chart: null
     }
   },
   watch: {
@@ -56,7 +55,7 @@ export default {
     initChart() {
       if (this.chartData === null || this.chartData === undefined) return
       this.chart = this.$echarts.init(this.$el, 'macarons')
-      var datas = this.chartData
+      // var datas = this.chartData
       this.chart.setOption(
         {
           tooltip: {
@@ -111,15 +110,15 @@ export default {
                   padding: [0, 10, 0, 10]
                 }
               }
-            },
-            formatter: function(name) {
-              for (var i = 0, l = datas.series.length; i < l; i++) {
-                if (datas.series[i].name === name) {
-                  this.target = datas.series[i].value
-                }
-              }
-              return `{a| ${name}}`
             }
+            // formatter: function(name) {
+            //   for (var i = 0, l = datas.series.length; i < l; i++) {
+            //     if (datas.series[i].name === name) {
+            //       target = datas.series[i].value
+            //     }
+            //   }
+            //   return `{a| ${name}}`
+            // }
           },
           title: {
             show: this.chartData.title.isShow,

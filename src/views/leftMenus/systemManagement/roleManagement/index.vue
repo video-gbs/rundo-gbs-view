@@ -287,7 +287,7 @@ export default {
     checkMenu(list) {
       list.forEach((item) => {
         if (item.permissionType === 1) {
-          item.ifPublic = this.checkList.indexOf(String(item.id)) != -1
+          item.ifPublic = this.checkList.indexOf(String(item.id)) !== -1
         } else {
           item.children && this.checkMenu(item.children)
         }
@@ -385,6 +385,9 @@ export default {
 <style lang="scss" scoped>
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid #eaeaea;
+}
+::v-deep .el-dialog__footer {
+  border-top: 1px solid #eaeaea;
 }
 .el-input {
   width: 100%;
