@@ -1,17 +1,15 @@
 <template>
   <div class="politicalDetail_container">
     <div class="act-btn f ai-c">
-      <el-button v-for="i in actBtn" v-if="i.show" :key="i.id" type="primary" style="margin:0px 1px" size="mini" @click="btnFn(i)">
+      <el-button v-for="i in actBtn" :key="i.id" :type="i.type||'primary'" style="margin:0px 1px" size="mini" @click="btnFn(i)">
         {{ i.label }}
       </el-button>
-      <el-button v-for="i in actBtn2" v-if="i.show" :key="i.id" :type="i.id===11?'danger':''" style="margin:0px 1px" size="mini" @click="btnFn(i)">
-        {{ i.label }}
-      </el-button>
+
     </div>
     <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
       <template>
         <el-tab-pane
-          v-for="(item, index) in tabpaneList"
+          v-for="(item) in tabpaneList"
           :key="item.name"
           :label="item.label"
           :name="item.label"
@@ -43,8 +41,8 @@
       <template slot="main">
         <el-form label-width="80px" :model="moreForm">
           <el-form-item label="审核结果">
-            <el-radio v-model="moreForm.result" :label="0">审核通过</el-radio>
-            <el-radio v-model="moreForm.result" :label="2">审核不通过</el-radio>
+            <el-radio v-model="moreForm.result" :label="1">审核通过</el-radio>
+            <el-radio v-model="moreForm.result" :label="0">审核不通过</el-radio>
           </el-form-item>
           <el-form-item label="审核说明">
             <el-input v-model="moreForm.content" />
@@ -183,6 +181,8 @@ import { affairsInfoSearch } from '@/api/method/politicalList'
 import { examineAffairs, acceptAffairs } from '@/api/method/affairscheck'
 import { unitList } from '@/api/method/unitManagement'
 import { transfer } from '@/api/method/transfer'
+import { Local } from '@/utils/storage'
+
 export default {
   components: {
     BasicInformation,
@@ -199,41 +199,50 @@ export default {
         {
           label: '基本信息',
           content: BasicInformation,
-          isShow: true
+          isShow: true,
+          author: 'all'
+
         },
         {
           label: '问政回复',
           content: PoliticalReply,
-          isShow: false
+          isShow: false,
+          author: 'all'
         },
         {
           label: '评价结果',
           content: ReviewResults,
-          isShow: false
+          isShow: false,
+          author: 'all'
         },
         {
           label: '问政记录',
           content: PoliticalRecord,
-          isShow: false
+          isShow: false,
+          author: 'admin'
         }
       ],
+      admin: [0, 1],
+      spokeman: [2, 3, 4],
+      all: [0, 1, 2, 3, 4],
       actBtn: [
-        { id: 1, label: '问政审核', dialog: 'examineRef', show: true },
-        { id: 2, label: '审核补充说明', dialog: 'moreRef', show: true },
-        { id: 3, label: '受理部门', dialog: 'deptRef', show: true },
-        { id: 4, label: '受理问政', dialog: 'acceptRef', show: true },
-        { id: 5, label: '回复问政', dialog: 'replyRef', show: true },
-        { id: 6, label: '问政转移', dialog: 'transferRef', show: true },
-        { id: 7, label: '邀请回复', dialog: 'inviteRef', show: true },
-        { id: 8, label: '审核回复', dialog: 'replyCheckRef', show: true },
-        { id: 9, label: '设为可见', dialog: 'isShowRef', show: true },
-        { id: 10, label: '开启评论', dialog: 'openCommentRef', show: true }
+        { id: 1, label: '问政审核', dialog: 'examineRef', show: true, author: 'admin' },
+        { id: 2, label: '审核补充说明', dialog: 'moreRef', show: true, author: 'admin' },
+        { id: 3, label: '受理部门', dialog: 'deptRef', show: true, author: 'admin' },
+        { id: 4, label: '受理问政', dialog: 'acceptRef', show: true, author: 'all' },
+        { id: 5, label: '回复问政', dialog: 'replyRef', show: true, author: 'all' },
+        { id: 6, label: '问政转移', dialog: 'transferRef', show: true, author: 'admin' },
+        { id: 7, label: '邀请回复', dialog: 'inviteRef', show: true, author: 'admin' },
+        { id: 8, label: '审核回复', dialog: 'replyCheckRef', show: true, author: 'admin' },
+        { id: 9, label: '设为可见', dialog: 'isShowRef', show: true, author: 'admin' },
+        { id: 10, label: '开启评论', dialog: 'openCommentRef', show: true, author: 'admin' },
+        { id: 11, label: '申请问政转移', dialog: 'applyTransferRef', show: true, author: 'spokeman' },
+        { id: 12, label: '申请邀请回复', dialog: 'applyInviteRef', show: true, author: 'spokeman' },
+        { id: 99, label: '删除', show: true, author: 'admin', type: 'danger' },
+        { id: 100, label: '返回', show: true, author: 'all', type: 'normal' }
       ],
       one: {},
-      actBtn2: [
-        { id: 11, label: '删除', show: true },
-        { id: 12, label: '返回', show: true }
-      ],
+
       examineForm: {
         result: 0,
         affairsId: '',
@@ -294,12 +303,21 @@ export default {
         result: 0,
         affairsId: '',
         content: ''
-      }
+      },
+      userType: ''
 
     }
   },
   watch: {},
   created() {
+    this.userType = Local.get('rj_wzwz_deptType')
+    this.userType !== null && (this.userType = this.userType * 1)
+    this.actBtn = this.actBtn.filter(i => {
+      return this[i.author].indexOf(this.userType) > -1
+    })
+    this.tabpaneList = this.tabpaneList.filter(i => {
+      return this[i.author].indexOf(this.userType) > -1
+    })
     if (this.$route.params.id) {
       this.getOne(this.$route.params.id)
       // 设置问政id
@@ -313,7 +331,11 @@ export default {
     this.getDept()
   },
   mounted() {
-
+    setTimeout(() => {
+      this.userType = Local.get('rj_wzwz_deptType')
+      this.userType !== null && (this.userType = this.userType * 1)
+      // console.log('actBtn', this.$_config.admin.indexOf(3))
+    }, 0)
   },
   methods: {
     getACC() {
