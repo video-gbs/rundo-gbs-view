@@ -5,8 +5,8 @@ import store from '@/store'
 import { Local } from '@/utils/storage'
 
 const requestTimeOut = 20 * 100000
-let isShowLogin = false
-
+const isShowLogin = false
+const noToken = ['/politics/sys/login', '/politics/v1/file/batchUploadImg']
 // create an axios instance
 
 // axios.defaults.transformResponse = jb
@@ -22,7 +22,7 @@ service.interceptors.request.use(
     config.headers = { ...config.headers, ...{}}// 不知为何 这里的headers是undefined,所以需要设置成{}
     const token = Local.getToken()
     // config.headers.Authorization= token;
-    if (config.url.indexOf('/politics/v1/file/batchUploadImg') !== -1) {
+    if (noToken.indexOf(config.url) !== -1) {
       // 图片上传不传token
       delete config.headers.Authorization
       return config
@@ -91,6 +91,5 @@ service.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-
 
 export default service

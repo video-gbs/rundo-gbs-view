@@ -9,9 +9,11 @@
           <template slot="header">
             <div class="f ai-c jc-sb">
               <div>单位列表</div>
-              <el-button size="mini" type="primary" @click="dialogShow(1)"
-                >新增</el-button
-              >
+              <el-button
+                size="mini"
+                type="primary"
+                @click="dialogShow(1)"
+              >新增</el-button>
             </div>
           </template>
           <el-table-column label="序号" type="index" width="60" />
@@ -19,12 +21,14 @@
           <el-table-column prop="accountNum" label="账号数量" />
           <el-table-column width="100" label="操作" fixed="right">
             <template slot-scope="scope">
-              <el-button type="text" @click="dialogShow(0, scope.row)"
-                >编辑</el-button
-              >
-              <el-button type="text" @click="deleteUnit(scope.row)"
-                ><span class="delete-button">删除</span></el-button
-              >
+              <el-button
+                type="text"
+                @click="dialogShow(0, scope.row)"
+              >编辑</el-button>
+              <el-button
+                type="text"
+                @click="deleteUnit(scope.row)"
+              ><span class="delete-button">删除</span></el-button>
             </template>
           </el-table-column>
         </el-table-column>
@@ -43,13 +47,13 @@
     >
       <div>
         <el-form
+          ref="unitForm"
           class="params-form"
           size="mini"
           label-position="left"
           label-width="80px"
           :model="dialog.params"
           :rules="rules"
-          ref="unitForm"
           @keyup.enter="submit('unitForm')"
         >
           <el-form-item label="单位名称" prop="name">
@@ -73,12 +77,11 @@
           </el-form-item>
           <el-form-item label="单位描述" prop="detail">
             <el-input
+              v-model="dialog.params.detail"
               type="textarea"
               :rows="2"
               placeholder="最多可输入4000个字符"
-              v-model="dialog.params.detail"
-            >
-            </el-input>
+            />
           </el-form-item>
         </el-form>
       </div>
@@ -91,96 +94,97 @@
 </template>
 
 <script>
-import pagination from "@/components/Pagination/index.vue";
+import pagination from '@/components/Pagination/index.vue'
 import {
   unitAdd,
   unitEdit,
   unitList,
-  unitDelete,
-} from "@/api/method/unitManagement";
-import { Local } from "@/utils/storage";
+  unitDelete
+} from '@/api/method/unitManagement'
+import { Local } from '@/utils/storage'
 
 export default {
-  name: "",
+  name: '',
   components: { pagination },
   data() {
     return {
       search: {
-        userName: "",
-        phone: "",
-        time: "",
+        userName: '',
+        phone: '',
+        time: ''
       },
       params: {
         pageNum: 1,
         pageSize: 10,
         total: 0,
-        proCount: 0,
+        proCount: 0
       },
       tableData: [],
       dialog: {
         show: false,
-        title: "新增用户",
+        title: '新增用户',
         params: {
-          name: "",
+          name: '',
           deptType: '',
-          detail: "",
-        },
+          detail: ''
+        }
       },
       types: [
-        { id: 2, label: "市直" },
-        { id: 3, label: "县直" },
-        { id: 4, label: "其他" },
+        { id: 1, label: '市领导' },
+        { id: 2, label: '市级单位' },
+        { id: 3, label: '县市级' },
+        { id: 4, label: '其他' }
       ],
       state: [
-        { id: 1, label: "启用" },
-        { id: 0, label: "禁用" },
+        { id: 1, label: '启用' },
+        { id: 0, label: '禁用' }
       ],
       passwordLevel: 0,
-      editId: "",
+      editId: '',
       headers: {
-        Authorization: Local.getToken(),
+        Authorization: Local.getToken()
       },
       rules: {
         name: [
-          { required: true, message: "不能为空", trigger: "blur" },
+          { required: true, message: '不能为空', trigger: 'blur' },
           {
             max: 40,
-            message: "40个字符",
-            trigger: "blur",
-          },
+            message: '40个字符',
+            trigger: 'blur'
+          }
         ],
         deptType: {
           required: true,
-          message: "不能为空",
-          trigger: "change",
+          message: '不能为空',
+          trigger: 'change'
         },
         detail: {
           required: true,
-          message: "不能为空",
-          trigger: "blur",
-          max: 40,
-        },
-      },
-    };
+          message: '不能为空',
+          trigger: 'blur',
+          max: 40
+        }
+      }
+    }
   },
   mounted() {
-    this.getUnitList();
+    this.getUnitList()
   },
   methods: {
     sizeChange(v) {},
     currentChange(v) {},
     goPage(path, query) {
-      this.$router.push(path);
+      this.$router.push(path)
     },
     dialogShow(act, data) {
-      this.dialog.title = act ? "新增单位" : "编辑单位";
-      this.dialog.show = !this.dialog.show;
+      this.dialog.title = act ? '新增单位' : '编辑单位'
+      this.dialog.show = !this.dialog.show
       if (act === 0) {
-        const { name, deptType, detail } = data;
-        this.dialog.params.name = name;
-        this.dialog.params.deptType = deptType;
-        this.dialog.params.detail = detail;
-        this.editId = data.id;
+        const { name, deptType, detail } = data
+        this.dialog.params.name = name
+        this.dialog.params.deptType = deptType
+        this.dialog.params.detail = detail
+        this.editId = data.id
       }
     },
 
@@ -189,84 +193,87 @@ export default {
         {
           ...this.params,
           current: this.params.pageNum,
-          size: this.params.pageSize,
+          size: this.params.pageSize
         }
-        
+
       ).then((res) => {
         if (res.code === 10000) {
-          this.tableData = res.data.records;
-          this.params.total = res.data.total;
-          this.params.pages = res.data.pages;
-          this.params.current = res.data.current;
+          this.tableData = res.data.records
+          this.params.total = res.data.total
+          this.params.pages = res.data.pages
+          this.params.current = res.data.current
         }
-      });
+      })
     },
     deleteUnit(row) {
-      this.$confirm("删除后数据无法恢复，是否确认删除？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       }).then(() => {
         unitDelete(row.id).then((res) => {
           if (res.code === 10000) {
             this.$message({
-              type: "success",
-              message: "删除成功",
-            });
-            this.params.pageNum=1;
-            this.getUnitList();
+              type: 'success',
+              message: '删除成功'
+            })
+            this.params.pageNum = 1
+            this.getUnitList()
           }
-        });
-      });
+        })
+      })
     },
 
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
-            case "新增单位":
+            case '新增单位':
               unitAdd(this.dialog.params).then((res) => {
                 if (res.code === 10000) {
                   this.$message({
-                    type: "success",
-                    message: "单位新增成功",
-                  });
-                  this.dialog.show = false;
-                  this.getUnitList();
+                    type: 'success',
+                    message: '单位新增成功'
+                  })
+                  this.dialog.show = false
+                  this.getUnitList()
                 }
-              });
-              break;
-            case "编辑单位":
+              })
+              break
+            case '编辑单位':
               unitEdit(
                 { id: this.editId, ...this.dialog.params }
               ).then((res) => {
                 if (res.code === 10000) {
                   this.$message({
-                    type: "success",
-                    message: "单位修改成功",
-                  });
-                  this.dialog.show = false;
-                  this.getUnitList();
+                    type: 'success',
+                    message: '单位修改成功'
+                  })
+                  this.dialog.show = false
+                  this.getUnitList()
                 }
-              });
-              break;
+              })
+              break
 
             default:
-              break;
+              break
           }
         }
-      });
+      })
     },
     handleClose(done) {
-      done();
-    },
-  },
-};
+      done()
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid #eaeaea;
+}
+::v-deep .el-dialog__footer {
+  border-top: 1px solid #eaeaea;
 }
 .params-form {
   .el-input,

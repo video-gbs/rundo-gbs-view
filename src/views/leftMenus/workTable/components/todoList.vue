@@ -10,9 +10,9 @@
         <ul class="todo-ul-scoll">
           <li v-for="(item, index) in noticeList" :key="index">
             <LineFont
-              :lineTitle="item.name"
-              :textStyle="textStyle"
-              :lineBlueStyle="index < 3 ? lineBlueStyle : lineBlueStyle1"
+              :line-title="item.name"
+              :text-style="textStyle"
+              :line-blue-style="index < 3 ? lineBlueStyle : lineBlueStyle1"
             />
             <div class="type" :data-index="index">{{ item.num }}</div>
             <div class="go-router">
@@ -27,9 +27,9 @@
         <ul class="todo-ul-scoll">
           <li v-for="(item1, index) in noticeList1" :key="index">
             <LineFont
-              :lineTitle="item1.name"
-              :textStyle="textStyle"
-              :lineBlueStyle="lineBlueStyle"
+              :line-title="item1.name"
+              :text-style="textStyle"
+              :line-blue-style="lineBlueStyle"
             />
             <div class="type" :data-index="index">{{ item1.num }}</div>
             <div class="go-router">
@@ -43,100 +43,100 @@
 </template>
 
 <script>
-import LineFont from "@/components/LineFont";
+import LineFont from '@/components/LineFont'
 export default {
-  name: "",
+  name: '',
   components: {
-    LineFont,
+    LineFont
   },
   props: {
     homeLists: {
       type: Object,
       default: () => {
-        return {};
-      },
-    },
+        return {}
+      }
+    }
   },
   data() {
     return {
       textStyle: {
-        fontSize: "14px",
-        fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
-        fontWeight: "bold",
-        color: "#333333",
+        fontSize: '14px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#333333'
       },
       textStyle1: {
-        fontSize: "16px",
-        fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
-        fontWeight: "bold",
-        color: "#1E56A0",
+        fontSize: '16px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#1E56A0'
       },
       lineBlueStyle: {
-        background: "rgba(30, 86, 160, 1)",
-        width: "2px",
-        height: "19px",
+        background: 'rgba(30, 86, 160, 1)',
+        width: '2px',
+        height: '19px'
       },
       lineBlueStyle1: {
-        background: "#A0791E",
-        width: "2px",
-        height: "19px",
+        background: '#A0791E',
+        width: '2px',
+        height: '19px'
       },
       lineBlueStyleNone: {
-        background: "rgba(30, 86, 160, 1)",
-        width: "0px",
-        height: "19px",
+        background: 'rgba(30, 86, 160, 1)',
+        width: '0px',
+        height: '19px'
       },
 
       lineTitle: {
-        title: "问政待办",
-        notShowSmallTitle: false,
+        title: '问政待办',
+        notShowSmallTitle: false
       },
       lineTitle1: {
-        title: "综合处理",
-        notShowSmallTitle: false,
+        title: '综合处理',
+        notShowSmallTitle: false
       },
       noticeList: [
         {
-          name: { title: "待审核问政", notShowSmallTitle: false },
-          num: this.homeLists.auditNum,
+          name: { title: '待审核问政', notShowSmallTitle: false },
+          num: this.homeLists.auditNum
         },
         {
-          name: { title: "待受理问政", notShowSmallTitle: false },
-          num: this.homeLists.acceptNum,
+          name: { title: '待受理问政', notShowSmallTitle: false },
+          num: this.homeLists.acceptNum
         },
         {
-          name: { title: "待回复问政", notShowSmallTitle: false },
-          num: this.homeLists.replyNum,
+          name: { title: '待回复问政', notShowSmallTitle: false },
+          num: this.homeLists.replyNum
         },
         {
-          name: { title: "逾期未审核", notShowSmallTitle: false },
-          num: this.homeLists.overdueAuditNum,
+          name: { title: '逾期未审核', notShowSmallTitle: false },
+          num: this.homeLists.overdueAuditNum
         },
         {
-          name: { title: "逾期未受理", notShowSmallTitle: false },
-          num: this.homeLists.overdueAcceptNum,
+          name: { title: '逾期未受理', notShowSmallTitle: false },
+          num: this.homeLists.overdueAcceptNum
         },
         {
-          name: { title: "逾期未回复", notShowSmallTitle: false },
-          num: this.homeLists.overdueReplyNum,
-        },
+          name: { title: '逾期未回复', notShowSmallTitle: false },
+          num: this.homeLists.overdueReplyNum
+        }
       ],
       noticeList1: [
         {
-          name: { title: "转移审核", notShowSmallTitle: false },
-          num: this.homeLists.moveAuditNum,
+          name: { title: '转移审核', notShowSmallTitle: false },
+          num: this.homeLists.moveAuditNum
         },
         {
-          name: { title: "邀请审核", notShowSmallTitle: false },
-          num: this.homeLists.inviteAuditNum,
-        },
-      ],
-    };
+          name: { title: '邀请审核', notShowSmallTitle: false },
+          num: this.homeLists.inviteAuditNum
+        }
+      ]
+    }
   },
   watch: {},
   mounted() {},
-  methods: {},
-};
+  methods: {}
+}
 </script>
 
 <style lang="scss" scoped>
