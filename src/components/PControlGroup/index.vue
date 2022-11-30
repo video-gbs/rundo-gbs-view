@@ -4,12 +4,12 @@
     <template v-if="controlGroupData.layout == 'horizontal'">
       <el-row>
         <!-- controls -->
-        <el-col :span="controlGroupData.layoutConfig.contentSpan">
+        <el-col :span="layoutConfig.contentSpan">
           <el-form :model="ruleForm" :rules="rules" :inline="true" :ref="formRef">
             <el-row>
               <template v-for="item in controlGroupData.controls">
                 <el-col :span="item.span || 8" v-if="!item.hideControl">
-                  <el-form-item :label="item.label + '：'" :prop="item.key">
+                  <el-form-item :label="item.label + colonStr" :prop="item.key">
                     <template v-if="item.type === 'input'">
                       <el-input
                         v-model="ruleForm[item.key]"
@@ -69,6 +69,21 @@
                         end-placeholder="结束日期"
                       ></el-date-picker>
                     </template>
+                    <template v-if="item.type === 'radio'">
+                      <el-radio-group v-model="ruleForm[item.key]">
+                        <el-radio v-for="o in item.options" :label="o.value">{{o.label}}</el-radio>
+                      </el-radio-group>
+                    </template>
+                    <template v-if="item.type === 'textarea'">
+                      <el-input
+                        type="textarea"
+                        :autosize="item.autosize || { minRows: 2, maxRows: 4}"
+                        :placeholder="item.placeholder || '请输入'"
+                        :maxlength="item.maxlength || 120"
+                        v-model="ruleForm[item.key]"
+                        show-word-limit>
+                      </el-input>
+                    </template>
                   </el-form-item>
                 </el-col>
               </template>
@@ -76,8 +91,8 @@
           </el-form>
         </el-col>
         <!-- buttons -->
-        <el-col :span="controlGroupData.layoutConfig.buttonSpan">
-          <div :style="{ textAlign: controlGroupData.layoutConfig.buttonAlign }">
+        <el-col :span="layoutConfig.buttonSpan">
+          <div :style="{ textAlign: layoutConfig.buttonAlign }">
             <el-button
               v-for="item in controlGroupData.bottons"
               :icon="item.icon"
@@ -96,7 +111,7 @@
       <div class="vertical-form-control">
         <el-form :model="ruleForm" :rules="rules" :ref="formRef">
           <template v-for="item in controlGroupData.controls">
-            <el-form-item :label="item.label + '：'" :prop="item.key" v-if="!item.hideControl">
+            <el-form-item :label="item.label + colonStr" :prop="item.key" v-if="!item.hideControl">
               <template v-if="item.type === 'input'">
                 <el-input
                   v-model="ruleForm[item.key]"
@@ -154,12 +169,27 @@
                   :placeholder="item.placeholder || '请选择'"
                 ></el-date-picker>
               </template>
+              <template v-if="item.type === 'radio'">
+                <el-radio-group v-model="ruleForm[item.key]">
+                  <el-radio v-for="o in item.options" :label="o.value">{{o.label}}</el-radio>
+                </el-radio-group>
+              </template>
+              <template v-if="item.type === 'textarea'">
+                <el-input
+                  type="textarea"
+                  :autosize="item.autosize || { minRows: 2, maxRows: 4}"
+                  :placeholder="item.placeholder || '请输入'"
+                  :maxlength="item.maxlength || 120"
+                  v-model="ruleForm[item.key]"
+                  show-word-limit>
+                </el-input>
+              </template>
             </el-form-item>
           </template>
         </el-form>
         <div
           class="vertical-form-button"
-          :style="{ textAlign: controlGroupData.layoutConfig.buttonAlign }"
+          :style="{ textAlign: layoutConfig.buttonAlign }"
         >
           <el-button
             v-for="item in controlGroupData.bottons"
@@ -185,6 +215,7 @@ export default {
       ruleForm: {},
       rules: {},
       formRef: 'controlsForm' + Math.uuid(),
+      layoutConfig: {},
     };
   },
   props: {
@@ -195,6 +226,10 @@ export default {
   },
   created() {
     this.resetControl();
+    if(this.data.layoutConfig) {
+      Object.assign(this.layoutConfig, this.data.layoutConfig);
+    }
+
     Object.assign(this.controlGroupData, this.data);
     this.initControl();
 
@@ -204,6 +239,12 @@ export default {
   },
   mounted() {
     this.extendControl();
+  },
+  computed: {
+    colonStr() {
+      const flag = this.layoutConfig && !this.layoutConfig.showColon;
+      return flag ? '' : '：';
+    }
   },
   methods: {
     initControl() {
@@ -304,11 +345,13 @@ export default {
                 },
               ],
         layout: 'horizontal', // 布局模式 'vertical' | 'horizontal'
-        layoutConfig: {
-          contentSpan: 18,
-          buttonSpan: 6,
-          buttonAlign: this.data.layout === 'vertical' ? 'right' : 'center',
-        },
+      };
+
+      this.layoutConfig = {
+        contentSpan: 18,
+        buttonSpan: 6,
+        buttonAlign: this.data.layout === 'vertical' ? 'right' : 'center',
+        showColon: true,
       };
     },
     resetForm() {
