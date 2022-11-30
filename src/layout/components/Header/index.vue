@@ -122,6 +122,8 @@ export default {
         })
         .catch(() => {}).finally(() => {
           Local.setToken('')
+          Local.remove('rj_wzwz_token')
+          Local.remove('rj_wzwz_deptType')
           this.$router.push({ path: '/login' })
         })
     },

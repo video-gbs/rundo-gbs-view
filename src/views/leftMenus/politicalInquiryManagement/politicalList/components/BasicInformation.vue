@@ -72,7 +72,7 @@
               </el-form-item></el-col>
             <el-col :span="12">
               <el-form-item label="提交时间：">
-                <span class="span-text">{{ oen.updateTime||'-' }}</span>
+                <span class="span-text">{{ one.updateTime||'-' }}</span>
               </el-form-item></el-col>
             <el-col :span="12">
               <el-form-item label="联系方式：">
@@ -87,7 +87,7 @@
 
 <script>
 import LineFont from '@/components/LineFont'
-import { getAffairsMoreByOne } from ' @/api/method/affairsMore'
+import { getAffairsMoreByOne } from '@/api/method/affairsMore'
 export default {
   name: '',
   components: {
@@ -97,7 +97,7 @@ export default {
     one: {
       type: Object,
       default: () => {
-        return {}
+
       }
     }
   },
@@ -136,10 +136,11 @@ export default {
   watch: {
     one: {
       handler: function(n) {
-        console.log(n)
+        console.log('nnmnmnmnm', n)
         this.oneData = n
       },
-      immediate: true
+      immediate: true,
+      deep: true
     }
   },
   created() {
@@ -147,7 +148,9 @@ export default {
       this.getMore(this.$route.params.id)
     }
   },
-  mounted() {},
+  mounted() {
+    setTimeout(() => { console.log('this.one', this.one) }, 0)
+  },
   methods: {
     getOne() {
       // 获取单挑问政基本信息

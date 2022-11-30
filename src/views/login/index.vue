@@ -131,7 +131,10 @@ export default {
             .then((res) => {
               if (res.code === 10000) {
                 const access_token = res.data.token
+                const deptType = res.data.deptType
                 Local.setToken(access_token)
+                Local.set('rj_wzwz_token', access_token)
+                Local.set('rj_wzwz_deptType', deptType)
                 this.$router.push({ path: '/workTable' })
                 this.loading = false
               }
