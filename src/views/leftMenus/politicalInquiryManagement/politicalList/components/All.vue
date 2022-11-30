@@ -227,6 +227,7 @@ export default {
           width: '80'
         }
       ],
+      leftTitle: '',
       maxHeight: 800,
       tableData: [],
       // 分页器内容
@@ -564,7 +565,11 @@ export default {
     handleCurrentChange(val) {
       this.pagesData.pageNum = val
       this.getDataList()
-    }
+    },
+    selection() {},
+    haederBtnClick() {},
+    changeTableHeader() {},
+    handleSelectionChange() {}
   }
 }
 </script>

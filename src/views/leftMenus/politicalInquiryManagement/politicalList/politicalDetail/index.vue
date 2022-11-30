@@ -1,7 +1,10 @@
 <template>
   <div class="politicalDetail_container">
     <div class="act-btn f ai-c">
-      <el-button v-for="i in actBtn" :key="i.id" size="mini" @click="comDialog(i.dialog)">
+      <el-button v-for="i in actBtn" v-if="i.show" :key="i.id" type="primary" style="margin:0px 1px" size="mini" @click="btnFn(i)">
+        {{ i.label }}
+      </el-button>
+      <el-button v-for="i in actBtn2" v-if="i.show" :key="i.id" :type="i.id===11?'danger':''" style="margin:0px 1px" size="mini" @click="btnFn(i)">
         {{ i.label }}
       </el-button>
     </div>
@@ -134,7 +137,7 @@
       <template slot="main">
         <el-form label-width="80px" :model="transferForm">
           <el-form-item label="邀请单位">
-            <el-select v-model="inviteForm.deptId" placeholder="请选择">
+            <el-select v-model="inviteForm.deptId" collapse-tags multiple placeholder="请选择" @change="inviteSelect">
               <el-option
                 v-for="i in deptList"
                 :key="i.id"
@@ -143,8 +146,35 @@
               />
             </el-select>
           </el-form-item>
+          <el-form-item label="已选部门">
+            <el-tag
+              v-for="i in inviteList"
+              :key="i.name+'tag'"
+              class="mr5"
+              closable
+              @close="inviteCloseTag(i)"
+            >
+              {{ i.name }}
+            </el-tag>
+          </el-form-item>
           <el-form-item label="审核说明">
             <el-input v-model="inviteForm.content" />
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
+    <!--审核回复-->
+    <PDialog ref="replyCheckRef" @submit="replyCheckFn">
+      <template slot="title">审核回复</template>
+      <template slot="main">
+        <el-form label-width="80px" :model="replyCheckForm">
+          <el-form-item label="审核结果">
+            <el-radio v-model="replyCheckForm.result" :label="0">审核通过</el-radio>
+            <el-radio v-model="replyCheckForm.result" :label="2">审核不通过</el-radio>
+          </el-form-item>
+          <el-form-item label="审核说明">
+            <PEditorVue ref="replyCheckEditorRef" :value="replyCheckContent" @input="replyCheckChange" />
+
           </el-form-item>
         </el-form>
       </template>
@@ -198,21 +228,22 @@ export default {
         }
       ],
       actBtn: [
-        { id: 1, label: '问政审核', dialog: 'examineRef' },
-        { id: 2, label: '审核补充说明', dialog: 'moreRef' },
-        { id: 3, label: '受理部门', dialog: 'deptRef' },
-        { id: 4, label: '受理问政', dialog: 'acceptRef' },
-        { id: 5, label: '回复问政', dialog: 'replyRef' },
-        { id: 6, label: '问政转移', dialog: 'transferRef' },
-        { id: 7, label: '邀请回复', dialog: 'inviteRef' },
-        { id: 8, label: '审核回复', dialog: 'replyCheckRef' },
-        { id: 9, label: '设为可见', dialog: 'isShowRef' },
-        { id: 10, label: '开启评论', dialog: 'openCommentRef' },
-        { id: 11, label: '删除' },
-        { id: 12, label: '返回' }
-
+        { id: 1, label: '问政审核', dialog: 'examineRef', show: true },
+        { id: 2, label: '审核补充说明', dialog: 'moreRef', show: true },
+        { id: 3, label: '受理部门', dialog: 'deptRef', show: true },
+        { id: 4, label: '受理问政', dialog: 'acceptRef', show: true },
+        { id: 5, label: '回复问政', dialog: 'replyRef', show: true },
+        { id: 6, label: '问政转移', dialog: 'transferRef', show: true },
+        { id: 7, label: '邀请回复', dialog: 'inviteRef', show: true },
+        { id: 8, label: '审核回复', dialog: 'replyCheckRef', show: true },
+        { id: 9, label: '设为可见', dialog: 'isShowRef', show: true },
+        { id: 10, label: '开启评论', dialog: 'openCommentRef', show: true }
       ],
       one: {},
+      actBtn2: [
+        { id: 11, label: '删除', show: true },
+        { id: 12, label: '返回', show: true }
+      ],
       examineForm: {
         result: 0,
         affairsId: '',
@@ -249,7 +280,8 @@ export default {
       replyForm: {
         'affairsId': '',
         'deptId': ''
-      }, transferForm: {
+      },
+      transferForm: {
         'affairsId': '',
         'content': '',
         // 'createBy': '',
@@ -261,6 +293,18 @@ export default {
         // 'updateBy': '',
         // 'updateTime': '',
         // 'userId': ''
+      },
+      inviteList: [],
+      inviteForm: {
+        'affairsId': '',
+        'content': '',
+        'deptId': []
+      },
+      replyCheckContent: '',
+      replyCheckForm: {
+        result: 0,
+        affairsId: '',
+        content: ''
       }
 
     }
@@ -317,9 +361,16 @@ export default {
         }
       })
     },
-
+    btnFn(i) {
+      i.dialog && this.comDialog(i.dialog)
+      i.id === 12 && this.$router.go(-1)
+    },
     comDialog(v) {
-      this.$refs[v].visible = true
+      console.log('vvsafsafsaf', v)
+
+      this.$refs[v] && (this.$refs[v].visible = true)
+      v === 'replyRef' && (this.replyContent = '')
+      v === 'replyCheckRef' && (this.replyCheckContent = '')
     },
 
     examineFn() {
@@ -348,12 +399,36 @@ export default {
       // 回复问政的编辑器内容同步
       this.replyForm.content = v
     },
+    replyCheckChange(v) {
+      // 回复问政审核的编辑器内容同步
+      this.replyCheckForm.content = v
+    },
     replyFn() {
       // 回复问政
     },
     transferFn() {
       transfer(this.transferForm).then(res => {
       })
+    },
+    inviteSelect(v) {
+      this.inviteList = this.deptList.filter(i => {
+        return this.inviteForm.deptId.indexOf(i.id) !== -1
+      })
+    },
+    inviteCloseTag(v) {
+      console.log('vvvvss', v)
+      this.inviteList = this.inviteList.filter(i => {
+        return i.id !== v.id
+      })
+      this.inviteForm.deptId = this.inviteForm.deptId.filter(i => {
+        return i !== v.id
+      })
+    },
+    replyCheckFn() {
+      // 审核回复
+    },
+    inviteFn() {
+      // 邀请回复
     }
   }
 }
@@ -396,8 +471,8 @@ export default {
 }
 .act-btn{
   position: absolute;
-  top: 0px;
-  right: 0px;
-  z-index: 9999;
+  top: 6px;
+  right: 5px;
+  z-index: 1999;
 }
 </style>
