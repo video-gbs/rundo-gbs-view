@@ -89,7 +89,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="submitFn('roleForm')">确 定</el-button>
+        <el-button type="primary" @click="submit('roleForm')">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -142,7 +142,7 @@
                       <div class="item-title">{{ child.title }}</div>
                       <div class="tree-operation">
                         <template v-for="op in child.childs">
-                          <el-checkbox :key="op.id">{{ op.title }}</el-checkbox>
+                          <el-checkbox :key="op.id" v-model="op.hasAuthorize">{{ op.title }}</el-checkbox>
                         </template>
                       </div>
                     </div>
@@ -258,6 +258,23 @@ export default {
     permissionHandleClose(done) {
       done()
     },
+    buildTree(v) {
+      // v==get ,set
+      this.checkList = []
+      this.permissionTableData.forEach(i => {
+        if (i.childs && i.childs.length) {
+          v === 'get' && i.hasAuthorize && this.checkList.push(i.id)
+          i.childs.forEach(l => {
+            v === 'get' && l.hasAuthorize && this.checkList.push(l.id)
+            if (l.childs && l.childs.length) {
+              l.childs.forEach(m => {
+                v === 'get' && m.hasAuthorize && this.checkList.push(m.id)
+              })
+            }
+          })
+        }
+      })
+    },
     getPermissionTableData(id) {
       this.permissionDialog.show = !this.permissionDialog.show
       this.roleId = id
@@ -276,21 +293,23 @@ export default {
         }
       })
     },
+    getCkeckList() {},
     savePermission() {
       this.buttonLoading = true
-      this.checkList = []
-      this.getCkeckList(this.permsTree)
+      // this.checkList = []
+      this.buildTree('get')
       setAppAuth({
-        roleId,
+        roleId: this.roleId,
         permissionIds: this.checkList
       }).then((res) => {
         this.buttonLoading = false
-        if (res.data.data) {
+        if (res.code === 10000) {
           this.$message({
             message: '保存成功！',
             type: 'success'
           })
-          this.$router.go(-1)
+          this.permissionDialog.show = !this.permissionDialog.show
+          // this.$router.go(-1)
         }
       })
     },
@@ -325,7 +344,7 @@ export default {
         })
       })
     },
-    submitFn(formName) {
+    submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {

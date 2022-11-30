@@ -21,7 +21,7 @@
           <el-table-column prop="name" label="姓名" />
           <el-table-column prop="mobile" label="手机号" />
           <el-table-column prop="email" label="邮箱" />
-          <el-table-column prop="roleId" label="所属角色" />
+          <el-table-column prop="roleName" label="所属角色" />
           <el-table-column prop="status" label="帐号状态">
             <template slot-scope="scope">
               <span>{{
@@ -164,6 +164,16 @@
                     v-for="i in selectList"
                     :key="i.id"
                     :label="i.label"
+                    :value="i.id"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="所属部门" prop="deptId">
+                <el-select v-model="dialog.params.deptId" placeholder="请选择">
+                  <el-option
+                    v-for="i in deptList"
+                    :key="i.id"
+                    :label="i.name"
                     :value="i.id"
                   />
                 </el-select>
@@ -312,6 +322,9 @@ import {
   otherUnitRoleId,
   otherUnitDeptRoleList
 } from '@/api/method/otherUnitManagement'
+import { unitList } from '@/api/method/unitManagement'
+// import { getRolesList } from "@/api/method/role";
+
 import { Local } from '@/utils/storage'
 
 export default {
@@ -430,13 +443,10 @@ export default {
           nickName: '',
           name: '',
           email: '',
-          deptId: 1
+          deptId: ''
         }
       },
-      gender: [
-        { id: 1, label: '男' },
-        { id: 2, label: '女' }
-      ],
+      deptList: [],
       state: [
         { id: 1, label: '启用' },
         { id: 0, label: '禁用' }
@@ -451,6 +461,8 @@ export default {
   mounted() {
     this.checkPassworLevel()
     this.getOtherUnitList()
+    this.getList()
+    this.getDeptList()
   },
   methods: {
     /**
@@ -575,14 +587,15 @@ export default {
       if (act === 0) {
         // this.editShow = false;
         this.editShowChild = false
-        const { account, email, mobile, name, nickName, status, roleId } = data
+        const { account, email, mobile, name, nickName, status, roleId, deptId } = data
         this.dialog.params.account = account
         this.dialog.params.email = email
         this.dialog.params.mobile = mobile
         this.dialog.params.name = name
         this.dialog.params.nickName = nickName
         this.dialog.params.status = Number(status)
-        this.dialog.params.roleId = roleId
+        this.dialog.params.roleId = Number(roleId)
+        this.dialog.params.deptId = deptId
         this.editId = data.id
       } else {
         this.editShowChild = true
@@ -609,12 +622,20 @@ export default {
         })
       })
     },
+    getDeptList() {
+      // 获取部门
+      unitList({ current: 1, size: 399 }).then(res => {
+        if (res.code === 10000) {
+          this.deptList = res.data.records
+        }
+      })
+    },
     getOtherUnitList() {
       otherUnitList(
         {
-          ...this.params,
-          current: this.params.pageNum,
-          size: this.params.pageSize
+
+          current: 1,
+          size: 10
         }
       ).then(res => {
         if (res.code === 10000) {

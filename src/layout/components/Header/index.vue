@@ -48,11 +48,11 @@
   </div>
 </template>
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex'
 // import Message from "../Message/index.vue";
-import { Local } from "@/utils/storage";
+import { Local } from '@/utils/storage'
 // import NotTips from "@/components/NotTips";
-import { logout } from "@/api/method/user";
+import { logout } from '@/api/method/user'
 export default {
   components: {
     // Message,
@@ -65,10 +65,10 @@ export default {
       messageCount: 0,
       lastCount: 0,
       show: false
-    };
+    }
   },
   computed: {
-    ...mapGetters(["user", "systemTitle"]),
+    ...mapGetters(['user', 'systemTitle']),
     // avatar() {
     //   if (this.user.avatar) {
     //     return require(`@/assets/avatar/${this.user.avatar}`);
@@ -81,16 +81,16 @@ export default {
      */
     routes() {
       const routes = this.$router.options.routes.filter(route => {
-        return route.systemCode;
-      });
-      return routes;
+        return route.systemCode
+      })
+      return routes
     },
     systemName() {
-      return this.$store.state.settings.systemName;
+      return this.$store.state.settings.systemName
     },
     toGreet() {
-      const now = new Date().getHours();
-      return now < 12 ? "上午好" : now > 2 ? "下午好" : "中午好";
+      const now = new Date().getHours()
+      return now < 12 ? '上午好' : now > 2 ? '下午好' : '中午好'
     }
   },
   created() {
@@ -114,53 +114,56 @@ export default {
       // Local.
       logout({}, { Authorization: Local.getToken() })
         .then(res => {
-          console.log(res, 11111);
-          if (res.code === 10000) {
-            Local.setToken("");
-            this.$router.push({ path: "/login" });
-          }
+          // console.log(res, 11111)
+          // if (res.code === 10000) {
+          //   Local.setToken('')
+          //   this.$router.push({ path: '/login' })
+          // }
         })
-        .catch(() => {});
+        .catch(() => {}).finally(() => {
+          Local.setToken('')
+          this.$router.push({ path: '/login' })
+        })
     },
     setTheme() {
-      this.$utils.setTheme("theme-blue");
+      this.$utils.setTheme('theme-blue')
     },
     reconent() {
-      this.$socket.create();
+      this.$socket.create()
     },
     initNotice() {
       this.$api.message.list().then(res => {
         if (res.data.data) {
           this.messageData = {
             rows: res.data.data
-          };
-          let count = this.messageData.rows.length;
+          }
+          let count = this.messageData.rows.length
           this.messageData.rows.forEach(item => {
             if (item.isRead) {
-              count--;
+              count--
             }
-          });
-          this.messageCount = count;
+          })
+          this.messageCount = count
           if (count > 0) {
             if (count > this.lastCount) {
-              this.lastCount = count;
-              this.show = true;
+              this.lastCount = count
+              this.show = true
             }
           } else {
-            this.show = false;
+            this.show = false
           }
         }
-      });
+      })
     },
     toMessage() {
-      this.showDrawer = true;
-      this.show = false;
+      this.showDrawer = true
+      this.show = false
     },
     closeTips() {
-      this.show = false;
+      this.show = false
     }
   }
-};
+}
 </script>
 <style lang="scss">
 @import "~@/styles/element-variables.scss";

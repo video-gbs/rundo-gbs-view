@@ -3,11 +3,11 @@ import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { Local } from '@/utils/storage'
-
+import getPageTitle from '@/utils/get-page-title'
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 let asyncRouter
 const whiteList = ['/login'] // no redirect whitelist
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async(to, from, next) => {
   NProgress.start()
   const hasToken = Local.getToken()
   // if (whiteList.indexOf(to.path) !== -1 && !hasToken) {
@@ -15,8 +15,8 @@ router.beforeEach(async (to, from, next) => {
   //   next()
   // } else {
   // token存在-
-
-  if (to.path === "/login") {
+  document.title = getPageTitle(to.meta.title)
+  if (to.path === '/login') {
     next()
   } else if (to.path == '/404') {
     Message({
@@ -36,7 +36,6 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // }
-
 })
 
 // 如果跳往登录页，则转到首页
