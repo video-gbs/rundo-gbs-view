@@ -363,7 +363,7 @@ export default {
         email: {
           pattern: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9_\.\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
           required: true,
-          message: '不能为空',
+          message: '请输入正确的邮箱',
           trigger: 'blur'
         },
         roleId: {

@@ -136,6 +136,21 @@
           >
             <el-input v-model="dialog.params.rePassword" />
           </el-form-item>
+          <el-form-item label="昵称" prop="nickName">
+            <el-input
+              v-model="dialog.params.nickName"
+              placeholder="最多40个字符"
+            />
+          </el-form-item>
+          <el-form-item label="姓名" prop="name">
+            <el-input v-model="dialog.params.name" placeholder="最多20个字符" />
+          </el-form-item>
+          <el-form-item label="手机号" prop="mobile">
+            <el-input v-model="dialog.params.mobile" />
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="dialog.params.email" />
+          </el-form-item>
           <el-form-item label="所属角色" prop="roleId">
             <el-select v-model="dialog.params.roleId" placeholder="请选择">
               <el-option
@@ -159,21 +174,6 @@
           <el-form-item label="账号状态">
             <el-radio v-model="dialog.params.status" :label="1">启用</el-radio>
             <el-radio v-model="dialog.params.status" :label="0">禁用</el-radio>
-          </el-form-item>
-          <el-form-item label="昵称" prop="nickName">
-            <el-input
-              v-model="dialog.params.nickName"
-              placeholder="最多40个字符"
-            />
-          </el-form-item>
-          <el-form-item label="姓名" prop="name">
-            <el-input v-model="dialog.params.name" placeholder="最多20个字符" />
-          </el-form-item>
-          <el-form-item label="手机号" prop="mobile">
-            <el-input v-model="dialog.params.mobile" />
-          </el-form-item>
-          <el-form-item label="邮箱" prop="email">
-            <el-input v-model="dialog.params.email" />
           </el-form-item>
         </el-form>
       </div>
@@ -348,7 +348,7 @@ export default {
         email: {
           pattern: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9_\.\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
           required: true,
-          message: '不能为空',
+          message: '请输入正确的邮箱',
           trigger: 'blur'
         },
         roleId: {
@@ -518,7 +518,7 @@ export default {
         nickName: '',
         name: '',
         email: '',
-        deptId: 1
+        deptId: ''
       }
       this.editShow = true
       if (act === 0) {
