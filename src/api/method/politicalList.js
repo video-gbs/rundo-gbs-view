@@ -3,7 +3,7 @@ import request from '@/api/fetch'
 
 export function affairsInfoSearch(id) {
   // 通过主键查询单条数据
-  return request.delete(`/politics/backstage/affairsInfo/${id}`)
+  return request.get(`/politics/backstage/affairsInfo/${id}`)
 }
 
 export function affairsInfoList(params) {
