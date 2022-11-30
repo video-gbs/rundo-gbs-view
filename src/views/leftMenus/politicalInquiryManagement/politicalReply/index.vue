@@ -163,13 +163,13 @@ export default {
     queryData(data) {
       console.log(data);
     },
-    sizeChange(){
+    sizeChange() {
 
     },
-    currentChange(){
+    currentChange() {
 
     },
-    dialogShow(){
+    dialogShow() {
       this.auditPopData.controlData = {
         layout: 'vertical',
         controls: [
@@ -186,13 +186,16 @@ export default {
           },
           {
             label: "协助单位",
-            type: "select",
+            type: "transfer",
             key: "f2",
             isRequired: true,
-            value: "",
+            btnText: '选择单位',
+            value: [],
             options: [
-              { label: "梧州教育局", value: "1" },
-              { label: "钦州教育局", value: "2" },
+              { label: "梧州教育局", key: "1" },
+              { label: "钦州教育局", key: "2" },
+              { label: "南宁教育局", key: "3" },
+              { label: "百色教育局", key: "4" },
             ],
           },
           {
@@ -207,6 +210,16 @@ export default {
       };
 
       this.auditPopData.show = true;
+    },
+    async comfirmAudit() {
+      const isPass = await this.auditPopData.controlData.regCheck();
+      if(!isPass) {
+        return;
+      }
+
+      const data = this.auditPopData.controlData.getData();
+      console.log(data);
+      this.auditPopData.show = false;
     }
   },
 };

@@ -207,7 +207,8 @@ export default {
       };
 
       this.auditPopData.show = true;
-    }
+    },
+    comfirmAudit() {}
   },
 };
 </script>

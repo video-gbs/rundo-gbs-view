@@ -184,6 +184,12 @@
                   show-word-limit>
                 </el-input>
               </template>
+              <template v-if="item.type === 'transfer'">
+                <div>
+                  <el-button type="primary" size="small" @click="showTransfer(item)">{{item.btnText}}</el-button>
+                </div>
+                <div class="transfer-control-text">{{ ruleForm[item.key] | transferDict(item.options) }}</div>
+              </template>
             </el-form-item>
           </template>
         </el-form>
@@ -202,11 +208,20 @@
         </div>
       </div>
     </template>
+
+    <el-dialog :title="transferPopData.title" :visible.sync="transferPopData.show" custom-class="transferPop" append-to-body width="50%">
+      <PTransfer v-if="transferPopData.show" :data="transferPopData.data" ></PTransfer>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="(transferPopData.show = false)">取 消</el-button>
+        <el-button type="primary" @click="comfirmTransfer">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import RegCheck from '@/utils/regCheck';
+import PTransfer from "@/components/PTransfer";
 
 export default {
   data() {
@@ -216,6 +231,11 @@ export default {
       rules: {},
       formRef: 'controlsForm' + Math.uuid(),
       layoutConfig: {},
+      transferPopData: {
+        show: false,
+        data: null,
+        title: ''
+      }
     };
   },
   props: {
@@ -223,6 +243,9 @@ export default {
       type: Object,
       default: {},
     },
+  },
+  components: {
+    PTransfer
   },
   created() {
     this.resetControl();
@@ -255,11 +278,24 @@ export default {
         ruleForm[item.key] = item.initValue || item.value;
         rules[item.key] = [];
         if (item.isRequired) {
-          rules[item.key].push({
-            required: true,
-            message: '不能为空',
-            trigger: 'change',
-          });
+          if(item.type === 'transfer') {
+            rules[item.key].push({
+              validator: (rule, value, callback) => {
+                if (value.length) {
+                  callback();
+                } else {
+                  callback(new Error('不能为空'));
+                }
+              },
+              trigger: 'change',
+            });
+          } else {
+            rules[item.key].push({
+              required: true,
+              message: '不能为空',
+              trigger: 'change',
+            });
+          }
         }
 
         if (item.regKey) {
@@ -373,7 +409,32 @@ export default {
       data.showFlag = !data.showFlag;
       this.$forceUpdate();
     },
+    showTransfer(data) {
+      this.transferPopData.title = data.btnText;
+      this.transferPopData.data = data;
+      this.transferPopData.show = true;
+    },
+    comfirmTransfer() {
+      const result = this.transferPopData.data.getData();
+      if(this.transferPopData.data.isRequired && !result.length) {
+        this.$message.error('不能为空，至少选择一个');
+        return;
+      }
+
+      this.transferPopData.data.value = JSON.parse(JSON.stringify(result));
+      this.ruleForm[this.transferPopData.data.key] = JSON.parse(JSON.stringify(result));
+      this.$refs[this.formRef].validateField(this.transferPopData.data.key);
+      this.transferPopData.show = false;
+    }
   },
+  filters: {
+    transferDict(valList, dict) {
+      return valList.map(val => {
+        const data = (dict || []).find(o => o.key == val);
+        return data ? data.label : val;
+      }).join('、');
+    }
+  }
 };
 </script>
 
@@ -418,7 +479,6 @@ export default {
 .control-group-container {
   .pwd-icon {
     cursor: pointer;
-
     &.svg-icon {
       font-size: 1.2rem;
       margin-right: 0.5rem;
@@ -427,6 +487,17 @@ export default {
 
   .hidePwd .el-input__inner {
     -webkit-text-security: disc !important;
+  }
+  .transfer-control-text {
+    line-height: 2;
+    font-size: 12px;
+  }
+}
+
+.transferPop {
+  z-index: 1000;
+  .el-transfer-panel {
+    width: calc((100% - 182px) / 2);
   }
 }
 </style>
