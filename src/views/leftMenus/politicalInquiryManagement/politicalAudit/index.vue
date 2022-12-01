@@ -18,10 +18,10 @@
         <el-table-column prop="state" label="领域" />
         <el-table-column prop="state" label="留言对象" />
         <el-table-column prop="state" label="发布账号" />
-        <el-table-column prop="tel" label="电话" />
-        <el-table-column prop="createTime" label="提交时间" />
-        <el-table-column prop="createTime" label="状态" />
-        <el-table-column prop="createTime" label="是否可见" >
+        <el-table-column prop="tel" width="120" label="电话" />
+        <el-table-column prop="createTime" width="150" label="提交时间" />
+        <el-table-column prop="label" label="状态" />
+        <el-table-column prop="label" label="是否可见" >
           <template slot-scope="scope">
               {{scope.row.isAvavle ? '是':'否'  }}
           </template>
@@ -29,8 +29,8 @@
         <el-table-column prop="state" label="申请单位" />
         <el-table-column width="200" label="操作" fixed="right" >
           <template slot-scope="scope">
-            <el-button type="text" @click="dialogShow(0, scope.row)">转移审核</el-button>
-            <el-button type="text">查看详情</el-button>
+            <el-button type="text" @click="dialogShow(scope.row)">转移审核</el-button>
+            <el-button type="text" @click="goDetail(scope.row)">查看详情</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -51,7 +51,7 @@
 
 <script>
 import PControlGroup from "@/components/PControlGroup";
-import pagination from '@/components/Pagination/index.vue'
+import pagination from '@/components/Pagination/index.vue';
 
 export default {
   data() {
@@ -68,6 +68,7 @@ export default {
       ],
       auditPopData: {
         show: false,
+        data: null,
         controlData: null,
       }
     };
@@ -169,7 +170,8 @@ export default {
     currentChange(){
 
     },
-    dialogShow(){
+    dialogShow(data){
+      this.auditPopData.data = data;
       this.auditPopData.controlData = {
         layout: 'vertical',
         controls: [
@@ -207,6 +209,10 @@ export default {
       };
 
       this.auditPopData.show = true;
+    },
+    comfirmAudit() {},
+    goDetail(data) {
+      this.$router.push(`/politicalAudit/${data.id}`);
     }
   },
 };
