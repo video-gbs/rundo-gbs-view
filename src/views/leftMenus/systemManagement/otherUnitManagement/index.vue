@@ -9,11 +9,7 @@
           <template slot="header">
             <div class="f ai-c jc-sb">
               <div>数据列表</div>
-              <el-button
-                size="mini"
-                type="primary"
-                @click="dialogShow(1)"
-              >新增</el-button>
+              <el-button size="mini" type="primary" @click="dialogShow(1)">新增</el-button>
             </div>
           </template>
           <el-table-column prop="account" label="账号" />
@@ -36,18 +32,11 @@
           <el-table-column prop="createTime" label="创建时间" width="160" />
           <el-table-column width="200" label="操作" fixed="right">
             <template slot-scope="scope">
-              <el-button
-                type="text"
-                @click="editPassword(scope.row)"
-              >修改密码</el-button>
-              <el-button
-                type="text"
-                @click="dialogShow(0, scope.row)"
-              >编辑</el-button>
-              <el-button
-                type="text"
-                @click="deleteAccount(scope.row)"
-              ><span class="delete-button">删除</span></el-button>
+              <el-button type="text" @click="editPassword(scope.row)">修改密码</el-button>
+              <el-button type="text" @click="dialogShow(0, scope.row)">编辑</el-button>
+              <el-button type="text" @click="deleteAccount(scope.row)">
+                <span class="delete-button">删除</span>
+              </el-button>
             </template>
           </el-table-column>
         </el-table-column>
@@ -62,7 +51,7 @@
       v-if="editShow"
       :title="dialog.title"
       :visible.sync="dialog.show"
-      width="700px"
+      width="748px"
       :before-close="handleClose"
     >
       <div>
@@ -76,156 +65,125 @@
           :rules="rules"
           @keyup.enter="submit('accountForm')"
         >
-          <el-row>
-            <el-col :span="12">
-              <el-form-item label="账号" prop="account">
-                <el-input
-                  v-model="dialog.params.account"
-                  placeholder="6~20字符"
+          <el-form-item label="账号" prop="account">
+            <el-input v-model="dialog.params.account" placeholder="6~20字符" />
+          </el-form-item>
+          <el-form-item
+            v-if="editShowChild"
+            label="密码"
+            prop="password"
+            :rules="editShowChild ? rules.password : [{ required: false }]"
+          >
+            <div class="f fd-c mr30">
+              <el-input
+                v-model="dialog.params.password"
+                placeholder="6~20字符"
+                @input="checkPassworLevel"
+              />
+              <span class="fs12 mt10">请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span>
+            </div>
+          </el-form-item>
+          <el-form-item v-if="editShowChild" style="position: absolute;right: 60px;top: 140px;">
+            <div class="password-level-box f ai-c">
+              <div class="password-level f ai-c">
+                <div
+                  :style="{
+                    'background-color':
+                      passwordLevel > 0 ? 'rgba(30, 86, 160, .4)' : '',
+                  }"
                 />
-              </el-form-item>
-              <el-form-item
-                v-if="editShowChild"
-                label="密码"
-                prop="password"
-                :rules="editShowChild ? rules.password : [{ required:false}]"
-              >
-                <div class="f fd-c mr30">
-                  <el-input
-                    v-model="dialog.params.password"
-                    placeholder="6~20字符"
-                    @input="checkPassworLevel"
-                  />
-                  <span
-                    class="fs12 mt10"
-                  >请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span>
-                </div>
-              </el-form-item>
-              <el-form-item v-if="editShowChild" label="密码强度">
-                <el-row>
-                  <el-col :span="24">
-                    <div class="password-level-box f ai-c">
-                      <div class="password-level f ai-c">
-                        <div
-                          :style="{
-                            'background-color':
-                              passwordLevel > 0 ? '#00d000' : ''
-                          }"
-                        />
-                        <div
-                          :style="{
-                            'background-color':
-                              passwordLevel > 1 ? 'orange' : ''
-                          }"
-                        />
-                        <div
-                          :style="{
-                            'background-color': passwordLevel > 2 ? 'red' : ''
-                          }"
-                        />
-
-                        <span
-                          v-if="passwordLevel === 1"
-                          class=" fs12 ml5"
-                          style="color:#00d000"
-                        >
-                          弱
-                        </span>
-                        <span
-                          v-if="passwordLevel === 2"
-                          class=" fs12 ml5"
-                          style="color:orange"
-                        >
-                          中
-                        </span>
-                        <span
-                          v-if="passwordLevel === 3"
-                          class=" fs12 ml5"
-                          style="color:red"
-                        >
-                          强
-                        </span>
-                      </div>
-                    </div>
-                  </el-col>
-                </el-row>
-              </el-form-item>
-              <el-form-item
-                v-if="editShowChild"
-                label="确认密码"
-                prop="rePassword"
-                :rules="editShowChild ? rules.rePassword : [{ required:false}]"
-              >
-                <el-input v-model="dialog.params.rePassword" />
-              </el-form-item>
-              <el-form-item label="所属角色" prop="roleId">
-                <el-select v-model="dialog.params.roleId" placeholder="请选择">
-                  <el-option
-                    v-for="i in selectList"
-                    :key="i.id"
-                    :label="i.label"
-                    :value="i.id"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="所属部门" prop="deptId">
-                <el-select v-model="dialog.params.deptId" placeholder="请选择">
-                  <el-option
-                    v-for="i in deptList"
-                    :key="i.id"
-                    :label="i.name"
-                    :value="i.id"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="账号状态">
-                <el-row>
-                  <el-col>
-                    <el-radio
-                      v-model="dialog.params.status"
-                      :label="1"
-                    >启用</el-radio>
-                    <el-radio
-                      v-model="dialog.params.status"
-                      :label="0"
-                    >禁用</el-radio>
-                  </el-col>
-                </el-row>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item label="昵称" prop="nickName">
-                <el-input
-                  v-model="dialog.params.nickName"
-                  placeholder="最多40个字符"
+                <div
+                  :style="{
+                    'background-color':
+                      passwordLevel > 1 ? 'rgba(30, 86, 160, .8)' : '',
+                  }"
                 />
-              </el-form-item>
-              <el-form-item label="姓名" prop="name">
-                <el-input
-                  v-model="dialog.params.name"
-                  placeholder="最多20个字符"
+                <div
+                  :style="{
+                    'background-color':
+                      passwordLevel > 2 ? 'rgba(30, 86, 160, 1)' : '',
+                  }"
                 />
-              </el-form-item>
-              <el-form-item label="手机号" prop="mobile">
-                <el-input v-model="dialog.params.mobile" />
-              </el-form-item>
-              <el-form-item label="邮箱" prop="email">
-                <el-input v-model="dialog.params.email" />
-              </el-form-item>
-            </el-col>
-          </el-row>
+                <span
+                  v-if="passwordLevel === 1"
+                  class="fs12 ml5"
+                  style="color: rgba(30, 86, 160, 0.4)"
+                >
+                  弱
+                </span>
+                <span
+                  v-if="passwordLevel === 2"
+                  class="fs12 ml5"
+                  style="color: rgba(30, 86, 160, 0.8)"
+                >
+                  中
+                </span>
+                <span
+                  v-if="passwordLevel === 3"
+                  class="fs12 ml5"
+                  style="color: rgba(30, 86, 160, 1)"
+                >
+                  强
+                </span>
+              </div>
+            </div>
+          </el-form-item>
+          <el-form-item
+            v-if="editShowChild"
+            label="确认密码"
+            prop="rePassword"
+            :rules="editShowChild ? rules.rePassword : [{ required: false }]"
+          >
+            <el-input v-model="dialog.params.rePassword" />
+          </el-form-item>
+          <el-form-item label="昵称" prop="nickName">
+            <el-input
+              v-model="dialog.params.nickName"
+              placeholder="最多40个字符"
+            />
+          </el-form-item>
+          <el-form-item label="姓名" prop="name">
+            <el-input v-model="dialog.params.name" placeholder="最多20个字符" />
+          </el-form-item>
+          <el-form-item label="手机号" prop="mobile">
+            <el-input v-model="dialog.params.mobile" />
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+            <el-input v-model="dialog.params.email" />
+          </el-form-item>
+          <el-form-item label="所属角色" prop="roleId">
+            <el-select v-model="dialog.params.roleId" placeholder="请选择">
+              <el-option
+                v-for="i in selectList"
+                :key="i.id"
+                :label="i.label"
+                :value="i.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="所属部门" prop="deptId">
+            <el-select v-model="dialog.params.deptId" placeholder="请选择">
+              <el-option
+                v-for="i in deptList"
+                :key="i.id"
+                :label="i.name"
+                :value="i.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="账号状态">
+            <el-radio v-model="dialog.params.status" :label="1">启用</el-radio>
+            <el-radio v-model="dialog.params.status" :label="0">禁用</el-radio>
+          </el-form-item>
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button
-          type="primary"
-          @click="submit('accountForm')"
-        >确 定</el-button>
+        <el-button type="primary" @click="submit('accountForm')">确 定</el-button>
       </span>
     </el-dialog>
 
-    <el-dialog title="修改密码" :visible.sync="passwordVisible" width="550px">
+    <el-dialog title="修改密码" :visible.sync="passwordVisible" width="748px">
       <el-form
         ref="savePasswordForm"
         :model="passwordForm"
@@ -241,57 +199,54 @@
               class="new_password_input"
               @input="checkPassworLevel1"
             />
-            <span
-              class="fs12 mt10"
-            >请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span>
+            <span class="fs12 mt10">请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span>
           </div>
         </el-form-item>
-        <el-form-item label="密码强度">
-          <el-row>
-            <el-col :span="24">
-              <div class="password-level-box f ai-c">
-                <div class="password-level f ai-c">
-                  <div
-                    :style="{
-                      'background-color': passwordLevel1 > 0 ? '#00d000' : ''
-                    }"
-                  />
-                  <div
-                    :style="{
-                      'background-color': passwordLevel1 > 1 ? 'orange' : ''
-                    }"
-                  />
-                  <div
-                    :style="{
-                      'background-color': passwordLevel1 > 2 ? 'red' : ''
-                    }"
-                  />
+        <el-form-item style="position: absolute;right: 35px;top: 105px;">
+          <div class="password-level-box f ai-c">
+            <div class="password-level f ai-c">
+              <div
+                :style="{
+                  'background-color':
+                    passwordLevel1 > 0 ? 'rgba(30, 86, 160, 0.4)' : '',
+                }"
+              />
+              <div
+                :style="{
+                  'background-color':
+                    passwordLevel1 > 1 ? 'rgba(30, 86, 160, 0.8)' : '',
+                }"
+              />
+              <div
+                :style="{
+                  'background-color':
+                    passwordLevel1 > 2 ? 'rgba(30, 86, 160, 1)' : '',
+                }"
+              />
 
-                  <span
-                    v-if="passwordLevel1 === 1"
-                    class=" fs12 ml5"
-                    style="color:#00d000"
-                  >
-                    弱
-                  </span>
-                  <span
-                    v-if="passwordLevel1 === 2"
-                    class=" fs12 ml5"
-                    style="color:orange"
-                  >
-                    中
-                  </span>
-                  <span
-                    v-if="passwordLevel1 === 3"
-                    class=" fs12 ml5"
-                    style="color:red"
-                  >
-                    强
-                  </span>
-                </div>
-              </div>
-            </el-col>
-          </el-row>
+              <span
+                v-if="passwordLevel1 === 1"
+                class="fs12 ml5"
+                style="color: rgba(30, 86, 160, 0.4)"
+              >
+                弱
+              </span>
+              <span
+                v-if="passwordLevel1 === 2"
+                class="fs12 ml5"
+                style="color: rgba(30, 86, 160, 0.8)"
+              >
+                中
+              </span>
+              <span
+                v-if="passwordLevel1 === 3"
+                class="fs12 ml5"
+                style="color: rgba(30, 86, 160, 1)"
+              >
+                强
+              </span>
+            </div>
+          </div>
         </el-form-item>
         <el-form-item label="确认密码" prop="rePassword">
           <el-input
@@ -302,10 +257,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="passwordVisible = false">取 消</el-button>
-        <el-button
-          type="primary"
-          @click="savePassword('savePasswordForm')"
-        >保 存</el-button>
+        <el-button type="primary" @click="savePassword('savePasswordForm')">保 存</el-button>
       </span>
     </el-dialog>
   </div>
@@ -319,7 +271,6 @@ import {
   otherUnitList,
   otherUnitDelete,
   otherUnitEditPassword,
-  otherUnitRoleId,
   otherUnitDeptRoleList
 } from '@/api/method/otherUnitManagement'
 import { unitList } from '@/api/method/unitManagement'
@@ -353,22 +304,6 @@ export default {
             message: '6-20个字符',
             trigger: 'blur'
           }
-          // {
-          //   validator: (rule, value, callback) => {
-          //     if (!this.role.roleId) {
-          //       this.$api.role.check(value).then((r) => {
-          //         if (!r.data) {
-          //           callback('该角色名称已存在')
-          //         } else {
-          //           callback()
-          //         }
-          //       })
-          //     } else {
-          //       callback()
-          //     }
-          //   },
-          //   trigger: 'blur'
-          // }
         ],
         name: {
           required: true,
@@ -411,8 +346,9 @@ export default {
           max: 40
         },
         email: {
+          pattern: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9_\.\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
           required: true,
-          message: '不能为空',
+          message: '请输入正确的邮箱',
           trigger: 'blur'
         },
         roleId: {
@@ -490,7 +426,7 @@ export default {
     },
 
     savePassword(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           if (
             !this.handlePasswordCheck(
@@ -500,9 +436,10 @@ export default {
           ) {
             return
           }
-          otherUnitEditPassword(
-            { id: this.passwordForm.id, password: this.passwordForm.password }
-          ).then(res => {
+          otherUnitEditPassword({
+            id: this.passwordForm.id,
+            password: this.passwordForm.password
+          }).then((res) => {
             if (res.code === 10000) {
               this.$message({
                 type: 'success',
@@ -581,7 +518,7 @@ export default {
         nickName: '',
         name: '',
         email: '',
-        deptId: 1
+        deptId: ''
       }
       this.editShow = true
       if (act === 0) {
@@ -610,7 +547,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        otherUnitDelete(row.id).then(res => {
+        otherUnitDelete(row.id).then((res) => {
           if (res.code === 10000) {
             this.$message({
               type: 'success',
@@ -648,7 +585,7 @@ export default {
     },
 
     submit(formName) {
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
             case '添加账号':
@@ -660,7 +597,7 @@ export default {
               ) {
                 return
               }
-              otherUnitAdd(this.dialog.params).then(res => {
+              otherUnitAdd(this.dialog.params).then((res) => {
                 if (res.code === 10000) {
                   this.$message({
                     type: 'success',
@@ -727,6 +664,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-dialog__header {
+  border-bottom: 1px solid #eaeaea;
+}
+::v-deep .el-dialog__footer {
+  border-top: 1px solid #eaeaea;
+}
+::v-deep .el-dialog__body {
+  padding: 30px 108px;
+}
 .el-input {
   width: 120px;
 }
@@ -737,7 +683,7 @@ export default {
 .params-form {
   .el-input,
   .el-select {
-    width: 100%;
+    width: 345px;
     margin-right: 30px;
   }
 }
@@ -768,5 +714,8 @@ export default {
 }
 .delete-button {
   color: red !important;
+}
+.mr30{
+  width: calc(100% - 30px);
 }
 </style>

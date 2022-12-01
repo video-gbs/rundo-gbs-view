@@ -26,13 +26,7 @@ router.beforeEach(async(to, from, next) => {
     NProgress.done()
     next('/404')
   } else {
-    if (hasToken) {
-      next()
-    } else {
-      console.log('4021')
-      asyncRouter = null
-      next('/login')
-    }
+    hasToken ? next() : next('/login')
   }
 
   // }

@@ -2,43 +2,41 @@
   <div class="page-container">
     <div class="container-left">
       <div class="container-left-top">
-        <Overview :homeLists="homeLists" v-if="overviewShow" />
+        <Overview v-if="overviewShow" :home-lists="homeLists" />
       </div>
       <div class="container-left-top-bottom">
-        <TodoList :homeLists="homeLists" v-if="todoListShow" />
+        <TodoList v-if="todoListShow" :home-lists="homeLists" />
       </div>
     </div>
     <div class="container-right">
-      <Weather :weatherList="weatherList" v-if="weatherListShow" />
+      <Weather v-if="weatherListShow" :weather-list="weatherList" />
       <NoticeList
-        style="margin: 5px 0 20px 0"
-        :notification="notification"
         v-if="notificationShow"
+        style="margin: 5px 0 20px 0;"
+        :notification="notification"
       />
-      <Statistical :statisticalData="statisticalData" v-if="statisticalShow" />
+      <Statistical v-if="statisticalShow" :statistical-data="statisticalData" />
     </div>
   </div>
 </template>
 
 <script>
-import Overview from "./components/overview.vue";
-import TodoList from "./components/todoList.vue";
-import Weather from "./components/Weather.vue";
-import Statistical from "./components/statistical.vue";
-import NoticeList from "./components/noticeList.vue";
+import Overview from './components/overview.vue'
+import TodoList from './components/todoList.vue'
+import Weather from './components/Weather.vue'
+import Statistical from './components/statistical.vue'
+import NoticeList from './components/noticeList.vue'
 
-import { editAffiche } from "@/api/method/appraise";
-import { getAfficheList } from "@/api/method/affiche";
-import { areaWeather } from "@/api/method/weather";
-import { homeLists } from "@/api/method/home";
-import { Local } from "@/utils/storage";
+import { areaWeather, editAfficheWork } from '@/api/method/weather'
+import { homeLists } from '@/api/method/home'
+import { Local } from '@/utils/storage'
 export default {
   components: {
     Overview,
     TodoList,
     Weather,
     NoticeList,
-    Statistical,
+    Statistical
     // PCard
   },
   data() {
@@ -53,62 +51,55 @@ export default {
       homeLists: {},
       notification: [],
       headers: {
-        Authorization: Local.getToken(),
+        Authorization: Local.getToken()
       },
-      statisticalData: [],
-    };
+      statisticalData: []
+    }
   },
   watch: {},
   created() {
-    this.getWeather();
+    this.getWeather()
   },
   mounted() {
-    this.getHomeLists();
-    this.editAffiche();
+    this.getHomeLists()
+    this.editAfficheWork()
     // this.getAfficheList();
   },
   methods: {
     getHomeLists() {
       homeLists(this.params).then((res) => {
         if (res.code === 10000) {
-          this.homeLists = res.data;
-          this.notification = res.data.notification;
-          this.notificationShow = true;
-          this.todoListShow = true;
-          this.overviewShow = true;
+          this.homeLists = res.data
+          this.notification = res.data.notification
+          this.notificationShow = true
+          this.todoListShow = true
+          this.overviewShow = true
         }
-      });
+      })
     },
-    editAffiche() {
-      editAffiche(this.params).then((res) => {
+    editAfficheWork() {
+      editAfficheWork().then((res) => {
         if (res.code === 10000) {
-          this.statisticalData = res.data;
-          this.statisticalShow = true;
+          this.statisticalData = res.data
+          this.statisticalShow = true
         }
-      });
-    },
-    getAfficheList() {
-      getAfficheList(this.params).then((res) => {
-        if (res.code === 10000) {
-          console.log("res", res);
-        }
-      });
+      })
     },
     getWeather() {
-      let weatherParams = {
-        area: "梧州",
-        from: "5",
-        needIndex: "1",
-      };
+      const weatherParams = {
+        area: '梧州',
+        from: '5',
+        needIndex: '1'
+      }
       areaWeather(weatherParams).then((res) => {
         if (res.code === 10000) {
-          this.weatherList = res.data.showapi_res_body;
-          this.weatherListShow = true;
+          this.weatherList = res.data.showapi_res_body
+          this.weatherListShow = true
         }
-      });
-    },
-  },
-};
+      })
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
