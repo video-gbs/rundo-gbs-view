@@ -3,16 +3,16 @@
 import request from '@/api/fetch'
 export function acceptAffairs(params) {
   // 问政受理
-  return request.post(`/politics/affairscheck/accept`, params)
+  return request.post(`/politics/basicFlow/deptAccept`, params)
 }
 export function examineAffairs(params) {
   // 审核问政
-  return request.post(`/politics/affairscheck/examine`, params)
+  return request.post(`/politics/mailboxFlow/auditAffair`, params)
 }
 
 export function replyAffairs(params) {
   // 问政回复
-  return request.post(`/politics/affairscheck/reply`, params)
+  return request.post(`/politics/basicFlow/mainDeptReply`, params)
 }
 
 export function replyExamineAffairs(params) {

@@ -24,8 +24,8 @@
       <template slot="main">
         <el-form label-width="80px" :model="examineForm">
           <el-form-item label="审核结果">
-            <el-radio v-model="examineForm.result" :label="0">审核通过</el-radio>
-            <el-radio v-model="examineForm.result" :label="2">审核不通过</el-radio>
+            <el-radio v-model="examineForm.auditResult" :label="1">审核通过</el-radio>
+            <el-radio v-model="examineForm.auditResult" :label="0">审核不通过</el-radio>
           </el-form-item>
           <el-form-item label="审核说明">
             <el-input v-model="examineForm.content" />
@@ -157,11 +157,34 @@
       <template slot="main">
         <el-form label-width="80px" :model="replyCheckForm">
           <el-form-item label="审核结果">
-            <el-radio v-model="replyCheckForm.result" :label="0">审核通过</el-radio>
-            <el-radio v-model="replyCheckForm.result" :label="2">审核不通过</el-radio>
+            <el-radio v-model="replyCheckForm.result" :label="1">审核通过</el-radio>
+            <el-radio v-model="replyCheckForm.result" :label="0">审核不通过</el-radio>
           </el-form-item>
           <el-form-item label="审核说明">
             <PEditorVue ref="replyCheckEditorRef" :value="replyCheckContent" @input="replyCheckChange" />
+
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
+
+    <!--申请转移-->
+    <PDialog ref="applyTransferRef" @submit="applyTransferFn">
+      <template slot="title">申请问政转移</template>
+      <template slot="main">
+        <el-form label-width="80px" :model="applyTransferForm">
+          <el-form-item label="部门">
+            <el-select v-model="applyTransferForm.deptId" collapse-tags placeholder="请选择">
+              <el-option
+                v-for="i in deptList"
+                :key="i.id"
+                :label="i.name"
+                :value="i.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="转移说明">
+            <el-input v-model="applyTransferForm.content" />
 
           </el-form-item>
         </el-form>
@@ -179,6 +202,8 @@ import PoliticalRecord from '../components/PoliticalRecord'
 import PDialog from '@/components/PDialog'
 import { affairsInfoSearch } from '@/api/method/politicalList'
 import { examineAffairs, acceptAffairs } from '@/api/method/affairscheck'
+import { applyTransferAffair } from '@/api/method/transfer'
+import { replyAffairs } from '@/api/method/affairscheck'
 import { unitList } from '@/api/method/unitManagement'
 import { transfer } from '@/api/method/transfer'
 import { Local } from '@/utils/storage'
@@ -244,9 +269,13 @@ export default {
       one: {},
 
       examineForm: {
-        result: 0,
-        affairsId: '',
-        content: ''
+        // 问政审核参数
+        'affairsId': '',
+        'auditResult': 1,
+        'content': ''
+        // 'id': 0,
+        // 'targetDeptId': 0,
+        // 'targetDeptName': ''
       },
       moreForm: {
         result: 0,
@@ -277,7 +306,7 @@ export default {
       replyContent: '',
       replyForm: {
         'affairsId': '',
-        'deptId': ''
+        'content': ''
       },
       transferForm: {
         'affairsId': '',
@@ -304,6 +333,13 @@ export default {
         affairsId: '',
         content: ''
       },
+      applyTransferForm: {
+        // 申请问政转移
+        'affairsId': '',
+        'content': '',
+        'deptId': '',
+        'deptName': ''
+      },
       userType: ''
 
     }
@@ -321,11 +357,29 @@ export default {
     if (this.$route.params.id) {
       this.getOne(this.$route.params.id)
       // 设置问政id
-      this.examineForm.affairsId = this.$route.params.id
-      this.moreForm.affairsId = this.$route.params.id
-      this.deptForm.affairsId = this.$route.params.id
-      this.acceptForm.affairsId = this.$route.params.id
-      this.transferForm.affairsId = this.$route.params.id
+      const arr = [
+        'examineForm',
+        'moreForm',
+        'deptForm',
+        'acceptForm',
+        'replyForm',
+        'transferForm',
+        'inviteForm',
+        'replyCheckForm',
+        'applyTransferForm'
+      ]
+      arr.forEach(i => {
+        this[i].affairsId = this.$route.params.id
+      })
+      // this.examineForm.affairsId = this.$route.params.id
+      // this.moreForm.affairsId = this.$route.params.id
+      // this.deptForm.affairsId = this.$route.params.id
+      // this.acceptForm.affairsId = this.$route.params.id
+      // this.replyForm.affairsId = this.$route.params.id
+      // this.transferForm.affairsId = this.$route.params.id
+      // this.inviteForm.affairsId = this.$route.params.id
+      // this.replyCheckForm.affairsId = this.$route.params.id
+      // this.applyTransferAffairForm.affairsId = this.$route.params.id
     }
     // 获取部门
     this.getDept()
@@ -398,8 +452,8 @@ export default {
       this.deptForm.processingDeptName = this.deptList.filter(i => {
         i.id === this.deptForm.processingDeptId
       })
-      acceptAffairs(this.deptForm).then(res => {
-      })
+      // acceptAffairs(this.deptForm).then(res => {
+      // })
     },
     acceptFn() {
       // 受理问政
@@ -416,6 +470,7 @@ export default {
     },
     replyFn() {
       // 回复问政
+      replyAffairs(this.replyForm)
     },
     transferFn() {
       transfer(this.transferForm).then(res => {
@@ -440,6 +495,13 @@ export default {
     },
     inviteFn() {
       // 邀请回复
+    },
+    applyTransferFn() {
+      // 申请问政转移
+      this.applyTransferForm.deptName = this.deptList.filter(i => {
+        return i.id === this.applyTransferForm.deptId
+      })[0].name
+      applyTransferAffair(this.applyTransferForm)
     }
   }
 }

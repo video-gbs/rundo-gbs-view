@@ -479,7 +479,7 @@ export default {
     },
     submitSearch() { this.getDataList() },
     toReset(val) {
-      this.query = val
+      this.pagesData = val
       this.pagesData.pageNum = 1
       this.pagesData.pageSize = 10
       setTimeout(() => {
