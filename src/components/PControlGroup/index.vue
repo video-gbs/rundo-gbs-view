@@ -4,7 +4,7 @@
     <template v-if="controlGroupData.layout == 'horizontal'">
       <el-row>
         <!-- controls -->
-        <el-col :span="layoutConfig.contentSpan">
+        <el-col :span="layoutConfig.hideButton ? 24 : layoutConfig.contentSpan">
           <el-form :model="ruleForm" :rules="rules" :inline="true" :ref="formRef">
             <el-row>
               <template v-for="item in controlGroupData.controls">
@@ -84,6 +84,18 @@
                         show-word-limit>
                       </el-input>
                     </template>
+                    <template v-if="item.type === 'transfer'">
+                      <div>
+                        <el-button type="primary" size="small" @click="showTransfer(item)">{{item.btnText}}</el-button>
+                      </div>
+                      <div class="transfer-control-text" :title="ruleForm[item.key] | transferDict(item.options)">{{ ruleForm[item.key] | transferDict(item.options) }}</div>
+                    </template>
+                    <template v-if="item.type === 'text'">
+                      <div class="control-text" :class="item.textClass || ''">{{item.value}}</div>
+                    </template>
+                    <template v-if="item.type === 'upload'">
+
+                    </template>
                   </el-form-item>
                 </el-col>
               </template>
@@ -91,7 +103,7 @@
           </el-form>
         </el-col>
         <!-- buttons -->
-        <el-col :span="layoutConfig.buttonSpan">
+        <el-col :span="layoutConfig.buttonSpan" v-if="!layoutConfig.hideButton">
           <div :style="{ textAlign: layoutConfig.buttonAlign }">
             <el-button
               v-for="item in controlGroupData.bottons"
@@ -188,7 +200,7 @@
                 <div>
                   <el-button type="primary" size="small" @click="showTransfer(item)">{{item.btnText}}</el-button>
                 </div>
-                <div class="transfer-control-text">{{ ruleForm[item.key] | transferDict(item.options) }}</div>
+                <div class="transfer-control-text" :title="ruleForm[item.key] | transferDict(item.options)">{{ ruleForm[item.key] | transferDict(item.options) }}</div>
               </template>
             </el-form-item>
           </template>
@@ -387,7 +399,8 @@ export default {
         contentSpan: 18,
         buttonSpan: 6,
         buttonAlign: this.data.layout === 'vertical' ? 'right' : 'center',
-        showColon: true,
+        showColon: true, // 默认显示冒号
+        hideButton: false,
       };
     },
     resetForm() {
@@ -425,7 +438,7 @@ export default {
       this.ruleForm[this.transferPopData.data.key] = JSON.parse(JSON.stringify(result));
       this.$refs[this.formRef].validateField(this.transferPopData.data.key);
       this.transferPopData.show = false;
-    }
+    },
   },
   filters: {
     transferDict(valList, dict) {
@@ -491,6 +504,9 @@ export default {
   .transfer-control-text {
     line-height: 2;
     font-size: 12px;
+  }
+  .control-text {
+    line-height: 1.5;
   }
 }
 

@@ -18,8 +18,8 @@
         <el-table-column prop="state" label="领域" />
         <el-table-column prop="state" label="留言对象" />
         <el-table-column prop="state" label="发布账号" />
-        <el-table-column prop="tel" label="电话" />
-        <el-table-column prop="createTime" label="提交时间" />
+        <el-table-column prop="tel" width="120" label="电话" />
+        <el-table-column prop="createTime" width="150" label="提交时间" />
         <el-table-column prop="createTime" label="状态" />
         <el-table-column prop="createTime" label="是否可见" >
           <template slot-scope="scope">
