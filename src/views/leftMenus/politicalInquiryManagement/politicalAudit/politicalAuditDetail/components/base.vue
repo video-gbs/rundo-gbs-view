@@ -126,6 +126,24 @@ export default {
             key: 'text5',
             span: 24,
             value: '根据广西壮族自治区实施的《中华人民共和国老年人权益保障法》办法中的只要是独生子女都可以享受每年累计不超过15天带薪陪护假。但现在事实上单位（参公）并没有依法实施，不给本单位独生子女提供以上所述假期，导致家里老人住院无法陪护，请问梧州市是否能依法出一份通知，让各级单位依法执行该假期！谢谢。'
+          }, {
+            label: '附件补充',
+            type: 'upload',
+            key: 'text5',
+            span: 24,
+            canAdd: false,
+            canDown: false,
+            canDel: false,
+            value: [
+              {
+                name: '2500f00c825b47208232f588c2955423.png',
+                url: 'https://staticoss.runjian.com/upload/202212/2500f00c825b47208232f588c2955423.png',
+              },
+              {
+                name: '340d7d1c352546858c00bad3c3207ac0.png',
+                url: 'https://staticoss.runjian.com/upload/202212/340d7d1c352546858c00bad3c3207ac0.png',
+              }
+            ]
           }
         ],
         layoutConfig: {
