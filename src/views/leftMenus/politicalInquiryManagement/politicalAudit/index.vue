@@ -210,7 +210,16 @@ export default {
 
       this.auditPopData.show = true;
     },
-    comfirmAudit() {},
+    async comfirmAudit() {
+      const isPass = await this.auditPopData.controlData.regCheck();
+      if(!isPass) {
+        return;
+      }
+
+      const data = this.auditPopData.controlData.getData();
+      console.log(data);
+      this.auditPopData.show = false;
+    },
     goDetail(data) {
       this.$router.push(`/politicalAudit/${data.id}`);
     }
