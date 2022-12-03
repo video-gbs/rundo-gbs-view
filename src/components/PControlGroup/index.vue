@@ -463,6 +463,21 @@ export default {
           return false;
         }
       };
+
+      this.data.updateControls = (controls) => {
+        controls.forEach(control => {
+          this.controlGroupData.controls.forEach(target => {
+            if(target.key === control.key) {
+              Object.keys(control).forEach(key => {
+                target[key] = control[key];
+                if(key === 'value') {
+                  this.ruleForm[target.key] = control[key];
+                }
+              });
+            }
+          });
+        });
+      }
     },
     resetControl() {
       this.controlGroupData = {
