@@ -114,10 +114,10 @@ export default {
         time: ''
       },
       params: {
-        pageNum: 1,
-        pageSize: 10,
-        total: 0,
-        proCount: 0
+        current: 1,
+        size: 10,
+        total: 0
+
       },
       tableData: [],
       dialog: {
@@ -171,8 +171,14 @@ export default {
     this.getUnitList()
   },
   methods: {
-    sizeChange(v) {},
-    currentChange(v) {},
+    sizeChange(v) {
+      this.params.size = v
+      this.getUnitList()
+    },
+    currentChange(v) {
+      this.params.current = v
+      this.getUnitList()
+    },
     goPage(path, query) {
       this.$router.push(path)
     },
@@ -189,14 +195,7 @@ export default {
     },
 
     getUnitList() {
-      unitList(
-        {
-          ...this.params,
-          current: this.params.pageNum,
-          size: this.params.pageSize
-        }
-
-      ).then((res) => {
+      unitList(this.params).then((res) => {
         if (res.code === 10000) {
           this.tableData = res.data.records
           this.params.total = res.data.total

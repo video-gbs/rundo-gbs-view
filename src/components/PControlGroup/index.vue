@@ -5,23 +5,23 @@
       <el-row>
         <!-- controls -->
         <el-col :span="layoutConfig.hideButton ? 24 : layoutConfig.contentSpan">
-          <el-form :model="ruleForm" :rules="rules" :inline="true" :ref="formRef">
+          <el-form :ref="formRef" :model="ruleForm" :rules="rules" :inline="true">
             <el-row>
               <template v-for="item in controlGroupData.controls">
-                <el-col :span="item.span || 8" v-if="!item.hideControl">
+                <el-col v-if="!item.hideControl" :span="item.span || 8">
                   <el-form-item :label="item.label + colonStr" :prop="item.key">
                     <template v-if="item.type === 'input'">
                       <el-input
                         v-model="ruleForm[item.key]"
                         :placeholder="item.placeholder || '请输入'"
                         :disabled="item.disabled"
-                      ></el-input>
+                      />
                     </template>
                     <template v-if="item.type === 'password'">
                       <el-input
                         v-if="!item.showFlag"
-                        class="hidePwd"
                         v-model="ruleForm[item.key]"
+                        class="hidePwd"
                         :disabled="item.disabled"
                         :placeholder="item.placeholder || '请输入'"
                       >
@@ -52,12 +52,12 @@
                         :placeholder="item.placeholder || '请选择'"
                         :disabled="item.disabled"
                       >
-                        <el-option v-if="!item.hideDefault" label="请选择" value=""></el-option>
+                        <el-option v-if="!item.hideDefault" label="请选择" value="" />
                         <el-option
                           v-for="o in item.options"
                           :label="o.label"
                           :value="o.value"
-                        ></el-option>
+                        />
                       </el-select>
                     </template>
                     <template v-if="item.type === 'date'">
@@ -67,35 +67,33 @@
                         :placeholder="item.placeholder || '请选择'"
                         start-placeholder="开始日期"
                         end-placeholder="结束日期"
-                      ></el-date-picker>
+                      />
                     </template>
                     <template v-if="item.type === 'radio'">
                       <el-radio-group v-model="ruleForm[item.key]">
-                        <el-radio v-for="o in item.options" :label="o.value">{{o.label}}</el-radio>
+                        <el-radio v-for="o in item.options" :label="o.value">{{ o.label }}</el-radio>
                       </el-radio-group>
                     </template>
                     <template v-if="item.type === 'textarea'">
                       <el-input
+                        v-model="ruleForm[item.key]"
                         type="textarea"
                         :autosize="item.autosize || { minRows: 2, maxRows: 4}"
                         :placeholder="item.placeholder || '请输入'"
                         :maxlength="item.maxlength || 120"
-                        v-model="ruleForm[item.key]"
-                        show-word-limit>
-                      </el-input>
+                        show-word-limit
+                      />
                     </template>
                     <template v-if="item.type === 'transfer'">
                       <div>
-                        <el-button type="primary" size="small" @click="showTransfer(item)">{{item.btnText}}</el-button>
+                        <el-button type="primary" size="small" @click="showTransfer(item)">{{ item.btnText }}</el-button>
                       </div>
                       <div class="transfer-control-text" :title="ruleForm[item.key] | transferDict(item.options)">{{ ruleForm[item.key] | transferDict(item.options) }}</div>
                     </template>
                     <template v-if="item.type === 'text'">
-                      <div class="control-text" :class="item.textClass || ''">{{item.value}}</div>
+                      <div class="control-text" :class="item.textClass || ''">{{ item.value }}</div>
                     </template>
-                    <template v-if="item.type === 'upload'">
-
-                    </template>
+                    <template v-if="item.type === 'upload'" />
                   </el-form-item>
                 </el-col>
               </template>
@@ -103,7 +101,7 @@
           </el-form>
         </el-col>
         <!-- buttons -->
-        <el-col :span="layoutConfig.buttonSpan" v-if="!layoutConfig.hideButton">
+        <el-col v-if="!layoutConfig.hideButton" :span="layoutConfig.buttonSpan">
           <div :style="{ textAlign: layoutConfig.buttonAlign }">
             <el-button
               v-for="item in controlGroupData.bottons"
@@ -121,21 +119,21 @@
     <!-- vertical 模式 -->
     <template v-else>
       <div class="vertical-form-control">
-        <el-form :model="ruleForm" :rules="rules" :ref="formRef">
+        <el-form :ref="formRef" :model="ruleForm" :rules="rules">
           <template v-for="item in controlGroupData.controls">
-            <el-form-item :label="item.label + colonStr" :prop="item.key" v-if="!item.hideControl">
+            <el-form-item v-if="!item.hideControl" :label="item.label + colonStr" :prop="item.key">
               <template v-if="item.type === 'input'">
                 <el-input
                   v-model="ruleForm[item.key]"
                   :placeholder="item.placeholder || '请输入'"
                   :disabled="item.disabled"
-                ></el-input>
+                />
               </template>
               <template v-if="item.type === 'password'">
                 <el-input
                   v-if="!item.showFlag"
-                  class="hidePwd"
                   v-model="ruleForm[item.key]"
+                  class="hidePwd"
                   :disabled="item.disabled"
                   :placeholder="item.placeholder || '请输入'"
                 >
@@ -166,12 +164,12 @@
                   :placeholder="item.placeholder || '请选择'"
                   :disabled="item.disabled"
                 >
-                  <el-option v-if="!item.hideDefault" label="请选择" value=""></el-option>
+                  <el-option v-if="!item.hideDefault" label="请选择" value="" />
                   <el-option
                     v-for="o in item.options"
                     :label="o.label"
                     :value="o.value"
-                  ></el-option>
+                  />
                 </el-select>
               </template>
               <template v-if="item.type === 'date'">
@@ -179,26 +177,26 @@
                   v-model="ruleForm[item.key]"
                   :type="item.dateType || 'date'"
                   :placeholder="item.placeholder || '请选择'"
-                ></el-date-picker>
+                />
               </template>
               <template v-if="item.type === 'radio'">
                 <el-radio-group v-model="ruleForm[item.key]">
-                  <el-radio v-for="o in item.options" :label="o.value">{{o.label}}</el-radio>
+                  <el-radio v-for="o in item.options" :label="o.value">{{ o.label }}</el-radio>
                 </el-radio-group>
               </template>
               <template v-if="item.type === 'textarea'">
                 <el-input
+                  v-model="ruleForm[item.key]"
                   type="textarea"
                   :autosize="item.autosize || { minRows: 2, maxRows: 4}"
                   :placeholder="item.placeholder || '请输入'"
                   :maxlength="item.maxlength || 120"
-                  v-model="ruleForm[item.key]"
-                  show-word-limit>
-                </el-input>
+                  show-word-limit
+                />
               </template>
               <template v-if="item.type === 'transfer'">
                 <div>
-                  <el-button type="primary" size="small" @click="showTransfer(item)">{{item.btnText}}</el-button>
+                  <el-button type="primary" size="small" @click="showTransfer(item)">{{ item.btnText }}</el-button>
                 </div>
                 <div class="transfer-control-text" :title="ruleForm[item.key] | transferDict(item.options)">{{ ruleForm[item.key] | transferDict(item.options) }}</div>
               </template>
@@ -222,7 +220,7 @@
     </template>
 
     <el-dialog :title="transferPopData.title" :visible.sync="transferPopData.show" custom-class="transferPop" append-to-body width="50%">
-      <PTransfer v-if="transferPopData.show" :data="transferPopData.data" ></PTransfer>
+      <PTransfer v-if="transferPopData.show" :data="transferPopData.data" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="(transferPopData.show = false)">取 消</el-button>
         <el-button type="primary" @click="comfirmTransfer">确 定</el-button>
@@ -232,10 +230,27 @@
 </template>
 
 <script>
-import RegCheck from '@/utils/regCheck';
-import PTransfer from "@/components/PTransfer";
+import RegCheck from '@/utils/regCheck'
+import PTransfer from '@/components/PTransfer'
 
 export default {
+  components: {
+    PTransfer
+  },
+  filters: {
+    transferDict(valList, dict) {
+      return valList.map(val => {
+        const data = (dict || []).find(o => o.key == val)
+        return data ? data.label : val
+      }).join('、')
+    }
+  },
+  props: {
+    data: {
+      type: Object,
+      default: {}
+    }
+  },
   data() {
     return {
       controlGroupData: {},
@@ -248,120 +263,113 @@ export default {
         data: null,
         title: ''
       }
-    };
-  },
-  props: {
-    data: {
-      type: Object,
-      default: {},
-    },
-  },
-  components: {
-    PTransfer
-  },
-  created() {
-    this.resetControl();
-    if(this.data.layoutConfig) {
-      Object.assign(this.layoutConfig, this.data.layoutConfig);
     }
-
-    Object.assign(this.controlGroupData, this.data);
-    this.initControl();
-
-    __dev(() => {
-      window['thisControlGroup'] = this;
-    });
-  },
-  mounted() {
-    this.extendControl();
   },
   computed: {
     colonStr() {
-      const flag = this.layoutConfig && !this.layoutConfig.showColon;
-      return flag ? '' : '：';
+      const flag = this.layoutConfig && !this.layoutConfig.showColon
+      return flag ? '' : '：'
     }
+  },
+  created() {
+    this.resetControl()
+    if (this.data.layoutConfig) {
+      Object.assign(this.layoutConfig, this.data.layoutConfig)
+    }
+
+    Object.assign(this.controlGroupData, this.data)
+    this.initControl()
+
+    __dev(() => {
+      window['thisControlGroup'] = this
+    })
+  },
+  mounted() {
+    this.extendControl()
   },
   methods: {
     initControl() {
-      const ruleForm = {};
-      const rules = {};
+      const ruleForm = {}
+      const rules = {}
 
       this.controlGroupData.controls.forEach((item) => {
-        ruleForm[item.key] = item.initValue || item.value;
-        rules[item.key] = [];
+        ruleForm[item.key] = item.initValue || item.value
+        rules[item.key] = []
         if (item.isRequired) {
-          if(item.type === 'transfer') {
+          if (item.type === 'transfer') {
             rules[item.key].push({
               validator: (rule, value, callback) => {
+                console.log('transfer', value)
                 if (value.length) {
-                  callback();
+                  callback()
                 } else {
-                  callback(new Error('不能为空'));
+                  callback(new Error('不能为空'))
                 }
               },
-              trigger: 'change',
-            });
+              trigger: 'change'
+            })
           } else {
+            console.log('else', item.value)
             rules[item.key].push({
               required: true,
               message: '不能为空',
-              trigger: 'change',
-            });
+              trigger: 'change'
+            })
           }
         }
 
         if (item.regKey) {
-          const regKeyList = item.regKey.split(',');
+          const regKeyList = item.regKey.split(',')
           regKeyList.forEach((key) => {
             rules[item.key].push({
               validator: (rule, value, callback) => {
-                const { success, msg } = RegCheck.simpleCheck(value, key);
+                const { success, msg } = RegCheck.simpleCheck(value, key)
                 if (success) {
-                  callback();
+                  callback()
                 } else {
-                  callback(new Error(msg));
+                  callback(new Error(msg))
                 }
               },
-              trigger: 'change',
-            });
-          });
+              trigger: 'change'
+            })
+          })
         }
 
-        if (typeof item.regCheck == 'function') {
+        if (typeof item.regCheck === 'function') {
           rules[item.key].push({
             validator: (rule, value, callback) => {
-              const { success, msg } = item.regCheck(value, this.ruleForm);
+              const { success, msg } = item.regCheck(value, this.ruleForm)
               if (success) {
-                callback();
+                callback()
               } else {
-                callback(new Error(msg));
+                callback(new Error(msg))
               }
             },
-            trigger: 'change',
-          });
+            trigger: 'change'
+          })
         }
 
         // 密码框特殊处理，解决自动补全密码问题
         if (item.type == 'password') {
-          item.showFlag = false;
+          item.showFlag = false
         }
-      });
+      })
 
-      this.ruleForm = ruleForm;
-      this.rules = rules;
+      this.ruleForm = ruleForm
+      this.rules = rules
     },
     extendControl() {
       this.data.getData = () => {
-        return this.ruleForm;
-      };
+        return this.ruleForm
+      }
 
-      this.data.regCheck = async () => {
+      this.data.regCheck = async() => {
         try {
-          return await this.$refs[this.formRef].validate();
+          return await this.$refs[this.formRef].validate()
         } catch (e) {
-          return false;
+          return false
         }
-      };
+      }
     },
     resetControl() {
       this.controlGroupData = {
@@ -369,86 +377,79 @@ export default {
         bottons:
           this.data.layout === 'vertical'
             ? [
-                {
-                  type: 'default',
-                  action: 'cancel',
-                  text: '取消',
-                },
-                {
-                  type: 'primary',
-                  text: '确定',
-                },
-              ]
+              {
+                type: 'default',
+                action: 'cancel',
+                text: '取消'
+              },
+              {
+                type: 'primary',
+                text: '确定'
+              }
+            ]
             : [
-                {
-                  icon: 'el-icon-search',
-                  type: 'primary',
-                  text: '查询',
-                },
-                {
-                  icon: 'el-icon-refresh',
-                  type: 'default',
-                  action: 'reset',
-                  text: '重置',
-                },
-              ],
-        layout: 'horizontal', // 布局模式 'vertical' | 'horizontal'
-      };
+              {
+                icon: 'el-icon-search',
+                type: 'primary',
+                text: '查询'
+              },
+              {
+                icon: 'el-icon-refresh',
+                type: 'default',
+                action: 'reset',
+                text: '重置'
+              }
+            ],
+        layout: 'horizontal' // 布局模式 'vertical' | 'horizontal'
+      }
 
       this.layoutConfig = {
         contentSpan: 18,
         buttonSpan: 6,
         buttonAlign: this.data.layout === 'vertical' ? 'right' : 'center',
         showColon: true, // 默认显示冒号
-        hideButton: false,
-      };
+        hideButton: false
+      }
     },
     resetForm() {
       this.controlGroupData.controls.forEach((item) => {
-        this.ruleForm[item.key] = item.initValue || '';
-      });
+        this.ruleForm[item.key] = item.initValue || ''
+      })
     },
     handleBtnClick(data) {
       if (data.action == 'reset') {
-        this.resetForm();
-        this.$emit('onBtnReset');
+        this.resetForm()
+        this.$emit('onBtnReset')
       } else if (data.action == 'cancel') {
-        this.$emit('onBtnCancel');
+        this.$emit('onBtnCancel')
       } else {
-        this.$emit('onBtnClick', { btnData: data, formData: this.ruleForm });
+        this.$emit('onBtnClick', { btnData: data, formData: this.ruleForm })
       }
     },
     pwdShowChange(data) {
-      data.showFlag = !data.showFlag;
-      this.$forceUpdate();
+      data.showFlag = !data.showFlag
+      this.$forceUpdate()
     },
     showTransfer(data) {
-      this.transferPopData.title = data.btnText;
-      this.transferPopData.data = data;
-      this.transferPopData.show = true;
+      this.transferPopData.title = data.btnText
+      this.transferPopData.data = data
+      this.transferPopData.show = true
     },
     comfirmTransfer() {
-      const result = this.transferPopData.data.getData();
-      if(this.transferPopData.data.isRequired && !result.length) {
-        this.$message.error('不能为空，至少选择一个');
-        return;
+      const result = this.transferPopData.data.getData()
+      console.log('result', result)
+      if (this.transferPopData.data.isRequired && !result.length) {
+        this.$message.error('不能为空，至少选择一个')
+        return
       }
 
-      this.transferPopData.data.value = JSON.parse(JSON.stringify(result));
-      this.ruleForm[this.transferPopData.data.key] = JSON.parse(JSON.stringify(result));
-      this.$refs[this.formRef].validateField(this.transferPopData.data.key);
-      this.transferPopData.show = false;
-    },
-  },
-  filters: {
-    transferDict(valList, dict) {
-      return valList.map(val => {
-        const data = (dict || []).find(o => o.key == val);
-        return data ? data.label : val;
-      }).join('、');
+      this.transferPopData.data.value = JSON.parse(JSON.stringify(result))
+      this.ruleForm[this.transferPopData.data.key] = JSON.parse(JSON.stringify(result))
+      this.$refs[this.formRef].validateField(this.transferPopData.data.key)
+      this.transferPopData.show = false
     }
   }
-};
+}
 </script>
 
 <style lang="scss">

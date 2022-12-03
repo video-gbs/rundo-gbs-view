@@ -25,8 +25,9 @@ const dict = {
     '12': '待审核',
     '13': '未通过',
     '14': '待受理',
-    '21': '审核未通过',
-    '22': '待受理',
+    '20': '待审核',
+    '21': '待受理',
+    '23': '待审核',
     '100': '已完成'
   },
   _status: [
@@ -39,8 +40,9 @@ const dict = {
     { value: 12, label: '待审核' },
     { value: 13, label: '未通过' },
     { value: 14, label: '待受理' },
-    { value: 21, label: '审核未通过' },
-    { value: 22, label: '待受理' },
+    { value: 20, label: '待审核' },
+    { value: 21, label: '待受理' },
+    { value: 23, label: '待审核' },
     { value: 100, label: '已完成' }
   ],
   domain: {
