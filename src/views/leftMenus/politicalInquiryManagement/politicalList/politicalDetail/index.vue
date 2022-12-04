@@ -1,39 +1,45 @@
 <template>
   <div class="politicalDetail_container">
     <div class="act-btn f ai-c">
-      <el-button v-for="i in actBtn" v-if="i.show" :key="i.id" type="primary" style="margin:0px 1px" size="mini" @click="btnFn(i)">
-        {{ i.label }}
-      </el-button>
-      <el-button v-for="i in actBtn2" v-if="i.show" :key="i.id" :type="i.id===11?'danger':''" style="margin:0px 1px" size="mini" @click="btnFn(i)">
-        {{ i.label }}
+      <el-button
+        v-for="i in Object.keys(actBtn)"
+        :key="actBtn[i].id"
+        :disabled="!actBtn[i].show"
+        :type="actBtn[i].type || 'primary'"
+        style="margin: 0px 1px"
+        size="mini"
+        @click="btnFn(actBtn[i])"
+      >
+        {{ actBtn[i].label }}
       </el-button>
     </div>
     <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
-      <template>
-        <el-tab-pane
-          v-for="(item, index) in tabpaneList"
-          :key="item.name"
-          :label="item.label"
-          :name="item.label"
-        >
-          <component :is="item.content" v-if="item.isShow" :one="one" />
-        </el-tab-pane>
-      </template>
+      <el-tab-pane
+        v-for="item in tabpaneList"
+        :key="item.name"
+        :label="item.label"
+        :name="item.label"
+      >
+        <component :is="item.content" :one="one" />
+      </el-tab-pane>
     </el-tabs>
-    <!--问政审核-->
+    <!--问政审核 管理员-->
     <PDialog ref="examineRef" @submit="examineFn">
       <template slot="title">问政审核</template>
       <template slot="main">
         <el-form label-width="80px" :model="examineForm">
           <el-form-item label="审核结果">
-            <el-radio v-model="examineForm.result" :label="0">审核通过</el-radio>
-            <el-radio v-model="examineForm.result" :label="2">审核不通过</el-radio>
+            <el-radio v-model="examineForm.auditResult" :label="1"
+              >审核通过</el-radio
+            >
+            <el-radio v-model="examineForm.auditResult" :label="0"
+              >审核不通过</el-radio
+            >
           </el-form-item>
           <el-form-item label="审核说明">
             <el-input v-model="examineForm.content" />
           </el-form-item>
         </el-form>
-
       </template>
     </PDialog>
 
@@ -43,14 +49,13 @@
       <template slot="main">
         <el-form label-width="80px" :model="moreForm">
           <el-form-item label="审核结果">
-            <el-radio v-model="moreForm.result" :label="0">审核通过</el-radio>
-            <el-radio v-model="moreForm.result" :label="2">审核不通过</el-radio>
+            <el-radio v-model="moreForm.result" :label="1">审核通过</el-radio>
+            <el-radio v-model="moreForm.result" :label="0">审核不通过</el-radio>
           </el-form-item>
           <el-form-item label="审核说明">
             <el-input v-model="moreForm.content" />
           </el-form-item>
         </el-form>
-
       </template>
     </PDialog>
 
@@ -58,9 +63,14 @@
     <PDialog ref="deptRef" @submit="deptFn">
       <template slot="title">受理部门</template>
       <template slot="main">
-        <el-form label-width="80px" :model="deptForm">
-          <el-form-item label="选择单位">
-            <el-select v-model="deptForm.processingDeptId" placeholder="请选择">
+        <el-form
+          ref="deptFormRef"
+          label-width="80px"
+          :model="deptForm"
+          :rules="deptRules"
+        >
+          <el-form-item label="选择单位" prop="targetDeptId">
+            <el-select v-model="deptForm.targetDeptId" placeholder="请选择">
               <el-option
                 v-for="i in deptList"
                 :key="i.id"
@@ -81,17 +91,7 @@
       <template slot="title">受理问政</template>
       <template slot="main">
         <el-form label-width="80px" :model="acceptForm">
-          <el-form-item label="选择单位">
-            <el-select v-model="acceptForm.deptId" placeholder="请选择">
-              <el-option
-                v-for="i in deptList"
-                :key="i.id"
-                :label="i.name"
-                :value="i.id"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="审核说明">
+          <el-form-item label="受理说明">
             <el-input v-model="acceptForm.content" />
           </el-form-item>
         </el-form>
@@ -104,8 +104,11 @@
       <template slot="main">
         <el-form label-width="80px" :model="replyForm">
           <el-form-item label="回复说明">
-            <PEditorVue ref="replyEditorRef" :value="replyContent" @input="replyChange" />
-
+            <PEditorVue
+              ref="replyEditorRef"
+              :value="replyContent"
+              @input="replyChange"
+            />
           </el-form-item>
         </el-form>
       </template>
@@ -132,12 +135,23 @@
       </template>
     </PDialog>
     <!--邀请回复-->
-    <PDialog ref="inviteRef" @submit="inviteFn">
+    <PDialog ref="applyInviteRef" @submit="applyInviteFn">
       <template slot="title">邀请回复</template>
       <template slot="main">
-        <el-form label-width="80px" :model="transferForm">
+        <el-form
+          label-width="80px"
+          :model="applyInviteForm"
+          :rules="applyInviteRules"
+        >
           <el-form-item label="邀请单位">
-            <el-select v-model="inviteForm.deptId" collapse-tags multiple placeholder="请选择" @change="inviteSelect">
+            <el-select
+              v-model="applyInviteForm.deptId"
+              collapse-tags
+              multiple
+              placeholder="请选择"
+              @clear="applyInviteSelectClear"
+              @change="applyInviteSelect"
+            >
               <el-option
                 v-for="i in deptList"
                 :key="i.id"
@@ -148,33 +162,89 @@
           </el-form-item>
           <el-form-item label="已选部门">
             <el-tag
-              v-for="i in inviteList"
-              :key="i.name+'tag'"
+              v-for="i in applyInviteList"
+              :key="i.name + 'tag'"
               class="mr5"
               closable
-              @close="inviteCloseTag(i)"
+              @close="applyInviteCloseTag(i)"
             >
               {{ i.name }}
             </el-tag>
           </el-form-item>
           <el-form-item label="审核说明">
-            <el-input v-model="inviteForm.content" />
+            <el-input v-model="applyInviteForm.content" />
           </el-form-item>
         </el-form>
       </template>
     </PDialog>
     <!--审核回复-->
-    <PDialog ref="replyCheckRef" @submit="replyCheckFn">
+    <PDialog
+      ref="replyCheckRef"
+      @submit="replyCheckFn"
+      @opened="getReplyListFn"
+    >
       <template slot="title">审核回复</template>
       <template slot="main">
         <el-form label-width="80px" :model="replyCheckForm">
           <el-form-item label="审核结果">
-            <el-radio v-model="replyCheckForm.result" :label="0">审核通过</el-radio>
-            <el-radio v-model="replyCheckForm.result" :label="2">审核不通过</el-radio>
+            <el-radio v-model="replyCheckForm.auditResult" :label="1"
+              >审核通过</el-radio
+            >
+            <el-radio v-model="replyCheckForm.auditResult" :label="0"
+              >审核不通过</el-radio
+            >
           </el-form-item>
           <el-form-item label="审核说明">
-            <PEditorVue ref="replyCheckEditorRef" :value="replyCheckContent" @input="replyCheckChange" />
+            <PEditorVue
+              ref="replyCheckEditorRef"
+              :value="replyCheckContent"
+              @input="replyCheckChange"
+            />
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
 
+    <!--申请转移-->
+    <PDialog ref="applyTransferRef" @submit="applyTransferFn">
+      <template slot="title">申请问政转移</template>
+      <template slot="main">
+        <el-form label-width="80px" :model="applyTransferForm">
+          <el-form-item label="部门">
+            <el-select
+              v-model="applyTransferForm.deptId"
+              collapse-tags
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="i in deptList"
+                :key="i.id"
+                :label="i.name"
+                :value="i.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="转移说明">
+            <el-input v-model="applyTransferForm.content" />
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
+    <!--协助回复-->
+    <PDialog ref="otherDetpReplyRef" @submit="otherDetpReplyFn">
+      <template slot="title">协助回复</template>
+      <template slot="main">
+        <el-form
+          label-width="80px"
+          :model="otherDetpReplyForm"
+          :rules="otherDetpReplyRules"
+        >
+          <el-form-item label="回复内容">
+            <PEditorVue
+              ref="replyEditorRef"
+              :value="otherDetpReplyContent"
+              @input="otherDetpReplyChange"
+            />
           </el-form-item>
         </el-form>
       </template>
@@ -183,16 +253,27 @@
 </template>
 
 <script>
-import PEditorVue from '@/components/PEditorVue'
-import BasicInformation from '../components/DetailList'
-import PoliticalReply from '../components/PoliticalReply'
-import ReviewResults from '../components/ReviewResults'
-import PoliticalRecord from '../components/PoliticalRecord'
-import PDialog from '@/components/PDialog'
-import { affairsInfoSearch } from '@/api/method/politicalList'
-import { examineAffairs, acceptAffairs } from '@/api/method/affairscheck'
-import { unitList } from '@/api/method/unitManagement'
-import { transfer } from '@/api/method/transfer'
+import PEditorVue from "@/components/PEditorVue";
+import BasicInformation from "../components/DetailList";
+import PoliticalReply from "../components/PoliticalReply";
+import ReviewResults from "../components/ReviewResults";
+import PoliticalRecord from "../components/PoliticalRecord";
+import PDialog from "@/components/PDialog";
+import { affairsInfoSearch } from "@/api/method/politicalList";
+import {
+  examineAffairs,
+  secondExamineAffairs,
+  acceptAffairs,
+  replyExamineAffairs,
+} from "@/api/method/affairscheck";
+import { applyTransferAffair } from "@/api/method/transfer";
+import { replyAffairs } from "@/api/method/affairscheck";
+import { unitList } from "@/api/method/unitManagement";
+import { transfer } from "@/api/method/transfer";
+import { getReplyList } from "@/api/method/reply";
+import { addAffairsassist, otherDeptReply } from "@/api/method/affairsassist";
+import { Local } from "@/utils/storage";
+
 export default {
   components: {
     BasicInformation,
@@ -200,145 +281,411 @@ export default {
     ReviewResults,
     PoliticalRecord,
     PDialog,
-    PEditorVue
+    PEditorVue,
   },
   data() {
     return {
-      activeName: '基本信息',
-      tabpaneList: [
-        {
-          label: '基本信息',
-          content: BasicInformation,
-          isShow: true
-        },
-        {
-          label: '问政回复',
-          content: PoliticalReply,
-          isShow: false
-        },
-        {
-          label: '评价结果',
-          content: ReviewResults,
-          isShow: false
-        },
-        {
-          label: '问政记录',
-          content: PoliticalRecord,
-          isShow: false
+      activeName: "基本信息",
+      tabpaneList: (function () {
+        let u = localStorage.getItem("rj_wzwz_deptType");
+        u && (u = u * 1);
+        if (u > 1) {
+          return [
+            {
+              label: "基本信息",
+              content: BasicInformation,
+              isShow: true,
+              author: "all",
+            },
+            {
+              label: "问政回复",
+              content: PoliticalReply,
+              isShow: true,
+              author: "all",
+            },
+            {
+              label: "评价结果",
+              content: ReviewResults,
+              isShow: true,
+              author: "all",
+            },
+          ];
         }
-      ],
-      actBtn: [
-        { id: 1, label: '问政审核', dialog: 'examineRef', show: true },
-        { id: 2, label: '审核补充说明', dialog: 'moreRef', show: true },
-        { id: 3, label: '受理部门', dialog: 'deptRef', show: true },
-        { id: 4, label: '受理问政', dialog: 'acceptRef', show: true },
-        { id: 5, label: '回复问政', dialog: 'replyRef', show: true },
-        { id: 6, label: '问政转移', dialog: 'transferRef', show: true },
-        { id: 7, label: '邀请回复', dialog: 'inviteRef', show: true },
-        { id: 8, label: '审核回复', dialog: 'replyCheckRef', show: true },
-        { id: 9, label: '设为可见', dialog: 'isShowRef', show: true },
-        { id: 10, label: '开启评论', dialog: 'openCommentRef', show: true }
-      ],
-      one: {},
-      actBtn2: [
-        { id: 11, label: '删除', show: true },
-        { id: 12, label: '返回', show: true }
-      ],
-      examineForm: {
-        result: 0,
-        affairsId: '',
-        content: ''
+
+        return [
+          {
+            label: "基本信息",
+            content: BasicInformation,
+            isShow: true,
+            author: "all",
+          },
+          {
+            label: "问政回复",
+            content: PoliticalReply,
+            isShow: true,
+            author: "all",
+          },
+          {
+            label: "评价结果",
+            content: ReviewResults,
+            isShow: true,
+            author: "all",
+          },
+          {
+            label: "问政记录",
+            content: PoliticalRecord,
+            isShow: true,
+            author: "admin",
+          },
+        ];
+      })(),
+      admin: [0, 1],
+      spokeman: [2, 3, 4],
+      all: [0, 1, 2, 3, 4],
+      btnAll: {
+        examine: {
+          id: 1,
+          label: "问政审核",
+          dialog: "examineRef",
+          show: false,
+          author: "admin",
+        },
+        more: {
+          id: 2,
+          label: "审核补充说明",
+          dialog: "moreRef",
+          show: false,
+          author: "admin",
+        },
+        dept: {
+          id: 3,
+          label: "受理部门",
+          dialog: "deptRef",
+          show: false,
+          author: "admin",
+        },
+        accept: {
+          id: 4,
+          label: "受理问政",
+          dialog: "acceptRef",
+          show: false,
+          author: "all",
+        },
+        reply: {
+          id: 5,
+          label: "回复问政",
+          dialog: "replyRef",
+          show: false,
+          author: "all",
+        },
+        transfer: {
+          id: 6,
+          label: "问政转移",
+          dialog: "transferRef",
+          show: false,
+          author: "admin",
+        },
+        invite: {
+          id: 7,
+          label: "邀请回复",
+          dialog: "inviteRef",
+          show: false,
+          author: "admin",
+        },
+        replyCheck: {
+          id: 8,
+          label: "审核回复",
+          dialog: "replyCheckRef",
+          show: false,
+          author: "admin",
+        },
+        isShow: {
+          id: 9,
+          label: "设为可见",
+          dialog: "isShowRef",
+          show: false,
+          author: "admin",
+        },
+        openComment: {
+          id: 10,
+          label: "开启评论",
+          dialog: "openCommentRef",
+          show: false,
+          author: "admin",
+        },
+        applyTransfer: {
+          id: 11,
+          label: "申请问政转移",
+          dialog: "applyTransferRef",
+          show: false,
+          author: "spokeman",
+        },
+        applyInvite: {
+          id: 12,
+          label: "申请邀请回复",
+          dialog: "applyInviteRef",
+          show: false,
+          author: "spokeman",
+        },
+        otherDetpReply: {
+          id: 13,
+          label: "协助回复",
+          dialog: "otherDetpReplyRef",
+          show: false,
+          author: "spokeman",
+        },
+        delete: {
+          id: 99,
+          label: "删除",
+          show: false,
+          author: "admin",
+          type: "danger",
+        },
+        back: {
+          id: 100,
+          label: "返回",
+          show: false,
+          author: "all",
+          type: "normal",
+        },
       },
+      actBtn: {},
+      one: {},
+      deptList: [],
+      dialogName: "",
+      examineForm: {
+        // 问政审核参数
+        affairsId: "",
+        auditResult: 1,
+        content: "",
+      },
+
       moreForm: {
         result: 0,
-        affairsId: '',
-        content: ''
+        affairsId: "",
+        content: "",
       },
-      deptList: [],
       deptForm: {
-        'affairsId': '',
-        'content': '',
-        // 'createBy': '',
-        // 'createTime': '',
-        'processingDeptId': '',
-        'processingDeptName': ''
-        // 'id': '',
-        // 'result': '',
-        // 'status': '',
-        // 'updateBy': '',
-        // 'updateTime': '',
-        // 'userId': ''
+        affairsId: "",
+        content: "",
+        targetDeptId: "",
+        targetDeptName: "",
+      },
+      deptRules: {
+        targetDeptId: [
+          { required: true, message: "请选择一个单位", trigger: "change" },
+        ],
       },
       acceptForm: {
-        'affairsId': '',
-        'content': '',
-        // 'createBy': '',
-        // 'createTime': '',
-        'deptId': ''
+        affairsId: "",
+        content: "",
       },
-      replyContent: '',
+      replyContent: "",
       replyForm: {
-        'affairsId': '',
-        'deptId': ''
+        affairsId: "",
+        content: "",
       },
       transferForm: {
-        'affairsId': '',
-        'content': '',
-        // 'createBy': '',
-        // 'createTime': '',
-        'deptId': ''
-        // 'id': '',
-        // 'result': '',
-        // 'status': '',
-        // 'updateBy': '',
-        // 'updateTime': '',
-        // 'userId': ''
-      },
-      inviteList: [],
-      inviteForm: {
-        'affairsId': '',
-        'content': '',
-        'deptId': []
-      },
-      replyCheckContent: '',
-      replyCheckForm: {
-        result: 0,
-        affairsId: '',
-        content: ''
-      }
+        affairsId: "",
+        content: "",
 
-    }
+        deptId: "",
+      },
+
+      inviteForm: {
+        affairsId: "",
+        content: "",
+        deptId: [],
+      },
+      replyCheckContent: "",
+      replyCheckForm: {
+        auditResult: 1,
+        affairsId: "",
+        content: "",
+      },
+      applyTransferForm: {
+        // 申请问政转移
+        affairsId: "",
+        content: "",
+        deptId: "",
+        deptName: "",
+      },
+      applyInviteRules: {
+        deptList: [
+          { required: true, message: "请选择至少一个单位", trigger: "change" },
+        ],
+      },
+      applyInviteList: [],
+      applyInviteForm: {
+        // 邀请回复
+        affairsId: "",
+        content: "",
+        deptId: [],
+        deptList: [],
+      },
+      otherDetpReplyContent: "",
+      otherDetpReplyForm: {
+        // 协助回复
+        affairsId: "",
+        content: "",
+      },
+      otherDetpReplyRules: {
+        content: [
+          { required: true, message: "请输入回复内容", trigger: "change" },
+        ],
+      },
+      firstLoading: true,
+      userType: "",
+    };
   },
-  watch: {},
+  watch: {
+    one: {
+      handler: function (n) {
+        console.log("获取了新的状态", n.status);
+        if (this.firstLoading) {
+          this.firstLoading = false;
+        } else {
+          this.processPermission();
+        }
+      },
+    },
+  },
   created() {
-    if (this.$route.params.id) {
-      this.getOne(this.$route.params.id)
-      // 设置问政id
-      this.examineForm.affairsId = this.$route.params.id
-      this.moreForm.affairsId = this.$route.params.id
-      this.deptForm.affairsId = this.$route.params.id
-      this.acceptForm.affairsId = this.$route.params.id
-      this.transferForm.affairsId = this.$route.params.id
-    }
-    // 获取部门
-    this.getDept()
+    this.init();
   },
   mounted() {
-
+    setTimeout(() => {
+      this.userType = Local.get("rj_wzwz_deptType");
+      this.userType !== null && (this.userType = this.userType * 1);
+      // console.log('actBtn', this.$_config.admin.indexOf(3))
+    }, 0);
   },
   methods: {
-    getACC() {
-      alert('acc')
+    async init() {
+      // 获取账号所属角色类型
+      this.userType = Local.get("rj_wzwz_deptType");
+      this.userType !== null && (this.userType = this.userType * 1);
+      if (this.$route.params.id) {
+        await affairsInfoSearch(this.$route.params.id).then((res) => {
+          res.code === 10000 && (this.one = res.data);
+        });
+        // 设置问政id
+        const arr = [
+          "examineForm",
+          "moreForm",
+          "deptForm",
+          "acceptForm",
+          "replyForm",
+          "transferForm",
+          "inviteForm",
+          "replyCheckForm",
+          "applyTransferForm",
+          "applyInviteForm",
+          "otherDetpReplyForm",
+        ];
+        arr.forEach((i) => {
+          this[i].affairsId = this.$route.params.id;
+        });
+        // 账号权限判断
+        this.accountPermission();
+        // 流程按钮显示权限判断
+        this.processPermission();
+        // 获取部门
+        this.getDept();
+      }
+    },
+    accountPermission() {
+      console.log(1, this.one);
+      // 账号权限判断,左侧tabs和右侧按钮
+      // 如果是不是主单位问政数据，是为协助回复，只能显示 协助回复按钮
+
+      if (!this.one.isMainDept) {
+        this.$set(this.actBtn, "otherDeptReply", this.btnAll.otherDeptReply);
+      } else {
+        // 否则
+        Object.keys(this.btnAll).forEach((i) => {
+          this[this.btnAll[i].author].indexOf(this.userType) > -1 &&
+            this.$set(this.actBtn, i, this.btnAll[i]);
+        });
+      }
+
+      console.log("this.actBtn", this.actBtn);
+    },
+    setShow(arr) {
+      console.log("arrrrrr", arr);
+      Object.keys(this.actBtn).forEach((i) => {
+        this.actBtn[i].show = false;
+        arr.indexOf(i) > -1 && (this.actBtn[i].show = true);
+      });
+    },
+    processPermission() {
+      console.log(2);
+      // 根据账号角色和 问政状态 判断操作按钮显示与否
+      const ut = this.userType * 1; // ut 0超管 1 市长、书记发言人 2 市级单位发言人 3  县区发言人 4 其他部门发言人
+      const status = this.one.status;
+      console.log(ut, status);
+      let arr = [];
+      if (ut === 0) {
+        // 超管
+        // 全部权限
+        arr = [
+          "examine",
+          "more",
+          "dept",
+          "accept",
+          "reply",
+          "transfer",
+          "invite",
+          "replyCheck",
+          "isShow",
+          "openComment",
+          "delete",
+        ];
+      }
+      if (ut === 1) {
+        // 书记， 市长 发言人
+        // 审核通过  可以审核转移、受理部门
+        "20".indexOf(status) > -1 && (arr = arr.concat(["dept"]));
+        "5".indexOf(status) > -1 && (arr = arr.concat(["replyCheck", "dept"]));
+        "23".indexOf(status) > -1 && (arr = arr.concat(["replyCheck"]));
+      }
+
+      if (ut > 1) {
+        // 一般 发言人
+        // 审核通过未受理,市领导指派后  可以申请审核转移、受理
+        "4,13,14,21".indexOf(status) > -1 &&
+          (arr = arr.concat([
+            "applyTransfer",
+            "accept",
+            "reply",
+            "applyInvite",
+          ]));
+        // // 已受理  发起邀请回复、回复问政
+        "5".indexOf(status) > -1 &&
+          (arr = arr.concat(["applyInvite", "applyTransfer", "reply"]));
+        // 转移申请已提交，待审核  什么也不能干
+        "12".indexOf(status) > -1 && (arr = arr.concat([]));
+        // 转移申请不通过，仍是需要自己选择是否受理  什么也不能干
+        "13".indexOf(status) > -1 && (arr = arr.concat(["accept"]));
+
+        // 如果是不是主单位问政数据，是为协助回复，只能显示 协助回复按钮
+        !this.one.isMainDept((arr = ["otherDetpReply"]));
+      }
+
+      // 100 已完成  不可做任何操作
+      "100".indexOf(status) > -1 && (arr = arr.concat([]));
+      arr.push("back");
+      this.setShow(arr);
     },
     handleClick(val, event) {
-      this.tabpaneList = this.tabpaneList.map(item => {
+      this.tabpaneList = this.tabpaneList.map((item) => {
         if (item.label === val.label) {
-          item.isShow = true
+          item.isShow = true;
         } else {
-          item.isShow = false
+          item.isShow = false;
         }
-        return item
-      })
+        return item;
+      });
       // this.$nextTick(() => {
       //   document.getElementById("tab").scrollIntoView({
       //     behavior: "smooth",
@@ -346,92 +693,170 @@ export default {
       //   });
       // });
     },
-    getOne(v) {
-      affairsInfoSearch(v).then(res => {
-        res.code === 10000 && (this.one = res.data)
-      })
+    async getOne(v) {
+      console.log("水电费地方 个");
+      await affairsInfoSearch(v).then((res) => {
+        res.code === 10000 && (this.one = res.data);
+      });
     },
     getDept() {
       unitList({
-        'current': 1,
-        'size': 299
-      }).then(res => {
-        if (res.code === 10000) {
-          this.deptList = res.data.records
-        }
+        current: 1,
+        size: 9999,
       })
+        .then((res) => {
+          if (res.code === 10000) {
+            this.deptList = res.data.records;
+          }
+        })
+        .finally(() => {});
     },
     btnFn(i) {
-      i.dialog && this.comDialog(i.dialog)
-      i.id === 12 && this.$router.go(-1)
+      console.log(i.dialog);
+      i.dialog && this.comDialog(i.dialog);
+      i.id === 100 && this.$router.go(-1); // 返回
+      i.id === 99 && this.$router.go(-1); // 删除
     },
     comDialog(v) {
-      console.log('vvsafsafsaf', v)
+      this.dialogName = v;
+      console.log("vvsafsafsaf", v);
 
-      this.$refs[v] && (this.$refs[v].visible = true)
-      v === 'replyRef' && (this.replyContent = '')
-      v === 'replyCheckRef' && (this.replyCheckContent = '')
+      this.$refs[v] && (this.$refs[v].visible = true);
+      v === "replyRef" && (this.replyContent = "");
+      v === "replyCheckRef" && (this.replyCheckContent = "");
+    },
+    comDialogHide() {
+      this.$refs[this.dialogName].visible = false;
+      this.getOne(this.$route.params.id);
     },
 
     examineFn() {
       // 审核问政
-      examineAffairs(this.examineForm).then(res => {
-
-      })
+      examineAffairs(this.examineForm).then((res) => {
+        res.code === 10000 && this.comDialogHide();
+      });
     },
     moreFn() {
       // 补充说明审核
     },
     deptFn() {
       // 受理部门
-      this.deptForm.processingDeptName = this.deptList.filter(i => {
-        i.id === this.deptForm.processingDeptId
-      })
-      acceptAffairs(this.deptForm).then(res => {
-      })
+      this.$refs["deptFormRef"].validate((v) => {
+        if (v) {
+          this.deptForm.targetDeptName = this.deptList.filter((i) => {
+            return i.id === this.deptForm.targetDeptId;
+          })[0].name;
+          secondExamineAffairs(this.deptForm).then((res) => {
+            res.code === 10000 && this.comDialogHide();
+          });
+        }
+      });
     },
     acceptFn() {
       // 受理问政
-      acceptAffairs(this.acceptForm).then(res => {
-      })
+      acceptAffairs(this.acceptForm).then((res) => {
+        res.code === 10000 && this.comDialogHide();
+      });
     },
     replyChange(v) {
       // 回复问政的编辑器内容同步
-      this.replyForm.content = v
+      this.replyForm.content = v;
     },
-    replyCheckChange(v) {
-      // 回复问政审核的编辑器内容同步
-      this.replyCheckForm.content = v
-    },
+
     replyFn() {
       // 回复问政
+      replyAffairs(this.replyForm).then((res) => {
+        res.code === 10000 && this.comDialogHide();
+      });
     },
-    transferFn() {
-      transfer(this.transferForm).then(res => {
-      })
-    },
-    inviteSelect(v) {
-      this.inviteList = this.deptList.filter(i => {
-        return this.inviteForm.deptId.indexOf(i.id) !== -1
-      })
-    },
-    inviteCloseTag(v) {
-      console.log('vvvvss', v)
-      this.inviteList = this.inviteList.filter(i => {
-        return i.id !== v.id
-      })
-      this.inviteForm.deptId = this.inviteForm.deptId.filter(i => {
-        return i !== v.id
-      })
+
+    getReplyListFn() {
+      getReplyList(this.replyCheckForm.affairsId).then((res) => {
+        if (res.code === 10000) {
+          const rd = res.data.filter((i) => {
+            return i.mainFlag === 2;
+          });
+          this.replyCheckContent = rd[0] ? rd[0].content : "";
+        }
+      });
     },
     replyCheckFn() {
       // 审核回复
+      // console.log('this.replyCheckForm', this.replyCheckForm)
+      // return
+      replyExamineAffairs(this.replyCheckForm).then((res) => {
+        res.code === 10000 && this.comDialogHide();
+      });
     },
-    inviteFn() {
+    replyCheckChange(v) {
+      // 回复问政审核的编辑器内容同步
+      this.replyCheckForm.content = v;
+    },
+    applyInviteSelect(v) {
+      this.applyInviteList = this.deptList.filter((i) => {
+        return this.applyInviteForm.deptId.indexOf(i.id) !== -1;
+      });
+    },
+    applyInviteSelectClear() {
+      console.log("sdfsdf", this.applyInviteList);
+    },
+    applyInviteCloseTag(v) {
+      console.log("vvvvss", v);
+      this.applyInviteList = this.applyInviteList.filter((i) => {
+        return i.id !== v.id;
+      });
+      this.applyInviteForm.deptList = this.applyInviteForm.deptList.filter(
+        (i) => {
+          return i.deptId !== v.id;
+        }
+      );
+    },
+    applyInviteFn() {
       // 邀请回复
-    }
-  }
-}
+      console.log("sfsdffapplyInviteFn", this.applyInviteList);
+      this.applyInviteForm.deptList = [];
+      this.applyInviteList.forEach((i) => {
+        this.applyInviteForm.deptList.push({ deptId: i.id, deptName: i.name });
+      });
+      console.log(this.applyInviteForm);
+      const p = Object.assign({}, this.applyInviteForm);
+      delete p.deptId;
+
+      addAffairsassist(p).then((res) => {
+        res.code === 10000 && this.comDialogHide();
+      });
+    },
+    applyTransferFn() {
+      // 申请问政转移
+      this.applyTransferForm.deptName = this.deptList.filter((i) => {
+        return i.id === this.applyTransferForm.deptId;
+      })[0].name;
+      applyTransferAffair(this.applyTransferForm).then((res) => {
+        res.code === 10000 && this.comDialogHide();
+      });
+    },
+    transferFn() {
+      // 问政转移
+      transfer(this.transferForm).then((res) => {
+        res.code === 10000 && this.comDialogHide();
+      });
+    },
+    otherDetpReplyFn() {
+      // 协助回复
+      this.otherDetpReplyForm.content = this.otherDetpReplyContent;
+      this.$refs["otherDetpReplyRef"].validate((v) => {
+        if (v) {
+          otherDeptReply(this.otherDetpReplyForm).then((res) => {
+            res.code === 10000 && this.comDialogHide();
+          });
+        }
+      });
+    },
+    otherDetpReplyChange(v) {
+      this.otherDetpReplyContent = v;
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -458,8 +883,8 @@ export default {
 }
 
 ::v-deep .el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active {
-  position:relative;
-  top:4px;
+  position: relative;
+  top: 4px;
 }
 ::v-deep .el-tabs__nav > .is-active {
   background: #f9f9f9 !important;
@@ -469,7 +894,7 @@ export default {
 .politicalDetail_container {
   background: #ececec;
 }
-.act-btn{
+.act-btn {
   position: absolute;
   top: 6px;
   right: 5px;

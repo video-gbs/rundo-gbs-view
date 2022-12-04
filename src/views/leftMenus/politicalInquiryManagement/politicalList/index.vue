@@ -122,7 +122,7 @@ export default {
         },
         {
           label: '未回复',
-          value: 4,
+          value: 5,
           isShow: false
         },
         {
@@ -132,12 +132,12 @@ export default {
         },
         {
           label: '已回复',
-          value: 7,
+          value: 100,
           isShow: false
         },
         {
           label: '审核未通过',
-          value: 3,
+          value: 22,
           isShow: false
         }
       ]

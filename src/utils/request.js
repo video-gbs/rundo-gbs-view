@@ -2,6 +2,7 @@ import Vue from 'vue'
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
+import router from '@/router'
 import { Local } from '@/utils/storage'
 
 const requestTimeOut = 20 * 100000
@@ -53,6 +54,8 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
+    console.log('response', response)
+
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.
@@ -82,7 +85,13 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err' + error) // for debug
+    if ((error + '').indexOf('401') > -1) {
+      Local.remove('MANAGE_USER_TOKEN')
+      Local.remove('rj_wzwz_token')
+      Local.remove('rj_wzwz_deptType')
+      router.push('/login')
+    }
+    console.log('err info:' + error) // for debug
     Message({
       message: error.message,
       type: 'error',

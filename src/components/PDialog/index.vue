@@ -8,7 +8,9 @@
     :show-close="false"
     :close-on-click-modal="closeOnClickModal"
     append-to-body
-    @open="open">
+    @open="open"
+    @opened="opened"
+  >
     <div slot="title" class="dialog-title">
       <span class="title">{{ title }}</span>
       <svg-icon icon-class="close" class="pointer" @click="cancel()" />
@@ -75,6 +77,9 @@ export default {
     },
     open() {
       this.$emit('open')
+    },
+    opened() {
+      this.$emit('opened')
     },
     showLoading() {
       this.submitLoading = true

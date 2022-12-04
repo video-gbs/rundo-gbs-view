@@ -18,18 +18,32 @@ const dict = {
   status: {
     '': '全部状态',
     '1': '已撤回',
-    '2': '未通过',
-    '3': '未回复',
+    '2': '待审核',
+    '3': '审核未通过',
+    '4': '待受理',
     '5': '已受理',
-    '6': '审核回复'
+    '12': '待审核',
+    '13': '未通过',
+    '14': '待受理',
+    '20': '待审核',
+    '21': '待受理',
+    '23': '待审核',
+    '100': '已完成'
   },
   _status: [
     { value: '', label: '全部状态' },
     { value: 1, label: '已撤回' },
-    { value: 2, label: '未通过' },
-    { value: 3, label: '未回复' },
-    { value: 4, label: '已受理' },
-    { value: 5, label: '审核回复' }
+    { value: 2, label: '待审核' },
+    { value: 3, label: '审核未通过' },
+    { value: 4, label: '待受理' },
+    { value: 5, label: '已受理' },
+    { value: 12, label: '待审核' },
+    { value: 13, label: '未通过' },
+    { value: 14, label: '待受理' },
+    { value: 20, label: '待审核' },
+    { value: 21, label: '待受理' },
+    { value: 23, label: '待审核' },
+    { value: 100, label: '已完成' }
   ],
   domain: {
     '': '全部领域',
