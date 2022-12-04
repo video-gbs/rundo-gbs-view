@@ -73,6 +73,8 @@
                       <el-date-picker
                         v-model="ruleForm[item.key]"
                         :type="item.dateType || 'date'"
+                        :format="item.format || ''"
+                        :value-format="item.valueFormat || ''"
                         :placeholder="item.placeholder || '请选择'"
                         start-placeholder="开始日期"
                         end-placeholder="结束日期"
@@ -244,6 +246,8 @@
                 <el-date-picker
                   v-model="ruleForm[item.key]"
                   :type="item.dateType || 'date'"
+                  :format="item.format || ''"
+                  :value-format="item.valueFormat || ''"
                   :placeholder="item.placeholder || '请选择'"
                 />
               </template>

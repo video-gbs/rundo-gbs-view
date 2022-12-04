@@ -1,7 +1,12 @@
 <template>
   <div v-if="!this.showDetails" class="projectManagement">
     <div class="seach">
-      <Seach :form-list="FormList" :query="pagesData" @submitSearch="submitSearch" @submitReset="toReset" />
+      <Seach
+        :form-list="FormList"
+        :query="pagesData"
+        @submitSearch="submitSearch"
+        @submitReset="toReset"
+      />
     </div>
     <div class="footer-table">
       <div class="tab-table">
@@ -25,134 +30,138 @@
           @changeTableHeader="changeTableHeader"
           @selection-change="handleSelectionChange"
         />
-        <Pagination :pages-data="pagesData" @size-change="sizeChange" @current-change="currentChange" />
+        <Pagination
+          :pages-data="pagesData"
+          @size-change="sizeChange"
+          @current-change="currentChange"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Seach from '@/components/Seach/index.vue'
-import ComTabble from '@/components/ComTabble/index.vue'
-import Pagination from '@/components/Pagination/index.vue'
-import { unitList } from '@/api/method/unitManagement'
+import Seach from "@/components/Seach/index.vue";
+import ComTabble from "@/components/ComTabble/index.vue";
+import Pagination from "@/components/Pagination/index.vue";
+import { unitList } from "@/api/method/unitManagement";
 import {
   affairsInfoList,
   affairsInfoDelete,
-  affairsInfoSearch
-} from '@/api/method/politicalList'
+  affairsInfoSearch,
+} from "@/api/method/politicalList";
 export default {
-  name: 'ProjectManagement',
+  name: "ProjectManagement",
   components: {
     Seach,
     ComTabble,
-    Pagination
+    Pagination,
   },
   data() {
     return {
       showDetails: false,
       headerStyle: {
-        background: '#EAEAEA',
-        fontsize: '14px',
+        background: "#EAEAEA",
+        fontsize: "14px",
         fontWeight: 400,
-        color: '#333333'
+        color: "#333333",
       },
       // 搜索栏配置
 
       FormList: [
         {
-          poro: 'title',
-          type: 'input',
-          label: '标题：',
-          size: 'small'
+          poro: "title",
+          type: "input",
+          label: "标题：",
+          size: "small",
         },
         {
-          poro: 'type',
-          type: 'select',
-          label: '分类：',
-          size: 'small',
-          optionsList: this.$dict._type
+          poro: "type",
+          type: "select",
+          label: "分类：",
+          size: "small",
+          optionsList: this.$dict._type,
         },
         {
-          poro: 'domain',
-          type: 'select',
-          label: '领域：',
-          size: 'small',
+          poro: "domain",
+          type: "select",
+          label: "领域：",
+          size: "small",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+            multiple: true,
           },
-          optionsList: this.$dict._domain
+          optionsList: this.$dict._domain,
         },
         {
-          poro: 'deptId',
-          type: 'select',
-          label: '留言对象：',
-          size: 'small',
+          poro: "deptId",
+          type: "select",
+          label: "留言对象：",
+          size: "small",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+            multiple: true,
           },
-          optionsList: []
+          optionsList: [],
         },
 
         {
-          poro: 'isShow',
-          type: 'select',
-          label: '显示状态：',
-          size: 'small',
+          poro: "isShow",
+          type: "select",
+          label: "显示状态：",
+          size: "small",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+            multiple: true,
           },
-          optionsList: this.$dict._isShow
+          optionsList: this.$dict._isShow,
         },
         {
-          poro: 'pubUsername',
-          label: '发布账号：',
-          size: 'small',
-          type: 'input',
+          poro: "pubUsername",
+          label: "发布账号：",
+          size: "small",
+          type: "input",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+            multiple: true,
           },
-          optionsList: []
+          optionsList: [],
         },
         {
-          poro: 'phone',
-          type: 'input',
-          label: '电话：',
-          size: 'small',
+          poro: "phone",
+          type: "input",
+          label: "电话：",
+          size: "small",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+            multiple: true,
           },
-          optionsList: []
-        }
+          optionsList: [],
+        },
       ],
       // 搜索from
       query: {
         deptId: 0,
         deptType: 0,
-        domain: '',
-        endTime: '',
+        domain: "",
+        endTime: "",
         field: [],
         fileBatchId: 0,
         isDeleted: 0,
         isReview: 0,
-        isShow: '',
+        isShow: "",
         order: true,
-        phone: '',
-        pubUsername: '',
-        realName: '',
-        startTime: '',
+        phone: "",
+        pubUsername: "",
+        realName: "",
+        startTime: "",
         status: 0,
-        title: '',
-        type: '',
+        title: "",
+        type: "",
         pageNum: 1,
         pageSize: 10,
         total: 0,
-        proCount: 0
+        proCount: 0,
       },
       // 高级搜索
       isLoading: false,
@@ -160,418 +169,420 @@ export default {
       index: true,
       tableItems: [
         {
-          label: '编号',
-          name: 'id',
-          width: '100',
+          label: "编号",
+          name: "id",
+          width: "100",
           isShow: true,
-          isBold: false
+          isBold: false,
         },
         {
-          label: '标题',
-          name: 'title',
-          width: '200',
-          isShow: true
-        },
-        {
-          label: '分类',
-          name: 'type',
-          content: 'type',
+          label: "标题",
+          name: "title",
+          width: "200",
           isShow: true,
-          width: '80'
         },
         {
-          label: '留言对象',
-          name: 'deptName',
-          isShow: true
-        },
-        {
-          label: '发布账号',
-          name: 'username',
-          isShow: true
-        },
-        {
-          label: '电话',
-          name: 'phone',
-          isShow: true
-        },
-        {
-          label: '提交时间',
-          name: 'createTime',
+          label: "分类",
+          name: "type",
+          content: "type",
           isShow: true,
-          width: '120'
+          width: "80",
         },
         {
-          label: '状态',
-          name: 'status',
+          label: "留言对象",
+          name: "deptName",
           isShow: true,
-          content: 'status',
-          width: '80'
         },
         {
-          label: '受理单位',
-          name: 'processingDeptName',
-          isShow: true
-        },
-        {
-          label: '是否可见',
-          name: 'isShow',
+          label: "发布账号",
+          name: "username",
           isShow: true,
-          content: 'isShow',
-          width: '80'
         },
         {
-          label: '评论区',
-          name: 'isReview',
+          label: "电话",
+          name: "phone",
           isShow: true,
-          content: 'isReview',
-          width: '80'
-        }
+        },
+        {
+          label: "提交时间",
+          name: "createTime",
+          isShow: true,
+          width: "120",
+        },
+        {
+          label: "状态",
+          name: "status",
+          isShow: true,
+          content: "status",
+          width: "80",
+        },
+        {
+          label: "受理单位",
+          name: "processingDeptName",
+          isShow: true,
+        },
+        {
+          label: "是否可见",
+          name: "isShow",
+          isShow: true,
+          content: "isShow",
+          width: "80",
+        },
+        {
+          label: "评论区",
+          name: "isReview",
+          isShow: true,
+          content: "isReview",
+          width: "80",
+        },
       ],
-      leftTitle: '',
+      leftTitle: "",
       maxHeight: 800,
       tableData: [],
       // 分页器内容
       pagesData: {
-        'account': '',
-        'deptId': '',
-        'deptType': '',
-        'domain': '',
-        'endTime': '',
-        'field': [],
-        'fileBatchId': 0,
-        'isDeleted': 0,
-        'isReview': 0,
-        'isShow': '',
-        'order': true,
-        'pageNum': 1,
-        'pageSize': 10,
-        'phone': '',
-        'pubUsername': '',
-        'realName': '',
-        'startTime': '',
-        'status': '',
-        'title': '',
-        'type': '',
-        'total': 0,
-        'proCount': 0
+        account: "",
+        deptId: "",
+        deptType: "",
+        domain: "",
+        endTime: "",
+        field: [],
+        fileBatchId: 0,
+        isDeleted: 0,
+        isReview: 0,
+        isShow: "",
+        order: true,
+        pageNum: 1,
+        pageSize: 10,
+        phone: "",
+        pubUsername: "",
+        realName: "",
+        startTime: "",
+        status: "",
+        title: "",
+        type: "",
+        total: 0,
+        proCount: 0,
       },
       buttonItems: {
         options: [
           {
-            text: '详情',
-            cb: 'verify',
-            icon: 'el-icon-view'
+            text: "详情",
+            cb: "verify",
+            icon: "el-icon-view",
           },
           {
-            text: '删除',
-            cb: 'delect',
-            icon: 'el-icon-delete',
-            className: 'isRed'
-          }
+            text: "删除",
+            cb: "delect",
+            icon: "el-icon-delete",
+            className: "isRed",
+          },
         ],
-        label: '操作',
-        width: '200px'
+        label: "操作",
+        width: "200px",
       },
-      activeName: '',
+      activeName: "",
       dialogVisible: false,
-      dialogTitle: '项目详情',
+      dialogTitle: "项目详情",
       baseList: [
         {
-          label: '项目名称 ',
-          prop: 'projectName',
-          type: 'input'
+          label: "项目名称 ",
+          prop: "projectName",
+          type: "input",
         },
         {
-          label: '子项目名称',
-          prop: 'projectSubName',
-          type: 'input'
+          label: "子项目名称",
+          prop: "projectSubName",
+          type: "input",
         },
         {
-          label: '所属地市',
-          prop: 'area',
-          type: 'addressCascader',
-          propsConfig: {
-            checkStrictly: true
-          },
-          optionsList: []
-        },
-        {
-          label: '修复类型 ',
-          prop: 'renovateType',
-          type: 'addressCascader',
+          label: "所属地市",
+          prop: "area",
+          type: "addressCascader",
           propsConfig: {
             checkStrictly: true,
-            multiple: true
+          },
+          optionsList: [],
+        },
+        {
+          label: "修复类型 ",
+          prop: "renovateType",
+          type: "addressCascader",
+          propsConfig: {
+            checkStrictly: true,
+            multiple: true,
           },
           optionsList: [],
           onlyLast: false,
-          collapseTags: true
+          collapseTags: true,
         },
         {
-          label: '资金来源 ',
-          prop: 'moneySource',
-          type: 'addressCascader',
+          label: "资金来源 ",
+          prop: "moneySource",
+          type: "addressCascader",
           propsConfig: {
-            checkStrictly: true
+            checkStrictly: true,
           },
-          optionsList: []
+          optionsList: [],
         },
         {
-          label: '下达资金(万元) ',
-          prop: 'issuedMoeny',
-          type: 'input'
+          label: "下达资金(万元) ",
+          prop: "issuedMoeny",
+          type: "input",
         },
         {
-          label: '项目状态 ',
-          prop: 'projectState',
-          type: 'addressCascader',
+          label: "项目状态 ",
+          prop: "projectState",
+          type: "addressCascader",
           propsConfig: {
-            checkStrictly: true
+            checkStrictly: true,
           },
-          optionsList: []
+          optionsList: [],
         },
         {
-          label: '项目位置 ',
-          prop: 'projectPlace',
-          type: 'input',
-          optionsList: []
+          label: "项目位置 ",
+          prop: "projectPlace",
+          type: "input",
+          optionsList: [],
         },
         {
-          label: '申报年份 ',
-          prop: 'declareYear',
-          type: 'datePicker',
-          dateType: 'year',
-          fromat: 'yyyy',
-          valueFromat: 'yyyy'
+          label: "申报年份 ",
+          prop: "declareYear",
+          type: "datePicker",
+          dateType: "year",
+          fromat: "yyyy",
+          valueFromat: "yyyy",
         },
         {
-          label: '承接单位 ',
-          prop: 'assumeUnit',
-          type: 'input'
+          label: "承接单位 ",
+          prop: "assumeUnit",
+          type: "input",
         },
         {
-          label: '经纬度 ',
-          prop: 'coordinate',
-          type: 'input'
+          label: "经纬度 ",
+          prop: "coordinate",
+          type: "input",
         },
         {
-          label: '实施年限 ',
-          prop: 'carryTerm',
-          type: 'input',
-          optionsList: []
+          label: "实施年限 ",
+          prop: "carryTerm",
+          type: "input",
+          optionsList: [],
         },
         {
-          label: '联系人 ',
-          prop: 'contacts',
-          type: 'input'
+          label: "联系人 ",
+          prop: "contacts",
+          type: "input",
         },
         {
-          label: '责任单位 ',
-          prop: 'accountabilityUnit',
-          type: 'input'
+          label: "责任单位 ",
+          prop: "accountabilityUnit",
+          type: "input",
         },
         {
-          label: '开始时间 ',
-          prop: 'startDate',
-          type: 'datePicker',
-          dateType: 'date',
-          fromat: 'yyyy-MM-dd HH:mm:ss',
-          valueFromat: 'yyyy-MM-dd HH:mm:ss'
+          label: "开始时间 ",
+          prop: "startDate",
+          type: "datePicker",
+          dateType: "date",
+          fromat: "yyyy-MM-dd HH:mm:ss",
+          valueFromat: "yyyy-MM-dd HH:mm:ss",
         },
         {
-          label: '验收时间 ',
-          prop: 'acceptDate',
-          type: 'datePicker',
-          dateType: 'date',
-          fromat: 'yyyy-MM-dd ',
-          valueFromat: 'yyyy-MM-dd'
+          label: "验收时间 ",
+          prop: "acceptDate",
+          type: "datePicker",
+          dateType: "date",
+          fromat: "yyyy-MM-dd ",
+          valueFromat: "yyyy-MM-dd",
         },
         {
-          label: '资金支出进度 ',
-          prop: 'moneyExpPlan',
-          type: 'input'
+          label: "资金支出进度 ",
+          prop: "moneyExpPlan",
+          type: "input",
         },
         {
-          prop: 'isTypical',
-          type: 'radio',
-          label: '是否典型案例：',
-          optionsList: []
+          prop: "isTypical",
+          type: "radio",
+          label: "是否典型案例：",
+          optionsList: [],
         },
         {
-          label: '项目完成进度 ',
-          prop: 'workPlan',
-          type: 'textarea',
-          itemWidth: '1045px'
+          label: "项目完成进度 ",
+          prop: "workPlan",
+          type: "textarea",
+          itemWidth: "1045px",
         },
         {
-          label: '绩效目标 ',
-          prop: 'perfTarget',
-          type: 'textarea',
-          itemWidth: '1045px'
+          label: "绩效目标 ",
+          prop: "perfTarget",
+          type: "textarea",
+          itemWidth: "1045px",
         },
         {
-          label: '修复内容 ',
-          prop: 'restoreContent',
-          type: 'textarea',
-          itemWidth: '1045px'
-        }
+          label: "修复内容 ",
+          prop: "restoreContent",
+          type: "textarea",
+          itemWidth: "1045px",
+        },
       ],
       btnItems: [
         {
-          text: '保存',
-          cb: 'submitPreservation'
+          text: "保存",
+          cb: "submitPreservation",
         },
         {
-          text: '重置',
-          cb: 'submitReset'
-        }
+          text: "重置",
+          cb: "submitReset",
+        },
       ],
       selectionList: [],
       checkedHeader: [],
       isCheckedHeader: true,
       headerBtn: [],
       fileList: [],
-      isLoding: false
-    }
+      isLoding: false,
+    };
   },
   computed: {},
   watch: {
     // ??????
     pagesData: {
-      handler: function(n) {
-        this.getDataList()
-      }
-    }
+      handler: function (n) {
+        this.getDataList();
+      },
+    },
   },
   mounted() {
-    this.init()
+    this.init();
   },
 
   methods: {
     init() {
-      this.getDataList()
-      this.getDeptFn()
+      this.getDataList();
+      this.getDeptFn();
     },
     getDataList() {
       affairsInfoList(this.pagesData).then((res) => {
         if (res.code === 10000) {
-          this.tableData = res.data ? res.data.rows : []
-          this.pagesData.total = res.data.total
-          this.pagesData.pages = res.data.pages
-          this.pagesData.current = res.data.current
+          this.tableData = res.data ? res.data.rows : [];
+          this.pagesData.total = res.data.total;
+          this.pagesData.pages = res.data.pages;
+          this.pagesData.current = res.data.current;
         }
-      })
+      });
     },
     getDeptFn() {
       // 获取部门
-      unitList({ 'current': 1, 'size': 3000 }).then(res => {
+      unitList({ current: 1, size: 3000 }).then((res) => {
         if (res.code === 10000) {
-          0
-          this.FormList.forEach(i => {
-            if (i.poro === 'deptId') {
-              i.optionsList = res.data.records.map(l => {
-                return { value: l.id, label: l.name }
-              })
+          0;
+          this.FormList.forEach((i) => {
+            if (i.poro === "deptId") {
+              i.optionsList = res.data.records.map((l) => {
+                return { value: l.id, label: l.name };
+              });
             }
-          })
+          });
         }
-      })
+      });
     },
-    submitSearch() { this.getDataList() },
+    submitSearch() {
+      this.getDataList();
+    },
     toReset(val) {
-      this.pagesData = val
-      this.pagesData.pageNum = 1
-      this.pagesData.pageSize = 10
+      this.pagesData = val;
+      this.pagesData.pageNum = 1;
+      this.pagesData.pageSize = 10;
       setTimeout(() => {
-        this.getDataList()
-      }, 200)
+        this.getDataList();
+      }, 200);
     },
 
     deletItem(val) {
-      this.$confirm('此操作将删除该附件, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将删除该附件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
         .then(() => {
-          this.fileList = this.fileList.filter((item) => item.uid !== val.uid)
-          this.$message.success('删除成功!')
+          this.fileList = this.fileList.filter((item) => item.uid !== val.uid);
+          this.$message.success("删除成功!");
         })
         .catch(() => {
-          console.log('取消')
-        })
+          console.log("取消");
+        });
     },
 
     async downloadExect() {
       const parms = {
-        ...this.query
-      }
-      const rest = await projectExport(parms)
+        ...this.query,
+      };
+      const rest = await projectExport(parms);
     },
 
     async delectitem() {
-      const list = []
+      const list = [];
       this.selectionList.map((item) => {
-        list.push(item.projectId)
-      })
+        list.push(item.projectId);
+      });
       if (list.length === 0) {
-        this.$message.error('选中的项目不能为空!')
-        return false
+        this.$message.error("选中的项目不能为空!");
+        return false;
       }
-      this.$confirm('此操作将删除选中的项目, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("此操作将删除选中的项目, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       })
-        .then(async() => {
+        .then(async () => {
           const params = {
-            ids: list.join(',')
-          }
-          const rest = await removeProject(params)
-          this.$message.success('删除成功!')
+            ids: list.join(","),
+          };
+          const rest = await removeProject(params);
+          this.$message.success("删除成功!");
           setTimeout(() => {
-            this.getDataList()
-          }, 200)
+            this.getDataList();
+          }, 200);
         })
         .catch(() => {
-          this.$message.info('已取消删除!')
+          this.$message.info("已取消删除!");
           setTimeout(() => {
-            this.getDataList()
-          }, 200)
-        })
+            this.getDataList();
+          }, 200);
+        });
     },
     handleClick(v) {
-      this[v.cb](v.row)
+      this[v.cb](v.row);
     },
     // 查看详情
     verify(val) {
-      console.log('xq', val)
-      this.$router.push(`/politicalList/${val.id}`)
+      console.log("xq", val);
+      this.$router.push(`/politicalList/list/${val.id}`);
     },
     // 每页显示条目个数
     sizeChange(val) {
-      this.pagesData.pageSize = val
-      this.getDataList()
+      this.pagesData.pageSize = val;
+      this.getDataList();
     },
     // 当前页数
     currentChange(val) {
-      this.pagesData.pageNum = val
-      this.getDataList()
+      this.pagesData.pageNum = val;
+      this.getDataList();
     },
     handleSizeChange(val) {
-      this.pagesData.pageSize = val
-      this.getDataList()
+      this.pagesData.pageSize = val;
+      this.getDataList();
     },
     handleCurrentChange(val) {
-      this.pagesData.pageNum = val
-      this.getDataList()
+      this.pagesData.pageNum = val;
+      this.getDataList();
     },
     selection() {},
     haederBtnClick() {},
     changeTableHeader() {},
-    handleSelectionChange() {}
-  }
-}
+    handleSelectionChange() {},
+  },
+};
 </script>
 <style lang="scss" scoped>
 ::v-deep .el-form-item__label {
