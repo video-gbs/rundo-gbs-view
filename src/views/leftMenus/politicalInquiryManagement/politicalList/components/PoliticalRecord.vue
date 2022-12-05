@@ -30,15 +30,12 @@
                 </slot>
               </div>
               <el-card>
-                <h4 class="reviewResults-h4">
-                  {{ i.content }}
-                </h4>
-                <p class="reviewResults-p">
-                  {{ `${i.updateBy} 提交于 ${i.updateTime}` }}
+                <p class="reviewResults-h4 fs20 fw600">
+                  {{ i.title }}
                 </p>
-                <!-- <p v-if="i.shyj" class="reviewResults-p">
-                  【审核意见】照片拍摄不清晰；需增加描述内容。
-                </p> -->
+                <p class="reviewResults-p">
+                  {{ `${i.updateTime}` }}
+                </p>
               </el-card>
             </el-timeline-item>
           </el-timeline>
@@ -97,14 +94,6 @@ export default {
       },
       params: {
         affairsId: "",
-        content: "",
-        createBy: "",
-        createTime: "",
-        id: "",
-        title: "",
-        type: "",
-        updateBy: "",
-        updateTime: "",
       },
     };
   },
@@ -123,7 +112,9 @@ export default {
         if (res.code === 10000) {
           const r = res.data;
           r.forEach((i) => {
+            Object.assign(i, this.actCss);
             i = { ...i, ...this.actCss };
+            i["timestamp"] = i.createTime;
             // 可以根据其他字段设置不同的icon
             // fn...
           });

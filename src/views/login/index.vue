@@ -54,7 +54,8 @@
         type="primary"
         style="width: 100%; margin-bottom: 30px"
         @click.native.prevent="handleLogin"
-      >Login</el-button>
+        >Login</el-button
+      >
 
       <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
@@ -65,91 +66,92 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-import { login } from '@/api/method/user'
-import { Local } from '@/utils/storage'
+import { validUsername } from "@/utils/validate";
+import { login } from "@/api/method/user";
+import { Local } from "@/utils/storage";
 export default {
-  name: 'Login',
+  name: "Login",
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error("Please enter the correct user name"));
       } else {
-        callback()
+        callback();
       }
-    }
+    };
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error("The password can not be less than 6 digits"));
       } else {
-        callback()
+        callback();
       }
-    }
+    };
     return {
       loginForm: {
         // adminsuper/123456
-        account: '',
-        password: ''
+        account: "",
+        password: "",
       },
       loginRules: {
         account: [
-          { required: true, trigger: 'blur', validator: validateUsername }
+          { required: true, trigger: "blur", validator: validateUsername },
         ],
         password: [
-          { required: true, trigger: 'blur', validator: validatePassword }
-        ]
+          { required: true, trigger: "blur", validator: validatePassword },
+        ],
       },
       loading: false,
-      passwordType: 'password',
-      redirect: undefined
-    }
+      passwordType: "password",
+      redirect: undefined,
+    };
   },
   watch: {
     $route: {
-      handler: function(route) {
-        this.redirect = route.query && route.query.redirect
+      handler: function (route) {
+        this.redirect = route.query && route.query.redirect;
       },
-      immediate: true
-    }
+      immediate: true,
+    },
   },
   methods: {
     showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
+      if (this.passwordType === "password") {
+        this.passwordType = "";
       } else {
-        this.passwordType = 'password'
+        this.passwordType = "password";
       }
       this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
+        this.$refs.password.focus();
+      });
     },
     handleLogin() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
-          this.loading = true
+          this.loading = true;
           login(this.loginForm)
             .then((res) => {
               if (res.code === 10000) {
-                const access_token = res.data.token
-                const deptType = res.data.deptType
-                Local.setToken(access_token)
-                Local.set('rj_wzwz_token', access_token)
-                Local.set('rj_wzwz_deptType', deptType)
-                this.$router.push({ path: '/workTable' })
-                this.loading = false
+                const { deptName, deptType, userName, token } = res.data;
+                Local.setToken(token);
+                Local.set("rj_wzwz_token", token);
+                Local.set("rj_wzwz_deptType", deptType);
+                Local.set("rj_wzwz_userName", userName);
+                Local.set("rj_wzwz_deptName", deptName);
+                this.$router.push({ path: "/workTable" });
+                this.loading = false;
               }
             })
             .catch(() => {
-              this.loading = false
-            })
+              this.loading = false;
+            });
         } else {
-          console.log('error submit!!')
-          return false
+          console.log("error submit!!");
+          return false;
         }
-      })
-    }
-  }
-}
+      });
+    },
+  },
+};
 </script>
 
 <style lang="scss">
