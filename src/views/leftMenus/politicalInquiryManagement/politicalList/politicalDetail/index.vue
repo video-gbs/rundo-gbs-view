@@ -737,25 +737,25 @@ export default {
       const { status, isMainDept } = this.one;
 
       console.log(ut, status);
-      let arr = [];
+      let arr = [
+        "examine",
+        "more",
+        "dept",
+        "accept",
+        "reply",
+        "transfer",
+        "invite",
+        "replyCheck",
+        "applyTransfer",
+        "applyTransferCheck",
+        "applyInvite",
+        "otherDeptReply",
+      ];
       if (ut === 0) {
         // 超管
         // 全部权限
-        arr = [
-          "examine",
-          "more",
-          "dept",
-          "accept",
-          "reply",
-          "transfer",
-          "invite",
-          "replyCheck",
-          "applyTransferCheck",
-          "applyInviteCheck",
-          "isShow",
-          "openComment",
-          "delete",
-        ];
+        // 初次审核网友问政，可以审核
+        "2".indexOf(status) > -1 && (arr = arr.concat(["examine"]));
       }
       if (ut === 1) {
         // 书记， 市长 发言人
@@ -763,6 +763,7 @@ export default {
         "20".indexOf(status) > -1 && (arr = arr.concat(["dept"]));
         "5".indexOf(status) > -1 && (arr = arr.concat(["replyCheck", "dept"]));
         "23".indexOf(status) > -1 && (arr = arr.concat(["replyCheck"]));
+        "12".indexOf(status) > -1 && (arr = arr.concat(["applyTransfer"]));
       }
 
       if (ut > 1) {
@@ -777,7 +778,7 @@ export default {
           ]));
         // // 已受理  发起邀请回复、回复问政
         "5".indexOf(status) > -1 &&
-          (arr = arr.concat(["applyInvite", "applyTransfer", "reply"]));
+          (arr = arr.concat(["applyInvite", "reply"]));
         // 转移申请已提交，待审核  什么也不能干
         "12".indexOf(status) > -1 && (arr = arr.concat([]));
         // 转移申请不通过，仍是需要自己选择是否受理  什么也不能干

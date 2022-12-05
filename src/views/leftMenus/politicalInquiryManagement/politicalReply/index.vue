@@ -125,7 +125,7 @@ export default {
   created() {
     this.initQueryControl();
     this.getDeptFn();
-    this.queryData(this.params);
+    this.queryData();
   },
   methods: {
     initQueryControl() {
@@ -192,6 +192,8 @@ export default {
             label: "提交时间",
             type: "date",
             dateType: "daterange",
+            format: "yyyy-MM-dd",
+            valueFormat: "yyyy-MM-dd",
             key: "startTime",
             span: 6,
             value: "",
@@ -206,7 +208,7 @@ export default {
     },
     queryData(data) {
       let p = {};
-      if (data.formData) {
+      if (data && data.formData) {
         p = data.formData;
         console.log("data111111111111111111111", data);
 
@@ -214,7 +216,7 @@ export default {
           if (i !== "startTime") {
             this.params[i] !== undefined && (this.params[i] = p[i]);
           } else {
-            if (!this.params[i]) {
+            if (p[i] && p[i].length) {
               this.params.startTime = p[i][0];
               this.params.endTime = p[i][1];
             } else {
@@ -223,17 +225,14 @@ export default {
             }
           }
         });
-      } else {
-        p = Object.assign({}, this.checkParams);
       }
 
-      getAffairsassistList(p).then((res) => {
+      getAffairsassistList(this.params).then((res) => {
         if (res.code === 10000) {
           this.tableData = res.data.rows;
           this.params.total = res.data.total;
         }
       });
-      console.log(data);
     },
     sizeChange() {},
     currentChange() {},

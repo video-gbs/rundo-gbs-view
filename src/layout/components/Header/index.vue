@@ -20,7 +20,7 @@
           <el-dropdown class="" trigger="click">
             <div class="user-info">
               <svg-icon icon-class="user1" class="user" />
-              <span>管理员</span>
+              <span>{{ userInfo.userName || "佚名用户" }}</span>
               <i class="el-icon-caret-bottom" />
             </div>
             <el-dropdown-menu slot="dropdown">
@@ -48,11 +48,11 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from "vuex";
 // import Message from "../Message/index.vue";
-import { Local } from '@/utils/storage'
+import { Local } from "@/utils/storage";
 // import NotTips from "@/components/NotTips";
-import { logout } from '@/api/method/user'
+import { logout } from "@/api/method/user";
 export default {
   components: {
     // Message,
@@ -64,11 +64,12 @@ export default {
       messageData: {},
       messageCount: 0,
       lastCount: 0,
-      show: false
-    }
+      show: false,
+      userInfo: {},
+    };
   },
   computed: {
-    ...mapGetters(['user', 'systemTitle']),
+    ...mapGetters(["user", "systemTitle"]),
     // avatar() {
     //   if (this.user.avatar) {
     //     return require(`@/assets/avatar/${this.user.avatar}`);
@@ -80,18 +81,18 @@ export default {
      * 工作平台和系统管理菜单
      */
     routes() {
-      const routes = this.$router.options.routes.filter(route => {
-        return route.systemCode
-      })
-      return routes
+      const routes = this.$router.options.routes.filter((route) => {
+        return route.systemCode;
+      });
+      return routes;
     },
     systemName() {
-      return this.$store.state.settings.systemName
+      return this.$store.state.settings.systemName;
     },
     toGreet() {
-      const now = new Date().getHours()
-      return now < 12 ? '上午好' : now > 2 ? '下午好' : '中午好'
-    }
+      const now = new Date().getHours();
+      return now < 12 ? "上午好" : now > 2 ? "下午好" : "中午好";
+    },
   },
   created() {
     // if (Local.getToken()) {
@@ -105,6 +106,8 @@ export default {
     //     this.initNotice()
     //   }
     // })
+    this.userInfo.userName =
+      localStorage.getItem("rj_wzwz_userName") || "佚名用户";
   },
   methods: {
     /**
@@ -113,59 +116,62 @@ export default {
     logout() {
       // Local.
       logout({}, { Authorization: Local.getToken() })
-        .then(res => {
+        .then((res) => {
           // console.log(res, 11111)
           // if (res.code === 10000) {
           //   Local.setToken('')
           //   this.$router.push({ path: '/login' })
           // }
         })
-        .catch(() => {}).finally(() => {
-          Local.setToken('')
-          Local.remove('rj_wzwz_token')
-          Local.remove('rj_wzwz_deptType')
-          this.$router.push({ path: '/login' })
-        })
+        .catch(() => {})
+        .finally(() => {
+          Local.setToken("");
+          Local.remove("rj_wzwz_token");
+          Local.remove("rj_wzwz_deptType");
+          Local.remove("rj_wzwz_userName");
+          Local.remove("rj_wzwz_deptName");
+          this.$router.push({ path: "/login" });
+        });
     },
     setTheme() {
-      this.$utils.setTheme('theme-blue')
+      this.$utils.setTheme("theme-blue");
     },
     reconent() {
-      this.$socket.create()
+      this.$socket.create();
     },
     initNotice() {
-      this.$api.message.list().then(res => {
+      this.$api.message.list().then((res) => {
         if (res.data.data) {
           this.messageData = {
-            rows: res.data.data
-          }
-          let count = this.messageData.rows.length
-          this.messageData.rows.forEach(item => {
+            rows: res.data.data,
+          };
+          let count = this.messageData.rows.length;
+          this.messageData.rows.forEach((item) => {
             if (item.isRead) {
-              count--
+              count--;
             }
-          })
-          this.messageCount = count
+          });
+          this.messageCount = count;
           if (count > 0) {
             if (count > this.lastCount) {
-              this.lastCount = count
-              this.show = true
+              this.lastCount = count;
+              this.show = true;
             }
           } else {
-            this.show = false
+            this.show = false;
           }
         }
-      })
+      });
     },
     toMessage() {
-      this.showDrawer = true
-      this.show = false
+      this.showDrawer = true;
+      this.show = false;
     },
     closeTips() {
-      this.show = false
-    }
-  }
-}
+      this.show = false;
+    },
+  },
+};
 </script>
 <style lang="scss">
 @import "~@/styles/element-variables.scss";

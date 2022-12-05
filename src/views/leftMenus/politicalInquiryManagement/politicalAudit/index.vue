@@ -205,7 +205,7 @@ export default {
     // 获取部门
     this.getDeptFn();
     // 获取审核列表
-    this.queryData(this.params);
+    this.queryData();
   },
   methods: {
     initQueryControl() {
@@ -284,7 +284,7 @@ export default {
     },
     queryData(data) {
       let p = {};
-      if (data.formData) {
+      if (data && data.formData) {
         p = data.formData;
         console.log("data111111111111111111111", data);
 
@@ -292,7 +292,8 @@ export default {
           if (i !== "startTime") {
             this.params[i] !== undefined && (this.params[i] = p[i]);
           } else {
-            if (!this.params[i]) {
+            console.log(" this.params[i]", this.params[i]);
+            if (p[i] && p[i].length) {
               this.params.startTime = p[i][0];
               this.params.endTime = p[i][1];
             } else {
@@ -301,8 +302,6 @@ export default {
             }
           }
         });
-      } else {
-        p = Object.assign({}, this.checkParams);
       }
       transferCheckList(this.params).then((res) => {
         if (res.code === 10000) {

@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import staticRouters from "./static/index";
+import config from "@/config/index";
 
 Vue.use(Router);
 
@@ -31,6 +31,13 @@ import Layout from "@/layout";
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+
+const all = [0, 1, 2, 3, 4];
+const admin = [0, 1];
+const superAdmin = [0];
+
+const ut = localStorage.getItem("rj_wzwz_deptType") || null;
+console.log("ut````````````````````````````", ut);
 export const constantRoutes = [
   {
     path: "/login",
@@ -89,6 +96,7 @@ export const constantRoutes = [
             "@/views/leftMenus/politicalInquiryManagement/politicalList/politicalDetail/index"
           ),
         meta: { title: "问政列表", icon: "dashboard" },
+        author: all,
         hidden: true,
       },
       {
@@ -99,17 +107,18 @@ export const constantRoutes = [
             "@/views/leftMenus/politicalInquiryManagement/politicalAudit/index"
           ),
         meta: { title: "问政转移审核", icon: "dashboard" },
+        author: admin,
       },
-      {
-        path: "/politicalAudit/:id",
-        name: "问政转移详情",
-        component: () =>
-          import(
-            "@/views/leftMenus/politicalInquiryManagement/politicalAudit/politicalAuditDetail/index"
-          ),
-        meta: { title: "问政转移审核", icon: "dashboard" },
-        hidden: true,
-      },
+      // {
+      //   path: '/politicalAudit/:id',
+      //   name: '问政转移详情',
+      //   component: () =>
+      //     import(
+      //       '@/views/leftMenus/politicalInquiryManagement/politicalAudit/politicalAuditDetail/index'
+      //     ),
+      //   meta: { title: '问政转移审核', icon: 'dashboard' },
+      //   hidden: true
+      // },
       {
         path: "/politicalReply",
         name: "邀请回复审核",
@@ -118,6 +127,7 @@ export const constantRoutes = [
             "@/views/leftMenus/politicalInquiryManagement/politicalReply/index"
           ),
         meta: { title: "邀请回复审核", icon: "dashboard" },
+        author: admin,
       },
     ],
   },
@@ -128,6 +138,7 @@ export const constantRoutes = [
     // meta: { title: '展示信息管理' },
     redirect: "/roundChart",
     meta: { title: "展示信息管理", icon: "zsxxgl" },
+    author: superAdmin,
     children: [
       {
         path: "/roundChart",
@@ -194,6 +205,7 @@ export const constantRoutes = [
     redirect: "/userManagement",
     // component: () => import('@/views/leftMenus/userManagement/index'),
     meta: { title: "用户管理", icon: "role" },
+    author: superAdmin,
     children: [
       {
         path: "/userManagement",
@@ -210,6 +222,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: "/accountManagement",
     meta: { title: "系统管理", icon: "sys" },
+    author: superAdmin,
     children: [
       {
         path: "/accountManagement",

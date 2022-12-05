@@ -2,7 +2,11 @@
   <div class="reviewResults-container">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <LineFont :line-title="lineTitle" :text-style="textStyle" :line-blue-style="lineBlueStyle" />
+        <LineFont
+          :line-title="lineTitle"
+          :text-style="textStyle"
+          :line-blue-style="lineBlueStyle"
+        />
       </div>
       <div class="text item">
         <div class="reviewResults—timeline">
@@ -15,21 +19,43 @@
               :timestamp="activity.timestamp"
               placement="top"
             >
-              <!-- <svg-icon :icon-class="activity.myIcon" class="myIcon_svg" />
+              <!-- <svg-icon :icon-class="activity.myIcon" class="myIcon_svg mt10" /> -->
 
-              <div>
-                <slot name="timestamp" v-if="index % 2 === 0">
+              <!-- <div>
+                <slot v-if="index % 2 === 0" name="timestamp">
                   <svg-icon icon-class="line1" class="line1_svg" />
                 </slot>
-                <slot name="timestamp" v-else>
+                <slot v-else name="timestamp">
                   <svg-icon icon-class="line2" class="line2_svg" />
                 </slot>
               </div> -->
-              <el-card>
-                <h4 class="reviewResults-h4">
-                  {{ activity.content }}
-                </h4>
-                <p class="reviewResults-p">王小虎 提交于 2018/4/12 20:46</p>
+              <el-card class="p20">
+                <div class="f">
+                  <div class="mr10 reply-avatar" />
+                  <div class="f1">
+                    <div class="nickName f ai0c jc-sb mb20">
+                      <div>
+                        {{
+                          activity.nickName ||
+                          "网络发言人" + `  ${activity.deptName}  `
+                        }}
+                      </div>
+                      <el-tag
+                        size="mini"
+                        :type="activity.mainFlag === 3 ? '' : 'danger'"
+                        effect="dark"
+                      >
+                        {{
+                          activity.mainFlag === 3 ? "官方回复" : "邀请单位回复"
+                        }}
+                      </el-tag>
+                    </div>
+                    <div>{{ activity.createTime }}</div>
+                    <div v-html="activity.content" />
+                  </div>
+                </div>
+                <h4 class="reviewResults-h4" />
+                <!-- <p class="reviewResults-p">{{`${} 提交于 ${activity.createTime}`}}</p> -->
                 <p v-if="activity.shyj" class="reviewResults-p">
                   【审核意见】照片拍摄不清晰；需增加描述内容。
                 </p>
@@ -44,20 +70,22 @@
 </template>
 
 <script>
-import LineFont from '@/components/LineFont'
-import { getReplyList } from '@/api/method/reply'
+import LineFont from "@/components/LineFont";
+import { getReplyList } from "@/api/method/reply";
 export default {
-  name: '',
+  name: "",
   components: {
-    LineFont
+    LineFont,
   },
   data() {
     return {
       actCss: {
-        size: 'large',
-        type: 'primary',
-        myIcon: 'wzjl1',
-        color: 'rgba(30, 86, 160, 1)'
+        // content: '支持使用图标',
+        timestamp: "2018-04-12 20:46",
+        size: "large",
+        type: "primary",
+        myIcon: "wzjl1",
+        color: "rgba(30, 86, 160, 1)",
       },
       activities: [
         // {
@@ -68,50 +96,51 @@ export default {
         //   myIcon: 'wzjl1',
         //   color: 'rgba(30, 86, 160, 1)'
         // },
-
       ],
-      labelPosition: 'left',
+      labelPosition: "left",
       textStyle: {
-        fontSize: '20px',
-        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
-        fontWeight: 'bold',
-        color: '#333333'
+        fontSize: "20px",
+        fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
+        fontWeight: "bold",
+        color: "#333333",
       },
       lineBlueStyle: {
-        background: 'rgba(30, 86, 160, 1)',
-        borderRadius: '0px 4px 4px 0px'
+        background: "rgba(30, 86, 160, 1)",
+        borderRadius: "0px 4px 4px 0px",
       },
       form: {
-        content: '',
-        content1: ''
+        content: "",
+        content1: "",
       },
       lineTitle: {
-        title: '官方回复',
-        notShowSmallTitle: false
-      }
-    }
+        title: "官方回复",
+        notShowSmallTitle: false,
+      },
+    };
   },
   watch: {},
   created() {
-    this.$route.params.id && this.getReply(this.$route.params.id)
+    this.$route.params.id && this.getReply(this.$route.params.id);
   },
-  mounted() {
-
-  },
+  mounted() {},
   methods: {
     getReply(v) {
-      getReplyList(v).then(res => {
+      console.log("获取官方回复");
+      getReplyList(v).then((res) => {
         if (res.code === 10000) {
-          const r = Object.assign({}, res.data)
-          r.forEach(i => {
-            i = { ...i, ...this.actCss }
-          })
-          this.activities = r
+          const r = Object.assign([], res.data);
+          r.forEach((i) => {
+            Object.assign(i, this.actCss);
+            // i = { ...i, ...this.actCss }
+            i["timestamp"] = i.createTime;
+          });
+          this.activities = r;
+          console.log(" this.activities~~~~~~~~~~~~~~~", this.activities);
         }
-      })
-    }
-  }
-}
+      });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -130,7 +159,7 @@ export default {
 ::v-deep .el-timeline-item__tail {
   height: 78%;
   top: 20px;
-  border-left:2px dashed #1E56A0;
+  border-left: 2px dashed #1e56a0;
 }
 ::v-deep .el-timeline-item {
   position: relative;
@@ -219,5 +248,14 @@ export default {
     .reviewResults-p {
     }
   }
+}
+.reply-avatar {
+  width: 46px;
+  height: 46px;
+  background-image: url("~@/assets/imgs/user-center-avatar.png");
+  background-size: cover;
+}
+::v-deep .el-timeline-item__timestamp {
+  font-size: 12px;
 }
 </style>
