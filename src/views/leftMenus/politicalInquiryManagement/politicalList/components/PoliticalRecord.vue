@@ -2,7 +2,11 @@
   <div class="reviewResults-container">
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <LineFont :line-title="lineTitle" :text-style="textStyle" :line-blue-style="lineBlueStyle" />
+        <LineFont
+          :line-title="lineTitle"
+          :text-style="textStyle"
+          :line-blue-style="lineBlueStyle"
+        />
       </div>
       <div class="text item">
         <div class="reviewResults—timeline">
@@ -29,7 +33,9 @@
                 <h4 class="reviewResults-h4">
                   {{ i.content }}
                 </h4>
-                <p class="reviewResults-p">{{ `${i.updateBy} 提交于 ${i.updateTime}` }}</p>
+                <p class="reviewResults-p">
+                  {{ `${i.updateBy} 提交于 ${i.updateTime}` }}
+                </p>
                 <!-- <p v-if="i.shyj" class="reviewResults-p">
                   【审核意见】照片拍摄不清晰；需增加描述内容。
                 </p> -->
@@ -44,22 +50,22 @@
 </template>
 
 <script>
-import LineFont from '@/components/LineFont'
+import LineFont from "@/components/LineFont";
 import {
   getAffairsrecordList,
-  getAffairsrecordPage
-} from '@/api/method/affairsrecord'
+  getAffairsrecordPage,
+} from "@/api/method/affairsrecord";
 export default {
-  name: '',
+  name: "",
   components: {
-    LineFont
+    LineFont,
   },
   data() {
     return {
       actCss: {
-        size: 'large',
-        type: 'primary',
-        myIcon: 'wzjl1'
+        size: "large",
+        type: "primary",
+        myIcon: "wzjl1",
       },
       activities: [
         // {
@@ -70,71 +76,70 @@ export default {
         //   myIcon: 'wzjl1'
         // },
       ],
-      labelPosition: 'left',
+      labelPosition: "left",
       textStyle: {
-        fontSize: '20px',
-        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
-        fontWeight: 'bold',
-        color: '#333333'
+        fontSize: "20px",
+        fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
+        fontWeight: "bold",
+        color: "#333333",
       },
       lineBlueStyle: {
-        background: 'rgba(30, 86, 160, 1)',
-        borderRadius: '0px 4px 4px 0px'
+        background: "rgba(30, 86, 160, 1)",
+        borderRadius: "0px 4px 4px 0px",
       },
       form: {
-        content: '',
-        content1: ''
+        content: "",
+        content1: "",
       },
       lineTitle: {
-        title: '问政记录',
-        notShowSmallTitle: false
+        title: "问政记录",
+        notShowSmallTitle: false,
       },
       params: {
-        'affairsId': '',
-        'content': '',
-        'createBy': '',
-        'createTime': '',
-        'id': '',
-        'title': '',
-        'type': '',
-        'updateBy': '',
-        'updateTime': ''
-      }
-    }
+        affairsId: "",
+        content: "",
+        createBy: "",
+        createTime: "",
+        id: "",
+        title: "",
+        type: "",
+        updateBy: "",
+        updateTime: "",
+      },
+    };
   },
   watch: {},
   created() {
+    console.log("进入问政记录页面");
     if (this.$route.params.id) {
-      this.params.affairsId = this.$route.params.id
-      this.getAffairsrecordList()
+      this.params.affairsId = this.$route.params.id;
+      this.getAffairsrecordList();
     }
   },
-  mounted() {
-
-  },
+  mounted() {},
   methods: {
     getAffairsrecordList() {
-      getAffairsrecordList(this.params).then(res => {
+      getAffairsrecordList(this.params).then((res) => {
         if (res.code === 10000) {
-          const r = res.data
-          r.forEach(i => {
-            i = { ...i, ...this.actCss }
+          const r = res.data;
+          r.forEach((i) => {
+            i = { ...i, ...this.actCss };
             // 可以根据其他字段设置不同的icon
             // fn...
-          })
-          this.activities = r
+          });
+          this.activities = r;
         }
-      })
+      });
     },
     getAffairsrecordPage() {
-      getAffairsrecordPage(this.params).then(res => {
+      getAffairsrecordPage(this.params).then((res) => {
         if (res.code === 10000) {
-          console.log('res', res)
+          console.log("res", res);
         }
-      })
-    }
-  }
-}
+      });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

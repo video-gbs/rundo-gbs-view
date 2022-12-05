@@ -1,11 +1,11 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import staticRouters from './static/index'
+import Vue from "vue";
+import Router from "vue-router";
+import staticRouters from "./static/index";
 
-Vue.use(Router)
+Vue.use(Router);
 
 /* Layout */
-import Layout from '@/layout'
+import Layout from "@/layout";
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -33,199 +33,239 @@ import Layout from '@/layout'
  */
 export const constantRoutes = [
   {
-    path: '/login',
-    component: () => import('@/views/login/index'),
-    hidden: true
+    path: "/login",
+    component: () => import("@/views/login/index"),
+    hidden: true,
   },
 
   // 用于导航标签刷新页面
   {
-    path: '/redirect',
+    path: "/redirect",
     component: Layout,
     hidden: true,
     children: [
       {
-        path: '/redirect/:path*',
-        component: () => import('@/views/redirect/index')
-      }
-    ]
+        path: "/redirect/:path*",
+        component: () => import("@/views/redirect/index"),
+      },
+    ],
   },
   {
-    path: '/',
+    path: "/",
     component: Layout,
-    redirect: '/workTable',
-    children: [{
-      path: '/workTable',
-      name: '综合工作台',
-      component: () => import('@/views/leftMenus/workTable/index'),
-      meta: { title: '综合工作台', icon: 'zhgzt' }
-    }]
+    redirect: "/workTable",
+    children: [
+      {
+        path: "/workTable",
+        name: "综合工作台",
+        component: () => import("@/views/leftMenus/workTable/index"),
+        meta: { title: "综合工作台", icon: "zhgzt" },
+      },
+    ],
   },
   {
-    path: '/politicalInquiryManagement',
-    name: '问政管理',
-    meta: { title: '问政管理' },
+    path: "/politicalInquiryManagement",
+    name: "问政管理",
+    // meta: { title: '问政管理' },
     component: Layout,
-    redirect: '/politicalList',
+    redirect: "/politicalList",
     // component: () => import('@/views/leftMenus/politicalInquiryManagement/index'),
-    meta: { title: '问政管理', icon: 'wzgl' },
+    meta: { title: "问政管理", icon: "wzgl" },
     children: [
       {
-        path: '/politicalList',
-        name: '问政列表',
-        component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalList/index'),
-        meta: { title: '问政列表', icon: 'dashboard' }
+        path: "/politicalList",
+        name: "问政列表",
+        component: () =>
+          import(
+            "@/views/leftMenus/politicalInquiryManagement/politicalList/index"
+          ),
+        meta: { title: "问政列表", icon: "dashboard" },
       },
       {
-        path: '/politicalList/:id',
-        name: '问政详情',
-        component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalList/politicalDetail/index'),
-        meta: { title: '问政列表', icon: 'dashboard' },
-        hidden: true
+        path: "/politicalList/:type/:id",
+        name: "问政详情",
+        component: () =>
+          import(
+            "@/views/leftMenus/politicalInquiryManagement/politicalList/politicalDetail/index"
+          ),
+        meta: { title: "问政列表", icon: "dashboard" },
+        hidden: true,
       },
       {
-        path: '/politicalAudit',
-        name: '问政转移审核',
-        component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalAudit/index'),
-        meta: { title: '问政转移审核', icon: 'dashboard' }
+        path: "/politicalAudit",
+        name: "问政转移审核",
+        component: () =>
+          import(
+            "@/views/leftMenus/politicalInquiryManagement/politicalAudit/index"
+          ),
+        meta: { title: "问政转移审核", icon: "dashboard" },
       },
       {
-        path: '/politicalAudit/:id',
-        name: '问政转移详情',
-        component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalAudit/politicalAuditDetail/index'),
-        meta: { title: '问政转移审核', icon: 'dashboard' },
-        hidden: true
+        path: "/politicalAudit/:id",
+        name: "问政转移详情",
+        component: () =>
+          import(
+            "@/views/leftMenus/politicalInquiryManagement/politicalAudit/politicalAuditDetail/index"
+          ),
+        meta: { title: "问政转移审核", icon: "dashboard" },
+        hidden: true,
       },
       {
-        path: '/politicalReply',
-        name: '邀请回复审核',
-        component: () => import('@/views/leftMenus/politicalInquiryManagement/politicalReply/index'),
-        meta: { title: '邀请回复审核', icon: 'dashboard' }
-      }
-    ]
+        path: "/politicalReply",
+        name: "邀请回复审核",
+        component: () =>
+          import(
+            "@/views/leftMenus/politicalInquiryManagement/politicalReply/index"
+          ),
+        meta: { title: "邀请回复审核", icon: "dashboard" },
+      },
+    ],
   },
   {
-    path: '/informationManagement',
-    name: '展示信息管理',
+    path: "/informationManagement",
+    name: "展示信息管理",
     component: Layout,
-    meta: { title: '展示信息管理' },
-    redirect: '/roundChart',
-    meta: { title: '展示信息管理', icon: 'zsxxgl' },
+    // meta: { title: '展示信息管理' },
+    redirect: "/roundChart",
+    meta: { title: "展示信息管理", icon: "zsxxgl" },
     children: [
       {
-        path: '/roundChart',
-        name: '轮播图管理',
-        component: () => import('@/views/leftMenus/informationManagement/roundChart/index'),
-        meta: { title: '轮播图管理', icon: 'dashboard' }
+        path: "/roundChart",
+        name: "轮播图管理",
+        component: () =>
+          import("@/views/leftMenus/informationManagement/roundChart/index"),
+        meta: { title: "轮播图管理", icon: "dashboard" },
       },
       {
-        path: '/roundChart/:id',
-        name: '轮播图管理',
-        component: () => import('@/views/leftMenus/informationManagement/roundChart/addOrEdit.vue'),
+        path: "/roundChart/:id",
+        name: "轮播图管理",
+        component: () =>
+          import(
+            "@/views/leftMenus/informationManagement/roundChart/addOrEdit.vue"
+          ),
         hidden: true,
-        meta: { title: '轮播图管理', icon: 'dashboard' }
+        meta: { title: "轮播图管理", icon: "dashboard" },
       },
       {
-        path: '/publicManagement',
-        name: '公告管理',
-        component: () => import('@/views/leftMenus/informationManagement/publicManagement/index'),
-        meta: { title: '公告管理', icon: 'dashboard' }
+        path: "/publicManagement",
+        name: "公告管理",
+        component: () =>
+          import(
+            "@/views/leftMenus/informationManagement/publicManagement/index"
+          ),
+        meta: { title: "公告管理", icon: "dashboard" },
       },
       {
-        path: '/publicManagement/:id',
-        name: '公告管理',
-        component: () => import('@/views/leftMenus/informationManagement/publicManagement/addOrEdit'),
+        path: "/publicManagement/:id",
+        name: "公告管理",
+        component: () =>
+          import(
+            "@/views/leftMenus/informationManagement/publicManagement/addOrEdit"
+          ),
         hidden: true,
-        meta: { title: '公告管理', icon: 'dashboard' }
+        meta: { title: "公告管理", icon: "dashboard" },
       },
       {
-        path: '/advertisementPicture',
-        name: '广告图管理',
-        component: () => import('@/views/leftMenus/informationManagement/advertisementPicture/index'),
-        meta: { title: '广告图管理', icon: 'dashboard' }
+        path: "/advertisementPicture",
+        name: "广告图管理",
+        component: () =>
+          import(
+            "@/views/leftMenus/informationManagement/advertisementPicture/index"
+          ),
+        meta: { title: "广告图管理", icon: "dashboard" },
       },
       {
-        path: '/advertisementPicture/:id',
-        name: '广告图管理',
-        component: () => import('@/views/leftMenus/informationManagement/advertisementPicture/addOrEdit'),
+        path: "/advertisementPicture/:id",
+        name: "广告图管理",
+        component: () =>
+          import(
+            "@/views/leftMenus/informationManagement/advertisementPicture/addOrEdit"
+          ),
         hidden: true,
-        meta: { title: '广告图管理', icon: 'dashboard' }
-      }
-    ]
+        meta: { title: "广告图管理", icon: "dashboard" },
+      },
+    ],
   },
   {
-    path: '/userManagement',
-    name: '用户管理',
+    path: "/userManagement",
+    name: "用户管理",
     component: Layout,
-    meta: { title: '用户管理' },
-    redirect: '/userManagement',
+    // meta: { title: '用户管理' },
+    redirect: "/userManagement",
     // component: () => import('@/views/leftMenus/userManagement/index'),
-    meta: { title: '用户管理', icon: 'role' },
+    meta: { title: "用户管理", icon: "role" },
     children: [
       {
-        path: '/userManagement',
-        name: '用户管理',
-        component: () => import('@/views/leftMenus/userManagement/index'),
-        meta: { title: '用户管理', icon: 'dashboard' }
-      }
-    ]
+        path: "/userManagement",
+        name: "用户管理",
+        component: () => import("@/views/leftMenus/userManagement/index"),
+        meta: { title: "用户管理", icon: "dashboard" },
+      },
+    ],
   },
   {
-    path: '/systemManagement',
-    name: '系统管理',
-    meta: { title: '系统管理' },
+    path: "/systemManagement",
+    name: "系统管理",
+    // meta: { title: '系统管理' },
     component: Layout,
-    redirect: '/accountManagement',
-    meta: { title: '系统管理', icon: 'sys' },
+    redirect: "/accountManagement",
+    meta: { title: "系统管理", icon: "sys" },
     children: [
       {
-        path: '/accountManagement',
-        name: '账号管理',
-        component: () => import('@/views/leftMenus/systemManagement/accountManagement/index'),
-        meta: { title: '账号管理', icon: 'dashboard' }
+        path: "/accountManagement",
+        name: "账号管理",
+        component: () =>
+          import("@/views/leftMenus/systemManagement/accountManagement/index"),
+        meta: { title: "账号管理", icon: "dashboard" },
       },
       {
-        path: '/roleManagement',
-        name: '角色管理',
-        component: () => import('@/views/leftMenus/systemManagement/roleManagement/index'),
-        meta: { title: '角色管理', icon: 'dashboard' }
+        path: "/roleManagement",
+        name: "角色管理",
+        component: () =>
+          import("@/views/leftMenus/systemManagement/roleManagement/index"),
+        meta: { title: "角色管理", icon: "dashboard" },
       },
       {
-        path: '/unitManagement',
-        name: '单位管理',
-        component: () => import('@/views/leftMenus/systemManagement/unitManagement/index'),
-        meta: { title: '单位管理', icon: 'dashboard' }
+        path: "/unitManagement",
+        name: "单位管理",
+        component: () =>
+          import("@/views/leftMenus/systemManagement/unitManagement/index"),
+        meta: { title: "单位管理", icon: "dashboard" },
       },
       {
-        path: '/otherUnitManagement',
-        name: '单位账号管理',
-        component: () => import('@/views/leftMenus/systemManagement/otherUnitManagement/index'),
-        meta: { title: '单位账号管理', icon: 'dashboard' }
-      }
-    ]
+        path: "/otherUnitManagement",
+        name: "单位账号管理",
+        component: () =>
+          import(
+            "@/views/leftMenus/systemManagement/otherUnitManagement/index"
+          ),
+        meta: { title: "单位账号管理", icon: "dashboard" },
+      },
+    ],
   },
   {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
+    path: "/404",
+    component: () => import("@/views/404"),
+    hidden: true,
   },
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
-]
+  { path: "*", redirect: "/404", hidden: true },
+];
 
-const createRouter = () => new Router({
-  // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
-})
+const createRouter = () =>
+  new Router({
+    // mode: 'history', // require service support
+    scrollBehavior: () => ({ y: 0 }),
+    routes: constantRoutes,
+  });
 
-const router = createRouter()
+const router = createRouter();
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
-  const newRouter = createRouter()
-  router.matcher = newRouter.matcher // reset router
+  const newRouter = createRouter();
+  router.matcher = newRouter.matcher; // reset router
 }
 
-export default router
+export default router;

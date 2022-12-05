@@ -50,7 +50,9 @@
             <el-button type="text" @click="dialogShow(scope.row)"
               >审核</el-button
             >
-            <el-button type="text">查看详情</el-button>
+            <el-button type="text" @click="goDetail(scope.row)"
+              >查看详情</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -123,7 +125,7 @@ export default {
   created() {
     this.initQueryControl();
     this.getDeptFn();
-    this.queryData();
+    this.queryData(this.params);
   },
   methods: {
     initQueryControl() {
@@ -142,7 +144,9 @@ export default {
             key: "type",
             span: 6,
             value: "",
-            options: this.$dict._type,
+            options: this.$dict._type.filter((i) => {
+              return i.value !== "";
+            }),
           },
           {
             label: "领域",
@@ -150,7 +154,9 @@ export default {
             key: "domain",
             span: 6,
             value: "",
-            options: this.$dict._domain,
+            options: this.$dict._domain.filter((i) => {
+              return i.value !== "";
+            }),
           },
           {
             label: "留言对象",
@@ -186,7 +192,7 @@ export default {
             label: "提交时间",
             type: "date",
             dateType: "daterange",
-            key: "f8",
+            key: "startTime",
             span: 6,
             value: "",
           },
@@ -199,7 +205,29 @@ export default {
       };
     },
     queryData(data) {
-      getAffairsassistList(this.params).then((res) => {
+      let p = {};
+      if (data.formData) {
+        p = data.formData;
+        console.log("data111111111111111111111", data);
+
+        Object.keys(p).forEach((i) => {
+          if (i !== "startTime") {
+            this.params[i] !== undefined && (this.params[i] = p[i]);
+          } else {
+            if (!this.params[i]) {
+              this.params.startTime = p[i][0];
+              this.params.endTime = p[i][1];
+            } else {
+              this.params.startTime = "";
+              this.params.endTime = "";
+            }
+          }
+        });
+      } else {
+        p = Object.assign({}, this.checkParams);
+      }
+
+      getAffairsassistList(p).then((res) => {
         if (res.code === 10000) {
           this.tableData = res.data.rows;
           this.params.total = res.data.total;
@@ -209,6 +237,9 @@ export default {
     },
     sizeChange() {},
     currentChange() {},
+    goDetail(data) {
+      this.$router.push(`/politicalList/reply/${data.id}`);
+    },
     dialogShow(data) {
       this.checkParams.affairsId = data.id;
       console.log("datadatadata", data);
