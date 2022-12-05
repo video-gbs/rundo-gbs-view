@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import config from "@/config/index";
+import staticRouters from "./static/index";
 
 Vue.use(Router);
 
@@ -31,13 +31,9 @@ import Layout from "@/layout";
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
-
 const all = [0, 1, 2, 3, 4];
 const admin = [0, 1];
 const superAdmin = [0];
-
-const ut = localStorage.getItem("rj_wzwz_deptType") || null;
-console.log("ut````````````````````````````", ut);
 export const constantRoutes = [
   {
     path: "/login",
@@ -78,6 +74,7 @@ export const constantRoutes = [
     redirect: "/politicalList",
     // component: () => import('@/views/leftMenus/politicalInquiryManagement/index'),
     meta: { title: "问政管理", icon: "wzgl" },
+
     children: [
       {
         path: "/politicalList",
@@ -95,8 +92,7 @@ export const constantRoutes = [
           import(
             "@/views/leftMenus/politicalInquiryManagement/politicalList/politicalDetail/index"
           ),
-        meta: { title: "问政列表", icon: "dashboard" },
-        author: all,
+        meta: { title: "问政详情", icon: "dashboard" },
         hidden: true,
       },
       {

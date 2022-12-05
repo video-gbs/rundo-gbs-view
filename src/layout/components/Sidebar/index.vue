@@ -1,7 +1,11 @@
 <template>
   <div :class="{ 'has-logo': showLogo }">
-    <el-scrollbar wrap-class="scrollbar-wrapper" style="height: calc(100% - 62px);">
+    <el-scrollbar
+      wrap-class="scrollbar-wrapper"
+      style="height: calc(100% - 62px)"
+    >
       <el-menu
+        ref="leftNavigation"
         :default-active="activeMenu"
         :background-color="variables.menuBg"
         :text-color="variables.menuText"
@@ -9,10 +13,9 @@
         :active-text-color="variables.menuActiveText"
         :collapse-transition="false"
         mode="vertical"
-        ref="leftNavigation"
       >
         <sidebar-item
-          v-for="route in routes"
+          v-for="route in myRouter"
           :key="route.path"
           :item="route"
           :base-path="route.path"
@@ -20,7 +23,7 @@
       </el-menu>
     </el-scrollbar>
 
-    <div class="bottom-logo"></div>
+    <div class="bottom-logo" />
   </div>
 </template>
 
@@ -32,6 +35,11 @@ import variables from "@/styles/variables.scss";
 
 export default {
   components: { SidebarItem, Logo },
+  data() {
+    return {
+      myRouter: [],
+    };
+  },
   computed: {
     ...mapGetters(["sidebar"]),
     routes() {
@@ -50,28 +58,44 @@ export default {
     },
     showLogo() {
       return this.$store.state.settings.sidebarLogo;
-    }
+    },
   },
+
   mounted() {
     this.select(this.$route.path);
+    this.myRouter = Object.assign([], this.routes);
+    const ut = localStorage.getItem("rj_wzwz_deptType") || 9999;
+    this.setHide(this.myRouter, ut * 1);
+    console.log("routes`~~~~~~~~~~~``", this.myRouter);
   },
   methods: {
+    setHide(v, ut) {
+      v.forEach((i) => {
+        if (i.author) {
+          this.$set(i, "hidden", false);
+          console.log(i.author, ut, i.author.indexOf(ut) === -1);
+          i.author.indexOf(ut) === -1 && this.$set(i, "hidden", true);
+        }
+        if (i.children && i.children.length) {
+          this.setHide(i.children, ut);
+        }
+      });
+    },
     select(index) {
       if (this.$route.path !== index) this.$router.push(index);
       if (
         this.$store.state.tabs.tabList.every(
-          item => item.path !== this.$route.path
+          (item) => item.path !== this.$route.path
         )
       ) {
         this.$store.state.tabs.tabList.push(this.$route);
         // this.$store.commit("tabList", this.$store.state.tabs.tabList);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
-
 .bottom-logo {
   position: absolute;
   height: 62px;
