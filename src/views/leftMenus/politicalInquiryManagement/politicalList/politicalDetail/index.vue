@@ -919,9 +919,14 @@ export default {
       getReplyList(this.replyCheckForm.affairsId).then((res) => {
         if (res.code === 10000) {
           const rd = res.data.filter((i) => {
-            return i.mainFlag === 2;
+            return i.mainFlag < 3;
           });
-          this.replyCheckContent = rd[0] ? rd[0].content : "";
+
+          rd.forEach((i) => {
+            this.replyCheckContent += i.content;
+          });
+
+          // this.replyCheckContent = rd[0] ? rd[0].content : ''
         }
       });
     },

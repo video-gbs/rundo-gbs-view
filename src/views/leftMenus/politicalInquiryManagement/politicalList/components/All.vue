@@ -3,7 +3,7 @@
     <div class="seach">
       <Seach
         :form-list="FormList"
-        :query="pagesData"
+        :query="query"
         @submitSearch="submitSearch"
         @submitReset="toReset"
       />
@@ -31,7 +31,7 @@
           @selection-change="handleSelectionChange"
         />
         <Pagination
-          :pages-data="pagesData"
+          :pages-data="query"
           @size-change="sizeChange"
           @current-change="currentChange"
         />
@@ -141,21 +141,21 @@ export default {
       ],
       // 搜索from
       query: {
-        deptId: 0,
-        deptType: 0,
+        deptId: "",
+        deptType: "",
         domain: "",
         endTime: "",
-        field: [],
-        fileBatchId: 0,
-        isDeleted: 0,
-        isReview: 0,
+        // field: [],
+        // fileBatchId: 0,
+        isDeleted: "",
+        isReview: "",
         isShow: "",
-        order: true,
+        order: false,
         phone: "",
         pubUsername: "",
         realName: "",
         startTime: "",
-        status: 0,
+        status: "",
         title: "",
         type: "",
         pageNum: 1,
@@ -462,7 +462,7 @@ export default {
       this.getDeptFn();
     },
     getDataList() {
-      affairsInfoList(this.pagesData).then((res) => {
+      affairsInfoList(this.query).then((res) => {
         if (res.code === 10000) {
           this.tableData = res.data ? res.data.rows : [];
           this.pagesData.total = res.data.total;

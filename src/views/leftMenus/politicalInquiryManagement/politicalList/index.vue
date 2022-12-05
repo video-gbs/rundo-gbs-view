@@ -20,13 +20,11 @@
     </el-tabs>
     <ul v-if="this.showDetails" class="right-btns-ul">
       <li v-for="(btn, i) in btnLists" :key="i" class="right-btns-li">
-        <el-button
-          type="primary"
-          class="right-btns-button"
-          size="mini"
-        ><svg-icon :icon-class="btn.iconName" class="btn_svg" />{{
-          btn.name
-        }}</el-button>
+        <el-button type="primary" class="right-btns-button" size="mini"
+          ><svg-icon :icon-class="btn.iconName" class="btn_svg" />{{
+            btn.name
+          }}</el-button
+        >
       </li>
     </ul>
     <div v-if="this.showDetails">
@@ -36,14 +34,13 @@
 </template>
 
 <script>
-
-import All from './components/All.vue'
+import All from "./components/All.vue";
 // import Dsh from './components/Dsh.vue'
 // import Shwtg from './components/Shwtg.vue'
 // import Whf from './components/Whf.vue'
 // import Yhf from './components/Yhf.vue'
 // import Ysl from './components/Ysl.vue'
-import DetailView from './politicalDetail/index.vue'
+import DetailView from "./politicalDetail/index.vue";
 
 export default {
   components: {
@@ -53,45 +50,45 @@ export default {
     // Whf,
     // Yhf,
     // Ysl,
-    DetailView
+    DetailView,
   },
   data() {
     return {
       showDetails: false,
-      activeName: '全部',
+      activeName: "全部",
       btnLists: [
         {
-          name: '审核问政',
-          iconName: 'right1'
+          name: "审核问政",
+          iconName: "right1",
         },
         {
-          name: '审核补充说明',
-          iconName: 'right2'
+          name: "审核补充说明",
+          iconName: "right2",
         },
         {
-          name: '受理问政',
-          iconName: 'right3'
+          name: "受理问政",
+          iconName: "right3",
         },
         {
-          name: '回复问政',
-          iconName: 'right4'
+          name: "回复问政",
+          iconName: "right4",
         },
         {
-          name: '问政转移',
-          iconName: 'right5'
+          name: "问政转移",
+          iconName: "right5",
         },
         {
-          name: '邀请回复',
-          iconName: 'right6'
+          name: "邀请回复",
+          iconName: "right6",
         },
         {
-          name: '设为可见',
-          iconName: 'right7'
+          name: "设为可见",
+          iconName: "right7",
         },
         {
-          name: '开启评论',
-          iconName: 'right8'
-        }
+          name: "开启评论",
+          iconName: "right8",
+        },
         // {
         //   name:'设为隐藏',
         //   iconName:'right9'
@@ -102,50 +99,50 @@ export default {
         // }
       ],
       tabDict: {
-        '0': '',
-        '1': 2,
-        '2': 4,
-        '3': 5,
-        '4': 7,
-        '5': 3
+        0: "",
+        1: 2,
+        2: 4,
+        3: 5,
+        4: 7,
+        5: 3,
       },
       tabpaneList: [
         {
-          label: '全部',
-          value: '',
-          isShow: true
+          label: "全部",
+          value: "",
+          isShow: true,
         },
         {
-          label: '待审核',
+          label: "待审核",
           value: 2,
-          isShow: false
+          isShow: false,
         },
         {
-          label: '未回复',
+          label: "未回复",
           value: 5,
-          isShow: false
+          isShow: false,
         },
         {
-          label: '已受理',
+          label: "已受理",
           value: 5,
-          isShow: false
+          isShow: false,
         },
         {
-          label: '已回复',
+          label: "已回复",
           value: 100,
-          isShow: false
+          isShow: false,
         },
         {
-          label: '审核未通过',
+          label: "审核未通过",
           value: 22,
-          isShow: false
-        }
-      ]
-    }
+          isShow: false,
+        },
+      ],
+    };
   },
   watch: {},
   mounted() {
-    this.getAffairsInfoList()
+    this.getAffairsInfoList();
   },
   methods: {
     getAffairsInfoList() {
@@ -157,8 +154,8 @@ export default {
     },
     handleClick(val, event) {
       // 切换 tabs
-      this.$refs['listRef'].pagesData.status = this.tabDict[val.index]
-      this.$refs['listRef'].getDataList()
+      this.$refs["listRef"].query.status = this.tabDict[val.index];
+      this.$refs["listRef"].getDataList();
       // this.tabpaneList = this.tabpaneList.map((item) => {
       //   if (item.label === val.label) {
       //     item.isShow = true
@@ -173,9 +170,9 @@ export default {
       //     block: "start"
       //   });
       // });
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
