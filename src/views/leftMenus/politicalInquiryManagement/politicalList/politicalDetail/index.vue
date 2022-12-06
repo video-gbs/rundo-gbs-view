@@ -23,7 +23,7 @@
       </el-tab-pane>
     </el-tabs>
     <!--问政审核-->
-    <PDialog ref="examineRef" @submit="examineFn">
+    <PDialog ref="examineRef" @submit="examineFn" @cancel="examineFn('c')">
       <template slot="title">问政审核</template>
       <template slot="main">
         <el-form label-width="80px" :model="examineForm">
@@ -43,7 +43,7 @@
     </PDialog>
 
     <!--补充说明审核-->
-    <PDialog ref="moreRef" @submit="moreFn">
+    <PDialog ref="moreRef" @submit="moreFn" @cancel="moreFn('c')">
       <template slot="title">补充说明审核</template>
       <template slot="main">
         <el-form label-width="80px" :model="moreForm">
@@ -68,7 +68,7 @@
     </PDialog>
 
     <!--受理部门-->
-    <PDialog ref="deptRef" @submit="deptFn">
+    <PDialog ref="deptRef" @submit="deptFn" @cancel="deptFn('c')">
       <template slot="title">受理部门</template>
       <template slot="main">
         <el-form
@@ -95,7 +95,7 @@
     </PDialog>
 
     <!--受理问政-->
-    <PDialog ref="acceptRef" @submit="acceptFn">
+    <PDialog ref="acceptRef" @submit="acceptFn" @cancel="acceptFn('c')">
       <template slot="title">受理问政</template>
       <template slot="main">
         <el-form label-width="80px" :model="acceptForm">
@@ -107,7 +107,7 @@
     </PDialog>
 
     <!--问政回复-->
-    <PDialog ref="replyRef" @submit="replyFn">
+    <PDialog ref="replyRef" @submit="replyFn" @cancel="replyFn('c')">
       <template slot="title">问政回复</template>
       <template slot="main">
         <el-form label-width="80px" :model="replyForm">
@@ -123,7 +123,11 @@
     </PDialog>
 
     <!--协助回复-->
-    <PDialog ref="otherDeptReplyRef" @submit="otherDeptReplyFn">
+    <PDialog
+      ref="otherDeptReplyRef"
+      @submit="otherDeptReplyFn"
+      @cancel="otherDeptReplyFn('c')"
+    >
       <!--样式和问政回复一样，接口不同-->
       <template slot="title">问政回复</template>
       <template slot="main">
@@ -145,7 +149,7 @@
     </PDialog>
 
     <!--问政转移-->
-    <PDialog ref="transferRef" @submit="transferFn">
+    <PDialog ref="transferRef" @submit="transferFn" @cancel="transferFn('c')">
       <template slot="title">问政转移</template>
       <template slot="main">
         <el-form label-width="80px" :model="transferForm">
@@ -170,6 +174,7 @@
     <PDialog
       ref="replyCheckRef"
       @submit="replyCheckFn"
+      @cancel="replyCheckFn('c')"
       @opened="getReplyListFn"
     >
       <template slot="title">审核回复</template>
@@ -195,7 +200,11 @@
     </PDialog>
 
     <!--申请邀请回复-->
-    <PDialog ref="applyInviteRef" @submit="applyInviteFn">
+    <PDialog
+      ref="applyInviteRef"
+      @submit="applyInviteFn"
+      @cancel="applyInviteFn('c')"
+    >
       <template slot="title">邀请回复</template>
       <template slot="main">
         <el-form
@@ -237,9 +246,7 @@
         </el-form>
       </template>
     </PDialog>
-
     <!--审核邀请回复-->
-
     <el-dialog ref="applyInviteCheckRef" title="审核登记" width="30%">
       <PControlGroup
         :data="auditPopData.controlData"
@@ -249,7 +256,11 @@
     </el-dialog>
 
     <!--申请问政转移-->
-    <PDialog ref="applyTransferRef" @submit="applyTransferFn">
+    <PDialog
+      ref="applyTransferRef"
+      @submit="applyTransferFn"
+      @cancel="applyTransferFn('c')"
+    >
       <template slot="title">申请问政转移</template>
       <template slot="main">
         <el-form label-width="80px" :model="applyTransferForm">
@@ -275,7 +286,7 @@
     </PDialog>
 
     <!--审核问政转移的申请-->
-    <PDialog ref="applyTransferCheckRef" @submit="applyTransferCheckFn">
+    <!-- <PDialog ref="applyTransferCheckRef" @submit="applyTransferCheckFn" @cancel="applyTransferCheckFn('c')">
       <template slot="title">转移审核</template>
       <template slot="main">
         <el-form
@@ -311,9 +322,8 @@
           <el-form-item label="审核说明">
             <el-input v-model="applyTransferCheckForm.content" />
           </el-form-item>
-        </el-form> </template
-      >affairAudit
-    </PDialog>
+        </el-form> </template>
+    </PDialog> -->
   </div>
 </template>
 
@@ -584,7 +594,6 @@ export default {
       transferForm: {
         affairsId: "",
         content: "",
-
         deptId: "",
       },
 
@@ -724,10 +733,7 @@ export default {
     async accountPermission() {
       console.log(1, this.one);
       // 判断路径和参数是否正确
-      console.log(
-        this.$route.params.type,
-        ["reply", "list", "audit"].indexOf(this.$route.params.type)
-      );
+
       if (["reply", "list", "audit"].indexOf(this.$route.params.type) === -1) {
         // 如果跳转前的页面不来至问政列表、问政转移、问政邀请，去掉所有按钮
         return;
@@ -793,43 +799,47 @@ export default {
         // 超管 '1,2,3,5,13,14,21,100'均不可操作
         [2, 3].includes(status) && arr.push("examine");
         this.moreData && this.moreData.status === -1 && arr.push("more");
-        [12].includes(status) && arr.push("applyTransferCheck");
       }
       if (ut === 1) {
         // 市长信箱，书记信箱发言人
         this.moreData && this.moreData.status === -1 && arr.push("more");
         [4, 20].includes(status) && arr.push("dept");
-        [12].includes(status) && arr.push("applyTransferCheck");
         [23].includes(status) && arr.push("replyCheck");
-        if (this.$route.params.type && this.$route.params.type === "audit") {
-          // 如果是从申请转移页面进来的，提供审核申请转移按钮
-          [12].includes(status) && arr.push("applyTransferCheck");
-        }
-        if (this.$route.params.type && this.$route.params.type === "reply") {
-          // 如果是从申请邀请回复页面进来的，提供审核申请邀请按钮
-          [12].includes(status) && arr.push("applyTransferCheck");
-        }
+        // if (this.$route.params.type && this.$route.params.type === 'audit') {
+        //   // 如果是从申请转移页面进来的，提供审核申请转移按钮
+        //   [12].includes(status) && arr.push('applyTransferCheck')
+        // }
+        // if (this.$route.params.type && this.$route.params.type === 'reply') {
+        //   // 如果是从申请邀请回复页面进来的，提供审核申请邀请按钮
+        //   [12].includes(status) && arr.push('applyTransferCheck')
+        // }
       }
       if (ut > 1) {
         // 一般网络发言人
         [4].includes(status) && arr.push("accept");
 
+        if (!isMainDept) {
+          arr.push("otherDeptReply");
+        } else {
+          [4, 5, 13, 14, 21].includes(status) &&
+            arr.push("reply", "applyTransfer", "applyInvite");
+        }
         // 获取受邀单位
-        await assistDeptList({ affairsId: this.one.id }).then((res) => {
-          if (res.code === 10000 && res.data.affairsAudit) {
-            // 如果有受邀单位 就判断受邀单位有没有当前账号的所在单位
-            const names = res.data.affairsAudit.targetDeptName.split(",");
-            let udn = localStorage.getItem("rj_wzwz_deptName") || "none";
-            udn = udn.replace('"', "").replace('"', "");
-            if (names.includes(udn)) {
-              // 如果当前账号是受邀单位
-              arr.push("otherDeptReply");
-            } else {
-              [5, 13, 14, 21].includes(status) &&
-                arr.push("reply", "applyTransfer", "applyInvite");
-            }
-          }
-        });
+        // await assistDeptList({ affairsId: this.one.id, auditId: this.one.auditId }).then((res) => {
+        //   if (res.code === 10000 && res.data.affairsAudit) {
+        //     // 如果有受邀单位 就判断受邀单位有没有当前账号的所在单位
+        //     const names = res.data.affairsAudit.targetDeptName.split(',')
+        //     let udn = localStorage.getItem('rj_wzwz_deptName') || 'none'
+        //     udn = udn.replace('"', '').replace('"', '')
+        //     if (names.includes(udn)) {
+        //       // 如果当前账号是受邀单位
+        //       arr.push('otherDeptReply')
+        //     } else {
+        //       [5, 13, 14, 21].includes(status) &&
+        //         arr.push('reply', 'applyTransfer', 'applyInvite')
+        //     }
+        //   }
+        // })
       }
       arr.push("back");
       arr.forEach((i) => {
@@ -970,7 +980,7 @@ export default {
       this.$refs[v] && (this.$refs[v].visible = true);
       v === "replyRef" && (this.replyContent = "");
       v === "replyCheckRef" && (this.replyCheckContent = "");
-      // 如果是审核问政转移，要先获取转移的对象
+      // 如果是弹出审核问政转移的窗口，要先获取转移的对象
       v === "applyTransferCheckRef" &&
         affairAudit({ affairsId: this.one.id }).then((res) => {
           if (res.code === 10000) {
@@ -990,7 +1000,13 @@ export default {
       this.getOne(this.$route.params.id);
     },
 
-    examineFn() {
+    examineFn(v) {
+      if (v && v === "c") {
+        // 重置数据
+        this.examineForm.content = "";
+        this.examineForm.auditResult = 1;
+        return;
+      }
       // 审核问政
       examineAffairs(this.examineForm)
         .then((res) => {
@@ -1000,8 +1016,14 @@ export default {
           this.$message.warning("操作失败：" + JSON.stringify(err));
         });
     },
-    moreFn() {
+    moreFn(v) {
       // 补充说明审核
+      if (v && v === "c") {
+        // 重置数据
+        this.moreForme.content = "";
+        this.moreForme.auditResult = 1;
+        return;
+      }
       if (!this.moreData) {
         this.$message.warning("未查找到当前问政的补充说明");
         return;
@@ -1016,7 +1038,14 @@ export default {
           this.$message.warning("操作失败：" + JSON.stringify(err));
         });
     },
-    deptFn() {
+    deptFn(v) {
+      if (v && v === "c") {
+        // 重置数据
+        this.deptForm.content = "";
+        this.deptForm.targetDeptId = "";
+        this.deptForm.targetDeptName = "";
+        return;
+      }
       // 受理部门
       this.$refs["deptFormRef"].validate((v) => {
         if (v) {
@@ -1033,8 +1062,13 @@ export default {
         }
       });
     },
-    acceptFn() {
+    acceptFn(v) {
       // 受理问政
+      if (v && v === "c") {
+        // 重置数据
+        this.acceptForm.content = "";
+        return;
+      }
       acceptAffairs(this.acceptForm)
         .then((res) => {
           res.code === 10000 && this.comDialogHide();
@@ -1048,8 +1082,14 @@ export default {
       this.replyForm.content = v;
     },
 
-    replyFn() {
+    replyFn(v) {
       // 回复问政
+      if (v && v === "c") {
+        // 重置数据
+        this.replyForm.content = "";
+        this.replyContent = "";
+        return;
+      }
       replyAffairs(this.replyForm)
         .then((res) => {
           res.code === 10000 && this.comDialogHide();
@@ -1060,6 +1100,7 @@ export default {
     },
 
     getReplyListFn() {
+      // 终审，获取所有单位的问政回复(含受邀单位)
       getReplyList(this.replyCheckForm.affairsId).then((res) => {
         if (res.code === 10000) {
           const rd = res.data.filter((i) => {
@@ -1074,8 +1115,15 @@ export default {
         }
       });
     },
-    replyCheckFn() {
+    replyCheckFn(v) {
       // 审核回复
+      if (v && v === "c") {
+        // 重置数据
+        this.replyForm.content = "";
+        this.replyCheckForm.auditResult = 1;
+        this.replyCheckContent = "";
+        return;
+      }
       // console.log('this.replyCheckForm', this.replyCheckForm)
       // return
       replyExamineAffairs(this.replyCheckForm)
@@ -1089,6 +1137,23 @@ export default {
     replyCheckChange(v) {
       // 回复问政审核的编辑器内容同步
       this.replyCheckForm.content = v;
+    },
+
+    transferFn(v) {
+      // 问政转移
+      if (v && v === "c") {
+        // 重置数据
+        this.replyForm.content = "";
+        this.replyForm.deptId = "";
+        return;
+      }
+      transfer(this.transferForm)
+        .then((res) => {
+          res.code === 10000 && this.comDialogHide();
+        })
+        .catch((err) => {
+          this.$message.warning("操作失败：" + JSON.stringify(err));
+        });
     },
     applyInviteSelect(v) {
       this.applyInviteList = this.deptList.filter((i) => {
@@ -1109,18 +1174,14 @@ export default {
         }
       );
     },
-    transferFn() {
-      // 问政转移
-      transfer(this.transferForm)
-        .then((res) => {
-          res.code === 10000 && this.comDialogHide();
-        })
-        .catch((err) => {
-          this.$message.warning("操作失败：" + JSON.stringify(err));
-        });
-    },
-    applyInviteFn() {
+    applyInviteFn(v) {
       // 邀请回复
+      if (v && v === "c") {
+        // 重置数据
+        this.replyForm.deptList = [];
+        this.replyForm.deptId = [];
+        return;
+      }
       console.log("sfsdffapplyInviteFn", this.applyInviteList);
       this.applyInviteForm.deptList = [];
       this.applyInviteList.forEach((i) => {
@@ -1138,8 +1199,15 @@ export default {
           this.$message.warning("操作失败：" + JSON.stringify(err));
         });
     },
-    applyTransferFn() {
+    applyTransferFn(v) {
       // 申请问政转移
+      if (v && v === "c") {
+        // 重置数据
+        this.applyTransferForm.deptName = "";
+        this.applyTransferForm.deptId = "";
+        this.applyTransferForm.content = "";
+        return;
+      }
       this.applyTransferForm.deptName = this.deptList.filter((i) => {
         return i.id === this.applyTransferForm.deptId;
       })[0].name;
@@ -1152,7 +1220,15 @@ export default {
         });
     },
 
-    applyTransferCheckFn() {
+    applyTransferCheckFn(v) {
+      if (v && v === "c") {
+        // 重置数据
+        this.applyTransferCheckForm.auditResult = 1;
+        this.applyTransferCheckForm.targetDeptId = "";
+        this.applyTransferCheckForm.targetDeptName = "";
+        this.applyTransferCheckForm.content = "";
+        return;
+      }
       // 审核申请转移
       this.applyTransferCheckForm.targetDeptName = this.deptList.filter((i) => {
         return i.value === this.applyTransferCheckForm.targetDeptId;
