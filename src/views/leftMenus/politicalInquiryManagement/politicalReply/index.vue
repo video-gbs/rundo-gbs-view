@@ -345,8 +345,11 @@ export default {
         })
         .join(",");
       delete p.targetDepts;
-      inviteReplyAudit(p);
-      this.auditPopData.show = false;
+      inviteReplyAudit(p).then((res) => {
+        res.code === 10000 &&
+          (this.$message.success("操作成功"), (this.auditPopData.show = false));
+        res.code !== 10000 && this.$message.warning(res.message);
+      });
     },
     comfirmAuditCancel() {
       this.auditPopData.controlData.updateControls([
