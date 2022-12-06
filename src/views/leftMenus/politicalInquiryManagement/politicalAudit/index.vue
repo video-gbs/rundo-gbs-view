@@ -315,9 +315,10 @@ export default {
     currentChange() {},
     async dialogShow(data) {
       this.one = data;
+      this.checkParams.auditId = data.auditId;
       this.checkParams.affairsId = data.id;
 
-      await affairAudit({ affairsId: data.id }).then((res) => {
+      await affairAudit({ auditId: data.auditId }).then((res) => {
         if (res.code === 10000) {
           this.oneByDept = res.data;
           this.checkParams.targetDeptId = res.data.affairsAudit.targetDeptId;
@@ -352,11 +353,12 @@ export default {
       // fn...
       transferCheckAo(this.checkParams).then((res) => {
         res.code === 10000 &&
-          (this.$message.success("审核成功"), (this.checkShow = false));
+          (this.$message.success("审核成功"),
+          (this.$refs["checkRef"].visible = false));
       });
     },
     goDetail(data) {
-      this.$router.push(`/politicalList/audit/${data.id}`);
+      this.$router.push(`/politicalList/audit/${data.auditId}`);
     },
     getDeptFn() {
       // 获取部门列表
