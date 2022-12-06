@@ -19,7 +19,7 @@
         :label="item.label"
         :name="item.label"
       >
-        <component :is="item.content" :one="one" :more-data="moreData" />
+        <component :is="item.content" :one="one" />
       </el-tab-pane>
     </el-tabs>
     <!--问政审核-->
@@ -758,7 +758,8 @@ export default {
       const { status, isMainDept } = this.one;
 
       console.log(ut, status);
-      const arr = [
+      this.actBtn = {};
+      let arr = [
         // 'examine',
         // 'more',
         // 'dept',
@@ -783,22 +784,32 @@ export default {
       //   return false
       // })
       // 是否有补充说明
-      await getAffairsMoreByOne(this.one.id)
-        .then((res) => {
-          if (res.code === 10000) {
-            this.moreData = res.data;
-            return true;
-          }
-          return false;
-        })
-        .catch(() => {
-          return false;
-        });
+      // await getAffairsMoreByOne(this.one.id)
+      //   .then((res) => {
+      //     if (res.code === 10000) {
+      //       this.moreData = res.data
+      //     }
+      //   })
+      //   .catch(() => {
+
+      //   })
 
       if (ut === 0) {
         // 超管 '1,2,3,5,13,14,21,100'均不可操作
         [2, 3].includes(status) && arr.push("examine");
         this.moreData && this.moreData.status === -1 && arr.push("more");
+        ![2, 3].includes(status) &&
+          (arr = [
+            "dept",
+            "reply",
+            "transfer",
+            "invite",
+            "replyCheck",
+            "applyTransfer",
+            "applyTransferCheck",
+            "applyInvite",
+            "applyInviteCheck",
+          ]);
       }
       if (ut === 1) {
         // 市长信箱，书记信箱发言人
@@ -816,14 +827,19 @@ export default {
       }
       if (ut > 1) {
         // 一般网络发言人
-        [4].includes(status) && arr.push("accept");
+        // 待受理
+        [4].includes(status) &&
+          arr.push("accept", "reply", "applyTransfer", "applyInvite");
 
         if (!isMainDept) {
           arr.push("otherDeptReply");
         } else {
-          [4, 13, 14, 21].includes(status) &&
-            arr.push("reply", "applyTransfer", "applyInvite");
+          // 已受理 待回复
           [5].includes(status) && arr.push("reply", "applyInvite");
+          // 申请转移未通过、 申请转移已通过、 市领导流程已审核已分配单位
+          [13, 14, 21].includes(status) &&
+            arr.push("reply", "applyTransfer", "applyInvite");
+
           // [13, 14, 21].includes(status) &&
           //   arr.push('reply', 'applyTransfer', 'applyInvite')
         }
