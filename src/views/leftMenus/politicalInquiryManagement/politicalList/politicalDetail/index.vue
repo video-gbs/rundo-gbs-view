@@ -806,9 +806,9 @@ export default {
             "invite",
             "replyCheck",
             "applyTransfer",
-            "applyTransferCheck",
+            // "applyTransferCheck",
             "applyInvite",
-            "applyInviteCheck",
+            // "applyInviteCheck",
           ]);
       }
       if (ut === 1) {
