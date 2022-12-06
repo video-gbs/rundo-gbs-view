@@ -29,6 +29,8 @@
           @handleClick="handleClick"
           @changeTableHeader="changeTableHeader"
           @selection-change="handleSelectionChange"
+          @setShow="setShow"
+          @setReview="setReview"
         />
         <Pagination
           :pages-data="query"
@@ -50,6 +52,7 @@ import {
   affairsInfoDelete,
   affairsInfoSearch,
 } from "@/api/method/politicalList";
+import { setAffairsShow, setAffairsReview } from "@/api/method/affairs";
 export default {
   name: "ProjectManagement",
   components: {
@@ -225,14 +228,20 @@ export default {
           label: "是否可见",
           name: "isShow",
           isShow: true,
-          content: "isShow",
+          type: "switch",
+
+          content: "",
+          fnName: "setShow",
           width: "80",
         },
         {
           label: "评论区",
           name: "isReview",
           isShow: true,
-          content: "isReview",
+
+          type: "switch",
+          content: "",
+          fnName: "setReview",
           width: "80",
         },
       ],
@@ -284,147 +293,7 @@ export default {
       activeName: "",
       dialogVisible: false,
       dialogTitle: "项目详情",
-      baseList: [
-        {
-          label: "项目名称 ",
-          prop: "projectName",
-          type: "input",
-        },
-        {
-          label: "子项目名称",
-          prop: "projectSubName",
-          type: "input",
-        },
-        {
-          label: "所属地市",
-          prop: "area",
-          type: "addressCascader",
-          propsConfig: {
-            checkStrictly: true,
-          },
-          optionsList: [],
-        },
-        {
-          label: "修复类型 ",
-          prop: "renovateType",
-          type: "addressCascader",
-          propsConfig: {
-            checkStrictly: true,
-            multiple: true,
-          },
-          optionsList: [],
-          onlyLast: false,
-          collapseTags: true,
-        },
-        {
-          label: "资金来源 ",
-          prop: "moneySource",
-          type: "addressCascader",
-          propsConfig: {
-            checkStrictly: true,
-          },
-          optionsList: [],
-        },
-        {
-          label: "下达资金(万元) ",
-          prop: "issuedMoeny",
-          type: "input",
-        },
-        {
-          label: "项目状态 ",
-          prop: "projectState",
-          type: "addressCascader",
-          propsConfig: {
-            checkStrictly: true,
-          },
-          optionsList: [],
-        },
-        {
-          label: "项目位置 ",
-          prop: "projectPlace",
-          type: "input",
-          optionsList: [],
-        },
-        {
-          label: "申报年份 ",
-          prop: "declareYear",
-          type: "datePicker",
-          dateType: "year",
-          fromat: "yyyy",
-          valueFromat: "yyyy",
-        },
-        {
-          label: "承接单位 ",
-          prop: "assumeUnit",
-          type: "input",
-        },
-        {
-          label: "经纬度 ",
-          prop: "coordinate",
-          type: "input",
-        },
-        {
-          label: "实施年限 ",
-          prop: "carryTerm",
-          type: "input",
-          optionsList: [],
-        },
-        {
-          label: "联系人 ",
-          prop: "contacts",
-          type: "input",
-        },
-        {
-          label: "责任单位 ",
-          prop: "accountabilityUnit",
-          type: "input",
-        },
-        {
-          label: "开始时间 ",
-          prop: "startDate",
-          type: "datePicker",
-          dateType: "date",
-          fromat: "yyyy-MM-dd HH:mm:ss",
-          valueFromat: "yyyy-MM-dd HH:mm:ss",
-        },
-        {
-          label: "验收时间 ",
-          prop: "acceptDate",
-          type: "datePicker",
-          dateType: "date",
-          fromat: "yyyy-MM-dd ",
-          valueFromat: "yyyy-MM-dd",
-        },
-        {
-          label: "资金支出进度 ",
-          prop: "moneyExpPlan",
-          type: "input",
-        },
-        {
-          prop: "isTypical",
-          type: "radio",
-          label: "是否典型案例：",
-          optionsList: [],
-        },
-        {
-          label: "项目完成进度 ",
-          prop: "workPlan",
-          type: "textarea",
-          itemWidth: "1045px",
-        },
-        {
-          label: "绩效目标 ",
-          prop: "perfTarget",
-          type: "textarea",
-          itemWidth: "1045px",
-        },
-        {
-          label: "修复内容 ",
-          prop: "restoreContent",
-          type: "textarea",
-          itemWidth: "1045px",
-        },
-      ],
+      baseList: [],
       btnItems: [
         {
           text: "保存",
@@ -558,6 +427,38 @@ export default {
     verify(val) {
       console.log("xq", val);
       this.$router.push(`/politicalList/list/${val.id}`);
+    },
+    setReview(v) {
+      setAffairsReview(v.id, v.isReview)
+        .then((res) => {
+          if (res.code === 10000) {
+            this.$message.success("修改成功");
+            return;
+          } else {
+            v.isReview = v.isReview === 0 ? 1 : 0;
+            this.$message.warning(res.message);
+          }
+        })
+        .catch(() => {
+          v.isReview = v.isReview === 0 ? 1 : 0;
+        });
+    },
+    setShow(v) {
+      // 设置可见性
+      console.log("可见性", v);
+      setAffairsShow(v.id, v.isShow)
+        .then((res) => {
+          if (res.code === 10000) {
+            this.$message.success("修改成功");
+            return;
+          } else {
+            v.isShow = v.isShow === 0 ? 1 : 0;
+            this.$message.warning(res.message);
+          }
+        })
+        .catch(() => {
+          v.isShow = v.isShow === 0 ? 1 : 0;
+        });
     },
     // 每页显示条目个数
     sizeChange(val) {
