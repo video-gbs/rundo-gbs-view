@@ -821,8 +821,11 @@ export default {
         if (!isMainDept) {
           arr.push("otherDeptReply");
         } else {
-          [4, 5, 13, 14, 21].includes(status) &&
+          [4, 13, 14, 21].includes(status) &&
             arr.push("reply", "applyTransfer", "applyInvite");
+          [5].includes(status) && arr.push("reply", "applyInvite");
+          // [13, 14, 21].includes(status) &&
+          //   arr.push('reply', 'applyTransfer', 'applyInvite')
         }
         // 获取受邀单位
         // await assistDeptList({ affairsId: this.one.id, auditId: this.one.auditId }).then((res) => {
