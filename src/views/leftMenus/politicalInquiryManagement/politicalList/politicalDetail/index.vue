@@ -4,7 +4,6 @@
       <el-button
         v-for="i in Object.keys(actBtn)"
         :key="actBtn[i].id"
-        :disabled="!actBtn[i].show"
         :type="actBtn[i].type || 'primary'"
         style="margin: 0px 1px"
         size="mini"
@@ -20,7 +19,7 @@
         :label="item.label"
         :name="item.label"
       >
-        <component :is="item.content" :one="one" />
+        <component :is="item.content" :one="one" :more-data="moreData" />
       </el-tab-pane>
     </el-tabs>
     <!--问政审核-->
@@ -49,8 +48,17 @@
       <template slot="main">
         <el-form label-width="80px" :model="moreForm">
           <el-form-item label="审核结果">
-            <el-radio v-model="moreForm.result" :label="1">审核通过</el-radio>
-            <el-radio v-model="moreForm.result" :label="0">审核不通过</el-radio>
+            <el-radio v-model="moreForm.auditResult" :label="1"
+              >审核通过</el-radio
+            >
+            <el-radio v-model="moreForm.auditResult" :label="0"
+              >审核不通过</el-radio
+            >
+          </el-form-item>
+          <el-form-item label="补充内容">
+            <span class="success-color fs12">
+              {{ moreData.content || "无" }}</span
+            >
           </el-form-item>
           <el-form-item label="审核说明">
             <el-input v-model="moreForm.content" />
@@ -108,6 +116,28 @@
               ref="replyEditorRef"
               :value="replyContent"
               @input="replyChange"
+            />
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
+
+    <!--协助回复-->
+    <PDialog ref="otherDeptReplyRef" @submit="otherDeptReplyFn">
+      <!--样式和问政回复一样，接口不同-->
+      <template slot="title">问政回复</template>
+      <template slot="main">
+        <el-form
+          ref="otherDeptReplyFormRef"
+          label-width="80px"
+          :model="otherDeptReplyForm"
+          :rules="otherDeptReplyRules"
+        >
+          <el-form-item label="回复内容" prop="content">
+            <PEditorVue
+              ref="replyEditorRef"
+              :value="otherDeptReplyContent"
+              @input="otherDeptReplyChange"
             />
           </el-form-item>
         </el-form>
@@ -284,27 +314,6 @@
         </el-form> </template
       >affairAudit
     </PDialog>
-
-    <!--协助回复-->
-    <PDialog ref="otherDeptReplyRef" @submit="otherDeptReplyFn">
-      <template slot="title">协助回复</template>
-      <template slot="main">
-        <el-form
-          ref="otherDeptReplyFormRef"
-          label-width="80px"
-          :model="otherDeptReplyForm"
-          :rules="otherDeptReplyRules"
-        >
-          <el-form-item label="回复内容" prop="content">
-            <PEditorVue
-              ref="replyEditorRef"
-              :value="otherDeptReplyContent"
-              @input="otherDeptReplyChange"
-            />
-          </el-form-item>
-        </el-form>
-      </template>
-    </PDialog>
   </div>
 </template>
 
@@ -316,7 +325,10 @@ import PoliticalReply from "../components/PoliticalReply";
 import ReviewResults from "../components/ReviewResults";
 import PoliticalRecord from "../components/PoliticalRecord";
 import PDialog from "@/components/PDialog";
-import { affairsInfoSearch } from "@/api/method/politicalList";
+import {
+  affairsInfoSearch,
+  affairsInfoSearchApply,
+} from "@/api/method/politicalList";
 import {
   examineAffairs,
   secondExamineAffairs,
@@ -334,6 +346,10 @@ import {
   assistDeptList,
   inviteReplyAudit,
 } from "@/api/method/affairsassist";
+import {
+  getAffairsMoreByOne,
+  affairsMoreCheck,
+} from "@/api/method/affairsMore";
 import { Local } from "@/utils/storage";
 
 export default {
@@ -528,6 +544,7 @@ export default {
       },
       actBtn: {},
       one: {},
+      auditId: "",
       oneByDept: null,
       deptList: [],
       dialogName: "",
@@ -539,9 +556,10 @@ export default {
       },
 
       moreForm: {
-        result: 0,
         affairsId: "",
+        auditResult: 1,
         content: "",
+        id: "",
       },
       deptForm: {
         affairsId: "",
@@ -629,6 +647,8 @@ export default {
           { required: true, message: "请输入回复内容", trigger: "change" },
         ],
       },
+      assistDept: {},
+      moreData: {},
       firstLoading: true,
       userType: "",
     };
@@ -640,7 +660,7 @@ export default {
         if (this.firstLoading) {
           this.firstLoading = false;
         } else {
-          this.processPermission();
+          this.accountPermission();
         }
       },
     },
@@ -662,9 +682,19 @@ export default {
       this.userType !== null && (this.userType = this.userType * 1);
       console.log("this.$route.params.id", this.$route.params.id);
       if (this.$route.params.id) {
-        await affairsInfoSearch(this.$route.params.id).then((res) => {
-          res.code === 10000 && (this.one = res.data);
-        });
+        // 获取当前问政信息
+        // affairsInfoSearchApply
+        const pid = this.$route.params.id;
+        const fn = ["reply", "audit"].includes(this.$route.params.type)
+          ? await affairsInfoSearchApply(pid)
+          : await affairsInfoSearch(pid);
+        console.log("fnnnnnnnn", fn);
+        fn.code === 10000 && (this.one = fn.data);
+        // fn().then((res) => {
+        //   fn.code === 10000 && (this.one = fn.data)
+        // })
+        // 获取当前问政的受邀单位
+
         // 设置问政id
         const arr = [
           "examineForm",
@@ -686,12 +716,12 @@ export default {
         // 账号权限判断
         this.accountPermission();
         // 流程按钮显示权限判断
-        this.processPermission();
+        // this.processPermission()
         // 获取部门
         this.getDept();
       }
     },
-    accountPermission() {
+    async accountPermission() {
       console.log(1, this.one);
       // 判断路径和参数是否正确
       console.log(
@@ -716,83 +746,173 @@ export default {
       //       this.$set(this.actBtn, i, this.btnAll[i])
       //   })
       // }
-      Object.keys(this.btnAll).forEach((i) => {
-        this[this.btnAll[i].author].indexOf(this.userType) > -1 &&
-          this.$set(this.actBtn, i, this.btnAll[i]);
-      });
 
-      console.log("this.actBtn123", this.actBtn);
-    },
-    setShow(arr) {
-      console.log("arrrrrr", arr);
-      Object.keys(this.actBtn).forEach((i) => {
-        this.actBtn[i].show = false;
-        arr.indexOf(i) > -1 && (this.actBtn[i].show = true);
-      });
-    },
-    processPermission() {
-      console.log(2);
       // 根据账号角色和 问政状态 判断操作按钮显示与否
       const ut = this.userType * 1; // ut 0超管 1 市长、书记发言人 2 市级单位发言人 3  县区发言人 4 其他部门发言人
       const { status, isMainDept } = this.one;
 
       console.log(ut, status);
-      let arr = [
-        "examine",
-        "more",
-        "dept",
-        "accept",
-        "reply",
-        "transfer",
-        "invite",
-        "replyCheck",
-        "applyTransfer",
-        "applyTransferCheck",
-        "applyInvite",
-        "otherDeptReply",
+      const arr = [
+        // 'examine',
+        // 'more',
+        // 'dept',
+        // 'accept',
+        // 'reply',
+        // 'transfer',
+        // 'invite',
+        // 'replyCheck',
+        // 'applyTransfer',
+        // 'applyTransferCheck',
+        // 'applyInvite',
+        // 'otherDeptReply'
       ];
+
+      // // 检查是否有受邀单位
+      // const hasAssistDept = await assistDeptList({ affairsId: this.one.id }).then(res => {
+      //   if (res.code === 10000 && res.data.affairsAudit) {
+      //     return res.data.affairsAudit
+      //   }
+      //   return false
+      // }).catch(() => {
+      //   return false
+      // })
+      // 是否有补充说明
+      await getAffairsMoreByOne(this.one.id)
+        .then((res) => {
+          if (res.code === 10000) {
+            this.moreData = res.data;
+            return true;
+          }
+          return false;
+        })
+        .catch(() => {
+          return false;
+        });
+
       if (ut === 0) {
-        // 超管
-        // 全部权限
-        // 初次审核网友问政，可以审核
-        "2".indexOf(status) > -1 && (arr = arr.concat(["examine"]));
+        // 超管 '1,2,3,5,13,14,21,100'均不可操作
+        [2, 3].includes(status) && arr.push("examine");
+        this.moreData && this.moreData.status === -1 && arr.push("more");
+        [12].includes(status) && arr.push("applyTransferCheck");
       }
       if (ut === 1) {
-        // 书记， 市长 发言人
-        // 审核通过  可以审核转移、受理部门
-        "20".indexOf(status) > -1 && (arr = arr.concat(["dept"]));
-        "5".indexOf(status) > -1 && (arr = arr.concat(["replyCheck", "dept"]));
-        "23".indexOf(status) > -1 && (arr = arr.concat(["replyCheck"]));
-        "12".indexOf(status) > -1 && (arr = arr.concat(["applyTransfer"]));
+        // 市长信箱，书记信箱发言人
+        this.moreData && this.moreData.status === -1 && arr.push("more");
+        [4, 20].includes(status) && arr.push("dept");
+        [12].includes(status) && arr.push("applyTransferCheck");
+        [23].includes(status) && arr.push("replyCheck");
+        if (this.$route.params.type && this.$route.params.type === "audit") {
+          // 如果是从申请转移页面进来的，提供审核申请转移按钮
+          [12].includes(status) && arr.push("applyTransferCheck");
+        }
+        if (this.$route.params.type && this.$route.params.type === "reply") {
+          // 如果是从申请邀请回复页面进来的，提供审核申请邀请按钮
+          [12].includes(status) && arr.push("applyTransferCheck");
+        }
       }
-
       if (ut > 1) {
-        // 一般 发言人
-        // 审核通过未受理,市领导指派后  可以申请审核转移、受理
-        "4,13,14,21".indexOf(status) > -1 &&
-          (arr = arr.concat([
-            "applyTransfer",
-            "accept",
-            "reply",
-            "applyInvite",
-          ]));
-        // // 已受理  发起邀请回复、回复问政
-        "5".indexOf(status) > -1 &&
-          (arr = arr.concat(["applyInvite", "reply"]));
-        // 转移申请已提交，待审核  什么也不能干
-        "12".indexOf(status) > -1 && (arr = arr.concat([]));
-        // 转移申请不通过，仍是需要自己选择是否受理  什么也不能干
-        "13".indexOf(status) > -1 && (arr = arr.concat(["accept"]));
+        // 一般网络发言人
+        [4].includes(status) && arr.push("accept");
 
-        // 如果是不是主单位问政数据，是为协助回复，只能显示 协助回复按钮
-        !this.one.isMainDept && (arr = ["otherDeptReply"]);
+        // 获取受邀单位
+        await assistDeptList({ affairsId: this.one.id }).then((res) => {
+          if (res.code === 10000 && res.data.affairsAudit) {
+            // 如果有受邀单位 就判断受邀单位有没有当前账号的所在单位
+            const names = res.data.affairsAudit.targetDeptName.split(",");
+            let udn = localStorage.getItem("rj_wzwz_deptName") || "none";
+            udn = udn.replace('"', "").replace('"', "");
+            if (names.includes(udn)) {
+              // 如果当前账号是受邀单位
+              arr.push("otherDeptReply");
+            } else {
+              [5, 13, 14, 21].includes(status) &&
+                arr.push("reply", "applyTransfer", "applyInvite");
+            }
+          }
+        });
       }
-
-      // 100 已完成  不可做任何操作
-      "100".indexOf(status) > -1 && (arr = arr.concat([]));
       arr.push("back");
-      this.setShow(arr);
+      arr.forEach((i) => {
+        this.$set(this.actBtn, i, this.btnAll[i]);
+      });
+      // Object.keys(this.btnAll).forEach((i) => {
+      //   this[this.btnAll[i].author].indexOf(this.userType) > -1 &&
+      //     this.$set(this.actBtn, i, this.btnAll[i])
+      // })
+
+      console.log("this.actBtn123", this.actBtn);
     },
+    // setShow(arr) {
+    // 设置按钮可点击
+    //   console.log('arrrrrr', arr)
+    //   Object.keys(this.actBtn).forEach((i) => {
+    //     this.actBtn[i].show = false
+    //     arr.indexOf(i) > -1 && (this.actBtn[i].show = true)
+    //   })
+    // },
+    // processPermission() {
+    //   console.log(2)
+    //   // 根据账号角色和 问政状态 判断操作按钮显示与否
+    //   const ut = this.userType * 1 // ut 0超管 1 市长、书记发言人 2 市级单位发言人 3  县区发言人 4 其他部门发言人
+    //   const { status, isMainDept } = this.one
+
+    //   console.log(ut, status)
+    //   let arr = [
+    //     'examine',
+    //     'more',
+    //     'dept',
+    //     'accept',
+    //     'reply',
+    //     'transfer',
+    //     'invite',
+    //     'replyCheck',
+    //     'applyTransfer',
+    //     'applyTransferCheck',
+    //     'applyInvite',
+    //     'otherDeptReply'
+    //   ]
+    //   if (ut === 0) {
+    //     // 超管
+    //     // 全部权限
+    //     // 初次审核网友问政，可以审核
+    //     '2'.indexOf(status) > -1 && (arr = arr.concat(['examine']))
+    //   }
+    //   if (ut === 1) {
+    //     // 书记， 市长 发言人
+    //     // 审核通过  可以审核转移、受理部门
+    //     '20'.indexOf(status) > -1 && (arr = arr.concat(['dept']))
+    //     '5'.indexOf(status) > -1 && (arr = arr.concat(['replyCheck', 'dept']))
+    //     '23'.indexOf(status) > -1 && (arr = arr.concat(['replyCheck']))
+    //     '12'.indexOf(status) > -1 && (arr = arr.concat(['applyTransfer']))
+    //   }
+
+    //   if (ut > 1) {
+    //     // 一般 发言人
+    //     // 审核通过未受理,市领导指派后  可以申请审核转移、受理
+    //     '4,13,14,21'.indexOf(status) > -1 &&
+    //       (arr = arr.concat([
+    //         'applyTransfer',
+    //         'accept',
+    //         'reply',
+    //         'applyInvite'
+    //       ]))
+    //     // // 已受理  发起邀请回复、回复问政
+    //     '5'.indexOf(status) > -1 &&
+    //       (arr = arr.concat(['applyInvite', 'reply']))
+    //     // 转移申请已提交，待审核  什么也不能干
+    //     '12'.indexOf(status) > -1 && (arr = arr.concat([]))
+    //     // 转移申请不通过，仍是需要自己选择是否受理  什么也不能干
+    //     '13'.indexOf(status) > -1 && (arr = arr.concat(['accept']))
+
+    //     // 如果是不是主单位问政数据，是为协助回复，只能显示 协助回复按钮
+    //     !this.one.isMainDept && (arr = ['otherDeptReply'])
+    //   }
+
+    //   // 100 已完成  不可做任何操作
+    //   '100'.indexOf(status) > -1 && (arr = arr.concat([]))
+    //   arr.push('back')
+    //   this.setShow(arr)
+    // },
     handleClick(val, event) {
       this.tabpaneList = this.tabpaneList.map((item) => {
         if (item.label === val.label) {
@@ -815,6 +935,14 @@ export default {
         res.code === 10000 && (this.one = res.data);
       });
     },
+    getMore(v) {
+      // 获取补充说明
+      getAffairsMoreByOne(v).then((res) => {
+        if (res.code === 10000) {
+          this.moreData = res.data;
+        }
+      });
+    },
     getDept() {
       unitList({
         current: 1,
@@ -822,7 +950,9 @@ export default {
       })
         .then((res) => {
           if (res.code === 10000) {
-            this.deptList = res.data.records;
+            this.deptList = res.data.records.filter((i) => {
+              return i.deptType > 1;
+            });
           }
         })
         .finally(() => {});
@@ -872,6 +1002,19 @@ export default {
     },
     moreFn() {
       // 补充说明审核
+      if (!this.moreData) {
+        this.$message.warning("未查找到当前问政的补充说明");
+        return;
+      }
+      this.moreForm.id = this.moreData.id;
+      affairsMoreCheck(this.moreForm)
+        .then((res) => {
+          res.code === 10000 &&
+            (this.comDialogHide(), delete this.actBtn["more"]);
+        })
+        .catch((err) => {
+          this.$message.warning("操作失败：" + JSON.stringify(err));
+        });
     },
     deptFn() {
       // 受理部门

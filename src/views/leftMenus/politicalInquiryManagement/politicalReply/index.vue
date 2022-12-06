@@ -67,7 +67,7 @@
         v-if="auditPopData.show"
         :data="auditPopData.controlData"
         @onBtnClick="comfirmAudit"
-        @onBtnCancel="auditPopData.show = false"
+        @onBtnCancel="comfirmAuditCancel"
       />
     </el-dialog>
   </div>
@@ -237,10 +237,11 @@ export default {
     sizeChange() {},
     currentChange() {},
     goDetail(data) {
-      this.$router.push(`/politicalList/reply/${data.id}`);
+      this.$router.push(`/politicalList/reply/${data.auditId}`);
     },
     dialogShow(data) {
       this.checkParams.affairsId = data.id;
+      this.checkParams.auditId = data.auditId;
       console.log("datadatadata", data);
       this.auditPopData.controlData = {
         layout: "vertical",
@@ -279,7 +280,7 @@ export default {
       };
 
       // 获取受邀单位
-      assistDeptList({ affairsId: data.id }).then((res) => {
+      assistDeptList({ auditId: data.auditId }).then((res) => {
         if (res.code === 10000) {
           const ids = res.data.affairsAudit.targetDeptId.split(",");
           const names = res.data.affairsAudit.targetDeptName.split(",");
@@ -345,6 +346,15 @@ export default {
         .join(",");
       delete p.targetDepts;
       inviteReplyAudit(p);
+      this.auditPopData.show = false;
+    },
+    comfirmAuditCancel() {
+      this.auditPopData.controlData.updateControls([
+        {
+          key: "targetDepts",
+          value: [],
+        },
+      ]);
       this.auditPopData.show = false;
     },
     getDeptFn() {

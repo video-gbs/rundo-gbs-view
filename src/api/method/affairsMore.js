@@ -1,22 +1,29 @@
 // 问政补充管理
 
-import request from '@/api/fetch'
+import request from "@/api/fetch";
 export function addAffairsMore(params) {
   // 新增补充说明
-  return request.put(`/politics/backstage/affairsMore/add`, params)
+  return request.put(`/politics/backstage/affairsMore/add`, params);
 }
 export function editAffairsMore(id, params) {
   // 编辑补充说明
-  return request.post(`/politics/backstage/affairsMore/edit/${id}`, params)
+  return request.post(`/politics/backstage/affairsMore/edit/${id}`, params);
 }
 
 export function getAffairsMoreByOne(affairsId) {
   // 获取某问政的补充说明
-  return request.get(`/politics/backstage/affairsMore/list/${affairsId}`)
+  return request.get(`/politics/backstage/affairsMore/${affairsId}`);
 }
 
 export function deleteAffairsMore(id) {
   // 删除补充说明
-  return request.delete(`/politics/backstage/affairsMore/${id}`)
+  return request.delete(`/politics/backstage/affairsMore/${id}`);
 }
 
+export function affairsMoreCheck(params) {
+  // 删除补充说明
+  return request.post(
+    `/politics/backstage/affairsMore/additionContentAudit`,
+    params
+  );
+}
