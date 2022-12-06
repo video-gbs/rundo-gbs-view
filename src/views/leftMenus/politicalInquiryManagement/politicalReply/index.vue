@@ -31,8 +31,8 @@
           </template>
         </el-table-column>
         <el-table-column prop="deptName" label="留言对象" />
-        <el-table-column prop="state" label="发布账号" />
-        <el-table-column prop="tel" width="120" label="电话" />
+        <el-table-column prop="username" label="发布账号" />
+        <el-table-column prop="phone" width="120" label="电话" />
         <el-table-column prop="createTime" width="150" label="提交时间" />
         <el-table-column prop="status" label="状态">
           <template slot-scope="scope">
@@ -278,7 +278,7 @@ export default {
           },
         ],
       };
-
+      this.transferDeptList = [];
       // 获取受邀单位
       assistDeptList({ auditId: data.auditId }).then((res) => {
         if (res.code === 10000) {
