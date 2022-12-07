@@ -884,7 +884,7 @@ export default {
       if (ut === 1) {
         // 市长信箱，书记信箱发言人
         this.moreData && this.moreData.auditStatus === -1 && arr.push("more");
-        [4, 20].includes(status) && arr.push("dept");
+        [4, 20].includes(status) && arr.push("accept", "dept", "reply");
         [23].includes(status) && arr.push("replyCheck");
       }
       if (ut > 1) {
