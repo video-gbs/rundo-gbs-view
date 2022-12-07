@@ -34,6 +34,7 @@ import Layout from "@/layout";
 const all = [0, 1, 2, 3, 4];
 const admin = [0, 1];
 const superAdmin = [0];
+const none = [];
 export const constantRoutes = [
   {
     path: "/login",
@@ -123,7 +124,8 @@ export const constantRoutes = [
             "@/views/leftMenus/politicalInquiryManagement/politicalReply/index"
           ),
         meta: { title: "邀请回复审核", icon: "dashboard" },
-        author: admin,
+        hidden: true,
+        author: none,
       },
     ],
   },

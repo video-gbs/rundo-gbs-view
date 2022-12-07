@@ -40,7 +40,7 @@
                           "网络发言人" + `  ${activity.deptName}  `
                         }}
                       </div>
-                      <el-tag
+                      <!-- <el-tag
                         size="mini"
                         :type="activity.mainFlag === 3 ? '' : 'danger'"
                         effect="dark"
@@ -48,7 +48,7 @@
                         {{
                           activity.mainFlag === 3 ? "官方回复" : "邀请单位回复"
                         }}
-                      </el-tag>
+                      </el-tag> -->
                     </div>
                     <div>{{ activity.createTime }}</div>
                     <div v-html="activity.content" />

@@ -110,7 +110,7 @@
       <template slot="main">
         <el-form label-width="80px" :model="acceptForm">
           <el-form-item label="受理说明">
-            <el-input v-model="acceptForm.content" />
+            <el-input v-model="acceptForm.content" type="textarea" />
           </el-form-item>
         </el-form>
       </template>
@@ -267,13 +267,13 @@
       </template>
     </PDialog>
     <!--审核邀请回复-->
-    <!-- <el-dialog ref="applyInviteCheckRef" title="审核邀请回复" width="30%">
+    <el-dialog ref="applyInviteCheckRef" title="审核邀请回复" width="30%">
       <PControlGroup
         :data="auditPopData.controlData"
         @onBtnClick="applyInviteCheckFn"
         @onBtnCancel="auditPopData.show = false"
       />
-    </el-dialog> -->
+    </el-dialog>
 
     <!--申请问政转移-->
     <PDialog
@@ -306,7 +306,11 @@
     </PDialog>
 
     <!--审核问政转移的申请-->
-    <!-- <PDialog ref="applyTransferCheckRef" @submit="applyTransferCheckFn" @cancel="applyTransferCheckFn('c')">
+    <PDialog
+      ref="applyTransferCheckRef"
+      @submit="applyTransferCheckFn"
+      @cancel="applyTransferCheckFn('c')"
+    >
       <template slot="title">转移审核</template>
       <template slot="main">
         <el-form
@@ -342,8 +346,9 @@
           <el-form-item label="审核说明">
             <el-input v-model="applyTransferCheckForm.content" />
           </el-form-item>
-        </el-form> </template>
-    </PDialog> -->
+        </el-form>
+      </template>
+    </PDialog>
   </div>
 </template>
 
@@ -857,11 +862,7 @@ export default {
 
       if (ut === 0) {
         // 超管 '1,2,3,5,13,14,21,100'均不可操作
-        console.log(
-          "this.moreData",
-          this.moreData,
-          this.moreData && this.moreData.auditStatus === -1
-        );
+
         [2, 3].includes(status) && arr.push("examine");
         ![2, 3].includes(status) &&
           (arr = [
@@ -879,6 +880,10 @@ export default {
         this.moreData &&
           this.moreData.auditStatus === -1 &&
           arr.splice(1, 0, "more");
+        // 可否审核问政转移
+        if (["audit"].indexOf(this.$route.params.type) !== -1) {
+          arr.push("applyTransferCheck");
+        }
         arr.push("delete");
       }
       if (ut === 1) {
@@ -886,6 +891,10 @@ export default {
         this.moreData && this.moreData.auditStatus === -1 && arr.push("more");
         [4, 20].includes(status) && arr.push("accept", "dept", "reply");
         [23].includes(status) && arr.push("replyCheck");
+        // 可否审核问政转移
+        if (["audit"].indexOf(this.$route.params.type) !== -1) {
+          arr.push("applyTransferCheck");
+        }
       }
       if (ut > 1) {
         // 一般网络发言人

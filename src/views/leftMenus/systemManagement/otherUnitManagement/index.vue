@@ -163,7 +163,7 @@
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="dialog.params.email" />
           </el-form-item>
-          <el-form-item label="所属角色" prop="roleId">
+          <!-- <el-form-item label="所属角色" prop="roleId">
             <el-select v-model="dialog.params.roleId" placeholder="请选择">
               <el-option
                 v-for="i in selectList"
@@ -172,7 +172,7 @@
                 :value="i.id"
               />
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="所属部门" prop="deptId">
             <el-select v-model="dialog.params.deptId" placeholder="请选择">
               <el-option
@@ -333,7 +333,7 @@ export default {
           pattern: /^(1[3-9]\d{9})$/,
           message: "请输入正确的手机号码",
           trigger: "blur",
-          required: true,
+          required: false,
         },
         password: [
           {
@@ -370,11 +370,11 @@ export default {
           message: "请输入正确的邮箱",
           trigger: "blur",
         },
-        roleId: {
-          required: true,
-          message: "不能为空",
-          trigger: "blur",
-        },
+        // roleId: {
+        //   required: true,
+        //   message: '不能为空',
+        //   trigger: 'blur'
+        // }
       },
       params: {
         pageNum: 1,
@@ -391,7 +391,6 @@ export default {
         title: "新增用户",
         params: {
           account: "",
-          roleId: 1,
           status: 1,
           password: "",
           rePassword: "",
@@ -416,7 +415,7 @@ export default {
   mounted() {
     this.checkPassworLevel();
     this.getOtherUnitList();
-    this.getList();
+    // this.getList()
     this.getDeptList();
   },
   methods: {
@@ -428,21 +427,21 @@ export default {
       this.passwordForm.id = row.id;
     },
 
-    getList() {
-      otherUnitDeptRoleList().then((res) => {
-        if (res.code === 10000) {
-          res.data.map((item) => {
-            const obj = {
-              id: "",
-              label: "",
-            };
-            obj.id = item.roleId;
-            obj.label = item.roleName;
-            this.selectList.push(obj);
-          });
-        }
-      });
-    },
+    // getList() {
+    //   otherUnitDeptRoleList().then((res) => {
+    //     if (res.code === 10000) {
+    //       res.data.map((item) => {
+    //         const obj = {
+    //           id: '',
+    //           label: ''
+    //         }
+    //         obj.id = item.roleId
+    //         obj.label = item.roleName
+    //         this.selectList.push(obj)
+    //       })
+    //     }
+    //   })
+    // },
 
     savePassword(formName) {
       this.$refs[formName].validate((valid) => {
@@ -530,7 +529,6 @@ export default {
     dialogShow(act, data) {
       this.dialog.params = {
         account: "",
-        roleId: 10000001,
         status: 1,
         password: "",
         rePassword: "",
@@ -543,23 +541,13 @@ export default {
       if (act === 0) {
         // this.editShow = false;
         this.editShowChild = false;
-        const {
-          account,
-          email,
-          mobile,
-          name,
-          nickName,
-          status,
-          roleId,
-          deptId,
-        } = data;
+        const { account, email, mobile, name, nickName, status, deptId } = data;
         this.dialog.params.account = account;
         this.dialog.params.email = email;
         this.dialog.params.mobile = mobile;
         this.dialog.params.name = name;
         this.dialog.params.nickName = nickName;
         this.dialog.params.status = Number(status);
-        this.dialog.params.roleId = Number(roleId);
         this.dialog.params.deptId = deptId;
         this.editId = data.id;
       } else {

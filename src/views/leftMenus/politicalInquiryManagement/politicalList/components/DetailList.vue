@@ -1,6 +1,6 @@
 <template>
   <div class="detail-container">
-    <el-card v-if="moreData" class="box-card1">
+    <el-card class="box-card1">
       <div slot="header" class="clearfix">
         <LineFont
           :line-title="lineTitle"
@@ -11,21 +11,37 @@
       <div class="text item">
         <el-form ref="form" :model="form" label-width="120px">
           <el-form-item label="补充内容：">
-            <span class="span-text">{{ moreData.content || "-" }}</span>
+            <span class="span-text">{{
+              moreData ? moreData.content || "暂无" : "暂无"
+            }}</span>
           </el-form-item>
           <el-form-item label="提交时间：">
-            <span class="span-text">{{ moreData.createTime || "-" }}</span>
+            <span class="span-text">{{
+              moreData ? moreData.createTime || "暂无" : "暂无"
+            }}</span>
           </el-form-item>
         </el-form>
       </div>
     </el-card>
     <el-card class="box-card2">
-      <div slot="header" class="clearfix">
+      <div slot="header" class="clearfix f jc-sb ai-c">
         <LineFont
+          class="f1"
           :line-title="lineTitle1"
           :text-style="textStyle"
           :line-blue-style="lineBlueStyle"
         />
+        <div style="width: 220px">
+          <el-tag effect="plain" class="mr10">
+            {{ $dict.status[one.status] }}
+          </el-tag>
+          <el-tag effect="plain" class="mr10" type="warning">
+            {{ one.isShow ? "已隐藏" : "已显示" }}
+          </el-tag>
+          <el-tag effect="plain" type="warning">
+            {{ one.isReview ? "关闭评论" : "开启评论" }}
+          </el-tag>
+        </div>
       </div>
       <div class="text item">
         <el-form v-if="oneData" ref="form" :model="form" label-width="120px">
