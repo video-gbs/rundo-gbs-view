@@ -2,6 +2,7 @@
   <div class="router_container4 m20 bg-w">
     <div class="panel-header-box f jc-sb ai-c fw-w">
       <div class="title-css">单位账号管理</div>
+      <el-button />
     </div>
     <div class="p10">
       <el-table :data="tableData" style="width: 100%">
@@ -9,7 +10,9 @@
           <template slot="header">
             <div class="f ai-c jc-sb">
               <div>数据列表</div>
-              <el-button size="mini" type="primary" @click="dialogShow(1)">新增</el-button>
+              <el-button size="mini" type="primary" @click="dialogShow(1)"
+                >新增</el-button
+              >
             </div>
           </template>
           <el-table-column prop="account" label="账号" />
@@ -24,16 +27,20 @@
                 scope.row.status === "1"
                   ? "启用"
                   : scope.row.status === "0"
-                    ? "禁用"
-                    : "-"
+                  ? "禁用"
+                  : "-"
               }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="createTime" label="创建时间" width="160" />
           <el-table-column width="200" label="操作" fixed="right">
             <template slot-scope="scope">
-              <el-button type="text" @click="editPassword(scope.row)">修改密码</el-button>
-              <el-button type="text" @click="dialogShow(0, scope.row)">编辑</el-button>
+              <el-button type="text" @click="editPassword(scope.row)"
+                >修改密码</el-button
+              >
+              <el-button type="text" @click="dialogShow(0, scope.row)"
+                >编辑</el-button
+              >
               <el-button type="text" @click="deleteAccount(scope.row)">
                 <span class="delete-button">删除</span>
               </el-button>
@@ -80,10 +87,15 @@
                 placeholder="6~20字符"
                 @input="checkPassworLevel"
               />
-              <span class="fs12 mt10">请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span>
+              <span class="fs12 mt10"
+                >请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span
+              >
             </div>
           </el-form-item>
-          <el-form-item v-if="editShowChild" style="position: absolute;right: 60px;top: 140px;">
+          <el-form-item
+            v-if="editShowChild"
+            style="position: absolute; right: 60px; top: 140px"
+          >
             <div class="password-level-box f ai-c">
               <div class="password-level f ai-c">
                 <div
@@ -179,7 +191,9 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="submit('accountForm')">确 定</el-button>
+        <el-button type="primary" @click="submit('accountForm')"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
 
@@ -199,10 +213,12 @@
               class="new_password_input"
               @input="checkPassworLevel1"
             />
-            <span class="fs12 mt10">请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span>
+            <span class="fs12 mt10"
+              >请使用大写字母（A~Z）、小写字母（a~z）、数字（0~9）三种组合</span
+            >
           </div>
         </el-form-item>
-        <el-form-item style="position: absolute;right: 35px;top: 105px;">
+        <el-form-item style="position: absolute; right: 35px; top: 105px">
           <div class="password-level-box f ai-c">
             <div class="password-level f ai-c">
               <div
@@ -257,156 +273,159 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="passwordVisible = false">取 消</el-button>
-        <el-button type="primary" @click="savePassword('savePasswordForm')">保 存</el-button>
+        <el-button type="primary" @click="savePassword('savePasswordForm')"
+          >保 存</el-button
+        >
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import pagination from '@/components/Pagination/index.vue'
+import pagination from "@/components/Pagination/index.vue";
 import {
   otherUnitAdd,
   otherUnitEdit,
   otherUnitList,
   otherUnitDelete,
   otherUnitEditPassword,
-  otherUnitDeptRoleList
-} from '@/api/method/otherUnitManagement'
-import { unitList } from '@/api/method/unitManagement'
+  otherUnitDeptRoleList,
+} from "@/api/method/otherUnitManagement";
+import { unitList } from "@/api/method/unitManagement";
 // import { getRolesList } from "@/api/method/role";
 
-import { Local } from '@/utils/storage'
+import { Local } from "@/utils/storage";
 
 export default {
-  name: '',
+  name: "",
   components: { pagination },
   data() {
     return {
       search: {
-        userName: '',
-        phone: '',
-        time: ''
+        userName: "",
+        phone: "",
+        time: "",
       },
       passwordForm: {
-        password: '',
-        rePassword: '',
-        id: ''
+        password: "",
+        rePassword: "",
+        id: "",
       },
       selectList: [],
       passwordVisible: false,
       rules: {
         account: [
-          { required: true, message: '不能为空', trigger: 'blur' },
+          { required: true, message: "不能为空", trigger: "blur" },
           {
             min: 6,
             max: 20,
-            message: '6-20个字符',
-            trigger: 'blur'
-          }
+            message: "6-20个字符",
+            trigger: "blur",
+          },
         ],
         name: {
           required: true,
-          message: '不能为空',
-          trigger: 'blur',
-          max: 20
+          message: "不能为空",
+          trigger: "blur",
+          max: 20,
         },
         mobile: {
           pattern: /^(1[3-9]\d{9})$/,
-          message: '请输入正确的手机号码',
-          trigger: 'blur',
-          required: true
+          message: "请输入正确的手机号码",
+          trigger: "blur",
+          required: true,
         },
         password: [
           {
             required: true,
-            message: '不能为空',
-            trigger: 'blur'
+            message: "不能为空",
+            trigger: "blur",
           },
           {
             validator: (rule, value, callback) => {
               if (this.handlePasswordLevel(value)) {
-                callback()
+                callback();
               } else {
-                callback('密码强度不够，至少包含数字/字母/字符两种组合')
+                callback("密码强度不够，至少包含数字/字母/字符两种组合");
               }
             },
-            trigger: 'blur'
-          }
+            trigger: "blur",
+          },
         ],
         rePassword: {
           required: true,
-          message: '不能为空',
-          trigger: 'blur'
+          message: "不能为空",
+          trigger: "blur",
         },
         nickName: {
           required: true,
-          message: '不能为空',
-          trigger: 'blur',
-          max: 40
+          message: "不能为空",
+          trigger: "blur",
+          max: 40,
         },
         email: {
-          pattern: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9_\.\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
+          pattern:
+            /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9_\.\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
           required: true,
-          message: '请输入正确的邮箱',
-          trigger: 'blur'
+          message: "请输入正确的邮箱",
+          trigger: "blur",
         },
         roleId: {
           required: true,
-          message: '不能为空',
-          trigger: 'blur'
-        }
+          message: "不能为空",
+          trigger: "blur",
+        },
       },
       params: {
         pageNum: 1,
         pageSize: 10,
         total: 0,
-        proCount: 0
+        proCount: 0,
       },
       tableData: [],
       editShow: true,
       editShowChild: true,
-      editId: '',
+      editId: "",
       dialog: {
         show: false,
-        title: '新增用户',
+        title: "新增用户",
         params: {
-          account: '',
+          account: "",
           roleId: 1,
           status: 1,
-          password: '',
-          rePassword: '',
-          nickName: '',
-          name: '',
-          email: '',
-          deptId: ''
-        }
+          password: "",
+          rePassword: "",
+          nickName: "",
+          name: "",
+          email: "",
+          deptId: "",
+        },
       },
       deptList: [],
       state: [
-        { id: 1, label: '启用' },
-        { id: 0, label: '禁用' }
+        { id: 1, label: "启用" },
+        { id: 0, label: "禁用" },
       ],
       passwordLevel: 0,
       passwordLevel1: 0,
       headers: {
-        Authorization: Local.getToken()
-      }
-    }
+        Authorization: Local.getToken(),
+      },
+    };
   },
   mounted() {
-    this.checkPassworLevel()
-    this.getOtherUnitList()
-    this.getList()
-    this.getDeptList()
+    this.checkPassworLevel();
+    this.getOtherUnitList();
+    this.getList();
+    this.getDeptList();
   },
   methods: {
     /**
      * 编辑超管密码
      */
     editPassword(row) {
-      this.passwordVisible = true
-      this.passwordForm.id = row.id
+      this.passwordVisible = true;
+      this.passwordForm.id = row.id;
     },
 
     getList() {
@@ -414,15 +433,15 @@ export default {
         if (res.code === 10000) {
           res.data.map((item) => {
             const obj = {
-              id: '',
-              label: ''
-            }
-            obj.id = item.roleId
-            obj.label = item.roleName
-            this.selectList.push(obj)
-          })
+              id: "",
+              label: "",
+            };
+            obj.id = item.roleId;
+            obj.label = item.roleName;
+            this.selectList.push(obj);
+          });
         }
-      })
+      });
     },
 
     savePassword(formName) {
@@ -434,47 +453,47 @@ export default {
               this.passwordForm.rePassword
             )
           ) {
-            return
+            return;
           }
           otherUnitEditPassword({
             id: this.passwordForm.id,
-            password: this.passwordForm.password
+            password: this.passwordForm.password,
           }).then((res) => {
             if (res.code === 10000) {
               this.$message({
-                type: 'success',
-                message: '修改成功'
-              })
-              this.passwordVisible = false
-              this.getOtherUnitList()
+                type: "success",
+                message: "修改成功",
+              });
+              this.passwordVisible = false;
+              this.getOtherUnitList();
             }
-          })
+          });
         }
-      })
+      });
     },
     /**
      * 校验密码强度
      * @param {password} 密码
      */
     handlePasswordLevel(password) {
-      let level = 0
+      let level = 0;
       // 判断这个字符串中有没有数字
       if (/[0-9]/.test(password)) {
-        level++
+        level++;
       }
       // 判断字符串中有没有字母
       if (/[a-zA-Z]/.test(password)) {
-        level++
+        level++;
       }
       // 判断字符串中有没有特殊符号
       if (/[^0-9a-zA-Z_]/.test(password)) {
-        level++
+        level++;
       }
       if (level >= 2) {
-        return true
+        return true;
       } else {
-        this.$message.error('密码强度不够，至少包含数字/字母/字符两种组合')
-        return false
+        this.$message.error("密码强度不够，至少包含数字/字母/字符两种组合");
+        return false;
       }
     },
     /**
@@ -484,183 +503,190 @@ export default {
      */
     handlePasswordCheck(password, rePassword) {
       if (!password) {
-        this.$message.error('请输入密码')
-        return false
+        this.$message.error("请输入密码");
+        return false;
       }
       if (!rePassword) {
-        this.$message.error('请确认新密码')
-        return false
+        this.$message.error("请确认新密码");
+        return false;
       }
       if (password && rePassword && password.trim() !== rePassword.trim()) {
-        this.$message.error('两次输入的密码不一致')
-        return false
+        this.$message.error("两次输入的密码不一致");
+        return false;
       }
-      return true
+      return true;
     },
     sizeChange(pageSize) {
-      this.params.pageSize = pageSize
-      this.getOtherUnitList()
+      this.params.pageSize = pageSize;
+      this.getOtherUnitList();
     },
     currentChange(proCount) {
-      this.params.proCount = proCount
-      this.getOtherUnitList()
+      this.params.proCount = proCount;
+      this.getOtherUnitList();
     },
     goPage(path, query) {
-      this.$router.push(path)
+      this.$router.push(path);
     },
     dialogShow(act, data) {
       this.dialog.params = {
-        account: '',
+        account: "",
         roleId: 10000001,
         status: 1,
-        password: '',
-        rePassword: '',
-        nickName: '',
-        name: '',
-        email: '',
-        deptId: ''
-      }
-      this.editShow = true
+        password: "",
+        rePassword: "",
+        nickName: "",
+        name: "",
+        email: "",
+        deptId: "",
+      };
+      this.editShow = true;
       if (act === 0) {
         // this.editShow = false;
-        this.editShowChild = false
-        const { account, email, mobile, name, nickName, status, roleId, deptId } = data
-        this.dialog.params.account = account
-        this.dialog.params.email = email
-        this.dialog.params.mobile = mobile
-        this.dialog.params.name = name
-        this.dialog.params.nickName = nickName
-        this.dialog.params.status = Number(status)
-        this.dialog.params.roleId = Number(roleId)
-        this.dialog.params.deptId = deptId
-        this.editId = data.id
+        this.editShowChild = false;
+        const {
+          account,
+          email,
+          mobile,
+          name,
+          nickName,
+          status,
+          roleId,
+          deptId,
+        } = data;
+        this.dialog.params.account = account;
+        this.dialog.params.email = email;
+        this.dialog.params.mobile = mobile;
+        this.dialog.params.name = name;
+        this.dialog.params.nickName = nickName;
+        this.dialog.params.status = Number(status);
+        this.dialog.params.roleId = Number(roleId);
+        this.dialog.params.deptId = deptId;
+        this.editId = data.id;
       } else {
-        this.editShowChild = true
+        this.editShowChild = true;
       }
-      this.dialog.title = act ? '添加账号' : '编辑用户'
-      this.dialog.show = !this.dialog.show
+      this.dialog.title = act ? "添加账号" : "编辑用户";
+      this.dialog.show = !this.dialog.show;
     },
 
     deleteAccount(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("删除后数据无法恢复，是否确认删除？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
       }).then(() => {
         otherUnitDelete(row.id).then((res) => {
           if (res.code === 10000) {
             this.$message({
-              type: 'success',
-              message: '删除成功'
-            })
-            this.params.pageNum = 1
-            this.getOtherUnitList()
+              type: "success",
+              message: "删除成功",
+            });
+            this.params.pageNum = 1;
+            this.getOtherUnitList();
           }
-        })
-      })
+        });
+      });
     },
     getDeptList() {
       // 获取部门
-      unitList({ current: 1, size: 399 }).then(res => {
+      unitList({ current: 1, size: 399 }).then((res) => {
         if (res.code === 10000) {
-          this.deptList = res.data.records
+          this.deptList = res.data.records;
         }
-      })
+      });
     },
     getOtherUnitList() {
-      otherUnitList(
-        {
-
-          current: 1,
-          size: 10
-        }
-      ).then(res => {
+      otherUnitList({
+        current: 1,
+        size: 10,
+      }).then((res) => {
         if (res.code === 10000) {
-          this.tableData = res.data.records
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
+          this.tableData = res.data.records;
+          this.params.total = res.data.total;
+          this.params.pages = res.data.pages;
+          this.params.current = res.data.current;
         }
-      })
+      });
     },
 
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
-            case '添加账号':
+            case "添加账号":
               if (
                 !this.handlePasswordCheck(
                   this.dialog.params.password,
                   this.dialog.params.rePassword
                 )
               ) {
-                return
+                return;
               }
               otherUnitAdd(this.dialog.params).then((res) => {
                 if (res.code === 10000) {
                   this.$message({
-                    type: 'success',
-                    message: '其他单位账号新增成功'
-                  })
-                  this.dialog.show = false
-                  this.getOtherUnitList()
+                    type: "success",
+                    message: "其他单位账号新增成功",
+                  });
+                  this.dialog.show = false;
+                  this.getOtherUnitList();
                 }
-              })
-              break
-            case '编辑用户':
-
-              otherUnitEdit({ id: this.editId, ...this.dialog.params }).then(res => {
-                if (res.code === 10000) {
-                  this.$message({
-                    type: 'success',
-                    message: '账号修改成功'
-                  })
-                  this.dialog.show = false
-                  this.getOtherUnitList()
+              });
+              break;
+            case "编辑用户":
+              otherUnitEdit({ id: this.editId, ...this.dialog.params }).then(
+                (res) => {
+                  if (res.code === 10000) {
+                    this.$message({
+                      type: "success",
+                      message: "账号修改成功",
+                    });
+                    this.dialog.show = false;
+                    this.getOtherUnitList();
+                  }
                 }
-              })
-              break
+              );
+              break;
 
             default:
-              break
+              break;
           }
         }
-      })
+      });
     },
     handleClose(done) {
-      done()
+      done();
     },
     checkPassworLevel() {
-      const reg = /[A-Z]/
-      const reg2 = /[a-z]/
-      const reg3 = /[0-9]/
-      this.passwordLevel = 0
-      reg.test(this.dialog.params.password) && (this.passwordLevel += 1)
-      reg2.test(this.dialog.params.password) && (this.passwordLevel += 1)
-      reg3.test(this.dialog.params.password) && (this.passwordLevel += 1)
+      const reg = /[A-Z]/;
+      const reg2 = /[a-z]/;
+      const reg3 = /[0-9]/;
+      this.passwordLevel = 0;
+      reg.test(this.dialog.params.password) && (this.passwordLevel += 1);
+      reg2.test(this.dialog.params.password) && (this.passwordLevel += 1);
+      reg3.test(this.dialog.params.password) && (this.passwordLevel += 1);
 
-      const l = this.dialog.params.password.length
+      const l = this.dialog.params.password.length;
       if (l < 5 || l > 20) {
-        this.passwordLevel = 0
+        this.passwordLevel = 0;
       }
     },
     checkPassworLevel1() {
-      const reg = /[A-Z]/
-      const reg2 = /[a-z]/
-      const reg3 = /[0-9]/
-      this.passwordLevel1 = 0
-      reg.test(this.passwordForm.password) && (this.passwordLevel1 += 1)
-      reg2.test(this.passwordForm.password) && (this.passwordLevel1 += 1)
-      reg3.test(this.passwordForm.password) && (this.passwordLevel1 += 1)
+      const reg = /[A-Z]/;
+      const reg2 = /[a-z]/;
+      const reg3 = /[0-9]/;
+      this.passwordLevel1 = 0;
+      reg.test(this.passwordForm.password) && (this.passwordLevel1 += 1);
+      reg2.test(this.passwordForm.password) && (this.passwordLevel1 += 1);
+      reg3.test(this.passwordForm.password) && (this.passwordLevel1 += 1);
 
-      const l = this.passwordForm.password.length
+      const l = this.passwordForm.password.length;
       if (l < 5 || l > 20) {
-        this.passwordLevel1 = 0
+        this.passwordLevel1 = 0;
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -715,7 +741,7 @@ export default {
 .delete-button {
   color: red !important;
 }
-.mr30{
+.mr30 {
   width: calc(100% - 30px);
 }
 </style>

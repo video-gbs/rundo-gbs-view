@@ -11,14 +11,10 @@
       <div class="text item">
         <el-form ref="form" :model="form" label-width="120px">
           <el-form-item label="补充内容：">
-            <span class="span-text">{{
-              moreData ? moreData.content : "-"
-            }}</span>
+            <span class="span-text">{{ moreData.content || "-" }}</span>
           </el-form-item>
           <el-form-item label="提交时间：">
-            <span class="span-text">{{
-              moreData ? moreData.createTime : "-"
-            }}</span>
+            <span class="span-text">{{ moreData.createTime || "-" }}</span>
           </el-form-item>
         </el-form>
       </div>
@@ -32,7 +28,7 @@
         />
       </div>
       <div class="text item">
-        <el-form ref="form" :model="form" label-width="120px">
+        <el-form v-if="oneData" ref="form" :model="form" label-width="120px">
           <el-row :gutter="20">
             <el-col :span="8">
               <el-form-item label="留言对象：">
@@ -59,7 +55,12 @@
             <span class="span-text">{{ oneData.content }}</span>
           </el-form-item>
           <el-form-item label="附件补充：">
-            <span class="span-text">图片</span>
+            <template v-if="oneData.photoUrl">
+              <div v-for="i in oneData.photoUrl.split(',')" :key="i">
+                <img class="annex-css" :src="i" />
+              </div>
+            </template>
+            <template v-else> 暂无附件 </template>
           </el-form-item>
         </el-form>
       </div>
@@ -154,7 +155,7 @@ export default {
         console.log("nnmnmnmnm", n);
         this.oneData = n;
       },
-      immediate: true,
+      // immediate: true,
       deep: true,
     },
   },
@@ -210,5 +211,10 @@ export default {
     font-weight: 400;
     color: #333333;
   }
+}
+
+.annex-css {
+  max-width: 100%;
+  height: auto;
 }
 </style>
