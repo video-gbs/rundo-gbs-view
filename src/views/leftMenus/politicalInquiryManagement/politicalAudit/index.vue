@@ -73,7 +73,7 @@
               @input="radioChange"
             >
               <el-radio :label="1">通过</el-radio>
-              <el-radio :label="0">驳回</el-radio>
+              <el-radio :label="2">驳回</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="受理单位">
@@ -107,7 +107,7 @@
           <el-form-item label="审核结果">
             <el-radio-group v-model="checkParams.auditResult" @input="radioChange">
               <el-radio :label="1">通过</el-radio>
-              <el-radio :label="0">驳回</el-radio>
+              <el-radio :label="2">驳回</el-radio>
             </el-radio-group>
 
           </el-form-item>

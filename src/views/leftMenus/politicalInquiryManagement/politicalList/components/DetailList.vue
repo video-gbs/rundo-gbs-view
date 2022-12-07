@@ -58,7 +58,7 @@
           <el-form-item label="内容：">
             <span class="span-text">{{ oneData.content }}</span>
           </el-form-item>
-          <el-form-item label="附近补充：">
+          <el-form-item label="附件补充：">
             <span class="span-text">图片</span>
           </el-form-item>
         </el-form>
