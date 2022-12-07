@@ -31,7 +31,7 @@
             <el-radio v-model="examineForm.auditResult" :label="1"
               >审核通过</el-radio
             >
-            <el-radio v-model="examineForm.auditResult" :label="0"
+            <el-radio v-model="examineForm.auditResult" :label="2"
               >审核不通过</el-radio
             >
           </el-form-item>
@@ -51,7 +51,7 @@
             <el-radio v-model="moreForm.auditResult" :label="1"
               >审核通过</el-radio
             >
-            <el-radio v-model="moreForm.auditResult" :label="0"
+            <el-radio v-model="moreForm.auditResult" :label="2"
               >审核不通过</el-radio
             >
           </el-form-item>
@@ -184,7 +184,7 @@
             <el-radio v-model="replyCheckForm.auditResult" :label="1"
               >审核通过</el-radio
             >
-            <el-radio v-model="replyCheckForm.auditResult" :label="0"
+            <el-radio v-model="replyCheckForm.auditResult" :label="2"
               >审核不通过</el-radio
             >
           </el-form-item>
@@ -300,7 +300,7 @@
               @input="applyTransferCheckRadioChange"
             >
               <el-radio :label="1">通过</el-radio>
-              <el-radio :label="0">驳回</el-radio>
+              <el-radio :label="2">驳回</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="受理单位">
@@ -1293,7 +1293,7 @@ export default {
             value: "1",
             options: [
               { label: "同意", value: "1" },
-              { label: "驳回", value: "0" },
+              { label: "驳回", value: "2" },
             ],
           },
           {

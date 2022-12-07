@@ -254,7 +254,7 @@ export default {
             value: "1",
             options: [
               { label: "同意", value: "1" },
-              { label: "驳回", value: "0" },
+              { label: "驳回", value: "2" },
             ],
           },
           {
