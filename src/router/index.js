@@ -193,24 +193,24 @@ export const constantRoutes = [
       },
     ],
   },
-  // {
-  //   path: "/userManagement",
-  //   name: "用户管理",
-  //   component: Layout,
-  //   // meta: { title: '用户管理' },
-  //   redirect: "/userManagement",
-  //   // component: () => import('@/views/leftMenus/userManagement/index'),
-  //   meta: { title: "用户管理", icon: "role" },
-  //   author: superAdmin,
-  //   children: [
-  //     {
-  //       path: "/userManagement",
-  //       name: "用户管理",
-  //       component: () => import("@/views/leftMenus/userManagement/index"),
-  //       meta: { title: "用户管理", icon: "dashboard" },
-  //     },
-  //   ],
-  // },
+  {
+    path: "/userManagement",
+    name: "用户管理",
+    component: Layout,
+    // meta: { title: '用户管理' },
+    redirect: "/userManagement",
+    // component: () => import('@/views/leftMenus/userManagement/index'),
+    meta: { title: "用户管理", icon: "role" },
+    author: superAdmin,
+    children: [
+      {
+        path: "/userManagement",
+        name: "用户管理",
+        component: () => import("@/views/leftMenus/userManagement/index"),
+        meta: { title: "用户管理", icon: "dashboard" },
+      },
+    ],
+  },
   {
     path: "/systemManagement",
     name: "系统管理",

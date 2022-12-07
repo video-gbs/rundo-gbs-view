@@ -59,6 +59,11 @@
             :inactive-value="1"
             active-color="#13ce66"
             inactive-color="#eeeeee"
+            :disabled="
+              item.disabled
+                ? item.disabled.fn(scope.row[item.disabled.attrName])
+                : false
+            "
             @change="$emit(item.fnName, scope.row)"
           />
 

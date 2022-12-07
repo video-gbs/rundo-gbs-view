@@ -202,7 +202,7 @@ export default {
           isShow: true,
         },
         {
-          label: "电话",
+          label: "手机号",
           name: "phone",
           isShow: true,
         },
@@ -229,7 +229,14 @@ export default {
           name: "isShow",
           isShow: true,
           type: "switch",
-
+          disabled: {
+            attrName: "status",
+            fn: function (v) {
+              console.log("只是多少", v);
+              // v 是传入的值 用这个值来判断return的布尔值
+              return [2, 3].includes(v);
+            },
+          },
           content: "",
           fnName: "setShow",
           width: "80",
@@ -238,7 +245,14 @@ export default {
           label: "评论区",
           name: "isReview",
           isShow: true,
-
+          disabled: {
+            attrName: "status",
+            fn: function (v) {
+              console.log("只是多少", v);
+              // v 是传入的值 用这个值来判断return的布尔值
+              return [2, 3].includes(v);
+            },
+          },
           type: "switch",
           content: "",
           fnName: "setReview",

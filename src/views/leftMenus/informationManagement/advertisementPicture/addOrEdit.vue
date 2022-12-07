@@ -28,26 +28,36 @@
         </el-form-item>
         <el-form-item label="广告图图片">
           <div>
-            <el-upload
-              ref="uploadRef"
-              size="mini"
-              drag
-              action=""
-              :http-request="uploadFn"
-              :on-change="onChange"
-              :limit="1"
-              @before-upload="beforeUpload"
-            >
-              <i class="el-icon-upload" />
-              <div class="el-upload__text">
-                将文件拖到此处，或<em>点击上传</em>
-              </div>
-              <div slot="tip" class="el-upload__tip">
-                {{
-                  `① 支持上传图片格式："*.jpg"、"*.jpeg"、"*.png"； ② 单张图片大小不超过50M；`
-                }}
-              </div>
-            </el-upload>
+            <el-row>
+              <el-col :span="params.photoUrl ? 14 : 24">
+                <el-upload
+                  ref="uploadRef"
+                  size="mini"
+                  drag
+                  action=""
+                  :http-request="uploadFn"
+                  :on-remove="onRemove"
+                  :limit="1"
+                >
+                  <i class="el-icon-upload" />
+                  <div class="el-upload__text">
+                    将文件拖到此处，或<em>点击上传</em>
+                  </div>
+                  <div slot="tip" class="el-upload__tip">
+                    {{
+                      `① 只能上传一张图片图片,格式："*.jpg"、"*.jpeg"、"*.png"； ② 大小不超过50M；`
+                    }}
+                  </div>
+                </el-upload></el-col
+              >
+              <el-col v-if="params.photoUrl" :span="10">
+                <div class="ml20">当前广告图</div>
+                <div class="ml20 f ai-c jc-c round-img-box">
+                  <i class="el-icon-delete" @click="clickIconRemove" />
+                  <img :src="params.photoUrl || ''" />
+                </div>
+              </el-col>
+            </el-row>
           </div>
         </el-form-item>
         <el-form-item label="显示顺序">
@@ -98,7 +108,7 @@ export default {
       title: "新增广告图",
       params: {
         createTime: "",
-        fileName: "",
+        photoUrl: "",
         id: 0,
         isShow: 0,
         orderValue: 4,
@@ -106,6 +116,7 @@ export default {
         related: 0,
         title: "",
       },
+      copyParams: {},
       rules: {
         content: [
           { required: true, message: "请输入提交的内容", trigger: "blur" },
@@ -147,12 +158,26 @@ export default {
     getNoticeById(v) {
       // 获取单个公告数据
       getAdvertisingOne(v).then((res) => {
-        res.code === 10000 && Object.assign(this.params, res.data);
+        if (res.code === 10000) {
+          Object.assign(this.params, res.data);
+          this.copyParams = res.data;
+        }
       });
 
       console.log("this.params", this.params);
     },
+    onRemove(file, fileList) {
+      !fileList.length && (this.params.photoUrl = "");
+    },
+    clickIconRemove() {
+      this.$refs["uploadRef"].clearFiles();
+      this.params.photoUrl = "";
+    },
     submitFn() {
+      if (this.params.photoUrl === "") {
+        // 不更换新的图片
+        this.params.photoUrl = this.copyParams.photoUrl;
+      }
       this.$refs["form"].validate((v) => {
         if (v) {
           const fn =
@@ -168,15 +193,27 @@ export default {
         }
       });
     },
-    uploadFn(files) {
-      console.log("sdf", files.raw);
+    uploadFn(file) {
+      console.log("file自定定义上传", file);
+      const ft = ["image/png", "image/jpeg"];
+
+      if (file.file.size / 1024 / 1024 > 50) {
+        this.$refs["uploadRef"].clearFiles();
+        this.$message.warning("图片体积大于50M");
+        return;
+      }
+      if (!ft.includes(file.file.type)) {
+        this.$refs["uploadRef"].clearFiles();
+        this.$message.warning("只能上传jpg/jpeg/png格式的图片");
+        return;
+      }
+      console.log("sdf", file.raw);
       const obj = new FormData();
-      obj.append("files", files.file);
+      obj.append("files", file.file);
       uploadImg(obj)
         .then((res) => {
-          res.code === 10000 &&
-            ((this.params.fileName = res.data[0].name),
-            (this.params.pageUrl = res.data[0].url));
+          res.code === 10000 && (this.params.photoUrl = res.data[0].url);
+
           res.code !== 10000 && this.$refs["uploadRef"].clearFiles();
         })
         .catch(() => {
@@ -197,6 +234,28 @@ export default {
 
   .el-row {
     width: 100%;
+  }
+}
+.round-img-box {
+  position: relative;
+  > i {
+    background-color: #fff;
+    border-radius: 50%;
+    padding: 10px;
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%);
+    transform: translateX(-50%);
+    cursor: pointer;
+    &:hover {
+      background-color: #eee;
+    }
+  }
+  > img {
+    width: 100%;
+    height: auto;
   }
 }
 </style>
