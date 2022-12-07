@@ -159,6 +159,7 @@ export default {
         realName: "",
         startTime: "",
         status: "",
+        statusList: [],
         title: "",
         type: "",
         pageNum: 1,

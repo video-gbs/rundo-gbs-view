@@ -100,11 +100,11 @@ export default {
       ],
       tabDict: {
         0: "",
-        1: 2,
-        2: 4,
-        3: 5,
-        4: 7,
-        5: 3,
+        1: [2],
+        2: [4, 12, 13, 14, 20, 21],
+        3: [5],
+        4: [100],
+        5: [3],
       },
       tabpaneList: [
         {
@@ -114,27 +114,27 @@ export default {
         },
         {
           label: "待审核",
-          value: 2,
+          value: 1,
           isShow: false,
         },
         {
           label: "未回复",
-          value: 5,
+          value: 2,
           isShow: false,
         },
         {
           label: "已受理",
-          value: 5,
+          value: 3,
           isShow: false,
         },
         {
           label: "已回复",
-          value: 100,
+          value: 4,
           isShow: false,
         },
         {
           label: "审核未通过",
-          value: 22,
+          value: 5,
           isShow: false,
         },
       ],
@@ -154,7 +154,7 @@ export default {
     },
     handleClick(val, event) {
       // 切换 tabs
-      this.$refs["listRef"].query.status = this.tabDict[val.index];
+      this.$refs["listRef"].query.statusList = this.tabDict[val.index];
       this.$refs["listRef"].getDataList();
       // this.tabpaneList = this.tabpaneList.map((item) => {
       //   if (item.label === val.label) {
