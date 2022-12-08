@@ -1,7 +1,13 @@
 <template>
   <div class="com-seach">
     <div class="seach-content">
-      <el-form ref="query" class="seach-form" :inline="true" :model="query" label-width="123px">
+      <el-form
+        ref="query"
+        class="seach-form"
+        :inline="true"
+        :model="query"
+        label-width="123px"
+      >
         <el-form-item
           v-for="(item, i) in FormList"
           :key="i + '-' + FormList.length"
@@ -16,7 +22,7 @@
             clearable
             :size="item.size"
             tooltip-effect="dark"
-            :placeholder="item.placeholder||'请输入'"
+            :placeholder="item.placeholder || '请输入'"
             :style="{ width: item.width || '272px' }"
           />
           <!-- 下拉框 -->
@@ -30,10 +36,10 @@
           >
             <el-option
               v-for="obj in item.optionsList"
-              :key="obj.value + FormList.length"
+              :key="obj.value + FormList.length + Math.random()"
               :label="obj.label"
               :value="obj.value"
-            ></el-option>
+            />
           </el-select>
           <el-radio-group
             v-if="item.type === 'radio'"
@@ -42,9 +48,10 @@
           >
             <el-radio
               v-for="option in item.optionsList"
-              :label="option.value"
               :key="option.value + FormList.length"
-            >{{ option.label }}</el-radio>
+              :label="option.value"
+              >{{ option.label }}</el-radio
+            >
           </el-radio-group>
           <!-- 多选框 {field, label, type, options{value，label} } -->
           <el-checkbox-group
@@ -55,10 +62,11 @@
           >
             <el-checkbox
               v-for="(option, i) in item.optionsList"
+              :key="i + FormList.length"
               :label="option.value || option"
               :name="item.poro"
-              :key="i + FormList.length"
-            >{{ option.label || option }}</el-checkbox>
+              >{{ option.label || option }}</el-checkbox
+            >
           </el-checkbox-group>
           <!-- 级联单选 -->
           <!-- showAll 是否展示路径 optionsList选项内容  checkStrictly是否强链接父子关系  props-->
@@ -69,7 +77,7 @@
             :props="item.propConfig"
             :options="item.options"
             :placeholder="'请选择' + item.label"
-          ></el-cascader>
+          />
           <!-- 日期时间选择 yyyy-MM-dd-->
           <el-date-picker
             v-if="item.type === 'datePicker'"
@@ -80,7 +88,7 @@
             :format="item.fromat || 'yyyy-MM-dd'"
             :value-format="item.valueFromat || 'yyyy-MM-dd'"
             :default-time="item.default"
-          ></el-date-picker>
+          />
 
           <!-- 日期时间选择 yyyy-MM-dd-->
           <el-date-picker
@@ -92,7 +100,7 @@
             format="yyyy-MM-dd"
             value-format="yyyy-MM-dd"
             :default-time="item.default"
-          ></el-date-picker>
+          />
           <!-- 日期时间选择 2022-->
           <el-date-picker
             v-if="item.type === 'dateYearPicker'"
@@ -103,7 +111,7 @@
             format="yyyy"
             value-format="yyyy"
             :default-time="item.default"
-          ></el-date-picker>
+          />
           <!-- 日期时间选择 2021-10-22 00:00:00-->
           <el-date-picker
             v-if="item.type === 'dateTimePicker'"
@@ -114,7 +122,7 @@
             format="yyyy-MM-dd HH:mm:ss"
             value-format="yyyy-MM-dd HH:mm:ss"
             :default-time="item.default"
-          ></el-date-picker>
+          />
           <!-- 时间段选择 -->
           <el-date-picker
             v-if="item.type === 'dateRange'"
@@ -127,7 +135,7 @@
             format="yyyy-MM-dd"
             value-format="yyyy-MM-dd"
             :style="{ width: item.width || '272px' }"
-          ></el-date-picker>
+          />
           <!-- 地区选中 -->
           <el-cascader
             v-if="item.type === 'addressCascader'"
@@ -138,15 +146,19 @@
             :disabled="item.disabled"
             :style="{ width: item.width || '272px' }"
             :props="{ ...item.propsConfig }"
-            :placeholder="item.placeholder||''"
-          ></el-cascader>
+            :placeholder="item.placeholder || ''"
+          />
         </el-form-item>
       </el-form>
     </div>
 
-    <div class="search-btn" v-if="isSearch">
-      <el-button class="cz-btn" @click="submitReset" size="small">重置</el-button>
-      <el-button class="cx-btn save_btn" @click="submitSearch" size="small">查询</el-button>
+    <div v-if="isSearch" class="search-btn">
+      <el-button class="cz-btn" size="small" @click="submitReset"
+        >重置</el-button
+      >
+      <el-button class="cx-btn save_btn" size="small" @click="submitSearch"
+        >查询</el-button
+      >
     </div>
   </div>
 </template>
@@ -159,21 +171,21 @@ export default {
     FormList: {
       // poro字段名字  type类型 width宽度  placeholder提示语  default数据类型
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 表单
     query: {
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     isSearch: {
       typeof: Boolean,
-      default: () => true
+      default: () => true,
     },
     isMore: {
       typeof: Boolean,
-      default: () => false
-    }
+      default: () => false,
+    },
   },
   data() {
     // 这里存放数据
@@ -186,7 +198,7 @@ export default {
       curEndYear: "",
       startPickerOptions: {},
       endPickerOptions: {},
-      defaultValue: ""
+      defaultValue: "",
     };
   },
   computed: {}, // 监听属性 类似于data概念
@@ -209,8 +221,8 @@ export default {
       val = !val;
       this.$emit("changeSeach", val);
     },
-    changeItem(val) {}
-  }
+    changeItem(val) {},
+  },
 };
 </script>
 <style lang="scss" scoped>

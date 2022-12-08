@@ -908,7 +908,8 @@ export default {
           [13, 14].includes(status) &&
             arr.push("reply", "applyTransfer", "applyInvite");
         } else {
-          ![2, 3].includes(status) && arr.push("otherDeptReply");
+          ![1, 2, 3, 20, 21, 23, 100].includes(status) &&
+            arr.push("otherDeptReply");
         }
 
         // 获取受邀单位

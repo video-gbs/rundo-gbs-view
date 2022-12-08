@@ -18,14 +18,13 @@
       v-on="$listeners"
     >
       <!-- 多选框 -->
-      <!-- <el-table-column
+      <el-table-column
         v-if="selection"
         type="selection"
         width="60"
         align="center"
         fixed="left"
-      >
-      </el-table-column> -->
+      />
       <!-- 序号 -->
       <!-- <el-table-column
         v-if="index"
