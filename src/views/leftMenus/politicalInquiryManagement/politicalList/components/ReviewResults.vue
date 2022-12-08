@@ -67,7 +67,7 @@ export default {
   },
   watch: {},
   mounted() {
-    // this.$route.params.id && this.getAppraiseBy(this.$route.params.id)
+    this.$route.params.id && this.getAppraiseBy(this.$route.params.id);
   },
   methods: {
     getAppraiseBy(v) {

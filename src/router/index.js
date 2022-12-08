@@ -245,7 +245,7 @@ export const constantRoutes = [
       },
       {
         path: "/otherUnitManagement",
-        name: "单位账号管理",
+        name: "OtherUnitManagement",
         component: () =>
           import(
             "@/views/leftMenus/systemManagement/otherUnitManagement/index"

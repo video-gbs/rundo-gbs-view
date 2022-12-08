@@ -908,6 +908,7 @@ export default {
           [13, 14].includes(status) &&
             arr.push("reply", "applyTransfer", "applyInvite");
         } else {
+          // 如果受理单位不是本单位，又显示了这条数据，看一下状态，只有待受理和已受理以及转移的过程才可以 协助回复
           ![1, 2, 3, 20, 21, 23, 100].includes(status) &&
             arr.push("otherDeptReply");
         }
@@ -930,9 +931,12 @@ export default {
         // })
       }
       arr.push("back");
-      arr.forEach((i) => {
-        this.$set(this.actBtn, i, this.btnAll[i]);
+      Object.keys(this.btnAll).forEach((i) => {
+        arr.includes(i) && this.$set(this.actBtn, i, this.btnAll[i]);
       });
+      // arr.forEach((i) => {
+      //   this.$set(this.actBtn, i, this.btnAll[i])
+      // })
       // Object.keys(this.btnAll).forEach((i) => {
       //   this[this.btnAll[i].author].indexOf(this.userType) > -1 &&
       //     this.$set(this.actBtn, i, this.btnAll[i])
@@ -1012,6 +1016,7 @@ export default {
     //   this.setShow(arr)
     // },
     handleClick(val, event) {
+      console.log("val", val);
       this.tabpaneList = this.tabpaneList.map((item) => {
         if (item.label === val.label) {
           item.isShow = true;
@@ -1020,6 +1025,13 @@ export default {
         }
         return item;
       });
+      console.log("PoliticalReply", PoliticalReply);
+      val.name === "问政回复" &&
+        PoliticalReply.methods.getReply(this.$route.params.id);
+      val.name === "评价结果" &&
+        ReviewResults.methods.getAppraiseBy(this.$route.params.id);
+      val.name === "问政纪录" &&
+        PoliticalRecord.methods.getList({ affairsId: this.$route.params.id });
       // this.$nextTick(() => {
       //   document.getElementById("tab").scrollIntoView({
       //     behavior: "smooth",

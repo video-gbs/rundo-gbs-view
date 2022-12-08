@@ -5,34 +5,34 @@
         <svg-icon icon-class="dbsx" class="dbsx_svg" />
         <span>待办事项</span>
       </div>
-      <div class="text item">
+      <div v-if="nl.length" class="text item">
         <span class="under_line">问政待办</span>
         <ul class="todo-ul-scoll">
-          <li v-for="(item, index) in noticeList" :key="index">
+          <li v-for="(item, index) in nl" :key="index">
             <LineFont
               :line-title="item.name"
               :text-style="textStyle"
               :line-blue-style="index < 3 ? lineBlueStyle : lineBlueStyle1"
             />
             <div class="type" :data-index="index">{{ item.num }}</div>
-            <div class="go-router">
+            <div class="go-router" @click="goPage(item)">
               前往处理 <span class="rightArrow_svg">></span>
             </div>
           </li>
         </ul>
       </div>
 
-      <div class="text item" style="margin-top: 40px">
+      <div v-if="nl1.length" class="text item" style="margin-top: 40px">
         <span class="under_line">综合处理</span>
         <ul class="todo-ul-scoll">
-          <li v-for="(item1, index) in noticeList1" :key="index">
+          <li v-for="(item1, index) in nl1" :key="index">
             <LineFont
               :line-title="item1.name"
               :text-style="textStyle"
               :line-blue-style="lineBlueStyle"
             />
             <div class="type" :data-index="index">{{ item1.num }}</div>
-            <div class="go-router">
+            <div class="go-router" @click="goPage(item1)">
               前往处理 <span class="rightArrow_svg">></span>
             </div>
           </li>
@@ -97,45 +97,83 @@ export default {
       },
       noticeList: [
         {
-          name: { title: "待审核问政", notShowSmallTitle: false },
-          num: this.homeLists.auditNum,
+          name: { title: "待审核问政", notShowSmallTitle: true },
+          num: this.homeLists.auditNum || 0,
+          author: [0],
+          path: "/politicalList",
         },
         {
           name: { title: "待受理问政", notShowSmallTitle: false },
-          num: this.homeLists.acceptNum,
+          num: this.homeLists.acceptNum || 0,
+          author: [1, 2, 3, 4],
+          path: "/politicalList",
         },
         {
           name: { title: "待回复问政", notShowSmallTitle: false },
-          num: this.homeLists.replyNum,
+          num: this.homeLists.replyNum || 0,
+          author: [1, 2, 3, 4],
+          path: "/politicalList",
         },
         // {
         //   name: { title: '逾期未审核', notShowSmallTitle: false },
-        //   num: this.homeLists.overdueAuditNum
+        //   num: this.homeLists.overdueAuditNum,
+        //   show: false
         // },
         // {
         //   name: { title: '逾期未受理', notShowSmallTitle: false },
-        //   num: this.homeLists.overdueAcceptNum
+        //   num: this.homeLists.overdueAcceptNum,
+        //   show: false
         // },
         // {
         //   name: { title: '逾期未回复', notShowSmallTitle: false },
-        //   num: this.homeLists.overdueReplyNum
+        //   num: this.homeLists.overdueReplyNum,
+        //   show: false
         // }
       ],
+      nl: [],
       noticeList1: [
         {
           name: { title: "转移审核", notShowSmallTitle: false },
-          num: this.homeLists.moveAuditNum,
+          num: this.homeLists.moveAuditNum || 0,
+          author: [1],
+          path: "/politicalAudit",
         },
         {
           name: { title: "邀请审核", notShowSmallTitle: false },
-          num: this.homeLists.inviteAuditNum,
+          num: this.homeLists.inviteAuditNum || 0,
+          author: [],
         },
       ],
+      nl1: [],
+      userDeptType: 123,
     };
   },
   watch: {},
-  mounted() {},
-  methods: {},
+  mounted() {
+    this.init();
+  },
+  methods: {
+    init() {
+      console.log(this.noticeList, this.noticeList1);
+      // 判断哪些账号类型可以显示哪些处理模块
+      this.userDeptType = +(localStorage.getItem("rj_wzwz_deptType") || 123);
+
+      console.log(
+        "this.userDeptType",
+        this.userDeptType,
+        typeof this.userDeptType
+      );
+      this.noticeList.forEach((i) => {
+        i.author.includes(this.userDeptType) && this.nl.push(i);
+      });
+      this.noticeList1.forEach((i) => {
+        i.author.includes(this.userDeptType) && this.nl1.push(i);
+      });
+    },
+    goPage(v) {
+      this.$router.push(v.path);
+    },
+  },
 };
 </script>
 

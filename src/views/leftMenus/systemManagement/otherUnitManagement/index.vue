@@ -3,12 +3,13 @@
     <div class="panel-header-box f jc-sb ai-c fw-w">
       <div class="title-css">单位账号管理</div>
       <el-select
-        v-model="value"
+        v-model="search.deptId"
         size="small"
         clearable
         filterable
         placeholder="请选择单位"
-        @clear="searchFn('all')"
+        @clear="getOtherUnitList"
+        @change="getOtherUnitList"
       >
         <el-option
           v-for="i in deptList"
@@ -62,11 +63,18 @@
           </el-table-column>
         </el-table-column>
       </el-table>
-      <pagination
-        :pages-data="params"
-        @size-change="sizeChange"
-        @current-change="currentChange"
-      />
+      <div class="f jc-e mt10">
+        <el-pagination
+          background
+          :current-page="search.current"
+          :page-sizes="[10, 20, 50, 100]"
+          :page-size="search.size"
+          layout="sizes, prev, pager, next, jumper"
+          :total="search.total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
     </div>
     <el-dialog
       v-if="editShow"
@@ -300,7 +308,7 @@ import pagination from "@/components/Pagination/index.vue";
 import {
   otherUnitAdd,
   otherUnitEdit,
-  otherUnitList,
+  otherUnitListByDept,
   otherUnitDelete,
   otherUnitEditPassword,
   otherUnitDeptRoleList,
@@ -311,14 +319,15 @@ import { unitList } from "@/api/method/unitManagement";
 import { Local } from "@/utils/storage";
 
 export default {
-  name: "",
+  name: "OtherUnitManagement",
   components: { pagination },
   data() {
     return {
       search: {
-        userName: "",
-        phone: "",
-        time: "",
+        current: 1,
+        size: 10,
+        deptId: "",
+        total: 0,
       },
       passwordForm: {
         password: "",
@@ -414,7 +423,7 @@ export default {
           deptId: "",
         },
       },
-      deptList: [],
+      deptList: [{ id: "", name: "全部" }],
       state: [
         { id: 1, label: "启用" },
         { id: 0, label: "禁用" },
@@ -427,6 +436,8 @@ export default {
     };
   },
   mounted() {
+    console.log("this.$route.params.pid", this.$route);
+    this.search.deptId = this.$route.params.pid || "";
     this.checkPassworLevel();
     this.getOtherUnitList();
     // this.getList()
@@ -528,12 +539,12 @@ export default {
       }
       return true;
     },
-    sizeChange(pageSize) {
-      this.params.pageSize = pageSize;
+    handleSizeChange(v) {
+      this.search.size = v;
       this.getOtherUnitList();
     },
-    currentChange(proCount) {
-      this.params.proCount = proCount;
+    handleCurrentChange(v) {
+      this.search.current = v;
       this.getOtherUnitList();
     },
     goPage(path, query) {
@@ -592,7 +603,7 @@ export default {
       // 获取部门
       unitList({ current: 1, size: 399 }).then((res) => {
         if (res.code === 10000) {
-          this.deptList = res.data.records;
+          this.deptList = [...this.deptList, ...res.data?.records];
         }
       });
     },
@@ -600,15 +611,12 @@ export default {
       // 通过部门搜索
     },
     getOtherUnitList() {
-      otherUnitList({
-        current: 1,
-        size: 10,
-      }).then((res) => {
+      otherUnitListByDept(this.search).then((res) => {
         if (res.code === 10000) {
           this.tableData = res.data.records;
-          this.params.total = res.data.total;
-          this.params.pages = res.data.pages;
-          this.params.current = res.data.current;
+          this.search.total = res.data.total;
+          this.search.pages = res.data.size;
+          this.search.current = res.data.current;
         }
       });
     },

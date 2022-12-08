@@ -102,13 +102,13 @@ export default {
     console.log("进入问政记录页面");
     if (this.$route.params.id) {
       this.params.affairsId = this.$route.params.id;
-      this.getAffairsrecordList();
+      this.getList();
     }
   },
   mounted() {},
   methods: {
-    getAffairsrecordList() {
-      getAffairsrecordList(this.params).then((res) => {
+    getList(v) {
+      getAffairsrecordList(v || this.params).then((res) => {
         if (res.code === 10000) {
           const r = res.data;
           r.forEach((i) => {
