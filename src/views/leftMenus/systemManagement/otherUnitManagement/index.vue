@@ -2,7 +2,21 @@
   <div class="router_container4 m20 bg-w">
     <div class="panel-header-box f jc-sb ai-c fw-w">
       <div class="title-css">单位账号管理</div>
-      <el-button />
+      <el-select
+        v-model="value"
+        size="small"
+        clearable
+        filterable
+        placeholder="请选择单位"
+        @clear="searchFn('all')"
+      >
+        <el-option
+          v-for="i in deptList"
+          :key="i.id"
+          :label="i.name"
+          :value="i.id"
+        />
+      </el-select>
     </div>
     <div class="p10">
       <el-table :data="tableData" style="width: 100%">
@@ -426,7 +440,6 @@ export default {
       this.passwordVisible = true;
       this.passwordForm.id = row.id;
     },
-
     // getList() {
     //   otherUnitDeptRoleList().then((res) => {
     //     if (res.code === 10000) {
@@ -582,6 +595,9 @@ export default {
           this.deptList = res.data.records;
         }
       });
+    },
+    searchFn() {
+      // 通过部门搜索
     },
     getOtherUnitList() {
       otherUnitList({
