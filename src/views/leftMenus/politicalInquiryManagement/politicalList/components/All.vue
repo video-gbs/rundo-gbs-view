@@ -14,7 +14,7 @@
           :index="index"
           :page-size="pagesData.pageSize"
           :page-num="pagesData.pageNum"
-          :selection="selection"
+          :selection="selection()"
           :header-style="headerStyle"
           :is-loading="isLoading"
           :max-height="maxHeight"
@@ -261,7 +261,7 @@ export default {
         },
       ],
       leftTitle: "",
-      maxHeight: 800,
+      maxHeight: "800",
       tableData: [],
       // 分页器内容
       pagesData: {
@@ -493,7 +493,9 @@ export default {
       this.pagesData.pageNum = val;
       this.getDataList();
     },
-    selection() {},
+    selection() {
+      return false;
+    },
     haederBtnClick() {},
     changeTableHeader() {},
     handleSelectionChange() {},
@@ -545,7 +547,7 @@ export default {
   }
 
   .footer-table {
-    margin: 20px;
+    margin-top: 20px;
     background: #ffffff;
 
     .btn-content {
