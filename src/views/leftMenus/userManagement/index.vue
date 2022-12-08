@@ -409,6 +409,7 @@ export default {
           this.dialog.params[i] !== undefined &&
             (this.dialog.params[i] = data[i]);
         });
+        this.dialog.params.id = data.id;
 
         delete this.dialog.params.password;
         delete this.dialog.params.verifyPassword;
@@ -425,6 +426,7 @@ export default {
             if (res.code === 10000) {
               this.$message.success(`${this.act ? "新增" : "编辑"}成功。`);
               this.dialog.show = false;
+              this.getList();
               return;
             }
             this.$message.warning(res.message);
