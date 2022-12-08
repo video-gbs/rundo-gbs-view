@@ -198,7 +198,9 @@
           <el-form-item label="所属部门" prop="deptId">
             <el-select v-model="dialog.params.deptId" placeholder="请选择">
               <el-option
-                v-for="i in deptList"
+                v-for="i in deptList.filter((i) => {
+                  return i.id !== '';
+                })"
                 :key="i.id"
                 :label="i.name"
                 :value="i.id"
@@ -393,6 +395,11 @@ export default {
           message: "请输入正确的邮箱",
           trigger: "blur",
         },
+        deptId: {
+          required: true,
+          message: "不能为空",
+          trigger: "blur",
+        },
         // roleId: {
         //   required: true,
         //   message: '不能为空',
@@ -572,7 +579,7 @@ export default {
         this.dialog.params.name = name;
         this.dialog.params.nickName = nickName;
         this.dialog.params.status = Number(status);
-        this.dialog.params.deptId = deptId;
+        this.dialog.params.deptId = deptId || "";
         this.editId = data.id;
       } else {
         this.editShowChild = true;

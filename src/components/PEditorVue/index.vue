@@ -99,7 +99,7 @@ export default {
   },
   mounted() {
     // 模拟 ajax 请求，异步渲染编辑器
-    console.log("value", this.value);
+    console.log("value12121212份饭", this.value);
     console.log("Toolbar.getConfig()", Toolbar.getConfig());
     setTimeout(() => {
       this.html = this.value;
@@ -125,6 +125,7 @@ export default {
       this.$nextTick(() => {
         this.changeStatus = false;
       });
+
       console.log("onChange", html); // onChange 时获取编辑器最新内容
     },
     getEditorText() {

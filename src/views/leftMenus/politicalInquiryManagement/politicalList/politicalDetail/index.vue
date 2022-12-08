@@ -872,8 +872,8 @@ export default {
             "invite",
             "replyCheck",
             "applyTransfer",
-            // "applyTransferCheck",
-            "applyInvite",
+            "applyTransferCheck",
+            // 'applyInvite'
             // "applyInviteCheck",
           ]);
         // 额外判断是否有补充说明
@@ -900,13 +900,11 @@ export default {
         // 一般网络发言人
         // 待受理
         if (isMainDept) {
-          [4].includes(status) &&
-            arr.push("accept", "reply", "applyTransfer", "applyInvite");
+          [4].includes(status) && arr.push("accept", "reply", "applyTransfer");
           // 已受理 待回复
-          [5, 21].includes(status) && arr.push("reply", "applyInvite");
+          [5, 21].includes(status) && arr.push("reply");
           // 申请转移未通过、 申请转移已通过、 市领导流程已审核已分配单位
-          [13, 14].includes(status) &&
-            arr.push("reply", "applyTransfer", "applyInvite");
+          [13, 14].includes(status) && arr.push("reply", "applyTransfer");
         } else {
           // 如果受理单位不是本单位，又显示了这条数据，看一下状态，只有待受理和已受理以及转移的过程才可以 协助回复
           ![1, 2, 3, 20, 21, 23, 100].includes(status) &&
