@@ -141,7 +141,7 @@ export default {
       types: [
         { id: 1, label: "市领导" },
         { id: 2, label: "市级单位" },
-        { id: 3, label: "县市级" },
+        { id: 3, label: "县市区" },
         { id: 4, label: "其他" },
       ],
       state: [
