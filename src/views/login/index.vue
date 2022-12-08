@@ -1,34 +1,62 @@
 <template>
   <div class="login-container f jc-c ai-c">
-    <div class="login-box r15">
-      <div class="title-container f jc-c ai-c">
-        <div class="title-box f jc-c ai-c fs28">账号登录</div>
+    <div class="login-box f fd-c ai-c">
+      <div class="login-label fs48 f jc-c ai-c mb46">
+        梧州零距离问政后台系统
       </div>
-      <div class="login-form r15">
-        <el-form
-          ref="loginForm"
-          :model="loginForm"
-          :rules="loginRules"
-          class="ph30 pv28 pt99"
-          auto-complete="on"
-          label-position="left"
-        >
-          <el-form-item prop="account">
-            <el-input
-              ref="account"
-              v-model="loginForm.account"
-              placeholder="Username"
-              name="account"
-              type="text"
-              tabindex="1"
-              auto-complete="on"
-            />
-          </el-form-item>
+      <div class="login-div">
+        <div class="title-container f jc-c ai-c">
+          <div class="title-box f jc-c ai-c fs28">账号登录</div>
+        </div>
+        <div class="login-form r15">
+          <el-form
+            ref="loginForm"
+            :model="loginForm"
+            :rules="loginRules"
+            class="ph30 pv28 pt99"
+            auto-complete="on"
+            label-position="left"
+          >
+            <el-form-item prop="account">
+              <el-input
+                ref="account"
+                v-model="loginForm.account"
+                placeholder="输入用户名"
+                name="account"
+                type="text"
+                tabindex="1"
+                auto-complete="on"
+              >
+                <i slot="prefix" class="icon-css icon-username" />
+              </el-input>
+            </el-form-item>
 
-          <el-form-item prop="password">
+            <el-form-item prop="password">
+              <el-input
+                :key="passwordType"
+                ref="password"
+                v-model="loginForm.password"
+                :type="passwordType"
+                placeholder="输入密码"
+                name="password"
+                tabindex="2"
+                auto-complete="on"
+                @keyup.enter.native="handleLogin"
+              >
+                <i slot="prefix" class="icon-css icon-password" />
+                <svg-icon
+                  slot="suffix"
+                  :icon-class="'login-hide'"
+                  class="pwd-icon"
+                  @click="pwdShowChange(item)"
+                />
+              </el-input>
+            </el-form-item>
+
+            <!-- <el-form-item prop="password">
             <el-input
               :key="passwordType"
-              ref="password"
+              ref="输入验证码"
               v-model="loginForm.password"
               :type="passwordType"
               placeholder="Password"
@@ -38,25 +66,24 @@
               @keyup.enter.native="handleLogin"
             />
             <span class="show-pwd" @click="showPwd">
-              <svg-icon
-                :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
-              />
+              <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
             </span>
-          </el-form-item>
-
-          <!-- <div class="tips">
+          </el-form-item> -->
+            <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span> password: any</span>
       </div> -->
-        </el-form>
-        <div class="f jc-c ai-c">
-          <el-button
-            :loading="loading"
-            type="primary"
-            style="margin-bottom: 30px; width: 224px; height: 38px"
-            @click.native.prevent="handleLogin"
-            >Login</el-button
-          >
+          </el-form>
+          <div class="f jc-c ai-c">
+            <el-button
+              class="r10"
+              :loading="loading"
+              type="primary"
+              style="margin-bottom: 30px; width: 224px; height: 38px"
+              @click.native.prevent="handleLogin"
+              >登录</el-button
+            >
+          </div>
         </div>
       </div>
     </div>
@@ -72,18 +99,27 @@ export default {
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error("Please enter the correct user name"));
+        callback(new Error("请输入账号"));
       } else {
-        callback();
+        if (value.length < 6 || value.length > 20) {
+          callback(new Error("账号长度6到20个字符"));
+        } else {
+          callback();
+        }
       }
     };
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error("The password can not be less than 6 digits"));
+      if (!validUsername(value)) {
+        callback(new Error("请输入密码"));
       } else {
-        callback();
+        if (value.length < 6 || value.length > 20) {
+          callback(new Error("密码长度6到20个字符"));
+        } else {
+          callback();
+        }
       }
     };
+
     return {
       loginForm: {
         // adminsuper/123456
@@ -152,7 +188,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<!-- <style lang="scss">
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
@@ -189,6 +225,7 @@ $cursor: #fff;
         // -webkit-text-fill-color: $cursor !important;
       }
     }
+
   }
 
   .el-form-item {
@@ -198,7 +235,7 @@ $cursor: #fff;
     color: #454545;
   }
 }
-</style>
+</style> -->
 
 <style lang="scss" scoped>
 $bg: #2d3a4b;
@@ -213,39 +250,60 @@ $light_gray: #eee;
   background-image: url("~@/assets/imgs/login/bg.png");
   background-size: cover;
   .login-box {
-    position: relative;
-    width: 400px;
-    height: 457px;
+    width: 100%;
+    .login-label {
+      color: #fff;
+    }
 
-    max-width: 100%;
+    .login-div {
+      position: relative;
+      width: 400px;
+      // height: 457px;
+      height: 347px;
+      max-width: 100%;
 
-    overflow: hidden;
-    .title-container {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 100%;
-      height: 56px;
+      overflow: hidden;
 
-      .title-box {
-        width: 304px;
+      .title-container {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
         height: 56px;
-        background-image: url("~@/assets/imgs/login/header.png");
-        background-size: cover;
-        background-repeat: no-repeat;
-        color: #fff;
+
+        .title-box {
+          width: 304px;
+          height: 56px;
+          background-image: url("~@/assets/imgs/login/header.png");
+          background-size: cover;
+          background-repeat: no-repeat;
+          color: #fff;
+        }
       }
     }
+    .icon-css {
+      width: 18px;
+      height: 18px;
+      background-size: cover;
+      color: #eee;
+      display: block;
+      margin: 10px;
+    }
+    .icon-username {
+      background-image: url("~@/assets/imgs/login/username.png");
+    }
+    .icon-password {
+      background-image: url("../../assets/imgs/login/password.png");
+    }
+    .login-form {
+      margin-top: 10px;
+      width: 400px;
+      // height: 447px;
+      background-color: #fff;
+      max-width: 100%;
+      box-shadow: 0px 3px 24px rgba(0, 53, 123, 0.44);
+    }
   }
-  .login-form {
-    margin-top: 10px;
-    width: 400px;
-    height: 447px;
-    background-color: #fff;
-    max-width: 100%;
-    box-shadow: 0px 3px 24px rgba(0, 53, 123, 0.44);
-  }
-
   .tips {
     font-size: 14px;
     color: #fff;
@@ -279,6 +337,9 @@ $light_gray: #eee;
   .el-input {
     width: 340px;
     height: 48px;
+    ::v-deep input {
+      text-indent: 16px !important;
+    }
   }
 }
 </style>
