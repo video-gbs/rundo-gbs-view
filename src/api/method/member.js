@@ -16,5 +16,5 @@ export function addMember(params) {
 
 export function editMember(params) {
   // 编辑会员
-  return request.post("/politics/manage/member/save", params);
+  return request.post("/politics/manage/member/update", params);
 }
