@@ -537,7 +537,7 @@ export default {
   }
 
   .seach {
-    margin: 20px 24px;
+    // margin: 20px 24px;
     padding: 32px 20px 10px 20px;
     box-shadow: 0px 2px 6px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;

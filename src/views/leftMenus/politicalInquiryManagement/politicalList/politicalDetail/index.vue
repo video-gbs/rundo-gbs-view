@@ -878,7 +878,7 @@ export default {
           ]);
         // 额外判断是否有补充说明
         this.moreData &&
-          this.moreData.auditStatus === -1 &&
+          this.moreData.auditStatus === 0 &&
           arr.splice(1, 0, "more");
         // 可否审核问政转移
         if (["audit"].indexOf(this.$route.params.type) !== -1) {

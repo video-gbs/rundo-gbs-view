@@ -31,7 +31,7 @@
           :text-style="textStyle"
           :line-blue-style="lineBlueStyle"
         />
-        <div style="width: 220px">
+        <div style="max-width: 350px" class="mr10">
           <el-tag effect="plain" class="mr10">
             {{ $dict.status[one.status] }}
           </el-tag>
