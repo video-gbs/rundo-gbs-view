@@ -1059,12 +1059,12 @@ export default {
         }
         return item;
       });
-      console.log("PoliticalReply", PoliticalReply);
+      console.log("comname", val.name);
       val.name === "问政回复" &&
         PoliticalReply.methods.getReply(this.$route.params.id);
       val.name === "评价结果" &&
         ReviewResults.methods.getAppraiseBy(this.$route.params.id);
-      val.name === "问政纪录" &&
+      val.name === "问政记录" &&
         PoliticalRecord.methods.getList({ affairsId: this.$route.params.id });
       // this.$nextTick(() => {
       //   document.getElementById("tab").scrollIntoView({
