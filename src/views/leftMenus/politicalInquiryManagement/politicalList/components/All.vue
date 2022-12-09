@@ -40,6 +40,31 @@
         />
       </div>
     </div>
+
+    <!--问政审核-->
+    <PDialog ref="examineRef" @submit="examineFn" @cancel="examineFn('c')">
+      <template slot="title">问政审核</template>
+      <template slot="main">
+        <el-form
+          ref="examineFormRef"
+          label-width="80px"
+          :model="examineForm"
+          :rules="auditResultRules"
+        >
+          <el-form-item label="审核结果">
+            <el-radio v-model="examineForm.auditResult" :label="1"
+              >审核通过</el-radio
+            >
+            <el-radio v-model="examineForm.auditResult" :label="2"
+              >审核不通过</el-radio
+            >
+          </el-form-item>
+          <el-form-item label="审核说明" prop="content">
+            <el-input v-model="examineForm.content" />
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
   </div>
 </template>
 
@@ -53,7 +78,12 @@ import {
   affairsInfoDelete,
   affairsInfoSearch,
 } from "@/api/method/politicalList";
-import { setAffairsShow, setAffairsReview } from "@/api/method/affairs";
+import {
+  setAffairsShow,
+  setAffairsReview,
+  deleteAffairs,
+} from "@/api/method/affairs";
+import { examineAffairs } from "@/api/method/affairscheck";
 export default {
   name: "ProjectManagement",
   components: {
@@ -62,6 +92,18 @@ export default {
     Pagination,
   },
   data() {
+    const _that = this;
+    const checkContent = function (rule, value, callback) {
+      if (_that[_that.paramsObj].auditResult === 2) {
+        if (value === "") {
+          callback(new Error("请输入审核不通过的原因。"));
+        } else {
+          callback();
+        }
+      } else {
+        callback();
+      }
+    };
     return {
       showDetails: false,
       headerStyle: {
@@ -293,14 +335,25 @@ export default {
       buttonItems: {
         options: [
           {
+            text: "审核问政",
+            cb: "examine",
+            // icon: 'el-icon-view',
+            visible: {
+              attrName: "status",
+              fn: function (v) {
+                return v === 2;
+              },
+            },
+          },
+          {
             text: "详情",
             cb: "verify",
-            icon: "el-icon-view",
+            // icon: 'el-icon-view'
           },
           {
             text: "删除",
-            cb: "delect",
-            icon: "el-icon-delete",
+            cb: "deletItem",
+            // icon: 'el-icon-delete',
             className: "isRed",
           },
         ],
@@ -327,6 +380,20 @@ export default {
       headerBtn: [],
       fileList: [],
       isLoding: false,
+      paramsObj: "", // 接口的对象名
+      paramsFormRef: "", // 表格对象ref
+      paramsForm: "", // dialog组件的ref
+      auditResultRules: {
+        // 审核不通过时候 必须校验 审核说明字段不能为空
+        content: [{ validator: checkContent, trigger: ["blur", "change"] }],
+      },
+      // 弹出层
+      examineForm: {
+        // 问政审核参数
+        affairsId: "",
+        auditResult: 1,
+        content: "",
+      },
     };
   },
   computed: {},
@@ -387,66 +454,56 @@ export default {
       }, 200);
     },
 
-    deletItem(val) {
-      this.$confirm("此操作将删除该附件, 是否继续?", "提示", {
-        confirmButtonText: "确定",
+    // deletItem(val) {
+    //   this.$confirm('此操作将删除该附件, 是否继续?', '提示', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     type: 'warning'
+    //   })
+    //     .then(() => {
+    //       this.fileList = this.fileList.filter((item) => item.uid !== val.uid)
+    //       this.$message.success('删除成功!')
+    //     })
+    //     .catch(() => {
+    //       console.log('取消')
+    //     })
+    // },
+
+    // async downloadExect() {
+    //   const parms = {
+    //     ...this.query
+    //   }
+    //   const rest = await projectExport(parms)
+    // },
+
+    async deletItem(obj) {
+      // 删除问政
+      this.$confirm(`是否删除标题为“${obj.row.title}”的问政信息`, "删除提示", {
+        confirmButtonText: "确定删除",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
-          this.fileList = this.fileList.filter((item) => item.uid !== val.uid);
-          this.$message.success("删除成功!");
+          deleteAffairs(obj.row.id).then((res) => {
+            if (res.code === 10000) {
+              this.$message.success("删除成功！");
+              this.getDataList();
+              return;
+            }
+            this.$message.warning(res.message);
+          });
         })
         .catch(() => {
           console.log("取消");
         });
     },
-
-    async downloadExect() {
-      const parms = {
-        ...this.query,
-      };
-      const rest = await projectExport(parms);
-    },
-
-    async delectitem() {
-      const list = [];
-      this.selectionList.map((item) => {
-        list.push(item.projectId);
-      });
-      if (list.length === 0) {
-        this.$message.error("选中的项目不能为空!");
-        return false;
-      }
-      this.$confirm("此操作将删除选中的项目, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(async () => {
-          const params = {
-            ids: list.join(","),
-          };
-          const rest = await removeProject(params);
-          this.$message.success("删除成功!");
-          setTimeout(() => {
-            this.getDataList();
-          }, 200);
-        })
-        .catch(() => {
-          this.$message.info("已取消删除!");
-          setTimeout(() => {
-            this.getDataList();
-          }, 200);
-        });
-    },
     handleClick(v) {
-      this[v.cb](v.row);
+      this[v.cb](v);
     },
     // 查看详情
     verify(val) {
       console.log("xq", val);
-      this.$router.push(`/politicalList/list/${val.id}`);
+      this.$router.push(`/politicalList/list/${val.row.id}`);
     },
     setReview(v) {
       setAffairsReview(v.id, v.isReview)
@@ -489,6 +546,55 @@ export default {
     currentChange(val) {
       this.query.pageNum = val;
       this.getDataList();
+    },
+
+    // 弹出层
+    comDialogHide(v) {
+      this.$message.success("操作成功");
+      this.getDataList();
+      this.$refs[this.paramsFormRef].visible = false;
+    },
+    // dialogShow(obj) {
+    //   console.log('obj', obj)
+    //   this.paramsObj = obj.cb + 'Form'// 记录当前弹出组件的 form 绑定的对象
+    //   this[this.paramsObj].affairsId = obj.row.id
+    //   this.paramsForm = obj.cb + 'Ref'// 记录当前的dlalog的 ref
+    //   this.paramsFormRef = obj.cb + 'FormRef'// 记录当前 dialog 中的 form的 ref
+    //   this.$refs[this.paramsForm].visible = true
+    // },
+    dialogSet(obj) {
+      console.log("obj", obj);
+      this.paramsObj = obj.cb + "Form"; // 记录当前弹出组件的 form 绑定的对象
+      this[this.paramsObj].affairsId = obj.row.id;
+      this.paramsForm = obj.cb + "Ref"; // 记录当前的dlalog的 ref
+      this.paramsFormRef = obj.cb + "FormRef"; // 记录当前 dialog 中的 form的 ref
+      this.$refs[this.paramsForm].visible = true;
+    },
+    examine(obj) {
+      this.dialogSet(obj);
+    },
+    // 各类操作接口执行
+    examineFn(v) {
+      if (v && v === "c") {
+        // 重置数据
+        this.examineForm.content = "";
+        this.examineForm.affairsId = "";
+        this.examineForm.auditResult = 1;
+        return;
+      }
+      console.log("提交前的", this.examineForm);
+      // 审核问政
+      this.$refs[this.paramsFormRef].validate((v) => {
+        if (v) {
+          examineAffairs(this[this.paramsObj])
+            .then((res) => {
+              res.code === 10000 && this.comDialogHide("examine");
+            })
+            .catch((err) => {
+              this.$message.warning("操作失败：" + JSON.stringify(err));
+            });
+        }
+      });
     },
     handleSizeChange(val) {
       this.pagesData.pageSize = val;
