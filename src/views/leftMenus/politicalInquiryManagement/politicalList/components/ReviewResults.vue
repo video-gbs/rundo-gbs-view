@@ -23,7 +23,7 @@
             <span class="span-text">{{ one.content }}</span>
           </el-form-item>
           <el-form-item label="评价时间：">
-            <span class="span-text">{{ one.updateTime }}</span>
+            <span class="span-text">{{ one.createTime }}</span>
           </el-form-item>
         </el-form>
         <div v-else class="fs12">暂无评价</div>

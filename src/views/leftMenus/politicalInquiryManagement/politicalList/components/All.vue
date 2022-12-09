@@ -17,7 +17,6 @@
           :page-num="query.pageNum"
           :selection="selection()"
           :header-style="headerStyle"
-          :is-loading="comTableLoading"
           :max-height="maxHeight"
           :left-title="leftTitle"
           :table-items="tableItems"
@@ -84,6 +83,7 @@ import {
   deleteAffairs,
 } from "@/api/method/affairs";
 import { examineAffairs } from "@/api/method/affairscheck";
+
 export default {
   name: "ProjectManagement",
   components: {
@@ -355,6 +355,12 @@ export default {
             cb: "deletItem",
             // icon: 'el-icon-delete',
             className: "isRed",
+            visible: {
+              attrName: "",
+              fn: function (v) {
+                return localStorage.getItem("rj_wzwz_deptType") === "0";
+              },
+            },
           },
         ],
         label: "操作",
@@ -415,7 +421,7 @@ export default {
       this.getDeptFn();
     },
     getDataList() {
-      this.$refs["comTableRef"].isLoading = true;
+      this.$refs["comTableRef"].isLoading_ = true;
       affairsInfoList(this.query)
         .then((res) => {
           if (res.code === 10000) {
@@ -424,7 +430,7 @@ export default {
           }
         })
         .finally(() => {
-          this.$refs["comTableRef"].isLoading = false;
+          this.$refs["comTableRef"].isLoading_ = false;
         });
     },
     getDeptFn() {
@@ -552,7 +558,7 @@ export default {
     comDialogHide(v) {
       this.$message.success("操作成功");
       this.getDataList();
-      this.$refs[this.paramsFormRef].visible = false;
+      this.$refs[this.paramsForm].visible = false;
     },
     // dialogShow(obj) {
     //   console.log('obj', obj)
