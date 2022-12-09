@@ -11,12 +11,13 @@
     <div class="footer-table">
       <div class="tab-table">
         <ComTabble
+          ref="comTableRef"
           :index="index"
-          :page-size="pagesData.pageSize"
-          :page-num="pagesData.pageNum"
+          :page-size="query.pageSize"
+          :page-num="query.pageNum"
           :selection="selection()"
           :header-style="headerStyle"
-          :is-loading="isLoading"
+          :is-loading="comTableLoading"
           :max-height="maxHeight"
           :left-title="leftTitle"
           :table-items="tableItems"
@@ -142,6 +143,7 @@ export default {
           optionsList: [],
         },
       ],
+      comTableLoading: false,
       // 搜索from
       query: {
         deptId: "",
@@ -346,14 +348,17 @@ export default {
       this.getDeptFn();
     },
     getDataList() {
-      affairsInfoList(this.query).then((res) => {
-        if (res.code === 10000) {
-          this.tableData = res.data ? res.data.rows : [];
-          this.pagesData.total = res.data.total;
-          this.pagesData.pages = res.data.pages;
-          this.pagesData.current = res.data.current;
-        }
-      });
+      this.$refs["comTableRef"].isLoading = true;
+      affairsInfoList(this.query)
+        .then((res) => {
+          if (res.code === 10000) {
+            this.tableData = res.data ? res.data.rows : [];
+            this.query.total = res.data.total || 0;
+          }
+        })
+        .finally(() => {
+          this.$refs["comTableRef"].isLoading = false;
+        });
     },
     getDeptFn() {
       // 获取部门
@@ -374,9 +379,9 @@ export default {
       this.getDataList();
     },
     toReset(val) {
-      this.pagesData = val;
-      this.pagesData.pageNum = 1;
-      this.pagesData.pageSize = 10;
+      this.query = val;
+      this.query.pageNum = 1;
+      this.query.pageSize = 10;
       setTimeout(() => {
         this.getDataList();
       }, 200);
@@ -477,12 +482,12 @@ export default {
     },
     // 每页显示条目个数
     sizeChange(val) {
-      this.pagesData.pageSize = val;
+      this.query.pageSize = val;
       this.getDataList();
     },
     // 当前页数
     currentChange(val) {
-      this.pagesData.pageNum = val;
+      this.query.pageNum = val;
       this.getDataList();
     },
     handleSizeChange(val) {

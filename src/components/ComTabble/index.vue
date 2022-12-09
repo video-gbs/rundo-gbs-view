@@ -6,6 +6,7 @@
     <el-table
       ref="comTable"
       v-loading="isLoading"
+      element-loading-background="rgba(0, 0, 0, 0)"
       :data="tableData"
       v-bind="$attrs"
       :show-summary="showSummary"
