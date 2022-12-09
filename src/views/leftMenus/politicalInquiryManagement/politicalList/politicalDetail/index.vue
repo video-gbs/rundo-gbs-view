@@ -329,8 +329,9 @@
           </el-form-item>
           <el-form-item label="受理单位">
             <el-select
+              v-if="applyTransferCheckForm.auditResult === 1"
               v-model="applyTransferCheckForm.targetDeptId"
-              :disabled="!applyTransferCheckForm.auditResult"
+              :disabled="applyTransferCheckForm.auditResult === 2"
               placeholder="请选择受理单位"
             >
               <el-option
@@ -342,6 +343,9 @@
                 :value="i.id"
               />
             </el-select>
+            <template v-else>
+              {{ oneByDept.affairsAudit.operateDeptName }}
+            </template>
           </el-form-item>
           <el-form-item label="审核说明">
             <el-input v-model="applyTransferCheckForm.content" />
@@ -807,7 +811,7 @@ export default {
         // 获取当前问政信息
         // affairsInfoSearchApply
         const pid = this.$route.params.id;
-        const fn = ["reply", "audit"].includes(this.$route.params.type)
+        const fn = ["audit"].includes(this.$route.params.type)
           ? await affairsInfoSearchApply(pid)
           : await affairsInfoSearch(pid);
         console.log("fnnnnnnnn", fn);
@@ -833,7 +837,7 @@ export default {
           "otherDeptReplyForm",
         ];
         arr.forEach((i) => {
-          this[i].affairsId = this.$route.params.id;
+          this[i].affairsId = this.one.id;
         });
         // 账号权限判断
         this.accountPermission();
@@ -916,7 +920,10 @@ export default {
         arr.push("isShow"); // openComment
         arr.push("delete");
 
-        if (["audit"].indexOf(this.$route.params.type) !== -1) {
+        if (
+          ["audit"].indexOf(this.$route.params.type) !== -1 &&
+          [12].includes(status)
+        ) {
           arr.push("applyTransferCheck");
         }
       }
@@ -926,7 +933,10 @@ export default {
         [4, 20].includes(status) && arr.push("accept", "dept", "reply");
         [23].includes(status) && arr.push("replyCheck");
         // 可否审核问政转移
-        if (["audit"].indexOf(this.$route.params.type) !== -1) {
+        if (
+          ["audit"].indexOf(this.$route.params.type) !== -1 &&
+          [12].includes(status)
+        ) {
           arr.push("applyTransferCheck");
         }
       }
@@ -1059,12 +1069,12 @@ export default {
         }
         return item;
       });
-      console.log("PoliticalReply", PoliticalReply);
+      console.log("comname", val.name);
       val.name === "问政回复" &&
         PoliticalReply.methods.getReply(this.$route.params.id);
       val.name === "评价结果" &&
         ReviewResults.methods.getAppraiseBy(this.$route.params.id);
-      val.name === "问政纪录" &&
+      val.name === "问政记录" &&
         PoliticalRecord.methods.getList({ affairsId: this.$route.params.id });
       // this.$nextTick(() => {
       //   document.getElementById("tab").scrollIntoView({
@@ -1158,7 +1168,7 @@ export default {
     comDialogHide() {
       this.$message.success("操作成功。");
       this.$refs[this.dialogName].visible = false;
-      this.getOne(this.$route.params.id);
+      this.getOne(this.one.id);
     },
 
     examineFn(v) {
@@ -1409,6 +1419,7 @@ export default {
         return i.id === this.applyTransferCheckForm.targetDeptId;
       })[0].name;
       console.log("this.applyTransferCheckForm", this.applyTransferCheckForm);
+      this.applyTransferCheckForm.auditId = this.one.auditId;
       // 执行 问政转移审核方法
       // fn...
       transferCheckAo(this.applyTransferCheckForm)

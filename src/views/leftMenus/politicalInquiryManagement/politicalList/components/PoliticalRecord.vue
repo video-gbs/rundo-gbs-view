@@ -33,9 +33,11 @@
                 <p class="reviewResults-h4 fs20 fw600">
                   {{ i.title }}
                 </p>
+
                 <p class="reviewResults-p">
                   {{ `${i.updateTime}` }}
                 </p>
+                <p v-html="i.content" />
               </el-card>
             </el-timeline-item>
           </el-timeline>

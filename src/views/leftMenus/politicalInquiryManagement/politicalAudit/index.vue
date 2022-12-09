@@ -78,8 +78,9 @@
           </el-form-item>
           <el-form-item label="受理单位">
             <el-select
+              v-if="checkParams.auditResult === 1"
               v-model="checkParams.targetDeptId"
-              :disabled="!checkParams.auditResult"
+              :disabled="checkParams.auditResult === 2"
               placeholder="请选择受理单位"
             >
               <el-option
@@ -89,6 +90,9 @@
                 :value="i.id"
               />
             </el-select>
+            <template v-else>
+              {{ oneByDept.affairsAudit.operateDeptName }}
+            </template>
           </el-form-item>
           <el-form-item label="审核说明">
             <el-input v-model="checkParams.content" />
