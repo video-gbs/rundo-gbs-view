@@ -30,7 +30,7 @@ export function getAffairsByOne(id) {
 
 export function deleteAffairs(id) {
   // 删除单条问政
-  return request.delete(`/politics/backstage/affairs/${id}`);
+  return request.delete(`/politics/backstage/affairsInfo/${id}`);
 }
 
 export function getAffairsMost(params) {

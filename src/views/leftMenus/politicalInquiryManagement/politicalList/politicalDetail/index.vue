@@ -349,6 +349,46 @@
         </el-form>
       </template>
     </PDialog>
+
+    <!--可见性设置-->
+    <PDialog ref="isShowRef" @submit="isShowFn">
+      <template slot="title">可见性开关设置</template>
+      <template slot="main">
+        <el-form label-position="left" label-width="80px">
+          <el-form-item label="当前设置">
+            <el-switch
+              v-model="one.isShow"
+              :active-value="0"
+              :inactive-value="1"
+              style="display: block"
+              active-text="可见"
+              inactive-text="不可见"
+            />
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
+
+    <!--评论开关s设置-->
+    <PDialog ref="openCommentRef" @submit="openCommentFn">
+      <template slot="title">评论开关设置</template>
+      <template slot="main">
+        <el-form label-position="left" label-width="80px">
+          <el-form-item label="当前设置">
+            <el-switch
+              v-model="one.isReview"
+              :active-value="0"
+              :inactive-value="1"
+              style="display: block"
+              active-color="#13ce66"
+              inactive-color="#eee"
+              active-text="开启"
+              inactive-text="关闭"
+            />
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
   </div>
 </template>
 
@@ -375,6 +415,11 @@ import { replyAffairs, affairAudit } from "@/api/method/affairscheck";
 import { unitList } from "@/api/method/unitManagement";
 import { transfer, transferCheckAo } from "@/api/method/transfer";
 import { getReplyList } from "@/api/method/reply";
+import {
+  setAffairsShow,
+  setAffairsReview,
+  deleteAffairs,
+} from "@/api/method/affairs";
 import {
   addAffairsassist,
   otherDeptReply,
@@ -827,7 +872,7 @@ export default {
 
       console.log(ut, status);
       this.actBtn = {};
-      let arr = [
+      const arr = [
         // 'examine',
         // 'more',
         // 'dept',
@@ -860,30 +905,15 @@ export default {
         })
         .catch(() => {});
 
+      this.btnAll.isShow.label =
+        this.one.isShow === 0 ? "关闭可见" : "开启可见";
+      this.btnAll.openComment.label =
+        this.one.isReview === 0 ? "关闭评论" : "开启评论";
       if (ut === 0) {
         // 超管 '1,2,3,5,13,14,21,100'均不可操作
 
         [2].includes(status) && arr.push("examine");
-        ![1, 2, 3, 100].includes(status) &&
-          (arr = [
-            "dept",
-            "reply",
-            "transfer",
-            // 'invite',
-            "replyCheck",
-            "applyTransfer",
-            "applyTransferCheck",
-            // 'applyInvite'
-            // "applyInviteCheck",
-          ]);
-        // 额外判断是否有补充说明
-        this.moreData &&
-          this.moreData.auditStatus === 0 &&
-          arr.splice(1, 0, "more");
-        // 可否审核问政转移
-        if (["audit"].indexOf(this.$route.params.type) !== -1) {
-          arr.push("applyTransferCheck");
-        }
+        arr.push("isShow"); // openComment
         arr.push("delete");
       }
       if (ut === 1) {
@@ -1074,7 +1104,27 @@ export default {
       obj.id === 100 && this.$router.go(-1); // 返回
       obj.id === 99 && this.removeitem(); // 删除
     },
-    removeitem() {},
+    removeitem() {
+      // 删除问政
+      this.$confirm(`是否删除标题为“${this.one.title}”的问政信息`, "删除提示", {
+        confirmButtonText: "确定删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          deleteAffairs(this.one.id).then((res) => {
+            if (res.code === 10000) {
+              this.$message.success("删除成功！");
+              this.$router.push("/politicalList");
+              return;
+            }
+            this.$message.warning(res.message);
+          });
+        })
+        .catch(() => {
+          console.log("取消");
+        });
+    },
     comDialog(v) {
       this.dialogName = v.dialog;
 
@@ -1499,6 +1549,38 @@ export default {
       this.otherDeptReplyForm.content = v;
       console.log(this.otherDeptReplyForm);
       // this.otherDeptReplyForm.content = this.otherDeptReplyContent
+    },
+    isShowFn() {
+      // 是否可见
+      // 设置可见性
+
+      setAffairsShow(this.one.id, this.one.isShow)
+        .then((res) => {
+          if (res.code === 10000) {
+            this.comDialogHide();
+          } else {
+            this.one.isShow = this.one.isShow === 0 ? 1 : 0;
+            this.$message.warning(res.message);
+          }
+        })
+        .catch(() => {
+          this.one.isShow = this.one.isShow === 0 ? 1 : 0;
+        });
+    },
+    openCommentFn() {
+      // 是否开启评论
+      setAffairsReview(this.one.id, this.one.isReview)
+        .then((res) => {
+          if (res.code === 10000) {
+            this.comDialogHide();
+          } else {
+            this.one.isReview = this.one.isReview === 0 ? 1 : 0;
+            this.$message.warning(res.message);
+          }
+        })
+        .catch(() => {
+          this.one.isReview = this.one.isReview === 0 ? 1 : 0;
+        });
     },
   },
 };

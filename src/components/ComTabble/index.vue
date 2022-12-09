@@ -89,6 +89,11 @@
             <div class="table-button">
               <el-button
                 v-for="item in buttonItems.options"
+                v-if="
+                  item.visible
+                    ? item.visible.fn(scope.row[item.visible.attrName])
+                    : true
+                "
                 :key="item.text || item.icon"
                 :type="item.type || 'text'"
                 :class="item.className"
@@ -330,5 +335,11 @@ export default {
   font-family: Microsoft YaHei-Bold, Microsoft YaHei;
   font-weight: bold;
   color: #333333;
+}
+.table-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 </style>
