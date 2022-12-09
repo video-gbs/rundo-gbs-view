@@ -863,13 +863,13 @@ export default {
       if (ut === 0) {
         // 超管 '1,2,3,5,13,14,21,100'均不可操作
 
-        [2, 3].includes(status) && arr.push("examine");
-        ![2, 3].includes(status) &&
+        [2].includes(status) && arr.push("examine");
+        ![1, 2, 3, 100].includes(status) &&
           (arr = [
             "dept",
             "reply",
             "transfer",
-            "invite",
+            // 'invite',
             "replyCheck",
             "applyTransfer",
             "applyTransferCheck",
