@@ -334,12 +334,12 @@
               placeholder="请选择受理单位"
             >
               <el-option
-                v-for="i in deptList.map((i) => {
-                  return { value: i.id, label: i.name };
+                v-for="i in deptList.filter((i) => {
+                  return i.deptType > 1;
                 })"
-                :key="i.value"
-                :label="i.label"
-                :value="i.value"
+                :key="i.id"
+                :label="i.name"
+                :value="i.id"
               />
             </el-select>
           </el-form-item>
@@ -915,6 +915,10 @@ export default {
         [2].includes(status) && arr.push("examine");
         arr.push("isShow"); // openComment
         arr.push("delete");
+
+        if (["audit"].indexOf(this.$route.params.type) !== -1) {
+          arr.push("applyTransferCheck");
+        }
       }
       if (ut === 1) {
         // 市长信箱，书记信箱发言人
@@ -1135,15 +1139,17 @@ export default {
       v.dialog === "replyCheckRef" && (this.replyCheckContent = "");
       // 如果是弹出审核问政转移的窗口，要先获取转移的对象
       v.dialog === "applyTransferCheckRef" &&
-        affairAudit({ affairsId: this.one.id }).then((res) => {
-          if (res.code === 10000) {
-            this.oneByDept = res.data;
-            this.applyTransferCheckForm.targetDeptId =
-              res.data.affairsAudit.targetDeptId;
-            this.applyTransferCheckForm.targetDeptName =
-              res.data.affairsAudit.targetDeptName;
+        affairAudit({ affairsId: this.one.id, auditId: this.one.auditId }).then(
+          (res) => {
+            if (res.code === 10000) {
+              this.oneByDept = res.data;
+              this.applyTransferCheckForm.targetDeptId =
+                res.data.affairsAudit.targetDeptId;
+              this.applyTransferCheckForm.targetDeptName =
+                res.data.affairsAudit.targetDeptName;
+            }
           }
-        });
+        );
       v.dialog === "applyInviteCheckRef" &&
         (this.applyInviteCheckShowFn(), (this.auditPopData.show = true));
     },
@@ -1398,8 +1404,8 @@ export default {
       }
       // 审核申请转移
       this.applyTransferCheckForm.targetDeptName = this.deptList.filter((i) => {
-        return i.value === this.applyTransferCheckForm.targetDeptId;
-      })[0].label;
+        return i.id === this.applyTransferCheckForm.targetDeptId;
+      })[0].name;
       console.log("this.applyTransferCheckForm", this.applyTransferCheckForm);
       // 执行 问政转移审核方法
       // fn...
@@ -1413,7 +1419,8 @@ export default {
     },
     applyTransferCheckRadioChange() {
       // 审核申请转移 单选框事件
-      if (this.applyTransferCheckForm.auditResult === 0) {
+      console.log("转移问政改变了", this.oneByDept.affairsAudit);
+      if (this.applyTransferCheckForm.auditResult === 2) {
         // 重置转移对象为原对象
         // this.checkParams.targetDeptId = this.oneByDept
         this.applyTransferCheckForm.targetDeptId =

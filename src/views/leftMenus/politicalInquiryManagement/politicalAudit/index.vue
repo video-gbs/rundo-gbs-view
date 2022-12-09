@@ -84,9 +84,9 @@
             >
               <el-option
                 v-for="i in deptList"
-                :key="i.value"
-                :label="i.label"
-                :value="i.value"
+                :key="i.id"
+                :label="i.name"
+                :value="i.id"
               />
             </el-select>
           </el-form-item>
@@ -330,7 +330,7 @@ export default {
       this.$refs["checkRef"].visible = true;
     },
     radioChange() {
-      if (this.checkParams.auditResult === 0) {
+      if (this.checkParams.auditResult === 2) {
         // 重置转移对象为原对象
         // this.checkParams.targetDeptId = this.oneByDept
         this.checkParams.targetDeptId =
@@ -345,16 +345,19 @@ export default {
       }
     },
     comfirmAudit(data) {
+      // 审核问政转移
       this.checkParams.targetDeptName = this.deptList.filter((i) => {
-        return i.value === this.checkParams.targetDeptId;
-      })[0].label;
+        return i.id === this.checkParams.targetDeptId;
+      })[0].name;
       console.log("this.checkParams", this.checkParams);
       // 执行 问政转移审核方法
       // fn...
       transferCheckAo(this.checkParams).then((res) => {
-        res.code === 10000 &&
-          (this.$message.success("审核成功"),
-          (this.$refs["checkRef"].visible = false));
+        if (res.code === 10000) {
+          this.$message.success("审核成功");
+          this.$refs["checkRef"].visible = false;
+          this.queryData();
+        }
       });
     },
     goDetail(data) {
@@ -364,8 +367,8 @@ export default {
       // 获取部门列表
       unitList({ current: 1, size: 9999 }).then((res) => {
         if (res.code === 10000) {
-          this.deptList = res.data.records.map((i) => {
-            return { value: i.id, label: i.name };
+          this.deptList = res.data.records.filter((i) => {
+            return i.deptType > 1;
           });
           // const arr = res.data.records.map(i => {
           //   return { value: i.id, label: i.name }

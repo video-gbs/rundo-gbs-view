@@ -5,7 +5,7 @@
     </div> -->
     <el-table
       ref="comTable"
-      v-loading="isLoading"
+      v-loading="isLoading_"
       element-loading-background="rgba(0, 0, 0, 0)"
       :data="tableData"
       v-bind="$attrs"
@@ -214,6 +214,7 @@ export default {
   },
   data() {
     return {
+      isLoading_: false,
       // 显示的头部
       checkedHeaderData: [],
       isClicked: false,
