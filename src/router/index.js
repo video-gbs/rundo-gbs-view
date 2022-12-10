@@ -35,7 +35,8 @@ const all = [0, 1, 2, 3, 4];
 const admin = [0, 1];
 const superAdmin = [0];
 const none = [];
-export const constantRoutes = [
+
+const constantRoutes = [
   {
     path: "/login",
     component: () => import("@/views/login/index"),
@@ -79,7 +80,7 @@ export const constantRoutes = [
     children: [
       {
         path: "/politicalList",
-        name: "问政列表",
+        name: "politicalList",
         component: () =>
           import(
             "@/views/leftMenus/politicalInquiryManagement/politicalList/index"
@@ -88,7 +89,7 @@ export const constantRoutes = [
       },
       {
         path: "/politicalList/:type/:id",
-        name: "问政详情",
+        name: "politicalListDetail",
         component: () =>
           import(
             "@/views/leftMenus/politicalInquiryManagement/politicalList/politicalDetail/index"
@@ -98,7 +99,7 @@ export const constantRoutes = [
       },
       {
         path: "/politicalAudit",
-        name: "问政转移审核",
+        name: "politicalAuditList",
         component: () =>
           import(
             "@/views/leftMenus/politicalInquiryManagement/politicalAudit/index"
@@ -118,7 +119,7 @@ export const constantRoutes = [
       // },
       {
         path: "/politicalReply",
-        name: "邀请回复审核",
+        name: "politicalReplyList",
         component: () =>
           import(
             "@/views/leftMenus/politicalInquiryManagement/politicalReply/index"
@@ -129,7 +130,7 @@ export const constantRoutes = [
       },
       {
         path: "/recycleBin",
-        name: "RecycleBin",
+        name: "recycleBin",
         component: () =>
           import(
             "@/views/leftMenus/politicalInquiryManagement/recycleBin/index"
@@ -139,7 +140,7 @@ export const constantRoutes = [
       },
       {
         path: "/recycleBin/:id",
-        name: "RecycleBin",
+        name: "recycleBinDetail",
         component: () =>
           import(
             "@/views/leftMenus/politicalInquiryManagement/recycleBin/politicalDetail/index"
@@ -152,7 +153,7 @@ export const constantRoutes = [
   },
   {
     path: "/informationManagement",
-    name: "展示信息管理",
+    name: "informationManagement",
     component: Layout,
     // meta: { title: '展示信息管理' },
     redirect: "/roundChart",
@@ -161,24 +162,27 @@ export const constantRoutes = [
     children: [
       {
         path: "/roundChart",
-        name: "轮播图管理",
+        name: "roundChart",
+        author: superAdmin,
         component: () =>
           import("@/views/leftMenus/informationManagement/roundChart/index"),
         meta: { title: "轮播图管理", icon: "dashboard" },
       },
       {
         path: "/roundChart/:id",
-        name: "轮播图管理",
+        name: "roundChartDetail",
+        author: superAdmin,
         component: () =>
           import(
             "@/views/leftMenus/informationManagement/roundChart/addOrEdit.vue"
           ),
         hidden: true,
-        meta: { title: "轮播图管理", icon: "dashboard" },
+        meta: { title: "轮播图明细", icon: "dashboard" },
       },
       {
         path: "/publicManagement",
-        name: "公告管理",
+        name: "publicManagement",
+        author: superAdmin,
         component: () =>
           import(
             "@/views/leftMenus/informationManagement/publicManagement/index"
@@ -187,17 +191,19 @@ export const constantRoutes = [
       },
       {
         path: "/publicManagement/:id",
-        name: "公告管理",
+        name: "publicManagementDetail",
+        author: superAdmin,
         component: () =>
           import(
             "@/views/leftMenus/informationManagement/publicManagement/addOrEdit"
           ),
         hidden: true,
-        meta: { title: "公告管理", icon: "dashboard" },
+        meta: { title: "公告详细", icon: "dashboard" },
       },
       {
         path: "/advertisementPicture",
-        name: "广告图管理",
+        name: "advertisementPicture",
+        author: superAdmin,
         component: () =>
           import(
             "@/views/leftMenus/informationManagement/advertisementPicture/index"
@@ -206,19 +212,20 @@ export const constantRoutes = [
       },
       {
         path: "/advertisementPicture/:id",
-        name: "广告图管理",
+        name: "advertisementPictureDetail",
         component: () =>
           import(
             "@/views/leftMenus/informationManagement/advertisementPicture/addOrEdit"
           ),
+        author: superAdmin,
         hidden: true,
-        meta: { title: "广告图管理", icon: "dashboard" },
+        meta: { title: "广告图明细", icon: "dashboard" },
       },
     ],
   },
   {
     path: "/userManagement",
-    name: "用户管理",
+    name: "userManagement",
     component: Layout,
     // meta: { title: '用户管理' },
     redirect: "/userManagement",
@@ -228,7 +235,8 @@ export const constantRoutes = [
     children: [
       {
         path: "/userManagement",
-        name: "用户管理",
+        name: "userManagementIndex",
+        author: superAdmin,
         component: () => import("@/views/leftMenus/userManagement/index"),
         meta: { title: "用户管理", icon: "dashboard" },
       },
@@ -236,7 +244,7 @@ export const constantRoutes = [
   },
   {
     path: "/systemManagement",
-    name: "系统管理",
+    name: "systemManagement",
     // meta: { title: '系统管理' },
     component: Layout,
     redirect: "/accountManagement",
@@ -245,14 +253,15 @@ export const constantRoutes = [
     children: [
       {
         path: "/accountManagement",
-        name: "账号管理",
+        name: "accountManagement",
+        author: superAdmin,
         component: () =>
           import("@/views/leftMenus/systemManagement/accountManagement/index"),
         meta: { title: "账号管理", icon: "dashboard" },
       },
       {
         path: "/roleManagement",
-        name: "角色管理",
+        name: "roleManagement",
         author: none,
         component: () =>
           import("@/views/leftMenus/systemManagement/roleManagement/index"),
@@ -260,14 +269,16 @@ export const constantRoutes = [
       },
       {
         path: "/unitManagement",
-        name: "单位管理",
+        name: "unitManagement",
+        author: superAdmin,
         component: () =>
           import("@/views/leftMenus/systemManagement/unitManagement/index"),
         meta: { title: "单位管理", icon: "dashboard" },
       },
       {
         path: "/otherUnitManagement",
-        name: "OtherUnitManagement",
+        name: "otherUnitManagement",
+        author: superAdmin,
         component: () =>
           import(
             "@/views/leftMenus/systemManagement/otherUnitManagement/index"
@@ -285,6 +296,22 @@ export const constantRoutes = [
   // 404 page must be placed at the end !!!
   { path: "*", redirect: "/404", hidden: true },
 ];
+
+const pageAuthor = {};
+
+function setPageAuthor(v) {
+  v.forEach((i) => {
+    if (i.author !== null && i.author !== undefined) {
+      pageAuthor[i.name] = i.author;
+    }
+    if (i.children) {
+      setPageAuthor(i.children);
+    }
+  });
+}
+setPageAuthor(constantRoutes);
+console.log("pageAuthorpageAuthor", pageAuthor);
+export { constantRoutes, pageAuthor };
 
 const createRouter = () =>
   new Router({
