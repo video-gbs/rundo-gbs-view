@@ -127,6 +127,27 @@ export const constantRoutes = [
         hidden: true,
         author: none,
       },
+      {
+        path: "/recycleBin",
+        name: "RecycleBin",
+        component: () =>
+          import(
+            "@/views/leftMenus/politicalInquiryManagement/recycleBin/index"
+          ),
+        author: superAdmin,
+        meta: { title: "回收站", icon: "dashboard" },
+      },
+      {
+        path: "/recycleBin/:id",
+        name: "RecycleBin",
+        component: () =>
+          import(
+            "@/views/leftMenus/politicalInquiryManagement/recycleBin/politicalDetail/index"
+          ),
+        author: superAdmin,
+        hidden: true,
+        meta: { title: "问政详细", icon: "dashboard" },
+      },
     ],
   },
   {
@@ -232,6 +253,7 @@ export const constantRoutes = [
       {
         path: "/roleManagement",
         name: "角色管理",
+        author: none,
         component: () =>
           import("@/views/leftMenus/systemManagement/roleManagement/index"),
         meta: { title: "角色管理", icon: "dashboard" },
