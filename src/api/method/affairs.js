@@ -5,9 +5,9 @@ export function addAffairs(params) {
   // 新增问政
   return request.put(`/politics/backstage/affairs/add`, params);
 }
-export function edAffairs(id, params) {
+export function editAffairs(params) {
   // 编辑问政
-  return request.post(`/politics/backstage/affairs/edit/${id}`, params);
+  return request.put(`/politics/backstage/affairsInfo`, params);
 }
 export function getAffairsFile(id) {
   // 获取问政附件列表
@@ -31,6 +31,10 @@ export function getAffairsByOne(id) {
 export function deleteAffairs(id) {
   // 删除单条问政
   return request.delete(`/politics/backstage/affairsInfo/${id}`);
+}
+export function reallyDeleteAffairs(id) {
+  // 永久物理删除删除单条问政
+  return request.delete(`/politics/backstage/affairsInfo/really/${id}`);
 }
 
 export function getAffairsMost(params) {

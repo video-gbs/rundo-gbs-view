@@ -930,7 +930,7 @@ export default {
       if (ut === 1) {
         // 市长信箱，书记信箱发言人
         this.moreData && this.moreData.auditStatus === -1 && arr.push("more");
-        [4, 20].includes(status) && arr.push("accept", "dept", "reply");
+        [4, 20].includes(status) && arr.push("dept", "reply");
         [23].includes(status) && arr.push("replyCheck");
         // 可否审核问政转移
         if (
@@ -944,10 +944,13 @@ export default {
         // 一般网络发言人
         // 待受理
         if (isMainDept) {
+          // 待受理
           [4].includes(status) && arr.push("accept", "reply", "applyTransfer");
-          [21].includes(status) && arr.push("accept", "reply", "applyTransfer");
           // 已受理 待回复
           [5].includes(status) && arr.push("reply");
+          // 市领导制定了部门
+          [21].includes(status) && arr.push("accept", "reply", "applyTransfer");
+
           // 申请转移未通过、 申请转移已通过、 市领导流程已审核已分配单位
           [13, 14].includes(status) &&
             arr.push("accept", "reply", "applyTransfer");
