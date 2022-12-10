@@ -1,6 +1,5 @@
 module.exports = {
-
-  title: '梧州问政后台系统',
+  title: "梧州零距离问政",
 
   /**
    * @type {boolean} true | false
@@ -12,5 +11,5 @@ module.exports = {
    * @type {boolean} true | false
    * @description Whether show the logo in sidebar
    */
-  sidebarLogo: false
-}
+  sidebarLogo: false,
+};

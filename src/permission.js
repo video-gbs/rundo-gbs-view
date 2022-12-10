@@ -8,6 +8,10 @@ import getPageTitle from "@/utils/get-page-title";
 NProgress.configure({ showSpinner: false }); // NProgress Configuration
 
 const whiteList = ["/login"]; // no redirect whitelist
+
+router.afterEach((to, from) => {
+  document.title = getPageTitle(to.meta.title);
+});
 router.beforeEach(async (to, from, next) => {
   const ut = +(localStorage.getItem("rj_wzwz_deptType") || 999);
   console.log("tototoott", ut, router, to);
@@ -19,7 +23,7 @@ router.beforeEach(async (to, from, next) => {
   //   next()
   // } else {
   // token存在-
-  document.title = getPageTitle(to.meta.title);
+  // document.title = getPageTitle(to.meta.title)
   if (to.path === "/login") {
     hasToken ? next("/workTable") : next();
   } else if (to.path == "/404") {
