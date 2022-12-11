@@ -272,8 +272,12 @@ export default {
         {
           label: "是否可见",
           name: "isShow",
-          isShow: true,
+          isShow: (function () {
+            const ut = +(localStorage.getItem("rj_wzwz_deptType") || 999);
+            return ut === 0;
+          })(),
           type: "switch",
+
           disabled: {
             attrName: "status",
             fn: function (v) {
@@ -289,7 +293,11 @@ export default {
         {
           label: "评论区",
           name: "isReview",
-          isShow: true,
+
+          isShow: (function () {
+            const ut = +(localStorage.getItem("rj_wzwz_deptType") || 999);
+            return ut === 0;
+          })(),
           disabled: {
             attrName: "status",
             fn: function (v) {
