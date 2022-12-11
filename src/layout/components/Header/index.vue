@@ -2,7 +2,7 @@
   <div class="app-header">
     <div class="app-header">
       <div class="app-header-left">
-        <svg-icon icon-class="logo" class="logo" />
+        <i class="logo mr8" />
         <h2>梧州问政后台系统</h2>
       </div>
       <div class="header-menu">
@@ -176,6 +176,7 @@ export default {
 <style lang="scss">
 @import "~@/styles/element-variables.scss";
 .app-header {
+  height: inherit;
   width: 100%;
   color: #fff;
   display: flex;
@@ -188,6 +189,9 @@ export default {
   justify-content: space-between;
   background-color: $bg-color;
   box-shadow: 0px 3px 6px 1px rgba(51, 51, 51, 0.16);
+  background-image: url("../../../assets/imgs/top-bg.png");
+  background-repeat: no-repeat;
+  background-size: cover;
   .app-header-left {
     position: relative;
 
@@ -196,6 +200,8 @@ export default {
       top: 10px;
       width: 1.75rem;
       height: 1.75rem;
+      background-image: url("~@/assets/imgs/logo.png");
+      background-size: cover;
     }
     h2 {
       font-size: 18px;

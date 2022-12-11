@@ -31,9 +31,6 @@ export default {
     TagsView,
   },
   mixins: [ResizeMixin],
-  created() {
-    this.initTabList();
-  },
   computed: {
     sidebar() {
       return this.$store.state.app.sidebar;
@@ -60,6 +57,9 @@ export default {
     tabList() {
       return this.$store.state.tabs.tabList;
     },
+  },
+  created() {
+    this.initTabList();
   },
   methods: {
     initTabList() {
