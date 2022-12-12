@@ -105,13 +105,13 @@ export default {
         {
           name: { title: "待受理问政", notShowSmallTitle: false },
           num: this.homeLists.acceptNum || 0,
-          author: [1, 2, 3, 4],
+          author: [0, 1, 2, 3, 4],
           path: "/politicalList",
         },
         {
           name: { title: "待回复问政", notShowSmallTitle: false },
           num: this.homeLists.replyNum || 0,
-          author: [1, 2, 3, 4],
+          author: [0, 1, 2, 3, 4],
           path: "/politicalList",
         },
         // {

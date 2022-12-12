@@ -1570,6 +1570,6 @@ export default {
   position: absolute;
   top: 6px;
   right: 5px;
-  z-index: 1999;
+  z-index: 10;
 }
 </style>
