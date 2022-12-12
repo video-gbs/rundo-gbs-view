@@ -1,6 +1,6 @@
 <template>
   <div class="detail-container">
-    <el-card class="box-card1">
+    <el-card v-if="moreData" class="box-card1">
       <div slot="header" class="clearfix">
         <LineFont
           :line-title="lineTitle"

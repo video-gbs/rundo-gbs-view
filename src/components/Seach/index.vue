@@ -6,7 +6,7 @@
         class="seach-form"
         :inline="true"
         :model="query"
-        label-width="90px"
+        label-width="80px"
       >
         <el-row>
           <el-col
@@ -156,9 +156,10 @@
               </el-form-item>
             </template>
           </el-col>
+        </el-row>
+        <el-row v-if="fold">
           <el-col
             v-for="(item, i) in FormList"
-            v-if="fold"
             :key="i + '-' + FormList.length"
             :span="4.8"
           >

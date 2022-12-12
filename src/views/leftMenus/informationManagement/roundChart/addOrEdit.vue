@@ -70,10 +70,11 @@
             v-model="params.orderValue"
             size="mini"
             :min="0"
-            :max="10000"
+            :max="1000"
             label="描述文字"
             @change="handleChange"
           />
+          <span class="ml10 fs12 title-c-3">显示循序为0到1000有效</span>
         </el-form-item>
         <el-form-item label="关联内容">
           <el-row>
@@ -178,7 +179,11 @@ export default {
     }
   },
   methods: {
-    handleChange() {},
+    handleChange(n, o) {
+      console.log(n, o);
+      n < 0 && (this.params.orderValue = 0);
+      n > 1000 && (this.params.orderValue = 1000);
+    },
     contentChange(v) {
       // 监听富文本内容变化并赋值
       this.params.content = v;

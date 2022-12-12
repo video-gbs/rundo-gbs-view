@@ -1,7 +1,6 @@
 <template>
-  <div class="router_container4 m20 bg-w">
-    <div class="panel-header-box f jc-sb ai-c fw-w">
-      <div class="title-css">用户管理</div>
+  <div class="router_container4 m20">
+    <div class="p10 bg-w user-panel-action-box">
       <div class="f1 f ai-c jc-e fw-w">
         <div class="fs14 mr10">用户名</div>
         <el-input
@@ -49,7 +48,10 @@
         <el-button size="mini" @click="resetBtn">重置</el-button>
       </div>
     </div>
-    <div class="p10">
+    <div class="mt10 panel-header-box f jc-sb ai-c fw-w bg-w">
+      <div class="title-css">用户管理</div>
+    </div>
+    <div class="bg-w p10">
       <el-table
         :data="tableData"
         style="width: 100%"
@@ -89,10 +91,14 @@
               {{ status[scope.row.status + ""] }}
             </template>
           </el-table-column>
-          <el-table-column prop="" label="创建时间" width="160" />
-          <el-table-column prop="" label="最近登录时间" width="160" />
-          <el-table-column prop="" label="最近登录IP" width="160" />
-          <el-table-column prop="" label="IP归属地" width="160" />
+          <el-table-column prop="createTime" label="创建时间" width="160" />
+          <el-table-column
+            prop="lastLoginTime"
+            label="最近登录时间"
+            width="160"
+          />
+          <el-table-column prop="lastLoginIp" label="最近登录IP" width="160" />
+          <!-- <el-table-column prop="belongingPlace" label="IP归属地" width="160" /> -->
           <el-table-column width="100" label="操作" fixed="right">
             <template slot-scope="scope">
               <el-button type="text" @click="dialogShow(0, scope.row)"
