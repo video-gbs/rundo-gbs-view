@@ -100,7 +100,7 @@ export default {
   mounted() {
     // 模拟 ajax 请求，异步渲染编辑器
     console.log("value12121212份饭", this.value);
-    console.log("Toolbar.getConfig()", Toolbar.getConfig());
+    // console.log("Toolbar.getConfig()", Toolbar.getConfig());
     setTimeout(() => {
       this.html = this.value;
     }, 0);

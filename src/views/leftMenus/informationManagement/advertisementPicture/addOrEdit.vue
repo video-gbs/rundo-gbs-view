@@ -64,11 +64,12 @@
           <el-input-number
             v-model="params.orderValue"
             size="mini"
-            :min="1"
-            :max="10000"
+            :min="0"
+            :max="1000"
             label="描述文字"
             @change="handleChange"
           />
+          <span class="ml10 fs12 title-c-3">显示循序为0到1000有效</span>
         </el-form-item>
         <el-form-item label="关联外部链接">
           <el-row>

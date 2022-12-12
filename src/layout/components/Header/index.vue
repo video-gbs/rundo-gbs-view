@@ -20,7 +20,9 @@
           <el-dropdown class="" trigger="click">
             <div class="user-info">
               <svg-icon icon-class="user1" class="user" />
-              <span>{{ userInfo.userName || "佚名用户" }}</span>
+              <span class="fs14 mr10">{{
+                userInfo.userName || "佚名用户"
+              }}</span>
               <i class="el-icon-caret-bottom" />
             </div>
             <el-dropdown-menu slot="dropdown">
@@ -108,6 +110,9 @@ export default {
     // })
     this.userInfo.userName =
       localStorage.getItem("rj_wzwz_userName") || "佚名用户";
+    this.userInfo.userName = this.userInfo.userName
+      .replace('"', "")
+      .replace('"', "");
   },
   methods: {
     /**

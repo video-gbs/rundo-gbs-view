@@ -25,6 +25,7 @@
           :is-checked-header="isCheckedHeader"
           :header-btn="headerBtn"
           :checked-header.sync="checkedHeader"
+          :height-table="'auto'"
           @haederBtnClick="haederBtnClick"
           @handleClick="handleClick"
           @changeTableHeader="changeTableHeader"
@@ -120,14 +121,14 @@ export default {
           type: "input",
           label: "标题",
           size: "small",
-          width: "200px",
+          width: "300px",
         },
         {
           poro: "type",
           type: "select",
           label: "分类",
           size: "small",
-          width: "150px",
+          width: "180px",
           optionsList: this.$dict._type,
         },
         {
@@ -135,7 +136,7 @@ export default {
           type: "select",
           label: "领域",
           size: "small",
-          width: "120px",
+          width: "180px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -147,7 +148,7 @@ export default {
           type: "select",
           label: "留言对象",
           size: "small",
-          width: "150x",
+          width: "216px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -160,7 +161,7 @@ export default {
           type: "select",
           label: "显示状态",
           size: "small",
-          width: "100px",
+          width: "216px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -172,7 +173,7 @@ export default {
           label: "发布账号",
           size: "small",
           type: "input",
-          width: "200px",
+          width: "300px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -184,7 +185,7 @@ export default {
           type: "input",
           label: "电话",
           size: "small",
-          width: "150px",
+          width: "180px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,

@@ -83,21 +83,24 @@ export default {
         {
           poro: "title",
           type: "input",
-          label: "标题：",
+          label: "标题",
           size: "small",
+          width: "300px",
         },
         {
           poro: "type",
           type: "select",
-          label: "分类：",
+          label: "分类",
           size: "small",
+          width: "180px",
           optionsList: this.$dict._type,
         },
         {
           poro: "domain",
           type: "select",
-          label: "领域：",
+          label: "领域",
           size: "small",
+          width: "180px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -107,8 +110,9 @@ export default {
         {
           poro: "deptId",
           type: "select",
-          label: "留言对象：",
+          label: "留言对象",
           size: "small",
+          width: "216px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -119,8 +123,9 @@ export default {
         {
           poro: "isShow",
           type: "select",
-          label: "显示状态：",
+          label: "显示状态",
           size: "small",
+          width: "216px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -129,9 +134,10 @@ export default {
         },
         {
           poro: "pubUsername",
-          label: "发布账号：",
+          label: "发布账号",
           size: "small",
           type: "input",
+          width: "300px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -141,8 +147,9 @@ export default {
         {
           poro: "phone",
           type: "input",
-          label: "电话：",
+          label: "电话",
           size: "small",
+          width: "180px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -417,7 +424,7 @@ export default {
           reallyDeleteAffairs(obj.row.id).then((res) => {
             if (res.code === 10000) {
               this.$message.success("删除成功！");
-              this.$router.push("/recycleBin");
+              this.getDataList();
               return;
             }
             this.$message.warning(res.message);
@@ -442,7 +449,7 @@ export default {
           editAffairs({ id: obj.row.id, isDeleted: 0 }).then((res) => {
             if (res.code === 10000) {
               this.$message.success("恢复成功！");
-              this.$router.push("/recycleBin");
+              this.getDataList();
               return;
             }
             this.$message.warning(res.message);
@@ -519,7 +526,7 @@ export default {
 
   .seach {
     // margin: 20px 24px;
-    padding: 32px 20px 10px 20px;
+    // padding: 32px 20px 10px 20px;
     box-shadow: 0px 2px 6px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     background: #ffffff;
