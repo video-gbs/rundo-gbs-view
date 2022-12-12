@@ -41,7 +41,7 @@
             >
           </el-form-item>
           <el-form-item label="审核说明" prop="content">
-            <el-input v-model="examineForm.content" />
+            <el-input v-model="examineForm.content" type="textarea" />
           </el-form-item>
         </el-form>
       </template>
@@ -200,14 +200,16 @@
           :model="replyCheckForm"
           :rules="auditResultRules"
         >
-          <el-form-item label="审核结果">
-            <el-radio v-model="replyCheckForm.auditResult" :label="1"
-              >审核通过</el-radio
-            >
-            <el-radio v-model="replyCheckForm.auditResult" :label="2"
-              >审核不通过</el-radio
-            >
-          </el-form-item>
+          <!-- <el-form-item label="审核结果">
+            <el-radio
+              v-model="replyCheckForm.auditResult"
+              :label="1"
+            >审核通过</el-radio>
+            <el-radio
+              v-model="replyCheckForm.auditResult"
+              :label="2"
+            >审核不通过</el-radio>
+          </el-form-item> -->
           <el-form-item label="审核说明" prop="content">
             <PEditorVue
               ref="replyCheckEditorRef"
@@ -930,8 +932,12 @@ export default {
       if (ut === 1) {
         // 市长信箱，书记信箱发言人
         this.moreData && this.moreData.auditStatus === -1 && arr.push("more");
-        [4, 20].includes(status) && arr.push("dept", "reply");
+        [4, 20].includes(status) && arr.push("accept");
         [23].includes(status) && arr.push("replyCheck");
+        // 4,5,21开启多个功能
+        // console.log('[4, 5, 12, 13, 14, 20, 21].includes(status)', [4, 5, 12, 13, 14, 20, 21].includes(status));
+        [5, 12, 13, 14, 20, 21].includes(status) &&
+          arr.push("reply", "dept", "transfer", "replyCheck");
         // 可否审核问政转移
         if (
           ["audit"].indexOf(this.$route.params.type) !== -1 &&
@@ -978,6 +984,7 @@ export default {
         // })
       }
       arr.push("back");
+      console.log("arrrrr", arr);
       Object.keys(this.btnAll).forEach((i) => {
         arr.includes(i) && this.$set(this.actBtn, i, this.btnAll[i]);
       });
@@ -1335,7 +1342,7 @@ export default {
         this.replyForm.deptId = "";
         return;
       }
-      transfer(this.transferForm)
+      transfer(this.one.id, this.transferForm)
         .then((res) => {
           res.code === 10000 && this.comDialogHide();
         })

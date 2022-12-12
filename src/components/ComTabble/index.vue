@@ -40,6 +40,7 @@
       <!-- 内容项 -->
       <el-table-column
         v-for="(item, index) in tableItems"
+        v-if="item.isShow"
         :key="item.name + index"
         :prop="item.name"
         :label="item.label"
@@ -233,7 +234,7 @@ export default {
     },
   },
   mounted() {
-    // this.getCheckItem();
+    // this.getCheckItem()
     console.log("tableItems", this.tableItems);
   },
   methods: {
@@ -250,7 +251,7 @@ export default {
         return item;
       });
       this.$nextTick(() => {
-        this.checkedHeader = list;
+        // this.checkedHeaderData = list
       });
     },
     // 更改头部显示

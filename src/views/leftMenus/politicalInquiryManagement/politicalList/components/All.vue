@@ -118,21 +118,24 @@ export default {
         {
           poro: "title",
           type: "input",
-          label: "标题：",
+          label: "标题",
           size: "small",
+          width: "200px",
         },
         {
           poro: "type",
           type: "select",
-          label: "分类：",
+          label: "分类",
           size: "small",
+          width: "150px",
           optionsList: this.$dict._type,
         },
         {
           poro: "domain",
           type: "select",
-          label: "领域：",
+          label: "领域",
           size: "small",
+          width: "120px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -142,8 +145,9 @@ export default {
         {
           poro: "deptId",
           type: "select",
-          label: "留言对象：",
+          label: "留言对象",
           size: "small",
+          width: "150x",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -154,8 +158,9 @@ export default {
         {
           poro: "isShow",
           type: "select",
-          label: "显示状态：",
+          label: "显示状态",
           size: "small",
+          width: "100px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -164,9 +169,10 @@ export default {
         },
         {
           poro: "pubUsername",
-          label: "发布账号：",
+          label: "发布账号",
           size: "small",
           type: "input",
+          width: "200px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -176,8 +182,9 @@ export default {
         {
           poro: "phone",
           type: "input",
-          label: "电话：",
+          label: "电话",
           size: "small",
+          width: "150px",
           propsConfig: {
             checkStrictly: true,
             multiple: true,
@@ -272,8 +279,12 @@ export default {
         {
           label: "是否可见",
           name: "isShow",
-          isShow: true,
+          isShow: (function () {
+            const ut = +(localStorage.getItem("rj_wzwz_deptType") || 999);
+            return ut === 0;
+          })(),
           type: "switch",
+
           disabled: {
             attrName: "status",
             fn: function (v) {
@@ -289,7 +300,11 @@ export default {
         {
           label: "评论区",
           name: "isReview",
-          isShow: true,
+
+          isShow: (function () {
+            const ut = +(localStorage.getItem("rj_wzwz_deptType") || 999);
+            return ut === 0;
+          })(),
           disabled: {
             attrName: "status",
             fn: function (v) {

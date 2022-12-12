@@ -86,7 +86,7 @@ const constantRoutes = [
           import(
             "@/views/leftMenus/politicalInquiryManagement/politicalList/index"
           ),
-        meta: { title: "问政列表", icon: "dashboard" },
+        meta: { title: "问政列表", icon: "" },
       },
       {
         path: "/politicalList/:type/:id",
@@ -95,7 +95,7 @@ const constantRoutes = [
           import(
             "@/views/leftMenus/politicalInquiryManagement/politicalList/politicalDetail/index"
           ),
-        meta: { title: "问政详情", icon: "dashboard" },
+        meta: { title: "问政详情", icon: "" },
         hidden: true,
       },
       {
@@ -105,7 +105,7 @@ const constantRoutes = [
           import(
             "@/views/leftMenus/politicalInquiryManagement/politicalAudit/index"
           ),
-        meta: { title: "问政转移审核", icon: "dashboard" },
+        meta: { title: "问政转移审核", icon: "" },
         author: admin,
       },
       // {
@@ -115,7 +115,7 @@ const constantRoutes = [
       //     import(
       //       '@/views/leftMenus/politicalInquiryManagement/politicalAudit/politicalAuditDetail/index'
       //     ),
-      //   meta: { title: '问政转移审核', icon: 'dashboard' },
+      //   meta: { title: '问政转移审核', icon: '' },
       //   hidden: true
       // },
       {
@@ -125,7 +125,7 @@ const constantRoutes = [
           import(
             "@/views/leftMenus/politicalInquiryManagement/politicalReply/index"
           ),
-        meta: { title: "邀请回复审核", icon: "dashboard" },
+        meta: { title: "邀请回复审核", icon: "" },
         hidden: true,
         author: none,
       },
@@ -137,7 +137,7 @@ const constantRoutes = [
             "@/views/leftMenus/politicalInquiryManagement/recycleBin/index"
           ),
         author: superAdmin,
-        meta: { title: "回收站", icon: "dashboard" },
+        meta: { title: "回收站", icon: "" },
       },
       {
         path: "/recycleBin/:id",
@@ -148,7 +148,7 @@ const constantRoutes = [
           ),
         author: superAdmin,
         hidden: true,
-        meta: { title: "问政详细", icon: "dashboard" },
+        meta: { title: "问政详细", icon: "" },
       },
     ],
   },
@@ -167,7 +167,7 @@ const constantRoutes = [
         author: superAdmin,
         component: () =>
           import("@/views/leftMenus/informationManagement/roundChart/index"),
-        meta: { title: "轮播图管理", icon: "dashboard" },
+        meta: { title: "轮播图管理", icon: "" },
       },
       {
         path: "/roundChart/:id",
@@ -178,7 +178,7 @@ const constantRoutes = [
             "@/views/leftMenus/informationManagement/roundChart/addOrEdit.vue"
           ),
         hidden: true,
-        meta: { title: "轮播图明细", icon: "dashboard" },
+        meta: { title: "轮播图明细", icon: "" },
       },
       {
         path: "/publicManagement",
@@ -188,7 +188,7 @@ const constantRoutes = [
           import(
             "@/views/leftMenus/informationManagement/publicManagement/index"
           ),
-        meta: { title: "公告管理", icon: "dashboard" },
+        meta: { title: "公告管理", icon: "" },
       },
       {
         path: "/publicManagement/:id",
@@ -199,7 +199,7 @@ const constantRoutes = [
             "@/views/leftMenus/informationManagement/publicManagement/addOrEdit"
           ),
         hidden: true,
-        meta: { title: "公告详细", icon: "dashboard" },
+        meta: { title: "公告详细", icon: "" },
       },
       {
         path: "/advertisementPicture",
@@ -209,7 +209,7 @@ const constantRoutes = [
           import(
             "@/views/leftMenus/informationManagement/advertisementPicture/index"
           ),
-        meta: { title: "广告图管理", icon: "dashboard" },
+        meta: { title: "广告图管理", icon: "" },
       },
       {
         path: "/advertisementPicture/:id",
@@ -220,7 +220,7 @@ const constantRoutes = [
           ),
         author: superAdmin,
         hidden: true,
-        meta: { title: "广告图明细", icon: "dashboard" },
+        meta: { title: "广告图明细", icon: "" },
       },
     ],
   },
@@ -231,7 +231,7 @@ const constantRoutes = [
     // meta: { title: '用户管理' },
     redirect: "/userManagement",
     // component: () => import('@/views/leftMenus/userManagement/index'),
-    meta: { title: "用户管理", icon: "role" },
+    meta: { title: "用户管理", icon: "yhgl" },
     author: superAdmin,
     children: [
       {
@@ -239,7 +239,7 @@ const constantRoutes = [
         name: "userManagementIndex",
         author: superAdmin,
         component: () => import("@/views/leftMenus/userManagement/index"),
-        meta: { title: "用户管理", icon: "dashboard" },
+        meta: { title: "用户管理", icon: "yhgl" },
       },
     ],
   },
@@ -258,7 +258,7 @@ const constantRoutes = [
         author: superAdmin,
         component: () =>
           import("@/views/leftMenus/systemManagement/accountManagement/index"),
-        meta: { title: "账号管理", icon: "dashboard" },
+        meta: { title: "账号管理", icon: "" },
       },
       {
         path: "/roleManagement",
@@ -266,7 +266,7 @@ const constantRoutes = [
         author: none,
         component: () =>
           import("@/views/leftMenus/systemManagement/roleManagement/index"),
-        meta: { title: "角色管理", icon: "dashboard" },
+        meta: { title: "角色管理", icon: "" },
       },
       {
         path: "/unitManagement",
@@ -274,7 +274,7 @@ const constantRoutes = [
         author: superAdmin,
         component: () =>
           import("@/views/leftMenus/systemManagement/unitManagement/index"),
-        meta: { title: "单位管理", icon: "dashboard" },
+        meta: { title: "单位管理", icon: "" },
       },
       {
         path: "/otherUnitManagement",
@@ -284,7 +284,7 @@ const constantRoutes = [
           import(
             "@/views/leftMenus/systemManagement/otherUnitManagement/index"
           ),
-        meta: { title: "单位账号管理", icon: "dashboard" },
+        meta: { title: "单位账号管理", icon: "" },
       },
     ],
   },
