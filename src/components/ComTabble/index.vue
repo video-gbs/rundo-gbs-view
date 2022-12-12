@@ -335,7 +335,7 @@ export default {
 .column-span {
   font-size: 14px;
   font-family: Microsoft YaHei-Bold, Microsoft YaHei;
-  font-weight: bold;
+  // font-weight: bold;
   color: #333333;
 }
 .table-button {

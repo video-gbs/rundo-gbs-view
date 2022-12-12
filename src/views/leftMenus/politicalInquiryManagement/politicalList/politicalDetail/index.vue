@@ -419,7 +419,7 @@ import {
 import { applyTransferAffair } from "@/api/method/transfer";
 import { replyAffairs, affairAudit } from "@/api/method/affairscheck";
 import { unitList } from "@/api/method/unitManagement";
-import { transfer, transferCheckAo } from "@/api/method/transfer";
+import { adminTransfer, transferCheckAo } from "@/api/method/transfer";
 import { getReplyList } from "@/api/method/reply";
 import {
   setAffairsShow,
@@ -714,6 +714,7 @@ export default {
         affairsId: "",
         content: "",
         deptId: "",
+        deptName: "",
       },
 
       inviteForm: {
@@ -917,8 +918,9 @@ export default {
         this.one.isReview === 0 ? "关闭评论" : "开启评论";
       if (ut === 0) {
         // 超管 '1,2,3,5,13,14,21,100'均不可操作
-
+        this.moreData && this.moreData.auditStatus === 0 && arr.push("more");
         [2].includes(status) && arr.push("examine");
+        [4, 5].includes(status) && arr.push("transfer");
         arr.push("isShow"); // openComment
         arr.push("delete");
 
@@ -931,7 +933,7 @@ export default {
       }
       if (ut === 1) {
         // 市长信箱，书记信箱发言人
-        this.moreData && this.moreData.auditStatus === -1 && arr.push("more");
+        this.moreData && this.moreData.auditStatus === 0 && arr.push("more");
         [4, 20].includes(status) && arr.push("accept");
         [23].includes(status) && arr.push("replyCheck");
         // 4,5,21开启多个功能
@@ -965,110 +967,16 @@ export default {
           ![1, 2, 3, 20, 21, 23, 100].includes(status) &&
             arr.push("otherDeptReply");
         }
-
-        // 获取受邀单位
-        // await assistDeptList({ affairsId: this.one.id, auditId: this.one.auditId }).then((res) => {
-        //   if (res.code === 10000 && res.data.affairsAudit) {
-        //     // 如果有受邀单位 就判断受邀单位有没有当前账号的所在单位
-        //     const names = res.data.affairsAudit.targetDeptName.split(',')
-        //     let udn = localStorage.getItem('rj_wzwz_deptName') || 'none'
-        //     udn = udn.replace('"', '').replace('"', '')
-        //     if (names.includes(udn)) {
-        //       // 如果当前账号是受邀单位
-        //       arr.push('otherDeptReply')
-        //     } else {
-        //       [5, 13, 14, 21].includes(status) &&
-        //         arr.push('reply', 'applyTransfer', 'applyInvite')
-        //     }
-        //   }
-        // })
       }
       arr.push("back");
       console.log("arrrrr", arr);
       Object.keys(this.btnAll).forEach((i) => {
         arr.includes(i) && this.$set(this.actBtn, i, this.btnAll[i]);
       });
-      // arr.forEach((i) => {
-      //   this.$set(this.actBtn, i, this.btnAll[i])
-      // })
-      // Object.keys(this.btnAll).forEach((i) => {
-      //   this[this.btnAll[i].author].indexOf(this.userType) > -1 &&
-      //     this.$set(this.actBtn, i, this.btnAll[i])
-      // })
 
       console.log("this.actBtn123", this.actBtn);
     },
-    // setShow(arr) {
-    // 设置按钮可点击
-    //   console.log('arrrrrr', arr)
-    //   Object.keys(this.actBtn).forEach((i) => {
-    //     this.actBtn[i].show = false
-    //     arr.indexOf(i) > -1 && (this.actBtn[i].show = true)
-    //   })
-    // },
-    // processPermission() {
-    //   console.log(2)
-    //   // 根据账号角色和 问政状态 判断操作按钮显示与否
-    //   const ut = this.userType * 1 // ut 0超管 1 市长、书记发言人 2 市级单位发言人 3  县区发言人 4 其他部门发言人
-    //   const { status, isMainDept } = this.one
 
-    //   console.log(ut, status)
-    //   let arr = [
-    //     'examine',
-    //     'more',
-    //     'dept',
-    //     'accept',
-    //     'reply',
-    //     'transfer',
-    //     'invite',
-    //     'replyCheck',
-    //     'applyTransfer',
-    //     'applyTransferCheck',
-    //     'applyInvite',
-    //     'otherDeptReply'
-    //   ]
-    //   if (ut === 0) {
-    //     // 超管
-    //     // 全部权限
-    //     // 初次审核网友问政，可以审核
-    //     '2'.indexOf(status) > -1 && (arr = arr.concat(['examine']))
-    //   }
-    //   if (ut === 1) {
-    //     // 书记， 市长 发言人
-    //     // 审核通过  可以审核转移、受理部门
-    //     '20'.indexOf(status) > -1 && (arr = arr.concat(['dept']))
-    //     '5'.indexOf(status) > -1 && (arr = arr.concat(['replyCheck', 'dept']))
-    //     '23'.indexOf(status) > -1 && (arr = arr.concat(['replyCheck']))
-    //     '12'.indexOf(status) > -1 && (arr = arr.concat(['applyTransfer']))
-    //   }
-
-    //   if (ut > 1) {
-    //     // 一般 发言人
-    //     // 审核通过未受理,市领导指派后  可以申请审核转移、受理
-    //     '4,13,14,21'.indexOf(status) > -1 &&
-    //       (arr = arr.concat([
-    //         'applyTransfer',
-    //         'accept',
-    //         'reply',
-    //         'applyInvite'
-    //       ]))
-    //     // // 已受理  发起邀请回复、回复问政
-    //     '5'.indexOf(status) > -1 &&
-    //       (arr = arr.concat(['applyInvite', 'reply']))
-    //     // 转移申请已提交，待审核  什么也不能干
-    //     '12'.indexOf(status) > -1 && (arr = arr.concat([]))
-    //     // 转移申请不通过，仍是需要自己选择是否受理  什么也不能干
-    //     '13'.indexOf(status) > -1 && (arr = arr.concat(['accept']))
-
-    //     // 如果是不是主单位问政数据，是为协助回复，只能显示 协助回复按钮
-    //     !this.one.isMainDept && (arr = ['otherDeptReply'])
-    //   }
-
-    //   // 100 已完成  不可做任何操作
-    //   '100'.indexOf(status) > -1 && (arr = arr.concat([]))
-    //   arr.push('back')
-    //   this.setShow(arr)
-    // },
     handleClick(val, event) {
       console.log("val", val);
       this.tabpaneList = this.tabpaneList.map((item) => {
@@ -1086,12 +994,6 @@ export default {
         ReviewResults.methods.getAppraiseBy(this.$route.params.id);
       val.name === "问政记录" &&
         PoliticalRecord.methods.getList({ affairsId: this.$route.params.id });
-      // this.$nextTick(() => {
-      //   document.getElementById("tab").scrollIntoView({
-      //     behavior: "smooth",
-      //     block: "start"
-      //   });
-      // });
     },
     async getOne(v) {
       console.log("水电费地方 个");
@@ -1338,11 +1240,16 @@ export default {
       // 问政转移
       if (v && v === "c") {
         // 重置数据
-        this.replyForm.content = "";
-        this.replyForm.deptId = "";
+        this.transferForm.content = "";
+        this.transferForm.deptId = "";
+        this.transferForm.deptName = "";
         return;
       }
-      transfer(this.one.id, this.transferForm)
+      this.transferForm.deptName = this.deptList.find((i) => {
+        return i.id === this.transferForm.deptId;
+      }).name;
+      console.log(this.transferForm.deptName);
+      adminTransfer(this.transferForm)
         .then((res) => {
           res.code === 10000 && this.comDialogHide();
         })

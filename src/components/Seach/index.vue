@@ -158,6 +158,7 @@
           </el-col>
           <el-col
             v-for="(item, i) in FormList"
+            v-if="fold"
             :key="i + '-' + FormList.length"
             :span="4.8"
           >
@@ -305,19 +306,34 @@
           </el-col>
         </el-row>
       </el-form>
-      <div class="f jc-c ai-c">
-        <div v-if="isSearch" class="mb19">
-          <el-button class="cz-btn" size="small" @click="submitReset"
-            ><span class="fs14">重置</span></el-button
-          >
-          <el-button
-            class="cx-btn save_btn"
-            size="small"
-            type="primary"
-            @click="submitSearch"
-            ><span class="fs14">查询</span></el-button
-          >
-        </div>
+    </div>
+    <div class="f jc-c ai-c">
+      <div v-if="isSearch" class="mb19">
+        <el-button class="cz-btn" size="small" @click="submitReset">
+          <div class="f ai-c jc-c">
+            <i class="reset-icon btn-css mr8" />
+            <div class="fs14">重置</div>
+          </div>
+        </el-button>
+        <el-button
+          class="cx-btn save_btn"
+          size="small"
+          type="primary"
+          @click="submitSearch"
+        >
+          <div class="f ai-c jc-c">
+            <i class="search-icon btn-css mr8" />
+            <div class="fs14">查询</div>
+          </div>
+        </el-button>
+      </div>
+    </div>
+    <div class="show-btn-box f jc-c ai-c">
+      <div class="show-btn r11 f jc-c ai-s hc-s cursor-p" @click="fold = !fold">
+        <div
+          class="show-icon"
+          :style="{ transform: `rotate(${fold ? 0 : 180}deg)` }"
+        />
       </div>
     </div>
   </div>
@@ -359,6 +375,7 @@ export default {
       startPickerOptions: {},
       endPickerOptions: {},
       defaultValue: "",
+      fold: true, // 是否折叠  false 折叠  true不折叠
     };
   },
   computed: {}, // 监听属性 类似于data概念
@@ -389,6 +406,7 @@ export default {
 .com-seach {
   position: relative;
 }
+
 .filter-item {
   line-height: 40px;
   font-size: 16px;
@@ -405,9 +423,19 @@ export default {
   //   margin-right: 0;
   // }
 }
+
 .seach-content {
   overflow: hidden;
+  padding: 20px 20px 0px 20px;
+  ::v-deep .el-form-item {
+    padding-bottom: 0px;
+    margin-bottom: 15px;
+  }
+  ::v-deep .el-col {
+    padding-bottom: 0px;
+  }
 }
+
 .search-btn {
   // width: 200px;
   // display: inline-block;
@@ -421,22 +449,58 @@ export default {
     width: 80px;
     height: 36px;
   }
+
   .span-btn {
     display: inline-block;
     padding-right: 20px;
     cursor: pointer;
+
     &:hover {
       color: #3a8ee6;
     }
   }
 }
+
 // .date-item {
 //   height: 42px;
 // }
 .input-with-select {
   width: 400px;
+
   .navigation-select {
     width: 100px;
   }
+}
+
+.show-btn-box {
+  height: 1px;
+  position: absolute;
+  bottom: -1.5px;
+  left: 0;
+  width: 100%;
+
+  .show-btn {
+    width: 75.76px;
+    height: 21px;
+    background-color: #fff;
+    box-shadow: 0px 5px 6px rgb(129, 129, 129, 0.1);
+    .show-icon {
+      width: 16px;
+      height: 16px;
+      background-image: url("~@/assets/imgs/doubleDown.svg");
+    }
+  }
+}
+
+.btn-css {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+.reset-icon {
+  background-image: url("../../assets/imgs/reset.svg");
+}
+.search-icon {
+  background-image: url("../../assets/imgs/search.svg");
 }
 </style>
