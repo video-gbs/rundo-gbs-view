@@ -65,6 +65,7 @@ export default {
     this.select(this.$route.path);
     this.myRouter = Object.assign([], this.routes);
     const ut = localStorage.getItem("rj_wzwz_deptType") || 9999;
+    console.log("进来了", ut);
     this.setHide(this.myRouter, ut * 1);
     console.log("routes`~~~~~~~~~~~``", this.myRouter);
   },
@@ -72,7 +73,7 @@ export default {
     setHide(v, ut) {
       v.forEach((i) => {
         if (i.author) {
-          // this.$set(i, "hidden", false);
+          this.$set(i, "hidden", false);
           console.log(i.author, ut, i.author.indexOf(ut) === -1);
           i.author.indexOf(ut) === -1 && this.$set(i, "hidden", true);
         }
