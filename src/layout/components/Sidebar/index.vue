@@ -73,9 +73,9 @@ export default {
     setHide(v, ut) {
       v.forEach((i) => {
         if (i.author) {
-          this.$set(i, "hidden", false);
-          console.log(i.author, ut, i.author.indexOf(ut) === -1);
-          i.author.indexOf(ut) === -1 && this.$set(i, "hidden", true);
+          this.$set(i, "authorHidden", false);
+          console.log(i.author, ut, i.author.includes(ut));
+          !i.author.includes(ut) && this.$set(i, "authorHidden", true);
         }
         if (i.children && i.children.length) {
           this.setHide(i.children, ut);

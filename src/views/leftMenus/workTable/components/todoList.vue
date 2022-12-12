@@ -101,18 +101,21 @@ export default {
           num: this.homeLists.auditNum || 0,
           author: [0],
           path: "/politicalList",
+          params: 1,
         },
         {
           name: { title: "待受理问政", notShowSmallTitle: false },
           num: this.homeLists.acceptNum || 0,
           author: [0, 1, 2, 3, 4],
           path: "/politicalList",
+          params: 2,
         },
         {
           name: { title: "待回复问政", notShowSmallTitle: false },
           num: this.homeLists.replyNum || 0,
           author: [0, 1, 2, 3, 4],
           path: "/politicalList",
+          params: 3,
         },
         // {
         //   name: { title: '逾期未审核', notShowSmallTitle: false },
@@ -171,7 +174,7 @@ export default {
       });
     },
     goPage(v) {
-      this.$router.push(v.path);
+      this.$router.push({ path: v.path, query: { t: v.params } });
     },
   },
 };

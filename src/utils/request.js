@@ -85,7 +85,7 @@ service.interceptors.response.use(
     }
   },
   (error) => {
-    let msg = "网络连接错误";
+    let msg = "系统连接异常";
     if ((error + "").indexOf("401") > -1) {
       Local.remove("MANAGE_USER_TOKEN");
       Local.remove("rj_wzwz_token");
@@ -94,7 +94,7 @@ service.interceptors.response.use(
       msg = "账户信息已过期,请重新登录。";
     }
     if ((error + "").indexOf("500") > -1) {
-      msg = "网络连接发成错误。";
+      msg = "系统连接异常";
     }
 
     if ((error + "").indexOf("403") > -1) {

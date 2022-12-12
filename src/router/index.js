@@ -280,7 +280,7 @@ const constantRoutes = [
         path: "/otherUnitManagement",
         name: "otherUnitManagement",
         author: superAdmin,
-        // hidden: true,
+        hidden: true,
         component: () =>
           import(
             "@/views/leftMenus/systemManagement/otherUnitManagement/index"

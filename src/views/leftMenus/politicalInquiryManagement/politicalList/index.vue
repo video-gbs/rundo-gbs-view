@@ -111,7 +111,7 @@ export default {
         0: [],
         1: [2],
         2: [4, 12, 13, 14, 20, 21],
-        3: [5],
+        3: [5, 23],
         4: [100],
         5: [3],
       },
@@ -154,7 +154,17 @@ export default {
   mounted() {
     const ut = +(localStorage.getItem("rj_wzwz_deptType") || 999);
     this.recycleShow = ut === 0;
-    this.getAffairsInfoList();
+    console.log(
+      "this.$route.querythis.$route.querythis.$route.querythis.$route.query",
+      this.$route.query
+    );
+    if (this.$route.query.t !== undefined) {
+      this.activeName = this.tabpaneList[+this.$route.query.t].label;
+      this.$refs["listRef"].query.statusList =
+        this.tabDict[this.$route.query.t];
+      this.$refs["listRef"].getDataList();
+    }
+    // this.getAffairsInfoList()
   },
   methods: {
     getAffairsInfoList() {
@@ -166,6 +176,7 @@ export default {
     },
     handleClick(val, event) {
       // 切换 tabs
+      this.$router.push("/politicalList");
       this.$refs["listRef"].query.statusList = this.tabDict[val.index];
       this.$refs["listRef"].getDataList();
       // this.tabpaneList = this.tabpaneList.map((item) => {

@@ -409,7 +409,7 @@ export default {
       }, 200);
     },
 
-    realyDelete(obj) {
+    reallyDelete(obj) {
       // 永久删除
       this.$confirm(
         `是否永久删除标题为“${obj.row.title}”的问政信息，删除后无法恢复`,

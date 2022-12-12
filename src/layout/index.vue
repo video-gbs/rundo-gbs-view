@@ -61,6 +61,7 @@ export default {
   created() {
     this.initTabList();
   },
+  mounted() {},
   methods: {
     initTabList() {
       this.tabList.push(this.$route.path);

@@ -65,10 +65,47 @@
         </el-form>
       </template>
     </PDialog>
+
+    <!--审核回复-->
+    <PDialog
+      ref="replyCheckRef"
+      @submit="replyCheckFn"
+      @cancel="replyCheckFn('c')"
+      @opened="getReplyListFn"
+    >
+      <template slot="title">审核回复</template>
+      <template slot="main">
+        <el-form
+          ref="replyCheckFormRef"
+          label-width="80px"
+          :model="replyCheckForm"
+          :rules="auditResultRules"
+        >
+          <!-- <el-form-item label="审核结果">
+            <el-radio
+              v-model="replyCheckForm.auditResult"
+              :label="1"
+            >审核通过</el-radio>
+            <el-radio
+              v-model="replyCheckForm.auditResult"
+              :label="2"
+            >审核不通过</el-radio>
+          </el-form-item> -->
+          <el-form-item label="审核说明" prop="content">
+            <PEditorVue
+              ref="replyCheckEditorRef"
+              :value="replyCheckContent"
+              @input="replyCheckChange"
+            />
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
   </div>
 </template>
 
 <script>
+import PEditorVue from "@/components/PEditorVue";
 import Seach from "@/components/Seach/index.vue";
 import ComTabble from "@/components/ComTabble/index.vue";
 import Pagination from "@/components/Pagination/index.vue";
@@ -78,12 +115,13 @@ import {
   affairsInfoDelete,
   affairsInfoSearch,
 } from "@/api/method/politicalList";
+import { getReplyList } from "@/api/method/reply";
 import {
   setAffairsShow,
   setAffairsReview,
   deleteAffairs,
 } from "@/api/method/affairs";
-import { examineAffairs } from "@/api/method/affairscheck";
+import { examineAffairs, replyExamineAffairs } from "@/api/method/affairscheck";
 
 export default {
   name: "ProjectManagement",
@@ -91,6 +129,7 @@ export default {
     Seach,
     ComTabble,
     Pagination,
+    PEditorVue,
   },
   data() {
     const _that = this;
@@ -362,6 +401,18 @@ export default {
             },
           },
           {
+            text: "审核回复",
+            cb: "replyCheck",
+            // icon: 'el-icon-view',
+            visible: {
+              attrName: "status",
+              fn: function (v) {
+                const ut = +(localStorage.getItem("rj_wzwz_deptType") || 999);
+                return v === 23 && ut < 2;
+              },
+            },
+          },
+          {
             text: "详情",
             cb: "verify",
             // icon: 'el-icon-view'
@@ -414,6 +465,13 @@ export default {
         // 问政审核参数
         affairsId: "",
         auditResult: 1,
+        content: "",
+      },
+      replyCheckContent: "",
+      replyCheckForm: {
+        // 审核回复
+        auditResult: 1,
+        affairsId: "",
         content: "",
       },
     };
@@ -617,6 +675,54 @@ export default {
             });
         }
       });
+    },
+    getReplyListFn() {
+      // 终审，获取所有单位的问政回复(含受邀单位)
+      getReplyList(this.replyCheckForm.affairsId).then((res) => {
+        if (res.code === 10000) {
+          const rd = res.data.filter((i) => {
+            return i.mainFlag < 3;
+          });
+
+          rd.forEach((i) => {
+            this.replyCheckContent += i.content;
+          });
+
+          // this.replyCheckContent = rd[0] ? rd[0].content : ''
+        }
+      });
+    },
+    replyCheck(obj) {
+      this.replyCheckContent = "";
+      this.dialogSet(obj);
+    },
+    replyCheckFn(v) {
+      // 审核回复
+      if (v && v === "c") {
+        // 重置数据
+        this.replyCheckForm.content = "";
+        this.replyCheckForm.auditResult = 1;
+        this.replyCheckContent = "";
+        return;
+      }
+      // console.log('this.replyCheckForm', this.replyCheckForm)
+      // return
+      this.$refs[this.paramsFormRef].validate((v) => {
+        if (v) {
+          replyExamineAffairs(this.replyCheckForm)
+            .then((res) => {
+              res.code === 10000 && this.comDialogHide();
+            })
+            .catch((err) => {
+              this.$message.warning("操作失败：" + JSON.stringify(err));
+            });
+        }
+      });
+    },
+    replyCheckChange(v) {
+      // 回复问政审核的编辑器内容同步
+      console.log("回复问政 编辑框内容", v);
+      this.replyCheckForm.content = v;
     },
     handleSizeChange(val) {
       this.query.pageSize = val;

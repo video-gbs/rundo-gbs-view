@@ -168,6 +168,9 @@
       <template slot="title">问政转移</template>
       <template slot="main">
         <el-form label-width="80px" :model="transferForm">
+          <el-form-item label="留言单位">
+            {{ one.deptName }}
+          </el-form-item>
           <el-form-item label="受理单位">
             <el-select v-model="transferForm.deptId" placeholder="请选择">
               <el-option
@@ -1211,7 +1214,7 @@ export default {
       // 审核回复
       if (v && v === "c") {
         // 重置数据
-        this.replyForm.content = "";
+        this.replyCheckForm.content = "";
         this.replyCheckForm.auditResult = 1;
         this.replyCheckContent = "";
         return;

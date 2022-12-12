@@ -6,6 +6,7 @@
         style="border-bottom: 1px solid #ccc"
         :editor="editor"
         :default-config="toolbarConfig"
+        :mode="'simple'"
       />
       <!-- 编辑器 -->
       <Editor
@@ -118,6 +119,7 @@ export default {
       }
     },
     onChange(editor) {
+      console.log("editor.getAllMenuKeys()", editor.getAllMenuKeys());
       let html = editor.getHtml();
       html = trim(html) == "<p><br></p>" ? "" : html;
       this.changeStatus = true;
