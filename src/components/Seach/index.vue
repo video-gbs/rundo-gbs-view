@@ -6,159 +6,319 @@
         class="seach-form"
         :inline="true"
         :model="query"
-        label-width="123px"
+        label-width="90px"
       >
-        <el-form-item
-          v-for="(item, i) in FormList"
-          :key="i + '-' + FormList.length"
-          :prop="item.poro"
-          class="filter-item"
-          :label="!item.isLabel ? item.label : ''"
-        >
-          <!-- 输入框 -->
-          <el-input
-            v-if="item.type === 'input'"
-            v-model="query[item.poro]"
-            clearable
-            :size="item.size"
-            tooltip-effect="dark"
-            :placeholder="item.placeholder || '请输入'"
-            :style="{ width: item.width || '272px' }"
-          />
-          <!-- 下拉框 -->
-          <el-select
-            v-if="item.type === 'select'"
-            v-model="query[item.poro]"
-            :placeholder="'请选择'"
-            clearable
-            :size="item.size"
-            :style="{ width: item.width || '272px' }"
+        <el-row>
+          <el-col
+            v-for="(item, i) in FormList"
+            :key="i + '-' + FormList.length"
+            :span="4.8"
           >
-            <el-option
-              v-for="obj in item.optionsList"
-              :key="obj.value + FormList.length + Math.random()"
-              :label="obj.label"
-              :value="obj.value"
-            />
-          </el-select>
-          <el-radio-group
-            v-if="item.type === 'radio'"
-            v-model="query[item.poro]"
-            :style="{ width: item.width || '272px' }"
-          >
-            <el-radio
-              v-for="option in item.optionsList"
-              :key="option.value + FormList.length"
-              :label="option.value"
-              >{{ option.label }}</el-radio
-            >
-          </el-radio-group>
-          <!-- 多选框 {field, label, type, options{value，label} } -->
-          <el-checkbox-group
-            v-if="item.type === 'checkbox'"
-            v-model="query[item.poro]"
-            :placeholder="'请选择' + item.label"
-            :style="{ width: item.width || '644px' }"
-          >
-            <el-checkbox
-              v-for="(option, i) in item.optionsList"
-              :key="i + FormList.length"
-              :label="option.value || option"
-              :name="item.poro"
-              >{{ option.label || option }}</el-checkbox
-            >
-          </el-checkbox-group>
-          <!-- 级联单选 -->
-          <!-- showAll 是否展示路径 optionsList选项内容  checkStrictly是否强链接父子关系  props-->
-          <el-cascader
-            v-if="item.type === 'cascader'"
-            v-model="query[item.poro]"
-            :show-all-levels="item.showAll"
-            :props="item.propConfig"
-            :options="item.options"
-            :placeholder="'请选择' + item.label"
-          />
-          <!-- 日期时间选择 yyyy-MM-dd-->
-          <el-date-picker
-            v-if="item.type === 'datePicker'"
-            v-model="query[item.poro]"
-            :type="item.dateType || 'date'"
-            :style="{ width: item.width || '272px' }"
-            :placeholder="'请选择'"
-            :format="item.fromat || 'yyyy-MM-dd'"
-            :value-format="item.valueFromat || 'yyyy-MM-dd'"
-            :default-time="item.default"
-          />
+            <template v-if="i < 5">
+              <el-form-item
+                :prop="item.poro"
+                class="filter-item"
+                :label="!item.isLabel ? item.label : ''"
+              >
+                <!-- 输入框 -->
+                <el-input
+                  v-if="item.type === 'input'"
+                  v-model="query[item.poro]"
+                  clearable
+                  :size="item.size"
+                  tooltip-effect="dark"
+                  :placeholder="item.placeholder || '请输入'"
+                  :style="{ width: item.width || '272px' }"
+                />
+                <!-- 下拉框 -->
+                <el-select
+                  v-if="item.type === 'select'"
+                  v-model="query[item.poro]"
+                  :placeholder="'请选择'"
+                  clearable
+                  :size="item.size"
+                  :style="{ width: item.width || '272px' }"
+                >
+                  <el-option
+                    v-for="obj in item.optionsList"
+                    :key="obj.value + FormList.length + Math.random()"
+                    :label="obj.label"
+                    :value="obj.value"
+                  />
+                </el-select>
+                <el-radio-group
+                  v-if="item.type === 'radio'"
+                  v-model="query[item.poro]"
+                  :style="{ width: item.width || '272px' }"
+                >
+                  <el-radio
+                    v-for="option in item.optionsList"
+                    :key="option.value + FormList.length"
+                    :label="option.value"
+                    >{{ option.label }}</el-radio
+                  >
+                </el-radio-group>
+                <!-- 多选框 {field, label, type, options{value，label} } -->
+                <el-checkbox-group
+                  v-if="item.type === 'checkbox'"
+                  v-model="query[item.poro]"
+                  :placeholder="'请选择' + item.label"
+                  :style="{ width: item.width || '644px' }"
+                >
+                  <el-checkbox
+                    v-for="(option, i) in item.optionsList"
+                    :key="i + FormList.length"
+                    :label="option.value || option"
+                    :name="item.poro"
+                    >{{ option.label || option }}</el-checkbox
+                  >
+                </el-checkbox-group>
+                <!-- 级联单选 -->
+                <!-- showAll 是否展示路径 optionsList选项内容  checkStrictly是否强链接父子关系  props-->
+                <el-cascader
+                  v-if="item.type === 'cascader'"
+                  v-model="query[item.poro]"
+                  :show-all-levels="item.showAll"
+                  :props="item.propConfig"
+                  :options="item.options"
+                  :placeholder="'请选择' + item.label"
+                />
+                <!-- 日期时间选择 yyyy-MM-dd-->
+                <el-date-picker
+                  v-if="item.type === 'datePicker'"
+                  v-model="query[item.poro]"
+                  :type="item.dateType || 'date'"
+                  :style="{ width: item.width || '272px' }"
+                  :placeholder="'请选择'"
+                  :format="item.fromat || 'yyyy-MM-dd'"
+                  :value-format="item.valueFromat || 'yyyy-MM-dd'"
+                  :default-time="item.default"
+                />
 
-          <!-- 日期时间选择 yyyy-MM-dd-->
-          <el-date-picker
-            v-if="item.type === 'datePicker1'"
-            v-model="query[item.poro]"
-            type="date"
-            :style="{ width: item.width || '272px' }"
-            :placeholder="item.placeholder"
-            format="yyyy-MM-dd"
-            value-format="yyyy-MM-dd"
-            :default-time="item.default"
-          />
-          <!-- 日期时间选择 2022-->
-          <el-date-picker
-            v-if="item.type === 'dateYearPicker'"
-            v-model="query[item.poro]"
-            type="year"
-            :style="{ width: item.width || '272px' }"
-            :placeholder="item.placeholder"
-            format="yyyy"
-            value-format="yyyy"
-            :default-time="item.default"
-          />
-          <!-- 日期时间选择 2021-10-22 00:00:00-->
-          <el-date-picker
-            v-if="item.type === 'dateTimePicker'"
-            v-model="query[item.poro]"
-            type="datetime"
-            :style="{ width: item.width || '272px' }"
-            :placeholder="item.placeholder"
-            format="yyyy-MM-dd HH:mm:ss"
-            value-format="yyyy-MM-dd HH:mm:ss"
-            :default-time="item.default"
-          />
-          <!-- 时间段选择 -->
-          <el-date-picker
-            v-if="item.type === 'dateRange'"
-            v-model="query[item.poro]"
-            type="daterange"
-            clearable
-            range-separator="-"
-            :start-placeholder="item.startPlaceholder"
-            :end-placeholder="item.endPlaceholder"
-            format="yyyy-MM-dd"
-            value-format="yyyy-MM-dd"
-            :style="{ width: item.width || '272px' }"
-          />
-          <!-- 地区选中 -->
-          <el-cascader
-            v-if="item.type === 'addressCascader'"
-            v-model="query[item.poro]"
-            :options="item.optionsList"
-            clearable
-            :size="item.size"
-            :disabled="item.disabled"
-            :style="{ width: item.width || '272px' }"
-            :props="{ ...item.propsConfig }"
-            :placeholder="item.placeholder || ''"
-          />
-        </el-form-item>
+                <!-- 日期时间选择 yyyy-MM-dd-->
+                <el-date-picker
+                  v-if="item.type === 'datePicker1'"
+                  v-model="query[item.poro]"
+                  type="date"
+                  :style="{ width: item.width || '272px' }"
+                  :placeholder="item.placeholder"
+                  format="yyyy-MM-dd"
+                  value-format="yyyy-MM-dd"
+                  :default-time="item.default"
+                />
+                <!-- 日期时间选择 2022-->
+                <el-date-picker
+                  v-if="item.type === 'dateYearPicker'"
+                  v-model="query[item.poro]"
+                  type="year"
+                  :style="{ width: item.width || '272px' }"
+                  :placeholder="item.placeholder"
+                  format="yyyy"
+                  value-format="yyyy"
+                  :default-time="item.default"
+                />
+                <!-- 日期时间选择 2021-10-22 00:00:00-->
+                <el-date-picker
+                  v-if="item.type === 'dateTimePicker'"
+                  v-model="query[item.poro]"
+                  type="datetime"
+                  :style="{ width: item.width || '272px' }"
+                  :placeholder="item.placeholder"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  :default-time="item.default"
+                />
+                <!-- 时间段选择 -->
+                <el-date-picker
+                  v-if="item.type === 'dateRange'"
+                  v-model="query[item.poro]"
+                  type="daterange"
+                  clearable
+                  range-separator="-"
+                  :start-placeholder="item.startPlaceholder"
+                  :end-placeholder="item.endPlaceholder"
+                  format="yyyy-MM-dd"
+                  value-format="yyyy-MM-dd"
+                  :style="{ width: item.width || '272px' }"
+                />
+                <!-- 地区选中 -->
+                <el-cascader
+                  v-if="item.type === 'addressCascader'"
+                  v-model="query[item.poro]"
+                  :options="item.optionsList"
+                  clearable
+                  :size="item.size"
+                  :disabled="item.disabled"
+                  :style="{ width: item.width || '272px' }"
+                  :props="{ ...item.propsConfig }"
+                  :placeholder="item.placeholder || ''"
+                />
+              </el-form-item>
+            </template>
+          </el-col>
+          <el-col
+            v-for="(item, i) in FormList"
+            :key="i + '-' + FormList.length"
+            :span="4.8"
+          >
+            <template v-if="i > 4">
+              <el-form-item
+                :prop="item.poro"
+                class="filter-item"
+                :label="!item.isLabel ? item.label : ''"
+              >
+                <!-- 输入框 -->
+                <el-input
+                  v-if="item.type === 'input'"
+                  v-model="query[item.poro]"
+                  clearable
+                  :size="item.size"
+                  tooltip-effect="dark"
+                  :placeholder="item.placeholder || '请输入'"
+                  :style="{ width: item.width || '272px' }"
+                />
+                <!-- 下拉框 -->
+                <el-select
+                  v-if="item.type === 'select'"
+                  v-model="query[item.poro]"
+                  :placeholder="'请选择'"
+                  clearable
+                  :size="item.size"
+                  :style="{ width: item.width || '272px' }"
+                >
+                  <el-option
+                    v-for="obj in item.optionsList"
+                    :key="obj.value + FormList.length + Math.random()"
+                    :label="obj.label"
+                    :value="obj.value"
+                  />
+                </el-select>
+                <el-radio-group
+                  v-if="item.type === 'radio'"
+                  v-model="query[item.poro]"
+                  :style="{ width: item.width || '272px' }"
+                >
+                  <el-radio
+                    v-for="option in item.optionsList"
+                    :key="option.value + FormList.length"
+                    :label="option.value"
+                    >{{ option.label }}</el-radio
+                  >
+                </el-radio-group>
+                <!-- 多选框 {field, label, type, options{value，label} } -->
+                <el-checkbox-group
+                  v-if="item.type === 'checkbox'"
+                  v-model="query[item.poro]"
+                  :placeholder="'请选择' + item.label"
+                  :style="{ width: item.width || '644px' }"
+                >
+                  <el-checkbox
+                    v-for="(option, i) in item.optionsList"
+                    :key="i + FormList.length"
+                    :label="option.value || option"
+                    :name="item.poro"
+                    >{{ option.label || option }}</el-checkbox
+                  >
+                </el-checkbox-group>
+                <!-- 级联单选 -->
+                <!-- showAll 是否展示路径 optionsList选项内容  checkStrictly是否强链接父子关系  props-->
+                <el-cascader
+                  v-if="item.type === 'cascader'"
+                  v-model="query[item.poro]"
+                  :show-all-levels="item.showAll"
+                  :props="item.propConfig"
+                  :options="item.options"
+                  :placeholder="'请选择' + item.label"
+                />
+                <!-- 日期时间选择 yyyy-MM-dd-->
+                <el-date-picker
+                  v-if="item.type === 'datePicker'"
+                  v-model="query[item.poro]"
+                  :type="item.dateType || 'date'"
+                  :style="{ width: item.width || '272px' }"
+                  :placeholder="'请选择'"
+                  :format="item.fromat || 'yyyy-MM-dd'"
+                  :value-format="item.valueFromat || 'yyyy-MM-dd'"
+                  :default-time="item.default"
+                />
+
+                <!-- 日期时间选择 yyyy-MM-dd-->
+                <el-date-picker
+                  v-if="item.type === 'datePicker1'"
+                  v-model="query[item.poro]"
+                  type="date"
+                  :style="{ width: item.width || '272px' }"
+                  :placeholder="item.placeholder"
+                  format="yyyy-MM-dd"
+                  value-format="yyyy-MM-dd"
+                  :default-time="item.default"
+                />
+                <!-- 日期时间选择 2022-->
+                <el-date-picker
+                  v-if="item.type === 'dateYearPicker'"
+                  v-model="query[item.poro]"
+                  type="year"
+                  :style="{ width: item.width || '272px' }"
+                  :placeholder="item.placeholder"
+                  format="yyyy"
+                  value-format="yyyy"
+                  :default-time="item.default"
+                />
+                <!-- 日期时间选择 2021-10-22 00:00:00-->
+                <el-date-picker
+                  v-if="item.type === 'dateTimePicker'"
+                  v-model="query[item.poro]"
+                  type="datetime"
+                  :style="{ width: item.width || '272px' }"
+                  :placeholder="item.placeholder"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  :default-time="item.default"
+                />
+                <!-- 时间段选择 -->
+                <el-date-picker
+                  v-if="item.type === 'dateRange'"
+                  v-model="query[item.poro]"
+                  type="daterange"
+                  clearable
+                  range-separator="-"
+                  :start-placeholder="item.startPlaceholder"
+                  :end-placeholder="item.endPlaceholder"
+                  format="yyyy-MM-dd"
+                  value-format="yyyy-MM-dd"
+                  :style="{ width: item.width || '272px' }"
+                />
+                <!-- 地区选中 -->
+                <el-cascader
+                  v-if="item.type === 'addressCascader'"
+                  v-model="query[item.poro]"
+                  :options="item.optionsList"
+                  clearable
+                  :size="item.size"
+                  :disabled="item.disabled"
+                  :style="{ width: item.width || '272px' }"
+                  :props="{ ...item.propsConfig }"
+                  :placeholder="item.placeholder || ''"
+                />
+              </el-form-item>
+            </template>
+          </el-col>
+        </el-row>
       </el-form>
-    </div>
-
-    <div v-if="isSearch" class="search-btn">
-      <el-button class="cz-btn" size="small" @click="submitReset"
-        >重置</el-button
-      >
-      <el-button class="cx-btn save_btn" size="small" @click="submitSearch"
-        >查询</el-button
-      >
+      <div class="f jc-c ai-c">
+        <div v-if="isSearch" class="mb19">
+          <el-button class="cz-btn" size="small" @click="submitReset"
+            ><span class="fs14">重置</span></el-button
+          >
+          <el-button
+            class="cx-btn save_btn"
+            size="small"
+            type="primary"
+            @click="submitSearch"
+            ><span class="fs14">查询</span></el-button
+          >
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -253,10 +413,14 @@ export default {
   // display: inline-block;
   // width: 100%;
   // padding-right: 40px;
-  position: absolute;
-  right: 0;
-  bottom: 20px;
-  text-align: right;
+  // position: absolute;
+  // right: 0;
+  // bottom: 20px;
+  // text-align: right;
+  ::v-deep .el-button {
+    width: 80px;
+    height: 36px;
+  }
   .span-btn {
     display: inline-block;
     padding-right: 20px;

@@ -620,7 +620,7 @@ export default {
     getOtherUnitList() {
       otherUnitListByDept(this.search).then((res) => {
         if (res.code === 10000) {
-          this.tableData = res.data.records;
+          this.tableData = res.data.rows;
           this.search.total = res.data.total;
           this.search.pages = res.data.size;
           this.search.current = res.data.current;

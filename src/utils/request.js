@@ -85,15 +85,24 @@ service.interceptors.response.use(
     }
   },
   (error) => {
+    let msg = "";
     if ((error + "").indexOf("401") > -1) {
       Local.remove("MANAGE_USER_TOKEN");
       Local.remove("rj_wzwz_token");
       Local.remove("rj_wzwz_deptType");
       router.push("/login");
+      msg = "账户信息已过期,请重新登录。";
+    }
+    if ((error + "").indexOf("500") > -1) {
+      msg = "网络连接发成错误。";
+    }
+
+    if ((error + "").indexOf("403") > -1) {
+      msg = "您的账号无访问权限。";
     }
     console.log("err info:" + error); // for debug
     Message({
-      message: error.message,
+      message: msg,
       type: "error",
       duration: 5 * 1000,
     });
