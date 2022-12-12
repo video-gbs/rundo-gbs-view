@@ -18,41 +18,41 @@
 
 <script>
 export default {
-  name: 'Overview',
+  name: "Overview",
   props: {
     homeLists: {
       type: Object,
       default: () => {
-        return {}
-      }
-    }
+        return {};
+      },
+    },
   },
   data() {
     return {
       pageData: [
         {
-          title: '平台用户',
+          title: "平台用户",
           value: this.homeLists.num,
-          color: 'red',
-          imgSrcName: 'ptyh'
+          color: "red",
+          imgSrcName: "ptyh",
         },
         {
-          title: '单位部门',
+          title: "单位部门",
           value: this.homeLists.deptNum,
-          color: 'blue',
-          imgSrcName: 'dwbm'
-        }
-      ]
-    }
+          color: "blue",
+          imgSrcName: "dwbm",
+        },
+      ],
+    };
   },
   watch: {
-    '$store.getters.plateId'(n, o) {
-      this.getTopStatic()
-    }
+    "$store.getters.plateId"(n, o) {
+      this.getTopStatic();
+    },
   },
   mounted() {
     if (this.$store.getters.plateId) {
-      this.getTopStatic()
+      this.getTopStatic();
     }
   },
   methods: {
@@ -64,39 +64,39 @@ export default {
     getTopStatic() {
       // {} 用于触发板块ID写入
       this.$api.document.getTopStatic({}).then((res) => {
-        const data = res.data.data
+        const data = res.data.data;
         if (data) {
           this.pageData = [
             {
-              title: '即将到期',
+              title: "即将到期",
               value: data.prepareToExpireCount || 0,
-              color: 'red',
-              status: 7
+              color: "red",
+              status: 7,
             },
             {
-              title: '已超时未完成',
+              title: "已超时未完成",
               value: data.timeoutCount || 0,
-              color: 'blue',
-              status: 8
+              color: "blue",
+              status: 8,
             },
             {
-              title: '已完成',
+              title: "已完成",
               value: data.finishCount || 0,
-              color: 'green',
-              status: 6
+              color: "green",
+              status: 6,
             },
             {
-              title: '特急公文',
+              title: "特急公文",
               value: data.keyCount || 0,
-              color: 'orange',
-              status: 9
-            }
-          ]
+              color: "orange",
+              status: 9,
+            },
+          ];
         }
-      })
-    }
-  }
-}
+      });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -201,7 +201,7 @@ export default {
 .svg {
   position: absolute;
   right: 58px;
-  width: 54px;
-  height: 54px;
+  width: 54px !important;
+  height: 54px !important;
 }
 </style>

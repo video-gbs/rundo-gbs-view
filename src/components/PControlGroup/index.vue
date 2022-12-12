@@ -167,19 +167,20 @@
           </el-form>
         </el-col>
         <!-- buttons -->
-        <el-col v-if="!layoutConfig.hideButton" :span="layoutConfig.buttonSpan">
-          <div :style="{ textAlign: layoutConfig.buttonAlign }">
-            <el-button
-              v-for="item in controlGroupData.bottons"
-              :icon="item.icon"
-              :type="item.type"
-              @click="handleBtnClick(item)"
-            >
-              {{ item.text }}
-            </el-button>
-          </div>
-        </el-col>
       </el-row>
+      <div
+        v-if="!layoutConfig.hideButton"
+        :style="{ textAlign: layoutConfig.buttonAlign }"
+      >
+        <el-button
+          v-for="item in controlGroupData.bottons"
+          :icon="item.icon"
+          :type="item.type"
+          @click="handleBtnClick(item)"
+        >
+          {{ item.text }}
+        </el-button>
+      </div>
     </template>
 
     <!-- vertical 模式 -->
