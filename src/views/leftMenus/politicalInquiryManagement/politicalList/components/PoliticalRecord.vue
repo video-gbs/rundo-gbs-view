@@ -30,14 +30,19 @@
                 </slot>
               </div>
               <el-card>
-                <p class="reviewResults-h4 fs20 fw600">
-                  {{ i.title }}
-                </p>
+                <div class="f jc-sb ai-c">
+                  <div>
+                    <p class="reviewResults-h4 fs20 fw600">
+                      {{ i.title }}
+                    </p>
 
-                <p class="reviewResults-p">
-                  {{ `${i.updateTime}` }}
-                </p>
-                <p v-html="i.content" />
+                    <p class="reviewResults-p">
+                      {{ `${i.updateTime}` }}
+                    </p>
+                    <p v-html="i.content" />
+                  </div>
+                  <div><div :class="`status_${i.status}`" /></div>
+                </div>
               </el-card>
             </el-timeline-item>
           </el-timeline>
@@ -139,21 +144,26 @@ export default {
 ::v-deep .el-form-item {
   margin-bottom: 0;
 }
+
 ::v-deep .el-card__header {
   padding: 0;
 }
+
 ::v-deep .el-form-item__label {
   font-size: 14px;
   font-family: Microsoft YaHei-Regular, Microsoft YaHei;
   font-weight: 400;
   color: #8b8b8b;
 }
+
 ::v-deep .el-timeline-item__tail {
   display: none;
 }
+
 ::v-deep .el-timeline-item__node {
   display: none;
 }
+
 ::v-deep .el-timeline-item {
   position: relative;
 }
@@ -161,6 +171,7 @@ export default {
 ::v-deep .el-card__body {
   padding: 0 1rem;
 }
+
 ::v-deep .el-timeline-item {
   &:last-child {
     .line2_svg {
@@ -168,8 +179,10 @@ export default {
     }
   }
 }
+
 ::v-deep .el-timeline-item__content {
   box-shadow: 0px 3px 12px 1px rgba(22, 49, 114, 0.2);
+
   &:after {
     position: absolute;
     top: 20px;
@@ -183,20 +196,25 @@ export default {
 
 .reviewResults-container {
   height: 100%;
+
   .box-card {
     height: 100%;
   }
+
   .text {
     // margin-left:-2rem;
   }
+
   .span-text {
     font-size: 14px;
     font-family: Microsoft YaHei-Regular, Microsoft YaHei;
     font-weight: 400;
     color: #333333;
   }
+
   .reviewResults—timeline {
     margin: 16px;
+
     .myIcon_svg {
       width: 2rem;
       height: 2rem;
@@ -204,6 +222,7 @@ export default {
       top: 10px;
       left: -2rem;
     }
+
     .line1_svg {
       width: 15px;
       height: 60px;
@@ -211,6 +230,7 @@ export default {
       top: 46px;
       left: -24px;
     }
+
     .line2_svg {
       width: 15px;
       height: 80px;
@@ -218,12 +238,32 @@ export default {
       top: 50px;
       left: -24px;
     }
+
     .reviewResults-h4 {
       margin-bottom: 0;
       padding-bottom: 0;
     }
+
     .reviewResults-p {
     }
+  }
+}
+
+$status: (
+  1: "ytj",
+  2: "ytg",
+  3: "wtg",
+  4: "ysl",
+  5: "yhf",
+);
+
+@each $k, $v in $status {
+  .status_#{$k} {
+    width: 89px;
+    height: 78px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url('~@/assets/imgs/' +#{$v}+'.png');
   }
 }
 </style>
