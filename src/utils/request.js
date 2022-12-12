@@ -85,7 +85,7 @@ service.interceptors.response.use(
     }
   },
   (error) => {
-    let msg = "";
+    let msg = "网络连接错误";
     if ((error + "").indexOf("401") > -1) {
       Local.remove("MANAGE_USER_TOKEN");
       Local.remove("rj_wzwz_token");

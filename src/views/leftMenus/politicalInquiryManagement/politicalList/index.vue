@@ -1,5 +1,13 @@
 <template>
   <div class="detail_container">
+    <el-button
+      v-if="recycleShow"
+      size="mini"
+      type="primary"
+      class="recycle-btn"
+      @click="$router.push('/recycleBin')"
+      >回收站</el-button
+    >
     <el-tabs
       v-if="!this.showDetails"
       v-model="activeName"
@@ -18,6 +26,7 @@
         <All ref="listRef" />
       </template>
     </el-tabs>
+
     <ul v-if="this.showDetails" class="right-btns-ul">
       <li v-for="(btn, i) in btnLists" :key="i" class="right-btns-li">
         <el-button type="primary" class="right-btns-button" size="mini"
@@ -138,10 +147,13 @@ export default {
           isShow: false,
         },
       ],
+      recycleShow: false,
     };
   },
   watch: {},
   mounted() {
+    const ut = +(localStorage.getItem("rj_wzwz_deptType") || 999);
+    this.recycleShow = ut === 0;
     this.getAffairsInfoList();
   },
   methods: {
@@ -176,6 +188,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.recycle-btn {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  z-index: 10;
+}
 ::v-deep .el-tabs__item.is-active {
   border: 0 none;
 }

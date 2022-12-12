@@ -104,7 +104,7 @@
             >
             <el-col :span="12">
               <el-form-item label="提交时间：">
-                <span class="span-text">{{ one.updateTime || "-" }}</span>
+                <span class="span-text">{{ one.createTime || "-" }}</span>
               </el-form-item></el-col
             >
             <el-col :span="12">

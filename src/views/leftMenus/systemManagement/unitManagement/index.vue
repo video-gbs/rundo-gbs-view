@@ -22,12 +22,12 @@
                 class="hc-s cursor-p fs12"
                 @click="
                   goPage({
-                    name: 'OtherUnitManagement',
+                    name: 'otherUnitManagement',
                     params: { pid: scope.row.id },
                   })
                 "
               >
-                {{ scope.row.accountNum }}
+                <a href="">{{ scope.row.accountNum }}</a>
               </div>
             </template>
           </el-table-column>
