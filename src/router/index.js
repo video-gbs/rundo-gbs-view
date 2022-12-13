@@ -278,7 +278,7 @@ const constantRoutes = [
       },
       {
         path: "/otherUnitManagement",
-        name: "otherUnitManagement",
+        name: "OtherUnitManagement",
         author: superAdmin,
         hidden: true,
         component: () =>

@@ -252,7 +252,7 @@ export default {
           {
             label: "申请单位",
             type: "select",
-            key: "processingDeptId",
+            key: "operateDeptId",
             span: 6,
             value: "",
             options: this.deptList,
@@ -285,7 +285,7 @@ export default {
         layoutConfig: {
           contentSpan: 20,
           buttonSpan: 4,
-          showColon: false,
+          showColon: 3,
         },
       };
     },

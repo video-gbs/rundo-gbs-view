@@ -22,22 +22,22 @@
                 class="hc-s cursor-p fs12"
                 @click="
                   goPage({
-                    name: 'otherUnitManagement',
+                    name: 'OtherUnitManagement',
                     params: { pid: scope.row.id },
                   })
                 "
               >
-                <a href="">{{ scope.row.accountNum }}</a>
+                <span>{{ scope.row.accountNum }}</span>
               </div>
             </template>
           </el-table-column>
-          <el-table-column width="100" label="操作" fixed="right">
+          <el-table-column width="150" label="操作" fixed="right">
             <template slot-scope="scope">
               <el-button type="text" @click="dialogShow(0, scope.row)"
                 >编辑</el-button
               >
               <el-button type="text" @click="deleteUnit(scope.row)"
-                ><span class="delete-button">删除</span></el-button
+                ><span>删除</span></el-button
               >
             </template>
           </el-table-column>
@@ -208,8 +208,8 @@ export default {
         if (res.code === 10000) {
           this.tableData = res.data.records;
           this.params.total = res.data.total;
-          this.params.pages = res.data.pages;
-          this.params.current = res.data.current;
+          // this.params.pages = res.data.pages
+          // this.params.current = res.data.current
         }
       });
     },
@@ -225,7 +225,7 @@ export default {
               type: "success",
               message: "删除成功",
             });
-            this.params.pageNum = 1;
+            this.params.current = 1;
             this.getUnitList();
           }
         });
