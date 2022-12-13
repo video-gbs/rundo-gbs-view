@@ -166,10 +166,11 @@ export default {
 
 ::v-deep .el-timeline-item {
   position: relative;
+  padding-bottom: 40px;
 }
 
 ::v-deep .el-card__body {
-  padding: 0 1rem;
+  padding: 0.2rem 1rem;
 }
 
 ::v-deep .el-timeline-item {

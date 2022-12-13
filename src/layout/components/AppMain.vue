@@ -28,17 +28,29 @@ export default {
 <style scoped>
 .app-main {
   /*50 = navbar  */
-  min-height: calc(100vh - 136px);
+  /* min-height: calc(100vh - 136px); */
+  min-height: calc(100vh - 50px);
   width: 100%;
   position: relative;
   overflow: auto;
+  padding: 0 0 40px;
 }
 .company-title {
+  /* text-align: center;
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #8b8b8b; */
+
+  position: absolute;
   text-align: center;
   font-size: 14px;
   font-family: Microsoft YaHei-Regular, Microsoft YaHei;
   font-weight: 400;
   color: #8b8b8b;
+  bottom: 0;
+  left: 0;
+  width: calc(100% - 0px);
 }
 .fixed-header + .app-main {
   padding-top: 50px;

@@ -9,6 +9,7 @@
         size="mini"
         @click="btnFn(i, actBtn[i])"
       >
+        <svg-icon :icon-class="actBtn[i].icon" class="btn_svg" />
         {{ actBtn[i].label }}
       </el-button>
     </div>
@@ -544,6 +545,7 @@ export default {
           dialog: "examineRef",
           show: false,
           author: "admin",
+          icon: "right1",
         },
         more: {
           id: 2,
@@ -552,6 +554,7 @@ export default {
           dialog: "moreRef",
           show: false,
           author: "admin",
+          icon: "right2",
         },
         dept: {
           id: 3,
@@ -560,6 +563,7 @@ export default {
 
           show: false,
           author: "admin",
+          icon: "right3",
         },
         accept: {
           id: 4,
@@ -568,14 +572,15 @@ export default {
           dialog: "acceptRef",
           show: false,
           author: "all",
+          icon: "right4",
         },
         reply: {
           id: 5,
           label: "回复问政",
-
           dialog: "replyRef",
           show: false,
           author: "all",
+          icon: "right4",
         },
         transfer: {
           id: 6,
@@ -584,6 +589,7 @@ export default {
           dialog: "transferRef",
           show: false,
           author: "admin",
+          icon: "right5",
         },
         invite: {
           id: 7,
@@ -592,6 +598,7 @@ export default {
           dialog: "inviteRef",
           show: false,
           author: "admin",
+          icon: "right6",
         },
         replyCheck: {
           id: 8,
@@ -600,6 +607,7 @@ export default {
           dialog: "replyCheckRef",
           show: false,
           author: "admin",
+          icon: "right4",
         },
         isShow: {
           id: 9,
@@ -607,6 +615,15 @@ export default {
           dialog: "isShowRef",
           show: false,
           author: "admin",
+          icon: "right7",
+        },
+        isHien: {
+          id: 101,
+          label: "设为隐藏",
+          dialog: "isHienRef",
+          show: false,
+          author: "admin",
+          icon: "right9",
         },
         openComment: {
           id: 10,
@@ -614,6 +631,7 @@ export default {
           dialog: "openCommentRef",
           show: false,
           author: "admin",
+          icon: "right8",
         },
         applyTransfer: {
           id: 11,
@@ -622,6 +640,7 @@ export default {
           dialog: "applyTransferRef",
           show: false,
           author: "spokeman",
+          icon: "",
         },
         applyTransferCheck: {
           id: 12,
@@ -630,6 +649,7 @@ export default {
           dialog: "applyTransferCheckRef",
           show: false,
           author: "admin",
+          icon: "",
         },
         applyInvite: {
           id: 13,
@@ -639,6 +659,7 @@ export default {
           dialog: "applyInviteRef",
           show: false,
           author: "spokeman",
+          icon: "",
         },
         applyInviteCheck: {
           id: 14,
@@ -648,6 +669,7 @@ export default {
           dialog: "applyInviteCheckRef",
           show: false,
           author: "admin",
+          icon: "",
         },
         otherDeptReply: {
           id: 15,
@@ -657,6 +679,7 @@ export default {
           dialog: "otherDeptReplyRef",
           show: false,
           author: "spokeman",
+          icon: "",
         },
         delete: {
           id: 99,
@@ -664,6 +687,7 @@ export default {
           show: false,
           author: "admin",
           type: "danger",
+          icon: "del-svg",
         },
         back: {
           id: 100,
@@ -671,6 +695,7 @@ export default {
           show: false,
           author: "all",
           type: "normal",
+          icon: "back-svg",
         },
       },
       actBtn: {},
@@ -854,7 +879,10 @@ export default {
       }
     },
     async accountPermission() {
-      console.log(1, this.one);
+      console.log(
+        "---------------------------------------------------",
+        this.one
+      );
       // 判断路径和参数是否正确
 
       if (["reply", "list", "audit"].indexOf(this.$route.params.type) === -1) {
@@ -917,8 +945,11 @@ export default {
 
       this.btnAll.isShow.label =
         this.one.isShow === 0 ? "关闭可见" : "开启可见";
+      this.btnAll.isShow.icon = this.one.isShow === 0 ? "right9" : "right7";
       this.btnAll.openComment.label =
         this.one.isReview === 0 ? "关闭评论" : "开启评论";
+      this.btnAll.openComment.icon =
+        this.one.isReview === 0 ? "right10" : "right8";
       if (ut === 0) {
         // 超管
         // 审核补充说明
@@ -1589,5 +1620,14 @@ export default {
   top: 6px;
   right: 5px;
   z-index: 10;
+  ::v-deep .el-button {
+    display: flex;
+    align-items: center;
+  }
+  ::v-deep .el-button--danger {
+    .btn_svg {
+      color: #fff;
+    }
+  }
 }
 </style>
