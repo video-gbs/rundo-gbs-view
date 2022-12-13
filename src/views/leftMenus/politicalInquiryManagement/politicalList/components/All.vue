@@ -360,7 +360,7 @@ export default {
         },
       ],
       leftTitle: "",
-      maxHeight: "800",
+      maxHeight: "",
       tableData: [],
       // 分页器内容
       pagesData: {
@@ -492,6 +492,7 @@ export default {
 
   methods: {
     init() {
+      this.maxHeight = document.body.clientHeight - 550 + "";
       this.getDataList();
       this.getDeptFn();
     },
@@ -797,6 +798,7 @@ export default {
     }
 
     .tab-table {
+      padding: 10px;
       // padding: 0 20px 20px 20px;
     }
   }

@@ -277,7 +277,7 @@ export default {
         // }
       ],
       leftTitle: "",
-      maxHeight: "800",
+      maxHeight: "",
       tableData: [],
       // 分页器内容
       pagesData: {
@@ -361,6 +361,7 @@ export default {
     },
   },
   mounted() {
+    this.maxHeight = document.body.clientHeight - 550 + "";
     this.init();
   },
 

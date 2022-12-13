@@ -14,7 +14,8 @@
       <el-table
         border
         :data="tableData"
-        max-height="500"
+        :height="maxHeight"
+        :max-height="maxHeight"
         :header-cell-style="{ background: '#EAEAEA' }"
         style="width: 100%"
       >
@@ -178,6 +179,7 @@ export default {
         title: "", // 标题
         type: "", // 分类
       },
+      maxHeight: "",
       checkShow: false,
       checkParams: {
         affairsId: "",
@@ -205,6 +207,7 @@ export default {
     },
   },
   created() {
+    this.maxHeight = document.body.clientHeight - 570 + "";
     this.initQueryControl();
     // 获取部门
     this.getDeptFn();
@@ -377,8 +380,12 @@ export default {
           // const arr = res.data.records.map(i => {
           //   return { value: i.id, label: i.name }
           // })
-          this.queryControlData.controls[3].options = this.deptList;
-          this.queryControlData.controls[4].options = this.deptList;
+          this.queryControlData.controls[3].options = this.deptList.map((i) => {
+            return { label: i.name, value: i.id };
+          });
+          this.queryControlData.controls[4].options = this.deptList.map((i) => {
+            return { label: i.name, value: i.id };
+          });
         }
       });
     },
