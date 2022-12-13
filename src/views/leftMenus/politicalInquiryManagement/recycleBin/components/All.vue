@@ -277,7 +277,7 @@ export default {
         // }
       ],
       leftTitle: "",
-      maxHeight: "",
+      maxHeight: "auto",
       tableData: [],
       // 分页器内容
       pagesData: {
