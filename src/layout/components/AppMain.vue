@@ -1,6 +1,6 @@
 <template>
   <section class="app-main">
-    <el-scrollbar style="height: 100%;">
+    <el-scrollbar style="height: 100%">
       <transition name="fade-transform1" mode="out-in">
         <keep-alive>
           <router-view v-if="$route.meta.keepAlive" :key="key" />
@@ -20,21 +20,21 @@ export default {
   computed: {
     key() {
       return this.$route.path;
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
 .app-main {
   /*50 = navbar  */
-  min-height: calc(100vh - 50px);
+  min-height: calc(100vh - 136px);
   width: 100%;
   position: relative;
   overflow: auto;
 }
 .company-title {
-  text-align:center;
+  text-align: center;
   font-size: 14px;
   font-family: Microsoft YaHei-Regular, Microsoft YaHei;
   font-weight: 400;

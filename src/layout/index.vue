@@ -31,6 +31,12 @@ export default {
     TagsView,
   },
   mixins: [ResizeMixin],
+  data() {
+    return {
+      nowWidth: "",
+      baseW: "",
+    };
+  },
   computed: {
     sidebar() {
       return this.$store.state.app.sidebar;
@@ -59,12 +65,28 @@ export default {
     },
   },
   created() {
+    this.setScale();
     this.initTabList();
   },
-  mounted() {},
+  mounted() {
+    window.onresize = () => {
+      this.setScale();
+    };
+  },
   methods: {
     initTabList() {
       this.tabList.push(this.$route.path);
+    },
+    setScale() {
+      // 以1920px为标准宽度
+      const baseW = this.nowWidth || 1920;
+      const w = document.body.clientWidth;
+      // this.nowWidth = w
+      // this.baseW = w
+      console.log("w", w);
+      const h = document.getElementsByTagName("HTML")[0];
+      this.nowWidth = 1920 / (w / baseW);
+      h.style.setProperty("--web-zoom", w / baseW);
     },
   },
 };
