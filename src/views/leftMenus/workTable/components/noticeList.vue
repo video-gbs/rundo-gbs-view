@@ -142,9 +142,7 @@ export default {
     padding: 10px 0;
     border-bottom: 1px solid #eaeaea;
     cursor: pointer;
-    &:hover {
-      font-weight: bold;
-    }
+
     .row {
       display: flex;
       white-space: nowrap;
@@ -166,10 +164,14 @@ export default {
         height: 28px;
         text-align: center;
         line-height: 28px;
-        background: #fcf4ea;
+        background: #ffe9cb;
         border-radius: 4px 4px 4px 4px;
-        opacity: 1;
-        border: 1px solid #ff9f00;
+        // opacity: 1;
+        border: 1px solid #ffe9cb;
+        &:hover {
+          border: 1px solid #ff9f00;
+          background-color: #fcf4ea;
+        }
       }
     }
     .type {

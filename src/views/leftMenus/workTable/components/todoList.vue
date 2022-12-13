@@ -103,19 +103,19 @@ export default {
           path: "/politicalList",
           params: 1,
         },
-        {
-          name: { title: "待受理问政", notShowSmallTitle: false },
-          num: this.homeLists.acceptNum || 0,
-          author: [0, 1, 2, 3, 4],
-          path: "/politicalList",
-          params: 2,
-        },
+        // {
+        //   name: { title: "待受理问政", notShowSmallTitle: false },
+        //   num: this.homeLists.acceptNum || 0,
+        //   author: [0, 1, 2, 3, 4],
+        //   path: "/politicalList",
+        //   params: 2,
+        // },
         {
           name: { title: "待回复问政", notShowSmallTitle: false },
           num: this.homeLists.replyNum || 0,
           author: [0, 1, 2, 3, 4],
           path: "/politicalList",
-          params: 3,
+          params: 2,
         },
         // {
         //   name: { title: '逾期未审核', notShowSmallTitle: false },

@@ -91,13 +91,9 @@
               {{ status[scope.row.status + ""] }}
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" width="160" />
-          <el-table-column
-            prop="lastLoginTime"
-            label="最近登录时间"
-            width="160"
-          />
-          <el-table-column prop="lastLoginIp" label="最近登录IP" width="160" />
+          <el-table-column prop="createTime" label="创建时间" />
+          <el-table-column prop="lastLoginTime" label="最近登录时间" />
+          <el-table-column prop="lastLoginIp" label="最近登录IP" />
           <!-- <el-table-column prop="belongingPlace" label="IP归属地" width="160" /> -->
           <el-table-column width="100" label="操作" fixed="right">
             <template slot-scope="scope">

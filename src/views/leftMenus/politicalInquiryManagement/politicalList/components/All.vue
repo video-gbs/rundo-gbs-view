@@ -302,7 +302,7 @@ export default {
           label: "提交时间",
           name: "createTime",
           isShow: true,
-          width: "120",
+          width: "160",
         },
         {
           label: "状态",
@@ -396,7 +396,8 @@ export default {
             visible: {
               attrName: "status",
               fn: function (v) {
-                return v === 2;
+                const ut = +(localStorage.getItem("rj_wzwz_deptType") || 999);
+                return v === 2 && ut === 0;
               },
             },
           },
@@ -408,7 +409,7 @@ export default {
               attrName: "status",
               fn: function (v) {
                 const ut = +(localStorage.getItem("rj_wzwz_deptType") || 999);
-                return v === 23 && ut < 2;
+                return v === 23 && ut === 1;
               },
             },
           },
