@@ -187,6 +187,7 @@ export default {
 }
 .todo-container {
   height: 100%;
+  width: 100%;
   .box-card {
     height: 100%;
   }

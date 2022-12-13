@@ -1,10 +1,10 @@
 <template>
   <div class="page-container">
-    <div class="container-left">
+    <div class="container-left f fd-c ai-c">
       <div class="container-left-top">
         <Overview v-if="overviewShow" :home-lists="homeLists" />
       </div>
-      <div class="container-left-top-bottom">
+      <div class="container-left-top-bottom f1">
         <TodoList v-if="todoListShow" :home-lists="homeLists" />
       </div>
     </div>
@@ -105,17 +105,20 @@ export default {
 <style lang="scss" scoped>
 .page-container {
   background: #f2f2f2;
-  min-height: calc(100vh - 98px);
-  padding: 1.25rem;
+  // min-height: calc(100vh - 98px);
+  padding: 20px;
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
   .container-left {
+    > div {
+      width: 100%;
+    }
     width: 1070px;
     margin-right: 20px;
   }
   .container-left-top-bottom {
-    height: calc(100% - 152px);
+    // height: calc(100% - 152px);
   }
   .container-right {
     min-width: 343px;

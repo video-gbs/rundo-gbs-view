@@ -920,36 +920,51 @@ export default {
       this.btnAll.openComment.label =
         this.one.isReview === 0 ? "关闭评论" : "开启评论";
       if (ut === 0) {
-        // 超管 '1,2,3,5,13,14,21,100'均不可操作
+        // 超管
+        // 审核补充说明
         this.moreData && this.moreData.auditStatus === 0 && arr.push("more");
+        // 未审核
         [2].includes(status) && arr.push("examine");
-        [4, 5].includes(status) && arr.push("transfer");
-        arr.push("isShow"); // openComment
-        arr.push("delete");
-
+        // [4, 5].includes(status) && arr.push("transfer");
+        // 未回复
+        [4, 13, 14, 20, 21].includes(status) &&
+          arr.push("accept", "reply", "transfer", "isShow", "openComment");
+        // 已受理
+        [5].includes(status) && arr.push("reply", "isShow", "openComment");
+        // 已回复
+        [100].includes(status) && arr.push("isShow", "openComment");
+        // 存在转移申请
         if (
           ["audit"].indexOf(this.$route.params.type) !== -1 &&
           [12].includes(status)
         ) {
           arr.push("applyTransferCheck");
         }
+        // 通用
+        arr.push("delete");
       }
       if (ut === 1) {
         // 市长信箱，书记信箱发言人
+        // 审核补充说明
         this.moreData && this.moreData.auditStatus === 0 && arr.push("more");
-        [4, 20].includes(status) && arr.push("accept");
-        [23].includes(status) && arr.push("replyCheck");
-        // 4,5,21开启多个功能
-        // console.log('[4, 5, 12, 13, 14, 20, 21].includes(status)', [4, 5, 12, 13, 14, 20, 21].includes(status));
-        [5, 12, 13, 14, 20, 21].includes(status) &&
-          arr.push("reply", "dept", "transfer", "replyCheck");
-        // 可否审核问政转移
+        // 未审核 无操作
+        // 未回复
+        [4, 13, 14, 20, 21].includes(status) &&
+          arr.push("accept", "reply", "transfer");
+        // 已受理
+        [5].includes(status) && arr.push("accept", "reply");
+        // 已回复 无操作
+        // 受理部门已回复 需要复审
+        [23].includes(status) && arr.push("isShow", "replyCheck");
+        // 存在转移申请
         if (
           ["audit"].indexOf(this.$route.params.type) !== -1 &&
           [12].includes(status)
         ) {
           arr.push("applyTransferCheck");
         }
+        // 通用
+        // arr.push('delete')
       }
       if (ut > 1) {
         // 一般网络发言人
@@ -959,14 +974,14 @@ export default {
           [4].includes(status) && arr.push("accept", "reply", "applyTransfer");
           // 已受理 待回复
           [5].includes(status) && arr.push("reply");
-          // 市领导制定了部门
+          // 市领导指派了部门
           [21].includes(status) && arr.push("accept", "reply", "applyTransfer");
 
-          // 申请转移未通过、 申请转移已通过、 市领导流程已审核已分配单位
+          // 申请转移未通过、 申请转移已通过, 市领导流程已审核已分配单位
           [13, 14].includes(status) &&
             arr.push("accept", "reply", "applyTransfer");
         } else {
-          // 如果受理单位不是本单位，又显示了这条数据，看一下状态，只有待受理和已受理以及转移的过程才可以 协助回复
+          // 如果受理单位不是本单位，又显示了这条数据，看一下状态，只有待受理和已受理以及内部转移的过程才可以 协助回复
           ![1, 2, 3, 20, 21, 23, 100].includes(status) &&
             arr.push("otherDeptReply");
         }
