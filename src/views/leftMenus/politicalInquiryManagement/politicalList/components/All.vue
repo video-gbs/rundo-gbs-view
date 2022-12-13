@@ -798,7 +798,7 @@ export default {
     }
 
     .tab-table {
-      padding: 10px;
+      // padding: 10px;
       // padding: 0 20px 20px 20px;
     }
   }

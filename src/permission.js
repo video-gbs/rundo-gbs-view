@@ -12,6 +12,7 @@ const whiteList = ["/login"]; // no redirect whitelist
 router.afterEach((to, from) => {
   document.title = getPageTitle(to.meta.title);
 });
+
 router.beforeEach(async (to, from, next) => {
   const ut = +(localStorage.getItem("rj_wzwz_deptType") || 999);
   console.log("tototoott", ut, router, to);
@@ -40,7 +41,12 @@ router.beforeEach(async (to, from, next) => {
         // 没有权限要求，直接放行
         next();
       } else {
-        console.log(";pageAuthor[to.name]", pageAuthor[to.name].includes(ut));
+        console.log(
+          ";pageAuthor[to.name]",
+          pageAuthor[to.name],
+          to.name,
+          pageAuthor[to.name].includes(ut)
+        );
         if (pageAuthor[to.name].includes(ut)) {
           // 有权限
           next();

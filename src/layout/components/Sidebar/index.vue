@@ -72,7 +72,7 @@ export default {
   methods: {
     setHide(v, ut) {
       v.forEach((i) => {
-        if (i.author) {
+        if (i.author !== null && i.author !== undefined) {
           this.$set(i, "authorHidden", false);
           console.log(i.author, ut, i.author.includes(ut));
           !i.author.includes(ut) && this.$set(i, "authorHidden", true);

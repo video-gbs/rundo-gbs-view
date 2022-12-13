@@ -57,7 +57,7 @@
                 >编辑</el-button
               >
               <el-button type="text" @click="deleteAccount(scope.row)">
-                <span class="delete-button">删除</span>
+                <span>删除</span>
               </el-button>
             </template>
           </el-table-column>
@@ -306,14 +306,12 @@
 </template>
 
 <script>
-import pagination from "@/components/Pagination/index.vue";
 import {
   otherUnitAdd,
   otherUnitEdit,
   otherUnitListByDept,
   otherUnitDelete,
   otherUnitEditPassword,
-  otherUnitDeptRoleList,
 } from "@/api/method/otherUnitManagement";
 import { unitList } from "@/api/method/unitManagement";
 // import { getRolesList } from "@/api/method/role";
@@ -322,7 +320,7 @@ import { Local } from "@/utils/storage";
 
 export default {
   name: "OtherUnitManagement",
-  components: { pagination },
+
   data() {
     return {
       search: {
@@ -448,8 +446,8 @@ export default {
   },
   mounted() {
     console.log("this.$route.params.pid", this.$route);
-    this.search.deptId = this.$route.params.pid || "";
-    this.checkPassworLevel();
+    this.search.deptId = this.$route.params?.pid || "";
+    // this.checkPassworLevel()
     this.getOtherUnitList();
     // this.getList()
     this.getDeptList();

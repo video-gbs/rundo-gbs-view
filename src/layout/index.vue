@@ -83,7 +83,7 @@ export default {
       const w = document.body.clientWidth;
       // this.nowWidth = w
       // this.baseW = w
-      console.log("w", w);
+
       const h = document.getElementsByTagName("HTML")[0];
       this.nowWidth = 1920 / (w / baseW);
       h.style.setProperty("--web-zoom", w / baseW);
