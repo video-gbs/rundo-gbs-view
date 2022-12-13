@@ -344,13 +344,13 @@ export default {
           {
             min: 6,
             max: 20,
-            message: "6-20个字符",
+            message: "长度为6-20个字符",
             trigger: "blur",
           },
         ],
         name: {
           required: true,
-          message: "不能为空",
+          message: "不能为空,长度不能超过20个字符",
           trigger: "blur",
           max: 20,
         },
@@ -363,8 +363,10 @@ export default {
         password: [
           {
             required: true,
-            message: "不能为空",
+            message: "不能为空,长度为6-20个字符",
             trigger: "blur",
+            min: 6,
+            max: 20,
           },
           {
             validator: (rule, value, callback) => {
@@ -379,8 +381,10 @@ export default {
         ],
         rePassword: {
           required: true,
-          message: "不能为空",
+          message: "不能为空,长度为6-20个字符",
           trigger: "blur",
+          min: 6,
+          max: 20,
         },
         nickName: {
           required: true,

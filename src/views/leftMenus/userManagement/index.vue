@@ -57,8 +57,8 @@
         style="width: 100%"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" />
-        <el-table-column>
+        <el-table-column type="selection" width="55" show-overflow-tooltip />
+        <el-table-column show-overflow-tooltip>
           <template slot="header">
             <div class="f ai-c jc-sb">
               <div>数据列表</div>
@@ -77,23 +77,53 @@
               </div>
             </div>
           </template>
-          <el-table-column prop="username" label="用户名" />
-          <el-table-column prop="nickName" label="昵称" />
-          <el-table-column label="性别">
+          <el-table-column
+            prop="username"
+            label="用户名"
+            width="160px"
+            show-overflow-tooltip
+          />
+          <el-table-column prop="nickName" label="昵称" show-overflow-tooltip />
+          <el-table-column label="性别" width="80px" show-overflow-tooltip>
             <template slot-scope="scope">
               {{ sex_[scope.row.sex + ""] }}
             </template>
           </el-table-column>
-          <el-table-column prop="mobile" label="手机号" />
-          <el-table-column prop="email" label="邮箱" />
-          <el-table-column prop="state" label="帐号状态">
+          <el-table-column
+            prop="mobile"
+            label="手机号"
+            width="120px"
+            show-overflow-tooltip
+          />
+          <el-table-column prop="email" label="邮箱" show-overflow-tooltip />
+          <el-table-column
+            prop="state"
+            label="帐号状态"
+            width="80px"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               {{ status[scope.row.status + ""] }}
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" />
-          <el-table-column prop="lastLoginTime" label="最近登录时间" />
-          <el-table-column prop="lastLoginIp" label="最近登录IP" />
+          <el-table-column
+            prop="createTime"
+            label="创建时间"
+            width="180px"
+            show-overflow-tooltip
+          />
+          <el-table-column
+            prop="lastLoginTime"
+            label="最近登录时间"
+            width="180px"
+            show-overflow-tooltip
+          />
+          <el-table-column
+            prop="lastLoginIp"
+            label="最近登录IP"
+            width="180px"
+            show-overflow-tooltip
+          />
           <!-- <el-table-column prop="belongingPlace" label="IP归属地" width="160" /> -->
           <el-table-column width="100" label="操作" fixed="right">
             <template slot-scope="scope">
