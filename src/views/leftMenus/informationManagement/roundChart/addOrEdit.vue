@@ -94,7 +94,11 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item
+          label="描述"
+          prop="content"
+          :required="params.related === 0"
+        >
           <!-- <PEditor id="roundChart" :value="editorCxt" @change="contentChange" /> -->
 
           <PEditorVue :value="editorCxt" @input="contentChange" />
@@ -115,6 +119,34 @@ export default {
   name: "RoundChartManage",
   components: { PEditorVue },
   data() {
+    const checkPageUrl = (rule, value, callback) => {
+      if (value === "") {
+        if (this.params.related === 0) {
+          callback();
+        } else {
+          callback(new Error("请输入连接地址"));
+        }
+      } else {
+        callback();
+      }
+    };
+
+    const checkContent = (rule, value, callback) => {
+      console.log(
+        "this.params.relatedthis.params.related",
+        this.params.related,
+        value
+      );
+      if (this.params.related) {
+        callback();
+      } else {
+        if (value && value !== "") {
+          callback();
+        } else {
+          callback(new Error("请输入展示内容"));
+        }
+      }
+    };
     return {
       title: "新增轮播图",
       params: {
@@ -133,10 +165,9 @@ export default {
         fileBatchId: "",
       },
       editorCxt: "",
+
       rules: {
-        content: [
-          { required: true, message: "请输入提交的内容", trigger: "blur" },
-        ],
+        content: [{ validator: checkContent, trigger: "blur" }],
         title: [
           { required: true, message: "请输入标题", trigger: "blur" },
           {
@@ -147,7 +178,8 @@ export default {
           },
         ],
         pageUrl: [
-          { required: true, message: "请输入连接地址", trigger: "blur" },
+          // { required: true, message: '请输入连接地址', trigger: 'blur' },
+          { validator: checkPageUrl, trigger: ["blur", "change"] },
           {
             min: 10,
             max: 200,

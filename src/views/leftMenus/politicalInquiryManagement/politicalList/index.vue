@@ -1,5 +1,5 @@
 <template>
-  <div class="detail_container">
+  <div class="detail_container f fd-c ai-c">
     <el-button
       v-if="recycleShow"
       size="mini"
@@ -11,6 +11,7 @@
     <el-tabs
       v-if="!this.showDetails"
       v-model="activeName"
+      class="f1"
       type="border-card"
       @tab-click="handleClick"
     >

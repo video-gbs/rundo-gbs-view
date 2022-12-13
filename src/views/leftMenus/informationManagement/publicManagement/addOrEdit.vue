@@ -69,7 +69,11 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item label="描述" prop="content">
+        <el-form-item
+          label="描述"
+          prop="content"
+          :required="params.related === 0"
+        >
           <!-- <PEditor id="publicManagement" :value="editorCxt" @change="contentChange" /> -->
           <PEditorVue :value="editorCxt" @input="contentChange" />
         </el-form-item>
@@ -97,11 +101,6 @@ export default {
     };
 
     const checkContent = (rule, value, callback) => {
-      console.log(
-        "this.params.relatedthis.params.related",
-        this.params.related,
-        value
-      );
       if (this.params.related) {
         callback();
       } else {
