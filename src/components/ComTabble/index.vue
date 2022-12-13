@@ -14,7 +14,7 @@
       highlight-current-row
       border
       :style="{ height: heightTable, width: '100%' }"
-      :height="MaxHeight"
+      :height="MaxHeight_"
       :cell-style="changeCellStyle"
       v-on="$listeners"
     >
@@ -220,6 +220,7 @@ export default {
       isClicked: false,
       value: true,
       value1: false,
+      MaxHeight_: "",
     };
   },
   watch: {
@@ -231,6 +232,17 @@ export default {
       },
       deep: true,
     },
+    MaxHeight: {
+      handler: function (v) {
+        this.$nextTick(() => {
+          this.MaxHeight_ = v;
+        });
+      },
+      deep: true,
+    },
+  },
+  created() {
+    this.MaxHeight_ = this.MaxHeight;
   },
   mounted() {
     // this.getCheckItem()

@@ -41,6 +41,15 @@ service.interceptors.request.use(
   }
 );
 
+const ls = ["MANAGE_USER_TOKEN", "rj_wzwz_token", "rj_wzwz_deptType"];
+
+const logoutFn = () => {
+  ls.forEach((i) => {
+    Local.remove(i);
+  });
+  router.push("/login");
+};
+
 // response interceptor
 service.interceptors.response.use(
   /**
@@ -74,9 +83,7 @@ service.interceptors.response.use(
           cancelButtonText: "取消",
           type: "warning",
         }).then(() => {
-          store.dispatch("user/resetToken").then(() => {
-            location.reload();
-          });
+          logoutFn();
         });
       }
       return Promise.reject(new Error(res.message || "Error"));
@@ -87,10 +94,7 @@ service.interceptors.response.use(
   (error) => {
     let msg = "系统连接异常";
     if ((error + "").indexOf("401") > -1) {
-      Local.remove("MANAGE_USER_TOKEN");
-      Local.remove("rj_wzwz_token");
-      Local.remove("rj_wzwz_deptType");
-      router.push("/login");
+      logoutFn();
       msg = "账户信息已过期,请重新登录。";
     }
     if ((error + "").indexOf("500") > -1) {
@@ -100,12 +104,21 @@ service.interceptors.response.use(
     if ((error + "").indexOf("403") > -1) {
       msg = "您的账号无访问权限。";
     }
+    if ((error + "").indexOf("502") > -1) {
+      msg = "服务器连接超时";
+    }
     console.log("err info:" + error); // for debug
-    Message({
-      message: msg,
-      type: "error",
-      duration: 5 * 1000,
-    });
+    if (
+      document &&
+      document.getElementsByClassName("el-message").length === 0
+    ) {
+      Message({
+        message: msg,
+        type: "error",
+        duration: 5 * 1000,
+      });
+    }
+
     return Promise.reject(error);
   }
 );

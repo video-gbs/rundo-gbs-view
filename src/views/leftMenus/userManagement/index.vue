@@ -405,9 +405,12 @@ export default {
       });
     },
     searchBtn() {
-      if (this.search.createTime.length) {
+      if (this.search.createTime && this.search.createTime.length) {
         this.search.startTime = this.search.createTime[0];
         this.search.endTime = this.search.createTime[1];
+      } else {
+        this.search.startTime = "";
+        this.search.endTime = "";
       }
 
       this.getList();
