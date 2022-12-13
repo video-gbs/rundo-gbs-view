@@ -11,78 +11,78 @@
 </template>
 
 <script>
-import PieEchart from './pieEchart.vue'
+import PieEchart from "./pieEchart.vue";
 
 export default {
-  name: '',
+  name: "",
   components: {
-    PieEchart
+    PieEchart,
   },
   props: {
     statisticalData: {
       type: Array,
       default: () => {
-        return []
-      }
-    }
+        return [];
+      },
+    },
   },
   data() {
     return {
       lineTitle: {
-        title: '问政待办',
-        notShowSmallTitle: false
+        title: "问政待办",
+        notShowSmallTitle: false,
       },
       chartData: {
-        showLegend: '',
+        showLegend: "",
         title: {
           isShow: true,
-          x: '34%',
-          y: '45%',
-          text: '评价统计'
+          x: "34%",
+          y: "45%",
+          text: "评价统计",
         },
-        color: ['#2796FF ', '#FED023', '#A0791E'],
-        radius: ['58%', '70%'],
-        center: ['35%', '50%'],
+        color: ["#2796FF ", "#FED023", "#A0791E"],
+        radius: ["58%", "70%"],
+        center: ["35%", "50%"],
         series: [
           {
-            name: '满意',
-            value: 1
+            name: "满意",
+            value: 1,
           },
           {
-            name: '非常满意',
-            value: 2
+            name: "非常满意",
+            value: 2,
           },
           {
-            name: '不满意',
-            value: 9
-          }
-        ]
-      }
-    }
+            name: "不满意",
+            value: 9,
+          },
+        ],
+      },
+    };
   },
   watch: {
     statisticalData(newValue, oldValue) {
-      console.log(newValue, oldValue)
+      console.log(newValue, oldValue);
       this.$props.statisticalData.map((item) => {
-        this.chartData.series.name = item.resultName
-        this.chartData.series.value = item.resultCount
-      })
-    }
+        this.chartData.series.name = item.resultName;
+        this.chartData.series.value = item.resultCount;
+      });
+    },
   },
   created() {
-    this.$props.statisticalData.map((item) => {
-      const obj = {
-        name: '',
-        value: ''
-      }
-      obj.name = item.resultName
-      obj.value = item.resultCount
-      this.chartData.series.push(obj)
-    })
+    // this.$props.statisticalData.map((item) => {
+    //   const obj = {
+    //     name: '',
+    //     value: ''
+    //   }
+    //   obj.name = item.resultName
+    //   obj.value = item.resultCount
+    //   this.chartData.series.push(obj)
+    // })
   },
   mounted() {},
-  methods: {}
-}
+  methods: {},
+};
 </script>
 
 <style lang="scss" scoped>

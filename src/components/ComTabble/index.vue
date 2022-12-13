@@ -82,7 +82,6 @@
         v-if="buttonItems"
         :label="buttonItems.label"
         align="center"
-        fixed="right"
         :width="buttonItems.width"
       >
         <template slot-scope="scope">

@@ -229,13 +229,13 @@ const constantRoutes = [
     name: "userManagement",
     component: Layout,
     // meta: { title: '用户管理' },
-    redirect: "/userManagement",
+    redirect: "/userManagementIndex",
     // component: () => import('@/views/leftMenus/userManagement/index'),
     meta: { title: "用户管理", icon: "yhgl" },
     author: superAdmin,
     children: [
       {
-        path: "/userManagement",
+        path: "/userManagementIndex",
         name: "userManagementIndex",
         author: superAdmin,
         component: () => import("@/views/leftMenus/userManagement/index"),
