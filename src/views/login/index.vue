@@ -44,10 +44,9 @@
                 @keyup.enter.native="handleLogin"
               >
                 <i slot="prefix" class="icon-css icon-password" />
-                <svg-icon
+                <i
                   slot="suffix"
-                  :icon-class="'login-hide'"
-                  class="pwd-icon"
+                  class="icon-css icon-password"
                   @click="pwdShowChange(item)"
                 />
               </el-input>

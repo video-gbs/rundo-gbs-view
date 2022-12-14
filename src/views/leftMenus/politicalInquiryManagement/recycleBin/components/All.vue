@@ -361,7 +361,8 @@ export default {
     },
   },
   mounted() {
-    this.maxHeight = document.body.clientHeight - 550 + "";
+    // this.maxHeight = document.body.clientHeight - 550 + "";
+    this.maxHeight = 800 + "";
     this.init();
   },
 

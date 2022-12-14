@@ -207,7 +207,8 @@ export default {
     },
   },
   created() {
-    this.maxHeight = document.body.clientHeight - 570 + "";
+    // this.maxHeight = document.body.clientHeight - 570 + "";
+    this.maxHeight = "800";
     this.initQueryControl();
     // 获取部门
     this.getDeptFn();
