@@ -14,7 +14,34 @@
   font-family: dinm;
   src: url("../assets//font//DIN-Medium-2.otf");
 }
-
+@font-face {
+  font-family: siyuan-b;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-e;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-h;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-l;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-m;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-n;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-r;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
 body {
   height: 100%;
   -moz-osx-font-smoothing: grayscale;
@@ -22,6 +49,9 @@ body {
   text-rendering: optimizeLegibility;
   font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
     Microsoft YaHei, Arial, sans-serif;
+  div {
+    font-family: "siyuan-n";
+  }
 }
 
 label {
