@@ -136,7 +136,7 @@ export default {
       console.log("vv", v);
       editAdvertisingOrder(v.id, v.orderValue)
         .then((res) => {
-          res.code === 1000 &&
+          res.code === 10000 &&
             (this.$message.success("修改成功"),
             (this.$refs["orderDialog"].visible = false));
         })

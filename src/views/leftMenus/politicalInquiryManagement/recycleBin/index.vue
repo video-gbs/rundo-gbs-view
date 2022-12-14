@@ -177,6 +177,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-tabs--border-card {
+  box-shadow: none;
+  border: 0;
+}
 ::v-deep .el-tabs__item.is-active {
   border: 0 none;
 }

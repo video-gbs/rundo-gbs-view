@@ -1573,6 +1573,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-tabs--border-card {
+  box-shadow: none;
+  border: 0;
+}
 ::v-deep .el-tabs__item.is-active {
   border: 0 none;
 }
@@ -1613,12 +1617,14 @@ export default {
 
 .politicalDetail_container {
   background: #ececec;
+  position: relative;
+  margin: 20px;
 }
 
 .act-btn {
   position: absolute;
   top: 6px;
-  right: 5px;
+  right: 0px;
   z-index: 10;
   ::v-deep .el-button {
     display: flex;
