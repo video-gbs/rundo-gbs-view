@@ -17,17 +17,24 @@
         <el-table-column prop="name" label="单位名称" />
         <el-table-column prop="accountNum" label="账号数量">
           <template slot-scope="scope">
-            <div
-              class="hc-s cursor-p fs12 numbHover"
-              @click="
-                goPage({
-                  name: 'OtherUnitManagement',
-                  params: { pid: scope.row.id },
-                })
-              "
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="点击查看单位账号"
+              placement="left"
             >
-              <span>{{ scope.row.accountNum }}</span>
-            </div>
+              <div
+                class="cursor-p fs12"
+                @click="
+                  goPage({
+                    name: 'OtherUnitManagement',
+                    params: { pid: scope.row.id },
+                  })
+                "
+              >
+                <span>{{ scope.row.accountNum }}</span>
+              </div>
+            </el-tooltip>
           </template>
         </el-table-column>
         <el-table-column width="150" label="操作" fixed="right">
