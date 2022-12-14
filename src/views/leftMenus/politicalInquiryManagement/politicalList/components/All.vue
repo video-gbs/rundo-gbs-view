@@ -17,7 +17,7 @@
           :page-num="query.pageNum"
           :selection="selection()"
           :header-style="headerStyle"
-          :max-height="maxHeight"
+          :max-height="800"
           :left-title="leftTitle"
           :table-items="tableItems"
           :table-data="tableData"
@@ -25,7 +25,7 @@
           :is-checked-header="isCheckedHeader"
           :header-btn="headerBtn"
           :checked-header.sync="checkedHeader"
-          :height-table="'auto'"
+          :height-table="'800'"
           @haederBtnClick="haederBtnClick"
           @handleClick="handleClick"
           @changeTableHeader="changeTableHeader"
@@ -492,7 +492,8 @@ export default {
 
   methods: {
     init() {
-      this.maxHeight = document.body.clientHeight - 550 + "";
+      // this.maxHeight = document.body.clientHeight - 550 + "";
+      this.maxHeight = "400";
       this.getDataList();
       this.getDeptFn();
     },

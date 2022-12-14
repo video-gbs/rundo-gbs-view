@@ -15,6 +15,7 @@
         border
         :data="tableData"
         max-height="500"
+        height="800"
         :header-cell-style="{ background: '#EAEAEA' }"
         style="width: 100%"
       >
