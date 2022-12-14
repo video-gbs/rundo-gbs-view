@@ -192,7 +192,7 @@ export default {
   padding: 0 2rem;
   align-items: center;
   justify-content: space-between;
-  background-color: $bg-color;
+  background-color: #1e56a0;
   // box-shadow: 0px 3px 6px 1px rgba(51, 51, 51, 0.16);
   background-image: url("../../../assets/imgs/top-bg.png");
   background-repeat: no-repeat;
