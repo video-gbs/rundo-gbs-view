@@ -168,7 +168,7 @@
             <el-input v-model="dialog.params.email" />
           </el-form-item>
 
-          <el-form-item label="所属角色" prop="roleId">
+          <!-- <el-form-item label="所属角色" prop="roleId">
             <el-select v-model="dialog.params.roleId" placeholder="请选择">
               <el-option
                 v-for="i in selectList"
@@ -177,7 +177,7 @@
                 :value="i.id"
               />
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="账号状态">
             <el-row>
               <el-col>
@@ -394,7 +394,7 @@ export default {
         title: "新增用户",
         params: {
           account: "",
-          roleId: "",
+          roleId: 0,
           status: 1,
           password: "",
           rePassword: "",
@@ -419,7 +419,7 @@ export default {
   mounted() {
     this.checkPassworLevel();
     this.getAccountList();
-    this.getList();
+    // this.getList()
   },
   methods: {
     /**
@@ -533,19 +533,19 @@ export default {
       this.$router.push(path);
     },
     dialogShow(act, data) {
-      this.dialog.params = {
-        account: "",
-        roleId: "",
-        status: 1,
-        password: "",
-        rePassword: "",
-        nickName: "",
-        name: "",
-        email: "",
-        jobId: 1,
-      };
       this.editShow = true;
       if (act === 0) {
+        this.dialog.params = {
+          account: "",
+          roleId: "",
+          status: 1,
+          password: "",
+          rePassword: "",
+          nickName: "",
+          name: "",
+          email: "",
+          jobId: 1,
+        };
         this.editShowChild = false;
         const { account, email, mobile, name, nickName, status, roleId } = data;
         this.dialog.params.account = account;
