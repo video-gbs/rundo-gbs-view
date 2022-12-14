@@ -17,7 +17,7 @@
           :page-num="query.pageNum"
           :selection="selection()"
           :header-style="headerStyle"
-          :max-height="800"
+          :max-height="'800'"
           :left-title="leftTitle"
           :table-items="tableItems"
           :table-data="tableData"
