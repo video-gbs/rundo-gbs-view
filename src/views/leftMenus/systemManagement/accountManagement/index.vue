@@ -299,6 +299,7 @@ import {
 } from "@/api/method/accountManage";
 import { getRolesList } from "@/api/method/role";
 import { Local } from "@/utils/storage";
+import verify from "@/store/modules/verify";
 
 export default {
   name: "",
@@ -346,20 +347,47 @@ export default {
           },
           {
             validator: (rule, value, callback) => {
-              if (this.handlePasswordLevel(value)) {
+              const zz = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/;
+
+              if (this.handlePasswordLevel(value) && zz.test(value)) {
                 callback();
               } else {
-                callback("密码强度不够，至少包含数字/字母/字符两种组合");
+                if (!zz.test(value)) {
+                  callback(new Error("密码只能由大小写字母+数字组成"));
+                } else if (!this.handlePasswordLevel(value)) {
+                  callback(
+                    new Error("密码强度不够，至少包含数字/字母/字符两种组合")
+                  );
+                } else {
+                  callback(new Error("密码不合规"));
+                }
               }
             },
             trigger: "blur",
           },
         ],
-        rePassword: {
-          required: true,
-          message: "不能为空",
-          trigger: "blur",
-        },
+        rePassword: [
+          {
+            required: true,
+            message: "不能为空",
+            trigger: "blur",
+          },
+          {
+            validator: (rule, value, callback) => {
+              if (
+                this.dialog.params.password &&
+                this.dialog.params.rePassword &&
+                this.dialog.params.password.trim() ===
+                  this.dialog.params.rePassword.trim()
+              ) {
+                callback();
+              } else {
+                callback(new Error("两次输入的密码不一致"));
+              }
+            },
+            trigger: "blur",
+          },
+        ],
         nickName: {
           required: true,
           message: "不能为空",
@@ -394,7 +422,7 @@ export default {
         title: "新增用户",
         params: {
           account: "",
-          roleId: 0,
+          roleId: 99999999,
           status: 1,
           password: "",
           rePassword: "",
@@ -497,7 +525,7 @@ export default {
       if (level >= 2) {
         return true;
       } else {
-        this.$message.error("密码强度不够，至少包含数字/字母/字符两种组合");
+        // this.$message.error('密码强度不够，至少包含数字/字母/字符两种组合')
         return false;
       }
     },
@@ -533,19 +561,19 @@ export default {
       this.$router.push(path);
     },
     dialogShow(act, data) {
+      this.dialog.params = {
+        account: "",
+        roleId: 99999999,
+        status: 1,
+        password: "",
+        rePassword: "",
+        nickName: "",
+        name: "",
+        email: "",
+        jobId: 1,
+      };
       this.editShow = true;
       if (act === 0) {
-        this.dialog.params = {
-          account: "",
-          roleId: "",
-          status: 1,
-          password: "",
-          rePassword: "",
-          nickName: "",
-          name: "",
-          email: "",
-          jobId: 1,
-        };
         this.editShowChild = false;
         const { account, email, mobile, name, nickName, status, roleId } = data;
         this.dialog.params.account = account;
@@ -609,6 +637,7 @@ export default {
               ) {
                 return;
               }
+              console.log("this.dialog.params", this.dialog.params);
               accountAdd(this.dialog.params).then((res) => {
                 if (res.code === 10000) {
                   this.$message({
