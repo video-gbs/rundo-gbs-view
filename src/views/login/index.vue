@@ -46,8 +46,16 @@
                 <i slot="prefix" class="icon-css icon-password" />
                 <i
                   slot="suffix"
-                  class="icon-css icon-password"
-                  @click="pwdShowChange(item)"
+                  :class="[
+                    passwordType === 'password'
+                      ? 'el-icon-open'
+                      : 'el-icon-turn-off',
+                    'cursor-p',
+                  ]"
+                  :style="{
+                    color: passwordType === 'password' ? '#ddd' : 'green  ',
+                  }"
+                  @click="pwdShowChange"
                 />
               </el-input>
             </el-form-item>
@@ -147,6 +155,10 @@ export default {
     },
   },
   methods: {
+    pwdShowChange() {
+      this.passwordType =
+        this.passwordType === "password" ? "type" : "password";
+    },
     showPwd() {
       if (this.passwordType === "password") {
         this.passwordType = "";

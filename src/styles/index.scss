@@ -5,6 +5,15 @@
 @import "./element-variables.scss";
 @import "./sidebar.scss";
 @import "./dom.scss";
+@font-face {
+  font-family: dinb;
+  src: url("../assets//font//din-bold-2.ttf");
+}
+
+@font-face {
+  font-family: dinm;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
 
 body {
   height: 100%;

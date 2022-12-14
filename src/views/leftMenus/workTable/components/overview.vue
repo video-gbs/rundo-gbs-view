@@ -144,6 +144,7 @@ export default {
       line-height: 36px;
       text-align: left;
       color: #ffab3c;
+      font-family: dinb;
     }
 
     .title {

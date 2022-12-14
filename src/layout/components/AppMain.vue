@@ -34,6 +34,7 @@ export default {
   position: relative;
   overflow: auto;
   padding: 0 0 40px;
+  background-color: #ececec;
 }
 .company-title {
   /* text-align: center;

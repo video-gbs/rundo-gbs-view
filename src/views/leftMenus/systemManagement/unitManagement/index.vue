@@ -2,45 +2,43 @@
   <div class="router_container4 m20 bg-w">
     <div class="panel-header-box f jc-sb ai-c fw-w">
       <div class="title-css">单位管理</div>
+      <el-button size="mini" type="primary" @click="dialogShow(1)"
+        >新增</el-button
+      >
     </div>
     <div class="p10">
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column>
-          <template slot="header">
-            <div class="f ai-c jc-sb">
-              <div>单位列表</div>
-              <el-button size="mini" type="primary" @click="dialogShow(1)"
-                >新增</el-button
-              >
+      <el-table
+        :data="tableData"
+        style="width: 100%"
+        :header-cell-style="{ background: '#EAEAEA' }"
+        border
+      >
+        <el-table-column label="序号" type="index" width="60" />
+        <el-table-column prop="name" label="单位名称" />
+        <el-table-column prop="accountNum" label="账号数量">
+          <template slot-scope="scope">
+            <div
+              class="hc-s cursor-p fs12 numbHover"
+              @click="
+                goPage({
+                  name: 'OtherUnitManagement',
+                  params: { pid: scope.row.id },
+                })
+              "
+            >
+              <span>{{ scope.row.accountNum }}</span>
             </div>
           </template>
-          <el-table-column label="序号" type="index" width="60" />
-          <el-table-column prop="name" label="单位名称" />
-          <el-table-column prop="accountNum" label="账号数量">
-            <template slot-scope="scope">
-              <div
-                class="hc-s cursor-p fs12"
-                @click="
-                  goPage({
-                    name: 'OtherUnitManagement',
-                    params: { pid: scope.row.id },
-                  })
-                "
-              >
-                <span>{{ scope.row.accountNum }}</span>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column width="150" label="操作" fixed="right">
-            <template slot-scope="scope">
-              <el-button type="text" @click="dialogShow(0, scope.row)"
-                >编辑</el-button
-              >
-              <el-button type="text" @click="deleteUnit(scope.row)"
-                ><span>删除</span></el-button
-              >
-            </template>
-          </el-table-column>
+        </el-table-column>
+        <el-table-column width="150" label="操作" fixed="right">
+          <template slot-scope="scope">
+            <el-button type="text" @click="dialogShow(0, scope.row)"
+              >编辑</el-button
+            >
+            <el-button type="text" @click="deleteUnit(scope.row)"
+              ><span>删除</span></el-button
+            >
+          </template>
         </el-table-column>
       </el-table>
       <pagination

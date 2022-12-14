@@ -199,6 +199,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-tabs--border-card {
+  box-shadow: none;
+  border: 0;
+}
 .recycle-btn {
   position: absolute;
   top: 7px;

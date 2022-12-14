@@ -2,65 +2,69 @@
   <div class="router_container4 m20 bg-w">
     <div class="panel-header-box f jc-sb ai-c fw-w">
       <div class="title-css">单位账号管理</div>
-      <el-select
-        v-model="search.deptId"
-        size="small"
-        clearable
-        filterable
-        placeholder="请选择单位"
-        @clear="getOtherUnitList"
-        @change="getOtherUnitList"
-      >
-        <el-option
-          v-for="i in deptList"
-          :key="i.id"
-          :label="i.name"
-          :value="i.id"
-        />
-      </el-select>
+      <div>
+        <el-select
+          v-model="search.deptId"
+          class="mr10"
+          size="small"
+          clearable
+          filterable
+          placeholder="请选择单位"
+          @clear="getOtherUnitList"
+          @change="getOtherUnitList"
+        >
+          <el-option
+            v-for="i in deptList"
+            :key="i.id"
+            :label="i.name"
+            :value="i.id"
+          />
+        </el-select>
+        <el-button size="mini" type="primary" @click="dialogShow(1)"
+          >新增账号</el-button
+        >
+        <el-button size="mini" @click="$router.push('/unitManagement')"
+          >返回</el-button
+        >
+      </div>
     </div>
     <div class="p10">
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column>
-          <template slot="header">
-            <div class="f ai-c jc-sb">
-              <div>数据列表</div>
-              <el-button size="mini" type="primary" @click="dialogShow(1)"
-                >新增</el-button
-              >
-            </div>
+      <el-table
+        :data="tableData"
+        style="width: 100%"
+        :header-cell-style="{ background: '#EAEAEA' }"
+        border
+      >
+        <el-table-column prop="account" label="账号" />
+        <el-table-column prop="nickName" label="昵称" />
+        <el-table-column prop="name" label="姓名" />
+        <el-table-column prop="mobile" label="手机号" />
+        <el-table-column prop="email" label="邮箱" />
+        <el-table-column prop="roleName" label="所属角色" />
+        <el-table-column prop="status" label="帐号状态">
+          <template slot-scope="scope">
+            <span>{{
+              scope.row.status === "1"
+                ? "启用"
+                : scope.row.status === "0"
+                ? "禁用"
+                : "-"
+            }}</span>
           </template>
-          <el-table-column prop="account" label="账号" />
-          <el-table-column prop="nickName" label="昵称" />
-          <el-table-column prop="name" label="姓名" />
-          <el-table-column prop="mobile" label="手机号" />
-          <el-table-column prop="email" label="邮箱" />
-          <el-table-column prop="roleName" label="所属角色" />
-          <el-table-column prop="status" label="帐号状态">
-            <template slot-scope="scope">
-              <span>{{
-                scope.row.status === "1"
-                  ? "启用"
-                  : scope.row.status === "0"
-                  ? "禁用"
-                  : "-"
-              }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" width="160" />
-          <el-table-column width="200" label="操作" fixed="right">
-            <template slot-scope="scope">
-              <el-button type="text" @click="editPassword(scope.row)"
-                >修改密码</el-button
-              >
-              <el-button type="text" @click="dialogShow(0, scope.row)"
-                >编辑</el-button
-              >
-              <el-button type="text" @click="deleteAccount(scope.row)">
-                <span>删除</span>
-              </el-button>
-            </template>
-          </el-table-column>
+        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" width="160" />
+        <el-table-column width="200" label="操作" fixed="right">
+          <template slot-scope="scope">
+            <el-button type="text" @click="editPassword(scope.row)"
+              >修改密码</el-button
+            >
+            <el-button type="text" @click="dialogShow(0, scope.row)"
+              >编辑</el-button
+            >
+            <el-button type="text" @click="deleteAccount(scope.row)">
+              <span>删除</span>
+            </el-button>
+          </template>
         </el-table-column>
       </el-table>
       <div class="f jc-e mt10">
