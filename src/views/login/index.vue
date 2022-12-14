@@ -258,7 +258,7 @@ $light_gray: #eee;
   width: 100%;
   // background-color: $bg;
   overflow: hidden;
-  background-image: url("~@/assets/imgs/login/bg.png");
+  background-image: url("~@/assets/imgs/login/bg.jpg");
   background-size: cover;
   .login-box {
     width: 100%;
