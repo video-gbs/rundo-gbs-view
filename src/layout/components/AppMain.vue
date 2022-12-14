@@ -29,10 +29,11 @@ export default {
 .app-main {
   /*50 = navbar  */
   /* min-height: calc(100vh - 136px); */
-  min-height: calc(100vh - 136px);
+  height: calc(100vh - 109px);
   width: 100%;
   position: relative;
   overflow: auto;
+  overflow-x: hidden;
   padding: 0 0 40px;
   background-color: #ececec;
 }
@@ -63,6 +64,12 @@ export default {
 .el-popup-parent--hidden {
   .fixed-header {
     padding-right: 15px;
+  }
+}
+
+.el-scrollbar {
+  .el-scrollbar__wrap {
+    overflow-x: hidden !important;
   }
 }
 </style>
