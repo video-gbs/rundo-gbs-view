@@ -120,14 +120,14 @@ export default {
   components: { PEditorVue },
   data() {
     const checkPageUrl = (rule, value, callback) => {
-      if (value === "") {
-        if (this.params.related === 0) {
-          callback();
-        } else {
-          callback(new Error("请输入连接地址"));
-        }
-      } else {
+      if (this.params.related === 0) {
         callback();
+      } else {
+        if (!value) {
+          callback(new Error("请输入链接地址"));
+        } else {
+          callback();
+        }
       }
     };
 
@@ -178,7 +178,7 @@ export default {
           },
         ],
         pageUrl: [
-          // { required: true, message: '请输入连接地址', trigger: 'blur' },
+          // { required: true, message: '请输入链接地址', trigger: 'blur' },
           { validator: checkPageUrl, trigger: ["blur", "change"] },
           {
             min: 10,

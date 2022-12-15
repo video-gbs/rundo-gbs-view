@@ -33,8 +33,8 @@
               v-model="scope.row.isShow"
               active-color="#4caf50"
               inactive-color="#eeeeee"
-              :active-value="0"
-              :inactive-value="1"
+              :active-value="1"
+              :inactive-value="0"
               @change="editShowFn(scope.row, editShow)"
             />
             <!-- {{ dict.isShow[scope.row.isShow] }} -->
