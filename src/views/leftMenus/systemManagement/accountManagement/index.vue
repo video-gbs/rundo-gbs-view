@@ -1,12 +1,12 @@
 <template>
-  <div class="router_container4 m20 bg-w">
+  <div class="router_container4 m20 bg-w f fc-d ai-s">
     <div class="panel-header-box f jc-sb ai-c fw-w">
       <div class="title-css">账号管理</div>
       <el-button size="mini" type="primary" @click="dialogShow(1)">
         新增
       </el-button>
     </div>
-    <div class="p10 f1 f fd-c">
+    <div class="p10 f1 f fd-c" style="overflow-y: auto">
       <el-table
         :data="tableData"
         :height="'auto'"
