@@ -7,7 +7,7 @@
       @click="handleClickOutside"
     />
     <sidebar class="sidebar-container" />
-    <div class="main-container">
+    <div class="main-container f fd-c ai-s">
       <div :class="{ 'fixed-header': fixedHeader }">
         <Navbar />
       </div>
@@ -103,6 +103,7 @@ export default {
       const h = document.getElementsByTagName("HTML")[0];
       this.nowWidth = 1920 / (w / baseW);
       h.style.setProperty("--web-zoom", w / baseW);
+      this.$forceUpdate();
     },
   },
 };
@@ -136,6 +137,9 @@ export default {
     padding-top: 3.5rem;
     overflow: auto;
     background-color: rgba(242, 242, 242, 1);
+    > div {
+      width: 100%;
+    }
   }
 }
 

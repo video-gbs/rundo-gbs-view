@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!this.showDetails" class="projectManagement">
+  <div v-if="!this.showDetails" class="projectManagement f fd-c">
     <div class="seach">
       <Seach
         :form-list="FormList"
@@ -8,37 +8,36 @@
         @submitReset="toReset"
       />
     </div>
-    <div class="footer-table">
-      <div class="tab-table">
-        <ComTabble
-          ref="comTableRef"
-          :index="index"
-          :page-size="query.pageSize"
-          :page-num="query.pageNum"
-          :selection="selection()"
-          :header-style="headerStyle"
-          :max-height="'800'"
-          :left-title="leftTitle"
-          :table-items="tableItems"
-          :table-data="tableData"
-          :button-items="buttonItems"
-          :is-checked-header="isCheckedHeader"
-          :header-btn="headerBtn"
-          :checked-header.sync="checkedHeader"
-          :height-table="'800'"
-          @haederBtnClick="haederBtnClick"
-          @handleClick="handleClick"
-          @changeTableHeader="changeTableHeader"
-          @selection-change="handleSelectionChange"
-          @setShow="setShow"
-          @setReview="setReview"
-        />
-        <Pagination
-          :pages-data="query"
-          @size-change="sizeChange"
-          @current-change="currentChange"
-        />
-      </div>
+    <div class="footer-table f1 f fd-c ai-c">
+      <ComTabble
+        ref="comTableRef"
+        :index="index"
+        width="100%"
+        :page-size="query.pageSize"
+        :page-num="query.pageNum"
+        :selection="selection()"
+        :header-style="headerStyle"
+        :max-height="'auto'"
+        :left-title="leftTitle"
+        :table-items="tableItems"
+        :table-data="tableData"
+        :button-items="buttonItems"
+        :is-checked-header="isCheckedHeader"
+        :header-btn="headerBtn"
+        :checked-header.sync="checkedHeader"
+        :height-table="'auto'"
+        @haederBtnClick="haederBtnClick"
+        @handleClick="handleClick"
+        @changeTableHeader="changeTableHeader"
+        @selection-change="handleSelectionChange"
+        @setShow="setShow"
+        @setReview="setReview"
+      />
+      <Pagination
+        :pages-data="query"
+        @size-change="sizeChange"
+        @current-change="currentChange"
+      />
     </div>
 
     <!--问政审核-->

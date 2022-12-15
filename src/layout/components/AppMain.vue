@@ -1,6 +1,6 @@
 <template>
-  <section class="app-main">
-    <el-scrollbar style="height: 100%">
+  <section class="app-main f1 fd-c ai-s">
+    <div style="height: 100%" class="app-main-c f1 f">
       <transition name="fade-transform1" mode="out-in">
         <keep-alive>
           <router-view v-if="$route.meta.keepAlive" :key="key" />
@@ -9,8 +9,8 @@
       <transition name="fade-transform2" mode="out-in">
         <router-view v-if="!$route.meta.keepAlive" :key="key" />
       </transition>
-    </el-scrollbar>
-    <h2 class="company-title">©2022 润建股份有限公司 版权所有</h2>
+    </div>
+    <h2 class="company-title f jc-c ai-c">©2022 润建股份有限公司 版权所有</h2>
   </section>
 </template>
 
@@ -25,7 +25,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .app-main {
   /*50 = navbar  */
   /* min-height: calc(100vh - 136px); */
@@ -36,6 +36,14 @@ export default {
   overflow-x: hidden;
   padding: 0 0 40px;
   background-color: #ececec;
+  > div {
+    width: 100%;
+  }
+}
+.app-main-c {
+  > div {
+    width: 100%;
+  }
 }
 .company-title {
   /* text-align: center;
@@ -52,7 +60,7 @@ export default {
   color: #8b8b8b;
   bottom: 0;
   left: 0;
-  width: calc(100% - 0px);
+  width: 100%;
 }
 .fixed-header + .app-main {
   padding-top: 50px;

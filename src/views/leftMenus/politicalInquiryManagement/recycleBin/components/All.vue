@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!this.showDetails" class="projectManagement">
+  <div v-if="!this.showDetails" class="projectManagement f fd-c">
     <div class="seach">
       <Seach
         :form-list="FormList"
@@ -8,34 +8,34 @@
         @submitReset="toReset"
       />
     </div>
-    <div class="footer-table">
-      <div class="tab-table">
-        <ComTabble
-          ref="comTableRef"
-          :index="index"
-          :page-size="query.pageSize"
-          :page-num="query.pageNum"
-          :selection="selection()"
-          :header-style="headerStyle"
-          :max-height="maxHeight"
-          :left-title="leftTitle"
-          :table-items="tableItems"
-          :table-data="tableData"
-          :button-items="buttonItems"
-          :is-checked-header="isCheckedHeader"
-          :header-btn="headerBtn"
-          :checked-header.sync="checkedHeader"
-          @handleClick="handleClick"
-          @haederBtnClick="haederBtnClick"
-          @changeTableHeader="changeTableHeader"
-          @selection-change="handleSelectionChange"
-        />
-        <Pagination
-          :pages-data="query"
-          @size-change="sizeChange"
-          @current-change="currentChange"
-        />
-      </div>
+    <div class="footer-table f1 f fd-c ai-e">
+      <ComTabble
+        ref="comTableRef"
+        :index="index"
+        width="100%"
+        :page-size="query.pageSize"
+        :page-num="query.pageNum"
+        :selection="selection()"
+        :header-style="headerStyle"
+        :max-height="maxHeight"
+        :height-table="maxHeight"
+        :left-title="leftTitle"
+        :table-items="tableItems"
+        :table-data="tableData"
+        :button-items="buttonItems"
+        :is-checked-header="isCheckedHeader"
+        :header-btn="headerBtn"
+        :checked-header.sync="checkedHeader"
+        @handleClick="handleClick"
+        @haederBtnClick="haederBtnClick"
+        @changeTableHeader="changeTableHeader"
+        @selection-change="handleSelectionChange"
+      />
+      <Pagination
+        :pages-data="query"
+        @size-change="sizeChange"
+        @current-change="currentChange"
+      />
     </div>
   </div>
 </template>
@@ -362,7 +362,8 @@ export default {
   },
   mounted() {
     // this.maxHeight = document.body.clientHeight - 550 + "";
-    this.maxHeight = 800 + "";
+    // this.maxHeight = 800 + ''
+
     this.init();
   },
 

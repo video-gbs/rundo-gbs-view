@@ -6,9 +6,10 @@
         新增
       </el-button>
     </div>
-    <div class="p10">
+    <div class="p10 f1 f fd-c">
       <el-table
         :data="tableData"
+        :height="'auto'"
         style="width: 100%"
         :header-cell-style="{ background: '#EAEAEA' }"
         border

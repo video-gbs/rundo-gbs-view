@@ -83,7 +83,7 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item v-if="params.related" label="链接地址">
+        <el-form-item v-if="params.related" label="链接地址" prop="pageUrl">
           <el-input
             v-model="params.pageUrl"
             size="mini"
@@ -104,6 +104,17 @@ import { uploadImg } from "@/api/method/files";
 export default {
   name: "RoundChartManage",
   data() {
+    const checkPageUrl = (rule, value, callback) => {
+      if (value === "") {
+        if (this.params.related === 0) {
+          callback();
+        } else {
+          callback(new Error("请输入连接地址"));
+        }
+      } else {
+        callback();
+      }
+    };
     return {
       action: "add",
       title: "新增广告图",
@@ -132,13 +143,14 @@ export default {
           },
         ],
         pageUrl: [
-          { required: true, message: "请输入连接地址", trigger: "blur" },
+          { required: false, message: "请输入连接地址", trigger: "blur" },
           {
             min: 10,
             max: 200,
             message: "长度在 10 到 200 个字符",
             trigger: "blur",
           },
+          { validator: checkPageUrl, trigger: ["blur", "change"] },
         ],
       },
     };

@@ -329,7 +329,7 @@
         </el-button>
       </div>
     </div>
-    <div class="show-btn-box f jc-c ai-c">
+    <div class="show-btn-box f jc-c ai-e">
       <div class="show-btn r11 f jc-c ai-s hc-s cursor-p" @click="fold = !fold">
         <div
           class="show-icon"
@@ -476,7 +476,7 @@ export default {
 .show-btn-box {
   height: 1px;
   position: absolute;
-  bottom: -1.5px;
+  bottom: -10px;
   left: 0;
   width: 100%;
 
