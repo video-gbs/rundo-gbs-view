@@ -2,15 +2,39 @@
   <div class="router_container4 m20 bg-w">
     <div class="panel-header-box f jc-sb ai-c fw-w">
       <div class="title-css">单位管理</div>
-      <el-button size="mini" type="primary" @click="dialogShow(1)"
-        >新增</el-button
-      >
+      <div class="f jc-c ai-c">
+        <el-input
+          v-model="params.name"
+          clearable
+          class="mr10"
+          placeholder="请输入部门名称"
+        />
+        <el-select
+          v-model="params.deptType"
+          class="mr10"
+          placeholder="请选择部门类型"
+        >
+          <el-option
+            v-for="item in [...[{ id: '', label: '全部单位类型' }], ...types]"
+            :key="item.id"
+            :label="item.label"
+            :value="item.id"
+          />
+        </el-select>
+        <el-button size="mini" type="primary" @click="getUnitList"
+          >搜索</el-button
+        >
+        <el-button size="mini" type="primary" @click="dialogShow(1)"
+          >新增</el-button
+        >
+      </div>
     </div>
-    <div class="p10">
+    <div class="p10 f1 f fd-c">
       <el-table
         :data="tableData"
         style="width: 100%"
         :header-cell-style="{ background: '#EAEAEA' }"
+        size="small"
         border
       >
         <el-table-column label="序号" type="index" width="60" />
@@ -131,6 +155,8 @@ export default {
       params: {
         current: 1,
         size: 10,
+        deptType: "",
+        name: "",
         total: 0,
       },
       tableData: [],
@@ -322,5 +348,8 @@ export default {
 }
 .delete-button {
   color: red !important;
+}
+.el-select {
+  width: 250px;
 }
 </style>

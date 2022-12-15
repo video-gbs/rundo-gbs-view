@@ -28,7 +28,7 @@
         >
       </div>
     </div>
-    <div class="p10">
+    <div class="p10 f1 f fd-c">
       <el-table
         :data="tableData"
         style="width: 100%"
@@ -451,6 +451,7 @@ export default {
   mounted() {
     console.log("this.$route.params.pid", this.$route);
     this.search.deptId = this.$route.params?.pid || "";
+    this.dialog.params.deptId = this.$route.params?.pid || "";
     // this.checkPassworLevel()
     this.getOtherUnitList();
     // this.getList()

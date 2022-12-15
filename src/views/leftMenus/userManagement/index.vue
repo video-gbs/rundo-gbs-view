@@ -65,9 +65,10 @@
         >批量删除</el-button
       >
     </div>
-    <div class="bg-w p10">
+    <div class="f1 f fd-c bg-w p10">
       <el-table
         border
+        :height="'auto'"
         :data="tableData"
         style="width: 100%"
         :header-cell-style="{ background: '#EAEAEA' }"
