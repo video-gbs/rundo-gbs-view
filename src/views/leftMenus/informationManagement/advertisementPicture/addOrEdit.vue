@@ -1,6 +1,6 @@
 <!--编辑或添加广告图-->
 <template>
-  <div class="router_container2 m20 bg-w">
+  <div class="router_container2 m20 bg-w f fd-c">
     <div class="panel-header-box f jc-sb ai-c">
       <div class="title-css">{{ title }}</div>
       <div class="f ai-c">
@@ -10,7 +10,7 @@
         >
       </div>
     </div>
-    <div class="p30">
+    <div class="p30 f1 nr-box">
       <el-form
         ref="form"
         :model="params"
@@ -270,5 +270,8 @@ export default {
     width: 100%;
     height: auto;
   }
+}
+.nr-box {
+  overflow-y: auto;
 }
 </style>
