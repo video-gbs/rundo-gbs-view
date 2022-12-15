@@ -1,9 +1,9 @@
 <template>
-  <div class="router_container2 m20 bg-w">
+  <div class="router_container2 m20 bg-w f fd-c">
     <div class="panel-header-box">
       <div class="title-css">轮播图管理</div>
     </div>
-    <div class="p10">
+    <div class="p10 f1 f fd-c" style="overflow-y: auto">
       <div class="f jc-sb ai-c mv10">
         <div class="fs18 fw600 title-c-1 ti5">轮播图列表</div>
         <el-button size="mini" type="primary" @click="goPage('/roundChart/add')"
@@ -13,7 +13,7 @@
       <el-table
         :data="tableData"
         border
-        :height="setHeigthFn(350)"
+        :height="'auto'"
         :header-cell-style="{ background: '#eaeaea' }"
         style="width: 100%"
       >

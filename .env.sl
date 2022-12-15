@@ -8,4 +8,4 @@ ENV = 'development'
 # VUE_APP_BASE_API = 'http://192.168.10.64:8081'
 
 # zhan shui lin
- VUE_APP_BASE_API = 'http://10.223.18.129:8964'
+ VUE_APP_BASE_API = 'http://10.223.18.150:8964'
