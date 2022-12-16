@@ -10,6 +10,8 @@
             :model="ruleForm"
             :rules="rules"
             :inline="true"
+            label-width="100px"
+            label-position="right"
           >
             <el-row>
               <template v-for="item in controlGroupData.controls">

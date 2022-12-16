@@ -1,6 +1,6 @@
 <!--编辑或添加广告图-->
 <template>
-  <div class="router_container2 m20 bg-w">
+  <div class="router_container2 m20 bg-w f fd-c">
     <div class="panel-header-box f jc-sb ai-c">
       <div class="title-css">{{ title }}</div>
       <div class="f ai-c">
@@ -10,7 +10,7 @@
         >
       </div>
     </div>
-    <div class="p30">
+    <div class="p30 f1 nr-box">
       <el-form
         ref="form"
         :model="params"
@@ -83,7 +83,7 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item v-if="params.related" label="链接地址">
+        <el-form-item v-if="params.related" label="链接地址" prop="pageUrl">
           <el-input
             v-model="params.pageUrl"
             size="mini"
@@ -104,6 +104,17 @@ import { uploadImg } from "@/api/method/files";
 export default {
   name: "RoundChartManage",
   data() {
+    const checkPageUrl = (rule, value, callback) => {
+      if (this.params.related === 0) {
+        callback();
+      } else {
+        if (!value) {
+          callback(new Error("请输入链接地址"));
+        } else {
+          callback();
+        }
+      }
+    };
     return {
       action: "add",
       title: "新增广告图",
@@ -132,13 +143,14 @@ export default {
           },
         ],
         pageUrl: [
-          { required: true, message: "请输入连接地址", trigger: "blur" },
+          { required: false, message: "请输入链接地址", trigger: "blur" },
           {
             min: 10,
             max: 200,
             message: "长度在 10 到 200 个字符",
             trigger: "blur",
           },
+          { validator: checkPageUrl, trigger: ["blur", "change"] },
         ],
       },
     };
@@ -258,5 +270,8 @@ export default {
     width: 100%;
     height: auto;
   }
+}
+.nr-box {
+  overflow-y: auto;
 }
 </style>

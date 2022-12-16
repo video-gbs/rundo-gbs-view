@@ -5,7 +5,43 @@
 @import "./element-variables.scss";
 @import "./sidebar.scss";
 @import "./dom.scss";
+@font-face {
+  font-family: dinb;
+  src: url("../assets//font//din-bold-2.ttf");
+}
 
+@font-face {
+  font-family: dinm;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-b;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-e;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-h;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-l;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-m;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-n;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
+@font-face {
+  font-family: siyuan-r;
+  src: url("../assets//font//DIN-Medium-2.otf");
+}
 body {
   height: 100%;
   -moz-osx-font-smoothing: grayscale;
@@ -13,6 +49,9 @@ body {
   text-rendering: optimizeLegibility;
   font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
     Microsoft YaHei, Arial, sans-serif;
+  div {
+    font-family: "siyuan-n";
+  }
 }
 
 label {
@@ -71,4 +110,9 @@ div:focus {
 // main-container global css
 .app-container {
   padding: 20px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: #e6eaed;
 }

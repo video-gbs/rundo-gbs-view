@@ -46,95 +46,93 @@
           >查询</el-button
         >
         <el-button size="mini" @click="resetBtn">重置</el-button>
+        <div class="mh10" style="height: inherit; width: 1px; color: #ddd">
+          |
+        </div>
+        <el-button size="mini" type="primary" @click="dialogShow(1)"
+          >新增</el-button
+        >
       </div>
     </div>
     <div class="mt10 panel-header-box f jc-sb ai-c fw-w bg-w">
       <div class="title-css">用户管理</div>
+      <el-button
+        v-if="selectList.length"
+        class="mr10"
+        size="mini"
+        type="primary"
+        @click="deleteItems('all')"
+        >批量删除</el-button
+      >
     </div>
-    <div class="bg-w p10">
+    <div class="f1 f fd-c bg-w p10">
       <el-table
+        border
+        :height="'auto'"
         :data="tableData"
         style="width: 100%"
+        :header-cell-style="{ background: '#EAEAEA' }"
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" show-overflow-tooltip />
-        <el-table-column show-overflow-tooltip>
-          <template slot="header">
-            <div class="f ai-c jc-sb">
-              <div>数据列表</div>
-              <div>
-                <el-button
-                  v-if="selectList.length"
-                  class="mr10"
-                  size="mini"
-                  type="primary"
-                  @click="deleteItems('all')"
-                  >批量删除</el-button
-                >
-                <el-button size="mini" type="primary" @click="dialogShow(1)"
-                  >新增</el-button
-                >
-              </div>
-            </div>
+
+        <el-table-column
+          prop="username"
+          label="用户名"
+          width="160px"
+          show-overflow-tooltip
+        />
+        <el-table-column prop="nickName" label="昵称" show-overflow-tooltip />
+        <el-table-column label="性别" width="80px" show-overflow-tooltip>
+          <template slot-scope="scope">
+            {{ sex_[scope.row.sex + ""] }}
           </template>
-          <el-table-column
-            prop="username"
-            label="用户名"
-            width="160px"
-            show-overflow-tooltip
-          />
-          <el-table-column prop="nickName" label="昵称" show-overflow-tooltip />
-          <el-table-column label="性别" width="80px" show-overflow-tooltip>
-            <template slot-scope="scope">
-              {{ sex_[scope.row.sex + ""] }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="mobile"
-            label="手机号"
-            width="120px"
-            show-overflow-tooltip
-          />
-          <el-table-column prop="email" label="邮箱" show-overflow-tooltip />
-          <el-table-column
-            prop="state"
-            label="帐号状态"
-            width="80px"
-            show-overflow-tooltip
-          >
-            <template slot-scope="scope">
-              {{ status[scope.row.status + ""] }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="createTime"
-            label="创建时间"
-            width="180px"
-            show-overflow-tooltip
-          />
-          <el-table-column
-            prop="lastLoginTime"
-            label="最近登录时间"
-            width="180px"
-            show-overflow-tooltip
-          />
-          <el-table-column
-            prop="lastLoginIp"
-            label="最近登录IP"
-            width="180px"
-            show-overflow-tooltip
-          />
-          <!-- <el-table-column prop="belongingPlace" label="IP归属地" width="160" /> -->
-          <el-table-column width="100" label="操作" fixed="right">
-            <template slot-scope="scope">
-              <el-button type="text" @click="dialogShow(0, scope.row)"
-                >编辑</el-button
-              >
-              <el-button type="text" @click="deleteItems(scope.row)"
-                >删除</el-button
-              >
-            </template>
-          </el-table-column>
+        </el-table-column>
+        <el-table-column
+          prop="mobile"
+          label="手机号"
+          width="120px"
+          show-overflow-tooltip
+        />
+        <el-table-column prop="email" label="邮箱" show-overflow-tooltip />
+        <el-table-column
+          prop="state"
+          label="帐号状态"
+          width="80px"
+          show-overflow-tooltip
+        >
+          <template slot-scope="scope">
+            {{ status[scope.row.status + ""] }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="createTime"
+          label="创建时间"
+          width="180px"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="lastLoginTime"
+          label="最近登录时间"
+          width="180px"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="lastLoginIp"
+          label="最近登录IP"
+          width="180px"
+          show-overflow-tooltip
+        />
+        <!-- <el-table-column prop="belongingPlace" label="IP归属地" width="160" /> -->
+        <el-table-column width="100" label="操作" fixed="right">
+          <template slot-scope="scope">
+            <el-button type="text" @click="dialogShow(0, scope.row)"
+              >编辑</el-button
+            >
+            <el-button type="text" @click="deleteItems(scope.row)"
+              >删除</el-button
+            >
+          </template>
         </el-table-column>
       </el-table>
       <pagination
@@ -548,6 +546,9 @@ export default {
     width: 100%;
     margin-right: 30px;
   }
+}
+.panel-header-box {
+  height: 58px;
 }
 .password-level-box {
   height: 28px !important;

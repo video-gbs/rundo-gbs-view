@@ -44,11 +44,18 @@
                 @keyup.enter.native="handleLogin"
               >
                 <i slot="prefix" class="icon-css icon-password" />
-                <svg-icon
+                <i
                   slot="suffix"
-                  :icon-class="'login-hide'"
-                  class="pwd-icon"
-                  @click="pwdShowChange(item)"
+                  :class="[
+                    passwordType === 'password'
+                      ? 'el-icon-open'
+                      : 'el-icon-turn-off',
+                    'cursor-p',
+                  ]"
+                  :style="{
+                    color: passwordType === 'password' ? '#ddd' : 'green  ',
+                  }"
+                  @click="pwdShowChange"
                 />
               </el-input>
             </el-form-item>
@@ -148,6 +155,10 @@ export default {
     },
   },
   methods: {
+    pwdShowChange() {
+      this.passwordType =
+        this.passwordType === "password" ? "type" : "password";
+    },
     showPwd() {
       if (this.passwordType === "password") {
         this.passwordType = "";
@@ -247,7 +258,7 @@ $light_gray: #eee;
   width: 100%;
   // background-color: $bg;
   overflow: hidden;
-  background-image: url("~@/assets/imgs/login/bg.png");
+  background-image: url("~@/assets/imgs/login/bg.jpg");
   background-size: cover;
   .login-box {
     width: 100%;

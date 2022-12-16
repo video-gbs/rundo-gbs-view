@@ -1,5 +1,5 @@
 <template>
-  <div class="ComTabble">
+  <div class="ComTabble f" :style="{ width: width }">
     <!-- <div class="btn-content flex-lr">
       <div class="left-title">{{ leftTitle }}</div>
     </div> -->
@@ -16,6 +16,7 @@
       :style="{ height: heightTable, width: '100%' }"
       :height="MaxHeight_"
       :cell-style="changeCellStyle"
+      :width="width"
       v-on="$listeners"
     >
       <!-- 多选框 -->
@@ -56,8 +57,8 @@
           <el-switch
             v-if="item.type && item.type === 'switch'"
             v-model="scope.row[item.name]"
-            :active-value="0"
-            :inactive-value="1"
+            :active-value="1"
+            :inactive-value="0"
             active-color="#13ce66"
             inactive-color="#eeeeee"
             :disabled="
@@ -142,6 +143,10 @@ export default {
       type: String,
       default: () => "100%",
     },
+    width: {
+      type: String,
+      default: () => "100%",
+    },
     // 表格内容高度
     MaxHeight: {
       type: String,
@@ -220,7 +225,7 @@ export default {
       isClicked: false,
       value: true,
       value1: false,
-      MaxHeight_: "",
+      MaxHeight_: "auto",
     };
   },
   watch: {
@@ -308,6 +313,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.ComTabble {
+  flex: 1;
+}
 .com-pagination {
   margin-top: 20px;
   text-align: right;

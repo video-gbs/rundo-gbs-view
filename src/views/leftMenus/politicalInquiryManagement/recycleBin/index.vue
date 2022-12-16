@@ -1,9 +1,10 @@
 <!-- 回收站 -->
 <template>
-  <div class="detail_container">
+  <div class="detail_container f1 f fd-c">
     <el-tabs
       v-if="!this.showDetails"
       v-model="activeName"
+      class="f1 f fd-c"
       type="border-card"
       @tab-click="handleClick"
     >
@@ -177,6 +178,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-tabs__content {
+  flex: 1;
+}
+::v-deep .el-tabs--border-card {
+  box-shadow: none;
+  border: 0;
+}
 ::v-deep .el-tabs__item.is-active {
   border: 0 none;
 }
@@ -212,6 +220,7 @@ export default {
   background: #ececec;
   margin: 20px;
   position: relative;
+
   .right-btns-ul {
     position: absolute;
     right: 10px;

@@ -11,7 +11,7 @@
     <el-tabs
       v-if="!this.showDetails"
       v-model="activeName"
-      class="f1"
+      class="f1 f fd-c"
       type="border-card"
       @tab-click="handleClick"
     >
@@ -200,6 +200,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-tabs__content {
+  flex: 1;
+}
+::v-deep .el-tabs--border-card {
+  box-shadow: none;
+  border: 0;
+}
 .recycle-btn {
   position: absolute;
   top: 7px;

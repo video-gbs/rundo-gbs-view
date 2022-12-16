@@ -1,46 +1,76 @@
 <template>
-  <div class="router_container4 m20 bg-w">
+  <div class="router_container4 m20 bg-w f fc-d ai-s">
     <div class="panel-header-box f jc-sb ai-c fw-w">
       <div class="title-css">单位管理</div>
+      <div class="f jc-c ai-c">
+        <el-input
+          v-model="params.name"
+          clearable
+          class="mr10"
+          placeholder="请输入部门名称"
+        />
+        <el-select
+          v-model="params.deptType"
+          class="mr10"
+          placeholder="请选择部门类型"
+        >
+          <el-option
+            v-for="item in [...[{ id: '', label: '全部单位类型' }], ...types]"
+            :key="item.id"
+            :label="item.label"
+            :value="item.id"
+          />
+        </el-select>
+        <el-button size="mini" type="primary" @click="getUnitList"
+          >搜索</el-button
+        >
+        <el-button size="mini" type="primary" @click="dialogShow(1)"
+          >新增</el-button
+        >
+      </div>
     </div>
-    <div class="p10">
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column>
-          <template slot="header">
-            <div class="f ai-c jc-sb">
-              <div>单位列表</div>
-              <el-button size="mini" type="primary" @click="dialogShow(1)"
-                >新增</el-button
-              >
-            </div>
-          </template>
-          <el-table-column label="序号" type="index" width="60" />
-          <el-table-column prop="name" label="单位名称" />
-          <el-table-column prop="accountNum" label="账号数量">
-            <template slot-scope="scope">
+    <div class="p10 f1 f fd-c" style="overflow-y: auto">
+      <el-table
+        :data="tableData"
+        style="width: 100%"
+        :height="'auto'"
+        :header-cell-style="{ background: '#EAEAEA' }"
+        size="small"
+        border
+      >
+        <el-table-column label="序号" type="index" width="60" />
+        <el-table-column prop="name" label="单位名称" />
+        <el-table-column prop="accountNum" label="账号数量">
+          <template slot-scope="scope">
+            <el-tooltip
+              class="item"
+              effect="dark"
+              content="点击查看单位账号"
+              placement="left"
+            >
               <div
-                class="hc-s cursor-p fs12"
+                class="cursor-p fs12"
                 @click="
                   goPage({
-                    name: 'otherUnitManagement',
+                    name: 'OtherUnitManagement',
                     params: { pid: scope.row.id },
                   })
                 "
               >
-                <a href="">{{ scope.row.accountNum }}</a>
+                <span>{{ scope.row.accountNum }}</span>
               </div>
-            </template>
-          </el-table-column>
-          <el-table-column width="100" label="操作" fixed="right">
-            <template slot-scope="scope">
-              <el-button type="text" @click="dialogShow(0, scope.row)"
-                >编辑</el-button
-              >
-              <el-button type="text" @click="deleteUnit(scope.row)"
-                ><span class="delete-button">删除</span></el-button
-              >
-            </template>
-          </el-table-column>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+        <el-table-column width="150" label="操作" fixed="right">
+          <template slot-scope="scope">
+            <el-button type="text" @click="dialogShow(0, scope.row)"
+              >编辑</el-button
+            >
+            <el-button type="text" @click="deleteUnit(scope.row)"
+              ><span>删除</span></el-button
+            >
+          </template>
         </el-table-column>
       </el-table>
       <pagination
@@ -126,6 +156,8 @@ export default {
       params: {
         current: 1,
         size: 10,
+        deptType: "",
+        name: "",
         total: 0,
       },
       tableData: [],
@@ -208,8 +240,8 @@ export default {
         if (res.code === 10000) {
           this.tableData = res.data.records;
           this.params.total = res.data.total;
-          this.params.pages = res.data.pages;
-          this.params.current = res.data.current;
+          // this.params.pages = res.data.pages
+          // this.params.current = res.data.current
         }
       });
     },
@@ -225,7 +257,7 @@ export default {
               type: "success",
               message: "删除成功",
             });
-            this.params.pageNum = 1;
+            this.params.current = 1;
             this.getUnitList();
           }
         });
@@ -317,5 +349,8 @@ export default {
 }
 .delete-button {
   color: red !important;
+}
+.el-select {
+  width: 250px;
 }
 </style>

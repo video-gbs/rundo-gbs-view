@@ -1,6 +1,6 @@
 <!--编辑或添加轮播图-->
 <template>
-  <div class="router_container2 m20 bg-w">
+  <div class="router_container2 m20 bg-w f fd-c">
     <div class="panel-header-box f jc-sb ai-c">
       <div class="title-css">{{ title }}</div>
       <div class="f ai-c">
@@ -10,7 +10,7 @@
         >
       </div>
     </div>
-    <div class="p30">
+    <div class="nr-box p30 f1">
       <el-form
         ref="roundChartForm"
         :rules="rules"
@@ -76,7 +76,7 @@
           />
           <span class="ml10 fs12 title-c-3">显示循序为0到1000有效</span>
         </el-form-item>
-        <el-form-item label="关联内容">
+        <el-form-item label="关联内容" prop="pageUrl">
           <el-row>
             <el-col :span="24">
               <el-radio v-model="params.related" size="mini" :label="0"
@@ -120,14 +120,14 @@ export default {
   components: { PEditorVue },
   data() {
     const checkPageUrl = (rule, value, callback) => {
-      if (value === "") {
-        if (this.params.related === 0) {
-          callback();
-        } else {
-          callback(new Error("请输入连接地址"));
-        }
-      } else {
+      if (this.params.related === 0) {
         callback();
+      } else {
+        if (!value) {
+          callback(new Error("请输入链接地址"));
+        } else {
+          callback();
+        }
       }
     };
 
@@ -152,7 +152,7 @@ export default {
       params: {
         content: "", // 展示内容
         photoUrl: "", // photoUrl
-        isShow: 0, // 是否显示，0显示，1不显示
+        isShow: 0, // 是否显示，0不显示，1显示
         orderValue: 0, // 显示顺序
         pageUrl: "", // 外部链接url
         related: 0, // 关联选项: 0:内容展示，关联外部链接
@@ -178,7 +178,7 @@ export default {
           },
         ],
         pageUrl: [
-          // { required: true, message: '请输入连接地址', trigger: 'blur' },
+          // { required: true, message: '请输入链接地址', trigger: 'blur' },
           { validator: checkPageUrl, trigger: ["blur", "change"] },
           {
             min: 10,
@@ -328,5 +328,8 @@ export default {
     width: 100%;
     height: auto;
   }
+}
+.nr-box {
+  overflow-y: auto;
 }
 </style>

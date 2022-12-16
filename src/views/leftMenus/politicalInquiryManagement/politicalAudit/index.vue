@@ -1,5 +1,5 @@
 <template>
-  <div class="router_container2 m20">
+  <div class="router_container2 m20 f fd-c ai-s">
     <div class="panel-header-box bg-w">
       <div class="title-css">问政转移审核列表</div>
     </div>
@@ -10,12 +10,12 @@
         @onBtnClick="queryData"
       />
     </div>
-    <div class="p20 mt20 bg-w">
+    <div style="width: 100%" class="p20 mt20 bg-w f1 f fd-c ai-e">
       <el-table
+        class="f1"
         border
         :data="tableData"
-        :height="maxHeight"
-        :max-height="maxHeight"
+        :height="'auto'"
         :header-cell-style="{ background: '#EAEAEA' }"
         style="width: 100%"
       >
@@ -207,7 +207,8 @@ export default {
     },
   },
   created() {
-    this.maxHeight = document.body.clientHeight - 570 + "";
+    // this.maxHeight = document.body.clientHeight - 570 + "";
+    // this.maxHeight = '800'
     this.initQueryControl();
     // 获取部门
     this.getDeptFn();
@@ -219,14 +220,14 @@ export default {
       this.queryControlData = {
         controls: [
           {
-            label: "标题",
+            label: "标题内容",
             type: "input",
             key: "title",
             span: 6,
             value: "",
           },
           {
-            label: "分类",
+            label: "问政分类",
             type: "select",
             key: "type",
             span: 6,
@@ -252,7 +253,7 @@ export default {
           {
             label: "申请单位",
             type: "select",
-            key: "processingDeptId",
+            key: "operateDeptId",
             span: 6,
             value: "",
             options: this.deptList,
@@ -285,7 +286,7 @@ export default {
         layoutConfig: {
           contentSpan: 20,
           buttonSpan: 4,
-          showColon: false,
+          showColon: 3,
         },
       };
     },

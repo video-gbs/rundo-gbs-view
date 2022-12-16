@@ -1,6 +1,6 @@
 <!--编辑或添加公告-->
 <template>
-  <div class="router_container2 m20 bg-w">
+  <div class="router_container2 m20 bg-w f fd-c">
     <div class="panel-header-box f jc-sb ai-c">
       <div class="title-css">{{ title }}</div>
       <div class="f ai-c">
@@ -10,7 +10,7 @@
         >
       </div>
     </div>
-    <div class="p30">
+    <div class="nr-box p30 f1">
       <el-form
         ref="form"
         :model="params"
@@ -89,14 +89,14 @@ export default {
   components: { PEditorVue },
   data() {
     const checkPageUrl = (rule, value, callback) => {
-      if (value === "") {
-        if (this.params.related === 0) {
-          callback();
-        } else {
-          callback(new Error("请输入连接地址"));
-        }
-      } else {
+      if (this.params.related === 0) {
         callback();
+      } else {
+        if (!value) {
+          callback(new Error("请输入链接地址"));
+        } else {
+          callback();
+        }
       }
     };
 
@@ -136,7 +136,7 @@ export default {
           },
         ],
         pageUrl: [
-          { required: false, message: "请输入连接地址", trigger: "blur" },
+          // { required: false, message: '请输入链接地址', trigger: 'blur' },
           {
             min: 10,
             max: 200,
@@ -202,5 +202,8 @@ export default {
   .el-row {
     width: 100%;
   }
+}
+.nr-box {
+  overflow-y: auto;
 }
 </style>

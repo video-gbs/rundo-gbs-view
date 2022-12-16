@@ -104,13 +104,16 @@ export default {
 
 <style lang="scss" scoped>
 .page-container {
+  height: 100%;
   background: #f2f2f2;
   // min-height: calc(100vh - 98px);
   padding: 20px;
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
+  overflow-y: auto;
   .container-left {
+    height: 835px;
     > div {
       width: 100%;
     }

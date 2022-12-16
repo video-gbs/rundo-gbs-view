@@ -7,7 +7,7 @@
       @click="handleClickOutside"
     />
     <sidebar class="sidebar-container" />
-    <div class="main-container">
+    <div class="main-container f fd-c ai-s">
       <div :class="{ 'fixed-header': fixedHeader }">
         <Navbar />
       </div>
@@ -69,13 +69,29 @@ export default {
     this.initTabList();
   },
   mounted() {
-    window.onresize = () => {
-      this.setScale();
-    };
+    window.onresize = this.throttle(this.setScale, 500, 500);
   },
   methods: {
     initTabList() {
       this.tabList.push(this.$route.path);
+    },
+    throttle(method, delay, duration) {
+      var timer = null;
+      var begin = new Date();
+      return function () {
+        var context = this;
+        var args = arguments;
+        var current = new Date();
+        clearTimeout(timer);
+        if (current - begin >= duration) {
+          method.apply(context, args);
+          begin = current;
+        } else {
+          timer = setTimeout(function () {
+            method.apply(context, args);
+          }, delay);
+        }
+      };
     },
     setScale() {
       // 以1920px为标准宽度
@@ -83,10 +99,11 @@ export default {
       const w = document.body.clientWidth;
       // this.nowWidth = w
       // this.baseW = w
-      console.log("w", w);
+
       const h = document.getElementsByTagName("HTML")[0];
       this.nowWidth = 1920 / (w / baseW);
       h.style.setProperty("--web-zoom", w / baseW);
+      this.$forceUpdate();
     },
   },
 };
@@ -120,6 +137,9 @@ export default {
     padding-top: 3.5rem;
     overflow: auto;
     background-color: rgba(242, 242, 242, 1);
+    > div {
+      width: 100%;
+    }
   }
 }
 
