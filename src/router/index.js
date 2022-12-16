@@ -126,8 +126,8 @@ const constantRoutes = [
             "@/views/leftMenus/politicalInquiryManagement/politicalReply/index"
           ),
         meta: { title: "邀请回复审核", icon: "" },
-        hidden: true,
-        author: none,
+        // hidden: true,
+        author: admin,
       },
       {
         path: "/recycleBin",
@@ -221,6 +221,48 @@ const constantRoutes = [
         author: superAdmin,
         hidden: true,
         meta: { title: "广告图明细", icon: "" },
+      },
+      {
+        path: "/introduction",
+        name: "introduction",
+        component: () =>
+          import("@/views/leftMenus/informationManagement/introduction/index"),
+        author: superAdmin,
+        meta: { title: "问政简介", icon: "" },
+      },
+      {
+        path: "/askProcess",
+        name: "askProcess",
+        component: () =>
+          import("@/views/leftMenus/informationManagement/askProcess/index"),
+        author: superAdmin,
+        meta: { title: "提问流程", icon: "" },
+      },
+      {
+        path: "/regulations",
+        name: "regulations",
+        component: () =>
+          import("@/views/leftMenus/informationManagement/regulations/index"),
+        author: superAdmin,
+        meta: { title: "相关规定", icon: "" },
+      },
+      {
+        path: "/pointsForAttention",
+        name: "pointsForAttention",
+        component: () =>
+          import(
+            "@/views/leftMenus/informationManagement/pointsForAttention/index"
+          ),
+        author: superAdmin,
+        meta: { title: "注意事项", icon: "" },
+      },
+      {
+        path: "/contactUs",
+        name: "contactUs",
+        component: () =>
+          import("@/views/leftMenus/informationManagement/contactUs/index"),
+        author: superAdmin,
+        meta: { title: "联系我们", icon: "" },
       },
     ],
   },

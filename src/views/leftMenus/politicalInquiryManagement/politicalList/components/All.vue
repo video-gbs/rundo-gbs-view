@@ -111,6 +111,7 @@ import Pagination from "@/components/Pagination/index.vue";
 import { unitList } from "@/api/method/unitManagement";
 import {
   affairsInfoList,
+  affairsInfoList_v2,
   affairsInfoDelete,
   affairsInfoSearch,
 } from "@/api/method/politicalList";
@@ -498,7 +499,7 @@ export default {
     },
     getDataList() {
       this.$refs["comTableRef"].isLoading_ = true;
-      affairsInfoList(this.query)
+      affairsInfoList_v2(this.query)
         .then((res) => {
           if (res.code === 10000) {
             this.tableData = res.data ? res.data.rows : [];

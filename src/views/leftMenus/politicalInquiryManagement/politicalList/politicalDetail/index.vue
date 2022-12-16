@@ -9,8 +9,10 @@
         size="mini"
         @click="btnFn(i, actBtn[i])"
       >
-        <svg-icon :icon-class="actBtn[i].icon" class="btn_svg" />
-        {{ actBtn[i].label }}
+        <div class="f jc-c ai-c">
+          <svg-icon :icon-class="actBtn[i].icon" class="btn_svg mr5" />
+          {{ actBtn[i].label }}
+        </div>
       </el-button>
     </div>
     <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
@@ -153,12 +155,29 @@
           :model="otherDeptReplyForm"
           :rules="otherDeptReplyRules"
         >
-          <el-form-item label="回复内容" prop="content">
+          <el-form-item label="回复结果">
+            <el-radio-group v-model="otherDeptReplyForm.isReply">
+              <el-radio :label="1">确认回复</el-radio>
+              <el-radio :label="2">无法回复</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item
+            v-if="otherDeptReplyForm.isReply === 1"
+            label="回复内容"
+            prop="content"
+          >
             <PEditorVue
               ref="replyEditorRef"
               :value="otherDeptReplyContent"
               @input="otherDeptReplyChange"
             />
+          </el-form-item>
+          <el-form-item
+            v-if="otherDeptReplyForm.isReply === 2"
+            label="拒绝理由"
+            prop="content"
+          >
+            <el-input v-model="otherDeptReplyForm.content2" :row="3" />
           </el-form-item>
         </el-form>
       </template>
@@ -649,7 +668,7 @@ export default {
           dialog: "applyTransferCheckRef",
           show: false,
           author: "admin",
-          icon: "",
+          icon: "right2",
         },
         applyInvite: {
           id: 13,
@@ -669,7 +688,7 @@ export default {
           dialog: "applyInviteCheckRef",
           show: false,
           author: "admin",
-          icon: "",
+          icon: "right2",
         },
         otherDeptReply: {
           id: 15,
@@ -679,7 +698,7 @@ export default {
           dialog: "otherDeptReplyRef",
           show: false,
           author: "spokeman",
-          icon: "",
+          icon: "right4",
         },
         delete: {
           id: 99,
@@ -797,11 +816,14 @@ export default {
       otherDeptReplyForm: {
         // 协助回复
         affairsId: "",
+        isReply: 1,
         content: "",
+        content1: "",
+        content2: "",
       },
       otherDeptReplyRules: {
         content: [
-          { required: true, message: "请输入回复内容", trigger: "change" },
+          { required: true, message: "请输入回复的内容", trigger: "change" },
         ],
       },
       assistDept: {},
@@ -842,7 +864,7 @@ export default {
         // 获取当前问政信息
         // affairsInfoSearchApply
         const pid = this.$route.params.id;
-        const fn = ["audit"].includes(this.$route.params.type)
+        const fn = ["audit", "reply"].includes(this.$route.params.type)
           ? await affairsInfoSearchApply(pid)
           : await affairsInfoSearch(pid);
         console.log("fnnnnnnnn", fn);
@@ -952,6 +974,7 @@ export default {
         this.one.isReview === 0 ? "right10" : "right8";
       if (ut === 0) {
         // 超管
+
         // 审核补充说明
         this.moreData && this.moreData.auditStatus === 0 && arr.push("more");
         // 未审核
@@ -971,6 +994,7 @@ export default {
         ) {
           arr.push("applyTransferCheck");
         }
+        // 存在邀请回复
         // 通用
         arr.push("delete");
       }
@@ -1013,8 +1037,7 @@ export default {
             arr.push("accept", "reply", "applyTransfer");
         } else {
           // 如果受理单位不是本单位，又显示了这条数据，看一下状态，只有待受理和已受理以及内部转移的过程才可以 协助回复
-          ![1, 2, 3, 20, 21, 23, 100].includes(status) &&
-            arr.push("otherDeptReply");
+          ![1, 2, 3, 100].includes(status) && arr.push("otherDeptReply");
         }
       }
       arr.push("back");
@@ -1516,9 +1539,19 @@ export default {
           this.$message.warning("操作失败：" + JSON.stringify(err));
         });
     },
-    otherDeptReplyFn() {
+    otherDeptReplyFn(v) {
+      if (v && v === "c") {
+        // 重置数据
+        this.otherDeptReplyForm.isReply = 1;
+        this.otherDeptReplyForm.content = "";
+        this.otherDeptReplyForm.content1 = "";
+        this.otherDeptReplyForm.content2 = "";
+        return;
+      }
       // 协助回复
 
+      this.otherDeptReplyForm.content =
+        this.otherDeptReplyForm[`content${this.otherDeptReplyForm.isReply}`];
       this.$refs["otherDeptReplyFormRef"].validate((v) => {
         if (v) {
           otherDeptReply(this.otherDeptReplyForm)
@@ -1532,7 +1565,7 @@ export default {
       });
     },
     otherDeptReplyChange(v) {
-      this.otherDeptReplyForm.content = v;
+      this.otherDeptReplyForm.content1 = v;
       console.log(this.otherDeptReplyForm);
       // this.otherDeptReplyForm.content = this.otherDeptReplyContent
     },
@@ -1577,6 +1610,7 @@ export default {
   box-shadow: none;
   border: 0;
 }
+
 ::v-deep .el-tabs__item.is-active {
   border: 0 none;
 }
@@ -1626,10 +1660,12 @@ export default {
   top: 6px;
   right: 0px;
   z-index: 10;
+
   ::v-deep .el-button {
     display: flex;
     align-items: center;
   }
+
   ::v-deep .el-button--danger {
     .btn_svg {
       color: #fff;
