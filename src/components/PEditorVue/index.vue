@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div
+    class="PEditorVue-panel"
+    :style="{ height: typeof height === 'number' ? `${height}px` : height }"
+  >
     <div style="border: 1px solid #ccc; margin-top: 10px">
       <!-- 工具栏 -->
       <Toolbar
@@ -39,6 +42,10 @@ export default {
     value: {
       type: String,
       default: "",
+    },
+    height: {
+      type: String || Number,
+      default: "400px",
     },
   },
   data() {
@@ -119,7 +126,7 @@ export default {
       }
     },
     onChange(editor) {
-      console.log("editor.getAllMenuKeys()", editor.getAllMenuKeys());
+      // console.log('editor.getAllMenuKeys()', editor.getAllMenuKeys())
       let html = editor.getHtml();
       html = trim(html) == "<p><br></p>" ? "" : html;
       this.changeStatus = true;
@@ -147,3 +154,16 @@ export default {
 </script>
 
 <style src="@wangeditor/editor/dist/css/style.css"></style>
+<style lang="scss" scoped>
+.PEditorVue-panel {
+  // display: flex;
+
+  > div {
+    width: 100%;
+    flex: 1;
+    > div {
+      width: 100%;
+    }
+  }
+}
+</style>
