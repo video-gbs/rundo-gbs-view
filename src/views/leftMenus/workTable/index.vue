@@ -113,6 +113,7 @@ export default {
   display: flex;
   overflow-y: auto;
   .container-left {
+    height: 835px;
     > div {
       width: 100%;
     }
