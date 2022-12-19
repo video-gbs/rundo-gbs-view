@@ -42,6 +42,7 @@ export default {
 }
 .app-main-c {
   > div {
+    margin: 20px;
     width: 100%;
   }
 }

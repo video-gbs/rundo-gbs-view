@@ -153,6 +153,94 @@ const constantRoutes = [
     ],
   },
   {
+    path: "/commentManagement",
+    name: "commentManagement",
+    component: Layout,
+    // meta: { title: '用户管理' },
+    meta: { title: "评论管理", icon: "yhgl" },
+    redirect: "/commentManagementIndex",
+    author: superAdmin,
+    children: [
+      {
+        path: "/commentManagementIndex",
+        name: "CommentManagementIndex",
+        author: superAdmin,
+        component: () => import("@/views/leftMenus/commentManagement/index"),
+        redirect: "/commentManagementList",
+        meta: { title: "", icon: "yhgl" },
+        hidden: true,
+        children: [
+          {
+            path: "/commentManagementList",
+            name: "commentManagementList",
+            author: superAdmin,
+            component: () =>
+              import("@/views/leftMenus/commentManagement/components/list"),
+            meta: { title: "评论列表", icon: "yhgl" },
+          },
+          {
+            path: "/commentManagementRecycleBin",
+            name: "commentManagementRecycleBin",
+            author: superAdmin,
+            component: () =>
+              import(
+                "@/views/leftMenus/commentManagement/components/recycleBin"
+              ),
+            meta: { title: "评论回收站", icon: "yhgl" },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: "/specialTopicManagement",
+    name: "specialTopicManagement",
+    component: Layout,
+    // meta: { title: '用户管理' },
+    meta: { title: "专题管理", icon: "yhgl" },
+    redirect: "/specialTopicManagementIndex",
+    author: superAdmin,
+    children: [
+      {
+        path: "/specialTopicManagementIndex",
+        name: "specialTopicManagementIndex",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/specialTopicManagement/index"),
+        meta: { title: "", icon: "yhgl" },
+        hidden: true,
+      },
+      {
+        path: "/specialTopicManagementComment",
+        name: "specialTopicManagementComment",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/specialTopicManagement/comment"),
+        meta: { title: "专题评论", icon: "yhgl" },
+        hidden: true,
+      },
+      {
+        path: "/specialTopic/:id",
+        name: "specialTopic",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/specialTopicManagement/addOrEdit"),
+        meta: { title: "专题操作", icon: "yhgl" },
+        hidden: true,
+      },
+      {
+        path: "/specialTopicDetail/:id",
+        name: "specialTopicDetail",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/specialTopicManagement/detail.vue"),
+        meta: { title: "专题详细", icon: "yhgl" },
+        hidden: true,
+      },
+    ],
+  },
+
+  {
     path: "/informationManagement",
     name: "informationManagement",
     component: Layout,
@@ -282,6 +370,32 @@ const constantRoutes = [
         author: superAdmin,
         component: () => import("@/views/leftMenus/userManagement/index"),
         meta: { title: "用户管理", icon: "yhgl" },
+      },
+    ],
+  },
+  {
+    path: "/analysis",
+    name: "analysis",
+    component: Layout,
+    // meta: { title: '用户管理' },
+    redirect: "/replyRank",
+    // component: () => import('@/views/leftMenus/userManagement/index'),
+    meta: { title: "统计分析 ", icon: "yhgl" },
+    author: superAdmin,
+    children: [
+      {
+        path: "/replyRank",
+        name: "ReplyRank",
+        author: superAdmin,
+        component: () => import("@/views/leftMenus/analysis/replyRank"),
+        meta: { title: "回复排行", icon: "yhgl" },
+      },
+      {
+        path: "/satisfactionRank",
+        name: "SatisfactionRank",
+        author: superAdmin,
+        component: () => import("@/views/leftMenus/analysis/satisfactionRank"),
+        meta: { title: "满意度排行", icon: "yhgl" },
       },
     ],
   },

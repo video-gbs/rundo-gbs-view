@@ -1025,6 +1025,7 @@ export default {
         // 一般网络发言人
         // 待受理
         if (isMainDept) {
+          // 如果是自己的问政，照常处理
           // 待受理
           [4].includes(status) && arr.push("accept", "reply", "applyTransfer");
           // 已受理 待回复
@@ -1036,8 +1037,10 @@ export default {
           [13, 14].includes(status) &&
             arr.push("accept", "reply", "applyTransfer");
         } else {
-          // 如果受理单位不是本单位，又显示了这条数据，看一下状态，只有待受理和已受理以及内部转移的过程才可以 协助回复
-          ![1, 2, 3, 100].includes(status) && arr.push("otherDeptReply");
+          // 如果受理单位不是本单位，又显示了这条数据，看一下状态，只有待受理和已受理以及内部转移的过程并且isReplied为false才可以 协助回复
+          ![1, 2, 3, 100].includes(status) &&
+            !this.one.isReplied &&
+            arr.push("otherDeptReply");
         }
       }
       arr.push("back");

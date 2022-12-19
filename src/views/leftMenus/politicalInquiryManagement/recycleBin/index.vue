@@ -220,6 +220,7 @@ export default {
   background: #ececec;
   margin: 20px;
   position: relative;
+  overflow-y: auto;
 
   .right-btns-ul {
     position: absolute;

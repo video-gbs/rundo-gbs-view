@@ -18,6 +18,7 @@
       :cell-style="changeCellStyle"
       :width="width"
       v-on="$listeners"
+      @sort-change="sortChange"
     >
       <!-- 多选框 -->
       <el-table-column
@@ -46,6 +47,7 @@
         :prop="item.name"
         :label="item.label"
         :width="item.width"
+        :sortable="item.sortable ? item.sortable : false"
         min-width="120"
         :style="{
           'text-align': item.align ? 'center !important;' : 'left !important;',

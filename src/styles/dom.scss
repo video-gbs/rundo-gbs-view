@@ -333,10 +333,10 @@ $fontWeight: (
   width: 100%;
   border-bottom: 1px solid #ececec;
   padding: 15px;
-  .title-css {
-    border-left: 4px solid $--bg-color;
-    text-indent: 10px;
-  }
+}
+.title-css {
+  border-left: 4px solid $--bg-color;
+  text-indent: 10px;
 }
 
 .router_container4 {
@@ -349,4 +349,13 @@ $fontWeight: (
 }
 .router_container2 {
   // overflow: auto;
+}
+
+.module-panel {
+  > div {
+    width: 100%;
+  }
+  .content-box {
+    overflow-y: auto;
+  }
 }
