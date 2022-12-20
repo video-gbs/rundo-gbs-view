@@ -659,7 +659,7 @@ export default {
           dialog: "applyTransferRef",
           show: false,
           author: "spokeman",
-          icon: "",
+          icon: "right2",
         },
         applyTransferCheck: {
           id: 12,
@@ -678,7 +678,7 @@ export default {
           dialog: "applyInviteRef",
           show: false,
           author: "spokeman",
-          icon: "",
+          icon: "right2",
         },
         applyInviteCheck: {
           id: 14,
@@ -1036,6 +1036,8 @@ export default {
           // 申请转移未通过、 申请转移已通过, 市领导流程已审核已分配单位
           [13, 14].includes(status) &&
             arr.push("accept", "reply", "applyTransfer");
+          // 邀请回复
+          ![1, 2, 3, 100].includes(status) && arr.push("applyInvite");
         } else {
           // 如果受理单位不是本单位，又显示了这条数据，看一下状态，只有待受理和已受理以及内部转移的过程并且isReplied为false才可以 协助回复
           ![1, 2, 3, 100].includes(status) &&

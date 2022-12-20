@@ -1,7 +1,18 @@
 <template>
   <div class="router_container2 m20">
-    <div class="panel-header-box bg-w">
+    <div class="panel-header-box bg-w f jc-sb ai-c">
       <div class="title-css">邀请回复审核列表</div>
+      <div class="tabs-css">
+        <el-tabs
+          v-model="activeName"
+          type="card"
+          size="mini"
+          @tab-click="handleClick"
+        >
+          <el-tab-pane label="邀请审核" name="1" />
+          <el-tab-pane label="回复审核" name="2" />
+        </el-tabs>
+      </div>
     </div>
     <div class="p20 border-bottom bg-w">
       <PControlGroup
@@ -19,7 +30,7 @@
         :header-cell-style="{ background: '#EAEAEA' }"
         style="width: 100%"
       >
-        <el-table-column prop="label" label="编号" />
+        <el-table-column prop="id" label="编号" width="140px" />
         <el-table-column prop="title" label="标题" width="180px" />
         <el-table-column prop="type" label="分类">
           <template slot-scope="scope">
@@ -48,8 +59,17 @@
         <el-table-column prop="operateDeptName" label="申请单位" />
         <el-table-column width="200" label="操作" fixed="right">
           <template slot-scope="scope">
-            <el-button type="text" @click="dialogShow(scope.row)"
+            <el-button
+              v-if="activeName === '1'"
+              type="text"
+              @click="dialogShow(scope.row)"
               >审核</el-button
+            >
+            <el-button
+              v-if="activeName === '2'"
+              type="text"
+              @click="checkInvite(scope.row)"
+              >受邀回复审核</el-button
             >
             <el-button type="text" @click="goDetail(scope.row)"
               >查看详情</el-button
@@ -71,16 +91,64 @@
         @onBtnCancel="comfirmAuditCancel"
       />
     </el-dialog>
+    <!--审核协助单位回复-->
+    <PDialog ref="checkInviteSecondRef" @submit="checkInviteSecondFn">
+      <template slot="title">审核协助单位回复</template>
+      <template slot="main">
+        <el-form label-width="80px" :model="deptInviteData" size="mini">
+          <el-form-item label="回复结果">
+            {{ deptInviteData.result }}
+          </el-form-item>
+          <el-form-item label="结果说明">
+            {{ deptInviteData.content }}
+          </el-form-item>
+          <el-form-item label="协助单位">
+            {{ deptInviteData.deptName }}
+          </el-form-item>
+          <el-form-item label="回复人">
+            {{ deptInviteData.resultName }}
+          </el-form-item>
+          <el-form-item label="回复时间">
+            {{ deptInviteData.resultTime }}
+          </el-form-item>
+        </el-form>
+        <el-form
+          ref="cantReplyAuditParamsRef"
+          label-width="80px"
+          :model="cantReplyAuditParams"
+          :rules="cantReplyAuditParamsRules"
+          size="mini"
+        >
+          <el-form-item label="审核结果" prop="auditResult">
+            <el-radio v-model="cantReplyAuditParams.auditResult" :label="1"
+              >审核通过</el-radio
+            >
+            <el-radio v-model="cantReplyAuditParams.auditResult" :label="2"
+              >审核不通过</el-radio
+            >
+          </el-form-item>
+          <el-form-item label="审核说明" prop="content">
+            <el-input
+              v-model="cantReplyAuditParams.content"
+              type="textarea"
+              rows="5"
+            />
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
   </div>
 </template>
 
 <script>
 import PControlGroup from "@/components/PControlGroup";
 import pagination from "@/components/Pagination/index.vue";
+import PDialog from "@/components/PDialog/index.vue";
 import {
   getAffairsassistList,
   assistDeptList,
   inviteReplyAudit,
+  cantReplyAudit,
 } from "@/api/method/affairsassist";
 import { unitList } from "@/api/method/unitManagement";
 
@@ -88,10 +156,23 @@ export default {
   components: {
     PControlGroup,
     pagination,
+    PDialog,
   },
   data() {
+    const checkInviteSecondRulesFn = (rule, value, callback) => {
+      if (this.cantReplyAuditParams.auditResult === 1) {
+        callback();
+      } else {
+        if (value && value !== "") {
+          callback();
+        } else {
+          callback(new Error("请输入拒绝理由"));
+        }
+      }
+    };
     return {
       queryControlData: null,
+      activeName: "1",
       params: {
         deptId: "", // 留言对象
         deptType: "",
@@ -106,6 +187,7 @@ export default {
         status: "", // 状态
         title: "", // 标题
         type: "", // 分类
+        inviteFlag: 1, // 邀请审核，2被邀请人拒绝
       },
       checkParams: {
         // result: 1,
@@ -114,6 +196,7 @@ export default {
         // deptId: '',
         affairsId: "",
       },
+      oneData: {},
       tableData: [],
       auditPopData: {
         show: false,
@@ -121,6 +204,25 @@ export default {
       },
       deptList: [],
       transferDeptList: [],
+      deptInviteData: {
+        result: "无法回复",
+        content: "太难了",
+        deptName: "某某局",
+        resultName: "王某某",
+        resultTime: "2022-12-15 15:23:53",
+      },
+      cantReplyAuditParams: {
+        affairsId: "",
+        auditId: "",
+        auditResult: 1,
+        content: "",
+      },
+      cantReplyAuditParamsRules: {
+        content: {
+          validator: checkInviteSecondRulesFn,
+          trigger: ["blur", "change"],
+        },
+      },
     };
   },
   created() {
@@ -376,6 +478,51 @@ export default {
         }
       });
     },
+    checkInvite(v) {
+      this.oneData = v;
+      this.$refs["checkInviteSecondRef"].visible = true;
+      // cantReplyAudit(p)
+    },
+    checkInviteSecondFn() {
+      this.$refs["cantReplyAuditParamsRef"].validate((v) => {
+        if (v) {
+          this.cantReplyAuditParams.affairsId = this.oneData.id;
+          this.cantReplyAuditParams.auditId = this.oneData.auditId;
+          cantReplyAudit(this.cantReplyAuditParams).then((res) => {
+            if (res.code === 10000) {
+              this.$message.success("审核成功");
+              this.$refs["checkInviteSecondRef"].visible = false;
+              this.queryData();
+            }
+          });
+        }
+      });
+    },
+    handleClick(v) {
+      this.params.inviteFlag = +v.name;
+
+      const p = Object.assign(
+        {
+          deptId: "", // 留言对象
+          deptType: "",
+          operateDeptId: "",
+          domain: "", // 领域
+          endTime: "", // 结束时间
+          pageNum: 1,
+          pageSize: 10,
+          phone: "", // 电话
+          pubUsername: "", // 发布账号
+          startTime: "", // 开始
+          status: "", // 状态
+          title: "", // 标题
+          type: "", // 分类
+          inviteFlag: +v.name, // 邀请审核，2被邀请人拒绝
+        },
+        this.params
+      );
+
+      this.queryData(p);
+    },
   },
 };
 </script>
@@ -385,5 +532,16 @@ export default {
   .border-bottom {
     border-bottom: 1px solid #ececec;
   }
+}
+.panel-header-box {
+  position: relative;
+  .tabs-css {
+    position: absolute;
+    bottom: 0px;
+    right: 5px;
+  }
+}
+::v-deep .el-tabs__header {
+  margin: 0 0 0px;
 }
 </style>

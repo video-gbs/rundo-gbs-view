@@ -409,6 +409,38 @@ const constantRoutes = [
     author: superAdmin,
     children: [
       {
+        path: "/commentSettings",
+        name: "commentSettings",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/commentSettings/index"),
+        meta: { title: "评论设置", icon: "" },
+      },
+      {
+        path: "/reviewOverdue",
+        name: "reviewOverdue",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/reviewOverdue/index"),
+        meta: { title: "审核逾期", icon: "" },
+      },
+      {
+        path: "/replyOverdue",
+        name: "replyOverdue",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/replyOverdue/index"),
+        meta: { title: "回复逾期", icon: "" },
+      },
+      {
+        path: "/satisfication",
+        name: "satisfication",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/satisfication/index"),
+        meta: { title: "满意度设置", icon: "" },
+      },
+      {
         path: "/accountManagement",
         name: "accountManagement",
         author: superAdmin,

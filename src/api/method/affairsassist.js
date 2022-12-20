@@ -35,3 +35,8 @@ export function otherDeptReply(params) {
   // 被邀请的单位回复问政
   return request.post(`/politics/basicFlow/otherDeptReply`, params);
 }
+
+export function cantReplyAudit(params) {
+  // 审核受邀单位的拒绝回复
+  return request.post(`/politics/mailboxFlow/cantReplyAudit`, params);
+}
