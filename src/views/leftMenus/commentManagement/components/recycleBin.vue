@@ -21,6 +21,7 @@
         :table-data="tableData"
         :button-items="buttonItems"
         :height-table="'auto'"
+        @handleClick="handleClick"
       />
       <Pagination
         :pages-data="query"
@@ -34,19 +35,31 @@
 import Seach from "@/components/Seach/index.vue";
 import ComTabble from "@/components/ComTabble/index.vue";
 import Pagination from "@/components/Pagination/index.vue";
+import {
+  getReviewList,
+  reallyDeleteReview,
+  refreshReview,
+} from "@/api/method/commentManagement";
+
 export default {
   name: "",
   components: { Seach, ComTabble, Pagination },
   data() {
     return {
       query: {
-        title: "",
+        auditStatus: "",
         content: "",
-        submitName: "",
+        delFlag: 1,
+        endTime: "",
+        field: [],
         isShow: "",
-        time: [],
+        order: false,
+        pubUsername: "",
+        startTime: "",
+        title: "",
         pageNum: 1,
         pageSize: 10,
+        total: 0,
       },
       headerStyle: {
         background: "#EAEAEA",
@@ -70,7 +83,7 @@ export default {
           width: "180px",
         },
         {
-          poro: "submitName",
+          poro: "pubUsername",
           type: "input",
           label: "提交人",
           size: "small",
@@ -91,7 +104,7 @@ export default {
         },
 
         {
-          poro: "time",
+          poro: "startTime",
           type: "dateRange",
           label: "提交时间",
           size: "small",
@@ -108,7 +121,7 @@ export default {
           },
           {
             text: "恢复数据",
-            cb: "resetData",
+            cb: "refreshData",
             // icon: 'el-icon-view'
           },
           {
@@ -164,8 +177,63 @@ export default {
       tableData: [],
     };
   },
+  mounted() {
+    this.getDataList();
+  },
   methods: {
-    getDataList() {},
+    getDataList() {
+      const p = Object.assign({}, this.query);
+      if (this.query.startTime && this.query.startTime.length) {
+        p.startTime = this.query.startTime[0];
+        p.endTime = this.query.startTime[1];
+      } else {
+        p.startTime = "";
+        p.endTime = "";
+      }
+      getReviewList(p).then((res) => {
+        if (res.code === 10000) {
+          this.tableData = res.data.rows;
+          this.query.total = res.data.total;
+        }
+      });
+    },
+    handleClick(v) {
+      this[v.cb](v.row);
+    },
+    verify(v) {
+      this.$router.push(`/commentDetail/${v.affairsId}`);
+    },
+
+    reallyDelete(v) {
+      this.$alert(
+        `确定要删除 '${v.title || v.realName || v.name}' 吗?`,
+        "删除操作",
+        {
+          dangerouslyUseHTMLString: true,
+          showCancelButton: true,
+        }
+      ).then((action) => {
+        reallyDeleteReview(v.id).then((res) => {
+          res.code === 10000 &&
+            (this.$message.success("删除成功"), this.getDataList());
+        });
+      });
+    },
+    refreshData(v) {
+      this.$alert(
+        `是否要恢复 '${v.title || v.realName || v.name}' 的数据?`,
+        "恢复操作",
+        {
+          dangerouslyUseHTMLString: true,
+          showCancelButton: true,
+        }
+      ).then((action) => {
+        refreshReview(v.id).then((res) => {
+          res.code === 10000 &&
+            (this.$message.success("恢复成功"), this.getDataList());
+        });
+      });
+    },
     submitSearch(val) {
       this.query = val;
       setTimeout(() => {
@@ -180,9 +248,20 @@ export default {
         this.getDataList();
       }, 200);
     },
+
     // 分页
-    sizeChange() {},
-    currentChange() {},
+    sizeChange(v) {
+      this.query.pageSize = v;
+      setTimeout(() => {
+        this.getDataList();
+      }, 200);
+    },
+    currentChange(v) {
+      this.query.pageNum = v;
+      setTimeout(() => {
+        this.getDataList();
+      }, 200);
+    },
     // 分页
     // 表格参数
     // 表格参数

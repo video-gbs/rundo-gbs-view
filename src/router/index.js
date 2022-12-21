@@ -190,8 +190,18 @@ const constantRoutes = [
           },
         ],
       },
+      {
+        path: "/commentDetail/:id/:id2",
+        // id是评论id   id2是对应问政id
+        name: "commentDetail",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/commentManagement/commentDetail/index"),
+        meta: { title: "评论详情", icon: "yhgl" },
+      },
     ],
   },
+
   {
     path: "/specialTopicManagement",
     name: "specialTopicManagement",

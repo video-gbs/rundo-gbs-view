@@ -32,24 +32,24 @@
         >
           <!-- <component :is="item.content" v-if="item.isShow" /> -->
         </el-tab-pane>
-        <router-view :status="activeName" />
+        <router-view ref="listRef" :status="activeName" />
       </template>
     </el-tabs>
   </div>
 </template>
 <script>
 export default {
-  name: "CommentManagementListIndex",
+  name: "CommentManagementIndex",
   data() {
     return {
       recycleShow: false,
       listShow: false,
       activeName: "全部",
       tabDict: {
-        0: [],
-        1: [2],
-        2: [4, 12, 13, 14, 20, 21],
-        3: [5],
+        0: "",
+        1: 2,
+        2: 4,
+        3: 3,
       },
       tabpaneList: [
         {
@@ -58,11 +58,11 @@ export default {
         },
         {
           label: "待审核",
-          value: 1,
+          value: 2,
         },
         {
           label: "审核通过",
-          value: 2,
+          value: 4,
         },
         {
           label: "审核未通过",
@@ -91,7 +91,10 @@ export default {
     // this.recycleShow = ut === 0
   },
   methods: {
-    handleClick() {},
+    handleClick(v) {
+      this.$refs["listRef"].query.auditStatus = this.tabDict[v.index];
+      this.$refs["listRef"].getDataList();
+    },
   },
 };
 </script>

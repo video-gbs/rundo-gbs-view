@@ -21,6 +21,7 @@
         :table-data="tableData"
         :button-items="buttonItems"
         :height-table="'auto'"
+        @handleClick="handleClick"
       />
       <Pagination
         :pages-data="query"
@@ -28,25 +29,84 @@
         @current-change="currentChange"
       />
     </div>
+    <PDialog ref="commentRef" @submit="examineFn">
+      <template slot="title">审核评论</template>
+      <template slot="main">
+        <el-form
+          ref="commentForm"
+          :model="checkParams"
+          :rules="rules"
+          label-width="80px"
+        >
+          <el-form-item label="审核结果">
+            <el-radio v-model="checkParams.auditResult" :label="1"
+              >审核通过</el-radio
+            >
+            <el-radio v-model="checkParams.auditResult" :label="0"
+              >审核未通过</el-radio
+            >
+            <el-input v-model="checkParams.auditResult" />
+          </el-form-item>
+          <el-form-item label="审核说明">
+            <el-input v-model="checkParams.content" />
+          </el-form-item>
+        </el-form>
+      </template>
+    </PDialog>
   </div>
 </template>
 <script>
 import Seach from "@/components/Seach/index.vue";
 import ComTabble from "@/components/ComTabble/index.vue";
 import Pagination from "@/components/Pagination/index.vue";
+import PDialog from "@/components/PDialog/index.vue";
+import {
+  getReviewList,
+  auditReview,
+  deleteReview,
+} from "@/api/method/commentManagement";
 export default {
   name: "",
-  components: { Seach, ComTabble, Pagination },
+  components: { Seach, ComTabble, Pagination, PDialog },
   data() {
     return {
       query: {
-        title: "",
+        auditStatus: "",
         content: "",
-        submitName: "",
+        delFlag: 0,
+        endTime: "",
+        field: [],
         isShow: "",
-        time: [],
+        order: false,
+        pubUsername: "",
+        startTime: "",
+        title: "",
         pageNum: 1,
         pageSize: 10,
+        total: 0,
+      },
+      checkParams: {
+        auditResult: 1,
+        content: "",
+        id: "",
+      },
+      rules: {
+        content: [
+          {
+            validator: (rule, value, callback) => {
+              if (this.checkParams.auditResult === 0) {
+                if (this.checkParams.content.replace(/\s*/g, "") === "") {
+                  callback(new Error("请输入不用通过的原因"));
+                } else {
+                  callback();
+                }
+              } else {
+                callback();
+              }
+            },
+            trigger: "blur",
+          },
+        ],
       },
       headerStyle: {
         background: "#EAEAEA",
@@ -70,7 +130,7 @@ export default {
           width: "180px",
         },
         {
-          poro: "submitName",
+          poro: "pubUsername",
           type: "input",
           label: "提交人",
           size: "small",
@@ -91,7 +151,7 @@ export default {
         },
 
         {
-          poro: "time",
+          poro: "startTime",
           type: "dateRange",
           label: "提交时间",
           size: "small",
@@ -105,7 +165,12 @@ export default {
             text: "评论审核",
             cb: "examine",
             // icon: 'el-icon-view',
-            visible: true,
+            visible: {
+              attrName: "auditStatus",
+              fn: function (v) {
+                return v === 2;
+              },
+            },
           },
           {
             text: "设为可见",
@@ -187,13 +252,69 @@ export default {
       tableData: [],
     };
   },
+  mounted() {
+    this.getDataList();
+  },
   methods: {
-    getDataList() {},
+    getDataList() {
+      const p = Object.assign({}, this.query);
+      if (this.query.startTime && this.query.startTime.length) {
+        p.startTime = this.query.startTime[0];
+        p.endTime = this.query.startTime[1];
+      } else {
+        p.startTime = "";
+        p.endTime = "";
+      }
+      getReviewList(p).then((res) => {
+        if (res.code === 10000) {
+          this.tableData = res.data.rows;
+          this.query.total = res.data.total;
+        }
+      });
+    },
     submitSearch(val) {
       this.query = val;
       setTimeout(() => {
         this.getDataList();
       }, 200);
+    },
+    handleClick(v) {
+      this[v.cb](v.row);
+    },
+    examine(v) {
+      this.checkParams.id = v.id;
+      this.$refs["commentRef"].visible = true;
+    },
+    examineFn() {
+      this.$refs["commentForm"].validate((v) => {
+        if (v) {
+          auditReview(this.checkParams).then((res) => {
+            if (res.code === 10000) {
+              this.$message.success("审核成功");
+              this.$refs["commentRef"].visible = false;
+              this.getDataList();
+            }
+          });
+        }
+      });
+    },
+    verify(v) {
+      this.$router.push(`/commentDetail/${v.id}/${v.affairsId}`);
+    },
+    deleteItem(v) {
+      this.$alert(
+        `确定要删除 '${v.title || v.realName || v.name}' 吗?`,
+        "删除操作",
+        {
+          dangerouslyUseHTMLString: true,
+          showCancelButton: true,
+        }
+      ).then((action) => {
+        deleteReview(v.id).then((res) => {
+          res.code === 10000 &&
+            (this.$message.success("删除成功"), this.getDataList());
+        });
+      });
     },
     toReset(val) {
       this.query = val;
@@ -204,8 +325,18 @@ export default {
       }, 200);
     },
     // 分页
-    sizeChange() {},
-    currentChange() {},
+    sizeChange(v) {
+      this.query.pageSize = v;
+      setTimeout(() => {
+        this.getDataList();
+      }, 200);
+    },
+    currentChange(v) {
+      this.query.pageNum = v;
+      setTimeout(() => {
+        this.getDataList();
+      }, 200);
+    },
     // 分页
     // 表格参数
     // 表格参数

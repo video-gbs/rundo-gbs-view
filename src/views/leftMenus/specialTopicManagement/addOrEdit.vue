@@ -13,100 +13,231 @@
       </div>
     </div>
     <div class="nr-box p30 f1">
-      <el-form
-        ref="form"
-        :rules="rules"
-        :model="params"
-        label-width="100px"
-        label-position="left"
-      >
-        <el-form-item label="展示标题" prop="title">
-          <el-input
-            v-model="params.title"
-            clearable
-            size="mini"
-            placeholder="请输入标题"
-          />
-        </el-form-item>
-        <el-form-item label="专题图片" prop="photoUrl">
-          <div>
-            <el-row>
-              <el-col :span="params.photoUrl ? 14 : 24">
-                <el-upload
-                  ref="uploadRef"
-                  size="mini"
-                  drag
-                  action=""
-                  :http-request="uploadFn"
-                  :on-remove="onRemove"
-                  :limit="1"
-                >
-                  <i class="el-icon-upload" />
-                  <div class="el-upload__text">
-                    将文件拖到此处，或<em>点击上传</em>
-                  </div>
-                  <div slot="tip" class="el-upload__tip">
-                    {{
-                      `① 只能上传一张图片图片,格式："*.jpg"、"*.jpeg"、"*.png"； ② 大小不超过50M；`
-                    }}
-                  </div>
-                </el-upload>
-                <div>{{ `已选择 ${params.photoUrl ? 1 : 0}/1` }}</div>
-              </el-col>
-              <el-col
-                v-if="params.photoUrl"
-                :span="10"
-                class="f fd-c jc-c ai-c"
-              >
-                <div class="ml20">当前专题图片</div>
-                <div class="ml20 f ai-c jc-c round-img-box">
-                  <i class="el-icon-delete" @click="clickIconRemove" />
-                  <img :src="params.photoUrl || ''" />
-                </div>
-              </el-col>
-            </el-row>
-          </div>
-        </el-form-item>
-        <el-form-item label="简述" prop="description">
-          <el-input
-            v-model="params.description"
-            clearable
-            size="mini"
-            type="textarea"
-            maxlength="1000"
-            rows="5"
-            placeholder="请输入简述"
-            show-word-limit
-          />
-        </el-form-item>
-        <el-form-item label="关联内容" prop="outUrl">
-          <el-row>
-            <el-col :span="24">
-              <el-radio v-model="params.contentSet" size="mini" :label="1"
-                >内容展示</el-radio
-              >
-              <el-radio v-model="params.contentSet" size="mini" :label="2"
-                >关联外部链接</el-radio
-              >
+      <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+        <el-tab-pane label="基本设置" name="1">
+          <el-form
+            ref="form"
+            :rules="rules"
+            :model="params"
+            label-width="100px"
+            label-position="left"
+          >
+            <el-form-item label="展示标题" prop="title">
               <el-input
-                v-if="params.contentSet === 2"
-                v-model="params.outUrl"
+                v-model="params.title"
+                clearable
                 size="mini"
-                placeholder="请输入外链地址"
+                placeholder="请输入标题"
               />
-            </el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item
-          label="内容"
-          prop="content"
-          :required="params.contentSet === 1"
-        >
-          <!-- <PEditor id="roundChart" :value="editorCxt" @change="contentChange" /> -->
+            </el-form-item>
+            <el-form-item label="专题图片" prop="photoUrl">
+              <div>
+                <el-row>
+                  <el-col :span="params.photoUrl ? 14 : 24">
+                    <el-upload
+                      ref="uploadRef"
+                      size="mini"
+                      drag
+                      action=""
+                      :http-request="uploadFn"
+                      :on-remove="onRemove"
+                      :limit="1"
+                    >
+                      <i class="el-icon-upload" />
+                      <div class="el-upload__text">
+                        将文件拖到此处，或<em>点击上传</em>
+                      </div>
+                      <div slot="tip" class="el-upload__tip">
+                        {{
+                          `① 只能上传一张图片图片,格式："*.jpg"、"*.jpeg"、"*.png"； ② 大小不超过50M；`
+                        }}
+                      </div>
+                    </el-upload>
+                    <div>{{ `已选择 ${params.photoUrl ? 1 : 0}/1` }}</div>
+                  </el-col>
+                  <el-col
+                    v-if="params.photoUrl"
+                    :span="10"
+                    class="f fd-c jc-c ai-c"
+                  >
+                    <div class="ml20">当前专题图片</div>
+                    <div class="ml20 f ai-c jc-c round-img-box">
+                      <i class="el-icon-delete" @click="clickIconRemove" />
+                      <img :src="params.photoUrl || ''" />
+                    </div>
+                  </el-col>
+                </el-row>
+              </div>
+            </el-form-item>
+            <el-form-item label="简述" prop="description">
+              <el-input
+                v-model="params.description"
+                clearable
+                size="mini"
+                type="textarea"
+                maxlength="1000"
+                rows="5"
+                placeholder="请输入简述"
+                show-word-limit
+              />
+            </el-form-item>
+            <el-form-item label="关联内容" prop="outUrl">
+              <el-row>
+                <el-col :span="24">
+                  <el-radio v-model="params.contentSet" size="mini" :label="1"
+                    >内容展示</el-radio
+                  >
+                  <el-radio v-model="params.contentSet" size="mini" :label="2"
+                    >关联外部链接</el-radio
+                  >
+                  <el-input
+                    v-if="params.contentSet === 2"
+                    v-model="params.outUrl"
+                    size="mini"
+                    placeholder="请输入外链地址"
+                  />
+                </el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item
+              label="内容"
+              prop="content"
+              :required="params.contentSet === 1"
+            >
+              <!-- <PEditor id="roundChart" :value="editorCxt" @change="contentChange" /> -->
 
-          <PEditorVue :value="editorCxt" @input="contentChange" />
-        </el-form-item>
-      </el-form>
+              <PEditorVue :value="editorCxt" @input="contentChange" />
+            </el-form-item> </el-form
+        ></el-tab-pane>
+        <el-tab-pane label="评论设置" name="2">
+          <el-form
+            :model="params"
+            class="mt10"
+            label-width="100px"
+            label-position="left"
+          >
+            <el-form-item label="评论区">
+              <div class="mt0">
+                <el-switch
+                  v-model="params.isReview"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  active-text="开"
+                  inactive-text="关"
+                />
+              </div>
+            </el-form-item>
+            <el-form-item label="是否显示">
+              <div class="mt0">
+                <el-switch
+                  v-model="params.isShow"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  active-text="开"
+                  inactive-text="关"
+                />
+              </div>
+            </el-form-item>
+            <div class="mv10 title-c-3">请选择提交评论需要填写的内容：</div>
+            <el-form-item label="留言对象">
+              <div class="mt0">
+                <el-radio v-model="params.settingInsertDto.toObjFlag" :label="1"
+                  >需选择</el-radio
+                >
+                <el-radio v-model="params.settingInsertDto.toObjFlag" :label="0"
+                  >无需选择</el-radio
+                >
+              </div>
+            </el-form-item>
+            <el-form-item label="分类">
+              <div class="mt0">
+                <el-radio v-model="params.settingInsertDto.typeFlag" :label="1"
+                  >需选择</el-radio
+                >
+                <el-radio v-model="params.settingInsertDto.typeFlag" :label="0"
+                  >无需选择</el-radio
+                >
+              </div>
+            </el-form-item>
+            <el-form-item label="领域">
+              <div class="mt0">
+                <el-radio
+                  v-model="params.settingInsertDto.domainFlag"
+                  :label="1"
+                  >需选择</el-radio
+                >
+                <el-radio
+                  v-model="params.settingInsertDto.domainFlag"
+                  :label="0"
+                  >无需选择</el-radio
+                >
+              </div>
+            </el-form-item>
+            <el-form-item label="标题">
+              <div class="mt0">
+                <el-radio v-model="params.settingInsertDto.titleFlag" :label="1"
+                  >需选择</el-radio
+                >
+                <el-radio v-model="params.settingInsertDto.titleFlag" :label="0"
+                  >无需选择</el-radio
+                >
+              </div>
+            </el-form-item>
+            <el-form-item label="内容">
+              <div class="mt0">
+                <el-radio
+                  v-model="params.settingInsertDto.contentFlag"
+                  :label="1"
+                  >需选择</el-radio
+                >
+                <el-radio
+                  v-model="params.settingInsertDto.contentFlag"
+                  :label="0"
+                  >无需选择</el-radio
+                >
+              </div>
+            </el-form-item>
+            <el-form-item label="附件补充">
+              <div class="mt0">
+                <el-radio
+                  v-model="params.settingInsertDto.attachmentFlag"
+                  :label="1"
+                  >可选择填写</el-radio
+                >
+                <el-radio
+                  v-model="params.settingInsertDto.attachmentFlag"
+                  :label="0"
+                  >无需选择</el-radio
+                >
+              </div>
+            </el-form-item>
+            <el-form-item label="真实姓名">
+              <div class="mt0">
+                <el-radio
+                  v-model="params.settingInsertDto.trueNameFlag"
+                  :label="1"
+                  >可选择填写</el-radio
+                >
+                <el-radio
+                  v-model="params.settingInsertDto.trueNameFlag"
+                  :label="0"
+                  >无需选择</el-radio
+                >
+              </div>
+            </el-form-item>
+            <el-form-item label="联系方式">
+              <div class="mt0">
+                <el-radio v-model="params.settingInsertDto.telFlag" :label="1"
+                  >可选择填写</el-radio
+                >
+                <el-radio v-model="params.settingInsertDto.telFlag" :label="0"
+                  >无需选择</el-radio
+                >
+              </div>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+      </el-tabs>
     </div>
   </div>
 </template>
@@ -143,6 +274,7 @@ export default {
       }
     };
     return {
+      activeName: "1",
       title: "新增专题",
       params: {
         content: "", // 内容
@@ -153,14 +285,14 @@ export default {
         photoUrl: "", // 图片url
         outUrl: "", // 外链
         settingInsertDto: {
-          attachmentFlag: 0, // 附件补充，0无需填写，默认1可选择填写
-          contentFlag: 0, //	内容，0无需填写，默认1需填写
-          domainFlag: 0, //	领域，0无需选择，默认1需选择
-          telFlag: 0, //	联系方式，0无需填写，默认1可选择填写
-          titleFlag: 0, //	标题，0无需填写，默认1需填写
-          toObjFlag: 0, //	留言对象，0无需选择，默认1需选择
-          trueNameFlag: 0, //	真实姓名，0无需填写，默认1可选择填写
-          typeFlag: 0, // 分类，0无需选择，默认1需选择
+          attachmentFlag: 1, // 附件补充，0无需填写，默认1可选择填写
+          contentFlag: 1, //	内容，0无需填写，默认1需填写
+          domainFlag: 1, //	领域，0无需选择，默认1需选择
+          telFlag: 1, //	联系方式，0无需填写，默认1可选择填写
+          titleFlag: 1, //	标题，0无需填写，默认1需填写
+          toObjFlag: 1, //	留言对象，0无需选择，默认1需选择
+          trueNameFlag: 1, //	真实姓名，0无需填写，默认1可选择填写
+          typeFlag: 1, // 分类，0无需选择，默认1需选择
         },
         title: "", // 标题
       },
