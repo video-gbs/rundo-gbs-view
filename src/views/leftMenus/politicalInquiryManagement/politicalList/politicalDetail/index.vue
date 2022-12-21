@@ -368,8 +368,8 @@
           <el-form-item label="当前设置">
             <el-switch
               v-model="one.isShow"
-              :active-value="0"
-              :inactive-value="1"
+              :active-value="1"
+              :inactive-value="0"
               style="display: block"
               active-text="可见"
               inactive-text="不可见"
@@ -387,8 +387,8 @@
           <el-form-item label="当前设置">
             <el-switch
               v-model="one.isReview"
-              :active-value="0"
-              :inactive-value="1"
+              :active-value="1"
+              :inactive-value="0"
               style="display: block"
               active-color="#13ce66"
               inactive-color="#eee"
@@ -944,12 +944,12 @@ export default {
         .catch(() => {});
 
       this.btnAll.isShow.label =
-        this.one.isShow === 0 ? "关闭可见" : "开启可见";
-      this.btnAll.isShow.icon = this.one.isShow === 0 ? "right9" : "right7";
+        this.one.isShow === 1 ? "关闭可见" : "开启可见";
+      this.btnAll.isShow.icon = this.one.isShow === 1 ? "right9" : "right7";
       this.btnAll.openComment.label =
-        this.one.isReview === 0 ? "关闭评论" : "开启评论";
+        this.one.isReview === 1 ? "关闭评论" : "开启评论";
       this.btnAll.openComment.icon =
-        this.one.isReview === 0 ? "right10" : "right8";
+        this.one.isReview === 1 ? "right10" : "right8";
       if (ut === 0) {
         // 超管
         // 审核补充说明
