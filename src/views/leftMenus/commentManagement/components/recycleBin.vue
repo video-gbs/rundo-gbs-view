@@ -128,8 +128,6 @@ export default {
             text: "永久删除",
             cb: "reallyDelete",
             // icon: 'el-icon-delete',
-
-            visible: true,
           },
         ],
         label: "操作",
@@ -201,7 +199,7 @@ export default {
       this[v.cb](v.row);
     },
     verify(v) {
-      this.$router.push(`/commentDetail/${v.affairsId}`);
+      this.$router.push(`/commentDetail/${v.id}/${v.affairsId}`);
     },
 
     reallyDelete(v) {

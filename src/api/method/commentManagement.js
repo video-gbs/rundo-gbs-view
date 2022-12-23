@@ -17,7 +17,7 @@ export function auditReview(params) {
 
 export function reallyDeleteReview(id) {
   // 删除评论-永久删除
-  return request.put(`/politics/backstage/review/really/${id}`);
+  return request.delete(`/politics/backstage/review/really/${id}`);
 }
 
 export function deleteReview(id) {
@@ -30,9 +30,7 @@ export function refreshReview(id) {
 }
 export function setShowReview(id, isShow) {
   // 设置评论可见性
-  return request.post(
-    `/politics/backstage/review/updateIsShow/${id}/${isShow}`
-  );
+  return request.put(`/politics/backstage/review/updateIsShow/${id}/${isShow}`);
 }
 
 export function getCommentList(id) {

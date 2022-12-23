@@ -109,12 +109,15 @@ service.interceptors.response.use(
       logoutFn();
       msg = "账户信息已过期,请重新登录。";
     }
-    if ((error + "").indexOf("500") > -1) {
-      msg = "系统连接异常";
-    }
 
     if ((error + "").indexOf("403") > -1) {
       msg = "您的账号无访问权限。";
+    }
+    if ((error + "").indexOf("405") > -1) {
+      msg = "数据请求异常";
+    }
+    if ((error + "").indexOf("500") > -1) {
+      msg = "系统连接异常";
     }
     if ((error + "").indexOf("502") > -1) {
       msg = "服务器连接超时";

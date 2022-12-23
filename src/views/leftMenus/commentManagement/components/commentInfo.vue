@@ -6,15 +6,16 @@
         {{ one.title }}
       </div>
       <el-card class="box-card1">
-        <div slot="header" class="clearfix">
+        <div slot="header" class="clearfix f jc-sb ai-c">
           <LineFont
-            :line-title="lineTitle2"
+            class="f1"
+            :line-title="lineTitle"
             :text-style="textStyle"
             :line-blue-style="lineBlueStyle"
           />
           <div style="max-width: 350px" class="mr10">
             <el-tag effect="plain" class="mr10">
-              {{ $dict.status[one.auditStatus] }}
+              {{ showStatus(one.auditStatus) }}
             </el-tag>
             <el-tag effect="plain" class="mr10" type="warning">
               {{ one.isShow ? "已隐藏" : "已显示" }}
@@ -22,7 +23,7 @@
           </div>
         </div>
         <div class="text item">
-          <el-form ref="form" :model="form" label-width="120px">
+          <el-form ref="form" label-width="120px">
             <el-form-item label="评论内容：">
               <span class="span-text">{{ one.content }}</span>
             </el-form-item>
@@ -39,20 +40,46 @@
   </div>
 </template>
 <script>
+import LineFont from "@/components/LineFont";
+
 export default {
   name: "",
+  components: { LineFont },
+  props: {
+    one: {
+      type: Object,
+    },
+  },
   data() {
     return {
-      one: {},
+      lineTitle: {
+        title: "评论详情",
+        notShowSmallTitle: false,
+      },
+      textStyle: {
+        fontSize: "20px",
+        fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
+        fontWeight: "bold",
+        color: "#333333",
+      },
+      lineBlueStyle: {
+        background: "rgba(30, 86, 160, 1)",
+        borderRadius: "0px 4px 4px 0px",
+      },
     };
   },
-  mounted() {
-    if (this.$route.params.id) {
-      this.getOne(this.$route.params.id);
-    }
-  },
+  mounted() {},
   methods: {
-    getOne(v) {},
+    showStatus(v) {
+      if (v === 2) {
+        return "待审核";
+      }
+      if (v === 3) {
+        return "审核未通过";
+      }
+      return "审核通过";
+    },
+    getOne() {},
   },
 };
 </script>

@@ -100,16 +100,16 @@ export default {
   watch: {
     value(val) {
       if (!this.changeStatus) {
-        console.log("vsal", val);
+        console.log("val", val);
         this.html = val;
       }
     },
   },
   mounted() {
     // 模拟 ajax 请求，异步渲染编辑器
-    console.log("value12121212份饭", this.value);
     // console.log("Toolbar.getConfig()", Toolbar.getConfig());
     setTimeout(() => {
+      console.log("mounted this.value", this.value);
       this.html = this.value;
     }, 0);
   },
@@ -122,13 +122,14 @@ export default {
     onCreated(editor) {
       this.editor = Object.seal(editor); // 【注意】一定要用 Object.seal() 否则会报错
       if (this.value) {
+        console.log("this.value", this.value);
         this.html = this.value;
       }
     },
     onChange(editor) {
       // console.log('editor.getAllMenuKeys()', editor.getAllMenuKeys())
       let html = editor.getHtml();
-      html = trim(html) == "<p><br></p>" ? "" : html;
+      html = trim(html) === "<p><br></p>" ? "" : html;
       this.changeStatus = true;
       this.$emit("input", html);
       this.$nextTick(() => {

@@ -25,7 +25,7 @@
         <component :is="item.content" :one="one" />
       </el-tab-pane>
     </el-tabs>
-    <PDialog ref="commentRef" @submit="examineFn">
+    <PDialog ref="commentRef" @submit="commentFn">
       <template slot="title">审核评论</template>
       <template slot="main">
         <el-form
@@ -38,13 +38,17 @@
             <el-radio v-model="checkParams.auditResult" :label="1"
               >审核通过</el-radio
             >
-            <el-radio v-model="checkParams.auditResult" :label="0"
+            <el-radio v-model="checkParams.auditResult" :label="2"
               >审核未通过</el-radio
             >
-            <el-input v-model="checkParams.auditResult" />
           </el-form-item>
           <el-form-item label="审核说明">
-            <el-input v-model="checkParams.content" />
+            <el-input
+              v-model="checkParams.content"
+              type="textarea"
+              max="500"
+              rows="4"
+            />
           </el-form-item>
         </el-form>
       </template>
@@ -79,6 +83,7 @@ import auditRecord from "../components/auditRecord";
 // import CommentList from '../components/commentList.vue'
 import PDialog from "@/components/PDialog";
 import { affairsInfoSearch } from "@/api/method/politicalList";
+import { getReviewOne, refreshReview } from "@/api/method/commentManagement";
 import {
   setShowReview,
   auditReview,
@@ -125,6 +130,7 @@ export default {
         comment: {
           id: 1,
           label: "审核评论",
+          dialog: "commentRef",
           formName: "commentRef",
           show: false,
           author: "admin",
@@ -170,6 +176,29 @@ export default {
           icon: "back-svg",
         },
       },
+      checkParams: {
+        auditResult: 1,
+        content: "",
+        id: "",
+      },
+      rules: {
+        content: [
+          {
+            validator: (rule, value, callback) => {
+              if (this.checkParams.auditResult === 2) {
+                if (this.checkParams.content.replace(/\s*/g, "") === "") {
+                  callback(new Error("请输入不用通过的原因"));
+                } else {
+                  callback();
+                }
+              } else {
+                callback();
+              }
+            },
+            trigger: "blur",
+          },
+        ],
+      },
       dialogName: "",
       actBtn: {},
       one: {},
@@ -181,7 +210,7 @@ export default {
   watch: {
     one: {
       handler: function (n) {
-        console.log("获取了新的状态", n.status);
+        // console.log('获取了新的状态', n.status)
         if (this.firstLoading) {
           this.firstLoading = false;
         } else {
@@ -195,12 +224,19 @@ export default {
   },
   mounted() {},
   methods: {
+    getOne(v) {
+      getReviewOne(v || this.$route.params.id).then((res) => {
+        if (res.code === 10000) {
+          this.one = res.data;
+        }
+      });
+    },
     async init() {
       if (this.$route.params.id) {
         // 获取当前问政信息
         // 根据评论id获取单条评论，再用单条评论的affairesId获取问政信息
         const pid = this.$route.params.id;
-        const fn = await affairsInfoSearch(pid);
+        const fn = await getReviewOne(pid);
 
         fn.code === 10000 && (this.one = fn.data);
         // fn().then((res) => {
@@ -213,7 +249,7 @@ export default {
     },
     async accountPermission() {
       // 是否有补充说明
-
+      this.actBtn = {};
       this.btnAll.isShow.label =
         this.one.isShow === 1 ? "关闭可见" : "开启可见";
       this.btnAll.isShow.icon = this.one.isShow === 1 ? "right9" : "right7";
@@ -224,6 +260,10 @@ export default {
       } else {
         // 从评论列表进来的
         arr.push("isShow", "delete", "back");
+        if (this.one.auditStatus === 2) {
+          // 待审核
+          arr.push("comment");
+        }
       }
 
       Object.keys(this.btnAll).forEach((i) => {
@@ -242,23 +282,21 @@ export default {
         return item;
       });
       console.log("comname", val.name);
-      val.name === "评论信息" &&
-        CommentInfo.methods.getOne(this.$route.params.id);
-      val.name === "问政信息" &&
-        BasicInformation.methods.getOne(this.$route.params.id);
-      val.name === "审核记录" &&
-        auditRecord.methods.getList(this.$route.params.id2);
+      val.name === "评论信息" && CommentInfo.methods.getOne();
+      val.name === "问政信息" && BasicInformation.methods.getOne();
+      val.name === "审核记录" && auditRecord.methods.getList();
     },
-    async getOne(v) {
-      console.log("水电费地方 个");
-      await affairsInfoSearch(v).then((res) => {
-        res.code === 10000 && (this.one = res.data);
-      });
-    },
+    // async getOne(v) {
+    //   console.log('水电费地方 个')
+    //   await affairsInfoSearch(v).then((res) => {
+    //     res.code === 10000 && (this.one = res.data)
+    //   })
+    // },
 
     btnFn(i, obj) {
       obj.dialog && this.comDialog(obj);
       obj.id === 100 && this.$router.go(-1); // 返回
+      obj.id === 3 && this.refreshData(); // 恢复数据
       obj.id === 4 && this.deleteItem(); // 删除
       obj.id === 5 && this.reallyDeleteItem(); // 永久删除
     },
@@ -273,50 +311,55 @@ export default {
       this.getOne(this.one.id);
     },
 
-    examine(v) {
-      this.checkParams.id = v.id;
+    comment(v) {
+      this.checkParams.id = this.$route.params.id;
       this.$refs["commentRef"].visible = true;
     },
-    examineFn() {
+    commentFn() {
       this.$refs["commentForm"].validate((v) => {
         if (v) {
+          this.checkParams.id = this.$route.params.id;
           auditReview(this.checkParams).then((res) => {
             if (res.code === 10000) {
               this.$message.success("审核成功");
               this.$refs["commentRef"].visible = false;
+              this.getOne(this.$route.params.id);
             }
           });
         }
       });
     },
     deleteItem(v) {
-      this.$alert(
-        `确定要删除 '${v.title || v.realName || v.name}' 吗?`,
-        "删除操作",
-        {
-          dangerouslyUseHTMLString: true,
-          showCancelButton: true,
-        }
-      ).then((action) => {
-        deleteReview(v.id).then((res) => {
+      this.$alert(`确定要删除该条评论吗?`, "删除操作", {
+        dangerouslyUseHTMLString: true,
+        showCancelButton: true,
+      }).then((action) => {
+        deleteReview(this.$route.params.id).then((res) => {
           res.code === 10000 &&
-            (this.$message.success("删除成功"), this.getDataList());
+            (this.$message.success("删除成功"), this.getOne());
         });
       });
     },
 
     reallyDeleteItem(v) {
-      this.$alert(
-        `确定要删除 '${v.title || v.realName || v.name}' 吗?`,
-        "删除操作",
-        {
-          dangerouslyUseHTMLString: true,
-          showCancelButton: true,
-        }
-      ).then((action) => {
-        reallyDeleteReview(v.id).then((res) => {
+      this.$alert(`确定要删除该条评论吗?`, "删除操作", {
+        dangerouslyUseHTMLString: true,
+        showCancelButton: true,
+      }).then((action) => {
+        reallyDeleteReview(this.$route.params.id).then((res) => {
           res.code === 10000 &&
-            (this.$message.success("删除成功"), this.getDataList());
+            (this.$message.success("删除成功"), this.getOne());
+        });
+      });
+    },
+    refreshData(v) {
+      this.$alert(`是否要恢复该条评论的数据?`, "恢复操作", {
+        dangerouslyUseHTMLString: true,
+        showCancelButton: true,
+      }).then((action) => {
+        refreshReview(this.$route.params.id).then((res) => {
+          res.code === 10000 &&
+            (this.$message.success("恢复成功"), this.getOne());
         });
       });
     },
@@ -324,7 +367,7 @@ export default {
       // 是否可见
       // 设置可见性
 
-      setShowReview(this.one.id, this.one.isShow)
+      setShowReview(this.$route.params.id, this.one.isShow)
         .then((res) => {
           if (res.code === 10000) {
             this.comDialogHide();

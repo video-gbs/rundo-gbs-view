@@ -44,23 +44,21 @@
         </div>
       </div>
       <div class="text item">
-        <el-form v-if="oneData" ref="form" :model="form" label-width="120px">
+        <el-form v-if="one" ref="form" :model="form" label-width="120px">
           <el-row :gutter="20">
             <el-col :span="8">
               <el-form-item label="留言对象：">
-                <span class="span-text">{{ oneData.deptName }}</span>
+                <span class="span-text">{{ one.deptName }}</span>
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="分类：">
-                <span class="span-text">{{ $dict.type[oneData.type] }}</span>
+                <span class="span-text">{{ $dict.type[one.type] }}</span>
               </el-form-item></el-col
             >
             <el-col :span="8">
               <el-form-item label="领域：">
-                <span class="span-text">{{
-                  $dict.domain[oneData.domain]
-                }}</span>
+                <span class="span-text">{{ $dict.domain[one.domain] }}</span>
               </el-form-item></el-col
             >
           </el-row>
@@ -68,11 +66,11 @@
             <span class="span-text">{{ one.title }}</span>
           </el-form-item>
           <el-form-item label="内容：">
-            <span class="span-text">{{ oneData.content }}</span>
+            <span class="span-text">{{ one.content }}</span>
           </el-form-item>
           <el-form-item label="附件补充：">
-            <template v-if="oneData.photoUrl">
-              <div v-for="i in oneData.photoUrl.split(',')" :key="i">
+            <template v-if="one.photoUrl">
+              <div v-for="i in one.photoUrl.split(',')" :key="i">
                 <img class="annex-css" :src="i" />
               </div>
             </template>
@@ -163,39 +161,38 @@ export default {
         title: "发布账号",
         notShowSmallTitle: false,
       },
-      oneData: null,
+      one: null,
       moreData: null,
     };
   },
   watch: {
-    one: {
-      handler: function (n) {
-        console.log("nnmnmnmnm", n);
-        this.oneData = n;
-      },
-      // immediate: true,
-      deep: true,
-    },
+    // one: {
+    //   handler: function(n) {
+    //     console.log('nnmnmnmnm', n)
+    //     this.one = n
+    //   },
+    //   // immediate: true,
+    //   deep: true
+    // }
   },
-  created() {
-    if (this.$route.params.id2) {
-      this.getOne(this.$route.params.id2);
-    }
-  },
+  created() {},
   mounted() {
-    console.log("sdfs");
+    console.log("this.$route.params.id2", this.$route.params);
+    if (this.$route.params.id2) {
+      this.getOne();
+    }
   },
   methods: {
     getOne(v) {
       // 获取单条问政信息
       // affairsId
-      affairsInfoSearch(v).then((res) => {
+      affairsInfoSearch(this.$route.params.id2).then((res) => {
         if (res.code === 10000) {
           this.one = Object.assign({}, res.data);
         }
       });
 
-      this.getMore(v);
+      this.getMore(this.$route.params.id2);
     },
     getMore(v) {
       // 获取补充说明

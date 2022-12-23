@@ -1,6 +1,6 @@
 <!--问政评论列表-->
 <template>
-  <div>
+  <div class="f fd-c">
     <div class="seach">
       <Seach
         :form-list="FormList"
@@ -22,6 +22,7 @@
         :button-items="buttonItems"
         :height-table="'auto'"
         @handleClick="handleClick"
+        @setShow="setShow"
       />
       <Pagination
         :pages-data="query"
@@ -42,13 +43,17 @@
             <el-radio v-model="checkParams.auditResult" :label="1"
               >审核通过</el-radio
             >
-            <el-radio v-model="checkParams.auditResult" :label="0"
+            <el-radio v-model="checkParams.auditResult" :label="2"
               >审核未通过</el-radio
             >
-            <el-input v-model="checkParams.auditResult" />
           </el-form-item>
           <el-form-item label="审核说明">
-            <el-input v-model="checkParams.content" />
+            <el-input
+              v-model="checkParams.content"
+              type="textarea"
+              max="500"
+              rows="4"
+            />
           </el-form-item>
         </el-form>
       </template>
@@ -64,6 +69,7 @@ import {
   getReviewList,
   auditReview,
   deleteReview,
+  setShowReview,
 } from "@/api/method/commentManagement";
 export default {
   name: "",
@@ -94,7 +100,7 @@ export default {
         content: [
           {
             validator: (rule, value, callback) => {
-              if (this.checkParams.auditResult === 0) {
+              if (this.checkParams.auditResult === 2) {
                 if (this.checkParams.content.replace(/\s*/g, "") === "") {
                   callback(new Error("请输入不用通过的原因"));
                 } else {
@@ -172,28 +178,7 @@ export default {
               },
             },
           },
-          {
-            text: "设为可见",
-            cb: "replyCheck",
-            // icon: 'el-icon-view',
-            visible: {
-              attrName: "isShow",
-              fn: function (v) {
-                return v === 0;
-              },
-            },
-          },
-          {
-            text: "设为隐藏",
-            cb: "replyCheck",
-            // icon: 'el-icon-view',
-            visible: {
-              attrName: "isShow",
-              fn: function (v) {
-                return v === 1;
-              },
-            },
-          },
+
           {
             text: "详情",
             cb: "verify",
@@ -201,10 +186,8 @@ export default {
           },
           {
             text: "删除",
-            cb: "deletItem",
+            cb: "deleteItem",
             // icon: 'el-icon-delete',
-            className: "isRed",
-            visible: true,
           },
         ],
         label: "操作",
@@ -230,22 +213,27 @@ export default {
         },
         {
           label: "提交人",
-          name: "submitName",
+          name: "username",
           isShow: true,
         },
         {
           label: "状态",
-          name: "stauts",
+          name: "auditStatus",
           isShow: true,
+          content: "status",
         },
         {
           label: "是否可见",
           name: "isShow",
           isShow: true,
+          type: "switch",
+          content: "",
+          fnName: "setShow",
+          width: "80",
         },
         {
           label: "提交时间",
-          name: "createdTime",
+          name: "createTime",
           isShow: true,
         },
       ],
@@ -297,6 +285,19 @@ export default {
           });
         }
       });
+    },
+    setShow(v) {
+      setShowReview(v.id, v.isShow)
+        .then((res) => {
+          if (res.code === 10000) {
+            this.$message.success("设置成功");
+            return;
+          }
+          v.isShow = v.isShow === 0 ? 1 : 0;
+        })
+        .catch(() => {
+          v.isShow = v.isShow === 0 ? 1 : 0;
+        });
     },
     verify(v) {
       this.$router.push(`/commentDetail/${v.id}/${v.affairsId}`);

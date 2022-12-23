@@ -120,6 +120,8 @@
               <div class="mt0">
                 <el-switch
                   v-model="params.isReview"
+                  active-value="1"
+                  inactive-value="0"
                   active-color="#13ce66"
                   inactive-color="#ff4949"
                   active-text="开"
@@ -131,6 +133,8 @@
               <div class="mt0">
                 <el-switch
                   v-model="params.isShow"
+                  active-value="1"
+                  inactive-value="0"
                   active-color="#13ce66"
                   inactive-color="#ff4949"
                   active-text="开"

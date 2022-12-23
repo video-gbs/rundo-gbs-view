@@ -195,6 +195,7 @@ const constantRoutes = [
         // id是评论id   id2是对应问政id
         name: "commentDetail",
         author: superAdmin,
+        hidden: true,
         component: () =>
           import("@/views/leftMenus/commentManagement/commentDetail/index"),
         meta: { title: "评论详情", icon: "yhgl" },
@@ -321,6 +322,27 @@ const constantRoutes = [
         meta: { title: "广告图明细", icon: "" },
       },
       {
+        path: "/topAdvertisement",
+        name: "topAdvertisement",
+        component: () =>
+          import(
+            "@/views/leftMenus/informationManagement/topAdvertisement/index"
+          ),
+        author: superAdmin,
+        meta: { title: "顶部广告图", icon: "" },
+      },
+      {
+        path: "/topAdvertisementDetail/:id",
+        name: "topAdvertisementDetail",
+        component: () =>
+          import(
+            "@/views/leftMenus/informationManagement/topAdvertisement/addOrEdit"
+          ),
+        author: superAdmin,
+        hidden: true,
+        meta: { title: "顶部广告图明细", icon: "" },
+      },
+      {
         path: "/introduction",
         name: "introduction",
         component: () =>
@@ -418,6 +440,23 @@ const constantRoutes = [
     meta: { title: "系统管理", icon: "sys" },
     author: superAdmin,
     children: [
+      {
+        path: "/systemNotice",
+        name: "systemNotice",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/systemNotice/index"),
+        meta: { title: "系统公告", icon: "" },
+      },
+      {
+        path: "/systemNotice/:id",
+        name: "systemNoticeDetail",
+        author: superAdmin,
+        hidden: true,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/systemNotice/addOrEdit"),
+        meta: { title: "系统公告明细", icon: "" },
+      },
       {
         path: "/commentSettings",
         name: "commentSettings",
