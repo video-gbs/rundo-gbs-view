@@ -13,7 +13,6 @@ export function affairsInfoList(params) {
   // 列表
   return request.post(`/politics/backstage/affairsInfo/list`, params);
 }
-
 export function affairsInfoDelete(id) {
   // 删除
   return request.delete(`/politics/backstage/affairsInfo/${id}`);

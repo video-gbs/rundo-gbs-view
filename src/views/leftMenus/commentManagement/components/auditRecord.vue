@@ -1,0 +1,10 @@
+<!--评价审核记录-->
+<template>
+  <div />
+</template>
+<script>
+export default {
+  name: "",
+};
+</script>
+<style lang="scss" scoped></style>

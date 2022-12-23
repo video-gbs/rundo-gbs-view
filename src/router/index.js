@@ -126,8 +126,8 @@ const constantRoutes = [
             "@/views/leftMenus/politicalInquiryManagement/politicalReply/index"
           ),
         meta: { title: "邀请回复审核", icon: "" },
-        hidden: true,
-        author: none,
+        // hidden: true,
+        author: admin,
       },
       {
         path: "/recycleBin",
@@ -152,6 +152,105 @@ const constantRoutes = [
       },
     ],
   },
+  {
+    path: "/commentManagement",
+    name: "commentManagement",
+    component: Layout,
+    // meta: { title: '用户管理' },
+    meta: { title: "评论管理", icon: "yhgl" },
+    redirect: "/commentManagementIndex",
+    author: superAdmin,
+    children: [
+      {
+        path: "/commentManagementIndex",
+        name: "CommentManagementIndex",
+        author: superAdmin,
+        component: () => import("@/views/leftMenus/commentManagement/index"),
+        redirect: "/commentManagementList",
+        meta: { title: "", icon: "yhgl" },
+        hidden: true,
+        children: [
+          {
+            path: "/commentManagementList",
+            name: "commentManagementList",
+            author: superAdmin,
+            component: () =>
+              import("@/views/leftMenus/commentManagement/components/list"),
+            meta: { title: "评论列表", icon: "yhgl" },
+          },
+          {
+            path: "/commentManagementRecycleBin",
+            name: "commentManagementRecycleBin",
+            author: superAdmin,
+            component: () =>
+              import(
+                "@/views/leftMenus/commentManagement/components/recycleBin"
+              ),
+            meta: { title: "评论回收站", icon: "yhgl" },
+          },
+        ],
+      },
+      {
+        path: "/commentDetail/:id/:id2",
+        // id是评论id   id2是对应问政id
+        name: "commentDetail",
+        author: superAdmin,
+        hidden: true,
+        component: () =>
+          import("@/views/leftMenus/commentManagement/commentDetail/index"),
+        meta: { title: "评论详情", icon: "yhgl" },
+      },
+    ],
+  },
+
+  {
+    path: "/specialTopicManagement",
+    name: "specialTopicManagement",
+    component: Layout,
+    // meta: { title: '用户管理' },
+    meta: { title: "专题管理", icon: "yhgl" },
+    redirect: "/specialTopicManagementIndex",
+    author: superAdmin,
+    children: [
+      {
+        path: "/specialTopicManagementIndex",
+        name: "specialTopicManagementIndex",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/specialTopicManagement/index"),
+        meta: { title: "", icon: "yhgl" },
+        hidden: true,
+      },
+      {
+        path: "/specialTopicManagementComment",
+        name: "specialTopicManagementComment",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/specialTopicManagement/comment"),
+        meta: { title: "专题评论", icon: "yhgl" },
+        hidden: true,
+      },
+      {
+        path: "/specialTopic/:id",
+        name: "specialTopic",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/specialTopicManagement/addOrEdit"),
+        meta: { title: "专题操作", icon: "yhgl" },
+        hidden: true,
+      },
+      {
+        path: "/specialTopicDetail/:id",
+        name: "specialTopicDetail",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/specialTopicManagement/detail.vue"),
+        meta: { title: "专题详细", icon: "yhgl" },
+        hidden: true,
+      },
+    ],
+  },
+
   {
     path: "/informationManagement",
     name: "informationManagement",
@@ -222,6 +321,69 @@ const constantRoutes = [
         hidden: true,
         meta: { title: "广告图明细", icon: "" },
       },
+      {
+        path: "/topAdvertisement",
+        name: "topAdvertisement",
+        component: () =>
+          import(
+            "@/views/leftMenus/informationManagement/topAdvertisement/index"
+          ),
+        author: superAdmin,
+        meta: { title: "顶部广告图", icon: "" },
+      },
+      {
+        path: "/topAdvertisementDetail/:id",
+        name: "topAdvertisementDetail",
+        component: () =>
+          import(
+            "@/views/leftMenus/informationManagement/topAdvertisement/addOrEdit"
+          ),
+        author: superAdmin,
+        hidden: true,
+        meta: { title: "顶部广告图明细", icon: "" },
+      },
+      {
+        path: "/introduction",
+        name: "introduction",
+        component: () =>
+          import("@/views/leftMenus/informationManagement/introduction/index"),
+        author: superAdmin,
+        meta: { title: "问政简介", icon: "" },
+      },
+      {
+        path: "/askProcess",
+        name: "askProcess",
+        component: () =>
+          import("@/views/leftMenus/informationManagement/askProcess/index"),
+        author: superAdmin,
+        meta: { title: "提问流程", icon: "" },
+      },
+      {
+        path: "/regulations",
+        name: "regulations",
+        component: () =>
+          import("@/views/leftMenus/informationManagement/regulations/index"),
+        author: superAdmin,
+        meta: { title: "相关规定", icon: "" },
+      },
+      {
+        path: "/pointsForAttention",
+        name: "pointsForAttention",
+        component: () =>
+          import(
+            "@/views/leftMenus/informationManagement/pointsForAttention/index"
+          ),
+        author: superAdmin,
+        meta: { title: "注意事项", icon: "" },
+      },
+      {
+        path: "/contactUs",
+        name: "contactUs",
+        component: () =>
+          import("@/views/leftMenus/informationManagement/contactUs/index"),
+        author: superAdmin,
+        meta: { title: "联系我们", icon: "" },
+      },
     ],
   },
   {
@@ -244,6 +406,32 @@ const constantRoutes = [
     ],
   },
   {
+    path: "/analysis",
+    name: "analysis",
+    component: Layout,
+    // meta: { title: '用户管理' },
+    redirect: "/replyRank",
+    // component: () => import('@/views/leftMenus/userManagement/index'),
+    meta: { title: "统计分析 ", icon: "yhgl" },
+    author: superAdmin,
+    children: [
+      {
+        path: "/replyRank",
+        name: "ReplyRank",
+        author: superAdmin,
+        component: () => import("@/views/leftMenus/analysis/replyRank"),
+        meta: { title: "回复排行", icon: "yhgl" },
+      },
+      {
+        path: "/satisfactionRank",
+        name: "SatisfactionRank",
+        author: superAdmin,
+        component: () => import("@/views/leftMenus/analysis/satisfactionRank"),
+        meta: { title: "满意度排行", icon: "yhgl" },
+      },
+    ],
+  },
+  {
     path: "/systemManagement",
     name: "systemManagement",
     // meta: { title: '系统管理' },
@@ -252,6 +440,55 @@ const constantRoutes = [
     meta: { title: "系统管理", icon: "sys" },
     author: superAdmin,
     children: [
+      {
+        path: "/systemNotice",
+        name: "systemNotice",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/systemNotice/index"),
+        meta: { title: "系统公告", icon: "" },
+      },
+      {
+        path: "/systemNotice/:id",
+        name: "systemNoticeDetail",
+        author: superAdmin,
+        hidden: true,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/systemNotice/addOrEdit"),
+        meta: { title: "系统公告明细", icon: "" },
+      },
+      {
+        path: "/commentSettings",
+        name: "commentSettings",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/commentSettings/index"),
+        meta: { title: "评论设置", icon: "" },
+      },
+      {
+        path: "/reviewOverdue",
+        name: "reviewOverdue",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/reviewOverdue/index"),
+        meta: { title: "审核逾期", icon: "" },
+      },
+      {
+        path: "/replyOverdue",
+        name: "replyOverdue",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/replyOverdue/index"),
+        meta: { title: "回复逾期", icon: "" },
+      },
+      {
+        path: "/satisfication",
+        name: "satisfication",
+        author: superAdmin,
+        component: () =>
+          import("@/views/leftMenus/systemManagement/satisfication/index"),
+        meta: { title: "满意度设置", icon: "" },
+      },
       {
         path: "/accountManagement",
         name: "accountManagement",

@@ -409,7 +409,7 @@ export default {
 }
 
 .filter-item {
-  line-height: 40px;
+  line-height: 30px;
   font-size: 16px;
   font-family: "SourceHanSansCN-Normal";
   color: rgba(0, 0, 0, 0.65);
