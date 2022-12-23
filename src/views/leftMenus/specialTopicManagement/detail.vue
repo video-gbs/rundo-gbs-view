@@ -10,7 +10,7 @@
             size="mini"
             type="primary"
             @click="setShow"
-            >{{ `设为${one.isShow ? "可见" : "隐藏"}` }}</el-button
+            >{{ `设为${one.isShow ? "隐藏" : "可见"}` }}</el-button
           >
           <el-button size="mini" type="primary" @click="editItem"
             >编辑</el-button
