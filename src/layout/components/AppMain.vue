@@ -1,5 +1,5 @@
 <template>
-  <section class="app-main f1 fd-c ai-s">
+  <section class="app-main f1 fd-c ai-s" v-if="changeRouter">
     <div style="height: 100%" class="app-main-c f1 f">
       <transition name="fade-transform1" mode="out-in">
         <keep-alive>
@@ -10,19 +10,49 @@
         <router-view v-if="!$route.meta.keepAlive" :key="key" />
       </transition>
     </div>
-    <h2 class="company-title f jc-c ai-c">©2022 润建股份有限公司 版权所有</h2>
+    <!-- <h2 class="company-title f jc-c ai-c">©2022 润建股份有限公司 版权所有</h2> -->
+  </section>
+  <section class="app-main-else f1 fd-c ai-s" style="height: 100%" v-else>
+    <div style="height: 100%" class="app-main-c f1 f">
+      <transition name="fade-transform1" mode="out-in">
+        <keep-alive>
+          <router-view v-if="$route.meta.keepAlive" :key="key" />
+        </keep-alive>
+      </transition>
+      <transition name="fade-transform2" mode="out-in">
+        <router-view v-if="!$route.meta.keepAlive" :key="key" />
+      </transition>
+    </div>
   </section>
 </template>
 
 <script>
 export default {
-  name: "AppMain",
+  name: 'AppMain',
+  data() {
+    return {
+      changeRouter: true
+    }
+  },
+  watch: {
+    $route: {
+      handler: function (val, oldVal) {
+        if (val.path === '/workTable') {
+          this.changeRouter = false
+        } else {
+          this.changeRouter = true
+        }
+      },
+      // 深度观察监听
+      deep: true
+    }
+  },
   computed: {
     key() {
-      return this.$route.path;
-    },
-  },
-};
+      return this.$route.path
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -42,7 +72,7 @@ export default {
 }
 .app-main-c {
   > div {
-    margin: 20px;
+    // margin: 20px;
     width: 100%;
   }
 }
@@ -80,5 +110,20 @@ export default {
   .el-scrollbar__wrap {
     overflow-x: hidden !important;
   }
+}
+
+/*滚动条样式*/
+.app-main::-webkit-scrollbar {
+  width: 6px;
+}
+.app-main::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+}
+.app-main::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.1);
 }
 </style>

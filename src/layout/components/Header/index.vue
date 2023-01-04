@@ -3,7 +3,7 @@
     <div class="app-header">
       <div class="app-header-left">
         <i class="logo mr8" />
-        <h2>梧州问政后台系统</h2>
+        <h2>视频联网平台</h2>
       </div>
       <div class="header-menu">
         <router-link
@@ -17,12 +17,17 @@
           <span>{{ item.meta.title }}</span>
         </router-link>
         <div class="menu-user">
-          <el-dropdown class="" trigger="click">
+          <div class="user-menu">
+            <svg-icon icon-class="user3" class="user" />
+            <span class="fs14 mr10">系统操作指南</span>
+            <span class="user-line" />
+          </div>
+          <el-dropdown class trigger="click">
             <div class="user-info">
-              <svg-icon icon-class="user1" class="user" />
-              <span class="fs14 mr10">{{
-                userInfo.userName || "佚名用户"
-              }}</span>
+              <svg-icon icon-class="user2" class="user" />
+              <span class="fs14 mr10">
+                {{ userInfo.userName || '佚名用户' }}
+              </span>
               <i class="el-icon-caret-bottom" />
             </div>
             <el-dropdown-menu slot="dropdown">
@@ -35,7 +40,7 @@
       </div>
     </div>
     <el-drawer
-      title=""
+      title
       :visible.sync="showDrawer"
       :append-to-body="true"
       :modal="false"
@@ -50,11 +55,11 @@
   </div>
 </template>
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex'
 // import Message from "../Message/index.vue";
-import { Local } from "@/utils/storage";
+import { Local } from '@/utils/storage'
 // import NotTips from "@/components/NotTips";
-import { logout } from "@/api/method/user";
+import { logout } from '@/api/method/user'
 export default {
   components: {
     // Message,
@@ -67,11 +72,11 @@ export default {
       messageCount: 0,
       lastCount: 0,
       show: false,
-      userInfo: {},
-    };
+      userInfo: {}
+    }
   },
   computed: {
-    ...mapGetters(["user", "systemTitle"]),
+    ...mapGetters(['user', 'systemTitle']),
     // avatar() {
     //   if (this.user.avatar) {
     //     return require(`@/assets/avatar/${this.user.avatar}`);
@@ -84,17 +89,17 @@ export default {
      */
     routes() {
       const routes = this.$router.options.routes.filter((route) => {
-        return route.systemCode;
-      });
-      return routes;
+        return route.systemCode
+      })
+      return routes
     },
     systemName() {
-      return this.$store.state.settings.systemName;
+      return this.$store.state.settings.systemName
     },
     toGreet() {
-      const now = new Date().getHours();
-      return now < 12 ? "上午好" : now > 2 ? "下午好" : "中午好";
-    },
+      const now = new Date().getHours()
+      return now < 12 ? '上午好' : now > 2 ? '下午好' : '中午好'
+    }
   },
   created() {
     // if (Local.getToken()) {
@@ -109,10 +114,10 @@ export default {
     //   }
     // })
     this.userInfo.userName =
-      localStorage.getItem("rj_wzwz_userName") || "佚名用户";
+      localStorage.getItem('rj_wzwz_userName') || '佚名用户'
     this.userInfo.userName = this.userInfo.userName
-      .replace('"', "")
-      .replace('"', "");
+      .replace('"', '')
+      .replace('"', '')
   },
   methods: {
     /**
@@ -130,56 +135,56 @@ export default {
         })
         .catch(() => {})
         .finally(() => {
-          Local.setToken("");
-          Local.remove("rj_wzwz_token");
-          Local.remove("rj_wzwz_deptType");
-          Local.remove("rj_wzwz_userName");
-          Local.remove("rj_wzwz_deptName");
-          this.$router.push({ path: "/login" });
-        });
+          Local.setToken('')
+          Local.remove('rj_wzwz_token')
+          Local.remove('rj_wzwz_deptType')
+          Local.remove('rj_wzwz_userName')
+          Local.remove('rj_wzwz_deptName')
+          this.$router.push({ path: '/login' })
+        })
     },
     setTheme() {
-      this.$utils.setTheme("theme-blue");
+      this.$utils.setTheme('theme-blue')
     },
     reconent() {
-      this.$socket.create();
+      this.$socket.create()
     },
     initNotice() {
       this.$api.message.list().then((res) => {
         if (res.data.data) {
           this.messageData = {
-            rows: res.data.data,
-          };
-          let count = this.messageData.rows.length;
+            rows: res.data.data
+          }
+          let count = this.messageData.rows.length
           this.messageData.rows.forEach((item) => {
             if (item.isRead) {
-              count--;
+              count--
             }
-          });
-          this.messageCount = count;
+          })
+          this.messageCount = count
           if (count > 0) {
             if (count > this.lastCount) {
-              this.lastCount = count;
-              this.show = true;
+              this.lastCount = count
+              this.show = true
             }
           } else {
-            this.show = false;
+            this.show = false
           }
         }
-      });
+      })
     },
     toMessage() {
-      this.showDrawer = true;
-      this.show = false;
+      this.showDrawer = true
+      this.show = false
     },
     closeTips() {
-      this.show = false;
-    },
-  },
-};
+      this.show = false
+    }
+  }
+}
 </script>
 <style lang="scss">
-@import "~@/styles/element-variables.scss";
+@import '~@/styles/element-variables.scss';
 .app-header {
   height: inherit;
   width: 100%;
@@ -194,7 +199,7 @@ export default {
   justify-content: space-between;
   background-color: #1e56a0;
   // box-shadow: 0px 3px 6px 1px rgba(51, 51, 51, 0.16);
-  background-image: url("../../../assets/imgs/top-bg.png");
+  background-image: url('../../../assets/imgs/top-bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   .app-header-left {
@@ -205,7 +210,7 @@ export default {
       top: 10px;
       width: 1.75rem;
       height: 1.75rem;
-      background-image: url("~@/assets/imgs/logo.png");
+      background-image: url('~@/assets/imgs/topLogo.png');
       background-size: cover;
     }
     h2 {
@@ -246,6 +251,39 @@ export default {
       align-items: center;
       cursor: pointer;
     }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      font-size: 0.5rem;
+      margin-right: 40px;
+      position: relative;
+
+      .user {
+        width: 1rem;
+        height: 1rem;
+        margin-right: 1rem;
+        position: absolute;
+        top: 1px;
+        left: -1.5rem;
+      }
+      .user-line {
+        display: inline-block;
+        width: 1px;
+        height: 16px;
+        background-color: #fff;
+        margin-left: 10px;
+      }
+      span {
+        color: $font-color;
+        font-size: 16px;
+        font-family: Microsoft YaHei-Bold, Microsoft YaHei;
+        font-weight: 400;
+      }
+
+      .el-avatar {
+        margin-right: 10px;
+      }
+    }
     .user-info {
       display: flex;
       align-items: center;
@@ -257,11 +295,14 @@ export default {
         height: 2rem;
         margin-right: 1rem;
         position: absolute;
-        top: -0.75rem;
+        top: -0.5rem;
         left: -2.5rem;
       }
       span {
         color: $font-color;
+        font-size: 16px;
+        font-family: Microsoft YaHei-Bold, Microsoft YaHei;
+        font-weight: bold;
       }
 
       .el-avatar {

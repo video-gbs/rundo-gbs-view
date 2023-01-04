@@ -34,9 +34,7 @@ export default {
   },
   watch: {
     value(n, o) {
-      console.log('nnnnn', n)
       if (this.id !== this.editorId) {
-        console.log('????')
         document.getElementById(this.editor.textElemId).innerHTML = n
         this.editorId = this.id
       }
@@ -48,7 +46,6 @@ export default {
   mounted() {
     const editor = new Editor('#p-editor-' + this.id)
     editor.config.onchange = (newHtml) => {
-      console.log('??!!')
       this.$emit('change', newHtml)
     }
     editor.create()

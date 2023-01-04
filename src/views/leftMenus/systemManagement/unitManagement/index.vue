@@ -1,7 +1,7 @@
 <template>
   <div class="router_container4 m20 bg-w f fc-d ai-s">
     <div class="panel-header-box f jc-sb ai-c fw-w">
-      <div class="title-css">单位管理</div>
+      <div class="title-css">部门管理</div>
       <div class="f jc-c ai-c">
         <el-input
           v-model="params.name"
@@ -53,7 +53,7 @@
                 @click="
                   goPage({
                     name: 'OtherUnitManagement',
-                    params: { pid: scope.row.id },
+                    params: { pid: scope.row.id }
                   })
                 "
               >
@@ -134,178 +134,178 @@
 </template>
 
 <script>
-import pagination from "@/components/Pagination/index.vue";
+import pagination from '@/components/Pagination/index.vue'
 import {
   unitAdd,
   unitEdit,
   unitList,
-  unitDelete,
-} from "@/api/method/unitManagement";
-import { Local } from "@/utils/storage";
+  unitDelete
+} from '@/api/method/unitManagement'
+import { Local } from '@/utils/storage'
 
 export default {
-  name: "",
+  name: '',
   components: { pagination },
   data() {
     return {
       search: {
-        userName: "",
-        phone: "",
-        time: "",
+        userName: '',
+        phone: '',
+        time: ''
       },
       params: {
         current: 1,
         size: 10,
-        deptType: "",
-        name: "",
-        total: 0,
+        deptType: '',
+        name: '',
+        total: 0
       },
       tableData: [],
       dialog: {
         show: false,
-        title: "新增用户",
+        title: '新增用户',
         params: {
-          name: "",
-          deptType: "",
-          detail: "",
-        },
+          name: '',
+          deptType: '',
+          detail: ''
+        }
       },
       types: [
-        { id: 1, label: "市领导" },
-        { id: 2, label: "市级单位" },
-        { id: 3, label: "县市区" },
-        { id: 4, label: "其他" },
+        { id: 1, label: '市领导' },
+        { id: 2, label: '市级单位' },
+        { id: 3, label: '县市区' },
+        { id: 4, label: '其他' }
       ],
       state: [
-        { id: 1, label: "启用" },
-        { id: 0, label: "禁用" },
+        { id: 1, label: '启用' },
+        { id: 0, label: '禁用' }
       ],
       passwordLevel: 0,
-      editId: "",
+      editId: '',
       headers: {
-        Authorization: Local.getToken(),
+        Authorization: Local.getToken()
       },
       rules: {
         name: [
-          { required: true, message: "不能为空", trigger: "blur" },
+          { required: true, message: '不能为空', trigger: 'blur' },
           {
             max: 40,
-            message: "40个字符",
-            trigger: "blur",
-          },
+            message: '40个字符',
+            trigger: 'blur'
+          }
         ],
         deptType: {
           required: true,
-          message: "不能为空",
-          trigger: "change",
+          message: '不能为空',
+          trigger: 'change'
         },
         detail: {
           required: true,
-          message: "不能为空",
-          trigger: "blur",
-          max: 40,
-        },
-      },
-    };
+          message: '不能为空',
+          trigger: 'blur',
+          max: 40
+        }
+      }
+    }
   },
   mounted() {
-    this.getUnitList();
+    this.getUnitList()
   },
   methods: {
     sizeChange(v) {
-      this.params.size = v;
-      this.getUnitList();
+      this.params.size = v
+      this.getUnitList()
     },
     currentChange(v) {
-      this.params.current = v;
-      this.getUnitList();
+      this.params.current = v
+      this.getUnitList()
     },
     goPage(path, query) {
-      this.$router.push(path);
+      this.$router.push(path)
     },
     dialogShow(act, data) {
-      this.dialog.title = act ? "新增单位" : "编辑单位";
-      this.dialog.show = !this.dialog.show;
+      this.dialog.title = act ? '新增单位' : '编辑单位'
+      this.dialog.show = !this.dialog.show
       if (act === 0) {
-        const { name, deptType, detail } = data;
-        this.dialog.params.name = name;
-        this.dialog.params.deptType = deptType;
-        this.dialog.params.detail = detail;
-        this.editId = data.id;
+        const { name, deptType, detail } = data
+        this.dialog.params.name = name
+        this.dialog.params.deptType = deptType
+        this.dialog.params.detail = detail
+        this.editId = data.id
       }
     },
 
     getUnitList() {
       unitList(this.params).then((res) => {
         if (res.code === 10000) {
-          this.tableData = res.data.records;
-          this.params.total = res.data.total;
+          this.tableData = res.data.records
+          this.params.total = res.data.total
           // this.params.pages = res.data.pages
           // this.params.current = res.data.current
         }
-      });
+      })
     },
     deleteUnit(row) {
-      this.$confirm("删除后数据无法恢复，是否确认删除？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       }).then(() => {
         unitDelete(row.id).then((res) => {
           if (res.code === 10000) {
             this.$message({
-              type: "success",
-              message: "删除成功",
-            });
-            this.params.current = 1;
-            this.getUnitList();
+              type: 'success',
+              message: '删除成功'
+            })
+            this.params.current = 1
+            this.getUnitList()
           }
-        });
-      });
+        })
+      })
     },
 
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
-            case "新增单位":
+            case '新增单位':
               unitAdd(this.dialog.params).then((res) => {
                 if (res.code === 10000) {
                   this.$message({
-                    type: "success",
-                    message: "单位新增成功",
-                  });
-                  this.dialog.show = false;
-                  this.getUnitList();
+                    type: 'success',
+                    message: '单位新增成功'
+                  })
+                  this.dialog.show = false
+                  this.getUnitList()
                 }
-              });
-              break;
-            case "编辑单位":
+              })
+              break
+            case '编辑单位':
               unitEdit({ id: this.editId, ...this.dialog.params }).then(
                 (res) => {
                   if (res.code === 10000) {
                     this.$message({
-                      type: "success",
-                      message: "单位修改成功",
-                    });
-                    this.dialog.show = false;
-                    this.getUnitList();
+                      type: 'success',
+                      message: '单位修改成功'
+                    })
+                    this.dialog.show = false
+                    this.getUnitList()
                   }
                 }
-              );
-              break;
+              )
+              break
 
             default:
-              break;
+              break
           }
         }
-      });
+      })
     },
     handleClose(done) {
-      done();
-    },
-  },
-};
+      done()
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

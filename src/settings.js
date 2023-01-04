@@ -1,5 +1,5 @@
 module.exports = {
-  title: "梧州零距离问政",
+  title: '视频联网平台',
 
   /**
    * @type {boolean} true | false
@@ -11,5 +11,5 @@ module.exports = {
    * @type {boolean} true | false
    * @description Whether show the logo in sidebar
    */
-  sidebarLogo: false,
-};
+  sidebarLogo: false
+}

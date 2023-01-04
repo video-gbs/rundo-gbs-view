@@ -240,16 +240,19 @@
   position: relative;
 }
 .el-menu-item:after {
-  content: "";
+  content: '';
   position: absolute;
   right: 0;
   top: 50%;
-  height: 2rem;
+  height: 100%;
+  width: 2px;
+  // background: #1e56a0;
   transform: translate(0%, -50%);
 }
 
 .el-menu-item:hover.el-menu-item:after {
-  border: 2px solid #1e56a0;
+  // border: 2px solid #1e56a0;
+  background: #1e56a0;
 }
 
 .is-active > .svg-icon {
@@ -275,6 +278,6 @@
   right: 0;
   height: 0;
   top: 0;
-  border-bottom: 4px solid #1E56A0;
+  border-bottom: 4px solid #1e56a0;
   border-radius: 2px 2px 0px 0px;
 }

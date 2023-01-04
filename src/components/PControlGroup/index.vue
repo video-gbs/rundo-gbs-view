@@ -327,254 +327,252 @@
 </template>
 
 <script>
-import RegCheck from "@/utils/regCheck";
-import PTransfer from "@/components/PTransfer";
+import RegCheck from '@/utils/regCheck'
+import PTransfer from '@/components/PTransfer'
 
 export default {
   components: {
-    PTransfer,
+    PTransfer
   },
   filters: {
     transferDict(valList, dict) {
       return valList
         .map((val) => {
-          const data = (dict || []).find((o) => o.key == val);
-          return data ? data.label : val;
+          const data = (dict || []).find((o) => o.key == val)
+          return data ? data.label : val
         })
-        .join("、");
-    },
+        .join('、')
+    }
   },
   props: {
     data: {
       type: Object,
-      default: {},
-    },
+      default: {}
+    }
   },
   data() {
     return {
       controlGroupData: {},
       ruleForm: {},
       rules: {},
-      formRef: "controlsForm" + Math.uuid(),
+      formRef: 'controlsForm' + Math.uuid(),
       layoutConfig: {},
       transferPopData: {
         show: false,
         data: null,
-        title: "",
+        title: ''
       },
       uploadPop: {
         show: false,
-        url: null,
-      },
-    };
+        url: null
+      }
+    }
   },
   computed: {
     colonStr() {
-      const flag = this.layoutConfig && !this.layoutConfig.showColon;
-      return flag ? "" : "：";
-    },
+      const flag = this.layoutConfig && !this.layoutConfig.showColon
+      return flag ? '' : '：'
+    }
   },
   created() {
-    this.resetControl();
+    this.resetControl()
     if (this.data.layoutConfig) {
-      Object.assign(this.layoutConfig, this.data.layoutConfig);
+      Object.assign(this.layoutConfig, this.data.layoutConfig)
     }
 
-    Object.assign(this.controlGroupData, this.data);
-    this.initControl();
+    Object.assign(this.controlGroupData, this.data)
+    this.initControl()
 
     __dev(() => {
-      window["thisControlGroup"] = this;
-    });
+      window['thisControlGroup'] = this
+    })
   },
   mounted() {
-    this.extendControl();
+    this.extendControl()
   },
   methods: {
     initControl() {
-      const ruleForm = {};
-      const rules = {};
+      const ruleForm = {}
+      const rules = {}
 
       this.controlGroupData.controls.forEach((item) => {
-        ruleForm[item.key] = item.initValue || item.value;
-        rules[item.key] = [];
+        ruleForm[item.key] = item.initValue || item.value
+        rules[item.key] = []
         if (item.isRequired) {
-          if (item.type === "transfer") {
+          if (item.type === 'transfer') {
             rules[item.key].push({
               validator: (rule, value, callback) => {
                 if (value.length) {
-                  callback();
+                  callback()
                 } else {
-                  callback(new Error("不能为空"));
+                  callback(new Error('不能为空'))
                 }
               },
-              trigger: "change",
-            });
+              trigger: 'change'
+            })
           } else {
             rules[item.key].push({
               required: true,
-              message: "不能为空",
-              trigger: "change",
-            });
+              message: '不能为空',
+              trigger: 'change'
+            })
           }
         }
 
         if (item.regKey) {
-          const regKeyList = item.regKey.split(",");
+          const regKeyList = item.regKey.split(',')
           regKeyList.forEach((key) => {
             rules[item.key].push({
               validator: (rule, value, callback) => {
-                const { success, msg } = RegCheck.simpleCheck(value, key);
+                const { success, msg } = RegCheck.simpleCheck(value, key)
                 if (success) {
-                  callback();
+                  callback()
                 } else {
-                  callback(new Error(msg));
+                  callback(new Error(msg))
                 }
               },
-              trigger: "change",
-            });
-          });
+              trigger: 'change'
+            })
+          })
         }
 
-        if (typeof item.regCheck === "function") {
+        if (typeof item.regCheck === 'function') {
           rules[item.key].push({
             validator: (rule, value, callback) => {
-              const { success, msg } = item.regCheck(value, this.ruleForm);
+              const { success, msg } = item.regCheck(value, this.ruleForm)
               if (success) {
-                callback();
+                callback()
               } else {
-                callback(new Error(msg));
+                callback(new Error(msg))
               }
             },
-            trigger: "change",
-          });
+            trigger: 'change'
+          })
         }
 
         // 密码框特殊处理，解决自动补全密码问题
-        if (item.type == "password") {
-          item.showFlag = false;
+        if (item.type == 'password') {
+          item.showFlag = false
         }
-      });
+      })
 
-      this.ruleForm = ruleForm;
-      this.rules = rules;
+      this.ruleForm = ruleForm
+      this.rules = rules
     },
     extendControl() {
       this.data.getData = () => {
-        return this.ruleForm;
-      };
+        return this.ruleForm
+      }
 
       this.data.regCheck = async () => {
         try {
-          return await this.$refs[this.formRef].validate();
+          return await this.$refs[this.formRef].validate()
         } catch (e) {
-          return false;
+          return false
         }
-      };
+      }
 
       this.data.updateControls = (controls) => {
         controls.forEach((control) => {
           this.controlGroupData.controls.forEach((target) => {
             if (target.key === control.key) {
               Object.keys(control).forEach((key) => {
-                target[key] = control[key];
-                if (key === "value") {
-                  this.ruleForm[target.key] = control[key];
+                target[key] = control[key]
+                if (key === 'value') {
+                  this.ruleForm[target.key] = control[key]
                 }
-              });
+              })
             }
-          });
-        });
-      };
+          })
+        })
+      }
     },
     resetControl() {
       this.controlGroupData = {
         controls: [],
         bottons:
-          this.data.layout === "vertical"
+          this.data.layout === 'vertical'
             ? [
                 {
-                  type: "default",
-                  action: "cancel",
-                  text: "取消",
+                  type: 'default',
+                  action: 'cancel',
+                  text: '取消'
                 },
                 {
-                  type: "primary",
-                  text: "确定",
-                },
+                  type: 'primary',
+                  text: '确定'
+                }
               ]
             : [
                 {
-                  icon: "el-icon-search",
-                  type: "primary",
-                  text: "查询",
+                  icon: 'el-icon-search',
+                  type: 'primary',
+                  text: '查询'
                 },
                 {
-                  icon: "el-icon-refresh",
-                  type: "default",
-                  action: "reset",
-                  text: "重置",
-                },
+                  icon: 'el-icon-refresh',
+                  type: 'default',
+                  action: 'reset',
+                  text: '重置'
+                }
               ],
-        layout: "horizontal", // 布局模式 'vertical' | 'horizontal'
-      };
+        layout: 'horizontal' // 布局模式 'vertical' | 'horizontal'
+      }
 
       this.layoutConfig = {
         contentSpan: 18,
         buttonSpan: 6,
-        buttonAlign: this.data.layout === "vertical" ? "right" : "center",
+        buttonAlign: this.data.layout === 'vertical' ? 'right' : 'center',
         showColon: true, // 默认显示冒号
-        hideButton: false,
-      };
+        hideButton: false
+      }
     },
     resetForm() {
       this.controlGroupData.controls.forEach((item) => {
-        this.ruleForm[item.key] = item.initValue || "";
-      });
+        this.ruleForm[item.key] = item.initValue || ''
+      })
     },
     handleBtnClick(data) {
-      if (data.action == "reset") {
-        this.resetForm();
-        this.$emit("onBtnReset");
-      } else if (data.action == "cancel") {
-        this.$emit("onBtnCancel");
+      if (data.action == 'reset') {
+        this.resetForm()
+        this.$emit('onBtnReset')
+      } else if (data.action == 'cancel') {
+        this.$emit('onBtnCancel')
       } else {
-        this.$emit("onBtnClick", { btnData: data, formData: this.ruleForm });
+        this.$emit('onBtnClick', { btnData: data, formData: this.ruleForm })
       }
     },
     pwdShowChange(data) {
-      data.showFlag = !data.showFlag;
-      this.$forceUpdate();
+      data.showFlag = !data.showFlag
+      this.$forceUpdate()
     },
     showTransfer(data) {
-      this.transferPopData.title = data.btnText;
-      this.transferPopData.data = data;
-      this.transferPopData.show = true;
+      this.transferPopData.title = data.btnText
+      this.transferPopData.data = data
+      this.transferPopData.show = true
     },
     comfirmTransfer() {
-      const result = this.transferPopData.data.getData();
+      const result = this.transferPopData.data.getData()
       if (this.transferPopData.data.isRequired && !result.length) {
-        this.$message.error("不能为空，至少选择一个");
-        return;
+        this.$message.error('不能为空，至少选择一个')
+        return
       }
 
-      this.transferPopData.data.value = JSON.parse(JSON.stringify(result));
+      this.transferPopData.data.value = JSON.parse(JSON.stringify(result))
       this.ruleForm[this.transferPopData.data.key] = JSON.parse(
         JSON.stringify(result)
-      );
-      this.$refs[this.formRef].validateField(this.transferPopData.data.key);
-      this.transferPopData.show = false;
+      )
+      this.$refs[this.formRef].validateField(this.transferPopData.data.key)
+      this.transferPopData.show = false
     },
     handlePictureCardPreview(file, item) {
-      this.uploadPop.url = file.url;
-      this.uploadPop.show = true;
+      this.uploadPop.url = file.url
+      this.uploadPop.show = true
     },
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handleDownload(file) {},
-  },
-};
+    handleRemove(file, fileList) {},
+    handleDownload(file) {}
+  }
+}
 </script>
 
 <style lang="scss">

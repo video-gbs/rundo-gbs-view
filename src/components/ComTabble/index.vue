@@ -50,7 +50,7 @@
         :sortable="item.sortable ? item.sortable : false"
         min-width="120"
         :style="{
-          'text-align': item.align ? 'center !important;' : 'left !important;',
+          'text-align': item.align ? 'center !important;' : 'left !important;'
         }"
         :class-name="item.isBold ? 'project-name-bold' : ''"
         show-overflow-tooltip
@@ -115,109 +115,109 @@
 
 <script>
 export default {
-  name: "ComTabble",
+  name: 'ComTabble',
   props: {
     // 是否显示合计行
     showSummary: {
       type: Boolean,
-      default: () => false,
+      default: () => false
     },
     // 项目列表fitstColumn
     leftTitle: {
       type: String,
-      default: () => "",
+      default: () => ''
     },
     // 固定行
     isFixed: {
       type: Boolean,
-      default: () => true,
+      default: () => true
     },
     isLoading: {
       type: Boolean,
-      default: () => true,
+      default: () => true
     },
     total: {
       type: Number,
-      default: () => 0,
+      default: () => 0
     },
     // 表格整体高度
     heightTable: {
       type: String,
-      default: () => "100%",
+      default: () => '100%'
     },
     width: {
       type: String,
-      default: () => "100%",
+      default: () => '100%'
     },
     // 表格内容高度
     MaxHeight: {
       type: String,
-      default: () => "auto",
+      default: () => 'auto'
       // default: () => '650'
     },
     // 是否多选
     selection: {
       type: Boolean,
-      default: () => false,
+      default: () => false
     },
     // 是否展示序号
     index: {
       type: Boolean,
-      default: () => false,
+      default: () => false
     },
     // 当前页
     pageNum: {
       type: Number,
-      default: () => 0,
+      default: () => 0
     },
     // 每页有多少条
     pageSize: {
       type: Number,
-      default: () => 0,
+      default: () => 0
     },
     // 是否控制头部显示
     isCheckedHeader: {
       type: Boolean,
-      default: () => false,
+      default: () => false
     },
     // 头部导航
     headerBtn: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     // 列表配置项 [{name,label,sortable?,style?,width? }]
     tableItems: {
       type: Array,
       default: () => [
         {
-          isShow: true,
-        },
-      ],
+          isShow: true
+        }
+      ]
     },
     // 操作按钮
     buttonItems: {
-      type: Object,
+      type: Object
     },
     // 头部样式
     headerStyle: {
-      type: Object,
+      type: Object
     },
     // 列表内容
     tableData: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     // 显示的头部
     checkedHeader: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     distinguishCode: {
       type: Function,
       default: (tableData, itemData) => {
-        return itemData.text;
-      },
-    },
+        return itemData.text
+      }
+    }
   },
   data() {
     return {
@@ -227,91 +227,90 @@ export default {
       isClicked: false,
       value: true,
       value1: false,
-      MaxHeight_: "auto",
-    };
+      MaxHeight_: 'auto'
+    }
   },
   watch: {
-    "$props.checkedHeader": {
+    '$props.checkedHeader': {
       handler: function (params) {
         this.$nextTick(() => {
-          this.checkedHeaderData = params;
-        });
+          this.checkedHeaderData = params
+        })
       },
-      deep: true,
+      deep: true
     },
     MaxHeight: {
       handler: function (v) {
         this.$nextTick(() => {
-          this.MaxHeight_ = v;
-        });
+          this.MaxHeight_ = v
+        })
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
   created() {
-    this.MaxHeight_ = this.MaxHeight;
+    this.MaxHeight_ = this.MaxHeight
   },
   mounted() {
     // this.getCheckItem()
-    console.log("tableItems", this.tableItems);
   },
   methods: {
     // 获取当前
     table_index(index) {
-      return (this.pageNum - 1) * this.pageSize + index + 1;
+      return (this.pageNum - 1) * this.pageSize + index + 1
     },
     getCheckItem() {
-      const list = [];
+      const list = []
       this.tableItems.map((item) => {
         if (item.isShow) {
-          list.push(item.label);
+          list.push(item.label)
         }
-        return item;
-      });
+        return item
+      })
       this.$nextTick(() => {
         // this.checkedHeaderData = list
-      });
+      })
     },
     // 更改头部显示
     changeTableHeader(val) {
-      this.$emit("changeTableHeader", val);
+      this.$emit('changeTableHeader', val)
     },
     // 头部按钮
     haederBtnClick(val) {
-      this.$emit("haederBtnClick", val);
+      this.$emit('haederBtnClick', val)
     },
     // 操作按钮回调
     handleClick(cb, row) {
-      this.$emit("handleClick", { cb: cb, row: row });
+      this.$emit('handleClick', { cb: cb, row: row })
     },
     handleSizeChange(val) {
-      this.$emit("size-changes", val);
+      this.$emit('size-changes', val)
     },
     // 页码选中
     paginationCurrentChange(val) {
-      this.$emit("current-changes", val);
+      this.$emit('current-changes', val)
     },
     // 列表选中改变
     tableCurrentChanges(val) {
-      this.$emit("tableCurrentChanges", val);
+      this.$emit('tableCurrentChanges', val)
     },
     // 排序操作
     sortChange({ prop, order }) {
-      this.$emit("sortChange", prop, order);
+      this.$emit('sortChange', prop, order)
     },
     changeCellStyle(row, column, rowIndex, columnIndex) {
       if (
-        row.column.label === "项目名称" &&
+        row.column.label === '项目名称' &&
         row.row.projectSubName &&
         row.row.projectSubName.length !== 0
       ) {
-        return "font-weight: 900"; // 修改的样式
+        return 'font-weight: 900' // 修改的样式
       } else {
-        return "";
+        return ''
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

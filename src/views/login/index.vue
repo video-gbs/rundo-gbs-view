@@ -1,356 +1,489 @@
 <template>
-  <div class="login-container f jc-c ai-c">
-    <div class="login-box f fd-c ai-c">
-      <div class="login-label fs48 f jc-c ai-c mb46">
-        梧州零距离问政后台系统
-      </div>
-      <div class="login-div">
-        <div class="title-container f jc-c ai-c">
-          <div class="title-box f jc-c ai-c fs28">账号登录</div>
+  <div class="login" id="login">
+    <div class="wrap-top">
+      <div class="wrap-middle">
+        <div class="wrap-middle-left">
+          <div class="left-img"></div>
         </div>
-        <div class="login-form r15">
-          <el-form
-            ref="loginForm"
-            :model="loginForm"
-            :rules="loginRules"
-            class="ph30 pv28 pt99"
-            auto-complete="on"
-            label-position="left"
-          >
-            <el-form-item prop="account">
-              <el-input
-                ref="account"
-                v-model="loginForm.account"
-                placeholder="输入用户名"
-                name="account"
-                type="text"
-                tabindex="1"
-                auto-complete="on"
-              >
-                <i slot="prefix" class="icon-css icon-username" />
-              </el-input>
-            </el-form-item>
+        <div class="wrap-middle-right">
+          <div class="wrap-middle-login">
+            <div class="wrap-middle-login-head">
+              <img src="../../assets/imgs/zlm-logo.png" />
+              <span>视频联网平台</span>
+            </div>
+            <div class="wrap-middle-login-body">
+              <div class="title-container f jc-c ai-c">
+                <div class="title-box f jc-c ai-c fs28">账号登录</div>
+              </div>
+              <!-- <div class="login-password">
+                <span>密码登录</span>
+                <div></div>
+              </div> -->
+              <div class="login-middle">
+                <el-form
+                  ref="loginForm"
+                  :model="loginForm"
+                  :rules="loginRules"
+                  auto-complete="on"
+                  label-position="left"
+                >
+                  <el-form-item prop="account">
+                    <div
+                      class="login-middle-input"
+                      data-validate="Valid email is: a@b.c"
+                    >
+                      <svg-icon class="svg-btn" icon-class="zhanghao" />
+                      <input
+                        ref="account"
+                        :class="
+                          'input100 ' +
+                          (loginForm.account == '' ? '' : 'has-val')
+                        "
+                        type="text"
+                        v-model="loginForm.account"
+                        name="account"
+                        placeholder="输入用户名"
+                      />
+                    </div>
+                  </el-form-item>
 
-            <el-form-item prop="password">
-              <el-input
-                :key="passwordType"
-                ref="password"
-                v-model="loginForm.password"
-                :type="passwordType"
-                placeholder="输入密码"
-                name="password"
-                tabindex="2"
-                auto-complete="on"
-                @keyup.enter.native="handleLogin"
-              >
-                <i slot="prefix" class="icon-css icon-password" />
-                <i
-                  slot="suffix"
-                  :class="[
-                    passwordType === 'password'
-                      ? 'el-icon-open'
-                      : 'el-icon-turn-off',
-                    'cursor-p',
-                  ]"
-                  :style="{
-                    color: passwordType === 'password' ? '#ddd' : 'green  ',
-                  }"
-                  @click="pwdShowChange"
-                />
-              </el-input>
-            </el-form-item>
+                  <el-form-item prop="password">
+                    <div
+                      class="login-middle-input"
+                      data-validate="Enter password"
+                    >
+                      <svg-icon class="svg-btn" icon-class="mima" />
+                      <input
+                        ref="password"
+                        :class="
+                          'input100 ' +
+                          (loginForm.password == '' ? '' : 'has-val')
+                        "
+                        :type="!showPassword ? 'password' : 'text'"
+                        v-model="loginForm.password"
+                        name="password"
+                        placeholder="输入密码"
+                      />
+                    </div>
+                  </el-form-item>
 
-            <!-- <el-form-item prop="password">
-            <el-input
-              :key="passwordType"
-              ref="输入验证码"
-              v-model="loginForm.password"
-              :type="passwordType"
-              placeholder="Password"
-              name="password"
-              tabindex="2"
-              auto-complete="on"
-              @keyup.enter.native="handleLogin"
-            />
-            <span class="show-pwd" @click="showPwd">
-              <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-            </span>
-          </el-form-item> -->
-            <!-- <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div> -->
-          </el-form>
-          <div class="f jc-c ai-c">
-            <el-button
-              class="r10"
-              :loading="loading"
-              type="primary"
-              style="margin-bottom: 30px; width: 224px; height: 38px"
-              @click.native.prevent="handleLogin"
-              >登录</el-button
-            >
+                  <el-form-item prop="account">
+                    <div
+                      class="login-middle-input"
+                      data-validate="Valid email is: a@b.c"
+                    >
+                      <svg-icon class="svg-btn" icon-class="yzm" />
+                      <input
+                        ref="account"
+                        :class="
+                          'input100 ' + (loginForm.code == '' ? '' : 'has-val')
+                        "
+                        type="text"
+                        v-model="loginForm.code"
+                        name="account"
+                        placeholder="输入验证码"
+                      />
+                    </div>
+                  </el-form-item>
+
+                  <el-form-item>
+                    <el-checkbox v-model="checked"
+                      ><span class="rember-span"
+                        >记住密码，下次自动登录</span
+                      ></el-checkbox
+                    >
+                  </el-form-item>
+                </el-form>
+                <div class="login-footer-button">
+                  <button @click="handleLogin">登录</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+    <div class="wrap-footer">
+      <span>©2022 润建股份版权所有</span>
     </div>
   </div>
 </template>
 
 <script>
-import { validUsername } from "@/utils/validate";
-import { login } from "@/api/method/user";
-import { Local } from "@/utils/storage";
+import { validUsername } from '@/utils/validate'
+import { login } from '@/api/method/user'
+import { Local } from '@/utils/storage'
 export default {
-  name: "Login",
+  name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error("请输入账号"));
+        callback(new Error('请输入账号'))
       } else {
         if (value.length < 6 || value.length > 20) {
-          callback(new Error("账号长度6到20个字符"));
+          callback(new Error('账号长度6到20个字符'))
         } else {
-          callback();
+          callback()
         }
       }
-    };
+    }
     const validatePassword = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error("请输入密码"));
+        callback(new Error('请输入密码'))
       } else {
         if (value.length < 6 || value.length > 20) {
-          callback(new Error("密码长度6到20个字符"));
+          callback(new Error('密码长度6到20个字符'))
         } else {
-          callback();
+          callback()
         }
       }
-    };
+    }
 
     return {
       loginForm: {
         // adminsuper/123456
-        account: "",
-        password: "",
+        account: '',
+        password: ''
+        // code:''
       },
+      checked: false,
+      isLoging: false,
+      showPassword: false,
+      loginLoading: false,
       loginRules: {
         account: [
-          { required: true, trigger: "blur", validator: validateUsername },
+          { required: true, trigger: 'blur', validator: validateUsername }
         ],
         password: [
-          { required: true, trigger: "blur", validator: validatePassword },
-        ],
+          { required: true, trigger: 'blur', validator: validatePassword }
+        ]
       },
       loading: false,
-      passwordType: "password",
-      redirect: undefined,
-    };
+      passwordType: 'password',
+      redirect: undefined
+    }
   },
   watch: {
     $route: {
       handler: function (route) {
-        this.redirect = route.query && route.query.redirect;
+        this.redirect = route.query && route.query.redirect
       },
-      immediate: true,
-    },
+      immediate: true
+    }
   },
   methods: {
     pwdShowChange() {
-      this.passwordType =
-        this.passwordType === "password" ? "type" : "password";
+      this.passwordType = this.passwordType === 'password' ? 'type' : 'password'
     },
     showPwd() {
-      if (this.passwordType === "password") {
-        this.passwordType = "";
+      if (this.passwordType === 'password') {
+        this.passwordType = ''
       } else {
-        this.passwordType = "password";
+        this.passwordType = 'password'
       }
       this.$nextTick(() => {
-        this.$refs.password.focus();
-      });
+        this.$refs.password.focus()
+      })
     },
     handleLogin() {
-      this.$refs.loginForm.validate((valid) => {
-        if (valid) {
-          this.loading = true;
-          login(this.loginForm)
-            .then((res) => {
-              if (res.code === 10000) {
-                const { deptName, deptType, userName, token } = res.data;
-                Local.setToken(token);
-                Local.set("rj_wzwz_token", token);
-                Local.set("rj_wzwz_deptType", deptType);
-                Local.set("rj_wzwz_userName", userName);
-                Local.set("rj_wzwz_deptName", deptName);
-                this.$router.push({ path: "/workTable" });
-                this.loading = false;
-              }
-            })
-            .catch(() => {
-              this.loading = false;
-            });
-        } else {
-          console.log("error submit!!");
-          return false;
+      // this.$refs.loginForm.validate((valid) => {
+      // if (valid) {
+      this.loading = true
+      console.log('his.loginForm', this.loginForm)
+      login(this.loginForm).then((res) => {
+        if (res.code === 10000) {
+          const { deptName, deptType, userName, token } = res.data
+          Local.setToken(token)
+          Local.set('rj_wzwz_token', token)
+          Local.set('rj_wzwz_deptType', deptType)
+          Local.set('rj_wzwz_userName', userName)
+          Local.set('rj_wzwz_deptName', deptName)
+          this.$router.push({ path: '/workTable' })
+          this.loading = false
         }
-      });
-    },
-  },
-};
-</script>
-
-<!-- <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-/* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
-$bg: #283443;
-$light_gray: #fff;
-$cursor: #fff;
-
-@supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
-  .login-container .el-input input {
-    color: $cursor;
-  }
-}
-
-/* reset element-ui css */
-.login-container {
-  .el-input {
-    display: inline-block;
-    height: 47px;
-    width: 85%;
-    margin-left: 10px;
-
-    input {
-      background: transparent;
-      border: 0px;
-      -webkit-appearance: none;
-      border-radius: 0px;
-      padding: 12px 5px 12px 15px;
-      // color: $light_gray;
-      height: 47px;
-      caret-color: $cursor;
-
-      &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
-        // -webkit-text-fill-color: $cursor !important;
-      }
+      })
+      // .catch(() => {
+      this.loading = false
+      // })
+      //   } else {
+      //     console.log("error submit!!");
+      //     return false;
+      //   }
+      // });
     }
-
-  }
-
-  .el-form-item {
-    border: 1px solid rgba(242, 242, 242, 1) !important;
-    // background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    color: #454545;
   }
 }
-</style> -->
-
+</script>
 <style lang="scss" scoped>
-$bg: #2d3a4b;
-$dark_gray: #889aa4;
-$light_gray: #eee;
+body {
+  margin: 0;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.85);
+  background-color: #f8f8f8;
+  font-family: 'PingFangSC-Medium', 'PingFang SC', sans-serif;
+  font-size: 14px;
+  /*font-weight: bolder;*/
+  line-height: 1.571428571;
+}
+.login {
+  margin: 0;
+  padding: 0;
+  position: relative;
 
-.login-container {
-  min-height: 100%;
-  width: 100%;
-  // background-color: $bg;
-  overflow: hidden;
-  background-image: url("~@/assets/imgs/login/bg.jpg");
+  .wrap-middle-right {
+    flex: 1;
+    margin-left: 5%;
+    display: flex;
+    justify-content: flex-start;
+    position: relative;
+    top: -130px;
+  }
+}
+.wrap-top {
+  background-image: url('../../assets/imgs/bg.png');
+  background-repeat: no-repeat;
   background-size: cover;
-  .login-box {
+  background-attachment: fixed;
+  height: 96vh;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+}
+.wrap-middle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  width: 100%;
+}
+.wrap-middle-left {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  height: 400px;
+
+  .left-img {
+    max-width: 800px;
     width: 100%;
-    .login-label {
+    height: 400px;
+    background: url('../../assets/imgs/tysp.png') 100% no-repeat;
+    background-size: cover;
+  }
+}
+.wrap-middle-login {
+  width: 420px;
+  height: 407px;
+  left: 70%;
+  top: -5%;
+}
+.wrap-middle-login-head {
+  height: 48px;
+  margin-bottom: 29px;
+  margin-left: 45px;
+  img {
+    width: 48px;
+    height: 48px;
+    float: left;
+    margin-right: 12px;
+  }
+
+  span {
+    float: left;
+    font-size: 40px;
+    font-family: PingFang SC-Semibold, PingFang SC;
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.18);
+    -webkit-background-clip: text;
+  }
+}
+.wrap-middle-login-body {
+  position: absolute;
+  width: 400px;
+  height: 447px;
+  background: #ffffff;
+  box-shadow: 0px 10px 20px 1px rgba(156, 169, 188, 0.25);
+  border-radius: 4px 4px 4px 4px;
+  opacity: 1;
+  padding: 25px 30px 40px 30px;
+  .title-container {
+    position: absolute;
+    top: -10px;
+    left: 0px;
+    width: 100%;
+    height: 56px;
+
+    .title-box {
+      width: 304px;
+      height: 56px;
+      background-image: url('../../assets/imgs/bt-logo.png');
+      background-size: cover;
+      background-repeat: no-repeat;
       color: #fff;
     }
+  }
+}
+.login-password {
+  position: relative;
+  top: 16px;
+  z-index: auto;
+  width: 100%;
+  min-height: 44px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  font-weight: 600;
 
-    .login-div {
-      position: relative;
-      width: 400px;
-      // height: 457px;
-      height: 347px;
-      max-width: 100%;
+  span {
+    z-index: 66;
+    width: 80px;
+    /*display: block;*/
+    overflow-wrap: break-word;
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 20px;
+    font-family: PingFangSC-Medium;
+    white-space: nowrap;
+    line-height: 28px;
+    text-align: left;
+    margin-top: 16px;
+    border-bottom: #1d2c6a 2px solid;
+    padding-bottom: 16px;
+  }
 
-      overflow: hidden;
+  div {
+    z-index: 64;
+    width: 100%;
+    height: 1px;
+    align-self: flex-start;
+    margin-top: 13px;
+  }
+}
+.login-middle {
+  position: relative;
+  top: 18%;
 
-      .title-container {
-        position: absolute;
-        top: 0px;
-        left: 0px;
-        width: 100%;
-        height: 56px;
+  .login-middle-input {
+    outline: none;
+    display: flex;
+    flex: 1;
+    min-width: 50px;
+    height: 48px;
+    padding: 0px 14px;
+    // margin-bottom: 20px;
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+    color: red;
+    border: 1px solid #f2f2f2;
+    border-radius: 2px;
+    background-color: #fcfeff;
+    background-image: none;
+    box-shadow: none;
+    font-size: 14px;
+    line-height: 1.571428571;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
 
-        .title-box {
-          width: 304px;
-          height: 56px;
-          background-image: url("~@/assets/imgs/login/header.png");
-          background-size: cover;
-          background-repeat: no-repeat;
-          color: #fff;
-        }
-      }
+    input {
+      border: none;
+      padding: 0;
+      font-size: 14px;
+      font-family: PingFangSC-Regular;
+      margin-left: 10px;
+      background-color: #ffffff;
+      -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
     }
-    .icon-css {
-      width: 18px;
-      height: 18px;
-      background-size: cover;
-      color: #eee;
+
+    label {
+      z-index: 61;
+      width: 60px;
       display: block;
-      margin: 10px;
-    }
-    .icon-username {
-      background-image: url("~@/assets/imgs/login/username.png");
-    }
-    .icon-password {
-      background-image: url("../../assets/imgs/login/password.png");
-    }
-    .login-form {
-      margin-top: 10px;
-      width: 400px;
-      // height: 447px;
-      background-color: #fff;
-      max-width: 100%;
-      box-shadow: 0px 3px 24px rgba(0, 53, 123, 0.44);
+      overflow-wrap: break-word;
+      color: rgba(0, 0, 0, 0.85);
+      font-size: 14px;
+      font-family: PingFangSC-Regular;
+      white-space: nowrap;
+      line-height: 40px;
+      text-align: justify;
+      font-weight: bolder;
+      margin: 0px 26px 0px 0px;
+      text-align: center;
     }
   }
-  .tips {
+  .svg-btn {
+    position: relative;
+    top: 15px;
+    left: -4px;
+  }
+  .rember-span {
+    font-size: 12px;
+    font-family: PingFang SC-Regular, PingFang SC;
+    font-weight: 400;
+    color: #c1c9ce;
+  }
+}
+
+.login-footer-button {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  /*padding-top: 20px;*/
+
+  button {
+    font-family: Poppins-Medium;
     font-size: 14px;
     color: #fff;
-    margin-bottom: 10px;
+    line-height: 1.2;
+    text-transform: uppercase;
 
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
-  }
-
-  .svg-container {
-    padding: 6px 5px 6px 15px;
-    color: $dark_gray;
-    vertical-align: middle;
-    width: 30px;
-    display: inline-block;
-  }
-
-  .show-pwd {
-    position: absolute;
-    right: 10px;
-    top: 7px;
-    font-size: 16px;
-    color: $dark_gray;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 20px;
+    width: 224px;
+    height: 38px;
+    border-radius: 10px;
+    outline: none !important;
+    border: none;
+    background-color: #1e56a0;
     cursor: pointer;
-    user-select: none;
   }
+}
+.wrap-footer {
+  display: flex;
+  height: 4vh;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+}
+.wrap-footer span {
+  font-weight: normal;
+  display: block;
+  overflow-wrap: break-word;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  white-space: nowrap;
+  line-height: 4vh;
+}
 
-  .el-input {
-    width: 340px;
-    height: 48px;
-    ::v-deep input {
-      text-indent: 16px !important;
+/* start 媒体查询 */
+@media screen and (max-width: 970px) {
+  .login {
+    .wrap-middle-left {
+      display: none !important;
+    }
+
+    .wrap-middle-right {
+      margin-left: 0;
+      justify-content: center;
     }
   }
 }
+/* end 媒体查询 */
 </style>

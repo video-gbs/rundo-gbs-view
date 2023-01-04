@@ -9,63 +9,99 @@
   <el-form ref="form" :model="form" :rules="rules" class="p-form">
     <div v-for="(rows, index1) in formats" :key="index1" class="p-form-row">
       <template v-for="(item, index2) in rows">
-        <el-form-item v-if="item.show"
-                      :key="index2"
-                      :label="`${item.label}：`"
-                      :prop="item.name"
-                      label-width="130px">
-          <div class="form-item-warrp" :class="{'front-warrp': item.front ? true : false}" :font-length="item.front? String(item.front.length): ''">
+        <el-form-item
+          v-if="item.show"
+          :key="index2"
+          :label="`${item.label}：`"
+          :prop="item.name"
+          label-width="130px"
+        >
+          <div
+            class="form-item-warrp"
+            :class="{ 'front-warrp': item.front ? true : false }"
+            :font-length="item.front ? String(item.front.length) : ''"
+          >
             <div v-if="item.front" class="front">{{ item.front }}</div>
-            <el-upload v-if="item.type == 'upload'"
-                       :ref="`upload-${item.name}`"
-                       class="p-upload"
-                       :action="item.name"
-                       :on-preview="handlePreview"
-                       :on-remove="handleRemove"
-                       :on-exceed="handleExceed"
-                       :on-success="handleSuccess"
-                       :on-change="handleChange"
-                       :limit="item.cover ? (item.limit ? item.limit + 1 : 2) : (item.limit ? item.limit : 999)"
-                       :file-list="fileList[item.name]"
-                       :auto-upload="true"
-                       :show-file-list="true"
-                       :multiple="item.multiple"
-                       :http-request="handleUpload">
-              <el-button size="small" type="upload" @click="chooseFile(item)">{{ item.label }}</el-button>
+            <el-upload
+              v-if="item.type == 'upload'"
+              :ref="`upload-${item.name}`"
+              class="p-upload"
+              :action="item.name"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              :on-exceed="handleExceed"
+              :on-success="handleSuccess"
+              :on-change="handleChange"
+              :limit="
+                item.cover
+                  ? item.limit
+                    ? item.limit + 1
+                    : 2
+                  : item.limit
+                  ? item.limit
+                  : 999
+              "
+              :file-list="fileList[item.name]"
+              :auto-upload="true"
+              :show-file-list="true"
+              :multiple="item.multiple"
+              :http-request="handleUpload"
+            >
+              <el-button size="small" type="upload" @click="chooseFile(item)">{{
+                item.label
+              }}</el-button>
             </el-upload>
-            <el-select v-else-if="item.type === 'select'"
-                       v-model="form[item.name]"
-                       :placeholder="`请选择${item.label}`">
-              <el-option v-for="(op, index3) in $dict(item.dict)"
-                         :key="index3"
-                         :label="op.value"
-                         :value="op.key" />
+            <el-select
+              v-else-if="item.type === 'select'"
+              v-model="form[item.name]"
+              :placeholder="`请选择${item.label}`"
+            >
+              <el-option
+                v-for="(op, index3) in $dict(item.dict)"
+                :key="index3"
+                :label="op.value"
+                :value="op.key"
+              />
             </el-select>
-            <el-radio-group v-else-if="item.type === 'radio'"
-                            v-model="form[item.name]"
-                            @change="changeRadio($event, item)">
-              <el-radio v-for="(op, index3) in $dict(item.dict)"
-                        :key="index3"
-                        :label="op.key">{{ op.value }}</el-radio>
+            <el-radio-group
+              v-else-if="item.type === 'radio'"
+              v-model="form[item.name]"
+              @change="changeRadio($event, item)"
+            >
+              <el-radio
+                v-for="(op, index3) in $dict(item.dict)"
+                :key="index3"
+                :label="op.key"
+                >{{ op.value }}</el-radio
+              >
             </el-radio-group>
-            <el-input v-else-if="item.type == 'textarea'"
-                      v-model="form[item.name]"
-                      type="textarea"
-                      :rows="item.rows"
-                      :resize="item.resize ? 'vertical' : 'none'"
-                      :placeholder="`请输入${item.label}`" />
-            <el-date-picker v-else-if="item.type == 'date'"
-                            v-model="form[item.name]"
-                            type="date"
-                            :value-format="item.format ? item.format : 'yyyy-MM-dd HH:mm:ss'"
-                            :picker-options="item.pickerOptions? item.pickerOptions : {}"
-                            :placeholder="`请选择${item.label}`" />
-            <el-radio-group v-else-if="item.type == 'boolean'"
-                            v-model="form[item.name]"
-                            @change="changeBoolean($event, item)">
-              <el-radio v-for="(itm, idx) in item.radios"
-                        :key="idx"
-                        :label="itm.label">{{ itm.value }}</el-radio>
+            <el-input
+              v-else-if="item.type == 'textarea'"
+              v-model="form[item.name]"
+              type="textarea"
+              :rows="item.rows"
+              :resize="item.resize ? 'vertical' : 'none'"
+              :placeholder="`请输入${item.label}`"
+            />
+            <el-date-picker
+              v-else-if="item.type == 'date'"
+              v-model="form[item.name]"
+              type="date"
+              :value-format="item.format ? item.format : 'yyyy-MM-dd HH:mm:ss'"
+              :picker-options="item.pickerOptions ? item.pickerOptions : {}"
+              :placeholder="`请选择${item.label}`"
+            />
+            <el-radio-group
+              v-else-if="item.type == 'boolean'"
+              v-model="form[item.name]"
+              @change="changeBoolean($event, item)"
+            >
+              <el-radio
+                v-for="(itm, idx) in item.radios"
+                :key="idx"
+                :label="itm.label"
+                >{{ itm.value }}</el-radio
+              >
             </el-radio-group>
             <el-time-select
               v-else-if="item.type == 'time'"
@@ -76,28 +112,35 @@
                 step: '01:00',
                 end: '23:00'
               }"
-              placeholder="选择时间" />
-            <span v-else-if="item.type == 'text'">{{ item.format? parseTime(item.value, item.format): item.value }}</span>
+              placeholder="选择时间"
+            />
+            <span v-else-if="item.type == 'text'">{{
+              item.format ? parseTime(item.value, item.format) : item.value
+            }}</span>
             <el-input-number
               v-else-if="item.type == 'number'"
               v-model="form[item.name]"
               :style="{ width: `${item.inputWdth}px` }"
-              :min="item.min ? item.min: null"
-              :max="item.max ? item.max: Infinity"
-              :precision="item.precision? item.precision: 0"
+              :min="item.min ? item.min : null"
+              :max="item.max ? item.max : Infinity"
+              :precision="item.precision ? item.precision : 0"
               :controls="false"
             />
-            <el-input v-else
-                      v-model="form[item.name]"
-                      :style="{ width: `${item.inputWdth}px` }"
-                      :placeholder="`请输入${item.label}`" />
+            <el-input
+              v-else
+              v-model="form[item.name]"
+              :style="{ width: `${item.inputWdth}px` }"
+              :placeholder="`请输入${item.label}`"
+            />
             <span v-if="item.unit" class="unit">{{ item.unit }}</span>
           </div>
         </el-form-item>
       </template>
     </div>
     <div v-if="periodic && form['isReply'] == 2" class="link">
-      <el-link type="primary" :underline="false" @click="initFormData">汇报周期表</el-link>
+      <el-link type="primary" :underline="false" @click="initFormData"
+        >汇报周期表</el-link
+      >
     </div>
     <div class="p-form-operation">
       <el-button type="blue" size="small" @click="submit">提交</el-button>
@@ -107,7 +150,8 @@
       :show.sync="showConfirm"
       :show-confirm-btn="true"
       :show-cancel-btn="true"
-      @handleConfirm="handleConfirm">
+      @handleConfirm="handleConfirm"
+    >
       <div class="confirm">{{ tips }}</div>
     </MsgBox>
     <MsgBox
@@ -201,15 +245,16 @@ export default {
           item.show = true
         }
         if (item.type === 'boolean') {
-          item.hidden && item.hidden.split(',').forEach((k) => {
-            this.formats.forEach((row1, i1) => {
-              row1.forEach((item1, i2) => {
-                if (item1.name === k) {
-                  this.hiddenPath[k] = [i1, i2]
-                }
+          item.hidden &&
+            item.hidden.split(',').forEach((k) => {
+              this.formats.forEach((row1, i1) => {
+                row1.forEach((item1, i2) => {
+                  if (item1.name === k) {
+                    this.hiddenPath[k] = [i1, i2]
+                  }
+                })
               })
             })
-          })
         }
         if (item.type === 'upload') {
           this.fileList[item.name] = []
@@ -271,7 +316,6 @@ export default {
           if (this.deadtimeData[key] !== this.form[key]) isRefresh = true
         }
       }
-      console.log(this.cycles, isRefresh)
       if (this.cycles.length === 0 || isRefresh) {
         this.deadtimeData = {
           firstDeadtime,
@@ -280,7 +324,10 @@ export default {
         }
         var num = 0
         do {
-          const deadtime = this.$utils.getMonthBetween(firstDeadtime, intervalDadtime * num)
+          const deadtime = this.$utils.getMonthBetween(
+            firstDeadtime,
+            intervalDadtime * num
+          )
           cycles.push({
             periodName: `第${this.$utils.toChinesNum(num + 1)}季度汇报`,
             deadtime,
@@ -288,7 +335,6 @@ export default {
           })
           num++
         } while (num < deadtimeCnt)
-        console.log(cycles)
       } else {
         cycles = this.cycles
       }
@@ -296,8 +342,6 @@ export default {
     },
     handleSubmit() {
       const { cycles, form } = this
-      console.log(cycles)
-      console.log(form)
     },
 
     submit() {
@@ -375,7 +419,7 @@ export default {
       const { file } = option
       if (!checkType(file) || !checkSize(file)) {
         const ref = this.$refs[`upload-${option.action}`][0]
-        ref.uploadFiles = ref.uploadFiles.filter(item => {
+        ref.uploadFiles = ref.uploadFiles.filter((item) => {
           return item.uid !== file.uid
         })
         return
@@ -394,26 +438,52 @@ export default {
         this.files[option.action] = {}
       }
       // kobe
-      this.$api.file.upload(forms, {
-        type: '3'
-      }).then((res) => {
-        if (res.data.code == 200) {
-          this.$message({
-            type: 'success',
-            message: '上传成功'
-          })
-          if (this.formItem && this.formItem.change) {
-            this.formItem.change(this.form, file)
-          }
-          if (option.action == 'docFileId') {
-            // this.files[option.action] = {}
-            this.files[option.action][uid] = res.data.data.id
+      this.$api.file
+        .upload(forms, {
+          type: '3'
+        })
+        .then((res) => {
+          if (res.data.code == 200) {
+            this.$message({
+              type: 'success',
+              message: '上传成功'
+            })
+            if (this.formItem && this.formItem.change) {
+              this.formItem.change(this.form, file)
+            }
+            if (option.action == 'docFileId') {
+              // this.files[option.action] = {}
+              this.files[option.action][uid] = res.data.data.id
+            } else {
+              this.files[option.action][uid] = res.data.data.id
+            }
           } else {
-            this.files[option.action][uid] = res.data.data.id
+            const ref = this.$refs[`upload-${option.action}`][0]
+            ref.uploadFiles = ref.uploadFiles.filter((item) => {
+              return item.uid !== file.uid
+            })
+            this.$message({
+              type: 'error',
+              message: '上传失败'
+            })
+            this.fileList[option.action] = this.fileList[option.action].filter(
+              (f) => {
+                return f.uid !== uid
+              }
+            )
           }
-        } else {
+          this.uploadCount--
+          if (this.uploadCount <= 0) {
+            this.$nextTick(() => {
+              // 以服务的方式调用的 Loading 需要异步关闭
+              this.loading.close()
+              this.loading = null
+            })
+          }
+        })
+        .catch(() => {
           const ref = this.$refs[`upload-${option.action}`][0]
-          ref.uploadFiles = ref.uploadFiles.filter(item => {
+          ref.uploadFiles = ref.uploadFiles.filter((item) => {
             return item.uid !== file.uid
           })
           this.$message({
@@ -425,41 +495,20 @@ export default {
               return f.uid !== uid
             }
           )
-        }
-        this.uploadCount--
-        if (this.uploadCount <= 0) {
-          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-            this.loading.close()
-            this.loading = null
-          })
-        }
-      }).catch(() => {
-        const ref = this.$refs[`upload-${option.action}`][0]
-        ref.uploadFiles = ref.uploadFiles.filter(item => {
-          return item.uid !== file.uid
-        })
-        this.$message({
-          type: 'error',
-          message: '上传失败'
-        })
-        this.fileList[option.action] = this.fileList[option.action].filter(
-          (f) => {
-            return f.uid !== uid
+          this.uploadCount--
+          if (this.uploadCount <= 0) {
+            this.$nextTick(() => {
+              // 以服务的方式调用的 Loading 需要异步关闭
+              this.loading.close()
+              this.loading = null
+            })
           }
-        )
-        this.uploadCount--
-        if (this.uploadCount <= 0) {
-          this.$nextTick(() => { // 以服务的方式调用的 Loading 需要异步关闭
-            this.loading.close()
-            this.loading = null
-          })
-        }
-      })
+        })
     },
     changeRadio(value, item) {
       const formats = []
-      this.formats.forEach(r => {
-        r.forEach(i => {
+      this.formats.forEach((r) => {
+        r.forEach((i) => {
           if (item.filter.indexOf(i.name) !== -1) {
             formats.push(i)
           }
@@ -511,13 +560,13 @@ export default {
     display: flex;
     height: 40px;
     align-items: center;
-}
+  }
 }
 .form-item-warrp.front-warrp[font-length='1'] + .el-form-item__error {
   left: 35px + 14px +5px !important;
 }
 .form-item-warrp.front-warrp[font-length='2'] + .el-form-item__error {
-  left: 35px + 14*2px +5px !important;
+  left: 35px + 14 * 2px +5px !important;
 }
 
 .link {
@@ -526,7 +575,7 @@ export default {
   justify-content: flex-end;
   padding: 10px 20px;
   .el-link:after {
-    content: "";
+    content: '';
     position: absolute;
     left: 0;
     right: 0;
