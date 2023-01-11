@@ -276,7 +276,7 @@ export default {
     },
     goContentList() {
       const { href } = this.$router.resolve({
-        path: '/systemManagement',
+        path: '/equipment',
         query: {}
       })
       console.log('href', href)

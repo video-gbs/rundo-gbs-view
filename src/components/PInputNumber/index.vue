@@ -7,9 +7,7 @@
     @input="handleNumber($event)"
     @change="handlePropChange($event)"
   >
-    <template v-if="suffix" slot="append">{{
-      suffix
-    }}</template>
+    <template v-if="suffix" slot="append">{{ suffix }}</template>
   </el-input>
 </template>
 
@@ -67,11 +65,11 @@ export default {
       if (val !== '' && val.substr(0, 1) === '.') {
         val = ''
       }
-      val = val.replace(/^0*(0\.|[1-9])/, '$1')// 解决 粘贴不生效
+      val = val.replace(/^0*(0\.|[1-9])/, '$1') // 解决 粘贴不生效
       val = val.replace(/[^\d.]/g, '') // 清除“数字”和“.”以外的字符
       val = val.replace(/\.{2,}/g, '.') // 只保留第一个. 清除多余的
       val = val.replace('.', '$#$').replace(/\./g, '').replace('$#$', '.')
-      val = val.replace(/^(\-)*(\d+)\.(\d\d\d\d).*$/, '$1$2.$3')// 只能输入4个小数
+      val = val.replace(/^(\-)*(\d+)\.(\d\d\d\d).*$/, '$1$2.$3') // 只能输入4个小数
       // val = val.replace(/^(\d+)\.(\d\d).*$/, '$1.$2')// 只能输入4个小数
       // val = val.replace(/^(\d\d\d\d\d\d\d\d\d\d\d\d)\.(\d\d\d\d).*$/, '$1.$2')// 只能输入4个小数
       // val = val.replace(/^(\d{1,5})?\.(\d{1,4}).*$/, '$1.$2')// 只能输入4个小数

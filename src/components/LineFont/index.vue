@@ -9,31 +9,31 @@
     </div>
     <div class="title-right">
       <span v-if="!lineTitle.notShowSmallTitle" class="font-gray">{{
-        lineTitle.smallTitle ? lineTitle.smallTitle : ""
+        lineTitle.smallTitle ? lineTitle.smallTitle : ''
       }}</span>
     </div>
   </div>
 </template>
 <script>
 export default {
-  name: "LineTitle",
+  name: 'LineTitle',
   props: {
     lineTitle: {
       type: Object,
-      default: function() {
-        return {};
+      default: function () {
+        return {}
       }
     },
     textStyle: {
       type: Object,
-      default: function() {
-        return {};
+      default: function () {
+        return {}
       }
     },
     lineBlueStyle: {
       type: Object,
-      default: function() {
-        return {};
+      default: function () {
+        return {}
       }
     },
     height: {
@@ -49,7 +49,7 @@ export default {
   created() {
     // document.title = this.lineTitle.title
   }
-};
+}
 </script>
 <style lang="scss" scoped>
 .line-title-box {

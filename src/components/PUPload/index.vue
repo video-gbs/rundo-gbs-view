@@ -21,12 +21,12 @@
   >
     <i slot="default" class="el-icon-plus" />
     <div class="upload-explain">
-      说明：<br>
+      说明：<br />
       ①支持上传图片格式：{{
         accept.length > 0
           ? accept.toString()
-          : accepts.map((a) => `*${a}`).join("、")
-      }}；<br>
+          : accepts.map((a) => `*${a}`).join('、')
+      }}；<br />
       ②单张图片大小不超过500M。
     </div>
   </el-upload>

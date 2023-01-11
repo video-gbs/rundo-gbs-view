@@ -1,4 +1,3 @@
-
 // 公告管理
 import request from '@/api/fetch'
 
@@ -28,7 +27,9 @@ export function editAfficheOrder(id, orderValue) {
 }
 export function editAfficheIsShow(id, isShwo) {
   // 修改公告是否显示
-  return request.post(`/politics/backstage/affiche/updateIsShow/${id}/${isShwo}`)
+  return request.post(
+    `/politics/backstage/affiche/updateIsShow/${id}/${isShwo}`
+  )
 }
 
 export function deleteAffiche(id) {

@@ -1,4 +1,3 @@
-
 // 账号管理
 import request from '@/api/fetch'
 
@@ -21,7 +20,6 @@ export function accountList(params) {
   // 列表
   return request.post(`/politics/sys/users/list`, params)
 }
-
 
 export function accountDelete(id) {
   // 删除

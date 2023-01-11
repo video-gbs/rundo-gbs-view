@@ -56,6 +56,13 @@
       width="748px"
       :before-close="handleClose"
     >
+      <div slot="title" class="dialog-title">
+        <LineFont
+          :line-title="lineTitle"
+          :text-style="textStyle"
+          :line-blue-style="lineBlueStyle"
+        />
+      </div>
       <div>
         <el-form
           ref="accountForm"
@@ -87,22 +94,22 @@
           </el-form-item>
         </el-form>
       </div>
-      <span slot="footer" class="dialog-footer">
+      <div slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
         <el-button type="primary" @click="submit('accountForm')"
           >确 定</el-button
         >
-      </span>
+      </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import leftTree from '../components/leftTree'
-
+import LineFont from '@/components/LineFont'
 export default {
   name: '',
-  components: { leftTree },
+  components: { leftTree, LineFont },
   data() {
     return {
       types: [
@@ -111,6 +118,21 @@ export default {
         { id: 3, label: '县市区' },
         { id: 4, label: '其他' }
       ],
+      lineTitle: {
+        title: '新建分组',
+        notShowSmallTitle: false
+      },
+      textStyle: {
+        fontSize: '18px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#333333'
+      },
+      lineBlueStyle: {
+        background: 'rgba(30, 86, 160, 1)',
+        width: '3px',
+        height: '18px'
+      },
       dialog: {
         show: false,
         title: '新建分组',
@@ -164,6 +186,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-dialog__header {
+  border-bottom: 1px solid rgba(234, 234, 234, 1);
+  padding: 0 20px;
+}
+::v-deep .el-dialog__footer {
+  padding: 0;
+}
+
 .main {
   .panel-header-box {
     margin: 0;
@@ -224,6 +254,24 @@ export default {
 .area-form {
   .el-input {
     width: 436px;
+  }
+}
+.dialog-footer {
+  width: 100%;
+  height: 52px;
+  line-height: 52px;
+  position: relative;
+  bottom: 0;
+  right: 0px;
+  text-align: right;
+  border-top: 1px solid #eaeaea;
+  > .el-button {
+    margin-right: 20px;
+  }
+  .svg-btn {
+    position: relative;
+    top: 1px;
+    left: -4px;
   }
 }
 ::v-deep .el-textarea__inner {

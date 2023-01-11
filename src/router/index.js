@@ -97,6 +97,17 @@ const constantRoutes = [
         meta: { title: '添加设备', icon: '' }
       },
       {
+        path: '/activeDiscovery/:type',
+        name: 'activeDiscovery',
+        component: () =>
+          import(
+            '@/views/leftMenus/resourceManagement/components/ActiveDiscovery.vue'
+          ),
+        author: superAdmin,
+        hidden: true,
+        meta: { title: '主动发现', icon: '' }
+      },
+      {
         path: '/displayControlEquipment',
         name: 'displayControlEquipment',
         author: superAdmin,
@@ -147,6 +158,17 @@ const constantRoutes = [
         component: () =>
           import('@/views/leftMenus/systemManagement/unitManagement/index'),
         meta: { title: '部门管理', icon: '' }
+      },
+      {
+        path: '/creatingRole/:type',
+        name: '/creatingRole',
+        component: () =>
+          import(
+            '@/views/leftMenus/resourceManagement/components/CreatingRole.vue'
+          ),
+        author: superAdmin,
+        hidden: true,
+        meta: { title: '新建角色', icon: '' }
       },
       {
         path: '/otherUnitManagement',

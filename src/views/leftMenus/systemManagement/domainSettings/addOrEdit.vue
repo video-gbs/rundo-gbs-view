@@ -82,115 +82,115 @@
   </div>
 </template>
 <script>
-import PEditorVue from "@/components/PEditorVue/index.vue";
-import { addAffiche, editAffiche, getAfficheOne } from "@/api/method/affiche";
+import PEditorVue from '@/components/PEditorVue/index.vue'
+import { addAffiche, editAffiche, getAfficheOne } from '@/api/method/affiche'
 export default {
-  name: "RoundChartManage",
+  name: 'RoundChartManage',
   components: { PEditorVue },
   data() {
     const checkPageUrl = (rule, value, callback) => {
       if (this.params.related === 0) {
-        callback();
+        callback()
       } else {
         if (!value) {
-          callback(new Error("请输入链接地址"));
+          callback(new Error('请输入链接地址'))
         } else {
-          callback();
+          callback()
         }
       }
-    };
+    }
 
     const checkContent = (rule, value, callback) => {
       if (this.params.related) {
-        callback();
+        callback()
       } else {
-        if (value && value !== "") {
-          callback();
+        if (value && value !== '') {
+          callback()
         } else {
-          callback(new Error("请输入展示内容"));
+          callback(new Error('请输入展示内容'))
         }
       }
-    };
+    }
 
     return {
-      title: "新增公告",
-      action: "add",
-      editorCxt: "",
+      title: '新增公告',
+      action: 'add',
+      editorCxt: '',
       params: {
-        content: "",
+        content: '',
         isShow: 0,
         orderValue: 0,
-        pageUrl: "",
+        pageUrl: '',
         related: 0,
-        title: "",
+        title: ''
       },
       rules: {
-        content: [{ validator: checkContent, trigger: "blur" }],
+        content: [{ validator: checkContent, trigger: 'blur' }],
         title: [
-          { required: true, message: "请输入标题", trigger: "blur" },
+          { required: true, message: '请输入标题', trigger: 'blur' },
           {
             min: 2,
             max: 50,
-            message: "长度在 2 到 50 个字符",
-            trigger: "blur",
-          },
+            message: '长度在 2 到 50 个字符',
+            trigger: 'blur'
+          }
         ],
         pageUrl: [
           // { required: false, message: '请输入链接地址', trigger: 'blur' },
           {
             min: 10,
             max: 200,
-            message: "长度在 10 到 200 个字符",
-            trigger: "blur",
+            message: '长度在 10 到 200 个字符',
+            trigger: 'blur'
           },
-          { validator: checkPageUrl, trigger: ["blur", "change"] },
-        ],
-      },
-    };
+          { validator: checkPageUrl, trigger: ['blur', 'change'] }
+        ]
+      }
+    }
   },
   mounted() {
-    console.log(this.$route.params);
-    if (this.$route.params.id && this.$route.params.id !== "add") {
-      this.action = "edit";
-      this.title = "编辑公告";
-      this.getNoticeById(this.$route.params.id);
+    console.log(this.$route.params)
+    if (this.$route.params.id && this.$route.params.id !== 'add') {
+      this.action = 'edit'
+      this.title = '编辑公告'
+      this.getNoticeById(this.$route.params.id)
     }
   },
   methods: {
     handleChange() {},
     contentChange(v) {
       // 监听富文本内容变化并赋值
-      console.log("onchangevvvvv", v);
-      this.params.content = v;
+      console.log('onchangevvvvv', v)
+      this.params.content = v
     },
     getNoticeById(v) {
       // 获取单个公告数据
       getAfficheOne(v).then((res) => {
         res.code === 10000 &&
           ((this.params = Object.assign(this.params, res.data)),
-          (this.editorCxt = this.params.content));
-      });
+          (this.editorCxt = this.params.content))
+      })
     },
     submitFn() {
-      this.$refs["form"].validate((v) => {
+      this.$refs['form'].validate((v) => {
         if (v) {
           const fn =
-            this.action === "add"
+            this.action === 'add'
               ? addAffiche(this.params)
-              : editAffiche(this.params.id, this.params);
+              : editAffiche(this.params.id, this.params)
           fn.then((res) => {
             res.code === 10000 &&
               (this.$message.success(
-                (this.action === "add" ? "添加" : "编辑") + "成功"
+                (this.action === 'add' ? '添加' : '编辑') + '成功'
               ),
-              this.$router.push("/publicManagement"));
-          });
-          return;
+              this.$router.push('/publicManagement'))
+          })
+          return
         }
-      });
-    },
-  },
-};
+      })
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 .el-input {

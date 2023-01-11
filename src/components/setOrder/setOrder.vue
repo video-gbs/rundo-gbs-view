@@ -6,8 +6,12 @@
         {{ orderForm.title }}
       </el-form-item>
       <el-form-item label="显示顺序">
-        <el-input-number v-model="orderForm.orderValue" :min="0" :max="1000" label="描述文字" />
-
+        <el-input-number
+          v-model="orderForm.orderValue"
+          :min="0"
+          :max="1000"
+          label="描述文字"
+        />
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -22,7 +26,6 @@ export default {
   props: {
     config: {
       type: Object
-
     },
     fn: {
       type: Function
@@ -36,7 +39,7 @@ export default {
   },
   watch: {
     config: {
-      handler: function(n) {
+      handler: function (n) {
         console.log('n', n)
         this.orderForm = n
       }
@@ -54,13 +57,9 @@ export default {
       this.$emit('refreshFn')
     },
     submitFn() {
-      this.fn && (
-        this.fn(this.orderForm)
-      )
+      this.fn && this.fn(this.orderForm)
     }
   }
 }
 </script>
-<style lang='scss' scoped>
-
-</style>
+<style lang="scss" scoped></style>

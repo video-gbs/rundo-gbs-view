@@ -6,7 +6,12 @@
 * @Description: 文件预览
 -->
 <template>
-  <div id="iframe" v-loading="loading" element-loading-text="加载中……" class="file-view" />
+  <div
+    id="iframe"
+    v-loading="loading"
+    element-loading-text="加载中……"
+    class="file-view"
+  />
 </template>
 <script>
 import { Base64 } from 'js-base64'
@@ -43,13 +48,14 @@ export default {
       const dialog = document.getElementById('iframe')
       dialog.innerHTML = ''
       const iframe = document.createElement('iframe')
-      iframe.src = window.config.previewUrl + encodeURIComponent(Base64.encode(src))
+      iframe.src =
+        window.config.previewUrl + encodeURIComponent(Base64.encode(src))
       if (iframe.attachEvent) {
-        iframe.attachEvent('onload', function() {
+        iframe.attachEvent('onload', function () {
           that.loading = false
         })
       } else {
-        iframe.onload = function() {
+        iframe.onload = function () {
           that.loading = false
         }
       }
@@ -59,12 +65,12 @@ export default {
 }
 </script>
 <style lang="scss">
-    .file-view {
-      height: 100%;
-      width: 100%;
-      iframe {
-        height: 100%;
-        width: 100%;
-      }
-    }
+.file-view {
+  height: 100%;
+  width: 100%;
+  iframe {
+    height: 100%;
+    width: 100%;
+  }
+}
 </style>

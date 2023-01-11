@@ -21,58 +21,58 @@
   </div>
 </template>
 <script>
-import PEditorVue from "@/components/PEditorVue";
-import { getInfo, editInfo } from "@/api/method/informationManagement";
+import PEditorVue from '@/components/PEditorVue'
+import { getInfo, editInfo } from '@/api/method/informationManagement'
 
 export default {
-  name: "",
+  name: '',
   components: { PEditorVue },
   props: {
     title: {
-      type: String,
+      type: String
     },
     dataType: {
-      type: Number,
-    },
+      type: Number
+    }
   },
   data() {
     return {
       btnLoading: false,
       params: {
-        content: "",
-      },
-    };
+        content: ''
+      }
+    }
   },
   mounted() {
-    this.getFn();
+    this.getFn()
   },
   methods: {
     getContent(v) {
-      this.params.content = v;
+      this.params.content = v
     },
     getFn() {
       getInfo(this.dataType).then((res) => {
         if (res.code === 10000) {
-          this.params.id = res.data.id;
-          this.params.content = res.data.content;
+          this.params.id = res.data.id
+          this.params.content = res.data.content
         }
-      });
+      })
     },
     setFn() {
-      this.btnLoading = !this.btnLoading;
+      this.btnLoading = !this.btnLoading
 
       editInfo(this.params)
         .then((res) => {
           if (res.code === 10000) {
-            this.$message.success("编辑成功");
+            this.$message.success('编辑成功')
           }
         })
         .finally(() => {
-          this.btnLoading = !this.btnLoading;
-        });
-    },
-  },
-};
+          this.btnLoading = !this.btnLoading
+        })
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 .module-panel {

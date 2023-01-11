@@ -342,66 +342,66 @@
 
 <script>
 export default {
-  name: "EcologySeach",
+  name: 'EcologySeach',
   props: {
     // 搜索框
     FormList: {
       // poro字段名字  type类型 width宽度  placeholder提示语  default数据类型
       type: Array,
-      default: () => [],
+      default: () => []
     },
     // 表单
     query: {
       type: Object,
-      default: () => {},
+      default: () => {}
     },
     isSearch: {
       typeof: Boolean,
-      default: () => true,
+      default: () => true
     },
     isMore: {
       typeof: Boolean,
-      default: () => false,
-    },
+      default: () => false
+    }
   },
   data() {
     // 这里存放数据
     return {
       isShow: false,
       arealist: [],
-      cityValue: "",
+      cityValue: '',
       visible: false,
-      curStartYear: "",
-      curEndYear: "",
+      curStartYear: '',
+      curEndYear: '',
       startPickerOptions: {},
       endPickerOptions: {},
-      defaultValue: "",
-      fold: true, // 是否折叠  false 折叠  true不折叠
-    };
+      defaultValue: '',
+      fold: true // 是否折叠  false 折叠  true不折叠
+    }
   },
   computed: {}, // 监听属性 类似于data概念
   watch: {}, // 监控data中的数据变化
 
   methods: {
     submitSearch() {
-      this.$emit("submitSearch", this.query);
+      this.$emit('submitSearch', this.query)
     },
     submitReset() {
       this.$nextTick(() => {
-        this.$refs.query.resetFields();
-      });
-      this.$emit("submitReset", this.query);
+        this.$refs.query.resetFields()
+      })
+      this.$emit('submitReset', this.query)
     },
     areaChange(val) {
-      this.query.code = val;
+      this.query.code = val
     },
     changeSeach(val) {
-      val = !val;
-      this.$emit("changeSeach", val);
+      val = !val
+      this.$emit('changeSeach', val)
     },
-    changeItem(val) {},
-  },
-};
+    changeItem(val) {}
+  }
+}
 </script>
 <style lang="scss" scoped>
 .com-seach {
@@ -411,7 +411,7 @@ export default {
 .filter-item {
   line-height: 30px;
   font-size: 16px;
-  font-family: "SourceHanSansCN-Normal";
+  font-family: 'SourceHanSansCN-Normal';
   color: rgba(0, 0, 0, 0.65);
   // margin-right: 126px;
   // &:last-child {
@@ -488,7 +488,7 @@ export default {
     .show-icon {
       width: 16px;
       height: 16px;
-      background-image: url("~@/assets/imgs/doubleDown.svg");
+      background-image: url('~@/assets/imgs/doubleDown.svg');
     }
   }
 }
@@ -499,9 +499,9 @@ export default {
   display: block;
 }
 .reset-icon {
-  background-image: url("../../assets/imgs/reset.svg");
+  background-image: url('../../assets/imgs/reset.svg');
 }
 .search-icon {
-  background-image: url("../../assets/imgs/search.svg");
+  background-image: url('../../assets/imgs/search.svg');
 }
 </style>

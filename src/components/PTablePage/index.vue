@@ -11,9 +11,11 @@
           v-for="val in defaultPage.pageSizes"
           :key="val"
           :label="val"
-          :value="val" />
+          :value="val"
+        />
       </el-select>
-      个项目</span>
+      个项目</span
+    >
     <el-pagination
       background
       :page-sizes="[10, 20, 30, 40, 50]"
@@ -33,7 +35,8 @@
         :min="1"
         :max="maxNum"
         :controls="false"
-        @keyup.enter.native="handlePageChange(page.pageNum)" />
+        @keyup.enter.native="handlePageChange(page.pageNum)"
+      />
       页
     </span>
   </div>
@@ -76,8 +79,7 @@ export default {
       return Math.ceil(this.page.total / this.page.pageSize)
     }
   },
-  created() {
-  },
+  created() {},
   methods: {
     isLayoutKey(key) {
       return this.defaultPage.layout.indexOf(key) !== -1
@@ -113,44 +115,44 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .p-table-page {
-        // position: relative;
-        // bottom: 0;
-        padding: 20px 20px 20px 20px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        .el-pagination {
-            margin-top: 0;
-        }
-        .table-page-total {
-            font-size: 14px;
-            white-space: nowrap;
-        }
-        .table-page-sizes {
-            font-size: 14px;
-            white-space: nowrap;
-            ::v-deep .el-select .el-input {
-                width: 70px;
-            }
-        }
-
-        .table-page-jumper {
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-            font-size: 14px;
-            height: 20px;
-            line-height: 20px;
-            color: #999;
-            // margin-top: 10px;
-            .table-page__editor {
-                width: 40px;
-                margin: 0 10px;
-                // ::v-deep .el-input .el-input__inner {
-                //     height: 28px;
-                // }
-            }
-        }
+.p-table-page {
+  // position: relative;
+  // bottom: 0;
+  padding: 20px 20px 20px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  .el-pagination {
+    margin-top: 0;
+  }
+  .table-page-total {
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .table-page-sizes {
+    font-size: 14px;
+    white-space: nowrap;
+    ::v-deep .el-select .el-input {
+      width: 70px;
     }
+  }
+
+  .table-page-jumper {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    font-size: 14px;
+    height: 20px;
+    line-height: 20px;
+    color: #999;
+    // margin-top: 10px;
+    .table-page__editor {
+      width: 40px;
+      margin: 0 10px;
+      // ::v-deep .el-input .el-input__inner {
+      //     height: 28px;
+      // }
+    }
+  }
+}
 </style>

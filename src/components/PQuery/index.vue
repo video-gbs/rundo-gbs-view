@@ -14,28 +14,37 @@
       <slot />
       <div class="operation">
         <template v-for="(item, index) in btns">
-          <el-button v-if="item == 'reset'"
-                     :key="'reset' + index"
-                     class="icon"
-                     size="medium"
-                     @click="reset">
+          <el-button
+            v-if="item == 'reset'"
+            :key="'reset' + index"
+            class="icon"
+            size="medium"
+            @click="reset"
+          >
             <svg-icon icon-class="refresh" /> 重置
           </el-button>
-          <el-button v-if="item == 'query'"
-                     :key="'query' + index"
-                     type="theme"
-                     class="icon"
-                     size="medium"
-                     @click="value.pageNum = 1;query()">
+          <el-button
+            v-if="item == 'query'"
+            :key="'query' + index"
+            type="theme"
+            class="icon"
+            size="medium"
+            @click="
+              value.pageNum = 1
+              query()
+            "
+          >
             <svg-icon icon-class="search" /> 查询
           </el-button>
-          <el-button v-if="item == 'del'"
-                     :key="'del' + index"
-                     type="red"
-                     class="icon"
-                     plain
-                     size="medium"
-                     @click="del">
+          <el-button
+            v-if="item == 'del'"
+            :key="'del' + index"
+            type="red"
+            class="icon"
+            plain
+            size="medium"
+            @click="del"
+          >
             <svg-icon icon-class="delete" /> 删除
           </el-button>
           <slot v-if="item == 'custom'" name="custom" />
@@ -91,7 +100,15 @@ export default {
   data() {
     return {
       btns: ['reset', 'query'],
-      fixFields: ['pageSize', 'pageNum', 'totalNum', 'plateId', 'pageNumber', 'deviceType', 'total'] // 指定不会重置的字段
+      fixFields: [
+        'pageSize',
+        'pageNum',
+        'totalNum',
+        'plateId',
+        'pageNumber',
+        'deviceType',
+        'total'
+      ] // 指定不会重置的字段
     }
   },
   watch: {
@@ -147,10 +164,7 @@ export default {
      */
     reset() {
       const form = this.value
-      const fixFields = [
-        ...this.fixFields,
-        ...this.fixField
-      ]
+      const fixFields = [...this.fixFields, ...this.fixField]
       Object.keys(this.value).forEach((key) => {
         if (fixFields.indexOf(key) === -1) {
           form[key] = null
@@ -176,16 +190,16 @@ export default {
   // background-color: #fff;
   // border-radius: 5px;
   // box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.16);
-  border-bottom: 1px solid #E5E5E5;
+  border-bottom: 1px solid #e5e5e5;
   & .is-query-bg {
-      height: 40px;
+    height: 40px;
+    width: 100%;
+    .svg-icon {
       width: 100%;
-      .svg-icon {
-        width: 100%;
-        height: 100%;
-}
-  // background: url('~@/assets/image/main-bg.png') no-repeat;
-  // background-size: contain;
+      height: 100%;
+    }
+    // background: url('~@/assets/image/main-bg.png') no-repeat;
+    // background-size: contain;
   }
   .operation {
     display: flex;
@@ -207,7 +221,6 @@ export default {
           }
         }
       }
-
     }
   }
   .condition {
@@ -225,7 +238,7 @@ export default {
       height: 40px;
       .el-input__inner {
         // border-radius: 0px;
-        border-color: #CCCCCC;
+        border-color: #cccccc;
       }
     }
     .p-select-date {

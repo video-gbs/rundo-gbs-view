@@ -7,9 +7,7 @@
     @input="handleNumber($event)"
     @change="handlePropChange($event)"
   >
-    <template v-if="suffix" slot="append">{{
-      suffix
-    }}</template>
+    <template v-if="suffix" slot="append">{{ suffix }}</template>
   </el-input>
 </template>
 

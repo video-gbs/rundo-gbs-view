@@ -51,7 +51,7 @@
               :picker-options="{
                 start: '00:00',
                 step: '00:15',
-                end: '23:59',
+                end: '23:59'
               }"
               value-format="hh:mm"
             />
@@ -72,52 +72,52 @@
   </div>
 </template>
 <script>
-import { getReplyConfig, setReplyConfig } from "@/api/method/system";
+import { getReplyConfig, setReplyConfig } from '@/api/method/system'
 export default {
-  name: "",
+  name: '',
   data() {
     return {
       btnDisabled: false,
       params: {
         overDueWarn: true, //	是否开启提醒
-        validPeriod: "", // 有效期
-        warnBeforeDay: "", // 预期警告提前天数
-        warnTime: "08:00", //	每天提醒的时间
-      },
-    };
+        validPeriod: '', // 有效期
+        warnBeforeDay: '', // 预期警告提前天数
+        warnTime: '08:00' //	每天提醒的时间
+      }
+    }
   },
   mounted() {
-    this.getFn();
+    this.getFn()
   },
   methods: {
     getFn() {
       getReplyConfig().then((res) => {
         if (res.code === 10000) {
-          Object.assign(this.params, res.data);
+          Object.assign(this.params, res.data)
         }
-      });
+      })
     },
     setFn() {
-      console.log(this.params);
+      console.log(this.params)
 
-      this.btnDisabled = !this.btnDisabled;
+      this.btnDisabled = !this.btnDisabled
       setReplyConfig(this.params)
         .then((res) => {
           if (res.code === 10000) {
-            this.$message.success("设置成功");
-            return;
+            this.$message.success('设置成功')
+            return
           }
-          this.params.isReview = !this.params.isReview;
+          this.params.isReview = !this.params.isReview
         })
         .catch(() => {
-          this.params.isReview = !this.params.isReview;
+          this.params.isReview = !this.params.isReview
         })
         .finally(() => {
-          this.btnDisabled = !this.btnDisabled;
-        });
-    },
-  },
-};
+          this.btnDisabled = !this.btnDisabled
+        })
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 .blue {

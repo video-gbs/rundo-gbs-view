@@ -198,13 +198,13 @@ div {
 //间隔
 $marginandpadding: (
   m: margin,
-  p: padding,
+  p: padding
 );
 $direction: (
   t: top,
   r: right,
   b: bottom,
-  l: left,
+  l: left
 );
 
 @for $r from 0 to 100 {

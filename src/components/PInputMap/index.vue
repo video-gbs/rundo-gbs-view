@@ -1,6 +1,11 @@
 <template>
   <div class="p-input-map">
-    <el-input v-if="isInput" v-model="inputVal" :readonly="readonly" placeholder="请选择" />
+    <el-input
+      v-if="isInput"
+      v-model="inputVal"
+      :readonly="readonly"
+      placeholder="请选择"
+    />
     <el-button class="btn" type="theme" size="small" @click="handleClick">{{
       title
     }}</el-button>
@@ -161,7 +166,10 @@ export default {
               if (this.isInput) {
                 this.$refs.map.addOverLay(this.points[0], this.points[1])
               } else {
-                this.$refs.map.addMarker({ lng: this.points[0], lat: this.points[1] })
+                this.$refs.map.addMarker({
+                  lng: this.points[0],
+                  lat: this.points[1]
+                })
               }
               break
             case 'polygon':
@@ -185,7 +193,10 @@ export default {
             if (this.isInput) {
               this.$refs.map.addOverLay(this.points[0], this.points[1])
             } else {
-              this.$refs.map.addMarker({ lng: this.points[0], lat: this.points[1] })
+              this.$refs.map.addMarker({
+                lng: this.points[0],
+                lat: this.points[1]
+              })
             }
             break
           case 'polygon':

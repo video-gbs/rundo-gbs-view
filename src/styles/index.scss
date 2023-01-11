@@ -1,46 +1,46 @@
-@import "./variables.scss";
-@import "./mixin.scss";
-@import "./transition.scss";
-@import "./element-ui.scss";
-@import "./element-variables.scss";
-@import "./sidebar.scss";
-@import "./dom.scss";
+@import './variables.scss';
+@import './mixin.scss';
+@import './transition.scss';
+@import './element-ui.scss';
+@import './element-variables.scss';
+@import './sidebar.scss';
+@import './dom.scss';
 @font-face {
   font-family: dinb;
-  src: url("../assets//font//din-bold-2.ttf");
+  src: url('../assets//font//din-bold-2.ttf');
 }
 
 @font-face {
   font-family: dinm;
-  src: url("../assets//font//DIN-Medium-2.otf");
+  src: url('../assets//font//DIN-Medium-2.otf');
 }
 @font-face {
   font-family: siyuan-b;
-  src: url("../assets//font//DIN-Medium-2.otf");
+  src: url('../assets//font//DIN-Medium-2.otf');
 }
 @font-face {
   font-family: siyuan-e;
-  src: url("../assets//font//DIN-Medium-2.otf");
+  src: url('../assets//font//DIN-Medium-2.otf');
 }
 @font-face {
   font-family: siyuan-h;
-  src: url("../assets//font//DIN-Medium-2.otf");
+  src: url('../assets//font//DIN-Medium-2.otf');
 }
 @font-face {
   font-family: siyuan-l;
-  src: url("../assets//font//DIN-Medium-2.otf");
+  src: url('../assets//font//DIN-Medium-2.otf');
 }
 @font-face {
   font-family: siyuan-m;
-  src: url("../assets//font//DIN-Medium-2.otf");
+  src: url('../assets//font//DIN-Medium-2.otf');
 }
 @font-face {
   font-family: siyuan-n;
-  src: url("../assets//font//DIN-Medium-2.otf");
+  src: url('../assets//font//DIN-Medium-2.otf');
 }
 @font-face {
   font-family: siyuan-r;
-  src: url("../assets//font//DIN-Medium-2.otf");
+  src: url('../assets//font//DIN-Medium-2.otf');
 }
 body {
   height: 100%;
@@ -50,7 +50,7 @@ body {
   font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
     Microsoft YaHei, Arial, sans-serif;
   div {
-    font-family: "siyuan-n";
+    font-family: 'siyuan-n';
   }
 }
 
@@ -101,7 +101,7 @@ div:focus {
     visibility: hidden;
     display: block;
     font-size: 0;
-    content: " ";
+    content: ' ';
     clear: both;
     height: 0;
   }

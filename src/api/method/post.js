@@ -20,4 +20,3 @@ export function deletePost(id) {
   // 删除岗位
   return request.delete(`/politics/sys/demos/${id}`)
 }
-

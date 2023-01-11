@@ -9,5 +9,5 @@ export function getInfo(params) {
 }
 
 export function logout(params) {
-  return request.get('/politics/sys/logout',params)
+  return request.get('/politics/sys/logout', params)
 }

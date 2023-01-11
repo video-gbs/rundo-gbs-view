@@ -71,7 +71,7 @@ export default {
               fontSize: fitChartSize(16),
               align: 'left'
             },
-            formatter: function(params) {
+            formatter: function (params) {
               return (
                 params.marker +
                 '<span style="color:' +

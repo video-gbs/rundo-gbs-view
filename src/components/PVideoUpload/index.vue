@@ -11,22 +11,31 @@
     :file-list="fileList"
     :limit="limit"
     :on-exceed="onExceed"
-    :accept="accept.length > 0 ? accept.toString() : accepts.map((a) => `${a}`).toString()"
+    :accept="
+      accept.length > 0
+        ? accept.toString()
+        : accepts.map((a) => `${a}`).toString()
+    "
   >
     <i slot="default" class="el-icon-plus" />
     <div class="upload-explain">
-      说明：<br>
+      说明：<br />
       ①支持上传视频格式：{{
-        accept.length > 0 ? accept.toString() : accepts.map((a) => `*${a}`).join('')
-      }}；<br>
+        accept.length > 0
+          ? accept.toString()
+          : accepts.map((a) => `*${a}`).join('')
+      }}；<br />
       ②单个视频大小不超过50M。
     </div>
-    <div slot="file" slot-scope="{file}">
+    <div slot="file" slot-scope="{ file }">
       <!-- <img
         class="el-upload-list__item-thumbnail"
         :src="file.url" alt=""
       > -->
-      <svg-icon class="el-upload-list__item-thumbnail" icon-class="icon-file-5" />
+      <svg-icon
+        class="el-upload-list__item-thumbnail"
+        icon-class="icon-file-5"
+      />
       <span class="el-upload-list__item-actions">
         <!-- <span
           class="el-upload-list__item-preview"
@@ -175,7 +184,7 @@ export default {
      * @param {Object} e 值
      */
     handlePropChange(key, e) {
-      const fileList = this.fileList.map(item => {
+      const fileList = this.fileList.map((item) => {
         return item.url
       })
       this.changeStatus = false
@@ -229,7 +238,8 @@ export default {
 
     // margin-bottom: 20px;
     // position: relative;
-    .el-icon-plus {}
+    .el-icon-plus {
+    }
 
     .upload-explain {
       position: absolute;

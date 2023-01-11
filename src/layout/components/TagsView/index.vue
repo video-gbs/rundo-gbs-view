@@ -38,9 +38,9 @@
 </template>
 
 <script>
-import ScrollPane from "./ScrollPane";
-import { mapGetters } from "vuex";
-import store from "@/store/index";
+import ScrollPane from './ScrollPane'
+import { mapGetters } from 'vuex'
+import store from '@/store/index'
 
 export default {
   components: { ScrollPane },
@@ -51,79 +51,77 @@ export default {
       left: 0,
       selectedTag: {},
       affixTags: [],
-      isScrollBar: false,
-    };
+      isScrollBar: false
+    }
   },
   computed: {
-    ...mapGetters(["activeTabsName", "tabList"]),
+    ...mapGetters(['activeTabsName', 'tabList']),
     tabList() {
-      return this.$store.state.tabs.tabList;
+      return this.$store.state.tabs.tabList
     },
     activeTabsName: {
       get() {
-        return this.$store.state.tabs.activeTabsName;
+        return this.$store.state.tabs.activeTabsName
       },
       set(val) {
         // store.commit("SET_ACTIVETABNAME", val);
-      },
-    },
+      }
+    }
   },
   watch: {
-    $route(val) {
-      
-    },
+    $route(val) {}
   },
   mounted() {
-    window.addEventListener("resize", () => {
+    window.addEventListener('resize', () => {
       this.$nextTick(() => {
-        this.isScrollBar = this.$refs.scrollPane.isScrollBar();
-      });
-    });
+        this.isScrollBar = this.$refs.scrollPane.isScrollBar()
+      })
+    })
   },
   methods: {
     removeTab(targetName) {
-      const tabs = this.tabList;
-      let activeName = this.activeTabsName;
+      const tabs = this.tabList
+      let activeName = this.activeTabsName
       if (activeName === targetName) {
         tabs.forEach((tab, index) => {
           if (tab.name === targetName) {
-            const nextTab = tabs[index + 1] || tabs[index - 1];
+            const nextTab = tabs[index + 1] || tabs[index - 1]
             if (nextTab) {
-              activeName = nextTab.name;
+              activeName = nextTab.name
             }
           }
-        });
-        store.commit("SET_ACTIVETABNAME", activeName);
+        })
+        store.commit('SET_ACTIVETABNAME', activeName)
         store.commit(
-          "SET_TABLIST",
+          'SET_TABLIST',
           tabs.filter((tab) => tab.name !== targetName)
-        );
-        this.tabClick();
+        )
+        this.tabClick()
       } else {
         store.commit(
-          "SET_TABLIST",
+          'SET_TABLIST',
           tabs.filter((tab) => tab.name !== targetName)
-        );
+        )
       }
     },
     tabClick() {
-      const { path } = this.tabList[this.activeTabsName];
-      if (this.$route.path !== path) this.$router.push(path);
+      const { path } = this.tabList[this.activeTabsName]
+      if (this.$route.path !== path) this.$router.push(path)
     },
     moveToCurrentTag() {
-      const tags = this.$refs.tag;
+      const tags = this.$refs.tag
       this.$nextTick(() => {
         for (const tag of tags) {
           if (tag.to.path === this.$route.path) {
-            this.$refs.scrollPane.moveToTarget(tag);
+            this.$refs.scrollPane.moveToTarget(tag)
             // when query is different then update
             if (tag.to.fullPath !== this.$route.fullPath) {
-              this.$store.dispatch("tagsView/updateVisitedView", this.$route);
+              this.$store.dispatch('tagsView/updateVisitedView', this.$route)
             }
-            break;
+            break
           }
         }
-      });
+      })
     },
     // refreshSelectedTag(view) {
     //   this.$store.dispatch("tagsView/delCachedView", view).then(() => {
@@ -194,7 +192,7 @@ export default {
     //   this.selectedTag = tag;
     // },
     closeMenu() {
-      this.visible = false;
+      this.visible = false
     },
     handleScroll() {
       // this.closeMenu();
@@ -205,12 +203,12 @@ export default {
      * @return {*}
      */
     toScrollPane(type) {
-      const wheelDelta = 270;
-      const deltaY = -225;
+      const wheelDelta = 270
+      const deltaY = -225
       this.$refs.scrollPane.handleScroll({
         wheelDelta: wheelDelta * type,
-        deltaY: deltaY * type,
-      });
+        deltaY: deltaY * type
+      })
     },
     /**
      * @description: 手动切换左右标签页
@@ -218,20 +216,20 @@ export default {
      * @return {*}
      */
     toScrollView(type) {
-      const tags = this.$refs.tag;
+      const tags = this.$refs.tag
       const currentIndex = tags.findIndex((tag) => {
-        return tag.to.path === this.$route.path;
-      });
+        return tag.to.path === this.$route.path
+      })
       if (type === 1) {
         if (currentIndex + 1 < tags.length) {
-          this.$router.push(tags[currentIndex + 1].to);
+          this.$router.push(tags[currentIndex + 1].to)
         }
       } else {
         if (currentIndex > 0) {
-          this.$router.push(tags[currentIndex - 1].to);
+          this.$router.push(tags[currentIndex - 1].to)
         }
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>

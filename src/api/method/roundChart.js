@@ -1,4 +1,3 @@
-
 // 轮播图管理
 
 import request from '@/api/fetch'
@@ -29,7 +28,9 @@ export function slideShowOrder(id, order) {
 }
 export function slideIsShow(id, isShow) {
   // 编辑轮播图顺序
-  return request.post(`/politics/backstage/slideshow/updateIsShow/${id}/${isShow}`)
+  return request.post(
+    `/politics/backstage/slideshow/updateIsShow/${id}/${isShow}`
+  )
 }
 
 export function deleteRoundChart(id) {

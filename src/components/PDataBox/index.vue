@@ -6,9 +6,11 @@
 * @Description: 查询内容框
 -->
 <template>
-  <div class="p-data-box" :class="{'is-back': isBack}">
+  <div class="p-data-box" :class="{ 'is-back': isBack }">
     <div v-if="isBack" class="back">
-      <el-button v-if="isSubmit" type="theme" size="small" @click="submit">保存</el-button>
+      <el-button v-if="isSubmit" type="theme" size="small" @click="submit"
+        >保存</el-button
+      >
       <el-button v-if="isBack" size="small" @click="back">返回</el-button>
     </div>
     <div v-if="title" class="operation">
@@ -18,13 +20,34 @@
       </div>
       <div v-if="operation" class="operation-right">
         <slot name="operation" />
-        <el-button v-if="isAdd" v-has-p="type ? `${type}:add` : ''" type="theme" class="icon" size="small" @click="add">
+        <el-button
+          v-if="isAdd"
+          v-has-p="type ? `${type}:add` : ''"
+          type="theme"
+          class="icon"
+          size="small"
+          @click="add"
+        >
           <svg-icon icon-class="add" /> {{ addText }}
         </el-button>
-        <el-button v-if="isDel" v-has-p="type ?`${type}:delete` : ''" type="theme" class="icon" size="small" @click="del">
+        <el-button
+          v-if="isDel"
+          v-has-p="type ? `${type}:delete` : ''"
+          type="theme"
+          class="icon"
+          size="small"
+          @click="del"
+        >
           <svg-icon icon-class="delete" /> 删除
         </el-button>
-        <el-button v-if="isExport" v-has-p="type ?`${type}:export` : ''" type="theme" class="icon" size="small" @click="exportFile">
+        <el-button
+          v-if="isExport"
+          v-has-p="type ? `${type}:export` : ''"
+          type="theme"
+          class="icon"
+          size="small"
+          @click="exportFile"
+        >
           <svg-icon icon-class="export" /> 导出
         </el-button>
       </div>
@@ -116,12 +139,10 @@ export default {
     ...mapGetters(['loading'])
   },
   watch: {
-    '$store.getters.loading': (n, o) => {
-    }
+    '$store.getters.loading': (n, o) => {}
   },
   created() {},
-  mounted() {
-  },
+  mounted() {},
   methods: {
     /**
      * 新增
@@ -212,7 +233,7 @@ export default {
     .left {
       width: calc(60% - 10px);
       padding: 20px;
-      border-right: 10px solid #E5EFF4;
+      border-right: 10px solid #e5eff4;
     }
     .right {
       width: 40%;

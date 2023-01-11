@@ -43,6 +43,7 @@
                         v-model="loginForm.account"
                         name="account"
                         placeholder="输入用户名"
+                        style="width: 200px"
                       />
                     </div>
                   </el-form-item>
@@ -69,7 +70,7 @@
 
                   <el-form-item prop="account">
                     <div
-                      class="login-middle-input"
+                      class="login-middle-input-last login-middle-input"
                       data-validate="Valid email is: a@b.c"
                     >
                       <svg-icon class="svg-btn" icon-class="yzm" />
@@ -85,6 +86,13 @@
                       />
                     </div>
                   </el-form-item>
+                  <div
+                    @click="refreshCode()"
+                    class="get-codes"
+                    title="点击切换验证码"
+                  >
+                    <!-- <Code :identifyCode="identifyCode" /> -->
+                  </div>
 
                   <el-form-item>
                     <el-checkbox v-model="checked"
@@ -110,11 +118,14 @@
 </template>
 
 <script>
+import Code from '@/views/leftMenus/systemManagement//components/Code'
+
 import { validUsername } from '@/utils/validate'
 import { login } from '@/api/method/user'
 import { Local } from '@/utils/storage'
 export default {
   name: 'Login',
+  components: { Code },
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
@@ -140,6 +151,8 @@ export default {
     }
 
     return {
+      identifyCode: '',
+      // identifyCodes: ['0','1','2','3'...'a','b','c'...'z'],
       loginForm: {
         // adminsuper/123456
         account: '',
@@ -238,6 +251,17 @@ body {
     position: relative;
     top: -130px;
   }
+}
+.get-codes {
+  position: relative;
+  top: -65px;
+  right: 0px;
+  float: right;
+  cursor: pointer;
+  width: 81px;
+  height: 48px;
+  background: #016bd5;
+  border-radius: 4px;
 }
 .wrap-top {
   background-image: url('../../assets/imgs/bg.png');
@@ -360,6 +384,9 @@ body {
 .login-middle {
   position: relative;
   top: 18%;
+  .login-middle-input-last {
+    width: 70%;
+  }
 
   .login-middle-input {
     outline: none;

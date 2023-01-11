@@ -6,7 +6,7 @@
         <span class="main-text">南宁市良庆区良庆大道</span>
       </div>
       <h2>
-        {{ $moment(new Date()).add("year", 0).format("YYYY-MM-DD") }}
+        {{ $moment(new Date()).add('year', 0).format('YYYY-MM-DD') }}
         {{ week }}
       </h2>
       <div class="main-weather">
@@ -23,52 +23,52 @@
 
 <script>
 export default {
-  name: "",
+  name: '',
   props: {
     weatherList: {
       type: Object,
       default: () => {
-        return {};
-      },
-    },
+        return {}
+      }
+    }
   },
   data() {
     return {
-      week: "",
-      resWeatherList: this.weatherList,
-    };
+      week: '',
+      resWeatherList: this.weatherList
+    }
   },
   watch: {
     weatherList(newValue, oldValue) {
-      this.resWeatherList = newValue;
+      this.resWeatherList = newValue
     },
     deep: true,
-    immediate: true,
+    immediate: true
   },
   created() {},
   mounted() {
-    this.getdataTime();
+    this.getdataTime()
   },
   methods: {
     getdataTime() {
-      const wk = new Date().getDay();
-      const yy = new Date().getFullYear();
-      const mm = new Date().getMonth() + 1;
-      const dd = new Date().getDate();
+      const wk = new Date().getDay()
+      const yy = new Date().getFullYear()
+      const mm = new Date().getMonth() + 1
+      const dd = new Date().getDate()
       const weeks = [
-        "星期日",
-        "星期一",
-        "星期二",
-        "星期三",
-        "星期四",
-        "星期五",
-        "星期六",
-      ];
-      this.week = weeks[wk];
-      this.date_show = yy + "年" + mm + "月" + dd + "日";
-    },
-  },
-};
+        '星期日',
+        '星期一',
+        '星期二',
+        '星期三',
+        '星期四',
+        '星期五',
+        '星期六'
+      ]
+      this.week = weeks[wk]
+      this.date_show = yy + '年' + mm + '月' + dd + '日'
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

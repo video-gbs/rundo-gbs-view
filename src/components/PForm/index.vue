@@ -56,21 +56,22 @@
           :disabled="props[key].disabled"
           @change="handlePropChange(key, $event)"
         >
-
           <template v-if="props[key].option">
             <el-radio
               v-for="(op, index3) in props[key].options"
               :key="index3"
               :label="op[props[key].option[0]]"
             >
-              {{ op[props[key].option[1]] }}</el-radio>
+              {{ op[props[key].option[1]] }}</el-radio
+            >
           </template>
           <template v-else-if="props[key].dict">
             <el-radio
               v-for="(op, index3) in props[key].options"
               :key="index3"
               :label="op.key"
-            >{{ op.value }}</el-radio>
+              >{{ op.value }}</el-radio
+            >
           </template>
         </el-radio-group>
         <el-date-picker
@@ -98,8 +99,12 @@
         >
           <i slot="default" class="el-icon-plus" />
           <div class="upload-explain">
-            说明：<br>
-            ①支持上传图片格式：{{ props[key].accept ? props[key].accept : accepts.map(a => `*${a}`).toString() }}；<br>
+            说明：<br />
+            ①支持上传图片格式：{{
+              props[key].accept
+                ? props[key].accept
+                : accepts.map((a) => `*${a}`).toString()
+            }}；<br />
             <!-- ①支持上传图片格式："*.jpg"、"*.jpeg"、"*.png"；<br> -->
             ②单张图片大小不超过500M。
           </div>
@@ -153,7 +158,7 @@
           :step="props[key].step || 1"
           :step-strictly="props[key].stepStrictly"
           :precision="props[key].precision"
-          :controls-position="props[key].controlsPosition? 'right': null"
+          :controls-position="props[key].controlsPosition ? 'right' : null"
           :min="props[key].min"
           :max="props[key].max"
           @change="handlePropChange(key, $event)"
@@ -163,9 +168,9 @@
           v-model="form[key]"
           :disabled="props[key].disabled"
           :placeholder="`请输入${props[key].label}`"
-          :maxlength="props[key].maxlength? props[key].maxlength: null"
+          :maxlength="props[key].maxlength ? props[key].maxlength : null"
           :show-word-limit="!!props[key].maxlength"
-          :minlength="props[key].minlength? props[key].minlength: null"
+          :minlength="props[key].minlength ? props[key].minlength : null"
           @change="handlePropChange(key, $event)"
         >
           <template v-if="props[key].suffix" slot="append">{{
@@ -209,27 +214,33 @@ export default {
     event: 'input'
   },
   props: {
-    value: { // 初始化的表单
+    value: {
+      // 初始化的表单
       type: Object,
       default: () => {}
     },
-    title: { // 表单标题
+    title: {
+      // 表单标题
       type: String,
       default: null
     },
-    props: { // 表单参数
+    props: {
+      // 表单参数
       type: Object,
       default: () => {}
     },
-    rules: { // 校验规则
+    rules: {
+      // 校验规则
       type: Object,
       default: () => {}
     },
-    width: { // 宽度
+    width: {
+      // 宽度
       type: [String, Number],
       default: '100%'
     },
-    labelWidth: { // 描述宽度
+    labelWidth: {
+      // 描述宽度
       type: [String, Number],
       default: '100px'
     }
@@ -248,7 +259,7 @@ export default {
     value: {
       handler(n, o) {
         if (this.changeForm) {
-          Object.keys(this.props).forEach(key => {
+          Object.keys(this.props).forEach((key) => {
             if (n[key] != undefined) {
               let value = n[key]
               if (this.props[key].split && typeof n[key] == 'string') {
@@ -294,7 +305,9 @@ export default {
       if (item.type == 'img' && !this.form[key]) {
         this.form[key] = []
         if (this.props[key].accept && this.props[key].accept instanceof Array) {
-          this.regExp[key] = new RegExp(`(\\${this.props[key].accept.join('|\\')})$`)
+          this.regExp[key] = new RegExp(
+            `(\\${this.props[key].accept.join('|\\')})$`
+          )
         } else if (!this.props[key].accept) {
           this.regExp[key] = new RegExp(`(\\${this.accepts.join('|\\')})$`)
         }
@@ -307,22 +320,31 @@ export default {
         } else if (item.join) {
           param = item.join
         }
-        item.api(param).then((res) => {
-          item.loading = false
-          if (item.type == 'select') {
-            this.$set(item, 'options', res.data.rows || (res.data.data && res.data.data.rows) || res.data.data)
-            if (item.multiple) {
-              const option = {}
-              option[item.option[0]] = 'all'
-              option[item.option[1]] = '全部' + item.label
-              item.options.unshift(option)
+        item
+          .api(param)
+          .then((res) => {
+            item.loading = false
+            if (item.type == 'select') {
+              this.$set(
+                item,
+                'options',
+                res.data.rows ||
+                  (res.data.data && res.data.data.rows) ||
+                  res.data.data
+              )
+              if (item.multiple) {
+                const option = {}
+                option[item.option[0]] = 'all'
+                option[item.option[1]] = '全部' + item.label
+                item.options.unshift(option)
+              }
+            } else {
+              this.form[key] = res.data.data
             }
-          } else {
-            this.form[key] = res.data.data
-          }
-        }).catch(() => {
-          item.loading = false
-        })
+          })
+          .catch(() => {
+            item.loading = false
+          })
       } else if (item.dict && !item.options) {
         this.$set(item, 'options', this.$dict(this.props[key].dict))
       }
@@ -351,8 +373,7 @@ export default {
     }
     this.reset(this.value)
   },
-  mounted() {
-  },
+  mounted() {},
 
   methods: {
     /**
@@ -364,7 +385,7 @@ export default {
         this.form = {}
         this.fileList = {}
         if (form && form != {}) {
-          Object.keys(this.props).forEach(key => {
+          Object.keys(this.props).forEach((key) => {
             const item = this.props[key]
             let value = form[key]
             // 如果有指定字段别名，则使用别名
@@ -372,7 +393,7 @@ export default {
               const k = this.props[key].alias
               if (form[k] instanceof Array) {
                 value = []
-                form[k].forEach(item => {
+                form[k].forEach((item) => {
                   value.push(item[this.props[key].option[0]])
                 })
               } else {
@@ -388,7 +409,7 @@ export default {
             }
             this.$set(this.form, key, value)
             if (item.change && item.change.length) {
-            // 手动触发下拉框的change事件
+              // 手动触发下拉框的change事件
               if (this.$refs['form-' + key]) {
                 this.$refs['form-' + key][0].emitChange(form[key])
               }
@@ -416,7 +437,7 @@ export default {
         this.$set(this.fileList, key, [])
         // this.fileList[key] = []
       }
-      item.forEach(async(url, index) => {
+      item.forEach(async (url, index) => {
         if (url.indexOf('http') == -1) {
           if (url) {
             const result = await this.$api.file.getFileUrl({ idStr: url })
@@ -468,19 +489,28 @@ export default {
             // param[this.props[item.up].option[0]] = $event
             param[item.up] = $event
           }
-          item.api(param).then((res) => {
-            item.loading = false
-            if (item.type == 'select') {
-              this.$set(item, 'options', res.data.rows || (res.data.data && res.data.data.rows) || res.data.data)
-            } else {
-              this.form[key] = res.data.data
-            }
-          }).catch(() => {
-            item.loading = false
-          })
+          item
+            .api(param)
+            .then((res) => {
+              item.loading = false
+              if (item.type == 'select') {
+                this.$set(
+                  item,
+                  'options',
+                  res.data.rows ||
+                    (res.data.data && res.data.data.rows) ||
+                    res.data.data
+                )
+              } else {
+                this.form[key] = res.data.data
+              }
+            })
+            .catch(() => {
+              item.loading = false
+            })
         } else if (item.dict) {
           if (this.props[item.up].options) {
-            this.props[item.up].options.some(op => {
+            this.props[item.up].options.some((op) => {
               if (op[this.props[item.up].option[0]] == this.form[item.up]) {
                 if (item.alias) {
                   this.form[key] = op[item.alias]
@@ -497,7 +527,7 @@ export default {
     },
     validate(callback) {
       return new Promise((resolve, reject) => {
-        this.$refs['form'].validate(valid => {
+        this.$refs['form'].validate((valid) => {
           this.$nextTick(() => {
             callback && callback(valid)
             resolve(valid)
@@ -519,7 +549,7 @@ export default {
       if (this.props[key].multiple && e.includes('all')) {
         const list = []
         const o1 = this.props[key].option[0]
-        this.props[key].options.forEach(item => {
+        this.props[key].options.forEach((item) => {
           if (item[o1] !== 'all') {
             list.push(item[o1])
           }
@@ -546,7 +576,7 @@ export default {
           type: 'warning',
           message: '上传的文件格式不支持'
         })
-        this.fileList[raw.action] = this.fileList[raw.action].filter(item => {
+        this.fileList[raw.action] = this.fileList[raw.action].filter((item) => {
           return true
         })
         return
@@ -601,7 +631,8 @@ export default {
      */
     handleImageRemove(file) {
       this.form[file.raw.action] = this.form[file.raw.action].filter(
-        (code) => file.raw.code !== code)
+        (code) => file.raw.code !== code
+      )
       this.handlePropChange(file.raw.action)
     },
     /**
@@ -613,11 +644,11 @@ export default {
       if (val !== '' && val.substr(0, 1) === '.') {
         val = ''
       }
-      val = val.replace(/^0*(0\.|[1-9])/, '$1')// 解决 粘贴不生效
+      val = val.replace(/^0*(0\.|[1-9])/, '$1') // 解决 粘贴不生效
       val = val.replace(/[^\d.]/g, '') // 清除“数字”和“.”以外的字符
       val = val.replace(/\.{2,}/g, '.') // 只保留第一个. 清除多余的
       val = val.replace('.', '$#$').replace(/\./g, '').replace('$#$', '.')
-      val = val.replace(/^(\-)*(\d+)\.(\d\d\d\d\d\d\d\d).*$/, '$1$2.$3')// 只能输入8个小数
+      val = val.replace(/^(\-)*(\d+)\.(\d\d\d\d\d\d\d\d).*$/, '$1$2.$3') // 只能输入8个小数
       if (val.indexOf('.') < 0 && val !== '') {
         if (val.substr(0, 1) === '0' && val.length === 2) {
           val = val.substr(1, val.length)
@@ -637,7 +668,7 @@ export default {
       font-size: 20px;
       font-weight: bold;
       &::before {
-        content: " ";
+        content: ' ';
         background-color: #00b690;
         width: 6px;
         height: 22px;

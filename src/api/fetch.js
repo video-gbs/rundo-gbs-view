@@ -1,4 +1,3 @@
-
 import request from '@/utils/request'
 import NProgress from 'nprogress'
 import { Message } from 'element-ui'
@@ -69,30 +68,32 @@ const methods = {
       headers: {
         responseType: 'blob'
       }
-    }).then(r => {
-      const content = r.data
-      const blob = new Blob([content])
-      if ('download' in document.createElement('a')) {
-        const elink = document.createElement('a')
-        elink.download = filename
-        elink.style.display = 'none'
-        elink.href = URL.createObjectURL(blob)
-        document.body.appendChild(elink)
-        elink.click()
-        URL.revokeObjectURL(elink.href)
-        document.body.removeChild(elink)
-      } else {
-        navigator.msSaveBlob(blob, filename)
-      }
-      NProgress.done()
-    }).catch(() => {
-      NProgress.done()
-      Message({
-        message: '下载失败',
-        type: 'error',
-        duration: 5 * 1000
-      })
     })
+      .then((r) => {
+        const content = r.data
+        const blob = new Blob([content])
+        if ('download' in document.createElement('a')) {
+          const elink = document.createElement('a')
+          elink.download = filename
+          elink.style.display = 'none'
+          elink.href = URL.createObjectURL(blob)
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href)
+          document.body.removeChild(elink)
+        } else {
+          navigator.msSaveBlob(blob, filename)
+        }
+        NProgress.done()
+      })
+      .catch(() => {
+        NProgress.done()
+        Message({
+          message: '下载失败',
+          type: 'error',
+          duration: 5 * 1000
+        })
+      })
   },
   upload(url, data, params) {
     return request.post(url, data, {
@@ -105,4 +106,3 @@ const methods = {
 }
 
 export default methods
-

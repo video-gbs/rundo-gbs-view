@@ -33,33 +33,33 @@
 </template>
 
 <script>
-import vueSeamlessScroll from "vue-seamless-scroll";
-import { parseTime } from "@/utils";
+import vueSeamlessScroll from 'vue-seamless-scroll'
+import { parseTime } from '@/utils'
 
 export default {
-  name: "NoticeList",
+  name: 'NoticeList',
   components: {
-    vueSeamlessScroll,
+    vueSeamlessScroll
   },
   props: {
     notification: {
       type: Array,
       default: () => {
-        return [];
-      },
-    },
+        return []
+      }
+    }
   },
   data() {
     return {
       lineTitle: {
-        title: "通知公告",
-        notShowSmallTitle: false,
+        title: '通知公告',
+        notShowSmallTitle: false
       },
       newsPopup: {
         isShow: false,
-        data: null,
-      },
-    };
+        data: null
+      }
+    }
   },
   computed: {
     defaultOption() {
@@ -71,9 +71,9 @@ export default {
         openWatch: true, // 开启数据实时监控刷新dom
         singleHeight: 38 * 5, // 单步运动停止的高度(默认值0是无缝不停止的滚动) direction => 0/1
         singleWidth: 0, // 单步运动停止的宽度(默认值0是无缝不停止的滚动) direction => 2/3
-        waitTime: 2000, // 单步运动停止的时间(默认值1000ms)
-      };
-    },
+        waitTime: 2000 // 单步运动停止的时间(默认值1000ms)
+      }
+    }
   },
   created() {},
   mounted() {},
@@ -81,27 +81,27 @@ export default {
     getNews() {
       this.$api.notice
         .all({
-          currentDatetime: parseTime(new Date()),
+          currentDatetime: parseTime(new Date())
         })
         .then((res) => {
-          this.noticeList = res.data.data;
+          this.noticeList = res.data.data
           this.noticeList &&
             this.noticeList.forEach((item) => {
-              item.date = item.createTime.split(" ")[0];
-              item.type = this.$dict("notice.type:" + item.newsTag);
-            });
-        });
+              item.date = item.createTime.split(' ')[0]
+              item.type = this.$dict('notice.type:' + item.newsTag)
+            })
+        })
     },
     // vue-seamless内部滚动点击失效，从外部点击再获取index匹配
     showNoticeDiaog(e) {
       if (e.target.dataset.index !== undefined) {
-        this.newsPopup.data = this.noticeList[e.target.dataset.index];
-        this.newsPopup.isShow = true;
-        this.newsDialogVisible = true;
+        this.newsPopup.data = this.noticeList[e.target.dataset.index]
+        this.newsPopup.isShow = true
+        this.newsDialogVisible = true
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

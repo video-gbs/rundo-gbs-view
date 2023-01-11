@@ -1,7 +1,7 @@
 import jsonBigint from 'json-bigint'
 
 const jb = [
-  function(data) {
+  function (data) {
     const j = jsonBigint({
       storeAsString: true
     })
@@ -10,4 +10,3 @@ const jb = [
 ]
 
 export default jb
-

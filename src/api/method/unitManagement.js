@@ -1,4 +1,3 @@
-
 // 单位管理
 import request from '@/api/fetch'
 
@@ -16,7 +15,6 @@ export function unitList(params) {
   // 列表
   return request.post(`/politics/sys/dept/list`, params)
 }
-
 
 export function unitDelete(id) {
   // 删除

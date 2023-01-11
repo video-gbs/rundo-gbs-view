@@ -9,8 +9,8 @@
       autoplay
       muted
     >
-      <source src="movie.mp4" type="video/mp4">
-      <source src="movie.ogg" type="video/ogg">
+      <source src="movie.mp4" type="video/mp4" />
+      <source src="movie.ogg" type="video/ogg" />
       您的浏览器不支持Video标签。
     </video>
   </div>
@@ -27,8 +27,7 @@ export default {
     }
   },
   data() {
-    return {
-    }
+    return {}
   },
   mounted() {
     this.$refs.video.src = this.videoUrl
@@ -38,7 +37,7 @@ export default {
 }
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .PlayVideo {
   width: 100%;
   height: 100%;

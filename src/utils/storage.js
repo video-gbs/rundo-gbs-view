@@ -60,7 +60,7 @@ const key = {
 
 function init() {
   const fun = {}
-  Object.keys(key).forEach(k => {
+  Object.keys(key).forEach((k) => {
     const n = k.toLowerCase().replace(/( |^)[a-z]/g, (L) => L.toUpperCase())
     fun['set' + n] = (data) => {
       if (data) {
@@ -172,4 +172,3 @@ export const Session = {
     window.sessionStorage.clear()
   }
 }
-

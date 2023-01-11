@@ -37,49 +37,49 @@
   </div>
 </template>
 <script>
-import { getSatisfication, setSatisfication } from "@/api/method/system";
+import { getSatisfication, setSatisfication } from '@/api/method/system'
 export default {
-  name: "",
+  name: '',
   data() {
     return {
       btnDisabled: false,
       params: {
-        validPeriod: "", // 有效期
-      },
-    };
+        validPeriod: '' // 有效期
+      }
+    }
   },
   mounted() {
-    this.getFn();
+    this.getFn()
   },
   methods: {
     getFn() {
       getSatisfication().then((res) => {
         if (res.code === 10000) {
-          Object.assign(this.params, res.data);
+          Object.assign(this.params, res.data)
         }
-      });
+      })
     },
     setFn() {
-      console.log(this.params);
+      console.log(this.params)
 
-      this.btnDisabled = !this.btnDisabled;
+      this.btnDisabled = !this.btnDisabled
       setSatisfication(this.params)
         .then((res) => {
           if (res.code === 10000) {
-            this.$message.success("设置成功");
-            return;
+            this.$message.success('设置成功')
+            return
           }
-          this.params.isReview = !this.params.isReview;
+          this.params.isReview = !this.params.isReview
         })
         .catch(() => {
-          this.params.isReview = !this.params.isReview;
+          this.params.isReview = !this.params.isReview
         })
         .finally(() => {
-          this.btnDisabled = !this.btnDisabled;
-        });
-    },
-  },
-};
+          this.btnDisabled = !this.btnDisabled
+        })
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 .blue {

@@ -31,47 +31,47 @@
   </div>
 </template>
 <script>
-import { getReview, setReview } from "@/api/method/system";
+import { getReview, setReview } from '@/api/method/system'
 export default {
-  name: "",
+  name: '',
   data() {
     return {
       btnDisabled: false,
       params: {
-        isReview: false,
-      },
-    };
+        isReview: false
+      }
+    }
   },
   mounted() {
-    this.getFn();
+    this.getFn()
   },
   methods: {
     getFn() {
       getReview().then((res) => {
         if (res.code === 10000) {
-          Object.assign(this.params, res.data);
+          Object.assign(this.params, res.data)
         }
-      });
+      })
     },
     setFn() {
-      this.btnDisabled = !this.btnDisabled;
+      this.btnDisabled = !this.btnDisabled
       setReview(this.params)
         .then((res) => {
           if (res.code === 10000) {
-            this.$message.success("设置成功");
-            return;
+            this.$message.success('设置成功')
+            return
           }
-          this.params.isReview = !this.params.isReview;
+          this.params.isReview = !this.params.isReview
         })
         .catch(() => {
-          this.params.isReview = !this.params.isReview;
+          this.params.isReview = !this.params.isReview
         })
         .finally(() => {
-          this.btnDisabled = !this.btnDisabled;
-        });
-    },
-  },
-};
+          this.btnDisabled = !this.btnDisabled
+        })
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 .blue {

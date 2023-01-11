@@ -122,16 +122,6 @@ export default {
       margin: 20px;
       background: #ffffff;
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
-      .btn-lists {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 10px 0 10px;
-        .svg-btn {
-          position: relative;
-          top: 1px;
-          left: -4px;
-        }
-      }
     }
     .right-table {
       width: calc(100% - 40px);

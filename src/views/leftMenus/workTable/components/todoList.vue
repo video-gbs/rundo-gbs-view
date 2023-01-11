@@ -43,65 +43,65 @@
 </template>
 
 <script>
-import LineFont from "@/components/LineFont";
+import LineFont from '@/components/LineFont'
 export default {
-  name: "",
+  name: '',
   components: {
-    LineFont,
+    LineFont
   },
   props: {
     homeLists: {
       type: Object,
       default: () => {
-        return {};
-      },
-    },
+        return {}
+      }
+    }
   },
   data() {
     return {
       textStyle: {
-        fontSize: "14px",
-        fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
-        fontWeight: "bold",
-        color: "#333333",
+        fontSize: '14px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#333333'
       },
       textStyle1: {
-        fontSize: "16px",
-        fontFamily: "Microsoft YaHei-Bold, Microsoft YaHei",
-        fontWeight: "bold",
-        color: "#1E56A0",
+        fontSize: '16px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#1E56A0'
       },
       lineBlueStyle: {
-        background: "rgba(30, 86, 160, 1)",
-        width: "2px",
-        height: "19px",
+        background: 'rgba(30, 86, 160, 1)',
+        width: '2px',
+        height: '19px'
       },
       lineBlueStyle1: {
-        background: "#A0791E",
-        width: "2px",
-        height: "19px",
+        background: '#A0791E',
+        width: '2px',
+        height: '19px'
       },
       lineBlueStyleNone: {
-        background: "rgba(30, 86, 160, 1)",
-        width: "0px",
-        height: "19px",
+        background: 'rgba(30, 86, 160, 1)',
+        width: '0px',
+        height: '19px'
       },
 
       lineTitle: {
-        title: "问政待办",
-        notShowSmallTitle: false,
+        title: '问政待办',
+        notShowSmallTitle: false
       },
       lineTitle1: {
-        title: "综合处理",
-        notShowSmallTitle: false,
+        title: '综合处理',
+        notShowSmallTitle: false
       },
       noticeList: [
         {
-          name: { title: "待审核问政", notShowSmallTitle: true },
+          name: { title: '待审核问政', notShowSmallTitle: true },
           num: this.homeLists.auditNum || 0,
           author: [0],
-          path: "/politicalList",
-          params: 1,
+          path: '/politicalList',
+          params: 1
         },
         // {
         //   name: { title: "待受理问政", notShowSmallTitle: false },
@@ -111,12 +111,12 @@ export default {
         //   params: 2,
         // },
         {
-          name: { title: "待回复问政", notShowSmallTitle: false },
+          name: { title: '待回复问政', notShowSmallTitle: false },
           num: this.homeLists.replyNum || 0,
           author: [0, 1, 2, 3, 4],
-          path: "/politicalList",
-          params: 2,
-        },
+          path: '/politicalList',
+          params: 2
+        }
         // {
         //   name: { title: '逾期未审核', notShowSmallTitle: false },
         //   num: this.homeLists.overdueAuditNum,
@@ -136,48 +136,48 @@ export default {
       nl: [],
       noticeList1: [
         {
-          name: { title: "转移审核", notShowSmallTitle: false },
+          name: { title: '转移审核', notShowSmallTitle: false },
           num: this.homeLists.moveAuditNum || 0,
           author: [1],
-          path: "/politicalAudit",
+          path: '/politicalAudit'
         },
         {
-          name: { title: "邀请审核", notShowSmallTitle: false },
+          name: { title: '邀请审核', notShowSmallTitle: false },
           num: this.homeLists.inviteAuditNum || 0,
-          author: [],
-        },
+          author: []
+        }
       ],
       nl1: [],
-      userDeptType: 123,
-    };
+      userDeptType: 123
+    }
   },
   watch: {},
   mounted() {
-    this.init();
+    this.init()
   },
   methods: {
     init() {
-      console.log(this.noticeList, this.noticeList1);
+      console.log(this.noticeList, this.noticeList1)
       // 判断哪些账号类型可以显示哪些处理模块
-      this.userDeptType = +(localStorage.getItem("rj_wzwz_deptType") || 123);
+      this.userDeptType = +(localStorage.getItem('rj_wzwz_deptType') || 123)
 
       console.log(
-        "this.userDeptType",
+        'this.userDeptType',
         this.userDeptType,
         typeof this.userDeptType
-      );
+      )
       this.noticeList.forEach((i) => {
-        i.author.includes(this.userDeptType) && this.nl.push(i);
-      });
+        i.author.includes(this.userDeptType) && this.nl.push(i)
+      })
       this.noticeList1.forEach((i) => {
-        i.author.includes(this.userDeptType) && this.nl1.push(i);
-      });
+        i.author.includes(this.userDeptType) && this.nl1.push(i)
+      })
     },
     goPage(v) {
-      this.$router.push({ path: v.path, query: { t: v.params } });
-    },
-  },
-};
+      this.$router.push({ path: v.path, query: { t: v.params } })
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

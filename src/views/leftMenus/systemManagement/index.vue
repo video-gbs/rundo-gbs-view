@@ -1,14 +1,9 @@
 <template>
-  <div class="router_container3">
-    3333
-  </div>
+  <div class="router_container3">3333</div>
 </template>
 
 <script>
-
-export default {
-}
+export default {}
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

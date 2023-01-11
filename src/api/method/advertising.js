@@ -21,12 +21,16 @@ export function editAdvertising(id, params) {
 
 export function editAdvertisingOrder(id, orderValue) {
   // 修改广告循序
-  return request.post(`/politics/backstage/advertising/order/${id}/${orderValue}`)
+  return request.post(
+    `/politics/backstage/advertising/order/${id}/${orderValue}`
+  )
 }
 
 export function editAdvertisingShow(id, isShow) {
   // 修改广告显示
-  return request.post(`/politics/backstage/advertising/updateIsShow/${id}/${isShow}`)
+  return request.post(
+    `/politics/backstage/advertising/updateIsShow/${id}/${isShow}`
+  )
 }
 
 export function deleteAdvertising(id) {

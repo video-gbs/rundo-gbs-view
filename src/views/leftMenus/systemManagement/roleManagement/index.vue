@@ -1,38 +1,86 @@
 <template>
-  <div class="router_container4 m20 bg-w">
-    <div class="panel-header-box f jc-sb ai-c fw-w">
-      <div class="title-css">角色管理</div>
+  <div class="role_container">
+    <div class="panel-header-box">
+      <div>角色管理</div>
     </div>
-    <div class="p10">
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column>
-          <template slot="header">
-            <div class="f ai-c jc-sb">
-              <div>数据列表</div>
-              <!-- <el-button
-                size="mini"
-                type="primary"
-                @click="dialogShow(1)"
-              >新增</el-button> -->
-            </div>
+
+    <div class="search">
+      <el-form
+        ref="query"
+        class="search-form"
+        :inline="true"
+        :model="searchParams"
+        label-width="120px"
+      >
+        <el-form-item label="角色名称:">
+          <el-input
+            v-model="searchParams.deptType"
+            placeholder="请输入"
+            style="width: 240px"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="创建者:">
+          <el-input
+            v-model="searchParams.status"
+            placeholder="请输入"
+            style="width: 240px"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item label="创建日期:">
+          <el-date-picker
+            v-model="searchParams.name"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+          >
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item style="float: right; margin-right: 20px">
+          <el-button
+            ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
+          >
+          <el-button type="primary" @click="cxData"
+            ><svg-icon class="svg-btn" icon-class="cx" />查询</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </div>
+    <div class="table-list">
+      <el-table
+        :data="tableData"
+        style="width: 100%"
+        border
+        :header-cell-style="{
+          background: 'rgba(0, 75, 173, 0.06)',
+          fontSize: '14px',
+          fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+          fontWeight: 'bold',
+          color: '#333333'
+        }"
+      >
+        <el-table-column type="selection" width="80" align="center">
+        </el-table-column>
+        <el-table-column type="index" width="50" align="center" label="序号">
+        </el-table-column>
+        <el-table-column prop="name" label="角色名称" />
+        <el-table-column prop="name1" label="创建者" />
+        <el-table-column prop="name2" label="创建时间" />
+        <el-table-column prop="name3" label="更新时间" />
+        <el-table-column prop="detail" label="描述" />
+        <el-table-column width="200" label="操作" fixed="right">
+          <template slot-scope="scope">
+            <el-button type="text" @click="getPermissionTableData(scope.row.id)"
+              >权限设置
+            </el-button>
+            <el-button type="text" @click="dialogShow(0, scope.row)"
+              >编辑</el-button
+            >
+            <el-button type="text" @click="deleteRole(scope.row)"
+              ><span class="delete-button">删除</span></el-button
+            >
           </template>
-          <el-table-column prop="name" label="角色名称" />
-          <el-table-column prop="detail" label="角色说明" />
-          <el-table-column width="200" label="操作" fixed="right">
-            <template slot-scope="scope">
-              <el-button
-                type="text"
-                @click="getPermissionTableData(scope.row.id)"
-                >权限设置
-              </el-button>
-              <el-button type="text" @click="dialogShow(0, scope.row)"
-                >编辑</el-button
-              >
-              <el-button type="text" @click="deleteRole(scope.row)"
-                ><span class="delete-button">删除</span></el-button
-              >
-            </template>
-          </el-table-column>
         </el-table-column>
       </el-table>
       <pagination
@@ -165,221 +213,235 @@ import {
   deleteRoles,
   permissionTree,
   getRolesList,
-  setAppAuth,
-} from "@/api/method/role";
+  setAppAuth
+} from '@/api/method/role'
 
-import pagination from "@/components/Pagination/index.vue";
+import pagination from '@/components/Pagination/index.vue'
 export default {
-  name: "",
+  name: '',
   components: { pagination },
   data() {
     return {
       search: {
-        userName: "",
-        phone: "",
-        time: "",
+        userName: '',
+        phone: '',
+        time: ''
       },
       params: {
         pageNum: 1,
         pageSize: 10,
-        total: 0,
+        total: 0
       },
+      optionsList: [
+        {
+          label: 'ces',
+          value: 'ces'
+        }
+      ],
       tableData: [],
       permissionTableData: [],
       dialog: {
         show: false,
-        title: "新增角色",
+        title: '新增角色',
         params: {
-          detail: "",
-          name: "",
-          status: 1,
-        },
+          detail: '',
+          name: '',
+          status: 1
+        }
       },
       permissionDialog: {
         show: false,
-        title: "编辑权限",
+        title: '编辑权限',
         params: {
-          detail: "",
-          name: "",
-          status: 1,
-        },
+          detail: '',
+          name: '',
+          status: 1
+        }
+      },
+      searchParams: {
+        deptType: '',
+        name: '',
+        status: 1
       },
       rules: {
         name: [
-          { required: true, message: "请输入角色名称", trigger: "blur" },
+          { required: true, message: '请输入角色名称', trigger: 'blur' },
           {
             min: 0,
             max: 15,
-            message: "长度在 3 到 15 个字符",
-            trigger: "blur",
-          },
-        ],
+            message: '长度在 3 到 15 个字符',
+            trigger: 'blur'
+          }
+        ]
       },
       remove: deleteRoles,
-      roleId: "",
+      roleId: '',
       checkList: [],
-      buttonLoading: false,
-    };
+      buttonLoading: false
+    }
   },
   mounted() {
-    this.getList();
+    this.getList()
   },
   methods: {
     sizeChange(pageSize) {
-      this.params.pageSize = pageSize;
-      this.getList();
+      this.params.pageSize = pageSize
+      this.getList()
     },
     currentChange(proCount) {
-      this.params.proCount = proCount;
-      this.getList();
+      this.params.proCount = proCount
+      this.getList()
+    },
+    cxData() {
+      this.$router.push(`/creatingRole/role`)
     },
     goPage(path, query) {
-      this.$router.push(path);
+      this.$router.push(path)
     },
     isShowChildren(data) {
       return data.find((res) => {
-        return res.childs.length !== 0;
-      });
+        return res.childs.length !== 0
+      })
     },
     dialogShow(act, data) {
       if (act === 0) {
-        const { name, detail, status } = data;
-        this.dialog.params.detail = detail;
-        this.dialog.params.name = name;
-        this.dialog.params.status = Number(status);
-        this.editId = data.id;
+        const { name, detail, status } = data
+        this.dialog.params.detail = detail
+        this.dialog.params.name = name
+        this.dialog.params.status = Number(status)
+        this.editId = data.id
       }
-      this.dialog.title = act ? "添加角色" : "编辑角色";
-      this.dialog.show = !this.dialog.show;
+      this.dialog.title = act ? '添加角色' : '编辑角色'
+      this.dialog.show = !this.dialog.show
     },
     handleClose(done) {
-      done();
+      done()
     },
     permissionHandleClose(done) {
-      done();
+      done()
     },
     buildTree(v) {
       // v==get ,set
-      this.checkList = [];
+      this.checkList = []
       this.permissionTableData.forEach((i) => {
         if (i.childs && i.childs.length) {
-          v === "get" && i.hasAuthorize && this.checkList.push(i.id);
+          v === 'get' && i.hasAuthorize && this.checkList.push(i.id)
           i.childs.forEach((l) => {
-            v === "get" && l.hasAuthorize && this.checkList.push(l.id);
+            v === 'get' && l.hasAuthorize && this.checkList.push(l.id)
             if (l.childs && l.childs.length) {
               l.childs.forEach((m) => {
-                v === "get" && m.hasAuthorize && this.checkList.push(m.id);
-              });
+                v === 'get' && m.hasAuthorize && this.checkList.push(m.id)
+              })
             }
-          });
+          })
         }
-      });
+      })
     },
     getPermissionTableData(id) {
-      this.permissionDialog.show = !this.permissionDialog.show;
-      this.roleId = id;
+      this.permissionDialog.show = !this.permissionDialog.show
+      this.roleId = id
       permissionTree(id).then((res) => {
         if (res.code === 10000) {
-          this.permissionTableData = res.data;
+          this.permissionTableData = res.data
         }
-      });
+      })
     },
     checkMenu(list) {
       list.forEach((item) => {
         if (item.permissionType === 1) {
-          item.ifPublic = this.checkList.indexOf(String(item.id)) !== -1;
+          item.ifPublic = this.checkList.indexOf(String(item.id)) !== -1
         } else {
-          item.children && this.checkMenu(item.children);
+          item.children && this.checkMenu(item.children)
         }
-      });
+      })
     },
     getCkeckList() {},
     savePermission() {
-      this.buttonLoading = true;
+      this.buttonLoading = true
       // this.checkList = []
-      this.buildTree("get");
+      this.buildTree('get')
       setAppAuth({
         roleId: this.roleId,
-        permissionIds: this.checkList,
+        permissionIds: this.checkList
       }).then((res) => {
-        this.buttonLoading = false;
+        this.buttonLoading = false
         if (res.code === 10000) {
           this.$message({
-            message: "保存成功！",
-            type: "success",
-          });
-          this.permissionDialog.show = !this.permissionDialog.show;
+            message: '保存成功！',
+            type: 'success'
+          })
+          this.permissionDialog.show = !this.permissionDialog.show
           // this.$router.go(-1)
         }
-      });
+      })
     },
     getList() {
       getRolesList({
         current: this.params.pageNum,
-        size: this.params.pageSize,
+        size: this.params.pageSize
       }).then((res) => {
         if (res.code === 10000) {
-          this.tableData = res.data.rows;
-          this.params.total = res.data.total;
-          this.params.pages = res.data.pages;
-          this.params.current = res.data.current;
+          this.tableData = res.data.rows
+          this.params.total = res.data.total
+          this.params.pages = res.data.pages
+          this.params.current = res.data.current
         }
-      });
+      })
     },
     deleteRole(row) {
-      this.$confirm("删除后数据无法恢复，是否确认删除？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       }).then(() => {
         deleteRoles(row.id).then((res) => {
           if (res.code === 10000) {
             this.$message({
-              type: "success",
-              message: "删除成功",
-            });
-            this.params.pageNum = 1;
-            this.getList();
+              type: 'success',
+              message: '删除成功'
+            })
+            this.params.pageNum = 1
+            this.getList()
           }
-        });
-      });
+        })
+      })
     },
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
-            case "添加角色":
+            case '添加角色':
               addRoles(this.dialog.params).then((res) => {
                 if (res.code === 10000) {
                   this.$message({
-                    type: "success",
-                    message: "添加角色成功",
-                  });
-                  this.dialog.show = false;
-                  this.getList();
+                    type: 'success',
+                    message: '添加角色成功'
+                  })
+                  this.dialog.show = false
+                  this.getList()
                 }
-              });
-              break;
-            case "编辑角色":
+              })
+              break
+            case '编辑角色':
               editRoles({ id: this.editId, ...this.dialog.params }).then(
                 (res) => {
                   if (res.code === 10000) {
-                    this.$message.success("编辑成功");
-                    this.dialog.show = false;
-                    this.getList();
+                    this.$message.success('编辑成功')
+                    this.dialog.show = false
+                    this.getList()
                   }
                 }
-              );
-              break;
+              )
+              break
 
             default:
-              break;
+              break
           }
         }
-      });
-    },
-  },
-};
+      })
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -389,6 +451,37 @@ export default {
 ::v-deep .el-dialog__footer {
   border-top: 1px solid #eaeaea;
 }
+.role_container {
+  width: 100%;
+  .panel-header-box {
+    margin: 0;
+    padding: 0 20px;
+    border: 1px solid #eaeaea;
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    background: #ffffff;
+    box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+  }
+
+  .search {
+    width: calc(100% - 40px);
+    height: 80px;
+    margin: 20px;
+    background: #ffffff;
+    box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    .search-form {
+      position: relative;
+      top: 60%;
+      transform: translate(0%, -50%);
+    }
+  }
+  .table-list {
+    margin: 20px;
+  }
+}
+
 .el-input {
   width: 100%;
 }
@@ -420,11 +513,11 @@ export default {
   }
 }
 
-::v-deep .el-form-item__content {
-  // height: 28px;
-  display: flex;
-  align-items: center;
-}
+// ::v-deep .el-form-item__content {
+//   // height: 28px;
+//   display: flex;
+//   align-items: center;
+// }
 .delete-button {
   color: red !important;
 }

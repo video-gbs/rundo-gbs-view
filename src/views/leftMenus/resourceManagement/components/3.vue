@@ -31,6 +31,19 @@ export default {
     line-height: 50px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+    .back-svg {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+    }
+    .back-title {
+      position: relative;
+      top: 0px;
+      left: 10px;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+    }
   }
 }
 </style>

@@ -65,7 +65,7 @@
             ><svg-icon class="svg-btn" icon-class="del" />批量删除</el-button
           >
 
-          <el-button
+          <el-button @click="moveEquipment"
             ><svg-icon class="svg-btn" icon-class="move" />移动</el-button
           >
           <el-button type="primary" @click="addEquipment"
@@ -149,20 +149,163 @@
         @current-change="currentChange"
       />
     </div>
+
+    <el-dialog title="移动位置" :visible.sync="dialogShow" width="30%">
+      <div slot="title" class="dialog-title">
+        <LineFont
+          :line-title="lineTitle"
+          :text-style="textStyle"
+          :line-blue-style="lineBlueStyle"
+        />
+      </div>
+      <el-form label-width="100px" :model="dialogForm">
+        <el-form-item label="设备数量：">
+          {{ dialogForm.num }}
+        </el-form-item>
+        <el-form-item label="设备名称：">
+          <span class="dialogEquipmentName">{{
+            dialogForm.dialogEquipmentName
+          }}</span>
+        </el-form-item>
+      </el-form>
+      <div class="securityArea_container">
+        <leftTree />
+      </div>
+
+      <div class="dialog-footer">
+        <el-button @click="dialogShow = false">取消</el-button>
+        <el-button type="primary"
+          ><svg-icon class="svg-btn" icon-class="save" />确认</el-button
+        >
+      </div>
+    </el-dialog>
+
+    <el-dialog title="选择编码器" :visible.sync="dialogShow1" width="80%">
+      <div slot="title" class="dialog-title">
+        <LineFont
+          :line-title="lineTitle1"
+          :text-style="textStyle"
+          :line-blue-style="lineBlueStyle"
+        />
+      </div>
+      <el-form label-width="80px" :model="dialogForm1">
+        <el-row>
+          <el-col :span="8">
+            <el-form-item label="当前目录">
+              <el-select
+                v-model="dialogForm1.region"
+                placeholder="请选择活动区域"
+              >
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8" style="float: right">
+            <el-form-item>
+              <el-input
+                placeholder="请输入搜索关键字"
+                suffix-icon="el-icon-search"
+                class="search-input"
+                v-model="dialogForm1.inputValue"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+
+      <el-table
+        ref="dialogEncoder"
+        class="table-content-bottom"
+        :data="dialogTableData"
+        border
+        :header-cell-style="{
+          background: 'rgba(0, 75, 173, 0.06)',
+          fontSize: '14px',
+          fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+          fontWeight: 'bold',
+          color: '#333333'
+        }"
+      >
+        <el-table-column type="selection" width="80" align="center">
+        </el-table-column>
+        <el-table-column type="index" width="50" align="center" label="序号">
+        </el-table-column>
+        <el-table-column
+          prop="name"
+          label="设备名称"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          prop="coding"
+          label="设备编码"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          prop="ip"
+          label="IP地址"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column prop="manufacturer" label="设备厂家" width="80" />
+        <el-table-column prop="city" label="所属行政区域" width="240" />
+      </el-table>
+
+      <pagination
+        :pages-data="params"
+        @size-change="sizeChange"
+        @current-change="currentChange"
+      />
+
+      <div class="dialog-footer">
+        <el-button @click="dialogShow1 = false">取消</el-button>
+        <el-button type="primary"
+          ><svg-icon class="svg-btn" icon-class="save" />确认</el-button
+        >
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import pagination from '@/components/Pagination/index.vue'
+import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
+import LineFont from '@/components/LineFont'
 export default {
   name: '',
-  components: { pagination },
+  components: { pagination, leftTree, LineFont },
   data() {
     return {
       params: {
         pageNum: 1,
         pageSize: 10,
         total: 0
+      },
+      lineTitle: {
+        title: '移动位置',
+        notShowSmallTitle: false
+      },
+      lineTitle1: {
+        title: '选择编码器',
+        notShowSmallTitle: false
+      },
+      textStyle: {
+        fontSize: '18px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#333333'
+      },
+      lineBlueStyle: {
+        background: 'rgba(30, 86, 160, 1)',
+        width: '3px',
+        height: '18px'
+      },
+      dialogForm: {
+        num: 3,
+        dialogEquipmentName:
+          '海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ;'
+      },
+      dialogForm1: {
+        inputValue: ''
       },
       searchParams: {
         deptType: '',
@@ -177,6 +320,145 @@ export default {
         }
       ],
       checked: false,
+      dialogShow: false,
+      dialogShow1: false,
+      dialogTableData: [
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 2
+        },
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 2
+        }
+      ],
       tableData: [
         {
           name: '球机192.168……',
@@ -324,20 +606,35 @@ export default {
     currentChange(proCount) {
       this.params.proCount = proCount
     },
-    synchronizationData() {},
+    synchronizationData() {
+      this.$router.push(`/activeDiscovery/transfer`)
+    },
     editData() {},
     restart() {},
-    deploymentData() {},
+    deploymentData() {
+      this.dialogShow1 = true
+    },
     deleteData() {},
     cxData() {},
     addEquipment() {
       this.$router.push(`/addEquipment/add`)
+    },
+    moveEquipment() {
+      this.dialogShow = true
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-dialog__body {
+  padding-bottom: 0;
+}
+::v-deep .el-dialog__header {
+  border-bottom: 1px solid rgba(234, 234, 234, 1);
+  padding: 0 20px;
+}
+
 .encoder-content {
   .search {
     width: 100%;
@@ -387,6 +684,32 @@ export default {
     height: 6px;
     border-radius: 50%;
     background: #b1b1b1;
+  }
+
+  .securityArea_container {
+    height: calc(100% - 40px);
+    width: 310px;
+    margin: 10px;
+    // background: #ffffff;
+    // box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+  }
+}
+.dialog-footer {
+  width: 100%;
+  height: 52px;
+  line-height: 52px;
+  position: relative;
+  bottom: 0;
+  right: 0px;
+  text-align: right;
+  border-top: 1px solid #eaeaea;
+  > .el-button {
+    margin-right: 20px;
+  }
+  .svg-btn {
+    position: relative;
+    top: 1px;
+    left: -4px;
   }
 }
 .svg-btn {

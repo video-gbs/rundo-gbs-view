@@ -84,62 +84,62 @@
 </template>
 
 <script>
-import _dict from "@/dict/index";
-import _mixins from "@/mixins/index";
+import _dict from '@/dict/index'
+import _mixins from '@/mixins/index'
 import {
   getAfficheList,
   deleteAffiche,
   editAffiche,
   editAfficheOrder,
-  editAfficheIsShow,
-} from "@/api/method/affiche";
+  editAfficheIsShow
+} from '@/api/method/affiche'
 export default {
-  name: "",
+  name: '',
   mixins: [_mixins],
   data() {
     return {
       params: {
         current: 1,
         size: 10,
-        total: 0,
+        total: 0
       },
       dict: _dict,
       tableData: [],
       one: {},
       orderForm: { order: 0 },
       remove: deleteAffiche,
-      editShow: editAfficheIsShow,
-    };
+      editShow: editAfficheIsShow
+    }
   },
   mounted() {
-    this.getListFn();
+    this.getListFn()
   },
   methods: {
     setHeigthFn(v) {
-      return document.body.clientHeight - v + "";
+      return document.body.clientHeight - v + ''
     },
     getListFn() {
       getAfficheList(this.params).then((res) => {
         if (res.code === 10000) {
-          this.tableData = res.data.records;
-          this.params.total = res.data.total;
+          this.tableData = res.data.records
+          this.params.total = res.data.total
         }
-      });
+      })
     },
     handleSizeChange(v) {
-      console.log("v");
+      console.log('v')
       // 执行搜索
-      this.params.size = v;
-      this.getListFn();
+      this.params.size = v
+      this.getListFn()
     },
     paginationCurrentChange(v) {
-      console.log("v2");
+      console.log('v2')
       // 执行搜索
-      this.params.current = v;
-      this.getListFn();
+      this.params.current = v
+      this.getListFn()
     },
     goPage(path, query) {
-      this.$router.push(path);
+      this.$router.push(path)
     },
     // deleteFn(v) {
     //   this.$alert(`确定要删除公告 '${v.title}' 吗?`, '删除公告', {
@@ -155,18 +155,18 @@ export default {
       editAfficheOrder(this.one.id, this.one.orderValue)
         .then((res) => {
           res.code === 10000 &&
-            (this.$message.success("修改成功"),
-            (this.$refs["orderDialog"].visible = false));
+            (this.$message.success('修改成功'),
+            (this.$refs['orderDialog'].visible = false))
         })
-        .catch(() => {});
+        .catch(() => {})
     },
 
     orderDialogFn(v) {
-      this.one = v;
-      this.$refs["orderDialog"].visible = true;
-    },
-  },
-};
+      this.one = v
+      this.$refs['orderDialog'].visible = true
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped></style>

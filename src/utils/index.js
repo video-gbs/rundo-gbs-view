@@ -17,8 +17,8 @@ export function parseTime(time, cFormat) {
   if (typeof time === 'object') {
     date = time
   } else {
-    if ((typeof time === 'string')) {
-      if ((/^[0-9]+$/.test(time))) {
+    if (typeof time === 'string') {
+      if (/^[0-9]+$/.test(time)) {
         // support "1548221490638"
         time = parseInt(time)
       } else {
@@ -28,7 +28,7 @@ export function parseTime(time, cFormat) {
       }
     }
 
-    if ((typeof time === 'number') && (time.toString().length === 10)) {
+    if (typeof time === 'number' && time.toString().length === 10) {
       time = time * 1000
     }
     date = new Date(time)
@@ -45,7 +45,9 @@ export function parseTime(time, cFormat) {
   const time_str = format.replace(/{([ymdhisa])+}/g, (result, key) => {
     const value = formatObj[key]
     // Note: getDay() returns 0 on Sunday
-    if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value ] }
+    if (key === 'a') {
+      return ['日', '一', '二', '三', '四', '五', '六'][value]
+    }
     return value.toString().padStart(2, '0')
   })
   return time_str
@@ -105,7 +107,7 @@ export function param2Obj(url) {
   }
   const obj = {}
   const searchArr = search.split('&')
-  searchArr.forEach(v => {
+  searchArr.forEach((v) => {
     const index = v.indexOf('=')
     if (index !== -1) {
       const name = v.substring(0, index)
@@ -116,15 +118,16 @@ export function param2Obj(url) {
   return obj
 }
 
-
 /* Echarts图表字体、间距自适应 */
-export const fitChartSize = (size,defalteWidth = 1920) => {
-  let clientWidth = window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth;
+export const fitChartSize = (size, defalteWidth = 1920) => {
+  let clientWidth =
+    window.innerWidth ||
+    document.documentElement.clientWidth ||
+    document.body.clientWidth
   // console.log('clientWidth', clientWidth);
-  if (!clientWidth) return size;
+  if (!clientWidth) return size
   // let scale = (defalteWidth / clientWidth);
-  let scale = (clientWidth / defalteWidth);
+  let scale = clientWidth / defalteWidth
   // console.log('Number((size*scale).toFixed(3)', Number((size*scale).toFixed(3)));
-  return Number((size*scale).toFixed(3));
+  return Number((size * scale).toFixed(3))
 }
-

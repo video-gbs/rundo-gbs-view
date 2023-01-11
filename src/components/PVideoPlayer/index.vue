@@ -71,7 +71,7 @@ export default {
   },
   computed: {
     player() {
-      return this.$refs.videoPlayer.player// 自定义播放
+      return this.$refs.videoPlayer.player // 自定义播放
     }
   },
   methods: {
@@ -109,29 +109,29 @@ export default {
   align-items: center;
 }
 .footer-btn {
-    display: inline-block;
-    line-height: 1;
-    white-space: nowrap;
-    cursor: pointer;
-    background: #fff;
-    border: 1px solid #dcdfe6;
-    color: #fff;
-    background-color: #409eff;
-    border-color: #409eff;
-    text-align: center;
-    box-sizing: border-box;
-    outline: none;
-    margin: 0;
-    transition: .1s;
-    font-weight: 500;
-    padding: 12px 20px;
-    font-size: 14px;
-    border-radius: 4px;
+  display: inline-block;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #dcdfe6;
+  color: #fff;
+  background-color: #409eff;
+  border-color: #409eff;
+  text-align: center;
+  box-sizing: border-box;
+  outline: none;
+  margin: 0;
+  transition: 0.1s;
+  font-weight: 500;
+  padding: 12px 20px;
+  font-size: 14px;
+  border-radius: 4px;
 }
 .footer-btn:hover {
-    background: #66b1ff;
-    border-color: #66b1ff;
-    color: #fff;
+  background: #66b1ff;
+  border-color: #66b1ff;
+  color: #fff;
 }
 .footer-btn + .footer-btn {
   margin-left: 20px;

@@ -59,12 +59,12 @@ export default {
 .app-main {
   /*50 = navbar  */
   /* min-height: calc(100vh - 136px); */
-  height: calc(100vh - 109px);
+  height: calc(100%);
   width: 100%;
   position: relative;
   overflow: auto;
   overflow-x: hidden;
-  padding: 0 0 40px;
+  padding: 0;
   background-color: #ececec;
   > div {
     width: 100%;

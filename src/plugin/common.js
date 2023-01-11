@@ -10,7 +10,7 @@ import PEditor from '@/components/PEditor'
 import PVideo from '@/components/PVideo'
 
 const Loading = {
-  install: function(Vue) {
+  install: function (Vue) {
     Vue.component('PQuery', PQuery)
     Vue.component('PDataBox', PDataBox)
     Vue.component('PForm', PForm)

@@ -1,25 +1,49 @@
 <template>
   <div class="p-input-region">
-    <el-select v-model="regionForm.province.code" class="p-item" :disabled="provinceDisabled" clearable placeholder="请选择" @change="provinceChange">
+    <el-select
+      v-model="regionForm.province.code"
+      class="p-item"
+      :disabled="provinceDisabled"
+      clearable
+      placeholder="请选择"
+      @change="provinceChange"
+    >
       <el-option
         v-for="item in regionOptions.province"
         :key="item.areaCode"
         :label="item.shortName"
-        :value="item.areaCode.toString()" />
+        :value="item.areaCode.toString()"
+      />
     </el-select>
-    <el-select v-model="regionForm.city.code" class="p-item" :disabled="cityDisabled" clearable placeholder="请选择" @change="cityChange">
+    <el-select
+      v-model="regionForm.city.code"
+      class="p-item"
+      :disabled="cityDisabled"
+      clearable
+      placeholder="请选择"
+      @change="cityChange"
+    >
       <el-option
         v-for="item in regionOptions.city"
         :key="item.areaCode"
         :label="item.shortName"
-        :value="item.areaCode.toString()" />
+        :value="item.areaCode.toString()"
+      />
     </el-select>
-    <el-select v-model="regionForm.district.code" class="p-item" :disabled="districtDisabled" clearable placeholder="请选择" @change="districtChange">
+    <el-select
+      v-model="regionForm.district.code"
+      class="p-item"
+      :disabled="districtDisabled"
+      clearable
+      placeholder="请选择"
+      @change="districtChange"
+    >
       <el-option
         v-for="item in regionOptions.district"
         :key="item.areaCode"
         :label="item.shortName"
-        :value="item.areaCode.toString()" />
+        :value="item.areaCode.toString()"
+      />
     </el-select>
   </div>
 </template>
@@ -129,7 +153,7 @@ export default {
         pageSize: 999,
         parentCode
       }
-      this.$api.areas.lazyTree(form).then(res => {
+      this.$api.areas.lazyTree(form).then((res) => {
         if (res.data.data) {
           const { rows } = res.data.data
           this.regionOptions[key] = rows
@@ -137,9 +161,9 @@ export default {
       })
     },
     regionChange() {
-    //   const regions = this.regionForm.map(item => {
-    //     return item.code
-    //   })
+      //   const regions = this.regionForm.map(item => {
+      //     return item.code
+      //   })
       const regions = []
       const regionForm = this.regionForm
       for (const key in regionForm) {
@@ -179,7 +203,7 @@ export default {
     setRegionName(key, code) {
       let name = ''
       if (this.regionOptions[key] && this.regionOptions[key].length > 0) {
-        this.regionOptions[key].forEach(item => {
+        this.regionOptions[key].forEach((item) => {
           if (item.areaCode == code) {
             name = item.shortName
           }
@@ -201,15 +225,15 @@ export default {
 
 <style lang="scss" scoped>
 .p-input-region {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    .p-item {
-        flex: 1;
-        margin-left: 1rem;
-        &:first-child {
-            margin-left: 0;
-        }
+  width: 100%;
+  display: flex;
+  align-items: center;
+  .p-item {
+    flex: 1;
+    margin-left: 1rem;
+    &:first-child {
+      margin-left: 0;
     }
+  }
 }
 </style>

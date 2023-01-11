@@ -28,73 +28,73 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import Logo from "./Logo";
-import SidebarItem from "./SidebarItem";
-import variables from "@/styles/variables.scss";
+import { mapGetters } from 'vuex'
+import Logo from './Logo'
+import SidebarItem from './SidebarItem'
+import variables from '@/styles/variables.scss'
 
 export default {
   components: { SidebarItem, Logo },
   data() {
     return {
-      myRouter: [],
-    };
+      myRouter: []
+    }
   },
   computed: {
-    ...mapGetters(["sidebar"]),
+    ...mapGetters(['sidebar']),
     routes() {
-      return this.$router.options.routes;
+      return this.$router.options.routes
     },
     activeMenu() {
-      const route = this.$route;
-      const { meta, path } = route;
+      const route = this.$route
+      const { meta, path } = route
       if (meta.activeMenu) {
-        return meta.activeMenu;
+        return meta.activeMenu
       }
-      return path;
+      return path
     },
     variables() {
-      return variables;
+      return variables
     },
     showLogo() {
-      return this.$store.state.settings.sidebarLogo;
-    },
+      return this.$store.state.settings.sidebarLogo
+    }
   },
 
   mounted() {
-    this.select(this.$route.path);
-    this.myRouter = Object.assign([], this.routes);
-    const ut = localStorage.getItem("rj_wzwz_deptType") || 9999;
+    this.select(this.$route.path)
+    this.myRouter = Object.assign([], this.routes)
+    const ut = localStorage.getItem('rj_wzwz_deptType') || 9999
     // console.log("进来了", ut);
-    this.setHide(this.myRouter, ut * 1);
+    this.setHide(this.myRouter, ut * 1)
     // console.log("routes`~~~~~~~~~~~``", this.myRouter);
   },
   methods: {
     setHide(v, ut) {
       v.forEach((i) => {
         if (i.author !== null && i.author !== undefined) {
-          this.$set(i, "authorHidden", false);
+          this.$set(i, 'authorHidden', false)
           // console.log(i.author, ut, i.author.includes(ut));
-          !i.author.includes(ut) && this.$set(i, "authorHidden", true);
+          !i.author.includes(ut) && this.$set(i, 'authorHidden', true)
         }
         if (i.children && i.children.length) {
-          this.setHide(i.children, ut);
+          this.setHide(i.children, ut)
         }
-      });
+      })
     },
     select(index) {
-      if (this.$route.path !== index) this.$router.push(index);
+      if (this.$route.path !== index) this.$router.push(index)
       if (
         this.$store.state.tabs.tabList.every(
           (item) => item.path !== this.$route.path
         )
       ) {
-        this.$store.state.tabs.tabList.push(this.$route);
+        this.$store.state.tabs.tabList.push(this.$route)
         // this.$store.commit("tabList", this.$store.state.tabs.tabList);
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 .bottom-logo {
@@ -102,7 +102,7 @@ export default {
   height: 62px;
   width: 100%;
   bottom: 0;
-  background: url("../../../assets/imgs/logoBottom.png") no-repeat;
+  background: url('../../../assets/imgs/logoBottom.png') no-repeat;
   background-size: 100% 100%;
 }
 </style>

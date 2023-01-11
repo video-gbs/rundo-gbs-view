@@ -20,7 +20,9 @@
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button @click="cancel">{{ cancelName }}</el-button>
-      <el-button :loading="submitLoading" type="theme" @click="submit">{{ submitName }}</el-button>
+      <el-button :loading="submitLoading" type="theme" @click="submit">{{
+        submitName
+      }}</el-button>
     </span>
   </el-dialog>
 </template>

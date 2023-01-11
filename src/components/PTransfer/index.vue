@@ -4,9 +4,9 @@
       v-model="value"
       filterable
       :filter-method="filterMethod"
-      :right-default-checked="data.rightDefaultChecked||[]"
+      :right-default-checked="data.rightDefaultChecked || []"
       filter-placeholder="输入进行筛选"
-      :titles="data.titles||['待选列表', '已选列表']"
+      :titles="data.titles || ['待选列表', '已选列表']"
       :data="data.options"
     />
   </div>

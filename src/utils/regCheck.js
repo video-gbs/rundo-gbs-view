@@ -29,7 +29,7 @@ const rules = {
     rule: /^(?=.*\d)(?=.*[a-zA-Z])[\da-zA-Z~!@#$%^&*._?]{8,20}$/,
     msg: '长度为8-20个字符，由字母/数字以及特殊符号组成'
   }
-};
+}
 
 /**
  *
@@ -43,74 +43,73 @@ const rules = {
  * @returns { success: Boolean; msg?: string; key?: string; }
  */
 const check = (verifyArr) => {
-  let result = { success: true };
+  let result = { success: true }
   verifyArr.some((item) => {
-
     if (item.require && !item.value) {
       result = {
         success: false,
         msg: `【${item.name}】不能为空`,
-        key: item.key,
-      };
-      return true;
+        key: item.key
+      }
+      return true
     }
 
     if (item.value && item.rule) {
-      const ruleItem = rules[item.rule];
+      const ruleItem = rules[item.rule]
       if (ruleItem) {
         if (!ruleItem.rule.test(item.value)) {
           result = {
             success: false,
             msg: item.regMsg || `【${item.name}】格式有误，${ruleItem.msg}`,
-            key: item.key,
-          };
-          return true;
+            key: item.key
+          }
+          return true
         }
-      } else if(item.rule.includes('byteLength')) {
-        const length = item.rule.substr(10);
-        if(item.value.byteLength() > +length) {
+      } else if (item.rule.includes('byteLength')) {
+        const length = item.rule.substr(10)
+        if (item.value.byteLength() > +length) {
           result = {
             success: false,
             msg: `【${item.name}】过长，至多为${length}个汉字`,
-            key: item.key,
-          };
-          return true;
+            key: item.key
+          }
+          return true
         }
       }
     }
 
-    return false;
-  });
+    return false
+  })
 
-  return result;
-};
+  return result
+}
 
 const simpleCheck = (value, rule) => {
   if (rule === 'required') {
     if (value === '' || value === undefined || value === null) {
-      return { success: false, msg: '不能为空' };
+      return { success: false, msg: '不能为空' }
     }
   }
 
-  const curRule = rules[rule];
+  const curRule = rules[rule]
   if (curRule && value) {
     if (!curRule.rule.test(value)) {
-      return { success: false, msg: `格式有误，${curRule.msg}` };
+      return { success: false, msg: `格式有误，${curRule.msg}` }
     }
-  } else if(rule.includes('byteLength')) {
-    const length = rule.substr(10);
-    if(value.byteLength() > +length) {
+  } else if (rule.includes('byteLength')) {
+    const length = rule.substr(10)
+    if (value.byteLength() > +length) {
       return {
         success: false,
-        msg: `文字过长，至多为${Math.floor(length / 2)}个汉字`,
-      };
+        msg: `文字过长，至多为${Math.floor(length / 2)}个汉字`
+      }
     }
   }
 
-  return { success: true };
-};
+  return { success: true }
+}
 
 export default {
   check,
-  simpleCheck,
+  simpleCheck
 }

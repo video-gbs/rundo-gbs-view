@@ -3,8 +3,8 @@
  */
 const req = require.context('./method', false, /\.js$/)
 const jsnames = {}
-const requireAllJs = function(rc) {
-  rc.keys().forEach(k => {
+const requireAllJs = function (rc) {
+  rc.keys().forEach((k) => {
     jsnames[k.replace('./', '').replace('.js', '')] = rc(k).default
   })
 }

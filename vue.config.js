@@ -22,6 +22,10 @@ const urls = [
     target: 'http://221.7.133.178:8111',
     proxy: '/dev-api'
   }
+  // {
+  //   target: 'http://192.168.0.63:7821',
+  //   proxy: '/rundoAuthServer'
+  // }
 ]
 
 /**
