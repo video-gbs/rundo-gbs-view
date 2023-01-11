@@ -129,15 +129,27 @@
                       suffix-icon="el-icon-search"
                       class="search-input"
                     ></el-input>
-                    <el-button type="primary" @click="checkedAll()"
+                    <el-button
+                      v-if="isCheckedAll"
+                      type="primary"
+                      @click="checkedAll(tableData)"
                       ><svg-icon
                         class="svg-btn"
                         icon-class="checkedAll"
                       />全选</el-button
                     >
+                    <el-button
+                      v-else
+                      type="primary"
+                      @click="cancellCheckedAll(tableData)"
+                      ><svg-icon
+                        class="svg-btn"
+                        icon-class="checkedAll"
+                      />取消全选</el-button
+                    >
                   </div>
                   <el-table
-                    ref="dialogEncoder"
+                    ref="tableChecked"
                     class="table-content-bottom"
                     :data="tableData"
                     border
@@ -148,6 +160,7 @@
                       fontWeight: 'bold',
                       color: '#333333'
                     }"
+                    @selection-change="handleSelectionChange"
                   >
                     <el-table-column
                       type="index"
@@ -162,94 +175,95 @@
                       :show-overflow-tooltip="true"
                     />
                     <el-table-column
-                      prop="coding"
+                      prop="preview"
                       label="预览"
                       :show-overflow-tooltip="true"
                     >
                       <template slot="header" slot-scope="scope">
                         <el-checkbox
-                          :indeterminate="isIndeterminate"
-                          v-model="checkAllDetail"
-                          @change="handleCheckAllDetail"
+                          v-model="previewCheckAll"
+                          :scope="scope"
+                          :indeterminate="previewIndeterminate"
+                          @change="checkColumnAll(scope)"
                           >预览</el-checkbox
                         >
                       </template>
                       <template slot-scope="scope">
                         <el-checkbox
-                          v-model="scope.row.checked"
-                          @change="handleCheckDetail"
+                          v-model="scope.row.previewChecked"
+                          @change="tableCheckboxChange('预览', scope.row)"
                           >预览</el-checkbox
                         >
                       </template>
                     </el-table-column>
                     <el-table-column
-                      prop="ip"
+                      prop="playback"
                       label="回放"
                       :show-overflow-tooltip="true"
                     >
                       <template slot="header" slot-scope="scope">
                         <el-checkbox
-                          :indeterminate="isIndeterminate"
-                          v-model="checkAllDetail"
-                          @change="handleCheckAllDetail"
+                          v-model="playbackCheckAll"
+                          :indeterminate="playbackIndeterminate"
+                          @change="checkColumnAll(scope)"
                           >回放</el-checkbox
                         >
                       </template>
                       <template slot-scope="scope">
                         <el-checkbox
-                          v-model="scope.row.checked"
-                          @change="handleCheckDetail"
+                          v-model="scope.row.playbackChecked"
+                          @change="tableCheckboxChange('回放', scope.row)"
                           >回放</el-checkbox
                         >
                       </template>
                     </el-table-column>
-                    <el-table-column prop="manufacturer" label="云台控制">
+                    <el-table-column prop="control" label="云台控制">
                       <template slot="header" slot-scope="scope">
                         <el-checkbox
-                          :indeterminate="isIndeterminate"
-                          v-model="checkAllDetail"
-                          @change="handleCheckAllDetail"
+                          v-model="controlCheckAll"
+                          :indeterminate="controlIndeterminate"
+                          @change="checkColumnAll(scope)"
                           >云台控制</el-checkbox
                         >
                       </template>
                       <template slot-scope="scope">
                         <el-checkbox
-                          v-model="scope.row.checked"
-                          @change="handleCheckDetail"
+                          v-model="scope.row.controlChecked"
+                          @change="tableCheckboxChange('云台控制', scope.row)"
                           >云台控制</el-checkbox
                         >
                       </template>
                     </el-table-column>
-                    <el-table-column prop="city" label="录像下载">
+                    <el-table-column prop="videoDownload" label="录像下载">
                       <template slot="header" slot-scope="scope">
                         <el-checkbox
-                          :indeterminate="isIndeterminate"
-                          v-model="checkAllDetail"
-                          @change="handleCheckAllDetail"
+                          v-model="downloadCheckAll"
+                          :indeterminate="downloadIndeterminate"
+                          @change="checkColumnAll(scope)"
                           >录像下载</el-checkbox
                         >
                       </template>
                       <template slot-scope="scope">
                         <el-checkbox
-                          v-model="scope.row.checked"
-                          @change="handleCheckDetail"
+                          v-model="scope.row.downloadChecked"
+                          @change="tableCheckboxChange('录像下载', scope.row)"
                           >录像下载</el-checkbox
                         >
                       </template>
                     </el-table-column>
-                    <el-table-column prop="city" label="告警下载">
+                    <el-table-column prop="alarm" label="告警下载">
                       <template slot="header" slot-scope="scope">
                         <el-checkbox
-                          :indeterminate="isIndeterminate"
-                          v-model="checkAllDetail"
-                          @change="handleCheckAllDetail"
+                          v-model="alarmCheckAll"
+                          :indeterminate="alarmIndeterminate"
+                          @change="checkColumnAll(scope)"
                           >告警下载</el-checkbox
                         >
                       </template>
                       <template slot-scope="scope">
                         <el-checkbox
-                          v-model="scope.row.checked"
-                          @change="handleCheckDetail"
+                          v-model="scope.row.alarmChecked"
+                          @change="tableCheckboxChange('告警下载', scope.row)"
                           >告警下载</el-checkbox
                         >
                       </template>
@@ -377,7 +391,12 @@ export default {
           ip: '192.168.119.152',
           port: 8000,
           manufacturer: '海康',
-          status: 1
+          status: 1,
+          previewChecked: false,
+          playbackChecked: false,
+          controlChecked: false,
+          downloadChecked: false,
+          alarmChecked: false
         },
         {
           name: '球机192.168……',
@@ -386,7 +405,12 @@ export default {
           ip: '192.168.119.152',
           port: 8000,
           manufacturer: '海康',
-          status: 1
+          status: 1,
+          previewChecked: false,
+          playbackChecked: false,
+          controlChecked: false,
+          downloadChecked: false,
+          alarmChecked: false
         },
         {
           name: '球机192.168……',
@@ -395,7 +419,12 @@ export default {
           ip: '192.168.119.152',
           port: 8000,
           manufacturer: '海康',
-          status: 1
+          status: 1,
+          previewChecked: false,
+          playbackChecked: false,
+          controlChecked: false,
+          downloadChecked: false,
+          alarmChecked: false
         },
         {
           name: '球机192.168……',
@@ -404,7 +433,12 @@ export default {
           ip: '192.168.119.152',
           port: 8000,
           manufacturer: '海康',
-          status: 1
+          status: 1,
+          previewChecked: false,
+          playbackChecked: false,
+          controlChecked: false,
+          downloadChecked: false,
+          alarmChecked: false
         },
         {
           name: '球机192.168……',
@@ -413,7 +447,12 @@ export default {
           ip: '192.168.119.152',
           port: 8000,
           manufacturer: '海康',
-          status: 1
+          status: 1,
+          previewChecked: false,
+          playbackChecked: false,
+          controlChecked: false,
+          downloadChecked: false,
+          alarmChecked: false
         },
         {
           name: '球机192.168……',
@@ -422,7 +461,12 @@ export default {
           ip: '192.168.119.152',
           port: 8000,
           manufacturer: '海康',
-          status: 1
+          status: 1,
+          previewChecked: false,
+          playbackChecked: false,
+          controlChecked: false,
+          downloadChecked: false,
+          alarmChecked: false
         },
         {
           name: '球机192.168……',
@@ -431,7 +475,12 @@ export default {
           ip: '192.168.119.152',
           port: 8000,
           manufacturer: '海康',
-          status: 1
+          status: 1,
+          previewChecked: false,
+          playbackChecked: false,
+          controlChecked: false,
+          downloadChecked: false,
+          alarmChecked: false
         }
       ],
       lineTitle: {
@@ -452,7 +501,18 @@ export default {
         background: 'rgba(30, 86, 160, 1)',
         width: '3px',
         height: '18px'
-      }
+      },
+      isCheckedAll: true,
+      previewCheckAll: false,
+      playbackCheckAll: false,
+      controlCheckAll: false,
+      downloadCheckAll: false,
+      alarmCheckAll: false,
+      previewIndeterminate: false,
+      playbackIndeterminate: false,
+      controlIndeterminate: false,
+      downloadIndeterminate: false,
+      alarmIndeterminate: false
     }
   },
   mounted() {},
@@ -466,7 +526,253 @@ export default {
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath)
-    }
+    },
+    handleSelectionChange(v) {
+      console.log('v', v)
+    },
+    checkedAll(tableData) {
+      this.isCheckedAll = false
+      tableData.forEach((item) => {
+        item.previewChecked = true
+        item.playbackChecked = true
+        item.controlChecked = true
+        item.downloadChecked = true
+        item.alarmChecked = true
+      })
+
+      this.previewCheckAll = true
+      this.playbackCheckAll = true
+      this.controlCheckAll = true
+      this.downloadCheckAll = true
+      this.alarmCheckAll = true
+
+      // this.$refs.tableChecked.toggleRowSelection(tableData)
+    },
+    cancellCheckedAll(tableData) {
+      this.isCheckedAll = true
+
+      tableData.forEach((item) => {
+        item.previewChecked = false
+        item.playbackChecked = false
+        item.controlChecked = false
+        item.downloadChecked = false
+        item.alarmChecked = false
+      })
+      this.previewCheckAll = false
+      this.playbackCheckAll = false
+      this.controlCheckAll = false
+      this.downloadCheckAll = false
+      this.alarmCheckAll = false
+
+      this.previewIndeterminate = false
+      this.playbackIndeterminate = false
+      this.controlIndeterminate = false
+      this.downloadIndeterminate = false
+      this.alarmIndeterminate = false
+
+      // this.$refs.tableChecked.clearSelection(tableData)
+    }, // 预览列选中逻辑
+    checkColumnAll(val) {
+      // console.log(111, val.column.label)
+      // console.log(22, val._self.previewCheckAll)
+      switch (val.column.label) {
+        case '预览':
+          if (val._self.previewCheckAll) {
+            this.tableData.forEach((item) => {
+              item.previewChecked = true
+            })
+            this.previewIndeterminate = false
+          } else {
+            this.tableData.forEach((item) => {
+              item.previewChecked = false
+            })
+            this.previewIndeterminate = false
+          }
+          break
+        case '回放':
+          if (val._self.playbackCheckAll) {
+            this.tableData.forEach((item) => {
+              item.playbackChecked = true
+            })
+            this.playbackIndeterminate = false
+          } else {
+            this.tableData.forEach((item) => {
+              item.playbackChecked = false
+            })
+            this.playbackIndeterminate = false
+          }
+          break
+        case '云台控制':
+          if (val._self.controlCheckAll) {
+            this.tableData.forEach((item) => {
+              item.controlChecked = true
+            })
+            this.controlIndeterminate = false
+          } else {
+            this.tableData.forEach((item) => {
+              item.controlChecked = false
+            })
+            this.controlIndeterminate = false
+          }
+          break
+        case '录像下载':
+          if (val._self.downloadCheckAll) {
+            this.tableData.forEach((item) => {
+              item.downloadChecked = true
+            })
+            this.downloadIndeterminate = false
+          } else {
+            this.tableData.forEach((item) => {
+              item.downloadChecked = false
+            })
+            this.downloadIndeterminate = false
+          }
+          break
+        case '告警下载':
+          if (val._self.alarmCheckAll) {
+            this.tableData.forEach((item) => {
+              item.alarmChecked = true
+            })
+            this.alarmIndeterminate = false
+          } else {
+            this.tableData.forEach((item) => {
+              item.alarmChecked = false
+            })
+            this.alarmIndeterminate = false
+          }
+          break
+
+        default:
+          break
+      }
+    },
+    tableCheckboxChange(name, row) {
+      console.log('222', row)
+
+      let isAllTrue = ''
+      let isAllFalse = ''
+      switch (name) {
+        case '预览':
+          setTimeout(() => {
+            isAllTrue = this.tableData.every(
+              (item) => item.previewChecked === true
+            )
+            isAllFalse = this.tableData.every(
+              (item) => item.previewChecked === false
+            )
+            if (isAllTrue) {
+              this.previewIndeterminate = false
+              this.previewCheckAll = true
+            } else if (isAllFalse) {
+              this.previewIndeterminate = false
+              this.previewCheckAll = false
+            } else {
+              this.previewCheckAll = false
+              this.previewIndeterminate = true
+            }
+          }, 0)
+          break
+        case '回放':
+          setTimeout(() => {
+            isAllTrue = this.tableData.every(
+              (item) => item.playbackChecked === true
+            )
+            isAllFalse = this.tableData.every(
+              (item) => item.playbackChecked === false
+            )
+            if (isAllTrue) {
+              this.playbackIndeterminate = false
+              this.playbackCheckAll = true
+            } else if (isAllFalse) {
+              this.playbackIndeterminate = false
+              this.playbackCheckAll = false
+            } else {
+              this.playbackCheckAll = false
+              this.playbackIndeterminate = true
+            }
+          }, 0)
+          break
+        case '云台控制':
+          setTimeout(() => {
+            isAllTrue = this.tableData.every(
+              (item) => item.controlChecked === true
+            )
+            isAllFalse = this.tableData.every(
+              (item) => item.controlChecked === false
+            )
+            if (isAllTrue) {
+              this.controlIndeterminate = false
+              this.controlCheckAll = true
+            } else if (isAllFalse) {
+              this.controlIndeterminate = false
+              this.controlCheckAll = false
+            } else {
+              this.controlCheckAll = false
+              this.controlIndeterminate = true
+            }
+          }, 0)
+          break
+        case '录像下载':
+          setTimeout(() => {
+            isAllTrue = this.tableData.every(
+              (item) => item.downloadChecked === true
+            )
+            isAllFalse = this.tableData.every(
+              (item) => item.downloadChecked === false
+            )
+            if (isAllTrue) {
+              this.pdownloadIndeterminate = false
+              this.downloadCheckAll = true
+            } else if (isAllFalse) {
+              this.downloadIndeterminate = false
+              this.downloadCheckAll = false
+            } else {
+              this.downloadCheckAll = false
+              this.downloadIndeterminate = true
+            }
+          }, 0)
+          break
+        case '告警下载':
+          setTimeout(() => {
+            isAllTrue = this.tableData.every(
+              (item) => item.alarmChecked === true
+            )
+            isAllFalse = this.tableData.every(
+              (item) => item.alarmChecked === false
+            )
+            if (isAllTrue) {
+              this.alarmIndeterminate = false
+              this.alarmCheckAll = true
+            } else if (isAllFalse) {
+              this.alarmIndeterminate = false
+              this.alarmCheckAll = false
+            } else {
+              this.alarmCheckAll = false
+              this.alarmIndeterminate = true
+            }
+          }, 0)
+          break
+
+        default:
+          break
+      }
+    },
+    previewChecked(row) {
+      console.log('1111', row)
+      // row.checked=false;
+    },
+    // 回放列选中逻辑
+    playbackCheckAllDetail() {},
+    playbackChecked() {},
+    // 云台控制列选中逻辑
+    controlCheckAllDetail() {},
+    controlChecked() {},
+    // 下载列选中逻辑
+    downloadCheckAllDetail() {},
+    downloadChecked() {},
+    // 告警列选中逻辑
+    alarmCheckAllDetail() {},
+    alarmChecked() {}
   }
 }
 </script>
