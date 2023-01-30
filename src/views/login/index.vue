@@ -27,21 +27,21 @@
                   auto-complete="on"
                   label-position="left"
                 >
-                  <el-form-item prop="account">
+                  <el-form-item prop="username">
                     <div
                       class="login-middle-input"
                       data-validate="Valid email is: a@b.c"
                     >
                       <svg-icon class="svg-btn" icon-class="zhanghao" />
                       <input
-                        ref="account"
+                        ref="username"
                         :class="
                           'input100 ' +
-                          (loginForm.account == '' ? '' : 'has-val')
+                          (loginForm.username == '' ? '' : 'has-val')
                         "
                         type="text"
-                        v-model="loginForm.account"
-                        name="account"
+                        v-model="loginForm.username"
+                        name="username"
                         placeholder="输入用户名"
                         style="width: 200px"
                       />
@@ -68,20 +68,20 @@
                     </div>
                   </el-form-item>
 
-                  <el-form-item prop="account">
+                  <el-form-item prop="code">
                     <div
                       class="login-middle-input-last login-middle-input"
                       data-validate="Valid email is: a@b.c"
                     >
                       <svg-icon class="svg-btn" icon-class="yzm" />
                       <input
-                        ref="account"
+                        ref="code"
                         :class="
                           'input100 ' + (loginForm.code == '' ? '' : 'has-val')
                         "
                         type="text"
                         v-model="loginForm.code"
-                        name="account"
+                        name="username"
                         placeholder="输入验证码"
                       />
                     </div>
@@ -155,7 +155,7 @@ export default {
       // identifyCodes: ['0','1','2','3'...'a','b','c'...'z'],
       loginForm: {
         // adminsuper/123456
-        account: '',
+        username: '',
         password: ''
         // code:''
       },
@@ -164,7 +164,7 @@ export default {
       showPassword: false,
       loginLoading: false,
       loginRules: {
-        account: [
+        username: [
           { required: true, trigger: 'blur', validator: validateUsername }
         ],
         password: [
@@ -201,22 +201,22 @@ export default {
     handleLogin() {
       // this.$refs.loginForm.validate((valid) => {
       // if (valid) {
-      this.loading = true
-      console.log('his.loginForm', this.loginForm)
-      login(this.loginForm).then((res) => {
-        if (res.code === 10000) {
-          const { deptName, deptType, userName, token } = res.data
-          Local.setToken(token)
-          Local.set('rj_wzwz_token', token)
-          Local.set('rj_wzwz_deptType', deptType)
-          Local.set('rj_wzwz_userName', userName)
-          Local.set('rj_wzwz_deptName', deptName)
-          this.$router.push({ path: '/workTable' })
-          this.loading = false
-        }
-      })
+      // this.loading = true
+      // login(this.loginForm)
+      //   .then((res) => {
+      //     if (res.code === 200) {
+
+      // const {  deptType,username, token } = res.data
+      Local.setToken(1)
+      Local.set('rj_token', 1)
+      Local.set('rj_deptType', 0)
+      Local.set('rj_userName', 222)
+      this.$router.push({ path: '/workTable' })
+      // this.loading = false
+      //   }
+      // })
       // .catch(() => {
-      this.loading = false
+      //   this.loading = false
       // })
       //   } else {
       //     console.log("error submit!!");

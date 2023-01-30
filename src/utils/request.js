@@ -42,7 +42,7 @@ service.interceptors.request.use(
   }
 )
 
-const ls = ['MANAGE_USER_TOKEN', 'rj_wzwz_token', 'rj_wzwz_deptType']
+const ls = ['MANAGE_USER_TOKEN', 'rj_token', 'rj_deptType']
 
 const logoutFn = () => {
   ls.forEach((i) => {
@@ -69,7 +69,7 @@ service.interceptors.response.use(
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 10000) {
+    if (res.code !== 200) {
       // Message({
       //   message: res.message || 'Error',
       //   type: 'error',

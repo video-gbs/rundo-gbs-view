@@ -64,7 +64,7 @@ export default {
   mounted() {
     this.select(this.$route.path)
     this.myRouter = Object.assign([], this.routes)
-    const ut = localStorage.getItem('rj_wzwz_deptType') || 9999
+    const ut = localStorage.getItem('rj_deptType') || 9999
     // console.log("进来了", ut);
     this.setHide(this.myRouter, ut * 1)
     // console.log("routes`~~~~~~~~~~~``", this.myRouter);

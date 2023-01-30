@@ -7,6 +7,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 // import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 Vue.use(ElementUI, { size: 'small' })
 import '@/styles/index.scss' // global css
+import '../static/fonts/iconfont/iconfont.css'
 
 import App from './App'
 import store from './store'

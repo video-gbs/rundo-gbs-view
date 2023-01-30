@@ -113,8 +113,7 @@ export default {
     //     this.initNotice()
     //   }
     // })
-    this.userInfo.userName =
-      localStorage.getItem('rj_wzwz_userName') || '佚名用户'
+    this.userInfo.userName = localStorage.getItem('rj__userName') || '佚名用户'
     this.userInfo.userName = this.userInfo.userName
       .replace('"', '')
       .replace('"', '')
@@ -124,22 +123,15 @@ export default {
      * 退出登录
      */
     logout() {
-      // Local.
-      logout({}, { Authorization: Local.getToken() })
-        .then((res) => {
-          // console.log(res, 11111)
-          // if (res.code === 10000) {
-          //   Local.setToken('')
-          //   this.$router.push({ path: '/login' })
-          // }
-        })
+      logout()
+        .then((res) => {})
         .catch(() => {})
         .finally(() => {
           Local.setToken('')
-          Local.remove('rj_wzwz_token')
-          Local.remove('rj_wzwz_deptType')
-          Local.remove('rj_wzwz_userName')
-          Local.remove('rj_wzwz_deptName')
+          Local.remove('rj_token')
+          Local.remove('rj_deptType')
+          Local.remove('rj_userName')
+          // Local.remove('rj__deptName')
           this.$router.push({ path: '/login' })
         })
     },

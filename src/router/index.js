@@ -116,6 +116,14 @@ const constantRoutes = [
             '@/views/leftMenus/resourceManagement/displayControlEquipment.vue'
           ),
         meta: { title: '显示控制设备', icon: '' }
+      },
+      {
+        path: '/live',
+        name: 'live',
+        author: superAdmin,
+        component: () =>
+          import('@/views/leftMenus/resourceManagement/live.vue'),
+        meta: { title: '视频设备', icon: '' }
       }
     ]
   },

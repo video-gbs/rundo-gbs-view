@@ -159,7 +159,7 @@ export default {
     init() {
       console.log(this.noticeList, this.noticeList1)
       // 判断哪些账号类型可以显示哪些处理模块
-      this.userDeptType = +(localStorage.getItem('rj_wzwz_deptType') || 123)
+      this.userDeptType = +(localStorage.getItem('rj_deptType') || 123)
 
       console.log(
         'this.userDeptType',

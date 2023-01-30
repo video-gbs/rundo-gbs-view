@@ -64,15 +64,15 @@
         </el-table-column>
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
-        <el-table-column prop="name" label="角色名称" />
-        <el-table-column prop="name1" label="创建者" />
-        <el-table-column prop="name2" label="创建时间" />
-        <el-table-column prop="name3" label="更新时间" />
+        <el-table-column prop="roleName" label="角色名称" />
+        <el-table-column prop="roleDesc" label="创建者" />
+        <el-table-column prop="createdTime" label="创建时间" />
+        <el-table-column prop="updatedTime" label="更新时间" />
         <el-table-column prop="detail" label="描述" />
         <el-table-column width="200" label="操作" fixed="right">
           <template slot-scope="scope">
             <el-button type="text" @click="getPermissionTableData(scope.row.id)"
-              >权限设置
+              >关联用户
             </el-button>
             <el-button type="text" @click="dialogShow(0, scope.row)"
               >编辑</el-button
@@ -213,9 +213,9 @@ import {
   deleteRoles,
   permissionTree,
   getRolesList,
-  setAppAuth
+  setAppAuth,
+  getSysOrgTree
 } from '@/api/method/role'
-
 import pagination from '@/components/Pagination/index.vue'
 export default {
   name: '',
@@ -277,13 +277,22 @@ export default {
       remove: deleteRoles,
       roleId: '',
       checkList: [],
-      buttonLoading: false
+      buttonLoading: false,
+      treeData: []
     }
   },
   mounted() {
     this.getList()
+    this.init()
   },
   methods: {
+    init() {
+      getSysOrgTree({ id: 1 }).then((res) => {
+        if (res.code === 200) {
+          this.treeData = res.data
+        }
+      })
+    },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
       this.getList()
@@ -380,8 +389,8 @@ export default {
         current: this.params.pageNum,
         size: this.params.pageSize
       }).then((res) => {
-        if (res.code === 10000) {
-          this.tableData = res.data.rows
+        if (res.code === 200) {
+          this.tableData = res.data
           this.params.total = res.data.total
           this.params.pages = res.data.pages
           this.params.current = res.data.current

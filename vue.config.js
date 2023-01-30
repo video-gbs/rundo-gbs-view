@@ -18,14 +18,14 @@ const port = process.env.port || process.env.npm_config_port || 9528 // dev port
 // 转发配置数组
 const urls = [
   // 本地
-  {
-    target: 'http://221.7.133.178:8111',
-    proxy: '/dev-api'
-  }
   // {
-  //   target: 'http://192.168.0.63:7821',
-  //   proxy: '/rundoAuthServer'
+  //   target: 'http://221.7.133.178:8111',
+  //   proxy: '/dev-api'
   // }
+  {
+    target: 'http://192.168.0.63:7821',
+    proxy: '/rundoAuthServer'
+  }
 ]
 
 /**

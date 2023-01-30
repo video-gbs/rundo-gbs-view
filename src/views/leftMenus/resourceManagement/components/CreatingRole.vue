@@ -119,7 +119,7 @@
                   </el-menu>
                 </div>
                 <div class="right-lists-table-tree">
-                  <leftTree />
+                  <leftTree :treeData="treeData" />
                 </div>
 
                 <div class="right-lists-table">
@@ -297,6 +297,7 @@
 import LineFont from '@/components/LineFont'
 import pagination from '@/components/Pagination/index.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
+import { getSysOrgTree } from '@/api/method/role'
 export default {
   name: '',
   components: { LineFont, pagination, leftTree },
@@ -368,6 +369,7 @@ export default {
           ]
         }
       ],
+      treeData: [],
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -515,8 +517,17 @@ export default {
       alarmIndeterminate: false
     }
   },
-  mounted() {},
+  mounted() {
+    this.init()
+  },
   methods: {
+    init() {
+      getSysOrgTree({ id: 1 }).then((res) => {
+        if (res.code === 200) {
+          this.treeData = res.data
+        }
+      })
+    },
     handleClick(val, event) {},
     goback() {
       this.$router.push({ path: '/roleManagement' })

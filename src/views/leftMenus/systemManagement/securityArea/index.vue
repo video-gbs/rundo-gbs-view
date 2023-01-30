@@ -16,7 +16,7 @@
             ><svg-icon class="svg-btn" icon-class="del" />删除</el-button
           >
         </div>
-        <leftTree />
+        <leftTree :treeData="treeData" />
       </div>
       <el-card class="right-box-card">
         <div slot="header" class="clearfix">
@@ -107,6 +107,9 @@
 <script>
 import leftTree from '../components/leftTree'
 import LineFont from '@/components/LineFont'
+
+import { getVideoAraeTree } from '@/api/method/role'
+
 export default {
   name: '',
   components: { leftTree, LineFont },
@@ -161,11 +164,21 @@ export default {
           trigger: 'blur',
           max: 40
         }
-      }
+      },
+      treeData: []
     }
   },
-  mounted() {},
+  mounted() {
+    this.init()
+  },
   methods: {
+    init() {
+      getVideoAraeTree({ id: 1 }).then((res) => {
+        if (res.code === 200) {
+          this.treeData = res.data
+        }
+      })
+    },
     handleClose(done) {
       done()
     },

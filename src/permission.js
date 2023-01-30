@@ -14,7 +14,8 @@ router.afterEach((to, from) => {
 })
 
 router.beforeEach(async (to, from, next) => {
-  const ut = +(localStorage.getItem('rj_wzwz_deptType') || 999)
+  const ut = +(localStorage.getItem('rj_deptType') || 999)
+  console.log('~~~~~~~~~~~~~~~~~~~~~', ut)
   NProgress.start()
 
   const hasToken = Local.getToken()

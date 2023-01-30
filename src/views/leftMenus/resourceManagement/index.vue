@@ -5,7 +5,7 @@
     </div>
     <div class="main-content">
       <div class="securityArea_container">
-        <leftTree />
+        <leftTree :treeData="treeData" />
       </div>
       <div class="right-table p10">
         <el-tabs
@@ -30,17 +30,28 @@
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import Encoder from './components/Encoder.vue'
 import Channel from './components/Channel.vue'
+import { getSysOrgTree } from '@/api/method/role'
 export default {
   name: '',
   components: { leftTree, Encoder, Channel },
   data() {
     return {
-      activeName: '编码器'
+      activeName: '编码器',
+      treeData: []
     }
   },
-  mounted() {},
+  mounted() {
+    this.init()
+  },
   methods: {
-    handleClick(val, event) {}
+    handleClick(val, event) {},
+    init() {
+      getSysOrgTree({ id: 1 }).then((res) => {
+        if (res.code === 200) {
+          this.treeData = res.data
+        }
+      })
+    }
   }
 }
 </script>

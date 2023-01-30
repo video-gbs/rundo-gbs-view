@@ -8,28 +8,28 @@
     <div class="operation_box">
       <el-tree
         ref="tree"
-        :data="data"
-        node-key="label"
+        :data="treeData"
+        node-key="orgName"
         class="tree"
         :props="defaultProps"
         :default-expanded-keys="['根节点']"
       >
         <span slot-scope="{ node, data }" class="custom-tree-node">
-          <span :dataType="data.type">
+          <span>
             <svg-icon
-              v-if="node.level === 1"
+              v-if="data.level === '1'"
               icon-class="tree1"
               class="tree1"
             />
             <svg-icon
               v-else-if="
-                node.level === 2 || node.level === 3 || node.level === 4
+                data.level === '2' || data.level === '3' || data.level === '4'
               "
               icon-class="tree2"
               class="tree2"
             />
             <svg-icon v-else icon-class="tree3" class="tree3" />
-            {{ node.label }}
+            {{ data.orgName || data.areaName }}
           </span>
         </span>
       </el-tree>
@@ -148,17 +148,35 @@ export default {
       defaultProps: {
         // 用于修改节点指定标签的属性值
         children: 'children',
-        label: 'label'
+        label: 'orgName'
       }
     }
   },
-  method: {
+  props: {
+    treeData: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    }
+  },
+  mounted() {
+    // this.init()
+  },
+  methods: {
     handleNodeClick(data) {
       // data.icon = 'tree1'
     },
     handleNodeClose(data) {
       // data.icon = 'tree2'
     }
+    // init() {
+    //   getSysOrgTree({ id: 1 }).then((res) => {
+    //     if (res.code === 200) {
+    //       this.data = res.data
+    //     }
+    //   })
+    // }
   }
 }
 </script>
