@@ -192,6 +192,76 @@ const constantRoutes = [
     ]
   },
   {
+    path: '/management',
+    name: 'management',
+    component: Layout,
+    redirect: '/applicationManagement',
+    meta: { title: '应用管理', icon: 'sys' },
+    author: superAdmin,
+    children: [
+      {
+        path: '/applicationManagement',
+        name: 'applicationManagement',
+        author: superAdmin,
+        component: () =>
+          import(
+            '@/views/leftMenus/systemManagement/system/applicationManagement.vue'
+          ),
+        meta: { title: '应用管理', icon: '' }
+      },
+      {
+        path: '/menuManagement',
+        name: 'menuManagement',
+        author: superAdmin,
+        component: () =>
+          import(
+            '@/views/leftMenus/systemManagement/system/menuManagement.vue'
+          ),
+        meta: { title: '菜单管理', icon: '' }
+      },
+      {
+        path: '/apiManagement',
+        name: 'apiManagement',
+        author: superAdmin,
+        component: () =>
+          import('@/views/leftMenus/systemManagement/system/apiManagement.vue'),
+        meta: { title: '接口管理', icon: '' }
+      },
+      {
+        path: '/dataDictionary',
+        name: 'dataDictionary',
+        author: superAdmin,
+        component: () =>
+          import(
+            '@/views/leftMenus/systemManagement/system/dataDictionary.vue'
+          ),
+        meta: { title: '数据字典', icon: '' }
+      }
+      // {
+      //   path: '/creatingRole/:type',
+      //   name: '/creatingRole',
+      //   component: () =>
+      //     import(
+      //       '@/views/leftMenus/resourceManagement/components/CreatingRole.vue'
+      //     ),
+      //   author: superAdmin,
+      //   hidden: true,
+      //   meta: { title: '新建角色', icon: '' }
+      // },
+      // {
+      //   path: '/otherUnitManagement',
+      //   name: 'OtherUnitManagement',
+      //   author: superAdmin,
+      //   hidden: true,
+      //   component: () =>
+      //     import(
+      //       '@/views/leftMenus/systemManagement/otherUnitManagement/index'
+      //     ),
+      //   meta: { title: '单位账号管理', icon: '' }
+      // }
+    ]
+  },
+  {
     path: '/404',
     component: () => import('@/views/404'),
     hidden: true

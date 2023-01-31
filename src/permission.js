@@ -15,10 +15,12 @@ router.afterEach((to, from) => {
 
 router.beforeEach(async (to, from, next) => {
   const ut = +(localStorage.getItem('rj_deptType') || 999)
-  console.log('~~~~~~~~~~~~~~~~~~~~~', ut)
+
   NProgress.start()
 
   const hasToken = Local.getToken()
+
+  // console.log('~~~~~~~~~~~~~~~~~~~~~', hasToken,to,pageAuthor)
   if (to.path === '/login') {
     hasToken ? next('/workTable') : next()
   } else if (to.path == '/404') {
@@ -30,7 +32,7 @@ router.beforeEach(async (to, from, next) => {
     next('/404')
   } else {
     if (hasToken) {
-      // console.log(';pageAuthor[to.name]', pageAuthor[to.name].includes(ut))
+      console.log(';pageAuthor[to.name]', !pageAuthor[to.name])
       if (!pageAuthor[to.name]) {
         // 没有权限要求，直接放行
         next()

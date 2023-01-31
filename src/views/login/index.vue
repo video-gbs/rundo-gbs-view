@@ -201,23 +201,22 @@ export default {
     handleLogin() {
       // this.$refs.loginForm.validate((valid) => {
       // if (valid) {
-      // this.loading = true
-      // login(this.loginForm)
-      //   .then((res) => {
-      //     if (res.code === 200) {
-
-      // const {  deptType,username, token } = res.data
-      Local.setToken(1)
-      Local.set('rj_token', 1)
-      Local.set('rj_deptType', 0)
-      Local.set('rj_userName', 222)
-      this.$router.push({ path: '/workTable' })
-      // this.loading = false
-      //   }
-      // })
-      // .catch(() => {
-      //   this.loading = false
-      // })
+      this.loading = true
+      login(this.loginForm)
+        .then((res) => {
+          if (res.code === 200) {
+            const { deptType, username, token } = res.data
+            Local.setToken(token)
+            Local.set('rj_token', token)
+            Local.set('rj_deptType', 0)
+            Local.set('rj_userName', username)
+            this.$router.push({ path: '/workTable' })
+            this.loading = false
+          }
+        })
+        .catch(() => {
+          this.loading = false
+        })
       //   } else {
       //     console.log("error submit!!");
       //     return false;
