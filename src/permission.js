@@ -32,7 +32,7 @@ router.beforeEach(async (to, from, next) => {
     next('/404')
   } else {
     if (hasToken) {
-      console.log(';pageAuthor[to.name]', !pageAuthor[to.name])
+      // console.log(';pageAuthor[to.name]', !pageAuthor[to.name])
       if (!pageAuthor[to.name]) {
         // 没有权限要求，直接放行
         next()

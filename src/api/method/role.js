@@ -65,3 +65,8 @@ export function getVideoAraeTree(params) {
   // 安防区域结构树
   return request.get('/videoArae/getTree', params)
 }
+
+export function getDepartmentTree(params) {
+  // 组织部门结构树
+  return request.get('/sysOrg/tree', params)
+}

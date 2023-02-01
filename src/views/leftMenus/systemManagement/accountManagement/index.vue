@@ -1,6 +1,6 @@
 <template>
   <div class="router_container4 m20 bg-w f fc-d ai-s">
-    <div class="panel-header-box f jc-sb ai-c fw-w">
+    <div class="panel-header-box">
       <div class="title-css">用户管理</div>
       <el-button size="mini" type="primary" @click="dialogShow(1)">
         新增

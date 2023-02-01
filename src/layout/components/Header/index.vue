@@ -113,7 +113,7 @@ export default {
     //     this.initNotice()
     //   }
     // })
-    this.userInfo.userName = localStorage.getItem('rj__userName') || '佚名用户'
+    this.userInfo.userName = localStorage.getItem('rj_userName') || '佚名用户'
     this.userInfo.userName = this.userInfo.userName
       .replace('"', '')
       .replace('"', '')

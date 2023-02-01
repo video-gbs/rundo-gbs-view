@@ -13,6 +13,8 @@
         class="tree"
         :props="defaultProps"
         :default-expanded-keys="['根节点']"
+        :expand-on-click-node="false"
+        @node-click="handleNodeClick"
       >
         <span slot-scope="{ node, data }" class="custom-tree-node">
           <span>
@@ -166,6 +168,7 @@ export default {
   methods: {
     handleNodeClick(data) {
       // data.icon = 'tree1'
+      this.$emit('childClickHandle', data)
     },
     handleNodeClose(data) {
       // data.icon = 'tree2'

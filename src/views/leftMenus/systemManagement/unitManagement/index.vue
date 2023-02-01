@@ -1,295 +1,366 @@
 <template>
-  <div class="router_container4 m20 bg-w f fc-d ai-s">
+  <div class="department_main">
     <div class="panel-header-box f jc-sb ai-c fw-w">
-      <div class="title-css">部门管理</div>
-      <div class="f jc-c ai-c">
-        <el-input
-          v-model="params.name"
-          clearable
-          class="mr10"
-          placeholder="请输入部门名称"
-        />
-        <el-select
-          v-model="params.deptType"
-          class="mr10"
-          placeholder="请选择部门类型"
-        >
-          <el-option
-            v-for="item in [...[{ id: '', label: '全部单位类型' }], ...types]"
-            :key="item.id"
-            :label="item.label"
-            :value="item.id"
-          />
-        </el-select>
-        <el-button size="mini" type="primary" @click="getUnitList"
-          >搜索</el-button
-        >
-        <el-button size="mini" type="primary" @click="dialogShow(1)"
-          >新增</el-button
-        >
-      </div>
+      <div>部门管理</div>
     </div>
-    <div class="p10 f1 f fd-c" style="overflow-y: auto">
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-        :height="'auto'"
-        :header-cell-style="{ background: '#EAEAEA' }"
-        size="small"
-        border
-      >
-        <el-table-column label="序号" type="index" width="60" />
-        <el-table-column prop="name" label="单位名称" />
-        <el-table-column prop="accountNum" label="账号数量">
-          <template slot-scope="scope">
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="点击查看单位账号"
-              placement="left"
-            >
-              <div
-                class="cursor-p fs12"
-                @click="
-                  goPage({
-                    name: 'OtherUnitManagement',
-                    params: { pid: scope.row.id }
-                  })
-                "
-              >
-                <span>{{ scope.row.accountNum }}</span>
-              </div>
-            </el-tooltip>
-          </template>
-        </el-table-column>
-        <el-table-column width="150" label="操作" fixed="right">
-          <template slot-scope="scope">
-            <el-button type="text" @click="dialogShow(0, scope.row)"
-              >编辑</el-button
-            >
-            <el-button type="text" @click="deleteUnit(scope.row)"
-              ><span>删除</span></el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-      <pagination
-        :pages-data="params"
-        @size-change="sizeChange"
-        @current-change="currentChange"
-      />
+    <div class="main-content">
+      <div class="securityArea_container">
+        <div class="btn-lists">
+          <el-button type="primary" @click="dialogShow()"
+            ><svg-icon class="svg-btn" icon-class="add" />新增</el-button
+          >
+          <el-button @click="dialogMoveShow()"
+            ><svg-icon class="svg-btn" icon-class="move" />移动</el-button
+          >
+          <el-button @click="deleteAccount(1)"
+            ><svg-icon class="svg-btn" icon-class="del" />删除</el-button
+          >
+        </div>
+        <leftTree :treeData="treeList" @childClickHandle="childClickHandle" />
+      </div>
+      <el-card class="right-box-card">
+        <div slot="header" class="clearfix">
+          <svg-icon icon-class="zzgl" class="tzgg_svg" />
+          <span>部门信息</span>
+        </div>
+
+        <el-form
+          ref="save"
+          :model="form"
+          :rules="rules"
+          label-position="right"
+          label-width="100px"
+          class="area-form"
+        >
+          <el-form-item label="部门信息" prop="orgName">
+            <div class="f fd-c mr30">
+              <el-input v-model="form.orgName" placeholder="6~20字符" />
+            </div>
+          </el-form-item>
+          <el-form-item label="部门负责人">
+            <div class="f fd-c mr30">
+              <el-input v-model="form.orgLeader" placeholder="6~20字符" />
+            </div>
+          </el-form-item>
+          <el-form-item label="手机号码">
+            <div class="f fd-c mr30">
+              <el-input v-model="form.phone" placeholder="6~20字符" />
+            </div>
+          </el-form-item>
+          <el-form-item label="描述">
+            <el-input v-model="form.description" type="textarea" />
+          </el-form-item>
+        </el-form>
+
+        <div class="dialog-footer">
+          <el-button type="primary" @click="save('savePasswordForm')"
+            ><svg-icon class="svg-btn" icon-class="save" />保 存</el-button
+          >
+        </div>
+      </el-card>
     </div>
     <el-dialog
+      v-if="editShow"
       :title="dialog.title"
       :visible.sync="dialog.show"
-      width="700px"
+      width="748px"
       :before-close="handleClose"
     >
+      <div slot="title" class="dialog-title">
+        <LineFont
+          :line-title="lineTitle"
+          :text-style="textStyle"
+          :line-blue-style="lineBlueStyle"
+        />
+      </div>
       <div>
         <el-form
-          ref="unitForm"
+          ref="accountForm"
           class="params-form"
-          size="mini"
-          label-position="left"
-          label-width="80px"
+          label-position="right"
+          label-width="120px"
           :model="dialog.params"
           :rules="rules"
-          @keyup.enter="submit('unitForm')"
+          @keyup.enter="submit('accountForm')"
         >
-          <el-form-item label="单位名称" prop="name">
-            <el-input
-              v-model="dialog.params.name"
-              placeholder="最多可输入40个字符"
-            />
-          </el-form-item>
-          <el-form-item label="单位分类" prop="deptType">
+          <el-form-item label="上级部门" prop="orgPid">
             <el-select
-              v-model="dialog.params.deptType"
-              placeholder="请选择分类"
+              v-model="dialog.params.orgPid"
+              placeholder="请选择"
+              :popper-append-to-body="false"
+              ref="selectTree"
+              style="width: 272px"
             >
-              <el-option
-                v-for="i in types"
-                :key="i.id"
-                :label="i.label"
-                :value="i.id"
-              />
+              <el-option :value="List">
+                <el-tree
+                  class="unit-tree"
+                  :data="treeList"
+                  node-key="id"
+                  :props="defaultProps"
+                  :default-expanded-keys="Ids"
+                  ref="tree"
+                  highlight-current
+                  :expand-on-click-node="false"
+                  @node-click="nodeClickHandle"
+                >
+                </el-tree>
+              </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="单位描述" prop="detail">
+
+          <el-form-item label="部门名称">
             <el-input
-              v-model="dialog.params.detail"
-              type="textarea"
-              :rows="2"
-              placeholder="最多可输入4000个字符"
+              v-model="dialog.params.orgName"
+              placeholder="最多40个字符"
             />
+          </el-form-item>
+
+          <el-form-item label="部门负责人">
+            <el-input
+              v-model="dialog.params.orgLeader"
+              placeholder="最多40个字符"
+            />
+          </el-form-item>
+
+          <el-form-item label="手机号码">
+            <el-input
+              v-model="dialog.params.phone"
+              placeholder="最多40个字符"
+            />
+          </el-form-item>
+
+          <el-form-item label="描述">
+            <el-input v-model="dialog.params.description" type="textarea" />
           </el-form-item>
         </el-form>
       </div>
-      <span slot="footer" class="dialog-footer">
+      <div slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="submit('unitForm')">确 定</el-button>
-      </span>
+        <el-button type="primary" @click="submit('accountForm')"
+          >确 定</el-button
+        >
+      </div>
     </el-dialog>
+
+    <moveTree :moveShow="moveShow" :treeData="treeList" />
   </div>
 </template>
 
 <script>
 import pagination from '@/components/Pagination/index.vue'
+import selectTree from './components/SelectTree'
+import moveTree from './components/MoveTree'
 import {
   unitAdd,
   unitEdit,
   unitList,
-  unitDelete
+  unitDelete,
+  getUnitDetails
 } from '@/api/method/unitManagement'
 import { Local } from '@/utils/storage'
+import leftTree from '../components/leftTree'
+import LineFont from '@/components/LineFont'
+
+import { getDepartmentTree } from '@/api/method/role'
+
+// import TreeSelect from '@riophae/vue-treeselect'
+// import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 export default {
   name: '',
-  components: { pagination },
+  components: { pagination, leftTree, LineFont, selectTree, moveTree },
   data() {
     return {
-      search: {
-        userName: '',
-        phone: '',
-        time: ''
+      lineTitle: {
+        title: '新建分组',
+        notShowSmallTitle: false
       },
-      params: {
-        current: 1,
-        size: 10,
-        deptType: '',
-        name: '',
-        total: 0
+      textStyle: {
+        fontSize: '18px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#333333'
       },
-      tableData: [],
+      lineBlueStyle: {
+        background: 'rgba(30, 86, 160, 1)',
+        width: '3px',
+        height: '18px'
+      },
       dialog: {
         show: false,
-        title: '新增用户',
+        title: '新建部门',
         params: {
-          name: '',
-          deptType: '',
-          detail: ''
+          orgPid: '',
+          description: '',
+          orgLeader: '',
+          orgName: '',
+          phone: ''
         }
       },
-      types: [
-        { id: 1, label: '市领导' },
-        { id: 2, label: '市级单位' },
-        { id: 3, label: '县市区' },
-        { id: 4, label: '其他' }
-      ],
-      state: [
-        { id: 1, label: '启用' },
-        { id: 0, label: '禁用' }
-      ],
-      passwordLevel: 0,
-      editId: '',
-      headers: {
-        Authorization: Local.getToken()
+      editShow: false,
+      form: {
+        orgName: '',
+        description: '',
+        phone: '',
+        orgLeader: ''
       },
       rules: {
-        name: [
-          { required: true, message: '不能为空', trigger: 'blur' },
-          {
-            max: 40,
-            message: '40个字符',
-            trigger: 'blur'
-          }
-        ],
-        deptType: {
+        orgName: {
+          required: true,
+          message: '不能为空',
+          trigger: 'blur',
+          max: 20
+        },
+        orgPid: {
           required: true,
           message: '不能为空',
           trigger: 'change'
         },
-        detail: {
+        fzmc: {
           required: true,
           message: '不能为空',
           trigger: 'blur',
           max: 40
         }
-      }
+      },
+      treeData: [],
+      treeList: [],
+      List: '',
+      Ids: [],
+      Id: '',
+      defaultProps: {
+        children: 'children',
+        label: 'orgName'
+      },
+      detailsId: '',
+      moveShow: false
+    }
+  },
+  watch: {
+    form(val) {
+      console.log(1111, val)
+      //  this.form=val
     }
   },
   mounted() {
-    this.getUnitList()
+    this.init()
   },
   methods: {
-    sizeChange(v) {
-      this.params.size = v
-      this.getUnitList()
-    },
-    currentChange(v) {
-      this.params.current = v
-      this.getUnitList()
-    },
-    goPage(path, query) {
-      this.$router.push(path)
-    },
-    dialogShow(act, data) {
-      this.dialog.title = act ? '新增单位' : '编辑单位'
-      this.dialog.show = !this.dialog.show
-      if (act === 0) {
-        const { name, deptType, detail } = data
-        this.dialog.params.name = name
-        this.dialog.params.deptType = deptType
-        this.dialog.params.detail = detail
-        this.editId = data.id
-      }
+    // 点击节点选中
+    nodeClickHandle(data) {
+      this.dialog.params.orgPid = data.orgName
+      this.Id = data.id
+      this.$refs.selectTree.blur()
     },
 
-    getUnitList() {
-      unitList(this.params).then((res) => {
-        if (res.code === 10000) {
-          this.tableData = res.data.records
-          this.params.total = res.data.total
-          // this.params.pages = res.data.pages
-          // this.params.current = res.data.current
+    childClickHandle(data) {
+      this.detailsId = data.id
+      this.getUnitDetailsData()
+    },
+    getUnitDetailsData() {
+      getUnitDetails(this.detailsId).then((res) => {
+        if (res.code === 200) {
+          // Object.keys(res.data).forEach((key) => {
+          //   this.form[key] = res.data[key] || this.form[key]
+          // })
+          this.form.orgName = res.data.orgName
+          this.form.description = res.data.description
+          this.form.phone = res.data.phone
+          this.form.orgLeader = res.data.orgLeader
         }
       })
     },
-    deleteUnit(row) {
+    async init() {
+      await getDepartmentTree()
+        .then((res) => {
+          if (res.code === 200) {
+            this.treeList = res.data
+            this.detailsId = res.data[0].id
+            this.getUnitDetailsData()
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    handleClose(done) {
+      done()
+    },
+    dialogShow() {
+      ;(this.dialog.params = {
+        orgPid: '',
+        description: '',
+        orgLeader: '',
+        orgName: '',
+        phone: ''
+      }),
+        (this.editShow = true)
+
+      this.dialog.show = !this.dialog.show
+    },
+    dialogMoveShow() {
+      this.moveShow = !this.moveShow
+    },
+    save() {
+      console.log('bianj', this.form)
+      unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
+        if (res.code === 200) {
+          this.$message({
+            type: 'success',
+            message: '编辑成功'
+          })
+          this.init()
+          this.getUnitDetailsData()
+        }
+      })
+    },
+    deleteAccount(row) {
       this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        unitDelete(row.id).then((res) => {
-          if (res.code === 10000) {
+        unitDelete(this.detailsId).then((res) => {
+          if (res.code === 200) {
             this.$message({
               type: 'success',
               message: '删除成功'
             })
-            this.params.current = 1
-            this.getUnitList()
+            this.init()
+            this.detailsId = this.treeList[0].id
+            this.getUnitDetailsData()
           }
         })
       })
     },
-
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
-            case '新增单位':
+            case '新建部门':
+              this.dialog.params.orgPid = this.Id
               unitAdd(this.dialog.params).then((res) => {
-                if (res.code === 10000) {
+                if (res.code === 200) {
                   this.$message({
                     type: 'success',
-                    message: '单位新增成功'
+                    message: '新建成功'
                   })
+
                   this.dialog.show = false
-                  this.getUnitList()
+                  this.detailsId = res.data.id
+                  this.init()
+                  this.getUnitDetailsData()
+                  // this.getList()
                 }
               })
               break
-            case '编辑单位':
-              unitEdit({ id: this.editId, ...this.dialog.params }).then(
+            case '编辑':
+              editApplication({ id: this.editId, ...this.dialog.params }).then(
                 (res) => {
-                  if (res.code === 10000) {
-                    this.$message({
-                      type: 'success',
-                      message: '单位修改成功'
-                    })
+                  if (res.code === 200) {
+                    this.$message.success('编辑成功')
                     this.dialog.show = false
-                    this.getUnitList()
+                    this.getList()
                   }
                 }
               )
@@ -300,9 +371,6 @@ export default {
           }
         }
       })
-    },
-    handleClose(done) {
-      done()
     }
   }
 }
@@ -310,47 +378,129 @@ export default {
 
 <style lang="scss" scoped>
 ::v-deep .el-dialog__header {
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: 1px solid rgba(234, 234, 234, 1);
+  padding: 0 20px;
 }
 ::v-deep .el-dialog__footer {
-  border-top: 1px solid #eaeaea;
+  padding: 0;
 }
-.params-form {
-  .el-input,
-  .el-select {
-    width: 240px;
-    margin-right: 30px;
+// ::v-deep .el-select-dropdown__item {
+//   background-color: #fff !important;
+//   padding: 0;
+//   margin: 0 20px;
+// }
+.el-select-dropdown__item {
+  height: 200px !important;
+  min-width: 260px;
+  overflow-y: scroll !important;
+  background: #fff !important;
+}
+.el-select-dropdown__item .el-tree-node__label {
+  font-weight: normal;
+}
+.el-select-dropdown__item::-webkit-scrollbar {
+  width: 6px;
+  background-color: #f5f5f5;
+}
+
+.el-select-dropdown__item::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 6px;
+}
+.filterStyle {
+  padding: 5px 20px;
+  width: 260px;
+}
+
+.department_main {
+  .panel-header-box {
+    margin: 0;
+    padding: 0 20px;
+    border: 1px solid #eaeaea;
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    background: #ffffff;
+    box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }
-}
-.password-level-box {
-  height: 28px !important;
-  width: 100px;
-  .password-level {
-    height: 10px;
-    width: 100px;
-
-    > div {
-      height: inherit;
-      width: 33%;
-      border: 1px solid #eee;
-      margin-right: 5px;
-
-      &:last-child {
-        margin-right: 0px;
+  .main-content {
+    height: calc(100% - 0px);
+    display: flex;
+    justify-content: space-between;
+    .securityArea_container {
+      height: calc(100% - 40px);
+      width: 310px;
+      margin: 20px;
+      background: #ffffff;
+      box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+      .btn-lists {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 10px 0 10px;
+        .svg-btn {
+          position: relative;
+          top: 1px;
+          left: -4px;
+        }
+      }
+    }
+    .right-box-card {
+      width: 100%;
+      margin: 20px 20px 20px 0;
+      position: relative;
+      .dialog-footer {
+        width: 100%;
+        height: 52px;
+        line-height: 52px;
+        position: absolute;
+        bottom: 0;
+        right: 0px;
+        text-align: right;
+        border-top: 1px solid #eaeaea;
+        > .el-button {
+          margin-right: 20px;
+        }
+        .svg-btn {
+          position: relative;
+          top: 1px;
+          left: -4px;
+        }
       }
     }
   }
 }
-
-::v-deep .el-form-item__content {
-  // height: 28px;
-  display: flex;
-  align-items: center;
+.area-form {
+  .el-input {
+    width: 436px;
+  }
 }
-.delete-button {
-  color: red !important;
+.dialog-footer {
+  width: 100%;
+  height: 52px;
+  line-height: 52px;
+  position: relative;
+  bottom: 0;
+  right: 0px;
+  text-align: right;
+  border-top: 1px solid #eaeaea;
+  > .el-button {
+    margin-right: 20px;
+  }
+  .svg-btn {
+    position: relative;
+    top: 1px;
+    left: -4px;
+  }
 }
-.el-select {
-  width: 250px;
+::v-deep .el-textarea__inner {
+  width: 436px;
+  height: 300px;
+}
+.setstyle {
+  min-height: 200px;
+  padding: 0 !important;
+  margin: 0;
+  overflow: auto;
+  cursor: default !important;
 }
 </style>

@@ -63,7 +63,7 @@ export function addDictionary(params) {
 
 // 获取字典信息
 export function getDictionaryById(id) {
-  return request.get(`/sysDict/sysDict/getById/${id}`)
+  return request.get(`/sysDict/getById/${id}`)
 }
 
 // 删除
