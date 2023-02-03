@@ -71,7 +71,7 @@
 
 <script>
 import LineFont from '@/components/LineFont'
-import { moveDepart } from '@/api/method/unitManagement'
+import { moveDepart } from '@/api/method/securityArea'
 export default {
   name: '',
   components: { LineFont },
@@ -93,7 +93,7 @@ export default {
       defaultProps: {
         // 用于修改节点指定标签的属性值
         children: 'children',
-        label: 'orgName'
+        label: 'areaName'
       },
       lineTitle: {
         title: '移动位置',
@@ -120,7 +120,7 @@ export default {
     }
   },
   mounted() {
-    console.log(this.$props.treeData)
+    console.log(111111111111112222, this.$props.treeData)
   },
   methods: {
     handleClose(done) {
@@ -134,7 +134,7 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true
-      return data.orgName.indexOf(value) !== -1
+      return data.areaName.indexOf(value) !== -1
     },
 
     // 拖拽事件 参数依次为：被拖拽节点对应的 Node、结束拖拽时最后进入的节点、被拖拽节点的放置位置（before、after、inner）、event

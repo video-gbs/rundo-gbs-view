@@ -77,7 +77,33 @@ export function editDictionary(params) {
   return request.post('/sysDict/update', params)
 }
 
-// // 状态切换
-// export function changeStatus(params) {
-//   return request.post('/sysAppInfo/status/change', params)
-// }
+// 用户模块
+// 用户列表
+export function getUserLists(params) {
+  return request.post('/sysUserInfo/getListByPage', params)
+}
+
+// 删除
+export function deteleUser(id) {
+  return request.post(`/sysUserInfo/remove/${id}`)
+}
+
+// 批量删除
+export function deteleAllUser(params) {
+  return request.post('/sysUserInfo/batchRemove', params)
+}
+
+// 新增
+export function addUser(params) {
+  return request.post('/sysUserInfo/add', params)
+}
+
+// 编辑
+export function editUser(params) {
+  return request.post('/sysUserInfo/update', params)
+}
+
+// 用户状态切换
+export function changeUserStatus(params) {
+  return request.post('/sysUserInfo/status/change', params)
+}

@@ -12,7 +12,7 @@
           <el-button @click="dialogMoveShow()"
             ><svg-icon class="svg-btn" icon-class="move" />移动</el-button
           >
-          <el-button @click="deleteAccount(1)"
+          <el-button @click="deleteAccount()"
             ><svg-icon class="svg-btn" icon-class="del" />删除</el-button
           >
         </div>
@@ -85,10 +85,10 @@
         >
           <el-form-item label="上级部门" prop="orgPid">
             <el-select
+              ref="selectTree"
               v-model="dialog.params.orgPid"
               placeholder="请选择"
               :popper-append-to-body="false"
-              ref="selectTree"
               style="width: 272px"
             >
               <el-option :value="List">
@@ -142,13 +142,11 @@
       </div>
     </el-dialog>
 
-    <moveTree :moveShow="moveShow" :treeData="treeList" />
+    <moveTree :moveShow="moveShow" :treeData="treeList" @init="init" />
   </div>
 </template>
 
 <script>
-import pagination from '@/components/Pagination/index.vue'
-import selectTree from './components/SelectTree'
 import moveTree from './components/MoveTree'
 import {
   unitAdd,
@@ -168,7 +166,7 @@ import { getDepartmentTree } from '@/api/method/role'
 
 export default {
   name: '',
-  components: { pagination, leftTree, LineFont, selectTree, moveTree },
+  components: { leftTree, LineFont, moveTree },
   data() {
     return {
       lineTitle: {
@@ -270,12 +268,12 @@ export default {
         }
       })
     },
-    async init() {
+    async init(id) {
       await getDepartmentTree()
         .then((res) => {
           if (res.code === 200) {
             this.treeList = res.data
-            this.detailsId = res.data[0].id
+            this.detailsId = id ? id : res.data[0].id
             this.getUnitDetailsData()
           }
         })
@@ -302,19 +300,18 @@ export default {
       this.moveShow = !this.moveShow
     },
     save() {
-      console.log('bianj', this.form)
       unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
         if (res.code === 200) {
           this.$message({
             type: 'success',
             message: '编辑成功'
           })
-          this.init()
-          this.getUnitDetailsData()
+          this.init(res.data.id)
+          // this.getUnitDetailsData()
         }
       })
     },
-    deleteAccount(row) {
+    deleteAccount() {
       this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -348,9 +345,8 @@ export default {
 
                   this.dialog.show = false
                   this.detailsId = res.data.id
-                  this.init()
-                  this.getUnitDetailsData()
-                  // this.getList()
+                  this.init(this.detailsId)
+                  // this.getUnitDetailsData()
                 }
               })
               break
@@ -502,5 +498,14 @@ export default {
   margin: 0;
   overflow: auto;
   cursor: default !important;
+}
+// 去掉顶部线条
+.unit-tree {
+  & > .el-tree-node::after {
+    border-top: none;
+  }
+  & > .el-tree-node::before {
+    border-left: none;
+  }
 }
 </style>

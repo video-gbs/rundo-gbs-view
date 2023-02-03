@@ -59,7 +59,7 @@ const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/workTable',
+    redirect: '/login',
     children: [
       {
         path: '/workTable',
@@ -150,6 +150,17 @@ const constantRoutes = [
         component: () =>
           import('@/views/leftMenus/systemManagement/accountManagement/index'),
         meta: { title: '用户管理', icon: '' }
+      },
+      {
+        path: '/user/:type',
+        name: 'user',
+        component: () =>
+          import(
+            '@/views/leftMenus/systemManagement/accountManagement/components/userAdd.vue'
+          ),
+        author: superAdmin,
+        hidden: true,
+        meta: { title: '添加设备', icon: '' }
       },
       {
         path: '/roleManagement',

@@ -65,14 +65,6 @@
         <el-table-column prop="appDesc" label="应用简介" />
         <el-table-column prop="status" label="是否禁用">
           <template slot-scope="scope">
-            <!-- <span>{{
-              scope.row.status === 1
-                ? '启用'
-                : scope.row.status === 0
-                ? '禁用'
-                : '-'
-            }}</span> -->
-
             <el-switch
               v-model="scope.row.status"
               active-color="#13ce66"
@@ -346,10 +338,7 @@ export default {
       }
     },
     changeSwitch(row) {
-      console.log('rpw', row)
       let text = row.status === 0 ? '启用' : '停用'
-
-      console.log('text', text)
 
       this.$confirm('确认要"' + text + '""' + row.appName + '"吗?', '警告', {
         confirmButtonText: '确定',
@@ -470,7 +459,7 @@ export default {
         type: 'warning'
       }).then(() => {
         deleteApplication(row.id).then((res) => {
-          if (res.code === 10000) {
+          if (res.code === 200) {
             this.$message({
               type: 'success',
               message: '删除成功'

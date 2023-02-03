@@ -9,14 +9,14 @@
           <el-button type="primary" @click="dialogShow()"
             ><svg-icon class="svg-btn" icon-class="add" />新增</el-button
           >
-          <el-button
+          <el-button @click="dialogMoveShow()"
             ><svg-icon class="svg-btn" icon-class="move" />移动</el-button
           >
-          <el-button @click="deleteAccount(1)"
+          <el-button @click="deleteAccount()"
             ><svg-icon class="svg-btn" icon-class="del" />删除</el-button
           >
         </div>
-        <leftTree :treeData="treeData" />
+        <leftTree :treeData="treeList" @childClickHandle="childClickHandle" />
       </div>
       <el-card class="right-box-card">
         <div slot="header" class="clearfix">
@@ -32,13 +32,13 @@
           label-width="100px"
           class="area-form"
         >
-          <el-form-item label="分组名称" prop="name">
+          <el-form-item label="分组名称" prop="areaName">
             <div class="f fd-c mr30">
-              <el-input v-model="form.name" placeholder="6~20字符" />
+              <el-input v-model="form.areaName" placeholder="6~20字符" />
             </div>
           </el-form-item>
           <el-form-item label="描述">
-            <el-input v-model="form.inputValue" type="textarea" />
+            <el-input v-model="form.description" type="textarea" />
           </el-form-item>
         </el-form>
 
@@ -74,23 +74,40 @@
           :rules="rules"
           @keyup.enter="submit('accountForm')"
         >
-          <el-form-item label="上级分组" prop="sjfz">
-            <el-select v-model="dialog.params.sjfz" placeholder="请选择">
-              <el-option
-                v-for="i in types"
-                :key="i.id"
-                :label="i.label"
-                :value="i.id"
-              />
+          <el-form-item label="上级分组" prop="areaPid">
+            <el-select
+              ref="selectTree"
+              v-model="dialog.params.areaPid"
+              placeholder="请选择"
+              :popper-append-to-body="false"
+              style="width: 272px"
+            >
+              <el-option :value="List">
+                <el-tree
+                  class="unit-tree"
+                  :data="treeList"
+                  node-key="id"
+                  :props="defaultProps"
+                  :default-expanded-keys="Ids"
+                  ref="tree"
+                  highlight-current
+                  :expand-on-click-node="false"
+                  @node-click="nodeClickHandle"
+                >
+                </el-tree>
+              </el-option>
             </el-select>
           </el-form-item>
 
-          <el-form-item label="分组名称" prop="fzmc">
-            <el-input v-model="dialog.params.fzmc" placeholder="最多40个字符" />
+          <el-form-item label="分组名称" prop="areaName">
+            <el-input
+              v-model="dialog.params.areaName"
+              placeholder="最多40个字符"
+            />
           </el-form-item>
 
           <el-form-item label="描述">
-            <el-input v-model="dialog.description" type="textarea" />
+            <el-input v-model="dialog.params.description" type="textarea" />
           </el-form-item>
         </el-form>
       </div>
@@ -101,26 +118,29 @@
         >
       </div>
     </el-dialog>
+    <moveTree :moveShow="moveShow" :treeData="treeList" @init="init" />
   </div>
 </template>
 
 <script>
 import leftTree from '../components/leftTree'
 import LineFont from '@/components/LineFont'
-
+import moveTree from './components/MoveTree'
 import { getVideoAraeTree } from '@/api/method/role'
+
+import {
+  unitAdd,
+  unitEdit,
+  unitList,
+  unitDelete,
+  getUnitDetails
+} from '@/api/method/securityArea'
 
 export default {
   name: '',
-  components: { leftTree, LineFont },
+  components: { leftTree, LineFont, moveTree },
   data() {
     return {
-      types: [
-        { id: 1, label: '市领导' },
-        { id: 2, label: '市级单位' },
-        { id: 3, label: '县市区' },
-        { id: 4, label: '其他' }
-      ],
       lineTitle: {
         title: '新建分组',
         notShowSmallTitle: false
@@ -138,22 +158,26 @@ export default {
       },
       dialog: {
         show: false,
-        title: '新建分组',
-        params: {}
+        title: '新建部门',
+        params: {
+          areaPid: '',
+          description: '',
+          areaName: ''
+        }
       },
       editShow: false,
       form: {
-        name: '',
-        inputValue: ''
+        areaName: '',
+        description: ''
       },
       rules: {
-        name: {
+        areaName: {
           required: true,
           message: '不能为空',
           trigger: 'blur',
           max: 20
         },
-        sjfz: {
+        areaPid: {
           required: true,
           message: '不能为空',
           trigger: 'change'
@@ -165,34 +189,147 @@ export default {
           max: 40
         }
       },
-      treeData: []
+      treeList: [],
+      List: '',
+      Ids: [],
+      Id: '',
+      defaultProps: {
+        children: 'children',
+        label: 'areaName'
+      },
+      detailsId: '',
+      moveShow: false
+    }
+  },
+  watch: {
+    form(val) {
+      console.log(1111, val)
+      //  this.form=val
     }
   },
   mounted() {
     this.init()
   },
   methods: {
-    init() {
-      getVideoAraeTree({ id: 1 }).then((res) => {
+    // 点击节点选中
+    nodeClickHandle(data) {
+      this.dialog.params.areaPid = data.areaName
+      this.Id = data.id
+      this.$refs.selectTree.blur()
+    },
+
+    childClickHandle(data) {
+      this.detailsId = data.id
+      this.getUnitDetailsData()
+    },
+    getUnitDetailsData() {
+      getUnitDetails(this.detailsId).then((res) => {
         if (res.code === 200) {
-          this.treeData = res.data
+          // Object.keys(res.data).forEach((key) => {
+          //   this.form[key] = res.data[key] || this.form[key]
+          // })
+          this.form.areaName = res.data.areaName
+          this.form.description = res.data.description
         }
       })
+    },
+    async init(id) {
+      await getVideoAraeTree()
+        .then((res) => {
+          if (res.code === 200) {
+            this.treeList = res.data
+            this.detailsId = id ? id : res.data[0].id
+            this.getUnitDetailsData()
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
     handleClose(done) {
       done()
     },
     dialogShow() {
-      this.editShow = true
+      ;(this.dialog.params = {
+        areaPid: '',
+        description: '',
+        areaName: ''
+      }),
+        (this.editShow = true)
+
       this.dialog.show = !this.dialog.show
     },
-    save() {},
-    deleteAccount(row) {
+    dialogMoveShow() {
+      this.moveShow = !this.moveShow
+    },
+    save() {
+      unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
+        if (res.code === 200) {
+          this.$message({
+            type: 'success',
+            message: '编辑成功'
+          })
+          this.init(res.data.id)
+          // this.getUnitDetailsData()
+        }
+      })
+    },
+    deleteAccount() {
       this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {})
+      }).then(() => {
+        unitDelete(this.detailsId).then((res) => {
+          if (res.code === 200) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.init()
+            this.detailsId = this.treeList[0].id
+            this.getUnitDetailsData()
+          }
+        })
+      })
+    },
+    submit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          switch (this.dialog.title) {
+            case '新建部门':
+              this.dialog.params.areaPid = this.Id
+              unitAdd(this.dialog.params).then((res) => {
+                if (res.code === 200) {
+                  this.$message({
+                    type: 'success',
+                    message: '新建成功'
+                  })
+
+                  this.dialog.show = false
+                  this.detailsId = res.data.id
+                  this.init(this.detailsId)
+                  // this.getUnitDetailsData()
+                }
+              })
+              break
+            case '编辑':
+              editApplication({ id: this.editId, ...this.dialog.params }).then(
+                (res) => {
+                  if (res.code === 200) {
+                    this.$message.success('编辑成功')
+                    this.dialog.show = false
+                    this.getList()
+                  }
+                }
+              )
+              break
+
+            default:
+              break
+          }
+        }
+      })
     }
   }
 }
@@ -205,6 +342,12 @@ export default {
 }
 ::v-deep .el-dialog__footer {
   padding: 0;
+}
+.el-select-dropdown__item {
+  height: 200px !important;
+  min-width: 260px;
+  overflow-y: scroll !important;
+  background: #fff !important;
 }
 
 .main {
@@ -290,5 +433,22 @@ export default {
 ::v-deep .el-textarea__inner {
   width: 436px;
   height: 300px;
+}
+
+.setstyle {
+  min-height: 200px;
+  padding: 0 !important;
+  margin: 0;
+  overflow: auto;
+  cursor: default !important;
+}
+// 去掉顶部线条
+.unit-tree {
+  & > .el-tree-node::after {
+    border-top: none;
+  }
+  & > .el-tree-node::before {
+    border-left: none;
+  }
 }
 </style>

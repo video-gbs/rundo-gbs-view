@@ -4,6 +4,8 @@
       placeholder="请输入搜索关键字"
       suffix-icon="el-icon-search"
       class="search-input"
+      v-model="filterText"
+      clearable
     ></el-input>
     <div class="operation_box">
       <el-tree
@@ -12,9 +14,11 @@
         node-key="orgName"
         class="tree"
         :props="defaultProps"
+        default-expand-all
         :default-expanded-keys="['根节点']"
         :expand-on-click-node="false"
         @node-click="handleNodeClick"
+        :filter-node-method="filterNode"
       >
         <span slot-scope="{ node, data }" class="custom-tree-node">
           <span>
@@ -151,7 +155,8 @@ export default {
         // 用于修改节点指定标签的属性值
         children: 'children',
         label: 'orgName'
-      }
+      },
+      filterText: ''
     }
   },
   props: {
@@ -160,6 +165,11 @@ export default {
       default: function () {
         return []
       }
+    }
+  },
+  watch: {
+    filterText(val) {
+      this.$refs.tree.filter(val)
     }
   },
   mounted() {
@@ -172,6 +182,10 @@ export default {
     },
     handleNodeClose(data) {
       // data.icon = 'tree2'
+    },
+    filterNode(value, data) {
+      if (!value) return true
+      return data.orgName.indexOf(value) !== -1
     }
     // init() {
     //   getSysOrgTree({ id: 1 }).then((res) => {
