@@ -10,7 +10,7 @@
       >
         <el-form-item label="设备类型:">
           <el-select
-            v-model="searchParams.deptType"
+            v-model="searchParams.deviceType"
             class="mr10"
             placeholder="请选择"
           >
@@ -24,7 +24,7 @@
         </el-form-item>
         <el-form-item label="状态:">
           <el-select
-            v-model="searchParams.status"
+            v-model="searchParams.onlineState"
             class="mr10"
             placeholder="请选择"
           >
@@ -37,11 +37,11 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item style="margin-left: 60px">
+        <el-form-item label="ip地址:">
           <el-input
-            v-model="searchParams.name"
-            placeholder="请输入设备名称/设备编码/IP地址"
-            style="width: 240px"
+            v-model="searchParams.ip"
+            placeholder="请输入IP地址"
+            class="mr10"
           ></el-input>
         </el-form-item>
         <el-form-item style="float: right; margin-right: 20px">
@@ -61,12 +61,14 @@
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deleteAccount(1)"
+          <el-button @click="deteleAll()"
             ><svg-icon class="svg-btn" icon-class="del" />批量删除</el-button
           >
-
           <el-button @click="moveEquipment"
             ><svg-icon class="svg-btn" icon-class="move" />移动</el-button
+          >
+          <el-button @click="addEquipment"
+            ><svg-icon class="svg-btn" icon-class="move" />代注册列表</el-button
           >
           <el-button type="primary" @click="addEquipment"
             ><svg-icon class="svg-btn" icon-class="add" />新增</el-button
@@ -74,7 +76,7 @@
         </div>
       </div>
       <el-table
-        ref="encoder"
+        ref="encoderTable"
         class="table-content-bottom"
         :data="tableData"
         border
@@ -96,16 +98,22 @@
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          prop="coding"
-          label="设备编码"
+          prop="areaNames"
+          label="所属区域"
           :show-overflow-tooltip="true"
         />
-        <el-table-column prop="type" label="设备类型" width="80" />
+        <el-table-column
+          prop="deviceId"
+          label="国标编码"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column prop="deviceType" label="设备类型" width="80" />
         <el-table-column
           prop="ip"
           label="IP地址"
           :show-overflow-tooltip="true"
         />
+
         <el-table-column prop="port" label="端口" width="80" />
         <el-table-column prop="manufacturer" label="设备厂家" width="80" />
         <el-table-column prop="status" label="状态" width="80">
@@ -123,12 +131,12 @@
             >
           </template>
         </el-table-column>
-        <el-table-column width="240" label="操作" fixed="right" align="center">
+        <el-table-column width="120" label="操作" fixed="right" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editData(scope.row.id)"
+            <el-button type="text" @click="editData(scope.row)"
               >编辑
             </el-button>
-            <el-button type="text" @click="restart(scope.row.id)"
+            <!-- <el-button type="text" @click="restart(scope.row.id)"
               >重启
             </el-button>
             <el-button type="text" @click="synchronizationData(scope.row.id)"
@@ -136,8 +144,8 @@
             </el-button>
             <el-button type="text" @click="deploymentData(scope.row.id)"
               >布防
-            </el-button>
-            <el-button type="text" @click="deleteData(scope.row)"
+            </el-button> -->
+            <el-button type="text" @click="deleteEncoder(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -237,8 +245,13 @@
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          prop="coding"
-          label="设备编码"
+          prop="areaNames"
+          label="所属区域"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          prop="deviceId"
+          label="国标编码"
           :show-overflow-tooltip="true"
         />
         <el-table-column
@@ -270,9 +283,23 @@
 import pagination from '@/components/Pagination/index.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import LineFont from '@/components/LineFont'
+
+import {
+  getEncoderById,
+  deleteEncoders,
+  deleteEncoder,
+  moveEncoder
+} from '@/api/method/encoder'
+
 export default {
   name: '',
   components: { pagination, leftTree, LineFont },
+  props: {
+    detailsId: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       params: {
@@ -308,15 +335,19 @@ export default {
         inputValue: ''
       },
       searchParams: {
-        deptType: '',
-        name: '',
-        status: 1
+        deviceType: '',
+        ip: '',
+        onlineState: ''
       },
       query: {},
       optionsList: [
         {
-          label: 'ces',
-          value: 'ces'
+          label: '离线',
+          value: 0
+        },
+        {
+          label: '在线',
+          value: 1
         }
       ],
       checked: false,
@@ -331,132 +362,6 @@ export default {
           city: '广东省/广州市/珠海区/新竹街道…',
           manufacturer: '海康',
           status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 2
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 2
         }
       ],
       tableData: [
@@ -468,138 +373,31 @@ export default {
           port: 8000,
           manufacturer: '海康',
           status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 2
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 2
         }
       ]
     }
   },
-  mounted() {},
+  mounted() {
+    this.getList()
+  },
   methods: {
+    getList(orgId) {
+      // : '1620396812466147329'
+      getEncoderById({
+        pageNum: this.params.pageNum,
+        pageSize: this.params.pageSize,
+        videoAreaId: 1,
+        ...this.searchParams
+      }).then((res) => {
+        console.log('res', res)
+        if (res.code === 0) {
+          this.tableData = res.data.records
+          this.params.total = res.data.total
+          this.params.pages = res.data.pages
+          this.params.current = res.data.current
+        }
+      })
+    },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
     },
@@ -609,12 +407,60 @@ export default {
     synchronizationData() {
       this.$router.push(`/activeDiscovery/transfer`)
     },
-    editData() {},
+    editData(row) {
+      this.$router.push({
+        path: `/editEquipment`,
+        query: {
+          row: row
+        }
+      })
+    },
     restart() {},
     deploymentData() {
       this.dialogShow1 = true
     },
-    deleteData() {},
+    deteleAll(row) {
+      this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const roleIds = []
+        // console.log('this.$refs.encoderTable.selection',this.$refs)
+        this.$refs.encoderTable.selection.map((item) => {
+          roleIds.push(item.id)
+        })
+        console.log('roleIds', roleIds)
+        deleteEncoders(roleIds).then((res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.params.pageNum = 1
+            this.getList()
+          }
+        })
+      })
+    },
+    deleteEncoder(row) {
+      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteEncoder(row.id).then((res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.params.pageNum = 1
+            this.getList()
+          }
+        })
+      })
+    },
     cxData() {},
     addEquipment() {
       this.$router.push(`/addEquipment/add`)

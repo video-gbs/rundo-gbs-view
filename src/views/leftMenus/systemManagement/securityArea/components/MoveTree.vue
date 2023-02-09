@@ -119,9 +119,7 @@ export default {
       this.$refs.tree.filter(val)
     }
   },
-  mounted() {
-    console.log(111111111111112222, this.$props.treeData)
-  },
+  mounted() {},
   methods: {
     handleClose(done) {
       done()
@@ -166,14 +164,13 @@ export default {
       let id = draggingNode.data.id
       let orgPid = dropNode.data.id
       moveDepart({ id, orgPid }).then((res) => {
-        if (res.code === 200) {
+        if (res.code === 0) {
           this.$message({
             type: 'success',
             message: '移动成功'
           })
         }
         this.$emit('init')
-        //自行逻辑，可以加提示框message
         this.loading = false
       })
     }

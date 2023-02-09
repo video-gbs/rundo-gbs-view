@@ -154,7 +154,7 @@ export default {
       identifyCode: '',
       // identifyCodes: ['0','1','2','3'...'a','b','c'...'z'],
       loginForm: {
-        // adminsuper/123456
+        // admin/123456
         username: '',
         password: ''
         // code:''
@@ -204,7 +204,7 @@ export default {
       this.loading = true
       login(this.loginForm)
         .then((res) => {
-          if (res.code === 200) {
+          if (res.code === 0) {
             const { deptType, username, token } = res.data
             Local.setToken(token)
             Local.set('rj_token', token)

@@ -4,7 +4,7 @@
       <div>
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
-          >主动发现</span
+          >关联用户</span
         >
       </div>
     </div>
@@ -54,20 +54,28 @@
                 >
                 </el-table-column>
                 <el-table-column
-                  prop="name"
-                  label="设备名称"
+                  prop="userAccount"
+                  label="用户账号"
                   :show-overflow-tooltip="true"
                 />
                 <el-table-column
-                  prop="coding"
-                  label="设备编码"
+                  prop="userName"
+                  label="用户名称"
                   :show-overflow-tooltip="true"
                 />
+                <el-table-column prop="orgName;" label="所属部门" width="240" />
                 <el-table-column
-                  prop="manufacturer"
-                  label="所属设备"
-                  width="240"
-                />
+                  width="80"
+                  label="操作"
+                  fixed="right"
+                  align="center"
+                >
+                  <template slot-scope="scope">
+                    <el-button type="text" @click="viewRolesDetails(scope.row)"
+                      ><span class="delete-button">查看</span></el-button
+                    >
+                  </template>
+                </el-table-column>
               </el-table>
 
               <pagination
@@ -149,20 +157,16 @@
                 >
                 </el-table-column>
                 <el-table-column
-                  prop="name"
-                  label="设备名称"
+                  prop="userAccount"
+                  label="用户账号"
                   :show-overflow-tooltip="true"
                 />
                 <el-table-column
-                  prop="coding"
-                  label="设备编码"
+                  prop="userName"
+                  label="用户名称"
                   :show-overflow-tooltip="true"
                 />
-                <el-table-column
-                  prop="manufacturer"
-                  label="所属设备"
-                  width="240"
-                />
+                <el-table-column prop="orgName;" label="所属部门" width="240" />
               </el-table>
 
               <pagination
@@ -211,6 +215,8 @@ const defaultListQuery = {
 }
 import LineFont from '@/components/LineFont'
 import pagination from '@/components/Pagination/index.vue'
+
+import { getRelationSysUserInfoList } from '@/api/method/role'
 export default {
   name: '',
   components: { LineFont, pagination },
@@ -224,60 +230,6 @@ export default {
       },
       checked: false,
       tableData: [
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
         {
           name: '球机192.168……',
           coding: '4400000000111500…',
@@ -335,8 +287,35 @@ export default {
       checkedIDArray: []
     }
   },
-  mounted() {},
+  mounted() {
+    this.init()
+  },
   methods: {
+    async init() {
+      await getRelationSysUserInfoList({
+        current: this.params.pageNum,
+        pageSize: this.params.pageSize
+      })
+        .then((res) => {
+          if (res.code === 0) {
+            this.tableData = res.data.records
+            this.params.total = res.data.total
+            this.params.pages = res.data.pages
+            this.params.current = res.data.current
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    sizeChange(pageSize) {
+      this.params.pageSize = pageSize
+      this.init()
+    },
+    currentChange(proCount) {
+      this.params.proCount = proCount
+      this.init()
+    },
     goback() {
       this.$router.push({ path: '/equipment' })
     },
@@ -414,7 +393,8 @@ export default {
 ///
 
 .transferbox {
-  height: 600px;
+  max-height: 730px;
+  overflow-y: auto;
   width: 45%; //右边盒子的宽占比
   border: 1px solid#ebedf2;
   margin-top: 16px;
@@ -486,6 +466,7 @@ export default {
   display: block;
 }
 .activeDiscovery-content {
+  // height: 90%;
   .panel-header-box {
     margin: 0;
     padding: 0 20px;
@@ -511,6 +492,7 @@ export default {
   }
 
   .activeDiscovery-transfer {
+    height: 90%;
     margin: 20px 20px 0 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
@@ -521,11 +503,13 @@ export default {
   height: 52px;
   line-height: 52px;
   margin-top: 20px;
-  position: relative;
-  bottom: 0;
-  right: 0px;
+
+  position: absolute;
+  bottom: 15px;
+
+  right: 10px;
   text-align: right;
-  border-top: 1px solid #eaeaea;
+  // border-top: 1px solid #eaeaea;
   > .el-button {
     margin-right: 20px;
   }

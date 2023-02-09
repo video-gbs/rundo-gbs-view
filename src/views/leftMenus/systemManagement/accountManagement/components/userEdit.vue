@@ -2,8 +2,10 @@
   <div class="addequipment-content">
     <div class="panel-header-box">
       <div>
-        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" />
-        <span class="back-title">新建用户</span>
+        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
+          class="back-title"
+          >编辑用户</span
+        >
       </div>
     </div>
     <el-card class="box-card">
@@ -19,6 +21,7 @@
                 <el-input
                   v-model="form.userAccount"
                   style="width: 436px"
+                  disabled
                 ></el-input>
               </el-form-item>
             </el-col>
@@ -56,10 +59,12 @@
                   v-model="form.expiryDateStart"
                   type="datetime"
                   placeholder="开始日期"
+                  disabled
                   style="width: 436px"
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
-                ></el-date-picker>
+                >
+                </el-date-picker>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -83,7 +88,8 @@
                       highlight-current
                       :expand-on-click-node="false"
                       @node-click="nodeClickHandle"
-                    ></el-tree>
+                    >
+                    </el-tree>
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -99,7 +105,8 @@
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
                   style="width: 436px"
-                ></el-date-picker>
+                >
+                </el-date-picker>
               </el-form-item>
             </el-col>
             <!-- <el-col :span="12"></el-col> -->
@@ -178,17 +185,15 @@
               color: '#333333'
             }"
           >
-            <el-table-column
-              type="selection"
-              width="80"
-              align="center"
-            ></el-table-column>
+            <el-table-column type="selection" width="80" align="center">
+            </el-table-column>
             <el-table-column
               type="index"
               width="50"
               align="center"
               label="序号"
-            ></el-table-column>
+            >
+            </el-table-column>
             <el-table-column
               prop="roleName"
               label="角色名称"
@@ -212,12 +217,12 @@
           />
         </div>
         <div class="dialog-footer">
-          <el-button @click="goback()">
-            <svg-icon class="svg-btn" icon-class="back-svg" />返回
-          </el-button>
-          <el-button type="primary" @click="save()">
-            <svg-icon class="svg-btn" icon-class="save" />保存
-          </el-button>
+          <el-button @click="goback()"
+            ><svg-icon class="svg-btn" icon-class="back-svg" />返回</el-button
+          >
+          <el-button type="primary" @click="save()"
+            ><svg-icon class="svg-btn" icon-class="save" />保存</el-button
+          >
         </div>
       </div>
     </el-card>
@@ -226,9 +231,16 @@
 
 <script>
 import pagination from '@/components/Pagination/index.vue'
-import { getVideoAraeTree, getUserInfoList } from '@/api/method/role'
-import { addUser } from '@/api/method/user'
+import {
+  // getVideoAraeTree,
+  getUserInfoList,
+  getDepartmentTree
+} from '@/api/method/role'
+
+import { getEditRolesDetail, editUser } from '@/api/method/user'
+
 import moment from 'moment'
+import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { pagination },
@@ -246,7 +258,7 @@ export default {
       Id: '',
       defaultProps: {
         children: 'children',
-        label: 'areaName'
+        label: 'orgName'
       },
       form: {
         userAccount: '',
@@ -297,27 +309,12 @@ export default {
     }
   },
   mounted() {
-    ;(this.form = {
-      userAccount: '',
-      password: '',
-      userName: '',
-      rePassword: '',
-      expiryDateStart: '',
-      orgId: '',
-      expiryDateEnd: ''
-    }),
-      (this.form1 = {
-        address: '',
-        description: '',
-        phone: '',
-        jobNo: ''
-      }),
-      this.init()
+    this.init()
     this.getLists()
   },
   methods: {
-    async init(id) {
-      await getVideoAraeTree()
+    async init() {
+      await getDepartmentTree()
         .then((res) => {
           if (res.code === 0) {
             this.treeList = res.data
@@ -334,26 +331,64 @@ export default {
       })
         .then((res) => {
           if (res.code === 0) {
-            this.tableData = res.data.records
-            this.params.total = res.data.total
-            this.params.pages = res.data.pages
-            this.params.current = res.data.current
+            getEditRolesDetail(this.$route.params.type).then((res1) => {
+              if (res1.code === 0) {
+                const {
+                  address,
+                  description,
+                  expiryDateEnd,
+                  expiryDateStart,
+                  jobNo,
+                  id,
+                  password,
+                  phone,
+                  rePassword,
+                  roleIds,
+                  userAccount,
+                  userName,
+                  orgName,
+                  orgId
+                } = res1.data
+                this.form1.address = address
+                this.form1.description = description
+                this.form.expiryDateEnd = expiryDateEnd
+                this.form.expiryDateStart = expiryDateStart
+                this.form1.jobNo = jobNo
+                this.form.id = id
+                this.form.orgId = orgName
+                this.form.password = password
+                this.form1.phone = phone
+                this.form.rePassword = rePassword
+                this.form.roleIds = roleIds
+                this.form.userAccount = userAccount
+                this.form.userName = userName
+                this.Id = orgId
+
+                let arr = res.data.records
+                this.tableData = arr
+                this.params.total = res.data.total
+                this.params.pages = res.data.pages
+                this.params.current = res.data.current
+                arr.forEach((item) => {
+                  for (let j in this.form.roleIds) {
+                    //console.log(arr[j])
+                    if (item.id == this.form.roleIds[j]) {
+                      //把对应的数据回显的时候，勾选上
+                      this.$nextTick(() => {
+                        this.$refs.userTable.toggleRowSelection(item, true)
+                      })
+                      break
+                    }
+                  }
+                })
+              }
+            })
           }
         })
         .catch((error) => {
           console.log(error)
         })
     },
-    // handleSelectionChange(val) {
-    //   if (val.length > 1) {
-    //     val.map((item) => {
-    //       this.roleIds.push(item.id)
-    //     })
-
-    //     this.roleIds = [...new Set(this.roleIds)]
-    //     console.log('this.roleIds', this.roleIds)
-    //   }
-    // },
 
     handlePasswordCheck(password, rePassword) {
       if (!password) {
@@ -383,19 +418,15 @@ export default {
         }
         this.form.orgId = this.Id
         const roleIds = []
-        console.log(
-          'this.$refs.userTable.selection',
-          this.$refs.userTable.selection
-        )
+
         this.$refs.userTable.selection.map((item) => {
           roleIds.push(item.id)
         })
-        console.log('roleIds', roleIds)
-        addUser({ roleIds, ...this.form, ...this.form1 }).then((res) => {
+        editUser({ ...this.form, ...this.form1, roleIds }).then((res) => {
           if (res.code === 0) {
             this.$message({
               type: 'success',
-              message: '新建成功'
+              message: '编辑成功'
             })
             this.goback()
           }

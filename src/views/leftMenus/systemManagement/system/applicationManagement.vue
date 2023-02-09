@@ -315,7 +315,7 @@ export default {
   methods: {
     init() {
       getSysOrgTree({ id: 1 }).then((res) => {
-        if (res.code === 200) {
+        if (res.code === 0) {
           this.treeData = res.data
         }
       })
@@ -444,7 +444,7 @@ export default {
         pageSize: this.params.pageSize,
         ...this.searchParams
       }).then((res) => {
-        if (res.code === 200) {
+        if (res.code === 0) {
           this.tableData = res.data.records
           this.params.total = res.data.total
           this.params.pages = res.data.pages
@@ -459,7 +459,7 @@ export default {
         type: 'warning'
       }).then(() => {
         deleteApplication(row.id).then((res) => {
-          if (res.code === 200) {
+          if (res.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -476,7 +476,7 @@ export default {
           switch (this.dialog.title) {
             case '新建':
               addApplication(this.dialog.params).then((res) => {
-                if (res.code === 200) {
+                if (res.code === 0) {
                   this.$message({
                     type: 'success',
                     message: '新建成功'
@@ -489,7 +489,7 @@ export default {
             case '编辑':
               editApplication({ id: this.editId, ...this.dialog.params }).then(
                 (res) => {
-                  if (res.code === 200) {
+                  if (res.code === 0) {
                     this.$message.success('编辑成功')
                     this.dialog.show = false
                     this.getList()

@@ -18,9 +18,42 @@
         </router-link>
         <div class="menu-user">
           <div class="user-menu">
-            <svg-icon icon-class="user3" class="user" />
-            <span class="fs14 mr10">系统操作指南</span>
-            <span class="user-line" />
+            <!-- <svg-icon icon-class="user3" class="user" />
+            <span class="fs14 mr10">系统操作指南</span> -->
+
+            <el-dropdown class trigger="click">
+              <div class="user-info">
+                <svg-icon icon-class="management" class="management" />
+
+                <span class="user-line" />
+              </div>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item divided @click.native="logout">
+                  <span style="display: block"
+                    ><svg-icon
+                      icon-class="peizhi"
+                      class="management1"
+                    />配置管理</span
+                  >
+                </el-dropdown-item>
+                <el-dropdown-item divided @click.native="logout">
+                  <span style="display: block"
+                    ><svg-icon
+                      icon-class="yunwei"
+                      class="management1"
+                    />运维管理</span
+                  >
+                </el-dropdown-item>
+                <el-dropdown-item divided @click.native="logout">
+                  <span style="display: block"
+                    ><svg-icon
+                      icon-class="zhinan"
+                      class="management1"
+                    />系统操作指南</span
+                  >
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </div>
           <el-dropdown class trigger="click">
             <div class="user-info">
@@ -188,8 +221,11 @@ export default {
   z-index: 999;
   padding: 0 2rem;
   align-items: center;
+  opacity: 1;
   justify-content: space-between;
-  background-color: #1e56a0;
+  background-color: rgba(0, 49, 116, 1);
+  // background: rgba(0, 75, 173, 1);
+  box-shadow: 0px 3px 6px 1px rgba(51, 51, 51, 0.16);
   // box-shadow: 0px 3px 6px 1px rgba(51, 51, 51, 0.16);
   background-image: url('../../../assets/imgs/top-bg.png');
   background-repeat: no-repeat;
@@ -282,6 +318,14 @@ export default {
       font-size: 0.5rem;
       margin-left: 20px;
       position: relative;
+      .management {
+        width: 1rem;
+        height: 1rem;
+        margin-right: 1rem;
+        position: absolute;
+        top: 0;
+        left: -1.5rem;
+      }
       .user {
         width: 2rem;
         height: 2rem;
@@ -343,5 +387,13 @@ export default {
   .put-away {
     font-size: 32px;
   }
+}
+.management1 {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 1rem;
+  // position: absolute;
+  // top: 0;
+  // left: -1.5rem;
 }
 </style>

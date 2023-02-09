@@ -1,6 +1,12 @@
 'use strict'
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
+// 本地环境
+// const devEnv = require('')
+// // 测试环境
+// const defaultSettings = require('')
+// 生产环境
+// const proEnv = require('')
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -13,17 +19,17 @@ const name = defaultSettings.title || '后台管理系统' // page title
 // For example, Mac: sudo npm run
 // You can change the port by the following methods:
 // port = 9528 npm run dev OR npm run dev --port = 9528
-const port = process.env.port || process.env.npm_config_port || 9528 // dev port
+const port = process.env.port || process.env.npm_config_port || 8080 // dev port
 
 // 转发配置数组
 const urls = [
   // 本地
-  // {
-  //   target: 'http://221.7.133.178:8111',
-  //   proxy: '/dev-api'
-  // }
   {
-    target: 'http://192.168.0.63:7821',
+    target: 'http://192.168.0.73:8090',
+    proxy: '/expansion'
+  },
+  {
+    target: 'http://124.71.21.11:7821',
     proxy: '/rundoAuthServer'
   }
 ]
@@ -40,11 +46,12 @@ function getProxys() {
         target: item.target,
         changeOrigin: true,
         pathRewrite: {
-          [`^` + item.proxy]: '/'
+          [`^` + item.proxy]: ''
         }
       }
     }
   })
+  console.log('proxys',proxys)
   return proxys
 }
 
@@ -57,10 +64,11 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: '/',
+  // publicPath: '/',
+  publicPath: process.env.NODE_ENV === "production" ? "./" : "/portal/",
   outputDir: 'dist',
   assetsDir: 'static',
-  lintOnSave: process.env.NODE_ENV === 'development',
+  lintOnSave: false,
   productionSourceMap: false,
   devServer: {
     port: port,

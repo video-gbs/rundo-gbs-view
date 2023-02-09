@@ -51,6 +51,7 @@ const methods = {
         }
       }
     }
+    console.log('Object.is', _params, params)
     // return request.service.delete(`${url}${_params}`)
     return request({
       method: 'DELETE',

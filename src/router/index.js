@@ -97,6 +97,17 @@ const constantRoutes = [
         meta: { title: '添加设备', icon: '' }
       },
       {
+        path: '/editEquipment',
+        name: 'editEquipment',
+        component: () =>
+          import(
+            '@/views/leftMenus/resourceManagement/components/EditEquipment.vue'
+          ),
+        author: superAdmin,
+        hidden: true,
+        meta: { title: '编辑设备', icon: '' }
+      },
+      {
         path: '/activeDiscovery/:type',
         name: 'activeDiscovery',
         component: () =>
@@ -160,7 +171,18 @@ const constantRoutes = [
           ),
         author: superAdmin,
         hidden: true,
-        meta: { title: '添加设备', icon: '' }
+        meta: { title: '新增用户', icon: '' }
+      },
+      {
+        path: '/editUser/:type',
+        name: 'editUser',
+        component: () =>
+          import(
+            '@/views/leftMenus/systemManagement/accountManagement/components/userEdit.vue'
+          ),
+        author: superAdmin,
+        hidden: true,
+        meta: { title: '编辑用户', icon: '' }
       },
       {
         path: '/roleManagement',

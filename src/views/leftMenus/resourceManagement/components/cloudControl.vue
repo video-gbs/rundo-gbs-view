@@ -339,11 +339,19 @@ export default {
     }
   }
 }
-.el-select-dropdown__item {
-  line-height: 24px;
-  font-family: PingFangSC-Regular, PingFang SC;
-  overflow: hidden;
+.selectTree {
+  .el-select-dropdown__item {
+    height: 200px !important;
+    min-width: 260px;
+    overflow-y: scroll !important;
+    background: #fff !important;
+  }
 }
+// .el-select-dropdown__item {
+//   line-height: 24px;
+//   font-family: PingFangSC-Regular, PingFang SC;
+//   overflow: hidden;
+// }
 .position-preset-middle .el-button--primary {
   height: 32px;
   font-size: 14px;

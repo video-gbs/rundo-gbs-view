@@ -99,7 +99,7 @@
         </el-table-column>
         <el-table-column width="120" label="操作" fixed="right" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editData(scope.row.id)"
+            <el-button type="text" @click="editEquipment(scope.row)"
               >编辑
             </el-button>
             <el-button type="text" @click="deleteUser(scope.row)"
@@ -115,7 +115,7 @@
       />
     </div>
 
-    <el-dialog title="移动位置" :visible.sync="dialogShow" width="30%">
+    <!-- <el-dialog title="移动位置" :visible.sync="dialogShow" width="30%">
       <div slot="title" class="dialog-title">
         <LineFont
           :line-title="lineTitle"
@@ -134,7 +134,7 @@
         </el-form-item>
       </el-form>
       <div class="securityArea_container">
-        <leftTree :treeData="treeList" @childClickHandle="childClickHandle" />
+        <leftTree :treeData="treeData" @childClickHandle="childClickHandle" />
       </div>
 
       <div class="dialog-footer">
@@ -227,7 +227,7 @@
           ><svg-icon class="svg-btn" icon-class="save" />确认</el-button
         >
       </div>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -243,7 +243,6 @@ import {
   changeUserStatus,
   deteleAllUser
 } from '@/api/method/user'
-import { getDepartmentTree } from '@/api/method/role'
 
 export default {
   name: '',
@@ -442,151 +441,23 @@ export default {
           port: 8000,
           manufacturer: '海康',
           status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 2
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 2
         }
       ],
       tableData1: [],
-      orgId: ''
+      orgId: '',
+      editRolesDetail: []
     }
   },
-  mounted() {
-    // this.getList()
-  },
+  mounted() {},
   methods: {
     getList(orgId) {
-      // : '1620396812466147329'
       getUserLists({
         current: this.params.pageNum,
         pageSize: this.params.pageSize,
         orgId,
         ...this.searchParams
       }).then((res) => {
-        if (res.code === 200) {
+        if (res.code === 0) {
           this.tableData1 = res.data.records
           this.params.total = res.data.total
           this.params.pages = res.data.pages
@@ -603,6 +474,13 @@ export default {
     saveId(id) {
       this.orgId = id
     },
+    // editEquipment(row) {
+    //   getEditRolesDetail(row.id).then((res) => {
+    //     if (res.code === 0) {
+    //       this.editRolesDetail=res.data
+    //     }
+    //   })
+    // },
     deleteUser(row) {
       this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
         confirmButtonText: '确定',
@@ -610,7 +488,7 @@ export default {
         type: 'warning'
       }).then(() => {
         deteleUser(row.id).then((res) => {
-          if (res.code === 200) {
+          if (res.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -621,7 +499,7 @@ export default {
         })
       })
     },
-    deteleAll(row) {
+    deteleAll() {
       this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -633,7 +511,7 @@ export default {
           roleIds.push(item.id)
         })
         deteleAllUser(roleIds).then((res) => {
-          if (res.code === 200) {
+          if (res.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -646,9 +524,11 @@ export default {
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
+      this.getList()
     },
     currentChange(proCount) {
       this.params.proCount = proCount
+      this.getList()
     },
     synchronizationData() {
       this.$router.push(`/activeDiscovery/transfer`)
@@ -661,6 +541,9 @@ export default {
     },
     addEquipment() {
       this.$router.push(`/user/add`)
+    },
+    editEquipment(row) {
+      this.$router.push(`/editUser/${row.id}`)
     },
     changeSwitch(row) {
       let text = row.status === 0 ? '启用' : '停用'

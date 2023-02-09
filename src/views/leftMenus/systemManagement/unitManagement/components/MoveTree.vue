@@ -166,7 +166,7 @@ export default {
       let id = draggingNode.data.id
       let orgPid = dropNode.data.id
       moveDepart({ id, orgPid }).then((res) => {
-        if (res.code === 200) {
+        if (res.code === 0) {
           this.$message({
             type: 'success',
             message: '移动成功'

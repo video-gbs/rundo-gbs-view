@@ -15,9 +15,10 @@
 </template>
 
 <script>
-import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
+import leftTree from '@/views/leftMenus/systemManagement/components/leftTree'
 import Encoder from './components/Encoder.vue'
 import { getDepartmentTree } from '@/api/method/role'
+import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { leftTree, Encoder },
@@ -35,12 +36,15 @@ export default {
   },
   methods: {
     handleClick(val, event) {},
-    async init(id) {
+    async init() {
       await getDepartmentTree()
         .then((res) => {
-          if (res.code === 200) {
+          if (res.code === 0) {
             this.treeData = res.data
-            this.$refs.encoder.getList(res.data[0].id)
+            const resId = Local.get('treeId')
+              ? Local.get('treeId')
+              : res.data[0].id
+            this.$refs.encoder.getList(resId)
           }
         })
         .catch((error) => {
@@ -49,6 +53,8 @@ export default {
     },
     childClickHandle(data) {
       this.$refs.encoder.saveId(data.id)
+
+      Local.set('treeId', data.id)
       this.$refs.encoder.getList(data.id)
     }
   }

@@ -38,11 +38,11 @@
             @click="goContentList"
           >
             <div class="top-li-div" :style="bacImage(item1, index1)"></div>
-            <span class="top-li-span">{{ item1.name }}</span>
+            <span class="top-li-span">{{ item1.appName }}</span>
           </li>
         </ul>
       </div>
-      <div class="container-middle-right">
+      <!-- <div class="container-middle-right">
         <LineFont
           class="line-font"
           :line-title="lineTitle3"
@@ -63,9 +63,9 @@
             <span class="top-li-span">{{ item2.name }}</span>
           </li>
         </ul>
-      </div>
+      </div> -->
     </div>
-    <div class="container-bottom">
+    <!-- <div class="container-bottom">
       <LineFont
         class="line-font"
         :line-title="lineTitle4"
@@ -83,12 +83,14 @@
           <span class="top-li-span">{{ item3.name }}</span>
         </li>
       </ul>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 import LineFont from '@/components/LineFont'
+import { getHomeLists } from '@/api/method/home'
+
 export default {
   components: {
     LineFont
@@ -243,11 +245,23 @@ export default {
     // this.getWeather()
   },
   mounted() {
-    // this.getHomeLists()
-    // this.editAfficheWork()
-    // this.getAfficheList();
+    this.init()
   },
   methods: {
+    async init() {
+      await getHomeLists()
+        .then((res) => {
+          if (res.code === 0) {
+            console.log('res！~~~~~~~~~', res)
+            const { appList, configList, devOpsList } = res.data
+            // this.treeData = res.data
+            this.topLists1 = appList
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     bacImage(item, index) {
       if (item.name === '组织管理' || item.name === '合同管理') {
         if (index === 0) {

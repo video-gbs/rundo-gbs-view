@@ -4,7 +4,7 @@
       <div>
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
-          >添加设备</span
+          >编辑设备</span
         >
       </div>
     </div>
@@ -82,8 +82,8 @@
                   placeholder="请选择活动区域"
                   style="width: 436px"
                 >
-                  <el-option label="区域一" value="0"></el-option>
-                  <el-option label="区域二" value="1"></el-option>
+                  <el-option label="hik" value="0"></el-option>
+                  <el-option label="jiadu" value="1"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
@@ -166,7 +166,7 @@
                     placeholder="请选择活动区域"
                     style="width: 436px"
                   >
-                    <el-option label="区域一" value="0"></el-option>
+                    <el-option label="tcp" value="0"></el-option>
                     <el-option label="区域二" value="1"></el-option>
                   </el-select>
                 </el-form-item>
@@ -219,10 +219,18 @@
 
 <script>
 import { getVideoAraeTree } from '@/api/method/role'
-import { addEncoder } from '@/api/method/encoder'
+import { editEncoder } from '@/api/method/encoder'
 export default {
   name: '',
   components: {},
+  props: {
+    treeData: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    }
+  },
   data() {
     return {
       form: {
@@ -235,16 +243,17 @@ export default {
         password: ''
       },
       form1: {
+        ip: '',
         transport: '',
+        latitude: '',
         longitude: '',
-        longitude: '',
-        port: '',
-        ip: ''
+        port: ''
       },
       treeList: [],
       List: '',
       Ids: [],
       Id: '',
+      editId: '',
       defaultProps: {
         children: 'children',
         label: 'areaName'
@@ -288,6 +297,40 @@ export default {
       }
     }
   },
+  created() {
+    console.log('this.$route.query.row', this.$route.query.row)
+    const {
+      model,
+      userName,
+      deviceType,
+      manufacturer,
+      videoAreaId,
+      name,
+      password,
+      transport,
+      latitude,
+      longitude,
+      port,
+      ip
+    } = this.$route.query.row
+    this.form1.ip = ip
+    this.form1.transport = transport
+    this.form1.latitude = latitude
+    this.form1.longitude = longitude
+    this.form1.port = port
+    this.form.password = password
+    this.form.name = name
+    this.form.password = password
+    this.form.videoAreaId = videoAreaId
+    this.form.manufacturer = manufacturer
+    this.form.model = model
+    this.form.userName = userName
+    this.form.deviceType = deviceType + ''
+    this.form.gatewayId = 7
+    this.editId = this.$route.query.row.id
+    console.log('form', this.form)
+    console.log('form1', this.form1)
+  },
   mounted() {
     this.init()
   },
@@ -318,11 +361,17 @@ export default {
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
         this.form.gatewayId = 7
-        addEncoder({ ...this.form, ...this.form1, deviceId: 1 }).then((res) => {
+
+        editEncoder({
+          ...this.form,
+          ...this.form1,
+          deviceId: 1,
+          id: this.editId
+        }).then((res) => {
           if (res.code === 0) {
             this.$message({
               type: 'success',
-              message: '新建成功'
+              message: '编辑成功'
             })
             this.goback()
           }

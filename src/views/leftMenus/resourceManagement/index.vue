@@ -5,7 +5,7 @@
     </div>
     <div class="main-content">
       <div class="securityArea_container">
-        <leftTree :treeData="treeData" />
+        <leftTree :treeData="treeList" @childClickHandle="childClickHandle" />
       </div>
       <div class="right-table p10">
         <el-tabs
@@ -15,7 +15,7 @@
           @tab-click="handleClick"
         >
           <el-tab-pane label="编码器" name="编码器">
-            <Encoder />
+            <Encoder :detailsId="detailsId" />
           </el-tab-pane>
           <el-tab-pane label="通道" name="通道">
             <Channel />
@@ -30,27 +30,36 @@
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import Encoder from './components/Encoder.vue'
 import Channel from './components/Channel.vue'
-import { getSysOrgTree } from '@/api/method/role'
+import { getSysOrgTree, getVideoAraeTree } from '@/api/method/role'
 export default {
   name: '',
   components: { leftTree, Encoder, Channel },
   data() {
     return {
       activeName: '编码器',
-      treeData: []
+      treeList: [],
+      detailsId: ''
     }
   },
   mounted() {
     this.init()
   },
   methods: {
+    async init(id) {
+      await getVideoAraeTree()
+        .then((res) => {
+          if (res.code === 0) {
+            this.treeList = res.data
+            this.detailsId = id ? id : res.data[0].id
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     handleClick(val, event) {},
-    init() {
-      getSysOrgTree({ id: 1 }).then((res) => {
-        if (res.code === 200) {
-          this.treeData = res.data
-        }
-      })
+    childClickHandle(data) {
+      this.detailsId = data.id
     }
   }
 }

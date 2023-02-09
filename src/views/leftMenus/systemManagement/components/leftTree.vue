@@ -189,7 +189,7 @@ export default {
     }
     // init() {
     //   getSysOrgTree({ id: 1 }).then((res) => {
-    //     if (res.code === 200) {
+    //     if (res.code === 0) {
     //       this.data = res.data
     //     }
     //   })

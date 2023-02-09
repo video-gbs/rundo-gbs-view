@@ -9,10 +9,10 @@ const requestTimeOut = 20 * 100000
 const isShowLogin = false
 const noToken = ['/politics/sys/login', '/politics/v1/file/batchUploadImg']
 // create an axios instance
-
+// console.log('process.env.VUE_APP_BASE_API',process.env)
 // axios.defaults.transformResponse = jb
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
+  // baseURL: process.env.VUE_APP_BASE_API1, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: requestTimeOut // request timeout
 })
@@ -69,7 +69,7 @@ service.interceptors.response.use(
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 200) {
+    if (res.code !== 200 && res.code !== 0) {
       // Message({
       //   message: res.message || 'Error',
       //   type: 'error',

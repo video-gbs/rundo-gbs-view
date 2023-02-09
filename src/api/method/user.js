@@ -1,11 +1,12 @@
 import request from '@/api/fetch'
 
-// export function login(data) {
-//   return request.post('/politics/sys/login', data)
-// }
+import baseUrls from '@/utils/baseUrlConfig'
+
+const rundoAuthServer = baseUrls.base1
+const rundoAuthServer1 = baseUrls.base3
 
 export function login(data) {
-  return request.post('/user/login', data)
+  return request.post(`${rundoAuthServer}/user/login`, data)
 }
 
 export function getInfo(params) {
@@ -17,93 +18,98 @@ export function getInfo(params) {
 // }
 
 export function logout(params) {
-  return request.post('/user/logout', params)
+  return request.post(`${rundoAuthServer}/user/logout`, params)
 }
 
 // 应用管理
 // 获取应用列表
 export function getAddApplicationList(params) {
-  return request.post('/sysAppInfo/getListByPage', params)
+  return request.post(`${rundoAuthServer}/sysAppInfo/getListByPage`, params)
 }
 // 添加应用
 export function addApplication(params) {
-  return request.post('/sysAppInfo/add', params)
+  return request.post(`${rundoAuthServer}/sysAppInfo/add`, params)
 }
 
 // 获取应用信息
 export function getAddApplicationById(params) {
-  return request.get('/sysAppInfo/getById', params)
+  return request.get(`${rundoAuthServer}/sysAppInfo/getById`, params)
 }
 
 // 删除
 export function deleteApplication(id) {
-  return request.post(`/sysAppInfo/remove/${id}`)
+  return request.post(`${rundoAuthServer}/sysAppInfo/remove/${id}`)
 }
 
 // 编辑应用
 
 export function editApplication(params) {
-  return request.post('/sysAppInfo/update', params)
+  return request.post(`${rundoAuthServer}/sysAppInfo/update`, params)
 }
 
 // 状态切换
 export function changeStatus(params) {
-  return request.post('/sysAppInfo/status/change', params)
+  return request.post(`${rundoAuthServer}/sysAppInfo/status/change`, params)
 }
 
 // 字典管理
 // 获取字典列表
 export function getDictionaryList(params) {
-  return request.post('/sysDict/getListByPage', params)
+  return request.post(`${rundoAuthServer}/sysDict/getListByPage`, params)
 }
 // 添加字典
 export function addDictionary(params) {
-  return request.post('/sysDict/add', params)
+  return request.post(`${rundoAuthServer}/sysDict/add`, params)
 }
 
 // 获取字典信息
 export function getDictionaryById(id) {
-  return request.get(`/sysDict/getById/${id}`)
+  return request.get(`${rundoAuthServer}/sysDict/getById/${id}`)
 }
 
 // 删除
 export function deleteDictionary(id) {
-  return request.post(`/sysDict/remove/${id}`)
+  return request.post(`${rundoAuthServer}/sysDict/remove/${id}`)
 }
 
 // 编辑字典
 
 export function editDictionary(params) {
-  return request.post('/sysDict/update', params)
+  return request.post(`${rundoAuthServer}/sysDict/update`, params)
 }
 
 // 用户模块
 // 用户列表
 export function getUserLists(params) {
-  return request.post('/sysUserInfo/getListByPage', params)
+  return request.post(`${rundoAuthServer}/sysUserInfo/getListByPage`, params)
 }
 
 // 删除
 export function deteleUser(id) {
-  return request.post(`/sysUserInfo/remove/${id}`)
+  return request.post(`${rundoAuthServer}/sysUserInfo/remove/${id}`)
 }
 
 // 批量删除
 export function deteleAllUser(params) {
-  return request.post('/sysUserInfo/batchRemove', params)
+  return request.post(`${rundoAuthServer}/sysUserInfo/batchRemove`, params)
 }
 
 // 新增
 export function addUser(params) {
-  return request.post('/sysUserInfo/add', params)
+  return request.post(`${rundoAuthServer}/sysUserInfo/add`, params)
 }
 
 // 编辑
 export function editUser(params) {
-  return request.post('/sysUserInfo/update', params)
+  return request.post(`${rundoAuthServer}/sysUserInfo/update`, params)
+}
+
+export function getEditRolesDetail(id) {
+  // 获取编辑详情
+  return request.post(`${rundoAuthServer}/sysUserInfo/getById/${id}`)
 }
 
 // 用户状态切换
 export function changeUserStatus(params) {
-  return request.post('/sysUserInfo/status/change', params)
+  return request.post(`${rundoAuthServer}/sysUserInfo/status/change`, params)
 }

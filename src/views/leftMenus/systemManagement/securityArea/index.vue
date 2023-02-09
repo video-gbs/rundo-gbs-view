@@ -81,6 +81,7 @@
               placeholder="请选择"
               :popper-append-to-body="false"
               style="width: 272px"
+              class="selectTree"
             >
               <el-option :value="List">
                 <el-tree
@@ -224,7 +225,7 @@ export default {
     },
     getUnitDetailsData() {
       getUnitDetails(this.detailsId).then((res) => {
-        if (res.code === 200) {
+        if (res.code === 0) {
           // Object.keys(res.data).forEach((key) => {
           //   this.form[key] = res.data[key] || this.form[key]
           // })
@@ -236,7 +237,7 @@ export default {
     async init(id) {
       await getVideoAraeTree()
         .then((res) => {
-          if (res.code === 200) {
+          if (res.code === 0) {
             this.treeList = res.data
             this.detailsId = id ? id : res.data[0].id
             this.getUnitDetailsData()
@@ -264,7 +265,7 @@ export default {
     },
     save() {
       unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
-        if (res.code === 200) {
+        if (res.code === 0) {
           this.$message({
             type: 'success',
             message: '编辑成功'
@@ -281,7 +282,7 @@ export default {
         type: 'warning'
       }).then(() => {
         unitDelete(this.detailsId).then((res) => {
-          if (res.code === 200) {
+          if (res.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -300,7 +301,7 @@ export default {
             case '新建部门':
               this.dialog.params.areaPid = this.Id
               unitAdd(this.dialog.params).then((res) => {
-                if (res.code === 200) {
+                if (res.code === 0) {
                   this.$message({
                     type: 'success',
                     message: '新建成功'
@@ -316,7 +317,7 @@ export default {
             case '编辑':
               editApplication({ id: this.editId, ...this.dialog.params }).then(
                 (res) => {
-                  if (res.code === 200) {
+                  if (res.code === 0) {
                     this.$message.success('编辑成功')
                     this.dialog.show = false
                     this.getList()
@@ -343,11 +344,19 @@ export default {
 ::v-deep .el-dialog__footer {
   padding: 0;
 }
-.el-select-dropdown__item {
-  height: 200px !important;
-  min-width: 260px;
-  overflow-y: scroll !important;
-  background: #fff !important;
+// .el-select-dropdown__item {
+//   height: 200px !important;
+//   min-width: 260px;
+//   overflow-y: scroll !important;
+//   background: #fff !important;
+// }
+.selectTree {
+  .el-select-dropdown__item {
+    height: 200px !important;
+    min-width: 260px;
+    overflow-y: scroll !important;
+    background: #fff !important;
+  }
 }
 
 .main {

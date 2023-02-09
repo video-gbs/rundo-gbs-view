@@ -14,26 +14,30 @@
       >
         <el-form-item label="角色名称:">
           <el-input
-            v-model="searchParams.deptType"
+            v-model="searchParams.roleName"
             placeholder="请输入"
+            clearable
             style="width: 240px"
           ></el-input>
         </el-form-item>
         <el-form-item label="创建者:">
           <el-input
-            v-model="searchParams.status"
+            v-model="searchParams.userAccount"
             placeholder="请输入"
+            clearable
             style="width: 240px"
           ></el-input>
         </el-form-item>
 
         <el-form-item label="创建日期:">
           <el-date-picker
-            v-model="searchParams.name"
-            type="daterange"
+            v-model="searchParams.time"
+            type="datetimerange"
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
+            format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-dd HH:mm:ss"
           >
           </el-date-picker>
         </el-form-item>
@@ -48,7 +52,21 @@
       </el-form>
     </div>
     <div class="table-list">
+      <div class="table-content-top">
+        <!-- <el-checkbox v-model="checked" class="table-content-top-check"
+          >包含下级组织</el-checkbox
+        > -->
+        <div class="btn-lists">
+          <el-button @click="deteleAll()"
+            ><svg-icon class="svg-btn" icon-class="del" />批量删除</el-button
+          >
+          <el-button type="primary" @click="addEquipment"
+            ><svg-icon class="svg-btn" icon-class="add" />新建</el-button
+          >
+        </div>
+      </div>
       <el-table
+        ref="encoderTable"
         :data="tableData"
         style="width: 100%"
         border
@@ -69,9 +87,22 @@
         <el-table-column prop="createdTime" label="创建时间" />
         <el-table-column prop="updatedTime" label="更新时间" />
         <el-table-column prop="detail" label="描述" />
+        <el-table-column prop="status" label="状态" width="80">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.status"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              :active-value="0"
+              :inactive-value="1"
+              @change="changeSwitch(scope.row)"
+            >
+            </el-switch>
+          </template>
+        </el-table-column>
         <el-table-column width="200" label="操作" fixed="right">
           <template slot-scope="scope">
-            <el-button type="text" @click="getPermissionTableData(scope.row.id)"
+            <el-button type="text" @click="goActiveDiscovery(scope.row.id)"
               >关联用户
             </el-button>
             <el-button type="text" @click="dialogShow(0, scope.row)"
@@ -136,73 +167,6 @@
         <el-button type="primary" @click="submit('roleForm')">确 定</el-button>
       </span>
     </el-dialog>
-
-    <el-dialog
-      :title="permissionDialog.title"
-      :visible.sync="permissionDialog.show"
-      width="1200px"
-      :before-close="permissionHandleClose"
-    >
-      <div class="page-main">
-        <div class="main-operation">
-          <div class="title">
-            <span>功能权限</span>
-          </div>
-          <div style="display: flex">
-            <div class="perms-operation">
-              <el-button
-                type="primary"
-                :loading="buttonLoading"
-                @click="savePermission()"
-                >保存设置</el-button
-              >
-            </div>
-            <el-button
-              class="button-back"
-              @click="permissionDialog.show = false"
-              >返回</el-button
-            >
-          </div>
-        </div>
-        <div class="main-content">
-          <div class="perms-tree">
-            <div class="tree-title">
-              <div class="title">一级功能</div>
-              <div class="title">二级功能</div>
-              <div class="title">操作权限</div>
-            </div>
-            <div v-if="permissionTableData && permissionTableData.length > 0">
-              <div
-                v-for="item in permissionTableData"
-                :key="item.id"
-                class="tree-item item-border"
-              >
-                <div class="item-title">{{ item.title }}</div>
-                <div class="item-children">
-                  <template>
-                    <div
-                      v-for="child in item.childs"
-                      :key="child.id"
-                      class="tree-item"
-                    >
-                      <div class="item-title">{{ child.title }}</div>
-                      <div class="tree-operation">
-                        <template v-for="op in child.childs">
-                          <el-checkbox :key="op.id" v-model="op.hasAuthorize">{{
-                            op.title
-                          }}</el-checkbox>
-                        </template>
-                      </div>
-                    </div>
-                  </template>
-                </div>
-              </div>
-            </div>
-            <div v-else class="tree-empty item-border">暂无数据</div>
-          </div>
-        </div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -211,8 +175,10 @@ import {
   addRoles,
   editRoles,
   deleteRoles,
+  deleteAllRoles,
+  changeRolesStatus,
   permissionTree,
-  getRolesList,
+  getRoleLists,
   setAppAuth,
   getSysOrgTree
 } from '@/api/method/role'
@@ -259,9 +225,9 @@ export default {
         }
       },
       searchParams: {
-        deptType: '',
-        name: '',
-        status: 1
+        userAccount: '',
+        roleName: '',
+        time: ''
       },
       rules: {
         name: [
@@ -274,7 +240,6 @@ export default {
           }
         ]
       },
-      remove: deleteRoles,
       roleId: '',
       checkList: [],
       buttonLoading: false,
@@ -283,15 +248,26 @@ export default {
   },
   mounted() {
     this.getList()
-    this.init()
+    // this.init()
   },
   methods: {
-    init() {
-      getSysOrgTree({ id: 1 }).then((res) => {
-        if (res.code === 200) {
-          this.treeData = res.data
-        }
+    changeSwitch(row) {
+      let text = row.status === 0 ? '启用' : '停用'
+
+      this.$confirm('确认要"' + text + '""' + row.roleName + '"吗?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
+        .then(function () {
+          changeRolesStatus({
+            id: row.id,
+            status: row.status
+          }).then((res) => {})
+        })
+        .catch(function () {
+          row.status = row.status === 0 ? 1 : 0
+        })
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
@@ -302,7 +278,7 @@ export default {
       this.getList()
     },
     cxData() {
-      this.$router.push(`/creatingRole/role`)
+      this.getList()
     },
     goPage(path, query) {
       this.$router.push(path)
@@ -346,14 +322,8 @@ export default {
         }
       })
     },
-    getPermissionTableData(id) {
-      this.permissionDialog.show = !this.permissionDialog.show
-      this.roleId = id
-      permissionTree(id).then((res) => {
-        if (res.code === 10000) {
-          this.permissionTableData = res.data
-        }
-      })
+    goActiveDiscovery(id) {
+      this.$router.push(`/activeDiscovery/${id}`)
     },
     checkMenu(list) {
       list.forEach((item) => {
@@ -385,16 +355,52 @@ export default {
       })
     },
     getList() {
-      getRolesList({
+      const createdTimeEnd = this.searchParams.time
+        ? this.searchParams.time[0]
+        : ''
+      const createdTimeStart = this.searchParams.time
+        ? this.searchParams.time[1]
+        : ''
+      const roleName = this.searchParams.roleName
+      const userAccount = this.searchParams.userAccount
+      getRoleLists({
         current: this.params.pageNum,
-        size: this.params.pageSize
+        size: this.params.pageSize,
+        roleName,
+        createdTimeStart,
+        createdTimeEnd,
+        userAccount
+        // ...this.searchParams
       }).then((res) => {
-        if (res.code === 200) {
-          this.tableData = res.data
+        if (res.code === 0) {
+          this.tableData = res.data.records
           this.params.total = res.data.total
           this.params.pages = res.data.pages
           this.params.current = res.data.current
         }
+      })
+    },
+    deteleAll() {
+      this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const roleIds = []
+        // console.log('this.$refs.encoderTable.selection',this.$refs)
+        this.$refs.encoderTable.selection.map((item) => {
+          roleIds.push(item.id)
+        })
+        deleteAllRoles(roleIds).then((res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.params.pageNum = 1
+            this.getList()
+          }
+        })
       })
     },
     deleteRole(row) {
@@ -404,7 +410,7 @@ export default {
         type: 'warning'
       }).then(() => {
         deleteRoles(row.id).then((res) => {
-          if (res.code === 10000) {
+          if (res.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -487,7 +493,24 @@ export default {
     }
   }
   .table-list {
+    background: #ffffff;
+    box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    padding: 18px;
     margin: 20px;
+    .table-content-top {
+      // .table-content-top-check {
+      //   float: left;
+      // }
+      .btn-lists {
+        float: right;
+
+        margin-bottom: 10px;
+      }
+    }
+    .table-content-bottom {
+      // padding: 0 18px;
+    }
   }
 }
 
