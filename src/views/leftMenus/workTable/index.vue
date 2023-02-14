@@ -37,12 +37,15 @@
             class="top-li"
             @click="goContentList"
           >
-            <div class="top-li-div" :style="bacImage(item1, index1)"></div>
-            <span class="top-li-span">{{ item1.appName }}</span>
+            <div
+              class="top-li-div"
+              :style="bacImage('应用', item1, index1)"
+            ></div>
+            <span class="top-li-span">{{ item1.name }}</span>
           </li>
         </ul>
       </div>
-      <!-- <div class="container-middle-right">
+      <div class="container-middle-right">
         <LineFont
           class="line-font"
           :line-title="lineTitle3"
@@ -56,16 +59,17 @@
             class="top-li"
             @click="goContentList"
           >
+            <!-- :style="{ background: colorList2[index2] }" -->
             <div
               class="top-li-div"
-              :style="{ background: colorList2[index2] }"
+              :style="bacImage('运维', item2, index2)"
             ></div>
             <span class="top-li-span">{{ item2.name }}</span>
           </li>
         </ul>
-      </div> -->
+      </div>
     </div>
-    <!-- <div class="container-bottom">
+    <div class="container-bottom">
       <LineFont
         class="line-font"
         :line-title="lineTitle4"
@@ -79,11 +83,14 @@
           class="top-li"
           @click="goContentList"
         >
-          <div class="top-li-div" :style="bacImage(item3, index3)"></div>
+          <div
+            class="top-li-div"
+            :style="bacImage('配置', item3, index3)"
+          ></div>
           <span class="top-li-span">{{ item3.name }}</span>
         </li>
       </ul>
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -121,7 +128,8 @@ export default {
         '#FFFFFF'
       ],
       colorList2: [
-        'linear-gradient(180deg, #38C07C 0%, #2E7753 100%)',
+        // 'linear-gradient(180deg, #38C07C 0%, #2E7753 100%)',
+        require('../../../assets/imgs/peizhi.png'),
         'linear-gradient(180deg, #00BCB6 0%, #009993 100%)',
         'linear-gradient(173deg, #54FFB5 0%, #259094 100%)',
         '#FFFFFF',
@@ -129,8 +137,6 @@ export default {
         '#FFFFFF'
       ],
       colorList3: [
-        // 'linear-gradient(179deg, #00BCB6 0%, #009993 100%)',
-        // 'linear-gradient(180deg, #F77062 0%, #FE5196 100%)',
         require('../../../assets/imgs/bottom1.png'),
         require('../../../assets/imgs/bottom2.png'),
         'linear-gradient(147deg, #4481EB 0%, #04BEFE 100%)',
@@ -171,7 +177,7 @@ export default {
       ],
       topLists2: [
         {
-          name: '功能功能'
+          name: '系统管理'
         },
         {
           name: '功能功能'
@@ -262,30 +268,45 @@ export default {
           console.log(error)
         })
     },
-    bacImage(item, index) {
-      if (item.name === '组织管理' || item.name === '合同管理') {
-        if (index === 0) {
-          return {
-            background:
-              'url(' + this.colorList3[index] + ') center center no-repeat'
+    bacImage(name, item, index) {
+      switch (name) {
+        case '应用':
+          if (index === 0) {
+            return {
+              background:
+                'url(' + this.colorList1[index] + ') center center no-repeat'
+            }
+          } else {
+            return `background:${this.colorList1[index]}`
           }
-        } else if (index === 1) {
-          return {
-            background:
-              'url(' + this.colorList3[index] + ') center center no-repeat'
+          break
+        case '运维':
+          if (index === 0) {
+            return {
+              background:
+                'url(' + this.colorList2[index] + ') center center no-repeat'
+            }
+          } else {
+            return `background:${this.colorList2[index]}`
           }
-        } else {
-          return `background:${this.colorList1[index]}`
-        }
-      } else {
-        if (index === 0) {
-          return {
-            background:
-              'url(' + this.colorList1[index] + ') center center no-repeat'
+          break
+        case '配置':
+          if (index === 0) {
+            return {
+              background:
+                'url(' + this.colorList3[index] + ') center center no-repeat'
+            }
+          } else if (index === 1) {
+            return {
+              background:
+                'url(' + this.colorList3[index] + ') center center no-repeat'
+            }
+          } else {
+            return `background:${this.colorList3[index]}`
           }
-        } else {
-          return `background:${this.colorList1[index]}`
-        }
+          break
+        default:
+          break
       }
     },
     goContentList() {

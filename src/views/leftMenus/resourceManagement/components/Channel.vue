@@ -1,5 +1,5 @@
 <template>
-  <div class="channel-content">
+  <div class="encoder-content">
     <div class="search">
       <el-form
         ref="query"
@@ -8,9 +8,9 @@
         :model="searchParams"
         label-width="100px"
       >
-        <el-form-item label="设备类型:">
+        <el-form-item label="外类型:">
           <el-select
-            v-model="searchParams.deptType"
+            v-model="searchParams.deviceType"
             class="mr10"
             placeholder="请选择"
           >
@@ -24,7 +24,7 @@
         </el-form-item>
         <el-form-item label="状态:">
           <el-select
-            v-model="searchParams.status"
+            v-model="searchParams.onlineState"
             class="mr10"
             placeholder="请选择"
           >
@@ -37,18 +37,18 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item style="margin-left: 60px">
+        <el-form-item label="ip地址:">
           <el-input
-            v-model="searchParams.name"
-            placeholder="请输入设备名称/设备编码/IP地址"
-            style="width: 240px"
+            v-model="searchParams.ip"
+            placeholder="请输入IP地址"
+            class="mr10"
           ></el-input>
         </el-form-item>
         <el-form-item style="float: right; margin-right: 20px">
           <el-button
             ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
           >
-          <el-button type="primary"
+          <el-button type="primary" @click="cxData"
             ><svg-icon class="svg-btn" icon-class="cx" />查询</el-button
           >
         </el-form-item>
@@ -61,20 +61,19 @@
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button
+          <el-button @click="deteleAll()"
             ><svg-icon class="svg-btn" icon-class="del" />批量删除</el-button
           >
-
-          <el-button
+          <el-button @click="moveEquipment"
             ><svg-icon class="svg-btn" icon-class="move" />移动</el-button
           >
-          <el-button type="primary" @click="addEquipments"
+          <el-button type="primary" @click="goChannelDiscovery"
             ><svg-icon class="svg-btn" icon-class="add" />新增</el-button
           >
         </div>
       </div>
       <el-table
-        ref="channel"
+        ref="encoderTable"
         class="table-content-bottom"
         :data="tableData"
         border
@@ -91,28 +90,53 @@
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
         <el-table-column
-          prop="name"
-          label="设备名称1"
+          prop="channelName"
+          label="通道名称"
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          prop="coding"
-          label="设备编码1"
+          prop="areaNames"
+          label="所属区域"
           :show-overflow-tooltip="true"
         />
-        <el-table-column prop="type" label="设备类型" width="80" />
         <el-table-column
-          prop="ip"
-          label="IP地址"
+          prop="channelCode"
+          label="通道编码"
           :show-overflow-tooltip="true"
+          width="160"
         />
-        <el-table-column prop="port" label="端口" width="80" />
-        <el-table-column prop="manufacturer" label="设备厂家" width="80" />
-        <el-table-column prop="status" label="状态" width="80">
+        <el-table-column prop="deviceName" label="所属设备" width="120" />
+
+        <el-table-column prop="channelType" label="通道类型" width="120">
           <template slot-scope="scope">
-            <span :class="scope.row.status === 1 ? 'yuan' : 'yuan1'"></span>
+            <!-- <span :class="scope.row.deviceType === 1 ? 'yuan' : 'yuan1'"></span> -->
             <span
-              v-if="scope.row.status === 1"
+              v-if="scope.row.deviceType === 0"
+              style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+              >视频</span
+            >
+            <span
+              v-else-if="scope.row.deviceType === 1"
+              style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
+              >音频</span
+            >
+            <span
+              v-else
+              style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
+              >告警</span
+            >
+          </template>
+        </el-table-column>
+        <el-table-column prop="ip" label="IP地址" width="120" />
+        <el-table-column prop="port" label="端口" width="80" />
+        <el-table-column prop="manufacturer" label="设备厂家" width="120" />
+        <el-table-column prop="onlineState" label="状态" width="80">
+          <template slot-scope="scope">
+            <span
+              :class="scope.row.onlineState === 1 ? 'yuan' : 'yuan1'"
+            ></span>
+            <span
+              v-if="scope.row.onlineState === 1"
               style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
               >在线</span
             >
@@ -123,12 +147,12 @@
             >
           </template>
         </el-table-column>
-        <el-table-column width="240" label="操作" fixed="right" align="center">
+        <el-table-column width="120" label="操作" fixed="right" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editData(scope.row.id)"
+            <el-button type="text" @click="editData(scope.row)"
               >编辑
             </el-button>
-            <el-button type="text" @click="restart(scope.row.id)"
+            <!-- <el-button type="text" @click="restart(scope.row.id)"
               >重启
             </el-button>
             <el-button type="text" @click="synchronizationData(scope.row.id)"
@@ -136,8 +160,8 @@
             </el-button>
             <el-button type="text" @click="deploymentData(scope.row.id)"
               >布防
-            </el-button>
-            <el-button type="text" @click="deleteData(scope.row)"
+            </el-button> -->
+            <el-button type="text" @click="deleteEncoder(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -149,14 +173,59 @@
         @current-change="currentChange"
       />
     </div>
+
+    <el-dialog title="移动位置" :visible.sync="dialogShow" width="30%">
+      <div slot="title" class="dialog-title">
+        <LineFont
+          :line-title="lineTitle"
+          :text-style="textStyle"
+          :line-blue-style="lineBlueStyle"
+        />
+      </div>
+      <el-form label-width="100px" :model="dialogForm">
+        <el-form-item label="设备数量：">
+          {{ dialogForm.num }}
+        </el-form-item>
+        <el-form-item label="设备名称：">
+          <span class="dialogEquipmentName">{{
+            dialogForm.dialogEquipmentName
+          }}</span>
+        </el-form-item>
+      </el-form>
+      <div class="securityArea_container">
+        <leftTree />
+      </div>
+
+      <div class="dialog-footer">
+        <el-button @click="dialogShow = false">取消</el-button>
+        <el-button type="primary"
+          ><svg-icon class="svg-btn" icon-class="save" />确认</el-button
+        >
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import pagination from '@/components/Pagination/index.vue'
+import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
+import LineFont from '@/components/LineFont'
+
+import {
+  getChannelById,
+  deleteChannels,
+  deleteChannel
+} from '@/api/method/channel'
+
 export default {
   name: '',
-  components: { pagination },
+  components: { pagination, leftTree, LineFont },
+  props: {
+    detailsId: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       params: {
@@ -164,19 +233,63 @@ export default {
         pageSize: 10,
         total: 0
       },
+      lineTitle: {
+        title: '移动位置',
+        notShowSmallTitle: false
+      },
+      lineTitle1: {
+        title: '选择编码器',
+        notShowSmallTitle: false
+      },
+      textStyle: {
+        fontSize: '18px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#333333'
+      },
+      lineBlueStyle: {
+        background: 'rgba(30, 86, 160, 1)',
+        width: '3px',
+        height: '18px'
+      },
+      dialogForm: {
+        num: 3,
+        dialogEquipmentName:
+          '海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ;'
+      },
+      dialogForm1: {
+        inputValue: ''
+      },
       searchParams: {
-        deptType: '',
-        name: '',
-        status: 1
+        deviceType: '',
+        ip: '',
+        onlineState: ''
       },
       query: {},
       optionsList: [
         {
-          label: 'ces',
-          value: 'ces'
+          label: '离线',
+          value: 0
+        },
+        {
+          label: '在线',
+          value: 1
         }
       ],
       checked: false,
+      dialogShow: false,
+      dialogShow1: false,
+      dialogTableData: [
+        {
+          name: '球机192.168……',
+          coding: '4400000000111500…',
+          type: 'IPC',
+          ip: '192.168.119.152',
+          city: '广东省/广州市/珠海区/新竹街道…',
+          manufacturer: '海康',
+          status: 1
+        }
+      ],
       tableData: [
         {
           name: '球机192.168……',
@@ -186,159 +299,112 @@ export default {
           port: 8000,
           manufacturer: '海康',
           status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 2
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 2
         }
       ]
     }
   },
-  mounted() {},
+  mounted() {
+    this.getList()
+  },
   methods: {
+    getList(orgId) {
+      // : '1620396812466147329'
+      getChannelById({
+        pageNum: this.params.pageNum,
+        pageSize: this.params.pageSize,
+        videoAreaId: 1,
+        ...this.searchParams
+      }).then((res) => {
+        console.log('res', res)
+        if (res.code === 0) {
+          this.tableData = res.data.records
+          this.params.total = res.data.total
+          this.params.pages = res.data.pages
+          this.params.current = res.data.current
+        }
+      })
+    },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
     },
     currentChange(proCount) {
       this.params.proCount = proCount
     },
-    synchronizationData() {},
-    editData() {},
+    editData(row) {
+      this.$router.push({
+        path: `/editEquipment`,
+        query: {
+          row: row
+        }
+      })
+    },
     restart() {},
-    deploymentData() {},
-    deleteData() {},
-    addEquipments() {
-      console.log(123)
-      // this.$router.push({ path: '/addEquipment' })
+    deploymentData() {
+      this.dialogShow1 = true
+    },
+    deteleAll(row) {
+      this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const roleIds = []
+        // console.log('this.$refs.encoderTable.selection',this.$refs)
+        this.$refs.encoderTable.selection.map((item) => {
+          roleIds.push(item.id)
+        })
+        console.log('roleIds', roleIds)
+        deleteChannels(roleIds).then((res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.params.pageNum = 1
+            this.getList()
+          }
+        })
+      })
+    },
+    deleteEncoder(row) {
+      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteChannel(row.id).then((res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.params.pageNum = 1
+            this.getList()
+          }
+        })
+      })
+    },
+    cxData() {},
+    goChannelDiscovery() {
+      this.$router.push(`/channelDiscovery/add`)
+    },
+    moveEquipment() {
+      this.dialogShow = true
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.channel-content {
+::v-deep .el-dialog__body {
+  padding-bottom: 0;
+}
+::v-deep .el-dialog__header {
+  border-bottom: 1px solid rgba(234, 234, 234, 1);
+  padding: 0 20px;
+}
+
+.encoder-content {
   .search {
     width: 100%;
     height: 80px;
@@ -387,6 +453,32 @@ export default {
     height: 6px;
     border-radius: 50%;
     background: #b1b1b1;
+  }
+
+  .securityArea_container {
+    height: calc(100% - 40px);
+    width: 310px;
+    margin: 10px;
+    // background: #ffffff;
+    // box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+  }
+}
+.dialog-footer {
+  width: 100%;
+  height: 52px;
+  line-height: 52px;
+  position: relative;
+  bottom: 0;
+  right: 0px;
+  text-align: right;
+  border-top: 1px solid #eaeaea;
+  > .el-button {
+    margin-right: 20px;
+  }
+  .svg-btn {
+    position: relative;
+    top: 1px;
+    left: -4px;
   }
 }
 .svg-btn {

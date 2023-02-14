@@ -18,10 +18,10 @@
         </router-link>
         <div class="menu-user">
           <div class="user-menu">
-            <!-- <svg-icon icon-class="user3" class="user" />
-            <span class="fs14 mr10">系统操作指南</span> -->
-
-            <el-dropdown class trigger="click">
+            <svg-icon icon-class="user3" class="user" />
+            <span class="fs14 mr10">系统操作指南</span>
+            <span class="user-line" />
+            <!-- <el-dropdown class trigger="click">
               <div class="user-info">
                 <svg-icon icon-class="management" class="management" />
 
@@ -53,7 +53,7 @@
                   >
                 </el-dropdown-item>
               </el-dropdown-menu>
-            </el-dropdown>
+            </el-dropdown> -->
           </div>
           <el-dropdown class trigger="click">
             <div class="user-info">

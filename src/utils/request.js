@@ -20,7 +20,6 @@ const service = axios.create({
 // request interceptor
 service.interceptors.request.use(
   (config) => {
-    console.log('con', config)
     config.headers = { ...config.headers, ...{} } // 不知为何 这里的headers是undefined,所以需要设置成{}
     const token = Local.getToken()
     // config.headers.Authorization= token;
@@ -64,8 +63,6 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   (response) => {
-    console.log('response', response)
-
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.

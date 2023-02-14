@@ -6,6 +6,7 @@
     >
       <el-menu
         ref="leftNavigation"
+        router
         :default-active="activeMenu"
         :background-color="variables.menuBg"
         :text-color="variables.menuText"
@@ -51,6 +52,7 @@ export default {
       if (meta.activeMenu) {
         return meta.activeMenu
       }
+      console.log('route~~~~~', route, path)
       return path
     },
     variables() {

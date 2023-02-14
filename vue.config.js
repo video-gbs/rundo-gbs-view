@@ -30,7 +30,7 @@ const urls = [
   },
   {
     target: 'http://124.71.21.11:7821',
-    proxy: '/rundoAuthServer'
+    proxy: '/auth'
   }
 ]
 

@@ -1,62 +1,48 @@
 import router from './router'
-import { pageAuthor } from './router'
+import store from '@/store/index'
+import NProgress from 'nprogress'
 import { Message } from 'element-ui'
-import NProgress from 'nprogress' // progress bar
-import 'nprogress/nprogress.css' // progress bar style
+import 'nprogress/nprogress.css'
 import { Local } from '@/utils/storage'
 import getPageTitle from '@/utils/get-page-title'
-NProgress.configure({ showSpinner: false }) // NProgress Configuration
+import Layout from '@/layout'
 
-const whiteList = ['/login'] // no redirect whitelist
+NProgress.configure({ showSpinner: false })
+
+const whiteList = ['/login']
 
 router.afterEach((to, from) => {
   document.title = getPageTitle(to.meta.title)
 })
-
 router.beforeEach(async (to, from, next) => {
-  const ut = +(localStorage.getItem('rj_deptType') || 999)
-
-  NProgress.start()
-
+  console.log('to~~~~~~~~~~~~~~~~~', to)
+  console.log('from~~~~~~~~~~~~~~~~~', from)
   const hasToken = Local.getToken()
-
-  // console.log('~~~~~~~~~~~~~~~~~~~~~', hasToken,to,pageAuthor)
-  if (to.path === '/login') {
-    hasToken ? next('/workTable') : next()
-  } else if (to.path == '/404') {
-    Message({
-      message: '页面不存在',
-      type: 'error'
-    })
-
-    next('/404')
-  } else {
-    if (hasToken) {
-      // console.log(';pageAuthor[to.name]', !pageAuthor[to.name])
-      if (!pageAuthor[to.name]) {
-        // 没有权限要求，直接放行
-        next()
-      } else {
-        console.log(
-          ';pageAuthor[to.name]',
-          pageAuthor[to.name],
-          to.name,
-          pageAuthor[to.name].includes(ut)
-        )
-        if (pageAuthor[to.name].includes(ut)) {
-          // 有权限
-          next()
-        } else {
-          // next()
-          next('/login')
-        }
-      }
+  console.log(
+    'sessionStorage~~~~~~~~~~~~~~~~~',
+    sessionStorage.getItem('dynamicRouters')
+  )
+  console.log('store~~~~~~~~~~~~~~~~~', store.state.user.routerLists)
+  if (
+    hasToken &&
+    store.state.user.routerLists.length !== 0 &&
+    sessionStorage.getItem('dynamicRouters')
+  ) {
+    if (!store.state.user.init) {
+      const accessRouteses = store.state.user.routerLists
+      console.log('accessRouteses~~~~~~~~~~~~~~~~~', accessRouteses)
+      store.dispatch('user/dynamicRouters', accessRouteses)
+      next({ ...to, replace: true })
     } else {
-      next('/login')
+      next()
+    }
+  } else {
+    if (whiteList.indexOf(to.path) !== -1) {
+      next()
+    } else {
+      next(`/login`)
     }
   }
-  NProgress.done()
-  // }
 })
 
 // 如果跳往登录页，则转到首页
@@ -69,6 +55,38 @@ function isLogin(to, next, callback) {
 }
 
 router.afterEach(() => {
-  // finish progress bar
   NProgress.done()
 })
+
+// function hasPermission(roles, route) {
+//   if (route.meta && route.meta.roles) {
+//       return roles.some(role => route.meta.roles.includes(role))
+//   } else {
+//       return true
+//   }
+// }
+
+// function filterAsyncRouter (routerMap, roles) {
+//   const accessedRouters = routerMap.filter(route => {
+//     if (hasPermission(roles, route)) {
+//       if (route.children && route.children.length) {
+//         route.children = filterAsyncRouter(route.children, roles)
+//       }
+//       return true
+//     }
+//     return false
+//   })
+//   return accessedRouters
+// }
+
+// 目前没有加入权限控制
+
+// function filterAsyncRouter(asyncRouterMap) {
+//   const accessedRouters = asyncRouterMap.filter((route) => {
+//     if (route.children && route.children.length) {
+//       route.children = filterAsyncRouter(route.children)
+//     }
+//     return true
+//   })
+//   return accessedRouters
+// }

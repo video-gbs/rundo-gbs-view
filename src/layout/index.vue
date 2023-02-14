@@ -55,6 +55,7 @@ export default {
   watch: {
     $route: {
       handler: function (val, oldVal) {
+        console.log('val.path', val.path)
         if (val.path === '/workTable') {
           this.showSidebar = false
         } else {
@@ -164,7 +165,7 @@ export default {
   .sidebar-container {
     top: 3.5rem;
     height: calc(100% - 3.5rem);
-    background-color: $bg-color1;
+    background-color: #fff;
     position: relative;
   }
   .main-container {

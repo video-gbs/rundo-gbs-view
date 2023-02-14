@@ -233,20 +233,18 @@
 
 <script>
 import pagination from '@/components/Pagination/index.vue'
-import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import LineFont from '@/components/LineFont'
 
 import {
   getUserLists,
   deteleUser,
-  editUser,
   changeUserStatus,
   deteleAllUser
 } from '@/api/method/user'
 
 export default {
   name: '',
-  components: { pagination, leftTree, LineFont },
+  components: { pagination, LineFont },
   data() {
     return {
       params: {

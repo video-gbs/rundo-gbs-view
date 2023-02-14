@@ -11,7 +11,7 @@ export function addChannel(params) {
 
 // 发现通道列表
 export function getFindChannelById(params) {
-  return request.post(`${expansion}/channel/findList`, params)
+  return request.get(`${expansion}/channel/findList`, params)
 }
 
 // 通道列表

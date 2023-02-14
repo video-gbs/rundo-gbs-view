@@ -5,7 +5,11 @@
     </div>
     <div class="main-content">
       <div class="securityArea_container">
-        <leftTree :treeData="treeList" @childClickHandle="childClickHandle" />
+        <leftTree
+          :treeData="treeList"
+          @childClickHandle="childClickHandle"
+          :defaultPropsName="areaNames"
+        />
       </div>
       <div class="right-table p10">
         <el-tabs
@@ -38,7 +42,8 @@ export default {
     return {
       activeName: '编码器',
       treeList: [],
-      detailsId: ''
+      detailsId: '',
+      areaNames: 'areaNames'
     }
   },
   mounted() {
