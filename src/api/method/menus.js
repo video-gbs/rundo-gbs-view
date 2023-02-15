@@ -7,6 +7,8 @@ export function getRouters() {
     let menuList = [
       {
         path: '/resourceManagement',
+        name: 'resourceManagement',
+        meta: { title: '资源管理', icon: 'zygl' },
         redirect: '/equipment',
         component: Layout,
         hidden: true,
@@ -14,7 +16,7 @@ export function getRouters() {
           {
             path: '/equipment',
             name: 'equipment',
-            component: '/leftMenus/resourceManagement/index',
+            component: 'leftMenus/resourceManagement/index',
             meta: {
               icon: '',
               title: '前端设备'
@@ -24,7 +26,7 @@ export function getRouters() {
             path: '/addEquipment/:type',
             name: 'addEquipment',
             component:
-              '/leftMenus/resourceManagement/components/AddEquipment.vue',
+              'leftMenus/resourceManagement/components/AddEquipment.vue',
             meta: {
               icon: '',
               title: '添加设备'
@@ -34,7 +36,7 @@ export function getRouters() {
             path: '/displayControlEquipment',
             name: 'displayControlEquipment',
             component:
-              '/leftMenus/resourceManagement/displayControlEquipment.vue',
+              'leftMenus/resourceManagement/displayControlEquipment.vue',
             meta: {
               icon: '',
               title: '显示控制设备'

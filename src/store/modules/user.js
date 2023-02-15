@@ -31,21 +31,53 @@ const mutations = {
   },
   SET_ROUTERLISTS: (state, routerLists) => {
     state.init = true
-    let routerMaps = filterRouter(routerLists)
-    routerMaps.push({
+    // let routerMaps = filterRouter(routerLists)
+    routerLists.push({
       path: '/404',
-      component: () => import('@/views/404'),
+      component: () => import('@/views/404.vue'),
       hidden: true
     })
-    console.log('routerMaps~~~~~~~~~~~~~~~~~', Router)
-    routerMaps.forEach((item) => {
-      Router.addRoutes([item])
+    const childComponent = []
+    routerLists.forEach((item) => {
+      if (item.children && item.children.length > 0) {
+        item.children.forEach((child) => {
+          let params = {}
+          params = {
+            path: child.path,
+            meta: child.meta,
+            name: child.name,
+            // component: () => import(`@/views/${child.component}`),
+            component: (resolve) =>
+              require([`@/views/${child.component}`], resolve)
+          }
+          childComponent.push(params)
+        })
+        Router.options.routes.push({
+          path: item.path,
+          meta: item.meta,
+          name: item.name,
+          // component: () => import(`@/views/${item.component}`),
+          component: (resolve) =>
+            require([`@/views/${item.component}`], resolve),
+          children: childComponent
+        })
+      } else {
+        Router.options.routes.push({
+          path: item.path,
+          meta: item.meta,
+          name: item.name,
+          component: item.component
+          // component: () => import(`@/views${item.component}`)
+          // component: (resolve) =>
+          //   require([`@/views/${item.component}`], resolve)
+        })
+      }
     })
-    // Router.addRoutes(routerMaps)
-    state.routerLists = routerMaps
-    // Router.addRoutes(state.routerLists)
+
+    state.routerLists = routerLists
+    Router.addRoutes(Router.options.routes)
     console.log('Router~~~~~~~~', Router)
-    sessionStorage.setItem('dynamicRouters', JSON.stringify(routerMaps))
+    sessionStorage.setItem('dynamicRouters', JSON.stringify(routerLists))
   },
   SET_INIT: (state, init) => {
     state.init = init
@@ -100,7 +132,12 @@ const actions = {
 
   // 动态设置路由 此为设置设置途径
   dynamicRouters({ commit }, routerLists) {
-    commit('SET_ROUTERLISTS', staticRouters.concat(routerLists)) // 进行路由拼接并存储
+    // staticRouters.concat(routerLists)
+    commit('SET_ROUTERLISTS', routerLists) // 进行路由拼接并存储
+  },
+
+  changeInit({ commit }, val) {
+    commit('SET_INIT', val)
   },
 
   // user logout
@@ -133,25 +170,25 @@ const actions = {
  * 格式化树形结构数据   生成 vue-router 层级路由表
  */
 const loadView = (viewPath) => {
-  return () => import('@/views/' + viewPath)
+  // return () => import('@/views/' + viewPath)
+  return () => require([`@/views/${viewPath}`])
 }
 
 const filterRouter = (routerMap) => {
-  return routerMap.filter((router) => {
-    if (router.component === 'Layout') {
-      router.component = Layout
-    } else {
+  let resRouters = routerMap.filter((router) => {
+    if (
+      !['resourceManagement', 'login', 'workTable', 'redirect'].includes(
+        router.name
+      )
+    ) {
       router.component = loadView(router.component)
     }
-    // 重定向
-    // router.redirect
-    // if (!router.redirect || !router.redirect.length) { delete router.redirect }
-    // 是否有子菜单，并递归处理
     if (router.children && router.children.length > 0) {
       router.children = filterRouter(router.children)
     }
     return true
   })
+  return resRouters
 }
 
 export default {

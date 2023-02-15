@@ -249,6 +249,10 @@ export default {
   watch: {},
   created() {
     // this.getWeather()
+    console.log(
+      'this.$router.options.routes~~~~~~~~~~',
+      this.$router.options.routes
+    )
   },
   mounted() {
     this.init()

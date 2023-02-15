@@ -1,23 +1,31 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-// import Layout from '@/layout'
+import { Local } from '@/utils/storage'
+import store from '@/store/index'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+import getPageTitle from '@/utils/get-page-title'
+import Layout from '@/layout'
+import { getRouters } from '@/api/method/menus'
+
 Vue.use(Router)
+
+NProgress.configure({ showSpinner: false })
 
 export const staticRouters = [
   {
     path: '/login',
-    name: 'login',
-    meta: { title: '登录' },
     component: () => import('@/views/login/index')
   },
-  {
-    path: '/workTable',
-    name: 'workTable',
-    component: () => import('@/views/leftMenus/workTable/index'),
-    meta: { title: '首页', icon: 'zhgzt' }
-  }
+  // {
+  //   path: '/workTable',
+  //   name: 'workTable',
+  //   component: () => import('@/views/leftMenus/workTable/index'),
+  //   meta: { title: '首页', icon: 'zhgzt' }
+  // },
   // {
   //   path: '/redirect',
+  //   name: 'redirect',
   //   component: Layout,
   //   hidden: true,
   //   children: [
@@ -27,18 +35,21 @@ export const staticRouters = [
   //     }
   //   ]
   // },
-  // {
-  //   path: '/',
-  //   redirect: '/workTable',
-  //   children: [
-  //     {
-  //       path: '/workTable',
-  //       name: '首页',
-  //       component: () => import('@/views/leftMenus/workTable/index'),
-  //       meta: { title: '首页', icon: 'zhgzt' }
-  //     }
-  //   ]
-  // },
+  {
+    path: '/',
+    component: Layout,
+    redirect: '/workTable',
+    name: 'workTable',
+    hidden: true,
+    children: [
+      {
+        path: '/workTable',
+        name: 'workTable',
+        component: () => import('@/views/leftMenus/workTable/index'),
+        meta: { title: '首页', icon: 'zhgzt' }
+      }
+    ]
+  }
   // {
   //   path: '/resourceManagement',
   //   name: 'resourceManagement',
@@ -300,23 +311,119 @@ Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch((err) => err)
 }
 
-// const router = new Router({
-// 	mode: 'history',
+// export default new Router({
+//   mode: 'history',
 //   scrollBehavior: () => ({ y: 0 }),
-//   routes:staticRouters
+//   routes: staticRouters
 // })
 
-const createRouter = () =>
-  new Router({
-    mode: 'history',
-    scrollBehavior: () => ({ y: 0 }),
-    routes: staticRouters
-  })
+const router = new Router({
+  mode: 'history',
+  scrollBehavior: () => ({ y: 0 }),
+  routes: staticRouters
+})
 
-const router = createRouter()
-export function resetRouter() {
-  const newRouter = createRouter()
-  router.matcher = newRouter.matcher
+// const createRouter = () =>
+//   new Router({
+//     mode: 'history',
+//     scrollBehavior: () => ({ y: 0 }),
+//     routes: staticRouters
+//   })
+
+// const router = createRouter()
+// export function resetRouter() {
+//   const newRouter = createRouter()
+//   router.matcher = newRouter.matcher
+// }
+
+const whiteList = ['/login']
+
+router.afterEach((to, from) => {
+  document.title = getPageTitle(to.meta.title)
+})
+router.beforeEach((to, from, next) => {
+  // debugger
+  console.log(to, '查看to')
+  console.log(store.state.user.init, 'store.state.user.init')
+  NProgress.start()
+  const hasToken = Local.getToken()
+  if (hasToken) {
+    if (to.path === '/login') {
+      next({ path: '/' })
+    } else {
+      if (!store.state.user.init && store.state.user.routerLists) {
+        getRouters().then((res) => {
+          store.dispatch('user/dynamicRouters', res)
+        })
+        const dynamicRouters = store.state.user.routerLists
+
+        console.log(dynamicRouters, '查看现有dynamicRouters')
+        const childComponent = []
+        dynamicRouters.forEach((item) => {
+          if (item.children && item.children.length > 0) {
+            item.children.forEach((child) => {
+              let params = {}
+              params = {
+                path: child.path,
+                meta: child.meta,
+                name: child.name,
+                // component: () => import(`@/views${child.component}`),
+                component: (resolve) =>
+                  require([`@/views/${child.component}`], resolve)
+              }
+              childComponent.push(params)
+            })
+            Router.options.routes.push({
+              path: item.path,
+              meta: item.meta,
+              name: item.name,
+              // component: () => import(`@/views${item.component}`),
+              component: (resolve) =>
+                require([`@/views/${item.component}`], resolve),
+              children: childComponent
+            })
+          } else {
+            router.addRoute({
+              path: item.path,
+              meta: item.meta,
+              name: item.name,
+              component: item.component
+              // component: () => import(`@/views${item.component}.vue`),
+              // component: (resolve) =>
+              //   require([`@/views/${item.component}.vue`], resolve)
+            })
+          }
+        })
+        // console.log(router)
+        // router.addRoutes(router.options.routes)
+
+        store.dispatch('user/changeInit', true)
+        next({ ...to, replace: true })
+      } else {
+        next()
+      }
+    }
+  } else {
+    if (whiteList.indexOf(to.path) !== -1) {
+      next()
+    } else {
+      next('/login')
+      NProgress.done()
+    }
+  }
+})
+
+// 如果跳往登录页，则转到首页
+function isLogin(to, next, callback) {
+  if (to.path == '/login') {
+    next('/')
+  } else {
+    callback()
+  }
 }
+
+router.afterEach(() => {
+  NProgress.done()
+})
 
 export default router

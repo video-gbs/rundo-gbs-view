@@ -1,30 +1,22 @@
 <template>
-  <div class="app-wrapper" v-if="showSidebar">
-    <Header class="wrapper-header" />
-    <div
-      v-if="device === 'mobile' && sidebar.opened"
-      class="drawer-bg"
-      @click="handleClickOutside"
-    />
-    <sidebar class="sidebar-container" />
+  <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
+    <Header class="wrapper-header" :isShowTopMenus="isShowTopMenus" />
+    <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" />
+    <sidebar class="sidebar-container" v-if="!showSidebar" />
     <div class="main-container f fd-c ai-s">
-      <div :class="{ 'fixed-header': fixedHeader }">
-        <Navbar />
-      </div>
       <app-main />
     </div>
   </div>
+
   <div class="app-wrapper" v-else>
-    <Header class="wrapper-header" />
-    <div
-      v-if="device === 'mobile' && sidebar.opened"
-      class="drawer-bg"
-      @click="handleClickOutside"
+    <Header
+      class="wrapper-header"
+      @changeSidebarHiddenStatus="changeSidebarHiddenStatus"
+      :isShowTopMenus="!isShowTopMenus"
     />
-    <div class="main-container-else">
-      <!-- <div :class="{ 'fixed-header': fixedHeader }">
-        <Navbar />
-      </div> -->
+    <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" />
+    <sidebar class="sidebar-container" v-if="showSidebar" />
+    <div class="main-container f fd-c ai-s">
       <app-main />
     </div>
   </div>
@@ -33,7 +25,6 @@
 <script>
 import { Header, Sidebar, AppMain, Navbar, TagsView } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
-import store from '@/store/index'
 
 export default {
   name: 'Layout',
@@ -49,13 +40,14 @@ export default {
     return {
       nowWidth: '',
       baseW: '',
-      showSidebar: true
+      showSidebar: false,
+      nowRouter: [],
+      isShowTopMenus: false
     }
   },
   watch: {
     $route: {
       handler: function (val, oldVal) {
-        console.log('val.path', val.path)
         if (val.path === '/workTable') {
           this.showSidebar = false
         } else {
@@ -94,9 +86,9 @@ export default {
     }
   },
   created() {
-    const nowRouter = this.$route.matched.filter((item) => item.name)
+    this.nowRouter = this.$route.matched.filter((item) => item.name)
 
-    if (nowRouter[0].path === '/workTable') {
+    if (this.nowRouter[0].name === 'workTable') {
       this.showSidebar = false
     } else {
       this.showSidebar = true
@@ -108,6 +100,12 @@ export default {
     window.onresize = this.throttle(this.setScale, 500, 500)
   },
   methods: {
+    changeSidebarHiddenStatus(val) {
+      // if(val){
+
+      // }
+      this.showSidebar = val
+    },
     initTabList() {
       this.tabList.push(this.$route.path)
     },

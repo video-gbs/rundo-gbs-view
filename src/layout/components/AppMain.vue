@@ -10,9 +10,9 @@
         <router-view v-if="!$route.meta.keepAlive" :key="key" />
       </transition>
     </div>
-    <!-- <h2 class="company-title f jc-c ai-c">©2022 润建股份有限公司 版权所有</h2> -->
+    <h2 class="company-title f jc-c ai-c">©2022 润建股份有限公司 版权所有</h2>
   </section>
-  <section class="app-main-else f1 fd-c ai-s" style="height: 100%" v-else>
+  <!-- <section class="app-main-else f1 fd-c ai-s" style="height: 100%" v-else>
     <div style="height: 100%" class="app-main-c f1 f">
       <transition name="fade-transform1" mode="out-in">
         <keep-alive>
@@ -23,7 +23,7 @@
         <router-view v-if="!$route.meta.keepAlive" :key="key" />
       </transition>
     </div>
-  </section>
+  </section> -->
 </template>
 
 <script>

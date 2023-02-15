@@ -2,20 +2,39 @@
   <div class="app-header">
     <div class="app-header">
       <div class="app-header-left">
-        <i class="logo mr8" />
-        <h2>视频联网平台</h2>
+        <div>
+          <i class="logo mr8" />
+          <h2>视频联网平台</h2>
+        </div>
+      </div>
+      <div class="top-menus-content" v-if="isShowTopMenus">
+        <el-menu
+          mode="horizontal"
+          text-color="#000000"
+          active-text-color="#3989fa"
+          :default-active="toIndex"
+          @select="handleSelect"
+          class="top-menus"
+        >
+          <el-menu-item
+            v-for="(item, index) in itemList"
+            :index="item.path"
+            :key="index"
+            class="top-menus-item"
+          >
+            <!-- <router-link active-class="active" :to="item.path"> -->
+            <div class="top-menus-div" @click="clickRouter(item)">
+              <span slot="title" class="top-menus-span"
+                ><svg-icon class="top-menu-svg" icon-class="zhanghao" />{{
+                  item.title
+                }}</span
+              >
+            </div>
+            <!-- </router-link> -->
+          </el-menu-item>
+        </el-menu>
       </div>
       <div class="header-menu">
-        <router-link
-          v-for="(item, index) in routes"
-          :key="index"
-          :to="item.path"
-          class="menu-item"
-        >
-          <!-- <i :class="item.meta.icon" /> -->
-          <!-- <svg-icon :icon-class="item.meta.icon" /> -->
-          <span>{{ item.meta.title }}</span>
-        </router-link>
         <div class="menu-user">
           <div class="user-menu">
             <svg-icon icon-class="user3" class="user" />
@@ -98,6 +117,12 @@ export default {
     // Message,
     // NotTips,
   },
+  props: {
+    isShowTopMenus: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       showDrawer: false,
@@ -105,47 +130,26 @@ export default {
       messageCount: 0,
       lastCount: 0,
       show: false,
-      userInfo: {}
+      userInfo: {},
+      itemList: [
+        { path: '/workTable', title: '首页', type: 1 },
+        { path: '/test1', title: '应用1', type: 2 },
+        { path: '/test2', title: '菜单1', type: 3 },
+        { path: '/test3', title: '运维1', type: 1 },
+        { path: '/permission', title: '应用2', type: 2 },
+        { path: '/permission', title: '菜单2', type: 3 }
+      ]
     }
   },
   computed: {
-    ...mapGetters(['user', 'systemTitle']),
-    // avatar() {
-    //   if (this.user.avatar) {
-    //     return require(`@/assets/avatar/${this.user.avatar}`);
-    //   } else {
-    //     return require(`@/assets/avatar/default.jpg`);
-    //   }
-    // },
-    /**
-     * 工作平台和系统管理菜单
-     */
-    routes() {
-      const routes = this.$router.options.routes.filter((route) => {
-        return route.systemCode
-      })
-      return routes
-    },
-    systemName() {
-      return this.$store.state.settings.systemName
-    },
-    toGreet() {
-      const now = new Date().getHours()
-      return now < 12 ? '上午好' : now > 2 ? '下午好' : '中午好'
+    ...mapGetters(['routerLists']),
+
+    toIndex() {
+      // 根据路径绑定到对应的一级菜单，防止页面刷新重新跳回第一个
+      return '/' + this.$route.path.split('/')[1]
     }
   },
   created() {
-    // if (Local.getToken()) {
-    //   // this.initNotice();
-    // }
-    // this.$socket.create({
-    //   callback: this.initNotice,
-    // });
-    // this.$socket.create(() => {
-    //   if (Local.getToken()) {
-    //     this.initNotice()
-    //   }
-    // })
     this.userInfo.userName = localStorage.getItem('rj_userName') || '佚名用户'
     this.userInfo.userName = this.userInfo.userName
       .replace('"', '')
@@ -168,42 +172,13 @@ export default {
           this.$router.push({ path: '/login' })
         })
     },
-    setTheme() {
-      this.$utils.setTheme('theme-blue')
-    },
-    reconent() {
-      this.$socket.create()
-    },
-    initNotice() {
-      this.$api.message.list().then((res) => {
-        if (res.data.data) {
-          this.messageData = {
-            rows: res.data.data
-          }
-          let count = this.messageData.rows.length
-          this.messageData.rows.forEach((item) => {
-            if (item.isRead) {
-              count--
-            }
-          })
-          this.messageCount = count
-          if (count > 0) {
-            if (count > this.lastCount) {
-              this.lastCount = count
-              this.show = true
-            }
-          } else {
-            this.show = false
-          }
-        }
-      })
-    },
-    toMessage() {
-      this.showDrawer = true
-      this.show = false
-    },
-    closeTips() {
-      this.show = false
+    clickRouter(item) {
+      if (item.type === 1) {
+        this.$emit('changeSidebarHiddenStatus', false)
+        this.$router.push({ path: item.path })
+      } else {
+        this.$emit('changeSidebarHiddenStatus', true)
+      }
     }
   }
 }
@@ -230,6 +205,56 @@ export default {
   background-image: url('../../../assets/imgs/top-bg.png');
   background-repeat: no-repeat;
   background-size: cover;
+
+  .top-menus-content {
+    position: absolute;
+    left: 260px;
+    .top-menus {
+      background-color: transparent;
+      height: 60px;
+      border: 0 none;
+      .top-menus-item {
+        background-color: transparent;
+        border: 0 none !important;
+        &::after {
+          display: none;
+        }
+        &.is-active {
+          background-color: transparent !important;
+          border: 0 none !important;
+          .top-menus-span {
+            background: linear-gradient(
+              180deg,
+              rgba(66, 148, 255, 0.5) 0%,
+              rgba(2, 112, 255, 0.03) 100%
+            );
+            box-shadow: inset 0px 0px 12px 1px rgba(255, 255, 255, 0.16);
+            border-radius: 15px 15px 15px 15px;
+          }
+        }
+        .top-menus-div {
+          height: 21px;
+
+          .top-menu-svg {
+            widows: 1rem;
+            height: 1rem;
+            position: relative;
+            top: 0px;
+            left: -8px;
+          }
+          .top-menus-span {
+            font-size: 16px;
+            font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+            font-weight: 400;
+            color: #ffffff;
+            display: inline;
+            padding: 3px 15px;
+            margin-left: 10px;
+          }
+        }
+      }
+    }
+  }
   .app-header-left {
     position: relative;
 

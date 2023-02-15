@@ -328,8 +328,6 @@ export default {
     this.form.deviceType = deviceType + ''
     this.form.gatewayId = 7
     this.editId = this.$route.query.row.id
-    console.log('form', this.form)
-    console.log('form1', this.form1)
   },
   mounted() {
     this.init()

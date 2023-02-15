@@ -5,7 +5,7 @@
       style="height: calc(100% - 62px)"
     >
       <el-menu
-        ref="leftNavigation"
+        ref="toptNavigation"
         router
         :default-active="activeMenu"
         :background-color="variables.menuBg"

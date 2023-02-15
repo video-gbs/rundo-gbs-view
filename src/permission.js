@@ -9,54 +9,59 @@ import Layout from '@/layout'
 
 NProgress.configure({ showSpinner: false })
 
-const whiteList = ['/login']
+// const whiteList = ['/login','/workTable']
 
-router.afterEach((to, from) => {
-  document.title = getPageTitle(to.meta.title)
-})
-router.beforeEach(async (to, from, next) => {
-  console.log('to~~~~~~~~~~~~~~~~~', to)
-  console.log('from~~~~~~~~~~~~~~~~~', from)
-  const hasToken = Local.getToken()
-  console.log(
-    'sessionStorage~~~~~~~~~~~~~~~~~',
-    sessionStorage.getItem('dynamicRouters')
-  )
-  console.log('store~~~~~~~~~~~~~~~~~', store.state.user.routerLists)
-  if (
-    hasToken &&
-    store.state.user.routerLists.length !== 0 &&
-    sessionStorage.getItem('dynamicRouters')
-  ) {
-    if (!store.state.user.init) {
-      const accessRouteses = store.state.user.routerLists
-      console.log('accessRouteses~~~~~~~~~~~~~~~~~', accessRouteses)
-      store.dispatch('user/dynamicRouters', accessRouteses)
-      next({ ...to, replace: true })
-    } else {
-      next()
-    }
-  } else {
-    if (whiteList.indexOf(to.path) !== -1) {
-      next()
-    } else {
-      next(`/login`)
-    }
-  }
-})
+// router.afterEach((to, from) => {
+//   document.title = getPageTitle(to.meta.title)
+// })
+// router.beforeEach(async (to, from, next) => {
+//   console.log('to~~~~~~~~~~~~~~~~~', to)
+//   console.log('from~~~~~~~~~~~~~~~~~', from)
+//   const hasToken = Local.getToken()
+//   console.log(
+//     'sessionStorage~~~~~~~~~~~~~~~~~',
+//     sessionStorage.getItem('dynamicRouters')
+//   )
+//   console.log('store~~~~~~~~~~~~~~~~~', store.state.user.routerLists)
+//   console.log('router！！！！！！！！！！！！', router)
+//   if (
+//     hasToken &&
+//     store.state.user.routerLists.length !== 0 &&
+//     sessionStorage.getItem('dynamicRouters')
+//   ) {
+//     // if(to.path === '/workTable'){
+
+//     //   store.dispatch('user/changeInit', false)
+//     // }
+//     if (!store.state.user.init) {
+//       const accessRouteses = store.state.user.routerLists
+//       console.log('accessRouteses~~~~~~~~~~~~~~~~~', accessRouteses)
+//       store.dispatch('user/dynamicRouters', accessRouteses)
+//       next({ ...to, replace: true })
+//     } else {
+//       next()
+//     }
+//   } else {
+//     if (whiteList.indexOf(to.path) !== -1) {
+//       next()
+//     } else {
+//       next(`/login`)
+//     }
+//   }
+// })
 
 // 如果跳往登录页，则转到首页
-function isLogin(to, next, callback) {
-  if (to.path == '/login') {
-    next('/')
-  } else {
-    callback()
-  }
-}
+// function isLogin(to, next, callback) {
+//   if (to.path == '/login') {
+//     next('/')
+//   } else {
+//     callback()
+//   }
+// }
 
-router.afterEach(() => {
-  NProgress.done()
-})
+// router.afterEach(() => {
+//   NProgress.done()
+// })
 
 // function hasPermission(roles, route) {
 //   if (route.meta && route.meta.roles) {
