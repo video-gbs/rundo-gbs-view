@@ -16,30 +16,49 @@ export function getRouters() {
           {
             path: '/equipment',
             name: 'equipment',
-            component: 'leftMenus/resourceManagement/index',
+            component: 'leftMenus/systemManagement/unitManagement/index',
             meta: {
-              icon: '',
-              title: '前端设备'
+              icon: 'ssjk',
+              title: '实施监控'
             }
           },
           {
-            path: '/addEquipment/:type',
-            name: 'addEquipment',
-            component:
-              'leftMenus/resourceManagement/components/AddEquipment.vue',
+            path: '/unitManagement',
+            name: 'unitManagement',
+            component: 'leftMenus/systemManagement/unitManagement/index',
             meta: {
-              icon: '',
-              title: '添加设备'
+              icon: 'lxhf',
+              title: '录像回放'
             }
           },
           {
-            path: '/displayControlEquipment',
-            name: 'displayControlEquipment',
+            path: '/securityArea',
+            name: 'securityArea',
             component:
               'leftMenus/resourceManagement/displayControlEquipment.vue',
             meta: {
-              icon: '',
-              title: '显示控制设备'
+              icon: 'bjcl',
+              title: '报警处理'
+            }
+          },
+          {
+            path: '/applicationManagement',
+            name: 'applicationManagement',
+            component:
+              'leftMenus/resourceManagement/displayControlEquipment.vue',
+            meta: {
+              icon: 'dzdt',
+              title: '电子地图'
+            }
+          },
+          {
+            path: '/applicationManagement1',
+            name: 'applicationManagement1',
+            component:
+              'leftMenus/resourceManagement/displayControlEquipment.vue',
+            meta: {
+              icon: 'dsq',
+              title: '电视墙'
             }
           }
         ]

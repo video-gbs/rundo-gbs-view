@@ -12,12 +12,12 @@
           mode="horizontal"
           text-color="#000000"
           active-text-color="#3989fa"
-          :default-active="toIndex"
+          :default-active="activeIndex"
           @select="handleSelect"
           class="top-menus"
         >
           <el-menu-item
-            v-for="(item, index) in itemList"
+            v-for="(item, index) in resRouterLists"
             :index="item.path"
             :key="index"
             class="top-menus-item"
@@ -25,9 +25,10 @@
             <!-- <router-link active-class="active" :to="item.path"> -->
             <div class="top-menus-div" @click="clickRouter(item)">
               <span slot="title" class="top-menus-span"
-                ><svg-icon class="top-menu-svg" icon-class="zhanghao" />{{
-                  item.title
-                }}</span
+                ><svg-icon
+                  class="top-menu-svg"
+                  :icon-class="item.meta.icon"
+                />{{ item.meta.title }}</span
               >
             </div>
             <!-- </router-link> -->
@@ -108,10 +109,9 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-// import Message from "../Message/index.vue";
 import { Local } from '@/utils/storage'
-// import NotTips from "@/components/NotTips";
 import { logout } from '@/api/method/user'
+import store from '@/store/index'
 export default {
   components: {
     // Message,
@@ -122,39 +122,78 @@ export default {
       type: Boolean,
       default: false
     }
+    // ,
+    // secondLevelRouters: {
+    //   type: Array,
+    //   default: [
+    //     { path: '/workTable', title: '首页', type: 1 },
+    //     { path: '/equipment', title: '应用1', type: 2 },
+    //     { path: '/test2', title: '菜单1', type: 3 },
+    //     { path: '/test3', title: '运维1', type: 1 },
+    //     { path: '/permission', title: '应用2', type: 2 },
+    //     { path: '/permission', title: '菜单2', type: 3 }
+    //   ]
+    // }
   },
   data() {
     return {
+      activeIndex: store.state.user.activeIndex,
       showDrawer: false,
       messageData: {},
       messageCount: 0,
       lastCount: 0,
       show: false,
       userInfo: {},
-      itemList: [
-        { path: '/workTable', title: '首页', type: 1 },
-        { path: '/test1', title: '应用1', type: 2 },
-        { path: '/test2', title: '菜单1', type: 3 },
-        { path: '/test3', title: '运维1', type: 1 },
-        { path: '/permission', title: '应用2', type: 2 },
-        { path: '/permission', title: '菜单2', type: 3 }
-      ]
+      resRouterLists: []
     }
   },
   computed: {
-    ...mapGetters(['routerLists']),
-
-    toIndex() {
-      // 根据路径绑定到对应的一级菜单，防止页面刷新重新跳回第一个
-      return '/' + this.$route.path.split('/')[1]
-    }
+    ...mapGetters(['routerLists'])
   },
   created() {
+    const homeRouters = [
+      {
+        path: '/workTable',
+        name: 'workTable',
+        component: () => import('@/views/leftMenus/workTable/index'),
+        meta: { title: '首页', icon: 'sy' }
+      }
+    ]
     this.userInfo.userName = localStorage.getItem('rj_userName') || '佚名用户'
     this.userInfo.userName = this.userInfo.userName
       .replace('"', '')
       .replace('"', '')
+
+    // store.watch(
+    //   (state, getters) => {
+    //     return state.routerLists
+    //   },
+    //   () => {
+
+    //   }
+    // )
+
+    console.log('this.routerLists', this.routerLists)
+    this.routerLists.map((item) => {
+      if (item.children && item.children.length > 0) {
+        item.children.forEach((child) => {
+          let params = {}
+          params = {
+            path: child.path,
+            meta: child.meta,
+            name: child.name,
+            component: (resolve) =>
+              require([`@/views/${child.component}`], resolve)
+          }
+          this.resRouterLists.push(params)
+        })
+      }
+    })
+    this.resRouterLists = homeRouters.concat(this.resRouterLists)
+    this.activeIndex = this.resRouterLists[1].path
+    console.log('this.resRouterLists', this.resRouterLists)
   },
+  mounted() {},
   methods: {
     /**
      * 退出登录
@@ -171,6 +210,9 @@ export default {
           // Local.remove('rj__deptName')
           this.$router.push({ path: '/login' })
         })
+    },
+    handleSelect(key, keyPath) {
+      console.log(key, keyPath)
     },
     clickRouter(item) {
       if (item.type === 1) {
@@ -190,11 +232,11 @@ export default {
   width: 100%;
   color: #fff;
   display: flex;
-  position: fixed;
-  top: 0;
-  left: 0;
+  // position: fixed;
+  // top: 0;
+  // left: 0;
   z-index: 999;
-  padding: 0 2rem;
+  padding: 0 10px;
   align-items: center;
   opacity: 1;
   justify-content: space-between;

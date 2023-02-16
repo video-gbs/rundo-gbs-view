@@ -1,7 +1,7 @@
 import { login, logout } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import Router, { staticRouters } from '@/router'
-
+import Layout from '@/layout'
 const getDefaultState = () => {
   return {
     token: getToken(),
@@ -10,7 +10,8 @@ const getDefaultState = () => {
     // 动态路由
     routerLists: [],
     init: false,
-    roles: []
+    roles: [],
+    activeIndex: ''
   }
 }
 
@@ -29,55 +30,55 @@ const mutations = {
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
   },
-  SET_ROUTERLISTS: (state, routerLists) => {
-    state.init = true
-    // let routerMaps = filterRouter(routerLists)
-    routerLists.push({
-      path: '/404',
-      component: () => import('@/views/404.vue'),
-      hidden: true
-    })
-    const childComponent = []
-    routerLists.forEach((item) => {
-      if (item.children && item.children.length > 0) {
-        item.children.forEach((child) => {
-          let params = {}
-          params = {
-            path: child.path,
-            meta: child.meta,
-            name: child.name,
-            // component: () => import(`@/views/${child.component}`),
-            component: (resolve) =>
-              require([`@/views/${child.component}`], resolve)
-          }
-          childComponent.push(params)
-        })
-        Router.options.routes.push({
-          path: item.path,
-          meta: item.meta,
-          name: item.name,
-          // component: () => import(`@/views/${item.component}`),
-          component: (resolve) =>
-            require([`@/views/${item.component}`], resolve),
-          children: childComponent
-        })
-      } else {
-        Router.options.routes.push({
-          path: item.path,
-          meta: item.meta,
-          name: item.name,
-          component: item.component
-          // component: () => import(`@/views${item.component}`)
-          // component: (resolve) =>
-          //   require([`@/views/${item.component}`], resolve)
-        })
-      }
-    })
+  SET_ACTIVEINDEX: (state, activeIndex) => {
+    state.activeIndex = activeIndex
+  },
+  SET_ROUTERLISTS: (state, dynamicRouters) => {
+    // routerLists.push({
+    //   path: '/404',
+    //   component: () => import('@/views/404.vue'),
+    //   hidden: true
+    // })
+    state.routerLists = dynamicRouters
 
-    state.routerLists = routerLists
-    Router.addRoutes(Router.options.routes)
-    console.log('Router~~~~~~~~', Router)
-    sessionStorage.setItem('dynamicRouters', JSON.stringify(routerLists))
+    console.log('routerLists22222222', state.routerLists, dynamicRouters)
+    // const childComponent = []
+    // routerLists.forEach((item) => {
+    //   if (item.children && item.children.length > 0) {
+    //     item.children.forEach((child) => {
+    //       let params = {}
+    //       params = {
+    //         path: child.path,
+    //         meta: child.meta,
+    //         name: child.name,
+    //         component: (resolve) =>
+    //           require([`@/views/${child.component}`], resolve)
+    //       }
+    //       childComponent.push(params)
+    //     })
+    //     if (item.component === 'Layout') {
+    //       Router.options.routes.push({
+    //         path: item.path,
+    //         meta: item.meta,
+    //         name: item.name,
+    //         component: Layout,
+    //         children: childComponent
+    //       })
+    //     }
+    //   } else {
+    //     Router.options.routes.push({
+    //       path: item.path,
+    //       meta: item.meta,
+    //       name: item.name,
+    //       component: Layout
+    //     })
+    //   }
+    // })
+
+    // state.routerLists = routerLists
+    // Router.addRoutes(Router.options.routes)
+    // console.log('Router~~~~~~~~', Router)
+    // sessionStorage.setItem('dynamicRouters', JSON.stringify(Router.options.routes))
   },
   SET_INIT: (state, init) => {
     state.init = init
@@ -131,13 +132,18 @@ const actions = {
   // },
 
   // 动态设置路由 此为设置设置途径
-  dynamicRouters({ commit }, routerLists) {
+  dynamicRouters({ commit }, dynamicRouters) {
     // staticRouters.concat(routerLists)
-    commit('SET_ROUTERLISTS', routerLists) // 进行路由拼接并存储
+    console.log('routerLists111111111111', dynamicRouters)
+    commit('SET_ROUTERLISTS', dynamicRouters) // 进行路由拼接并存储
   },
 
   changeInit({ commit }, val) {
     commit('SET_INIT', val)
+  },
+
+  changeActiveIndex({ commit }, val) {
+    commit('SET_ACTIVEINDEX', val)
   },
 
   // user logout

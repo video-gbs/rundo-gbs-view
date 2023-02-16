@@ -456,7 +456,7 @@ export default {
   }
 
   .securityArea_container {
-    height: calc(100% - 40px);
+    height: calc(100% - 90px);
     width: 310px;
     margin: 10px;
     // background: #ffffff;

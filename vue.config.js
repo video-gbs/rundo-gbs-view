@@ -65,7 +65,7 @@ module.exports = {
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
   // publicPath: '/',
-  publicPath: process.env.NODE_ENV === "production" ? "./" : "/portal/",
+  publicPath: process.env.NODE_ENV === "production" ? "./" : "/login",
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: false,

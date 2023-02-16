@@ -1,106 +1,123 @@
 <template>
-  <div class="page-container">
-    <div class="container-top">
-      <LineFont
-        class="line-font"
-        :line-title="lineTitle"
-        :text-style="textStyle"
-        :line-blue-style="lineBlueStyle"
-      />
-      <ul class="home-ul-top">
-        <li
-          v-for="(top, index) in topLists"
-          :key="index"
-          class="top-li"
-          @click="goContentList"
-        >
-          <div
-            class="top-li-div"
-            :style="{ background: colorList[index] }"
-          ></div>
-          <span class="top-li-span">{{ top.name }}</span>
-        </li>
-      </ul>
-    </div>
-    <div class="container-middle">
-      <div class="container-middle-left">
+  <div class="home-page-content">
+    <Header class="wrapper-header" :isShowTopMenus="isShowTopMenus" />
+    <div class="page-container">
+      <div class="container-top">
         <LineFont
           class="line-font"
-          :line-title="lineTitle2"
+          :line-title="lineTitle"
+          :text-style="textStyle"
+          :line-blue-style="lineBlueStyle"
+        />
+
+        <ul class="home-ul-top">
+          <li v-for="(top, index) in topLists" :key="index" class="top-li">
+            <div
+              class="top-li-div"
+              :style="{ background: colorList[index] }"
+            ></div>
+            <span class="top-li-span">{{ top.name }}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="container-middle">
+        <div class="container-middle-left">
+          <LineFont
+            class="line-font"
+            :line-title="lineTitle2"
+            :text-style="textStyle"
+            :line-blue-style="lineBlueStyle"
+          />
+          <ul class="home-ul-top">
+            <li
+              v-for="(item1, index1) in appList"
+              :key="index1"
+              class="top-li"
+              @click="goContentList('应用', item1, index1)"
+            >
+              <div
+                class="top-li-div"
+                :style="{
+                  background:
+                    'url(' +
+                    require('../../../assets/imgs/' + item1.appIcon + '.png') +
+                    ') center center no-repeat'
+                }"
+              ></div>
+              <span class="top-li-span">{{ item1.appName }}</span>
+            </li>
+          </ul>
+        </div>
+        <div class="container-middle-right">
+          <LineFont
+            class="line-font"
+            :line-title="lineTitle3"
+            :text-style="textStyle"
+            :line-blue-style="lineBlueStyle"
+          />
+          <ul class="home-ul-top">
+            <li
+              v-for="(item2, index2) in devOpsList"
+              :key="index2"
+              class="top-li"
+              @click="goContentList('运维', item2, index2)"
+            >
+              <!-- :style="{ background: colorList2[index2] }" -->
+              <div
+                class="top-li-div"
+                :style="{
+                  background:
+                    'url(' +
+                    require('../../../assets/imgs/' + item2.appIcon + '.png') +
+                    ') center center no-repeat'
+                }"
+              ></div>
+              <span class="top-li-span">{{ item2.appName }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="container-bottom">
+        <LineFont
+          class="line-font"
+          :line-title="lineTitle4"
           :text-style="textStyle"
           :line-blue-style="lineBlueStyle"
         />
         <ul class="home-ul-top">
           <li
-            v-for="(item1, index1) in topLists1"
-            :key="index1"
+            v-for="(item3, index3) in configList"
+            :key="index3"
             class="top-li"
-            @click="goContentList"
+            @click="goContentList('配置', item3, index3)"
           >
             <div
               class="top-li-div"
-              :style="bacImage('应用', item1, index1)"
+              :style="{
+                background:
+                  'url(' +
+                  require('../../../assets/imgs/' + item3.appIcon + '.png') +
+                  ') center center no-repeat'
+              }"
             ></div>
-            <span class="top-li-span">{{ item1.name }}</span>
+            <span class="top-li-span">{{ item3.appName }}</span>
           </li>
         </ul>
       </div>
-      <div class="container-middle-right">
-        <LineFont
-          class="line-font"
-          :line-title="lineTitle3"
-          :text-style="textStyle"
-          :line-blue-style="lineBlueStyle"
-        />
-        <ul class="home-ul-top">
-          <li
-            v-for="(item2, index2) in topLists2"
-            :key="index2"
-            class="top-li"
-            @click="goContentList"
-          >
-            <!-- :style="{ background: colorList2[index2] }" -->
-            <div
-              class="top-li-div"
-              :style="bacImage('运维', item2, index2)"
-            ></div>
-            <span class="top-li-span">{{ item2.name }}</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="container-bottom">
-      <LineFont
-        class="line-font"
-        :line-title="lineTitle4"
-        :text-style="textStyle"
-        :line-blue-style="lineBlueStyle"
-      />
-      <ul class="home-ul-top">
-        <li
-          v-for="(item3, index3) in topLists3"
-          :key="index3"
-          class="top-li"
-          @click="goContentList"
-        >
-          <div
-            class="top-li-div"
-            :style="bacImage('配置', item3, index3)"
-          ></div>
-          <span class="top-li-span">{{ item3.name }}</span>
-        </li>
-      </ul>
     </div>
   </div>
 </template>
 
 <script>
+import { Header } from '@/layout/components'
 import LineFont from '@/components/LineFont'
-import { getHomeLists } from '@/api/method/home'
+import { getHomeLists, getTypeTreeMenus } from '@/api/method/home'
+import store from '@/store/index'
 
 export default {
   components: {
-    LineFont
+    LineFont,
+    Header
   },
   data() {
     return {
@@ -120,7 +137,7 @@ export default {
         'linear-gradient(317deg, #4481EB 0%, #04BEFE 100%)'
       ],
       colorList1: [
-        require('../../../assets/imgs/mid1.png'),
+        // require('../../../assets/imgs/mid1.png'),
         'linear-gradient(167deg, #F77062 0%, #FE5196 100%)',
         'linear-gradient(180deg, #FFBC08 0%, #FFCC99 100%)',
         '#FFFFFF',
@@ -129,7 +146,7 @@ export default {
       ],
       colorList2: [
         // 'linear-gradient(180deg, #38C07C 0%, #2E7753 100%)',
-        require('../../../assets/imgs/peizhi.png'),
+        // require('../../../assets/imgs/peizhi.png'),
         'linear-gradient(180deg, #00BCB6 0%, #009993 100%)',
         'linear-gradient(173deg, #54FFB5 0%, #259094 100%)',
         '#FFFFFF',
@@ -137,8 +154,8 @@ export default {
         '#FFFFFF'
       ],
       colorList3: [
-        require('../../../assets/imgs/bottom1.png'),
-        require('../../../assets/imgs/bottom2.png'),
+        // require('../../../assets/imgs/bottom1.png'),
+        // require('../../../assets/imgs/bottom2.png'),
         'linear-gradient(147deg, #4481EB 0%, #04BEFE 100%)',
         '#FFFFFF',
         '#FFFFFF',
@@ -155,7 +172,7 @@ export default {
           name: '功能功能'
         }
       ],
-      topLists1: [
+      appList: [
         {
           name: '实时监控'
         },
@@ -175,7 +192,7 @@ export default {
           name: '功能功能'
         }
       ],
-      topLists2: [
+      devOpsList: [
         {
           name: '系统管理'
         },
@@ -195,7 +212,7 @@ export default {
           name: '功能功能'
         }
       ],
-      topLists3: [
+      configList: [
         {
           name: '组织管理'
         },
@@ -247,13 +264,7 @@ export default {
     }
   },
   watch: {},
-  created() {
-    // this.getWeather()
-    console.log(
-      'this.$router.options.routes~~~~~~~~~~',
-      this.$router.options.routes
-    )
-  },
+  created() {},
   mounted() {
     this.init()
   },
@@ -262,105 +273,150 @@ export default {
       await getHomeLists()
         .then((res) => {
           if (res.code === 0) {
-            console.log('res！~~~~~~~~~', res)
             const { appList, configList, devOpsList } = res.data
-            // this.treeData = res.data
-            this.topLists1 = appList
+            this.devOpsList = devOpsList
+            this.appList = appList
+            this.configList = configList
           }
         })
         .catch((error) => {
           console.log(error)
         })
     },
-    bacImage(name, item, index) {
+    // bacImage(name, item, index) {
+    //   const imgUrl = require(`../../../assets/imgs/${item.appIcon}.png`)
+    //   // require('../../../assets/imgs/mid1.png')
+    //   switch (name) {
+    //     case '应用':
+    //       // if (index === 0) {
+    //       return {
+    //         background: 'url(' + imgUrl + ') center center no-repeat'
+    //       }
+    //       // } else {
+    //       //   return `background:${this.colorList1[index]}`
+    //       // }
+    //       break
+    //     case '运维':
+    //       // if (index === 0) {
+    //       return {
+    //         background: 'url(' + imgUrl + ') center center no-repeat'
+    //       }
+    //       // } else {
+    //       //   return `background:${this.colorList2[index]}`
+    //       // }
+    //       break
+    //     case '配置':
+    //       // if (index === 0) {
+    //       return {
+    //         background: 'url(' + imgUrl + ') center center no-repeat'
+    //       }
+    //       // } else if (index === 1) {
+    //       //   return {
+    //       //     background:
+    //       //       'url(' + this.colorList3[index] + ') center center no-repeat'
+    //       //   }
+    //       // } else {
+    //       //   return `background:${this.colorList3[index]}`
+    //       // }
+    //       break
+    //     default:
+    //       break
+    //   }
+    // },
+    goContentList(name, item, index) {
+      // store.dispatch('user/changeActiveIndex', item.appUrl)
+      let Url = ''
+      console.log('name', name)
       switch (name) {
         case '应用':
-          if (index === 0) {
-            return {
-              background:
-                'url(' + this.colorList1[index] + ') center center no-repeat'
+          getTypeTreeMenus(1).then((res1) => {
+            if (res1.code === 0) {
+              const resRouter1 = []
+              res1.data.map((item) => {
+                resRouter1.push(item)
+              })
+              console.log('resRouter1', resRouter1)
+              Url = resRouter1[0].children[0].path
+              const { href } = this.$router.resolve({
+                path: Url,
+                query: {}
+              })
+              window.open(
+                href,
+                'scrollbars=yes,resizable=2,modal=false,alwaysRaised=yes'
+              )
+              store.dispatch('user/dynamicRouters', resRouter1)
             }
-          } else {
-            return `background:${this.colorList1[index]}`
-          }
+          })
           break
         case '运维':
-          if (index === 0) {
-            return {
-              background:
-                'url(' + this.colorList2[index] + ') center center no-repeat'
+          getTypeTreeMenus(2).then((res2) => {
+            if (res2.code === 0) {
+              const resRouter2 = []
+              res2.data.map((item) => {
+                resRouter2.push(item)
+              })
+
+              console.log('resRouter2', resRouter2)
+              Url = resRouter2[0].children[0].path
+              const { href } = this.$router.resolve({
+                path: Url,
+                query: {}
+              })
+              window.open(
+                href,
+                'scrollbars=yes,resizable=2,modal=false,alwaysRaised=yes'
+              )
+              // store.dispatch('user/dynamicRouters', [])
+              store.dispatch('user/dynamicRouters', resRouter2)
             }
-          } else {
-            return `background:${this.colorList2[index]}`
-          }
+          })
           break
         case '配置':
-          if (index === 0) {
-            return {
-              background:
-                'url(' + this.colorList3[index] + ') center center no-repeat'
+          getTypeTreeMenus(3).then((res3) => {
+            if (res3.code === 0) {
+              const resRouter3 = []
+              res3.data.map((item) => {
+                resRouter3.push(item)
+              })
+
+              console.log('resRouter3', resRouter3)
+              Url = resRouter3[0].children[0].path
+              console.log('Url', Url)
+              const { href } = this.$router.resolve({
+                path: Url,
+                query: {}
+              })
+              setTimeout(() => {
+                window.open(
+                  href,
+                  'scrollbars=yes,resizable=2,modal=false,alwaysRaised=yes'
+                )
+              }, 2000)
+
+              // store.dispatch('user/dynamicRouters', [])
+              store.dispatch('user/dynamicRouters', resRouter3)
             }
-          } else if (index === 1) {
-            return {
-              background:
-                'url(' + this.colorList3[index] + ') center center no-repeat'
-            }
-          } else {
-            return `background:${this.colorList3[index]}`
-          }
+          })
           break
         default:
           break
       }
-    },
-    goContentList() {
-      const { href } = this.$router.resolve({
-        path: '/equipment',
-        query: {}
-      })
-      console.log('href', href)
-      window.open(href, '_blank')
-      // this.$router.push({ path: "/systemManagement" });
-    },
-    getHomeLists() {
-      homeLists(this.params).then((res) => {
-        if (res.code === 10000) {
-          this.homeLists = res.data
-          this.notification = res.data.notification
-          this.notificationShow = true
-          this.todoListShow = true
-          this.overviewShow = true
-        }
-      })
-    },
-    editAfficheWork() {
-      editAfficheWork().then((res) => {
-        if (res.code === 10000) {
-          this.statisticalData = res.data
-          this.statisticalShow = true
-        }
-      })
-    },
-    getWeather() {
-      const weatherParams = {
-        area: '梧州',
-        from: '5',
-        needIndex: '1'
-      }
-      areaWeather(weatherParams).then((res) => {
-        if (res.code === 10000) {
-          this.weatherList = res.data.showapi_res_body
-          this.weatherListShow = true
-        }
-      })
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.home-page-content {
+  height: 100%;
+  .wrapper-header {
+    height: 3.5rem;
+  }
+}
+
 .page-container {
-  // height: calc(100% + 58px);
+  height: calc(100% - 56px);
   background: #f2f2f2;
   background-image: url('../../../assets/imgs/homebg.png');
   background-repeat: no-repeat;
@@ -373,7 +429,7 @@ export default {
   overflow: hidden;
   overflow-y: auto;
   .container-top {
-    width: 1872px;
+    // width: 100%;
     height: 184px;
     background: rgba(255, 255, 255, 0.35);
     border-radius: 12px;
@@ -408,7 +464,7 @@ export default {
     }
   }
   .container-middle {
-    width: 1872px;
+    width: 100%;
     height: 184px;
     border-radius: 12px;
     margin: 24px 24px 0 24px;
@@ -450,7 +506,7 @@ export default {
     }
   }
   .container-bottom {
-    width: 1872px;
+    width: 100%;
     height: 184px;
     border-radius: 12px;
     margin: 24px 24px 0 24px;

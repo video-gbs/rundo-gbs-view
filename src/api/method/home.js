@@ -10,7 +10,7 @@ export function getHomeLists(data) {
   return request.get(`${rundoAuthServer}/home/index`, data)
 }
 
-// export function getRoleMenus(data) {
-//   // 权限树
-//   return request.post(`${rundoAuthServer}/home/index`, data)
-// }
+export function getTypeTreeMenus(data) {
+  // 获取不同类型的菜单树
+  return request.post(`${rundoAuthServer}/sysMenuInfo/typeTree/${data}`)
+}

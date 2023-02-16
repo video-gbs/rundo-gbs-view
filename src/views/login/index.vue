@@ -113,9 +113,9 @@
         </div>
       </div>
     </div>
-    <div class="wrap-footer">
-      <span>©2022 润建股份版权所有</span>
-    </div>
+    <!-- <div class="wrap-footer">
+      <span>©2023 润建股份版权所有</span>
+    </div> -->
   </div>
 </template>
 
@@ -215,10 +215,11 @@ export default {
             Local.set('rj_userName', username)
             Local.setToken(token)
             Local.set('rj_token', token)
-            getRouters().then((res) => {
-              store.dispatch('user/dynamicRouters', res)
-              this.$router.push({ path: '/workTable' })
-            })
+            console.log('this.$router', this.$router)
+            // getRouters().then((res) => {
+            //   store.dispatch('user/dynamicRouters', res)
+            this.$router.push({ path: '/workTable' })
+            // })
             this.loading = false
           }
         })
@@ -275,7 +276,7 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
-  height: 96vh;
+  height: 100vh;
   position: relative;
   overflow: hidden;
   margin: 0;

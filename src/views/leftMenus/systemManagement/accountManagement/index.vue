@@ -133,7 +133,7 @@ export default {
     display: flex;
     justify-content: space-between;
     .securityArea_container {
-      height: calc(100% - 40px);
+      height: calc(100% - 90px);
       width: 310px;
       margin: 20px;
       background: #ffffff;

@@ -2,7 +2,7 @@
   <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
     <Header class="wrapper-header" :isShowTopMenus="isShowTopMenus" />
     <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" />
-    <sidebar class="sidebar-container" v-if="!showSidebar" />
+    <sidebar class="sidebar-container" v-if="showSidebar" />
     <div class="main-container f fd-c ai-s">
       <app-main />
     </div>
@@ -15,7 +15,7 @@
       :isShowTopMenus="!isShowTopMenus"
     />
     <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" />
-    <sidebar class="sidebar-container" v-if="showSidebar" />
+    <sidebar class="sidebar-container" v-if="!showSidebar" />
     <div class="main-container f fd-c ai-s">
       <app-main />
     </div>
@@ -88,6 +88,7 @@ export default {
   created() {
     this.nowRouter = this.$route.matched.filter((item) => item.name)
 
+    console.log('this.nowRouter', this.nowRouter)
     if (this.nowRouter[0].name === 'workTable') {
       this.showSidebar = false
     } else {
@@ -101,9 +102,6 @@ export default {
   },
   methods: {
     changeSidebarHiddenStatus(val) {
-      // if(val){
-
-      // }
       this.showSidebar = val
     },
     initTabList() {
