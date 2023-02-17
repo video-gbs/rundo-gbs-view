@@ -25,13 +25,13 @@ const port = process.env.port || process.env.npm_config_port || 8080 // dev port
 const urls = [
   // 本地
   {
-    target: 'http://192.168.0.73:8090',
-    proxy: '/expansion'
-  },
-  {
-    target: 'http://124.71.21.11:7821',
-    proxy: '/auth'
+    target: 'http://124.71.21.11:8080',
+    proxy: '/api'
   }
+  // {
+  //   target: 'http://124.71.21.11:8080',
+  //   proxy: '/auth'
+  // }
 ]
 
 /**

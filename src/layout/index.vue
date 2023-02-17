@@ -171,6 +171,7 @@ export default {
   }
   .main-container {
     height: 100%;
+    width: 100%;
     // padding-top: 3.5rem;
     overflow: auto;
     background-color: rgba(242, 242, 242, 1);
@@ -181,6 +182,7 @@ export default {
   .main-container-else {
     height: 100%;
     // padding-top: 3.5rem;
+    width: calc(100% - 220px);
     margin-left: 220px;
     overflow: auto;
     background-color: rgba(242, 242, 242, 1);

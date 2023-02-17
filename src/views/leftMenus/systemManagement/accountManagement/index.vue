@@ -140,7 +140,7 @@ export default {
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     }
     .right-table {
-      width: calc(100% - 40px);
+      width: 100%;
       margin: 6px 0 0 -10px;
       position: relative;
     }

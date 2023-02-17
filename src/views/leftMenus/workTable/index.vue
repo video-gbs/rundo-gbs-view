@@ -269,6 +269,7 @@ export default {
   created() {},
   mounted() {
     this.init()
+    Local.set('changRight_width', true)
   },
   methods: {
     async init() {

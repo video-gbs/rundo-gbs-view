@@ -3,7 +3,12 @@
     <div class="panel-header-box">
       <div>前端设备</div>
     </div>
-    <div class="main-content">
+    <div
+      class="main-content"
+      :style="{
+        width: changRight ? '100%' : 'calc(100% - 350px)'
+      }"
+    >
       <div class="securityArea_container">
         <leftTree
           :treeData="treeList"
@@ -35,6 +40,7 @@ import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import Encoder from './components/Encoder.vue'
 import Channel from './components/Channel.vue'
 import { getSysOrgTree, getVideoAraeTree } from '@/api/method/role'
+import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { leftTree, Encoder, Channel },
@@ -43,12 +49,16 @@ export default {
       activeName: '编码器',
       treeList: [],
       detailsId: '',
-      areaNames: 'areaNames'
+      areaNames: 'areaNames',
+      changRight: true
     }
+  },
+  created() {
+    this.changRight = Local.get('changRight_width')
+    console.log('this', Local.get('changRight_width'))
   },
   mounted() {
     this.init()
-    console.log('this', this.$router.option)
   },
   methods: {
     async init(id) {
@@ -150,7 +160,7 @@ export default {
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     }
     .right-table {
-      width: calc(100% - 40px);
+      width: 100%;
       margin: 6px 0 0 -10px;
       position: relative;
     }

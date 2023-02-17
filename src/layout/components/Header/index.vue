@@ -163,9 +163,13 @@ export default {
     this.userInfo.userName = this.userInfo.userName
       .replace('"', '')
       .replace('"', '')
-    console.log('this.routerLists', this.routerLists, Local.get('tree_type'))
+    console.log(
+      'this.routerLists',
+      this.routerLists,
+      typeof Local.get('tree_type')
+    )
     if (this.routerLists && this.routerLists.length > 0) {
-      if (Local.get('tree_type') === '2' || Local.get('tree_type') === '3') {
+      if (Local.get('tree_type') === 1) {
         this.routerLists.map((item) => {
           if (item.children && item.children.length > 0) {
             item.children.forEach((child) => {
@@ -175,7 +179,7 @@ export default {
                 meta: child.meta,
                 name: child.name,
                 component: (resolve) =>
-                  require([`@/views/${child.component}`], resolve)
+                  require([`@/views${child.component}`], resolve)
               }
               this.resRouterLists.push(params)
             })
@@ -192,7 +196,7 @@ export default {
             meta: item.meta,
             name: item.name,
             component: (resolve) =>
-              require([`@/views/${item.component}`], resolve)
+              require([`@/views${item.component}`], resolve)
           }
           this.resRouterLists.push(params1)
         })
@@ -230,11 +234,14 @@ export default {
           this.$router.push({ path: item.path })
         }
         this.$emit('changeSidebarHiddenStatus', false)
+        Local.set('changRight_width', false)
       } else {
         // if (item.path === '/workTable') {
         this.$router.push({ path: item.path })
         // }
         this.$emit('changeSidebarHiddenStatus', true)
+        Local.get('tree_type')
+        Local.set('changRight_width', true)
       }
     }
   }
