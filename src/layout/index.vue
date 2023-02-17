@@ -16,7 +16,10 @@
     />
     <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" />
     <sidebar class="sidebar-container" v-if="!showSidebar" />
-    <div class="main-container f fd-c ai-s">
+    <div
+      :class="[sidebarClass ? 'main-container' : 'main-container-else']"
+      class="f fd-c ai-s"
+    >
       <app-main />
     </div>
   </div>
@@ -42,7 +45,8 @@ export default {
       baseW: '',
       showSidebar: false,
       nowRouter: [],
-      isShowTopMenus: false
+      isShowTopMenus: false,
+      sidebarClass: true
     }
   },
   watch: {
@@ -103,6 +107,7 @@ export default {
   methods: {
     changeSidebarHiddenStatus(val) {
       this.showSidebar = val
+      this.sidebarClass = val
     },
     initTabList() {
       this.tabList.push(this.$route.path)
@@ -166,7 +171,7 @@ export default {
   }
   .main-container {
     height: 100%;
-    padding-top: 3.5rem;
+    // padding-top: 3.5rem;
     overflow: auto;
     background-color: rgba(242, 242, 242, 1);
     > div {
@@ -175,7 +180,8 @@ export default {
   }
   .main-container-else {
     height: 100%;
-    padding-top: 3.5rem;
+    // padding-top: 3.5rem;
+    margin-left: 220px;
     overflow: auto;
     background-color: rgba(242, 242, 242, 1);
     // background-image: url('../assets/imgs/homebg.png');

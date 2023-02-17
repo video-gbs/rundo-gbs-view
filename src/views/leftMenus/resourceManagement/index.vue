@@ -48,6 +48,7 @@ export default {
   },
   mounted() {
     this.init()
+    console.log('this', this.$router.option)
   },
   methods: {
     async init(id) {

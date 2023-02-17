@@ -2,6 +2,7 @@ import { login, logout } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import Router, { staticRouters } from '@/router'
 import Layout from '@/layout'
+import { Local } from '@/utils/storage'
 const getDefaultState = () => {
   return {
     token: getToken(),
@@ -34,51 +35,9 @@ const mutations = {
     state.activeIndex = activeIndex
   },
   SET_ROUTERLISTS: (state, dynamicRouters) => {
-    // routerLists.push({
-    //   path: '/404',
-    //   component: () => import('@/views/404.vue'),
-    //   hidden: true
-    // })
+    state.routerLists = []
     state.routerLists = dynamicRouters
-
-    console.log('routerLists22222222', state.routerLists, dynamicRouters)
-    // const childComponent = []
-    // routerLists.forEach((item) => {
-    //   if (item.children && item.children.length > 0) {
-    //     item.children.forEach((child) => {
-    //       let params = {}
-    //       params = {
-    //         path: child.path,
-    //         meta: child.meta,
-    //         name: child.name,
-    //         component: (resolve) =>
-    //           require([`@/views/${child.component}`], resolve)
-    //       }
-    //       childComponent.push(params)
-    //     })
-    //     if (item.component === 'Layout') {
-    //       Router.options.routes.push({
-    //         path: item.path,
-    //         meta: item.meta,
-    //         name: item.name,
-    //         component: Layout,
-    //         children: childComponent
-    //       })
-    //     }
-    //   } else {
-    //     Router.options.routes.push({
-    //       path: item.path,
-    //       meta: item.meta,
-    //       name: item.name,
-    //       component: Layout
-    //     })
-    //   }
-    // })
-
-    // state.routerLists = routerLists
-    // Router.addRoutes(Router.options.routes)
-    // console.log('Router~~~~~~~~', Router)
-    // sessionStorage.setItem('dynamicRouters', JSON.stringify(Router.options.routes))
+    Local.set('dynamicRouters', JSON.stringify(dynamicRouters))
   },
   SET_INIT: (state, init) => {
     state.init = init
@@ -133,8 +92,6 @@ const actions = {
 
   // 动态设置路由 此为设置设置途径
   dynamicRouters({ commit }, dynamicRouters) {
-    // staticRouters.concat(routerLists)
-    console.log('routerLists111111111111', dynamicRouters)
     commit('SET_ROUTERLISTS', dynamicRouters) // 进行路由拼接并存储
   },
 
@@ -170,31 +127,6 @@ const actions = {
       resolve()
     })
   }
-}
-
-/**
- * 格式化树形结构数据   生成 vue-router 层级路由表
- */
-const loadView = (viewPath) => {
-  // return () => import('@/views/' + viewPath)
-  return () => require([`@/views/${viewPath}`])
-}
-
-const filterRouter = (routerMap) => {
-  let resRouters = routerMap.filter((router) => {
-    if (
-      !['resourceManagement', 'login', 'workTable', 'redirect'].includes(
-        router.name
-      )
-    ) {
-      router.component = loadView(router.component)
-    }
-    if (router.children && router.children.length > 0) {
-      router.children = filterRouter(router.children)
-    }
-    return true
-  })
-  return resRouters
 }
 
 export default {

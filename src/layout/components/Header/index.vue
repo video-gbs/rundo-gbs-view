@@ -163,35 +163,44 @@ export default {
     this.userInfo.userName = this.userInfo.userName
       .replace('"', '')
       .replace('"', '')
-
-    // store.watch(
-    //   (state, getters) => {
-    //     return state.routerLists
-    //   },
-    //   () => {
-
-    //   }
-    // )
-
-    console.log('this.routerLists', this.routerLists)
-    this.routerLists.map((item) => {
-      if (item.children && item.children.length > 0) {
-        item.children.forEach((child) => {
-          let params = {}
-          params = {
-            path: child.path,
-            meta: child.meta,
-            name: child.name,
-            component: (resolve) =>
-              require([`@/views/${child.component}`], resolve)
+    console.log('this.routerLists', this.routerLists, Local.get('tree_type'))
+    if (this.routerLists && this.routerLists.length > 0) {
+      if (Local.get('tree_type') === '2' || Local.get('tree_type') === '3') {
+        this.routerLists.map((item) => {
+          if (item.children && item.children.length > 0) {
+            item.children.forEach((child) => {
+              let params = {}
+              params = {
+                path: child.path,
+                meta: child.meta,
+                name: child.name,
+                component: (resolve) =>
+                  require([`@/views/${child.component}`], resolve)
+              }
+              this.resRouterLists.push(params)
+            })
           }
-          this.resRouterLists.push(params)
         })
+        this.resRouterLists = homeRouters.concat(this.resRouterLists)
+        this.activeIndex = this.resRouterLists[1].path
+        console.log('this.resRouterLists', this.resRouterLists)
+      } else {
+        this.routerLists.map((item) => {
+          let params1 = {}
+          params1 = {
+            path: item.path,
+            meta: item.meta,
+            name: item.name,
+            component: (resolve) =>
+              require([`@/views/${item.component}`], resolve)
+          }
+          this.resRouterLists.push(params1)
+        })
+        this.resRouterLists = homeRouters.concat(this.resRouterLists)
+        this.activeIndex = this.resRouterLists[1].path
+        console.log('this.resRouterLists~~~~~~~~~', this.resRouterLists)
       }
-    })
-    this.resRouterLists = homeRouters.concat(this.resRouterLists)
-    this.activeIndex = this.resRouterLists[1].path
-    console.log('this.resRouterLists', this.resRouterLists)
+    }
   },
   mounted() {},
   methods: {
@@ -215,10 +224,16 @@ export default {
       console.log(key, keyPath)
     },
     clickRouter(item) {
-      if (item.type === 1) {
+      // console.log(typeof(Local.get('tree_type')))
+      if (Local.get('tree_type') === 2 || Local.get('tree_type') === 3) {
+        if (item.path === '/workTable') {
+          this.$router.push({ path: item.path })
+        }
         this.$emit('changeSidebarHiddenStatus', false)
-        this.$router.push({ path: item.path })
       } else {
+        // if (item.path === '/workTable') {
+        this.$router.push({ path: item.path })
+        // }
         this.$emit('changeSidebarHiddenStatus', true)
       }
     }

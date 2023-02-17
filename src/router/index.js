@@ -23,7 +23,7 @@ export const staticRouters = [
     name: 'workTable',
     component: () => import('@/views/leftMenus/workTable/index'),
     meta: { title: '首页', icon: 'zhgzt' }
-  },
+  }
   // {
   //   path: '/redirect',
   //   name: 'redirect',
@@ -36,21 +36,26 @@ export const staticRouters = [
   //     }
   //   ]
   // },
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/workTable',
-    name: 'workTable',
-    hidden: true,
-    children: [
-      {
-        path: '/workTable',
-        name: 'workTable',
-        component: () => import('@/views/leftMenus/workTable/index'),
-        meta: { title: '首页', icon: 'zhgzt' }
-      }
-    ]
-  }
+  // {
+  //   path: '/404',
+  //   component: () => import('@/views/404.vue'),
+  //   hidden: true
+  // },
+  // {
+  //   path: '/',
+  //   component: Layout,
+  //   redirect: '/workTable',
+  //   name: 'workTable',
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: '/workTable',
+  //       name: 'workTable',
+  //       component: () => import('@/views/leftMenus/workTable/index'),
+  //       meta: { title: '首页', icon: 'zhgzt' }
+  //     }
+  //   ]
+  // }
   // {
   //   path: '/resourceManagement',
   //   name: 'resourceManagement',
@@ -324,17 +329,16 @@ const router = new Router({
   routes: staticRouters
 })
 
-// const createRouter = () =>
-//   new Router({
-//     mode: 'history',
-//     scrollBehavior: () => ({ y: 0 }),
-//     routes: staticRouters
-//   })
-
-// const router = createRouter()
-// export function resetRouter() {
-//   const newRouter = createRouter()
-//   router.matcher = newRouter.matcher
+//路由重复的问题 解决
+// router.$addRoutes = (params) => {
+//   console.log('params',params)
+//   router.matcher = new Router({
+//     // 重置路由规则
+//     scrollBehavior: () => ({
+//       y: 0
+//     })
+//   }).matcher
+//   router.addRoutes(params) // 添加路由
 // }
 
 const whiteList = ['/login']
@@ -343,94 +347,99 @@ router.afterEach((to, from) => {
   document.title = getPageTitle(to.meta.title)
 })
 
-let isToken = true
+// let isToken = true
 router.beforeEach((to, from, next) => {
-  NProgress.start()
   const hasToken = Local.getToken()
-  if (to.path === '/login') {
-    // 如果是访问登录界面，如果用户会话信息存在，代表已登录过，跳转到主页
-    if (hasToken) {
-      next({ path: '/' })
+  const dynamicRouters = Local.get('dynamicRouters')
+  console.log('dynamicRouters', dynamicRouters)
+  if (hasToken) {
+    // 如果有 token 并且不是登录页的时候，进行权限获取
+    if (to.path !== '/login') {
+      // 动态路由只能添加一次
+      // 退出登录后可重新添加
+      if (!store.state.user.init && store.state.user.routerLists.length !== 0) {
+        //从vuex中获取动态路由
+        const accessRouteses = store.state.user.routerLists
+        console.log('accessRouteses', accessRouteses)
+        // //动态路由循环解析和添加
+        const childComponent = []
+        accessRouteses.forEach((item) => {
+          if (item.children && item.children.length > 0) {
+            item.children.forEach((child) => {
+              // 组装路由配置
+              const childTemp = {
+                name: child.name,
+                path: child.path,
+                meta: child.meta,
+                component: (resolve) =>
+                  require([`@/views${child.component}`], resolve)
+              }
+              childComponent.push(childTemp)
+            })
+            const temp = {
+              name: item.name,
+              path: item.path,
+              meta: item.meta,
+              component: Layout,
+              children: childComponent
+            }
+            router.addRoute(temp)
+            router.options.routes.push(temp)
+          } else {
+            const elseTemp = {
+              name: item.name,
+              path: item.path,
+              meta: item.meta,
+              component: (resolve) =>
+                require([`@/views${item.component}`], resolve)
+            }
+            router.addRoute(elseTemp)
+            router.options.routes.push(elseTemp)
+          }
+        })
+        console.log(router, 9999)
+        // isToken = false
+        store.dispatch('user/changeInit', true)
+        next({ ...to, replace: true })
+      } else {
+        // if (to.name === null) {
+        //   next('/404')
+        // } else {
+        //   next()
+        // }
+      }
     } else {
-      next()
+      next('/workTable')
     }
   } else {
-    // 如果访问非登录界面，且户会话信息不存在，代表未登录，则跳转到登录界面
-    if (!hasToken) {
-      next({ path: '/login' })
+    if (to.path !== '/login') {
+      next('/login')
     } else {
-      // 加载动态菜单和路由
-      if (!isToken) {
-        // 添加过的路由，就不重复添加了
-        next()
-      } else {
-        // 异步获取store中的路由
-        console.log('Router', Router)
-        console.log('store', store.state.user)
-        console.log('store', store.state.user.routerLists)
-        next()
-      }
     }
   }
-  // if (hasToken) {
-  //   if (to.path === '/login') {
-  //     next('/')
-  //   } else {
-  //     // 异步获取store中的路由
-  //     console.log('Router',Router)
-  //     console.log('store',store.state.user)
-  //     console.log('store',store.state.user.routerLists)
-  //     if (isToken && store.state.user.routerLists.length !== 0) {
-  //       //从vuex中获取动态路由
-  //       // const accessRouteses = store.state.routers.routers;
-  //       //动态路由循环解析和添加
-  //       // accessRouteses.forEach(v => {
-  //       //   v.children = routerChildren(v.children);
-  //       //   v.component = routerCom(v.component);
-  //       //   router.addRoute(v); //添加
-  //       // })
-  //       isToken = false //将isToken赋为 false ，否则会一直循环，崩溃
-  //       // next({...to,replace: true})​
-  //     }
-  //   }
-  //   next()
-  // } else {
-  //   if (whiteList.indexOf(to.path) !== -1) {
-  //     next()
-  //   } else {
-  //     next('/login')
-  //     NProgress.done()
-  //   }
-  // }
+  next()
 })
 
 /**
  * 格式化树形结构数据   生成 vue-router 层级路由表
  */
-const loadView = (viewPath) => {
+const routerCom = (viewPath) => {
   return () => require([`@/views/${viewPath}`])
 }
 
-const filterRouter = (routerMap) => {
-  let resRouters = routerMap.filter((router) => {
-    if (
-      !['resourceManagement', 'login', 'workTable', 'redirect'].includes(
-        router.name
-      )
-    ) {
-      router.component = loadView(router.component)
+const routerChildren = (children) => {
+  children.forEach((v) => {
+    v.component = routerCom(v.component)
+    if (v.children !== undefined) {
+      v.children = routerChildren(v.children)
     }
-    if (router.children && router.children.length > 0) {
-      router.children = filterRouter(router.children)
-    }
-    return true
   })
-  return resRouters
+  return children
 }
 
 // 如果跳往登录页，则转到首页
 function isLogin(to, next, callback) {
-  if (to.path == '/login') {
+  if (to.path === '/login') {
     next('/')
   } else {
     callback()

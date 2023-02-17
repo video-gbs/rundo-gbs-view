@@ -1,6 +1,6 @@
 <template>
   <div class="home-page-content">
-    <Header class="wrapper-header" :isShowTopMenus="isShowTopMenus" />
+    <Header class="wrapper-header" />
     <div class="page-container">
       <div class="container-top">
         <LineFont
@@ -113,6 +113,8 @@ import { Header } from '@/layout/components'
 import LineFont from '@/components/LineFont'
 import { getHomeLists, getTypeTreeMenus } from '@/api/method/home'
 import store from '@/store/index'
+import router from '../../../router/index'
+import { Local } from '@/utils/storage'
 
 export default {
   components: {
@@ -323,79 +325,111 @@ export default {
     //       break
     //   }
     // },
+    /**
+     * 格式化树形结构数据   生成 vue-router 层级路由表
+     */
+    loadView(viewPath) {
+      return () => require([`@/views/${viewPath}`])
+    },
+    filterRouter(data) {
+      // 重新加载一次 VueRouter
+      console.log('router~~~~~~~', router)
+      console.log('data~~~~~~~', data)
+      const childComponent = []
+      data.forEach((item) => {
+        if (item.children && item.children.length > 0) {
+          item.children.forEach((child) => {
+            // 组装路由配置
+            const childTemp = {
+              name: child.name,
+              path: child.path,
+              meta: child.meta,
+              component: (resolve) =>
+                require([`@/views/${child.component}`], resolve)
+            }
+            childComponent.push(childTemp)
+          })
+          const temp = {
+            name: item.name,
+            path: item.path,
+            meta: item.meta,
+            component: (resolve) =>
+              require([`@/views/${item.component}`], resolve),
+            children: childComponent
+          }
+          router.addRoutes([temp])
+          router.options.routes.push(temp)
+        } else {
+          const elseTemp = {
+            name: item.name,
+            path: item.path,
+            meta: item.meta,
+            component: (resolve) =>
+              require([`@/views/${item.component}`], resolve)
+          }
+          router.addRoutes([elseTemp])
+          router.options.routes.push(elseTemp)
+        }
+      })
+
+      // 动态添加一个 404 页面
+      router.addRoutes([
+        {
+          path: '*',
+          component: () => import('@/views/404.vue')
+        }
+      ])
+      console.log('router~~~~~~~last`````````````', router)
+      store.dispatch('user/dynamicRouters', router.options.routes)
+    },
+
     goContentList(name, item, index) {
       // store.dispatch('user/changeActiveIndex', item.appUrl)
       let Url = ''
       console.log('name', name)
       switch (name) {
         case '应用':
+          Local.set('tree_type', 1)
           getTypeTreeMenus(1).then((res1) => {
             if (res1.code === 0) {
               const resRouter1 = []
               res1.data.map((item) => {
                 resRouter1.push(item)
               })
-              console.log('resRouter1', resRouter1)
-              Url = resRouter1[0].children[0].path
-              const { href } = this.$router.resolve({
-                path: Url,
-                query: {}
-              })
-              window.open(
-                href,
-                'scrollbars=yes,resizable=2,modal=false,alwaysRaised=yes'
-              )
               store.dispatch('user/dynamicRouters', resRouter1)
+              console.log('resRouter1', resRouter1)
+              store.dispatch('user/changeInit', false)
+              this.$router.push({ path: resRouter1[0].children[0].path })
             }
           })
           break
         case '运维':
+          Local.set('tree_type', 2)
           getTypeTreeMenus(2).then((res2) => {
             if (res2.code === 0) {
               const resRouter2 = []
               res2.data.map((item) => {
                 resRouter2.push(item)
               })
-
               console.log('resRouter2', resRouter2)
-              Url = resRouter2[0].children[0].path
-              const { href } = this.$router.resolve({
-                path: Url,
-                query: {}
-              })
-              window.open(
-                href,
-                'scrollbars=yes,resizable=2,modal=false,alwaysRaised=yes'
-              )
-              // store.dispatch('user/dynamicRouters', [])
+              store.dispatch('user/changeInit', false)
               store.dispatch('user/dynamicRouters', resRouter2)
+              this.$router.push({ path: resRouter2[0].children[0].path })
             }
           })
           break
         case '配置':
+          Local.set('tree_type', 3)
           getTypeTreeMenus(3).then((res3) => {
             if (res3.code === 0) {
               const resRouter3 = []
               res3.data.map((item) => {
                 resRouter3.push(item)
               })
-
               console.log('resRouter3', resRouter3)
-              Url = resRouter3[0].children[0].path
-              console.log('Url', Url)
-              const { href } = this.$router.resolve({
-                path: Url,
-                query: {}
-              })
-              setTimeout(() => {
-                window.open(
-                  href,
-                  'scrollbars=yes,resizable=2,modal=false,alwaysRaised=yes'
-                )
-              }, 2000)
-
-              // store.dispatch('user/dynamicRouters', [])
               store.dispatch('user/dynamicRouters', resRouter3)
+              store.dispatch('user/changeInit', false)
+              this.$router.push({ path: resRouter3[0].children[0].path })
             }
           })
           break
