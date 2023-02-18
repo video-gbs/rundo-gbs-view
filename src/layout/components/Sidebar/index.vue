@@ -36,6 +36,14 @@ import variables from '@/styles/variables.scss'
 
 export default {
   components: { SidebarItem, Logo },
+  props: {
+    sidebarLists: {
+      type: Array,
+      default: () => {
+        return []
+      }
+    }
+  },
   data() {
     return {
       myRouter: []
@@ -62,10 +70,17 @@ export default {
       return this.$store.state.settings.sidebarLogo
     }
   },
+  watch: {
+    sidebarLists(newValue, oldValue) {
+      console.log(newValue, oldValue, 111111)
+      this.myRouter = newValue
+    }
+  },
 
   mounted() {
     this.select(this.$route.path)
-    this.myRouter = Object.assign([], this.routes)
+    this.myRouter = Object.assign([], this.$props.sidebarLists)
+    console.log(this.myRouter)
     const ut = localStorage.getItem('rj_deptType') || 9999
     // console.log("进来了", ut);
     this.setHide(this.myRouter, ut * 1)

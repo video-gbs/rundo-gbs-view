@@ -465,8 +465,8 @@ export default {
     },
     resetData() {
       this.searchParams = {
-        appIp: '',
-        appName: ''
+        userName: '',
+        userAccount: ''
       }
     },
     saveId(id) {

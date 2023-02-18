@@ -17,7 +17,7 @@
           class="top-menus"
         >
           <el-menu-item
-            v-for="(item, index) in resRouterLists"
+            v-for="(item, index) in typeRouter"
             :index="item.path"
             :key="index"
             class="top-menus-item"
@@ -144,67 +144,86 @@ export default {
       lastCount: 0,
       show: false,
       userInfo: {},
-      resRouterLists: []
+      sideBarRouterList: []
     }
   },
   computed: {
-    ...mapGetters(['routerLists'])
+    ...mapGetters(['routerLists', 'typeRouter']),
+    changeTypeRouter() {
+      console.log(111111111111111111111, this.typeRouter)
+      return this.typeRouter
+    }
+  },
+  watch: {
+    changeTypeRouter(newValue, oldValue) {
+      // this.isShowSidebar = newValue
+      // console.log(newValue, oldValue, this.isShowSidebar ,98989898)
+    }
   },
   created() {
-    const homeRouters = [
-      {
-        path: '/workTable',
-        name: 'workTable',
-        component: () => import('@/views/leftMenus/workTable/index'),
-        meta: { title: '首页', icon: 'sy' }
-      }
-    ]
+    // const homeRouters = [
+    //   {
+    //     path: '/workTable',
+    //     name: 'workTable',
+    //     component: () => import('@/views/leftMenus/workTable/index'),
+    //     meta: { title: '首页', icon: 'sy' }
+    //   }
+    // ]
     this.userInfo.userName = localStorage.getItem('rj_userName') || '佚名用户'
     this.userInfo.userName = this.userInfo.userName
       .replace('"', '')
       .replace('"', '')
-    console.log(
-      'this.routerLists',
-      this.routerLists,
-      typeof Local.get('tree_type')
-    )
-    if (this.routerLists && this.routerLists.length > 0) {
-      if (Local.get('tree_type') === 1) {
-        this.routerLists.map((item) => {
-          if (item.children && item.children.length > 0) {
-            item.children.forEach((child) => {
-              let params = {}
-              params = {
-                path: child.path,
-                meta: child.meta,
-                name: child.name,
-                component: (resolve) =>
-                  require([`@/views${child.component}`], resolve)
-              }
-              this.resRouterLists.push(params)
-            })
-          }
-        })
-        this.resRouterLists = homeRouters.concat(this.resRouterLists)
-        this.activeIndex = this.resRouterLists[1].path
-        console.log('this.resRouterLists', this.resRouterLists)
-      } else {
-        this.routerLists.map((item) => {
-          let params1 = {}
-          params1 = {
-            path: item.path,
-            meta: item.meta,
-            name: item.name,
-            component: (resolve) =>
-              require([`@/views${item.component}`], resolve)
-          }
-          this.resRouterLists.push(params1)
-        })
-        this.resRouterLists = homeRouters.concat(this.resRouterLists)
-        this.activeIndex = this.resRouterLists[1].path
-        console.log('this.resRouterLists~~~~~~~~~', this.resRouterLists)
-      }
-    }
+    // if (this.routerLists && this.routerLists.length > 0) {
+    //   if (Local.get('tree_type') === 1) {
+    //     this.routerLists.map((item) => {
+    //       if (item.children && item.children.length > 0) {
+    //         item.children.forEach((child) => {
+    //           let params = {}
+    //           params = {
+    //             path: child.path,
+    //             meta: child.meta,
+    //             name: child.name,
+    //             component: (resolve) =>
+    //               require([`@/views${child.component}`], resolve)
+    //           }
+    //           this.resRouterLists.push(params)
+    //         })
+    //       }
+    //     })
+    //     this.resRouterLists = homeRouters.concat(this.resRouterLists)
+    //     this.activeIndex = this.resRouterLists[1].path
+    //     console.log('this.resRouterLists', this.resRouterLists)
+    //   } else {
+    //     this.routerLists.map((item) => {
+    //       let params1 = {}
+    //       params1 = {
+    //         path: item.path,
+    //         meta: item.meta,
+    //         name: item.name,
+    //         component: (resolve) =>
+    //           require([`@/views${item.component}`], resolve)
+    //       }
+    //       this.resRouterLists.push(params1)
+    //       // 侧边栏路由
+    //       if (item.children && item.children.length > 0) {
+    //         item.children.forEach((child) => {
+    //           let params2 = {}
+    //           params2 = {
+    //             path: child.path,
+    //             meta: child.meta,
+    //             name: child.name,
+    //             component: (resolve) =>
+    //               require([`@/views${child.component}`], resolve)
+    //           }
+    //           this.sideBarRouterList.push(params2)
+    //         })
+    //       }
+    //     })
+    //     this.resRouterLists = homeRouters.concat(this.resRouterLists)
+    //     this.activeIndex = this.resRouterLists[1].path
+    //     console.log('this.resRouterLists~~~~~~~~~', this.resRouterLists)
+    //   }
+    // }
   },
   mounted() {},
   methods: {
@@ -225,23 +244,29 @@ export default {
         })
     },
     handleSelect(key, keyPath) {
-      console.log(key, keyPath)
+      console.log(key, this.sideBarRouterList)
+      // if (key === '/resourceManagement') {
+      //   this.$emit('changeSidebarLists', this.sideBarRouterList[0])
+      // } else if (key === '/management') {
+      //   this.$emit('changeSidebarLists', this.sideBarRouterList)
+      // } else {
+      //   this.$emit('changeSidebarLists', this.sideBarRouterList[1])
+      // }
     },
     clickRouter(item) {
-      // console.log(typeof(Local.get('tree_type')))
       if (Local.get('tree_type') === 2 || Local.get('tree_type') === 3) {
         if (item.path === '/workTable') {
           this.$router.push({ path: item.path })
+          store.dispatch('user/changeRightWidth', false)
+          store.dispatch('user/changeShowSidebar', false)
+        } else {
+          store.dispatch('user/changeShowSidebar', true)
         }
-        this.$emit('changeSidebarHiddenStatus', false)
-        Local.set('changRight_width', false)
       } else {
         // if (item.path === '/workTable') {
         this.$router.push({ path: item.path })
         // }
-        this.$emit('changeSidebarHiddenStatus', true)
-        Local.get('tree_type')
-        Local.set('changRight_width', true)
+        store.dispatch('user/changeShowSidebar', false)
       }
     }
   }

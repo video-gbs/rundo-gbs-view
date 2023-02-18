@@ -3,6 +3,7 @@ import request from '@/api/fetch'
 import baseUrls from '@/utils/baseUrlConfig'
 
 const expansion = baseUrls.base2
+const device = baseUrls.base3
 // 编码器
 // 新增编码器
 export function addEncoder(params) {
@@ -32,4 +33,14 @@ export function moveEncoder(params) {
 // 编辑
 export function editEncoder(params) {
   return request.put(`${expansion}/device/edit`, params)
+}
+
+// 代注册列表
+export function getDeviceList(params) {
+  return request.put(`${device}/device/north/page`, params)
+}
+
+// 代注册列表删除
+export function deleteDevice(id) {
+  return request.put(`${device}/device/north/delete/?deviceId=${id}`)
 }

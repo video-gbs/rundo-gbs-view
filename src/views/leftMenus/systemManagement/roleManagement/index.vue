@@ -42,7 +42,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item style="float: right; margin-right: 20px">
-          <el-button
+          <el-button @click="resetData"
             ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
           >
           <el-button type="primary" @click="cxData"
@@ -276,6 +276,13 @@ export default {
     currentChange(proCount) {
       this.params.proCount = proCount
       this.getList()
+    },
+    resetData() {
+      this.searchParams = {
+        userAccount: '',
+        roleName: '',
+        time: ''
+      }
     },
     cxData() {
       this.getList()

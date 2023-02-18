@@ -262,14 +262,22 @@ export default {
         borderRadius: '2px',
         background:
           'linear-gradient(90deg, #FFFFFF 0%, rgba(255,255,255,0) 100%)'
-      }
+      },
+
+      // 应用类型路由
+      appTypeRouter: [],
+      // 运维系统类型路由
+      systemTypeRouter: [],
+      // 配置类型路由
+      configTypeRouter: [],
+      // 侧边栏路由
+      sideBarRouterList: []
     }
   },
   watch: {},
   created() {},
   mounted() {
     this.init()
-    Local.set('changRight_width', true)
   },
   methods: {
     async init() {
@@ -286,108 +294,74 @@ export default {
           console.log(error)
         })
     },
-    // bacImage(name, item, index) {
-    //   const imgUrl = require(`../../../assets/imgs/${item.appIcon}.png`)
-    //   // require('../../../assets/imgs/mid1.png')
-    //   switch (name) {
-    //     case '应用':
-    //       // if (index === 0) {
-    //       return {
-    //         background: 'url(' + imgUrl + ') center center no-repeat'
-    //       }
-    //       // } else {
-    //       //   return `background:${this.colorList1[index]}`
-    //       // }
-    //       break
-    //     case '运维':
-    //       // if (index === 0) {
-    //       return {
-    //         background: 'url(' + imgUrl + ') center center no-repeat'
-    //       }
-    //       // } else {
-    //       //   return `background:${this.colorList2[index]}`
-    //       // }
-    //       break
-    //     case '配置':
-    //       // if (index === 0) {
-    //       return {
-    //         background: 'url(' + imgUrl + ') center center no-repeat'
-    //       }
-    //       // } else if (index === 1) {
-    //       //   return {
-    //       //     background:
-    //       //       'url(' + this.colorList3[index] + ') center center no-repeat'
-    //       //   }
-    //       // } else {
-    //       //   return `background:${this.colorList3[index]}`
-    //       // }
-    //       break
-    //     default:
-    //       break
-    //   }
-    // },
+
     /**
      * 格式化树形结构数据   生成 vue-router 层级路由表
      */
-    loadView(viewPath) {
-      return () => require([`@/views/${viewPath}`])
-    },
-    filterRouter(data) {
-      // 重新加载一次 VueRouter
-      console.log('router~~~~~~~', router)
-      console.log('data~~~~~~~', data)
-      const childComponent = []
-      data.forEach((item) => {
-        if (item.children && item.children.length > 0) {
-          item.children.forEach((child) => {
-            // 组装路由配置
-            const childTemp = {
-              name: child.name,
-              path: child.path,
-              meta: child.meta,
-              component: (resolve) =>
-                require([`@/views/${child.component}`], resolve)
+
+    saveComponents(val, data) {
+      if (data && data.length > 0) {
+        const homeRouters = [
+          {
+            path: '/workTable',
+            name: 'workTable',
+            component: () => import('@/views/leftMenus/workTable/index'),
+            meta: { title: '首页', icon: 'sy' }
+          }
+        ]
+        if (val) {
+          data.map((item) => {
+            if (item.children && item.children.length > 0) {
+              item.children.forEach((child) => {
+                let params = {}
+                params = {
+                  path: child.path,
+                  meta: child.meta,
+                  name: child.name,
+                  component: (resolve) =>
+                    require([`@/views${child.component}`], resolve)
+                }
+                this.appTypeRouter.push(params)
+              })
             }
-            childComponent.push(childTemp)
           })
-          const temp = {
-            name: item.name,
-            path: item.path,
-            meta: item.meta,
-            component: (resolve) =>
-              require([`@/views/${item.component}`], resolve),
-            children: childComponent
-          }
-          router.addRoutes([temp])
-          router.options.routes.push(temp)
+          this.appTypeRouter = homeRouters.concat(this.appTypeRouter)
+          console.log('this.appTypeRouter', this.appTypeRouter)
         } else {
-          const elseTemp = {
-            name: item.name,
-            path: item.path,
-            meta: item.meta,
-            component: (resolve) =>
-              require([`@/views/${item.component}`], resolve)
-          }
-          router.addRoutes([elseTemp])
-          router.options.routes.push(elseTemp)
+          data.map((item) => {
+            let params1 = {}
+            params1 = {
+              path: item.path,
+              meta: item.meta,
+              name: item.name,
+              component: (resolve) =>
+                require([`@/views${item.component}`], resolve)
+            }
+            this.systemTypeRouter.push(params1)
+            this.configTypeRouter.push(params1)
+            // 侧边栏路由
+            if (item.children && item.children.length > 0) {
+              item.children.forEach((child) => {
+                let params2 = {}
+                params2 = {
+                  path: child.path,
+                  meta: child.meta,
+                  name: child.name,
+                  component: (resolve) =>
+                    require([`@/views${child.component}`], resolve)
+                }
+                // this.sideBarRouterList.push(params2)
+              })
+            }
+          })
+          this.systemTypeRouter = homeRouters.concat(this.systemTypeRouter)
+          console.log('this.systemTypeRouter~~~~~~~~~', this.systemTypeRouter)
+          this.configTypeRouter = homeRouters.concat(this.configTypeRouter)
+          console.log('this.configTypeRouter~~~~~~~~~', this.configTypeRouter)
         }
-      })
-
-      // 动态添加一个 404 页面
-      router.addRoutes([
-        {
-          path: '*',
-          component: () => import('@/views/404.vue')
-        }
-      ])
-      console.log('router~~~~~~~last`````````````', router)
-      store.dispatch('user/dynamicRouters', router.options.routes)
+      }
     },
-
     goContentList(name, item, index) {
-      // store.dispatch('user/changeActiveIndex', item.appUrl)
-      let Url = ''
-      console.log('name', name)
       switch (name) {
         case '应用':
           Local.set('tree_type', 1)
@@ -398,38 +372,55 @@ export default {
                 resRouter1.push(item)
               })
               store.dispatch('user/dynamicRouters', resRouter1)
-              console.log('resRouter1', resRouter1)
               store.dispatch('user/changeInit', false)
+              store.dispatch('user/changeRightWidth', false)
+              store.dispatch('user/changeShowSidebar', false)
+              this.$emit('changeSidebarHiddenStatus', true)
+
+              this.saveComponents(true, resRouter1)
+              store.dispatch('user/changeTypeRouter', this.appTypeRouter)
+
               this.$router.push({ path: resRouter1[0].children[0].path })
             }
           })
           break
         case '运维':
-          Local.set('tree_type', 2)
-          getTypeTreeMenus(2).then((res2) => {
+          Local.set('tree_type', 3)
+          getTypeTreeMenus(3).then((res2) => {
             if (res2.code === 0) {
               const resRouter2 = []
               res2.data.map((item) => {
                 resRouter2.push(item)
               })
-              console.log('resRouter2', resRouter2)
               store.dispatch('user/changeInit', false)
               store.dispatch('user/dynamicRouters', resRouter2)
+              store.dispatch('user/changeRightWidth', true)
+              store.dispatch('user/changeShowSidebar', true)
+              this.$emit('changeSidebarHiddenStatus', false)
+
+              this.saveComponents(false, resRouter2)
+              store.dispatch('user/changeTypeRouter', this.systemTypeRouter)
+
               this.$router.push({ path: resRouter2[0].children[0].path })
             }
           })
           break
         case '配置':
-          Local.set('tree_type', 3)
-          getTypeTreeMenus(3).then((res3) => {
+          Local.set('tree_type', 2)
+          getTypeTreeMenus(2).then((res3) => {
             if (res3.code === 0) {
               const resRouter3 = []
               res3.data.map((item) => {
                 resRouter3.push(item)
               })
-              console.log('resRouter3', resRouter3)
               store.dispatch('user/dynamicRouters', resRouter3)
               store.dispatch('user/changeInit', false)
+              store.dispatch('user/changeRightWidth', true)
+              store.dispatch('user/changeShowSidebar', true)
+              this.$emit('changeSidebarHiddenStatus', false)
+
+              this.saveComponents(false, resRouter3)
+              store.dispatch('user/changeTypeRouter', this.configTypeRouter)
               this.$router.push({ path: resRouter3[0].children[0].path })
             }
           })

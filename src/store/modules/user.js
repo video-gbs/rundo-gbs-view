@@ -12,7 +12,15 @@ const getDefaultState = () => {
     routerLists: [],
     init: false,
     roles: [],
-    activeIndex: ''
+    activeIndex: '',
+    rightWidth: false,
+    showSidebar: false,
+    // 类型路由
+    typeRouter: []
+    // 运维系统类型路由
+    // systemTypeRouter: [],
+    // 配置类型路由
+    // configTypeRouter: []
   }
 }
 
@@ -34,6 +42,23 @@ const mutations = {
   SET_ACTIVEINDEX: (state, activeIndex) => {
     state.activeIndex = activeIndex
   },
+  SET_RIGHTWIDTH: (state, rightWidth) => {
+    state.rightWidth = rightWidth
+  },
+  SET_SHOWSIDEBAR: (state, showSidebar) => {
+    state.showSidebar = showSidebar
+  },
+  // SET_APPTYPEROUTER: (state, showSidebar) => {
+  //   state.showSidebar = showSidebar
+  // },
+  // SET_SYSTEMTYPEROUTER: (state, showSidebar) => {
+  //   state.showSidebar = showSidebar
+  // },
+  SET_TYPEROUTER: (state, typeRouter) => {
+    state.typeRouter = []
+    state.typeRouter = typeRouter
+  },
+
   SET_ROUTERLISTS: (state, dynamicRouters) => {
     state.routerLists = []
     state.routerLists = dynamicRouters
@@ -102,6 +127,27 @@ const actions = {
   changeActiveIndex({ commit }, val) {
     commit('SET_ACTIVEINDEX', val)
   },
+
+  changeRightWidth({ commit }, val) {
+    commit('SET_RIGHTWIDTH', val)
+  },
+
+  changeShowSidebar({ commit }, val) {
+    commit('SET_SHOWSIDEBAR', val)
+  },
+
+  // 类型路由
+  changeTypeRouter({ commit }, val) {
+    commit('SET_TYPEROUTER', val)
+  },
+  // // 运维系统类型路由
+  // changeSystemTypeRouter({ commit }, val) {
+  //   commit('SET_SHOWSIDEBAR', val)
+  // },
+  // // 配置类型路由
+  // changeConfigTypeRouter({ commit }, val) {
+  //   commit('SET_SHOWSIDEBAR', val)
+  // },
 
   // user logout
   logout({ commit, state }) {

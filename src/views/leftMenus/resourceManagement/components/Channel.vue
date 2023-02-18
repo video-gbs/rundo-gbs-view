@@ -45,7 +45,7 @@
           ></el-input>
         </el-form-item>
         <el-form-item style="float: right; margin-right: 20px">
-          <el-button
+          <el-button @click="resetData"
             ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
           >
           <el-button type="primary" @click="cxData"
@@ -384,7 +384,16 @@ export default {
         })
       })
     },
-    cxData() {},
+    resetData() {
+      this.searchParams = {
+        deviceType: '',
+        ip: '',
+        onlineState: ''
+      }
+    },
+    cxData() {
+      this.getList()
+    },
     goChannelDiscovery() {
       this.$router.push(`/channelDiscovery/add`)
     },

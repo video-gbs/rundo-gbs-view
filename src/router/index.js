@@ -350,8 +350,6 @@ router.afterEach((to, from) => {
 // let isToken = true
 router.beforeEach((to, from, next) => {
   const hasToken = Local.getToken()
-  const dynamicRouters = Local.get('dynamicRouters')
-  console.log('dynamicRouters', dynamicRouters)
   if (hasToken) {
     // 如果有 token 并且不是登录页的时候，进行权限获取
     if (to.path !== '/login') {
@@ -359,8 +357,8 @@ router.beforeEach((to, from, next) => {
       // 退出登录后可重新添加
       if (!store.state.user.init && store.state.user.routerLists.length !== 0) {
         //从vuex中获取动态路由
-        const accessRouteses = store.state.user.routerLists
-        console.log('accessRouteses', accessRouteses)
+        const accessRouteses =
+          store.state.user.routerLists || Local.get('dynamicRouters')
         // //动态路由循环解析和添加
         const childComponent = []
         accessRouteses.forEach((item) => {
@@ -371,6 +369,7 @@ router.beforeEach((to, from, next) => {
                 name: child.name,
                 path: child.path,
                 meta: child.meta,
+                hidden: child.hidden === 0 ? true : false,
                 component: (resolve) =>
                   require([`@/views${child.component}`], resolve)
               }

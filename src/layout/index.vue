@@ -2,7 +2,6 @@
   <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
     <Header class="wrapper-header" :isShowTopMenus="isShowTopMenus" />
     <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" />
-    <sidebar class="sidebar-container" v-if="showSidebar" />
     <div class="main-container f fd-c ai-s">
       <app-main />
     </div>
@@ -11,13 +10,17 @@
   <div class="app-wrapper" v-else>
     <Header
       class="wrapper-header"
-      @changeSidebarHiddenStatus="changeSidebarHiddenStatus"
       :isShowTopMenus="!isShowTopMenus"
+      @changeSidebarLists="changeSidebarLists"
     />
     <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" />
-    <sidebar class="sidebar-container" v-if="!showSidebar" />
+    <sidebar
+      class="sidebar-container"
+      v-if="showSidebar"
+      :sidebarLists="sidebarLists"
+    />
     <div
-      :class="[sidebarClass ? 'main-container' : 'main-container-else']"
+      :class="[!showSidebar ? 'main-container' : 'main-container-else']"
       class="f fd-c ai-s"
     >
       <app-main />
@@ -28,6 +31,8 @@
 <script>
 import { Header, Sidebar, AppMain, Navbar, TagsView } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
+import store from '@/store/index'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Layout',
@@ -43,34 +48,27 @@ export default {
     return {
       nowWidth: '',
       baseW: '',
-      showSidebar: false,
+      // isShowSidebar: false,.
       nowRouter: [],
       isShowTopMenus: false,
-      sidebarClass: true
-    }
-  },
-  watch: {
-    $route: {
-      handler: function (val, oldVal) {
-        if (val.path === '/workTable') {
-          this.showSidebar = false
-        } else {
-          this.showSidebar = true
-        }
-      },
-      // 深度观察监听
-      deep: true
+      sidebarClass: true,
+      sidebarLists: []
     }
   },
   computed: {
+    ...mapGetters(['showSidebar']),
+    changeShowSidebar() {
+      console.log(111111111111111111111, this.showSidebar)
+      return this.showSidebar
+    },
     sidebar() {
-      return this.$store.state.app.sidebar
+      return store.state.app.sidebar
     },
     device() {
-      return this.$store.state.app.device
+      return store.state.app.device
     },
     fixedHeader() {
-      return this.$store.state.settings.fixedHeader
+      return store.state.settings.fixedHeader
     },
     classObj() {
       return {
@@ -80,24 +78,29 @@ export default {
         mobile: this.device === 'mobile'
       }
     },
-
     // 当前所在模块
     menuModule() {
-      return this.$store.state.tabs.menuModule
+      return store.state.tabs.menuModule
     },
     tabList() {
-      return this.$store.state.tabs.tabList
+      return store.state.tabs.tabList
+    }
+  },
+  watch: {
+    changeShowSidebar(newValue, oldValue) {
+      // this.isShowSidebar = newValue
+      // console.log(newValue, oldValue, this.isShowSidebar ,98989898)
     }
   },
   created() {
     this.nowRouter = this.$route.matched.filter((item) => item.name)
 
     console.log('this.nowRouter', this.nowRouter)
-    if (this.nowRouter[0].name === 'workTable') {
-      this.showSidebar = false
-    } else {
-      this.showSidebar = true
-    }
+    // if (this.nowRouter[0].name === 'workTable') {
+    //   this.isShowSidebar = false
+    // } else {
+    //   this.isShowSidebar = true
+    // }
     this.setScale()
     this.initTabList()
   },
@@ -105,10 +108,15 @@ export default {
     window.onresize = this.throttle(this.setScale, 500, 500)
   },
   methods: {
-    changeSidebarHiddenStatus(val) {
-      this.showSidebar = val
-      this.sidebarClass = val
+    // changeSidebarHiddenStatus(val) {
+    //   this.showSidebar = val
+    //   this.sidebarClass = val
+    // },
+    changeSidebarLists(val) {
+      this.sidebarLists = val
+      console.log(777, this.sidebarLists)
     },
+
     initTabList() {
       this.tabList.push(this.$route.path)
     },

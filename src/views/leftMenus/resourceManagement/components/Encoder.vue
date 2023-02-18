@@ -45,7 +45,7 @@
           ></el-input>
         </el-form-item>
         <el-form-item style="float: right; margin-right: 20px">
-          <el-button
+          <el-button @click="resetData"
             ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
           >
           <el-button type="primary" @click="cxData"
@@ -67,8 +67,8 @@
           <el-button @click="moveEquipment"
             ><svg-icon class="svg-btn" icon-class="move" />移动</el-button
           >
-          <el-button @click="addEquipment"
-            ><svg-icon class="svg-btn" icon-class="move" />代注册列表</el-button
+          <el-button @click="goRegistrationList"
+            ><svg-icon class="svg-btn" icon-class="move" />待注册列表</el-button
           >
           <el-button type="primary" @click="addEquipment"
             ><svg-icon class="svg-btn" icon-class="add" />新增</el-button
@@ -461,9 +461,21 @@ export default {
         })
       })
     },
-    cxData() {},
+    resetData() {
+      this.searchParams = {
+        deviceType: '',
+        ip: '',
+        onlineState: ''
+      }
+    },
+    cxData() {
+      this.getList()
+    },
     addEquipment() {
-      this.$router.push(`/addEquipment/add`)
+      this.$router.push(`/addEquipment`)
+    },
+    goRegistrationList() {
+      this.$router.push(`/registrationList`)
     },
     moveEquipment() {
       this.dialogShow = true

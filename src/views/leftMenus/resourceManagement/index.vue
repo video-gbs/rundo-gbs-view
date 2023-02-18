@@ -3,12 +3,7 @@
     <div class="panel-header-box">
       <div>前端设备</div>
     </div>
-    <div
-      class="main-content"
-      :style="{
-        width: changRight ? '100%' : 'calc(100% - 350px)'
-      }"
-    >
+    <div class="main-content">
       <div class="securityArea_container">
         <leftTree
           :treeData="treeList"
@@ -16,7 +11,10 @@
           :defaultPropsName="areaNames"
         />
       </div>
-      <div class="right-table p10">
+      <div
+        class="p10"
+        :class="!showSidebar ? 'right-table' : 'right-table-else'"
+      >
         <el-tabs
           v-model="activeName"
           class="f1 f fd-c"
@@ -41,6 +39,7 @@ import Encoder from './components/Encoder.vue'
 import Channel from './components/Channel.vue'
 import { getSysOrgTree, getVideoAraeTree } from '@/api/method/role'
 import { Local } from '@/utils/storage'
+import { mapGetters } from 'vuex'
 export default {
   name: '',
   components: { leftTree, Encoder, Channel },
@@ -50,15 +49,24 @@ export default {
       treeList: [],
       detailsId: '',
       areaNames: 'areaNames',
-      changRight: true
+      changRight: ''
     }
   },
-  created() {
-    this.changRight = Local.get('changRight_width')
-    console.log('this', Local.get('changRight_width'))
-  },
+  created() {},
   mounted() {
     this.init()
+  },
+  computed: {
+    ...mapGetters(['rightWidth', 'showSidebar']),
+    hasChangeRightWidth() {
+      return this.rightWidth
+    }
+  },
+  watch: {
+    hasChangeRightWidth(newValue, oldValue) {
+      console.log(newValue, oldValue, 111111)
+      this.changRight = newValue
+    }
   },
   methods: {
     async init(id) {
@@ -161,6 +169,11 @@ export default {
     }
     .right-table {
       width: 100%;
+      margin: 6px 0 0 -10px;
+      position: relative;
+    }
+    .right-table-else {
+      width: calc(100% - 350px);
       margin: 6px 0 0 -10px;
       position: relative;
     }
