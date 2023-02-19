@@ -142,7 +142,10 @@ export default {
       lastCount: 0,
       show: false,
       userInfo: {},
-      sideBarRouterList: []
+      sideBarRouterList: [],
+      sideBarRouterList1: [],
+      sideBarRouterList2: [],
+      sideBarRouterList3: []
     }
   },
   computed: {
@@ -251,10 +254,96 @@ export default {
       //   this.$emit('changeSidebarLists', this.sideBarRouterList[1])
       // }
     },
-    clickRouter(item) {
+    clickRouter(data) {
+      console.log(1111, data)
+
+      switch (data.path) {
+        case '/resourceManagement':
+          this.routerLists.map((item) => {
+            if (
+              item.children &&
+              item.children.length > 0 &&
+              data.path === item.path
+            ) {
+              item.children.forEach((child) => {
+                let resourceManagement = {}
+                resourceManagement = {
+                  path: child.path,
+                  meta: child.meta,
+                  name: child.name,
+                  hidden: child.hidden === 1 ? true : false,
+                  component: (resolve) =>
+                    require([`@/views${child.component}`], resolve)
+                }
+
+                this.sideBarRouterList1.push(resourceManagement)
+              })
+            }
+          })
+
+          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList1)
+
+          console.log(1, this.sideBarRouterList1)
+          break
+        case '/systemManagement':
+          this.routerLists.map((item) => {
+            if (
+              item.children &&
+              item.children.length > 0 &&
+              data.path === item.path
+            ) {
+              item.children.forEach((child) => {
+                let systemManagement = {}
+                systemManagement = {
+                  path: child.path,
+                  meta: child.meta,
+                  name: child.name,
+                  hidden: child.hidden === 1 ? true : false,
+                  component: (resolve) =>
+                    require([`@/views${child.component}`], resolve)
+                }
+
+                this.sideBarRouterList2.push(systemManagement)
+              })
+            }
+          })
+
+          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList2)
+          console.log(2, this.sideBarRouterList2)
+          break
+        case '/moduleManageMent':
+          this.routerLists.map((item) => {
+            if (
+              item.children &&
+              item.children.length > 0 &&
+              data.path === item.path
+            ) {
+              item.children.forEach((child) => {
+                let moduleManageMent = {}
+                moduleManageMent = {
+                  path: child.path,
+                  meta: child.meta,
+                  name: child.name,
+                  hidden: child.hidden === 1 ? true : false,
+                  component: (resolve) =>
+                    require([`@/views${child.component}`], resolve)
+                }
+
+                this.sideBarRouterList3.push(moduleManageMent)
+              })
+            }
+          })
+
+          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList3)
+
+          console.log(3, this.sideBarRouterList3)
+          break
+        default:
+          break
+      }
       if (Local.get('tree_type') === 2 || Local.get('tree_type') === 3) {
-        if (item.path === '/workTable') {
-          this.$router.push({ path: item.path })
+        if (data.path === '/workTable') {
+          this.$router.push({ path: data.path })
           store.dispatch('user/changeRightWidth', false)
           store.dispatch('user/changeShowSidebar', false)
         } else {
@@ -262,7 +351,7 @@ export default {
         }
       } else {
         // if (item.path === '/workTable') {
-        this.$router.push({ path: item.path })
+        this.$router.push({ path: data.path })
         // }
         store.dispatch('user/changeShowSidebar', false)
       }
