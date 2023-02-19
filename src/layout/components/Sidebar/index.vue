@@ -16,7 +16,7 @@
         mode="vertical"
       >
         <sidebar-item
-          v-for="route in myRouter"
+          v-for="route in sidebarRouter"
           :key="route.path"
           :item="route"
           :base-path="route.path"
@@ -50,7 +50,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['sidebar']),
+    ...mapGetters(['sidebarRouter']),
+    changeSidebarRouter() {
+      console.log(22, this.sidebarRouter)
+      return this.sidebarRouter
+    },
     routes() {
       return this.$router.options.routes
     },
@@ -71,18 +75,16 @@ export default {
     }
   },
   watch: {
-    sidebarLists(newValue, oldValue) {
+    changeSidebarRouter(newValue, oldValue) {
       console.log(newValue, oldValue, 111111)
-      this.myRouter = newValue
     }
   },
 
   mounted() {
     this.select(this.$route.path)
-    this.myRouter = Object.assign([], this.$props.sidebarLists)
+    this.myRouter = Object.assign([], this.sidebarRouter)
     console.log(this.myRouter)
     const ut = localStorage.getItem('rj_deptType') || 9999
-    // console.log("进来了", ut);
     this.setHide(this.myRouter, ut * 1)
     // console.log("routes`~~~~~~~~~~~``", this.myRouter);
   },

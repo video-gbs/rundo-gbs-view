@@ -16,9 +16,9 @@ const getDefaultState = () => {
     rightWidth: false,
     showSidebar: false,
     // 类型路由
-    typeRouter: []
+    typeRouter: [],
     // 运维系统类型路由
-    // systemTypeRouter: [],
+    sidebarRouter: []
     // 配置类型路由
     // configTypeRouter: []
   }
@@ -57,6 +57,11 @@ const mutations = {
   SET_TYPEROUTER: (state, typeRouter) => {
     state.typeRouter = []
     state.typeRouter = typeRouter
+  },
+
+  SET_SIDEBARROUTER: (state, sidebarRouter) => {
+    state.sidebarRouter = []
+    state.sidebarRouter = sidebarRouter
   },
 
   SET_ROUTERLISTS: (state, dynamicRouters) => {
@@ -139,6 +144,11 @@ const actions = {
   // 类型路由
   changeTypeRouter({ commit }, val) {
     commit('SET_TYPEROUTER', val)
+  },
+
+  // 类型路由
+  changeSidebarRouter({ commit }, val) {
+    commit('SET_SIDEBARROUTER', val)
   },
   // // 运维系统类型路由
   // changeSystemTypeRouter({ commit }, val) {

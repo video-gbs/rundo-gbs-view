@@ -22,7 +22,6 @@
             :key="index"
             class="top-menus-item"
           >
-            <!-- <router-link active-class="active" :to="item.path"> -->
             <div class="top-menus-div" @click="clickRouter(item)">
               <span slot="title" class="top-menus-span"
                 ><svg-icon
@@ -31,7 +30,6 @@
                 />{{ item.meta.title }}</span
               >
             </div>
-            <!-- </router-link> -->
           </el-menu-item>
         </el-menu>
       </div>

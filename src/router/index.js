@@ -369,7 +369,7 @@ router.beforeEach((to, from, next) => {
                 name: child.name,
                 path: child.path,
                 meta: child.meta,
-                hidden: child.hidden === 0 ? true : false,
+                hidden: child.hidden === 1 ? true : false,
                 component: (resolve) =>
                   require([`@/views${child.component}`], resolve)
               }

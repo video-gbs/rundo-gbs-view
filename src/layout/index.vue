@@ -48,7 +48,6 @@ export default {
     return {
       nowWidth: '',
       baseW: '',
-      // isShowSidebar: false,.
       nowRouter: [],
       isShowTopMenus: false,
       sidebarClass: true,

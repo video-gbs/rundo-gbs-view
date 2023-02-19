@@ -271,7 +271,10 @@ export default {
       // 配置类型路由
       configTypeRouter: [],
       // 侧边栏路由
-      sideBarRouterList: []
+      sideBarRouterList: [],
+      sideBarRouterList1: [],
+      sideBarRouterList2: [],
+      sideBarRouterList3: []
     }
   },
   watch: {},
@@ -299,7 +302,8 @@ export default {
      * 格式化树形结构数据   生成 vue-router 层级路由表
      */
 
-    saveComponents(val, data) {
+    saveComponents(val, data, name) {
+      console.log('name~~~~~~~~~~~~~~~~~~~~~~~~', name)
       if (data && data.length > 0) {
         const homeRouters = [
           {
@@ -309,7 +313,7 @@ export default {
             meta: { title: '首页', icon: 'sy' }
           }
         ]
-        if (val) {
+        if (val === 1) {
           data.map((item) => {
             if (item.children && item.children.length > 0) {
               item.children.forEach((child) => {
@@ -318,6 +322,7 @@ export default {
                   path: child.path,
                   meta: child.meta,
                   name: child.name,
+                  hidden: child.hidden === 0 ? true : false,
                   component: (resolve) =>
                     require([`@/views${child.component}`], resolve)
                 }
@@ -326,6 +331,8 @@ export default {
             }
           })
           this.appTypeRouter = homeRouters.concat(this.appTypeRouter)
+
+          store.dispatch('user/changeActiveIndex', this.appTypeRouter[1].path)
           console.log('this.appTypeRouter', this.appTypeRouter)
         } else {
           data.map((item) => {
@@ -347,17 +354,117 @@ export default {
                   path: child.path,
                   meta: child.meta,
                   name: child.name,
+                  hidden: child.hidden === 1 ? true : false,
                   component: (resolve) =>
                     require([`@/views${child.component}`], resolve)
                 }
-                // this.sideBarRouterList.push(params2)
+
+                this.sideBarRouterList.push(params2)
               })
             }
+            switch (name) {
+              case '/resourceManagement':
+                if (
+                  item.children &&
+                  item.children.length > 0 &&
+                  name === item.path
+                ) {
+                  item.children.forEach((child) => {
+                    let resourceManagement = {}
+                    resourceManagement = {
+                      path: child.path,
+                      meta: child.meta,
+                      name: child.name,
+                      hidden: child.hidden === 1 ? true : false,
+                      component: (resolve) =>
+                        require([`@/views${child.component}`], resolve)
+                    }
+
+                    this.sideBarRouterList1.push(resourceManagement)
+                  })
+                }
+
+                store.dispatch(
+                  'user/changeSidebarRouter',
+                  this.sideBarRouterList1
+                )
+
+                console.log(1, this.sideBarRouterList1)
+                break
+              case '/systemManagement':
+                if (
+                  item.children &&
+                  item.children.length > 0 &&
+                  name === item.path
+                ) {
+                  item.children.forEach((child) => {
+                    let systemManagement = {}
+                    systemManagement = {
+                      path: child.path,
+                      meta: child.meta,
+                      name: child.name,
+                      hidden: child.hidden === 1 ? true : false,
+                      component: (resolve) =>
+                        require([`@/views${child.component}`], resolve)
+                    }
+
+                    this.sideBarRouterList2.push(systemManagement)
+                  })
+                }
+                // this.sideBarRouterList2.push(params2)
+
+                store.dispatch(
+                  'user/changeSidebarRouter',
+                  this.sideBarRouterList2
+                )
+                console.log(2, this.sideBarRouterList2)
+                break
+              case '/moduleManageMent':
+                // this.sideBarRouterList3.push(params2)
+                if (
+                  item.children &&
+                  item.children.length > 0 &&
+                  name === item.path
+                ) {
+                  item.children.forEach((child) => {
+                    let moduleManageMent = {}
+                    moduleManageMent = {
+                      path: child.path,
+                      meta: child.meta,
+                      name: child.name,
+                      hidden: child.hidden === 1 ? true : false,
+                      component: (resolve) =>
+                        require([`@/views${child.component}`], resolve)
+                    }
+
+                    this.sideBarRouterList3.push(moduleManageMent)
+                  })
+                }
+
+                store.dispatch(
+                  'user/changeSidebarRouter',
+                  this.sideBarRouterList3
+                )
+
+                console.log(3, this.sideBarRouterList3)
+                break
+              default:
+                break
+            }
           })
-          this.systemTypeRouter = homeRouters.concat(this.systemTypeRouter)
-          console.log('this.systemTypeRouter~~~~~~~~~', this.systemTypeRouter)
-          this.configTypeRouter = homeRouters.concat(this.configTypeRouter)
-          console.log('this.configTypeRouter~~~~~~~~~', this.configTypeRouter)
+          if (val === 3) {
+            this.systemTypeRouter = homeRouters.concat(this.systemTypeRouter)
+
+            console.log('this.systemTypeRouter', this.systemTypeRouter)
+            store.dispatch(
+              'user/changeActiveIndex',
+              this.systemTypeRouter[1].path
+            )
+            store.dispatch('user/changeSidebarRouter', this.sideBarRouterList)
+          } else {
+            this.configTypeRouter = homeRouters.concat(this.configTypeRouter)
+            console.log('this.configTypeRouter', this.configTypeRouter)
+          }
         }
       }
     },
@@ -371,13 +478,14 @@ export default {
               res1.data.map((item) => {
                 resRouter1.push(item)
               })
+
               store.dispatch('user/dynamicRouters', resRouter1)
               store.dispatch('user/changeInit', false)
               store.dispatch('user/changeRightWidth', false)
               store.dispatch('user/changeShowSidebar', false)
               this.$emit('changeSidebarHiddenStatus', true)
 
-              this.saveComponents(true, resRouter1)
+              this.saveComponents(1, resRouter1)
               store.dispatch('user/changeTypeRouter', this.appTypeRouter)
 
               this.$router.push({ path: resRouter1[0].children[0].path })
@@ -398,7 +506,7 @@ export default {
               store.dispatch('user/changeShowSidebar', true)
               this.$emit('changeSidebarHiddenStatus', false)
 
-              this.saveComponents(false, resRouter2)
+              this.saveComponents(3, resRouter2)
               store.dispatch('user/changeTypeRouter', this.systemTypeRouter)
 
               this.$router.push({ path: resRouter2[0].children[0].path })
@@ -419,7 +527,8 @@ export default {
               store.dispatch('user/changeShowSidebar', true)
               this.$emit('changeSidebarHiddenStatus', false)
 
-              this.saveComponents(false, resRouter3)
+              store.dispatch('user/changeActiveIndex', item.appUrl)
+              this.saveComponents(2, resRouter3, item.appUrl)
               store.dispatch('user/changeTypeRouter', this.configTypeRouter)
               this.$router.push({ path: resRouter3[0].children[0].path })
             }
