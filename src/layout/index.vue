@@ -177,7 +177,7 @@ export default {
     position: relative;
   }
   .main-container {
-    height: 100%;
+    height: calc(100% - 56px);
     width: 100%;
     // padding-top: 3.5rem;
     overflow: auto;
@@ -187,7 +187,7 @@ export default {
     }
   }
   .main-container-else {
-    height: 100%;
+    height: calc(100% - 56px);
     // padding-top: 3.5rem;
     width: calc(100% - 220px);
     margin-left: 220px;

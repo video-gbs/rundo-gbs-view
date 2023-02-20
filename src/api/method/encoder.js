@@ -37,10 +37,25 @@ export function editEncoder(params) {
 
 // 代注册列表
 export function getDeviceList(params) {
-  return request.put(`${device}/device/north/page`, params)
+  return request.get(`${device}/device/north/page`, params)
 }
 
 // 代注册列表删除
 export function deleteDevice(id) {
-  return request.put(`${device}/device/north/delete/?deviceId=${id}`)
+  return request.delete(`${device}/device/north/delete/?deviceId=${id}`)
 }
+
+// 代注册列表编辑
+// export function deleteDevice(id) {
+//   return request.delete(`${device}/device/north/delete/?deviceId=${id}`)
+// }
+
+// 代注册列表同步
+// export function syncDevice(id) {
+//   return request.put(`${device}/device/north/sync`)
+// }
+
+// 代注册列表恢复
+// export function syncDevice(id) {
+//   return request.put(`${device}/device/north/sync`)
+// }

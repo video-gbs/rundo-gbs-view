@@ -256,7 +256,9 @@ export default {
     },
     clickRouter(data) {
       console.log(1111, data)
-
+      this.sideBarRouterList1 = []
+      this.sideBarRouterList2 = []
+      this.sideBarRouterList3 = []
       switch (data.path) {
         case '/resourceManagement':
           this.routerLists.map((item) => {

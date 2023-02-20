@@ -765,7 +765,7 @@ export default {
 }
 
 .monitoring-content-box {
-  height: calc(100% - 0px);
+  height: calc(100% - 50px);
 }
 
 .real-time-monitoring {

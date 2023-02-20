@@ -16,6 +16,7 @@
           <el-input
             v-model="searchParams.itemName"
             placeholder="请输入"
+            clearable
             style="width: 240px"
           ></el-input>
         </el-form-item>
@@ -23,6 +24,7 @@
           <el-input
             v-model="searchParams.itemValue"
             placeholder="请输入"
+            clearable
             style="width: 240px"
           ></el-input>
         </el-form-item>

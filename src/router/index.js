@@ -412,6 +412,7 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     if (to.path !== '/login') {
+      Local.setToken()
       next('/login')
     } else {
     }

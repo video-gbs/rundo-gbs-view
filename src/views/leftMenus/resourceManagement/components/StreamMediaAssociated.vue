@@ -4,18 +4,11 @@
       <div>
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
-          >添加通道</span
+          >关联</span
         >
       </div>
     </div>
     <div class="activeDiscovery-transfer">
-      <div class="securityArea_container">
-        <leftTree
-          :treeData="treeList"
-          @childClickHandle="childClickHandle"
-          :defaultPropsName="areaNames"
-        />
-      </div>
       <div class="right-contnet">
         <div class="level">
           <!-- 左边框框 -->
@@ -422,7 +415,7 @@ export default {
 .transferbox {
   max-height: 730px;
   overflow-y: auto;
-  width: 45%; //右边盒子的宽占比
+  width: 50%; //右边盒子的宽占比
   border: 1px solid#ebedf2;
   margin-top: 16px;
   .topbox {
@@ -536,8 +529,9 @@ export default {
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     }
     .right-contnet {
-      width: calc(100% - 382px);
+      width: calc(100% - 0px);
       // margin-right: 10px;
+      padding: 0 20px;
       float: right;
     }
   }

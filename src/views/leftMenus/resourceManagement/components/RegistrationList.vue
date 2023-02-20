@@ -20,6 +20,7 @@
           <el-input
             v-model="searchParams.deviceName"
             placeholder="请输入名称"
+            clearable
             class="mr10"
           ></el-input>
         </el-form-item>
@@ -28,6 +29,7 @@
           <el-input
             v-model="searchParams.ip"
             placeholder="请输入IP地址"
+            clearable
             class="mr10"
           ></el-input>
         </el-form-item>
@@ -66,7 +68,7 @@
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          prop="areaNames"
+          prop="originId"
           label="设备编码"
           :show-overflow-tooltip="true"
         />
@@ -75,20 +77,50 @@
           label="设备序列号（平台）"
           :show-overflow-tooltip="true"
         />
-        <el-table-column prop="deviceType" label="设备类型" width="80" />
+        <el-table-column prop="deviceType" label="设备类型" />
         <el-table-column
           prop="ip"
           label="IP地址"
           :show-overflow-tooltip="true"
+          width="120"
         />
 
         <el-table-column prop="port" label="端口" width="80" />
-        <el-table-column prop="manufacturer" label="网关" />
-        <el-table-column prop="status" label="注册状态" width="80">
+        <el-table-column prop="gatewayName" label="网关" width="100" />
+        <el-table-column prop="signState" label="注册状态" width="120">
           <template slot-scope="scope">
-            <span :class="scope.row.status === 1 ? 'yuan' : 'yuan1'"></span>
+            <!-- <span
+              :class="scope.row.onlineState === 1 ? 'yuan' : 'yuan1'"
+            ></span> -->
             <span
-              v-if="scope.row.status === 1"
+              v-if="scope.row.signState === 0"
+              style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+              >已注册</span
+            >
+            <span
+              v-else-if="scope.row.signState === 1"
+              style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
+              >待添加</span
+            >
+            <span
+              v-else-if="scope.row.signState === 2"
+              style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
+              >待注册</span
+            >
+            <span
+              v-else
+              style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
+              >已删除</span
+            >
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" label="在线" width="80">
+          <template slot-scope="scope">
+            <span
+              :class="scope.row.onlineState === 1 ? 'yuan' : 'yuan1'"
+            ></span>
+            <span
+              v-if="scope.row.onlineState === 1"
               style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
               >在线</span
             >
@@ -99,22 +131,33 @@
             >
           </template>
         </el-table-column>
-        <el-table-column width="120" label="操作" fixed="right" align="center">
+        <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editData(scope.row)"
+            <el-button
+              type="text"
+              @click="editData(scope.row)"
+              v-if="scope.row.signState === 1"
               >编辑
             </el-button>
-            <!-- <el-button type="text" @click="restart(scope.row.id)"
-              >重启
+            <el-button
+              type="text"
+              @click="editData(scope.row)"
+              v-if="scope.row.signState === 2"
+              >注册
             </el-button>
-            <el-button type="text" @click="synchronizationData(scope.row.id)"
-              >同步
+            <el-button
+              type="text"
+              @click="editData(scope.row)"
+              v-if="scope.row.signState === -1"
+              >恢复
             </el-button>
-            <el-button type="text" @click="deploymentData(scope.row.id)"
-              >布防
-            </el-button> -->
-            <el-button type="text" @click="deleteDevice(scope.row)"
-              ><span class="delete-button">删除</span></el-button
+            <el-button
+              type="text"
+              @click="deleteDevice(scope.row)"
+              :disabled="scope.row.signState !== 2"
+              ><span :class="[scope.row.signState === 2 ? 'delete-button' : '']"
+                >删除</span
+              ></el-button
             >
           </template>
         </el-table-column>
@@ -130,15 +173,21 @@
 
 <script>
 import { getDeviceList, deleteDevice } from '@/api/method/encoder'
+import pagination from '@/components/Pagination/index.vue'
 export default {
   name: '',
-  components: {},
+  components: { pagination },
   data() {
     return {
       tableData: [],
       searchParams: {
         deviceName: '',
-        ip: ''
+        ip: null
+      },
+      params: {
+        pageNum: 1,
+        pageSize: 10,
+        total: 0
       },
       form: {
         model: '',
@@ -207,10 +256,18 @@ export default {
     this.init()
   },
   methods: {
-    async init(id) {
+    sizeChange(pageSize) {
+      this.params.pageSize = pageSize
+      this.init()
+    },
+    currentChange(proCount) {
+      this.params.proCount = proCount
+      this.init()
+    },
+    async init() {
       await getDeviceList({
-        pageNum: this.params.pageNum,
-        pageSize: this.params.pageSize,
+        num: this.params.pageNum,
+        page: this.params.pageSize,
         ...this.searchParams
       }).then((res) => {
         console.log('res', res)
@@ -256,6 +313,7 @@ export default {
         deviceName: '',
         ip: ''
       }
+      this.init()
     },
     cxData() {
       this.init()
@@ -323,10 +381,9 @@ export default {
     }
   }
   .search {
-    width: 100%;
+    width: calc(100% - 40px);
     height: 80px;
-    // line-height: 80px;
-    margin-bottom: 20px;
+    margin: 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
@@ -341,6 +398,7 @@ export default {
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     padding: 18px;
+    margin: 20px;
     .table-content-top {
       .table-content-top-check {
         float: left;
@@ -352,6 +410,23 @@ export default {
     }
     .table-content-bottom {
       // padding: 0 18px;
+    }
+    .yuan {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #359000;
+    }
+    .yuan1 {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #b1b1b1;
+    }
+    .delete-button {
+      color: red !important;
     }
   }
   .dialog-footer {

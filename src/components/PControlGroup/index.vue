@@ -15,7 +15,11 @@
           >
             <el-row>
               <template v-for="item in controlGroupData.controls">
-                <el-col v-if="!item.hideControl" :span="item.span || 8">
+                <el-col
+                  v-if="!item.hideControl"
+                  :span="item.span || 8"
+                  :key="item"
+                >
                   <el-form-item :label="item.label + colonStr" :prop="item.key">
                     <template v-if="item.type === 'input'">
                       <el-input
@@ -68,6 +72,7 @@
                           v-for="o in item.options"
                           :label="o.label"
                           :value="o.value"
+                          :key="o"
                         />
                       </el-select>
                     </template>
@@ -84,9 +89,12 @@
                     </template>
                     <template v-if="item.type === 'radio'">
                       <el-radio-group v-model="ruleForm[item.key]">
-                        <el-radio v-for="o in item.options" :label="o.value">{{
-                          o.label
-                        }}</el-radio>
+                        <el-radio
+                          v-for="o in item.options"
+                          :label="o.value"
+                          :key="o"
+                          >{{ o.label }}</el-radio
+                        >
                       </el-radio-group>
                     </template>
                     <template v-if="item.type === 'textarea'">
@@ -178,6 +186,7 @@
           v-for="item in controlGroupData.bottons"
           :icon="item.icon"
           :type="item.type"
+          :key="item"
           @click="handleBtnClick(item)"
         >
           {{ item.text }}
@@ -194,6 +203,7 @@
               v-if="!item.hideControl"
               :label="item.label + colonStr"
               :prop="item.key"
+              :key="item"
             >
               <template v-if="item.type === 'input'">
                 <el-input
@@ -242,6 +252,7 @@
                     v-for="o in item.options"
                     :label="o.label"
                     :value="o.value"
+                    :key="o"
                   />
                 </el-select>
               </template>
@@ -256,9 +267,12 @@
               </template>
               <template v-if="item.type === 'radio'">
                 <el-radio-group v-model="ruleForm[item.key]">
-                  <el-radio v-for="o in item.options" :label="o.value">{{
-                    o.label
-                  }}</el-radio>
+                  <el-radio
+                    v-for="o in item.options"
+                    :label="o.value"
+                    :key="o"
+                    >{{ o.label }}</el-radio
+                  >
                 </el-radio-group>
               </template>
               <template v-if="item.type === 'textarea'">
@@ -298,6 +312,7 @@
             v-for="item in controlGroupData.bottons"
             :icon="item.icon"
             :type="item.type"
+            :key="item"
             @click="handleBtnClick(item)"
           >
             {{ item.text }}

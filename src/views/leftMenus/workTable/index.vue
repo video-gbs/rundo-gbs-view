@@ -362,20 +362,22 @@ export default {
                 this.sideBarRouterList.push(params2)
               })
             }
-            switch (name) {
-              case '/resourceManagement':
+          })
+          switch (name) {
+            case '/resourceManagement':
+              data.map((item1) => {
                 if (
-                  item.children &&
-                  item.children.length > 0 &&
-                  name === item.path
+                  item1.children &&
+                  item1.children.length > 0 &&
+                  name === item1.path
                 ) {
-                  item.children.forEach((child) => {
+                  item1.children.forEach((child1) => {
                     let resourceManagement = {}
                     resourceManagement = {
-                      path: child.path,
-                      meta: child.meta,
-                      name: child.name,
-                      hidden: child.hidden === 1 ? true : false,
+                      path: child1.path,
+                      meta: child1.meta,
+                      name: child1.name,
+                      hidden: child1.hidden === 1 ? true : false,
                       component: (resolve) =>
                         require([`@/views${child.component}`], resolve)
                     }
@@ -383,27 +385,30 @@ export default {
                     this.sideBarRouterList1.push(resourceManagement)
                   })
                 }
+              })
 
-                store.dispatch(
-                  'user/changeSidebarRouter',
-                  this.sideBarRouterList1
-                )
+              store.dispatch(
+                'user/changeSidebarRouter',
+                this.sideBarRouterList1
+              )
 
-                console.log(1, this.sideBarRouterList1)
-                break
-              case '/systemManagement':
+              console.log(1, this.sideBarRouterList1)
+              this.$router.push({ path: this.sideBarRouterList1[0].path })
+              break
+            case '/systemManagement':
+              data.map((item2) => {
                 if (
-                  item.children &&
-                  item.children.length > 0 &&
-                  name === item.path
+                  item2.children &&
+                  item2.children.length > 0 &&
+                  name === item2.path
                 ) {
-                  item.children.forEach((child) => {
+                  item2.children.forEach((child2) => {
                     let systemManagement = {}
                     systemManagement = {
-                      path: child.path,
-                      meta: child.meta,
-                      name: child.name,
-                      hidden: child.hidden === 1 ? true : false,
+                      path: child2.path,
+                      meta: child2.meta,
+                      name: child2.name,
+                      hidden: child2.hidden === 1 ? true : false,
                       component: (resolve) =>
                         require([`@/views${child.component}`], resolve)
                     }
@@ -411,28 +416,29 @@ export default {
                     this.sideBarRouterList2.push(systemManagement)
                   })
                 }
-                // this.sideBarRouterList2.push(params2)
+              })
 
-                store.dispatch(
-                  'user/changeSidebarRouter',
-                  this.sideBarRouterList2
-                )
-                console.log(2, this.sideBarRouterList2)
-                break
-              case '/moduleManageMent':
-                // this.sideBarRouterList3.push(params2)
+              store.dispatch(
+                'user/changeSidebarRouter',
+                this.sideBarRouterList2
+              )
+              console.log(2, this.sideBarRouterList2)
+              this.$router.push({ path: this.sideBarRouterList2[0].path })
+              break
+            case '/moduleManageMent':
+              data.map((item3) => {
                 if (
-                  item.children &&
-                  item.children.length > 0 &&
-                  name === item.path
+                  item3.children &&
+                  item3.children.length > 0 &&
+                  name === item3.path
                 ) {
-                  item.children.forEach((child) => {
+                  item3.children.forEach((child3) => {
                     let moduleManageMent = {}
                     moduleManageMent = {
-                      path: child.path,
-                      meta: child.meta,
-                      name: child.name,
-                      hidden: child.hidden === 1 ? true : false,
+                      path: child3.path,
+                      meta: child3.meta,
+                      name: child3.name,
+                      hidden: child3.hidden === 1 ? true : false,
                       component: (resolve) =>
                         require([`@/views${child.component}`], resolve)
                     }
@@ -440,18 +446,19 @@ export default {
                     this.sideBarRouterList3.push(moduleManageMent)
                   })
                 }
+              })
 
-                store.dispatch(
-                  'user/changeSidebarRouter',
-                  this.sideBarRouterList3
-                )
+              store.dispatch(
+                'user/changeSidebarRouter',
+                this.sideBarRouterList3
+              )
 
-                console.log(3, this.sideBarRouterList3)
-                break
-              default:
-                break
-            }
-          })
+              console.log(3, this.sideBarRouterList3)
+              this.$router.push({ path: this.sideBarRouterList3[0].path })
+              break
+            default:
+              break
+          }
           if (val === 3) {
             this.systemTypeRouter = homeRouters.concat(this.systemTypeRouter)
 
@@ -514,6 +521,7 @@ export default {
           })
           break
         case '配置':
+          console.log(111111111, item)
           Local.set('tree_type', 2)
           getTypeTreeMenus(2).then((res3) => {
             if (res3.code === 0) {
@@ -530,7 +538,6 @@ export default {
               store.dispatch('user/changeActiveIndex', item.appUrl)
               this.saveComponents(2, resRouter3, item.appUrl)
               store.dispatch('user/changeTypeRouter', this.configTypeRouter)
-              this.$router.push({ path: resRouter3[0].children[0].path })
             }
           })
           break

@@ -1,10 +1,10 @@
 <template>
   <div class="main">
     <div class="panel-header-box">
-      <div>流媒体调度服务模块</div>
+      <div>网关管理</div>
     </div>
     <div class="main-content">
-      <div class="moduleManagement_container">
+      <div class="gatewayModuleManagement_container">
         <leftTree
           :treeData="treeList"
           @childClickHandle="childClickHandle"
@@ -46,13 +46,50 @@
                 label="序列号"
                 :show-overflow-tooltip="true"
               />
-              <!-- <el-table-column
-                prop="deviceId"
-                label="通讯域名"
-                :show-overflow-tooltip="true"
-              /> -->
-              <!-- <el-table-column prop="protocol" label="协议" width="80" /> -->
-              <el-table-column prop="url" label="通讯域名" />
+              <el-table-column prop="signType" label="通讯模式">
+                <template slot-scope="scope">
+                  <span
+                    v-if="scope.row.signType === 1"
+                    style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+                    >MQ</span
+                  >
+                  <span
+                    v-else
+                    style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
+                    >HTTP</span
+                  >
+                </template>
+              </el-table-column>
+              <el-table-column prop="gatewayType" label="网关类型">
+                <template slot-scope="scope">
+                  <span
+                    v-if="scope.row.gatewayType === 1"
+                    style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+                    >DEVICE</span
+                  >
+                  <span
+                    v-if="scope.row.gatewayType === 2"
+                    style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+                    >NVR</span
+                  >
+                  <span
+                    v-if="scope.row.gatewayType === 3"
+                    style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+                    >DVR</span
+                  >
+                  <span
+                    v-if="scope.row.gatewayType === 4"
+                    style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+                    >CVR</span
+                  >
+                  <span
+                    v-else
+                    style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
+                    >OTHER</span
+                  >
+                </template>
+              </el-table-column>
+              <el-table-column prop="protocol" label="协议" width="80" />
               <el-table-column
                 prop="ip"
                 label="IP"
@@ -129,11 +166,42 @@
                 disabled
               ></el-input>
             </el-form-item>
-            <el-form-item label="通讯域名：">
-              <el-input
-                v-model="dialogForm.url"
+            <el-form-item label="通讯模式：">
+              <el-select
+                v-model="dialogForm.signType"
+                placeholder="请选择"
                 style="width: 436px"
-                clearable
+                disabled
+              >
+                <el-option
+                  v-for="o in signTypeOptions"
+                  :label="o.label"
+                  :value="o.value"
+                  :key="o"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="网关类型：" style="width: 436px">
+              <el-select
+                v-model="dialogForm.gatewayType"
+                placeholder="请选择"
+                style="width: 436px"
+                disabled
+              >
+                <el-option
+                  v-for="o in gatewayTypeOptions"
+                  :label="o.label"
+                  :value="o.value"
+                  :key="o"
+                />
+              </el-select>
+            </el-form-item>
+
+            <el-form-item label="协议：">
+              <el-input
+                v-model="dialogForm.protocol"
+                style="width: 436px"
+                disabled
               ></el-input>
             </el-form-item>
             <el-form-item label="IP：">
@@ -154,7 +222,52 @@
         </div>
         <div class="dialog-footer">
           <el-button @click="dialogShow = false">取消</el-button>
-          <el-button type="primary" @click="save"
+          <el-button type="primary" @click="save(1)"
+            ><svg-icon class="svg-btn" icon-class="save" />确认</el-button
+          >
+        </div>
+      </el-dialog>
+
+      <el-dialog title="关联" :visible.sync="dialogShowDetails" width="30%">
+        <div slot="title" class="dialog-title">
+          <LineFont
+            :line-title="lineTitle1"
+            :text-style="textStyle"
+            :line-blue-style="lineBlueStyle"
+          />
+        </div>
+        <div>
+          <el-form
+            label-width="auto"
+            :model="dialogForm"
+            style="margin-left: 20px"
+          >
+            <el-form-item label="模块名称：">
+              <el-input
+                v-model="dialogShowDetailsForm.name"
+                style="width: 336px"
+                clearable
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="流媒体调度服务模块：">
+              <el-select
+                v-model="dialogShowDetailsForm.gatewayType"
+                placeholder="请选择"
+                style="width: 336px"
+              >
+                <el-option
+                  v-for="o in allNorthTypeOptions"
+                  :label="o.label"
+                  :value="o.value"
+                  :key="o"
+                />
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div class="dialog-footer">
+          <el-button @click="dialogShowDetails = false">取消</el-button>
+          <el-button type="primary" @click="save(2)"
             ><svg-icon class="svg-btn" icon-class="save" />确认</el-button
           >
         </div>
@@ -169,7 +282,12 @@ import pagination from '@/components/Pagination/index.vue'
 import LineFont from '@/components/LineFont'
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
-import { getNorthLists, updateNorthLists } from '@/api/method/moduleManagement'
+import {
+  getModuleLists,
+  updateModuleLists,
+  getAllNorthLists,
+  gatewayCorrelation
+} from '@/api/method/moduleManagement'
 export default {
   name: '',
   components: { leftTree, pagination, LineFont },
@@ -184,7 +302,22 @@ export default {
         title: '编辑',
         notShowSmallTitle: false
       },
+      lineTitle1: {
+        title: '关联',
+        notShowSmallTitle: false
+      },
+      allNorthTypeOptions: [],
       signTypeOptions: [
+        {
+          label: 'MQ',
+          value: 1
+        },
+        {
+          label: 'HTTP',
+          value: 0
+        }
+      ],
+      gatewayTypeOptions: [
         {
           label: 'DEVICE',
           value: 1
@@ -250,18 +383,24 @@ export default {
       ],
       dialogShow: false,
       dialogForm: {
-        url: 'http://',
+        protocol: '',
         name: '',
         port: '',
         ip: '',
         serialNum: '',
-        signType: ''
+        signType: '',
+        gatewayType: ''
+      },
+      dialogShowDetailsForm: {
+        name: '',
+        gatewayType: ''
       },
       dialogShowDetails: false,
       detailsId: '',
       areaNames: 'areaNames',
       tableData: [],
-      editId: ''
+      editId: '',
+      correlationId: ''
     }
   },
   created() {},
@@ -272,7 +411,7 @@ export default {
   watch: {},
   methods: {
     async init() {
-      await getNorthLists({
+      await getModuleLists({
         num: this.params.pageNum,
         page: this.params.pageSize
       }).then((res) => {
@@ -291,7 +430,6 @@ export default {
       this.params.proCount = proCount
     },
     childClickHandle(data) {
-      console.log(data, 1111)
       if (data.areaName === '网关模块') {
         this.$router.push({ path: '/gatewayModuleManagement' })
       } else {
@@ -300,36 +438,67 @@ export default {
     },
     editData(row) {
       this.dialogShow = true
-      const { url, name, port, ip, serialNum, signType } = row
+      const { protocol, name, port, ip, serialNum, signType, gatewayType } = row
       this.dialogForm.signType = signType
-      this.dialogForm.url = url
+      this.dialogForm.gatewayType = gatewayType
+      this.dialogForm.protocol = protocol
       this.dialogForm.name = name
       this.dialogForm.port = port
       this.dialogForm.ip = ip
       this.dialogForm.serialNum = serialNum
       this.editId = row.id
     },
-    showCorrelationPage(row) {
-      this.$router.push({
-        path: '/streamMediaAssociated',
-        query: { key: row.id }
-      })
-    },
-    async save() {
-      await updateNorthLists({
-        dispatchId: this.editId,
-        name: this.dialogForm.name,
-        url: this.dialogForm.url
-      }).then((res) => {
+    async showCorrelationPage(row) {
+      this.dialogShowDetailsForm.name = row.name
+      this.allNorthTypeOptions = [
+        {
+          label: '',
+          value: null
+        }
+      ]
+      await getAllNorthLists().then((res) => {
         if (res.code === 0) {
-          this.$message({
-            type: 'success',
-            message: '编辑成功'
+          this.correlationId = row.id
+          this.dialogShowDetails = true
+          let obj = {}
+          res.data.map((item) => {
+            obj.label = item.name
+            obj.value = item.dispatchId
+            this.allNorthTypeOptions.push(obj)
           })
-          this.dialogShow = false
-          this.init()
         }
       })
+    },
+    async save(val) {
+      if (val === 1) {
+        await updateModuleLists({
+          gatewayId: this.editId,
+          name: this.dialogForm.name
+        }).then((res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '编辑成功'
+            })
+            this.dialogShow = false
+            this.init()
+          }
+        })
+      } else {
+        await gatewayCorrelation({
+          gatewayId: this.correlationId,
+          dispatchId: this.dialogShowDetailsForm.gatewayType
+        }).then((res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '关联成功'
+            })
+            this.dialogShowDetails = false
+            this.init()
+          }
+        })
+      }
     },
     showDetails() {
       this.dialogShowDetails = true
@@ -419,7 +588,7 @@ export default {
     height: calc(100% - 50px);
     display: flex;
     justify-content: space-between;
-    .moduleManagement_container {
+    .gatewayModuleManagement_container {
       height: calc(100% - 40px);
       width: 310px;
       margin: 20px;

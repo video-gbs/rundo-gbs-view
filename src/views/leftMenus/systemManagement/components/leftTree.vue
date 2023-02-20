@@ -136,7 +136,8 @@ export default {
   border-width: 1px;
 }
 .el-tree-node__expand-icon.is-leaf {
-  display: none;
+  // display: none;
+  padding-left: 4px;
 }
 
 .el-tree-node:before {
@@ -152,7 +153,7 @@ export default {
 
 .el-tree-node:after {
   content: '';
-  width: 10px;
+  width: 24px;
   height: 20px;
   position: absolute;
   left: -4px;

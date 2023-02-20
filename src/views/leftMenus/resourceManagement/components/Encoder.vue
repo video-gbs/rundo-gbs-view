@@ -12,6 +12,7 @@
           <el-select
             v-model="searchParams.deviceType"
             class="mr10"
+            clearable
             placeholder="请选择"
           >
             <el-option
@@ -26,6 +27,7 @@
           <el-select
             v-model="searchParams.onlineState"
             class="mr10"
+            clearable
             placeholder="请选择"
           >
             <el-option
@@ -42,6 +44,7 @@
             v-model="searchParams.ip"
             placeholder="请输入IP地址"
             class="mr10"
+            clearable
           ></el-input>
         </el-form-item>
         <el-form-item style="float: right; margin-right: 20px">
@@ -545,7 +548,7 @@ export default {
   }
 
   .securityArea_container {
-    height: calc(100% - 90px);
+    height: calc(100% - 40px);
     width: 310px;
     margin: 10px;
     // background: #ffffff;
