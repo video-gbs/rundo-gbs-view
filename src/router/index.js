@@ -397,22 +397,58 @@ router.beforeEach((to, from, next) => {
           }
         })
         console.log(router, 9999)
-        // isToken = false
         store.dispatch('user/changeInit', true)
         next({ ...to, replace: true })
       } else {
-        // if (to.name === null) {
-        //   next('/404')
-        // } else {
-        //   next()
-        // }
+        // const accessRouteses1 = Local.get('dynamicRouters')
+        // console.log('accessRouteses1',JSON.parse(accessRouteses1))
+        // // //动态路由循环解析和添加
+        // const childComponent1 = []
+        // JSON.parse(accessRouteses1).forEach((item1) => {
+        //   if (item1.children && item1.children.length > 0) {
+        //     item1.children.forEach((child1) => {
+        //       // 组装路由配置
+        //       const childTemp = {
+        //         name: child1.name,
+        //         path: child1.path,
+        //         meta: child1.meta,
+        //         hidden: child1.hidden === 1 ? true : false,
+        //         component: (resolve) =>
+        //           require([`@/views${child1.component}`], resolve)
+        //       }
+        //       childComponent1.push(childTemp)
+        //     })
+        //     const temp = {
+        //       name: item1.name,
+        //       path: item1.path,
+        //       meta: item1.meta,
+        //       component: Layout,
+        //       children: childComponent1
+        //     }
+        //     router.addRoute(temp)
+        //     router.options.routes.push(temp)
+        //   } else {
+        //     const elseTemp = {
+        //       name: item1.name,
+        //       path: item1.path,
+        //       meta: item1.meta,
+        //       component: (resolve) =>
+        //         require([`@/views${item1.component}`], resolve)
+        //     }
+        //     router.addRoute(elseTemp)
+        //     router.options.routes.push(elseTemp)
+        //   }
+        // })
+        // console.log(router, 8888)
+        // store.dispatch('user/changeInit', false)
+        // next()
       }
     } else {
       next('/workTable')
     }
   } else {
     if (to.path !== '/login') {
-      Local.setToken()
+      Local.setToken('')
       next('/login')
     } else {
     }

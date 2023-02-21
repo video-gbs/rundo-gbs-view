@@ -303,7 +303,7 @@ export default {
      */
 
     saveComponents(val, data, name) {
-      console.log('name~~~~~~~~~~~~~~~~~~~~~~~~', name)
+      // console.log('val~~~~~~~~~~~~~~~~~~~~~~~~', val)
       if (data && data.length > 0) {
         const homeRouters = [
           {
@@ -335,20 +335,20 @@ export default {
           store.dispatch('user/changeActiveIndex', this.appTypeRouter[1].path)
           console.log('this.appTypeRouter', this.appTypeRouter)
         } else {
-          data.map((item) => {
+          data.map((item4) => {
             let params1 = {}
             params1 = {
-              path: item.path,
-              meta: item.meta,
-              name: item.name,
+              path: item4.path,
+              meta: item4.meta,
+              name: item4.name,
               component: (resolve) =>
-                require([`@/views${item.component}`], resolve)
+                require([`@/views${item4.component}`], resolve)
             }
             this.systemTypeRouter.push(params1)
             this.configTypeRouter.push(params1)
             // 侧边栏路由
-            if (item.children && item.children.length > 0) {
-              item.children.forEach((child) => {
+            if (item4.children && item4.children.length > 0) {
+              item4.children.forEach((child) => {
                 let params2 = {}
                 params2 = {
                   path: child.path,
@@ -462,7 +462,11 @@ export default {
           if (val === 3) {
             this.systemTypeRouter = homeRouters.concat(this.systemTypeRouter)
 
-            console.log('this.systemTypeRouter', this.systemTypeRouter)
+            console.log(
+              'this.systemTypeRouter',
+              this.systemTypeRouter,
+              this.sideBarRouterList
+            )
             store.dispatch(
               'user/changeActiveIndex',
               this.systemTypeRouter[1].path

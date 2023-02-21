@@ -27,11 +27,11 @@ const urls = [
   {
     target: 'http://124.71.21.11:8080',
     proxy: '/api'
+  },
+  {
+    target: 'http://192.168.0.73:8060',
+    proxy: '/expansion'
   }
-  // {
-  //   target: 'http://124.71.21.11:8080',
-  //   proxy: '/auth'
-  // }
 ]
 
 /**

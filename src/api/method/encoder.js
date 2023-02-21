@@ -4,6 +4,7 @@ import baseUrls from '@/utils/baseUrlConfig'
 
 const expansion = baseUrls.base2
 const device = baseUrls.base3
+const expansionTest = baseUrls.base5
 // 编码器
 // 新增编码器
 export function addEncoder(params) {

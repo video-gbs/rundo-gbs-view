@@ -2,19 +2,10 @@
   <!-- 云台控制 -->
   <div class="cloud-control-container">
     <DirectionControl :device-data="deviceData" />
-    <div class="control-operate-box">
+    <!-- <div class="control-operate-box">
       <div class="preliminary-position">
         <div class="position-title" style="margin-bottom: 0px">预置位</div>
         <div class="position-control-panel">
-          <!-- <el-input-number
-            class="input-number"
-            v-model="presetPos"
-            controls-position="right"
-            @change="handleChange"
-            :min="1"
-            :max="10"
-            size="small"
-          ></el-input-number>         -->
         </div>
         <div class="position-preset">
           <div class="position-preset-middle">
@@ -84,7 +75,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

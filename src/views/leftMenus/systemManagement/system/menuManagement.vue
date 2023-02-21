@@ -119,7 +119,6 @@
       :title="dialogForm.title1"
       :visible.sync="dialogForm.show"
       width="650px"
-      :before-close="handleClose"
     >
       <div>
         <el-form
@@ -129,12 +128,12 @@
           label-width="120px"
           :rules="rules"
           label-position="right"
-          :model="dialogForm"
+          :model="dialogForm.params"
           @keyup.enter="submit('roleForm')"
         >
-          <el-form-item label="所属应用：">
+          <el-form-item label="所属应用：" prop="appId">
             <el-select
-              v-model="dialogForm.appId"
+              v-model="dialogForm.params.appId"
               placeholder="请选择"
               style="width: 436px"
               @change="changeApplication"
@@ -143,14 +142,14 @@
                 v-for="o in applicationOption"
                 :label="o.label"
                 :value="o.value"
-                :key="o"
+                :key="o.value"
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="上级菜单：" v-if="isDisabled">
+          <el-form-item label="上级菜单：" v-if="isDisabled" prop="menuPid">
             <el-select
               ref="selectTree"
-              v-model="dialogForm.menuPid"
+              v-model="dialogForm.params.menuPid"
               placeholder="请选择"
               :popper-append-to-body="false"
               style="width: 436px"
@@ -160,12 +159,12 @@
             >
               <el-option :value="List">
                 <el-tree
+                  ref="tree"
                   class="unit-tree"
                   :data="treeList"
                   node-key="id"
                   :props="defaultProps"
                   :default-expanded-keys="Ids"
-                  ref="tree"
                   highlight-current
                   :expand-on-click-node="false"
                   @node-click="nodeClickHandle"
@@ -173,10 +172,10 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="上级菜单：" v-else>
+          <el-form-item label="上级菜单：" v-else prop="menuPid">
             <el-select
               ref="selectTree"
-              v-model="dialogForm.menuPid"
+              v-model="dialogForm.params.menuPid"
               placeholder="请选择"
               :popper-append-to-body="false"
               style="width: 436px"
@@ -185,12 +184,12 @@
             >
               <el-option :value="List">
                 <el-tree
+                  ref="tree"
                   class="unit-tree"
                   :data="treeList"
                   node-key="id"
                   :props="defaultProps"
                   :default-expanded-keys="Ids"
-                  ref="tree"
                   highlight-current
                   :expand-on-click-node="false"
                   @node-click="nodeClickHandle"
@@ -198,41 +197,38 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="菜单名称：">
-            <el-input
-              v-model="dialogForm.title"
-              style="width: 436px"
-            ></el-input>
+          <el-form-item label="菜单名称：" prop="title">
+            <el-input v-model="dialogForm.params.title" style="width: 436px" />
           </el-form-item>
-          <el-form-item label="菜单图标：">
-            <el-input v-model="dialogForm.icon" style="width: 436px"></el-input>
+          <el-form-item label="菜单图标：" prop="icon">
+            <el-input v-model="dialogForm.params.icon" style="width: 436px" />
           </el-form-item>
-          <el-form-item label="排序：">
+          <el-form-item label="排序：" prop="menuSort">
             <el-input
-              v-model="dialogForm.menuSort"
+              v-model="dialogForm.params.menuSort"
               style="width: 436px"
-            ></el-input>
+            />
           </el-form-item>
 
           <el-form-item label="跳转URL：">
-            <el-input v-model="dialogForm.path" style="width: 436px"></el-input>
+            <el-input v-model="dialogForm.params.path" style="width: 436px" />
           </el-form-item>
           <el-form-item label="前端组件路径：">
             <el-input
-              v-model="dialogForm.component"
+              v-model="dialogForm.params.component"
               style="width: 436px"
-            ></el-input>
+            />
           </el-form-item>
           <el-form-item label="是否禁用：">
-            <el-radio-group v-model="dialogForm.status">
-              <el-radio label="1">是</el-radio>
-              <el-radio label="0">否</el-radio>
+            <el-radio-group v-model="dialogForm.params.status">
+              <el-radio :label="1">是</el-radio>
+              <el-radio :label="0">否</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="是否隐藏：">
-            <el-radio-group v-model="dialogForm.hidden">
-              <el-radio label="1">是</el-radio>
-              <el-radio label="0">否</el-radio>
+            <el-radio-group v-model="dialogForm.params.hidden">
+              <el-radio :label="1">是</el-radio>
+              <el-radio :label="0">否</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-form>
@@ -277,38 +273,16 @@ export default {
           menuPid: ''
         }
       },
-      permissionDialog: {
-        show: false,
-        title: '编辑',
-        params: {
-          detail: '',
-          name: '',
-          status: 1
-        }
-      },
       searchParams: {
         menuName: '',
         url: ''
       },
       rules: {
-        appName: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' },
-          {
-            min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
-            trigger: 'blur'
-          }
-        ],
-        name: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' },
-          {
-            min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
-            trigger: 'blur'
-          }
-        ]
+        menuPid: [{ required: true, message: '请选择', trigger: 'change' }],
+        appId: [{ required: true, message: '请选择', trigger: 'change' }],
+        ip: [{ required: true, message: '请填写ip', trigger: 'blur' }],
+        icon: [{ required: true, message: '请填写图标', trigger: 'blur' }],
+        title: [{ required: true, message: '请填写名称', trigger: 'blur' }]
       },
       treeData: [],
       editId: '',
@@ -369,6 +343,7 @@ export default {
       })
     },
     dialogShow(type, row) {
+      console.log('rw~~~~~~~~~~~~~~', typeof type, row)
       this.applicationOption = []
       this.isDisabled = true
       getApplicationList().then((res) => {
@@ -382,18 +357,43 @@ export default {
         }
       })
       if (type === 0) {
-        const { component, path, status, hidden, menuSort, title, icon } = row
+        const {
+          component,
+          path,
+          status,
+          hidden,
+          menuSort,
+          title,
+          icon,
+          appId,
+          menuPid
+        } = row
         this.dialogForm.params.icon = icon
         this.dialogForm.params.title = title
         this.dialogForm.params.hidden = hidden
-        this.dialogForm.params.name = name
+        this.dialogForm.params.status = status
         this.dialogForm.params.menuSort = menuSort
         this.dialogForm.params.path = path
         this.dialogForm.params.component = component
+        this.dialogForm.params.appId = appId
+        this.dialogForm.params.menuPid = menuPid
+
+        this.editId = row.id
+      } else {
+        this.dialogForm.params = {
+          component: '',
+          path: '',
+          status: '',
+          hidden: '',
+          menuSort: '',
+          title: '',
+          icon: '',
+          appId: '',
+          menuPid: ''
+        }
       }
       this.dialogForm.title1 = type === 1 ? '新建' : '编辑'
       this.dialogForm.show = !this.dialogForm.show
-      this.editId = row.id
     },
     async getList() {
       await getMenuInfoLists({
@@ -424,25 +424,26 @@ export default {
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          switch (this.dialog.title) {
+          switch (this.dialogForm.title1) {
             case '新建':
-              addMenuInfo(this.dialog.params).then((res) => {
+              this.dialogForm.params.menuPid = this.Id
+              addMenuInfo(this.dialogForm.params).then((res) => {
                 if (res.code === 0) {
                   this.$message({
                     type: 'success',
                     message: '新建成功'
                   })
-                  this.dialog.show = false
+                  this.dialogForm.show = false
                   this.getList()
                 }
               })
               break
             case '编辑':
-              editMenuInfo({ id: this.editId, ...this.dialog.params }).then(
+              editMenuInfo({ id: this.editId, ...this.dialogForm.params }).then(
                 (res) => {
                   if (res.code === 0) {
                     this.$message.success('编辑成功')
-                    this.dialog.show = false
+                    this.dialogForm.show = false
                     this.getList()
                   }
                 }

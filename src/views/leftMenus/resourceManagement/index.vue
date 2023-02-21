@@ -37,7 +37,7 @@
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import Encoder from './components/Encoder.vue'
 import Channel from './components/Channel.vue'
-import { getSysOrgTree, getVideoAraeTree } from '@/api/method/role'
+import { getVideoAraeTree } from '@/api/method/role'
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
 export default {

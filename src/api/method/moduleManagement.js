@@ -38,3 +38,27 @@ export function getAllNorthLists(data) {
   // 获取所有流媒体调度服务的名称
   return request.get(`${streamanege}/dispatch/north/name`, data)
 }
+
+export function getAllNorthDispatchLists(data) {
+  // 获取所有流媒体调度服务绑定的网关
+  return request.get(
+    `${streamanege}/gateway-dispatch/north/dispatch/data/in`,
+    data
+  )
+}
+
+export function getAllUnNorthDispatchLists(data) {
+  // 获取所有流媒体调度服务未绑定的网关
+  return request.get(
+    `${streamanege}/gateway-dispatch/north/dispatch/data/not-in`,
+    data
+  )
+}
+
+export function bindingNorthLists(data) {
+  // 关联流媒体调度服务的网关
+  return request.post(
+    `${streamanege}/gateway-dispatch/north/dispatch/binding`,
+    data
+  )
+}

@@ -25,9 +25,15 @@
                 >已勾选 1/{{ tableData.length }}</el-checkbox
               > -->
               <el-input
-                placeholder="请输入搜索关键字"
-                suffix-icon="el-icon-search"
+                placeholder="请输入模块名称"
                 class="search-input"
+                clearable
+                v-model="leftSearchName"
+                ><el-button
+                  icon="el-icon-search"
+                  slot="append"
+                  @click="search(1)"
+                ></el-button
               ></el-input>
             </div>
             <div class="contont">
@@ -54,20 +60,17 @@
                 >
                 </el-table-column>
                 <el-table-column
-                  prop="channelName"
-                  label="通道名称"
+                  prop="name"
+                  label="模块名称"
                   :show-overflow-tooltip="true"
                 />
                 <el-table-column
-                  prop="channelCode"
-                  label="通道编号"
+                  prop="serialNum"
+                  label="序列号"
                   :show-overflow-tooltip="true"
                 />
-                <el-table-column
-                  prop="deviceExpansionName"
-                  label="所属设备"
-                  width="240"
-                />
+                <el-table-column prop="protocol" label="协议" width="240" />
+                <el-table-column prop="ip" label="IP" width="240" />
               </el-table>
 
               <pagination
@@ -98,9 +101,15 @@
             </div>
             <div class="level searchbox">
               <el-input
-                placeholder="请输入搜索关键字"
-                suffix-icon="el-icon-search"
+                placeholder="请输入模块名称"
                 class="search-input"
+                clearable
+                v-model="rightSearchName"
+                ><el-button
+                  icon="el-icon-search"
+                  slot="append"
+                  @click="search(2)"
+                ></el-button
               ></el-input>
             </div>
 
@@ -129,20 +138,17 @@
                 >
                 </el-table-column>
                 <el-table-column
-                  prop="channelName"
-                  label="通道名称"
+                  prop="name"
+                  label="模块名称"
                   :show-overflow-tooltip="true"
                 />
                 <el-table-column
-                  prop="channelCode"
-                  label="通道编号"
+                  prop="serialNum"
+                  label="序列号"
                   :show-overflow-tooltip="true"
                 />
-                <el-table-column
-                  prop="deviceExpansionName"
-                  label="所属设备"
-                  width="240"
-                />
+                <el-table-column prop="protocol" label="协议" width="240" />
+                <el-table-column prop="ip" label="IP" width="240" />
               </el-table>
 
               <pagination
@@ -173,40 +179,34 @@ const defaultListQuery = {
 }
 import LineFont from '@/components/LineFont'
 import pagination from '@/components/Pagination/index.vue'
-import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 
-import { getFindChannelById, addChannel } from '@/api/method/channel'
-
-import { getVideoAraeTree } from '@/api/method/role'
+import {
+  getAllUnNorthDispatchLists,
+  getAllNorthDispatchLists,
+  bindingNorthLists
+} from '@/api/method/moduleManagement'
 
 export default {
   name: '',
-  components: { LineFont, pagination, leftTree },
+  components: { LineFont, pagination },
   data() {
     return {
-      form: {},
       params: {
         pageNum: 1,
         pageSize: 10,
         total: 0
       },
-      areaNames: 'areaNames',
+      params1: {
+        pageNum: 1,
+        pageSize: 10,
+        total: 0
+      },
+      rightSearchName: '',
+      leftSearchName: '',
       selectedStaffList: [],
       selectedStaffData: [],
-      treeList: [],
-      channelId: 1,
       checked: false,
-      tableData: [
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        }
-      ],
+      tableData: [],
       lineTitle: {
         title: '未选择列表',
         notShowSmallTitle: false
@@ -225,47 +225,53 @@ export default {
         background: 'rgba(30, 86, 160, 1)',
         width: '3px',
         height: '18px'
-      },
-      defaultProps: {
-        children: 'children',
-        label: 'name',
-        isLeaf: (data, node) => {
-          return !data.hasChildren
-        }
       }
     }
   },
   mounted() {
-    this.init()
-    this.getVideoAraeTree()
+    this.leftInit()
+    this.rightInit()
   },
   methods: {
-    async getVideoAraeTree() {
-      await getVideoAraeTree()
+    search(val) {
+      if (val === 1) {
+        this.leftInit()
+      } else {
+        this.rightInit()
+      }
+    },
+    async leftInit() {
+      await getAllUnNorthDispatchLists({
+        page: this.params.pageNum,
+        num: this.params.pageSize,
+        dispatchId: this.$router.currentRoute.query.key,
+        name: this.leftSearchName
+      })
         .then((res) => {
           if (res.code === 0) {
-            this.treeList = res.data
+            this.tableData = res.data.list
+            this.params.total = res.data.total
+            this.params.pages = res.data.pages
+            this.params.current = res.data.current
           }
         })
         .catch((error) => {
           console.log(error)
         })
     },
-    childClickHandle(data) {
-      this.channelId = data.id
-    },
-    async init() {
-      await getFindChannelById({
-        page: this.params.pageNum,
-        num: this.params.pageSize,
-        nameOrOriginId: this.channelId
+    async rightInit() {
+      await getAllNorthDispatchLists({
+        page: this.params1.pageNum,
+        num: this.params1.pageSize,
+        dispatchId: this.$router.currentRoute.query.key,
+        name: this.rightSearchName
       })
         .then((res) => {
           if (res.code === 0) {
-            this.tableData = res.data.records
-            this.params.total = res.data.total
-            this.params.pages = res.data.pages
-            this.params.current = res.data.current
+            this.selectedStaffList = res.data.list
+            this.params1.total = res.data.total
+            this.params1.pages = res.data.pages
+            this.params1.current = res.data.current
           }
         })
         .catch((error) => {
@@ -281,7 +287,7 @@ export default {
       this.init()
     },
     goback() {
-      this.$router.push({ path: '/equipment' })
+      this.$router.push({ path: '/ModuleManagement' })
     },
     //数组去重
     fn2(arr) {
@@ -310,9 +316,9 @@ export default {
         })
         return
       } else {
-        this.selectedStaffList = this.selectedStaffList.concat(
-          this.$refs.tableLeft.selection
-        )
+        this.selectedStaffList = this.selectedStaffList
+          ? this.selectedStaffList
+          : [].concat(this.$refs.tableLeft.selection)
         // 复制数组对象
         let selectList = JSON.parse(
           JSON.stringify(this.$refs.tableLeft.selection)
@@ -324,8 +330,6 @@ export default {
           }
         })
         this.$refs.tableLeft.clearSelection()
-
-        console.log(this.selectedStaffList, 'this.selectedStaffList')
       }
     },
     //右到左
@@ -342,26 +346,21 @@ export default {
       let arr = this.selectedStaffList.filter((v) =>
         this.selectedStaffData.every((val) => val.id != v.id)
       )
-      console.log('--111', arr)
       this.selectedStaffList = arr
     },
     save() {
-      let channelList = []
+      let gatewayIds = []
       this.selectedStaffList.map((item) => {
-        channelList.push({
-          channelCode: item.channelCode,
-          channelName: item.channelName,
-          deviceExpansionId: item.deviceExpansionId,
-          channelId: item.channelId,
-          onlineState: item.onlineState
-        })
+        gatewayIds.push(item.id)
       })
-      console.log('channelList', channelList)
-      addChannel({ channelList, videoAreaId: this.channelId }).then((res) => {
+      bindingNorthLists({
+        gatewayIds,
+        dispatchId: this.$router.currentRoute.query.key
+      }).then((res) => {
         if (res.code === 0) {
           this.$message({
             type: 'success',
-            message: '添加通道成功'
+            message: '关联网关成功'
           })
           this.goback()
         }

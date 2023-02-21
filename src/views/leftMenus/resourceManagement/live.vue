@@ -5,7 +5,8 @@
         style="display: flex; flex-direction: column"
         class="monitoring-content-box"
       >
-        <div style="display: flex; flex-direction: row; padding: 16px 24px 0px">
+        <!-- padding: 16px 24px 0px -->
+        <div style="display: flex; flex-direction: row; height: 100%">
           <div class="left-tree" v-show="isShowMenu">
             <div class="equipment-group-wrapper">
               <div class="equipment-group-wrapper-top">
@@ -15,7 +16,62 @@
                   class="real-time-monitoring"
                 >
                   <el-tab-pane label="安防通道分组" name="equipmentGroup">
-                    <monitor-equipment-group :sendDevicePush="sendDevicePush" />
+                    <!-- <monitor-equipment-group :sendDevicePush="sendDevicePush" /> -->
+                    <div class="securityArea_container">
+                      <div class="tree-content">
+                        <el-input
+                          placeholder="请输入搜索关键字"
+                          suffix-icon="el-icon-search"
+                          class="search-input"
+                          v-model="filterText"
+                          clearable
+                        ></el-input>
+                        <div class="operation_box">
+                          <el-tree
+                            ref="tree"
+                            :data="treeList"
+                            class="tree"
+                            :props="{
+                              children: 'children',
+                              label: 'areaNames'
+                            }"
+                            default-expand-all
+                            :default-expanded-keys="['根节点']"
+                            :expand-on-click-node="false"
+                            @node-click="handleNodeClick"
+                            :filter-node-method="filterNode"
+                          >
+                            <span
+                              slot-scope="{ node, data }"
+                              class="custom-tree-node"
+                            >
+                              <span>
+                                <svg-icon
+                                  v-if="data.level === '1'"
+                                  icon-class="tree1"
+                                  class="tree1"
+                                />
+                                <svg-icon
+                                  v-else-if="
+                                    data.level === '2' ||
+                                    data.level === '3' ||
+                                    data.level === '4'
+                                  "
+                                  icon-class="tree2"
+                                  class="tree2"
+                                />
+                                <svg-icon
+                                  v-else
+                                  icon-class="tree3"
+                                  class="tree3"
+                                />
+                                {{ data.orgName || data.areaName }}
+                              </span>
+                            </span>
+                          </el-tree>
+                        </div>
+                      </div>
+                    </div>
                   </el-tab-pane>
                 </el-tabs>
               </div>
@@ -47,6 +103,7 @@
               flex: 1;
               background-color: #fff;
               position: relative;
+              height: 100%;
             "
             id="playerMain"
           >
@@ -214,13 +271,19 @@ import player from './components/flvjs.vue'
 import PlayerTool from './components/playerTool.vue'
 import monitorEquipmentGroup from './components/monitorEquipmentGroup.vue'
 import cloudControl from './components/cloudControl.vue'
+import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
+
+import { getPlayLists, getChannelPlayList } from '@/api/method/live'
+import { getVideoAraeTree } from '@/api/method/role'
+
 export default {
   name: 'live',
   components: {
     player,
     PlayerTool,
     monitorEquipmentGroup,
-    cloudControl
+    cloudControl,
+    leftTree
   },
   data() {
     return {
@@ -285,11 +348,17 @@ export default {
       loading: false,
       videoActiveArr: [],
       isShowMenu: true, //是否展示菜单
-      hasAudio: true
+      hasAudio: true,
+      treeList: [],
+      areaNames: 'areaNames',
+      detailsId: '',
+      data: [],
+      filterText: ''
     }
   },
   mounted() {
-    this.initData()
+    this.init()
+    this.getDeviceList()
 
     document.addEventListener('fullscreenchange', (e) => {
       // 监听到屏幕变化，更改全屏状态，该页面不能存在多个全屏元素
@@ -298,7 +367,7 @@ export default {
     this.$refs.dropdownMenuPlace.appendChild(this.$refs.dropdownMenu.popperElm)
   },
   created() {
-    this.checkPlayByParam()
+    // this.checkPlayByParam()
   },
 
   computed: {
@@ -317,6 +386,10 @@ export default {
   watch: {
     videoActiveArr(n) {
       console.log('nnnnn', n)
+    },
+    treeList(n) {
+      console.log('nnnnn', n)
+      this.treeList = n
     },
     spilt(newValue) {
       console.log('切换画幅;' + newValue)
@@ -342,7 +415,67 @@ export default {
     document.removeEventListener('fullscreenchange', () => {})
   },
   methods: {
-    initData: function () {
+    async init() {
+      await getVideoAraeTree()
+        .then((res) => {
+          if (res.code === 0) {
+            this.treeList = res.data
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    filterNode(value, data) {
+      if (!value) return true
+      // if (this.defaultPropsName === 'orgName') {
+      //   return data.orgName && data.orgName.indexOf(value) !== -1
+      // } else {
+      return data.areaNames && data.areaNames.indexOf(value) !== -1
+      // }
+    },
+    recursionTree(arr, id, resArray) {
+      arr.forEach((item) => {
+        if (item.id === id) {
+          item.children
+            ? item.children.push(resArray)
+            : (item.children = resArray)
+        } else {
+          if (item.children) {
+            this.recursionTree(item.children, id, resArray)
+          }
+        }
+      })
+
+      // console.log(11111222221, this.treeList)
+      return arr
+    },
+    async handleNodeClick(data) {
+      this.detailsId = data.id
+      await getChannelPlayList(data.id)
+        .then((res) => {
+          if (res.code === 0) {
+            let resArray = []
+            // let obj = {}s
+            res.data.map((item) => {
+              resArray.push({
+                onlineState: item.onlineState,
+                areaName: item.channelName,
+                areaNames: item.channelName,
+                areaPid: item.id
+              })
+            })
+            let resTreeList = JSON.parse(JSON.stringify(this.treeList))
+            this.recursionTree(resTreeList, data.id, resArray)
+            const lastList = this.recursionTree(resTreeList, data.id, resArray)
+            this.treeList = lastList
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    initData() {
       // 初始化播放器数据
       // const playerData = [];
       // for (let index = 0; index < 16; index++) {
@@ -474,29 +607,23 @@ export default {
       // this.playerData[i] = null;
       // this.stopPlaying(this.playerData[i])
     },
-    getDeviceList: function () {
-      let that = this
-      this.$axios({
-        method: 'get',
-        url: `/api/device/query/devices`,
-        params: {
-          page: that.currentPage,
-          count: that.count
-        }
-      })
-        .then(function (res) {
-          console.log(res.data.list)
-          that.total = res.data.total
+    async getDeviceList() {
+      await getPlayLists({ channelId: 21 })
+        .then((res) => {
+          if (res.code === 0) {
+            console.log(111111, res)
+            // that.total = res.data.total
 
-          that.deviceList = res.data.list.map((item) => {
-            return { deviceChannelList: [], ...item }
-          })
-          that.deviceList_ = that.deviceList
-          that.getDeviceListLoading = false
+            // that.deviceList = res.data.list.map((item) => {
+            //   return { deviceChannelList: [], ...item }
+            // })
+            // that.deviceList_ = that.deviceList
+            // that.getDeviceListLoading = false
+          }
         })
         .catch(function (error) {
           console.log(error)
-          that.getDeviceListLoading = false
+          // this.getDeviceListLoading = false
         })
     },
     // 切换播放器全屏
@@ -765,12 +892,21 @@ export default {
 }
 
 .monitoring-content-box {
-  height: calc(100% - 50px);
+  height: calc(100% - 56px);
 }
 
 .real-time-monitoring {
   .el-tabs__nav-wrap {
     padding: 0px 24px 0;
+  }
+  .securityArea_container {
+    height: 780px;
+    width: 360px;
+    margin-top: -15px;
+    background: #ffffff;
+    overflow-y: auto;
+    overflow-x: hidden;
+    // box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -933,8 +1069,6 @@ export default {
     }
   }
 }
-</style>
-<style>
 .videoList {
   display: flex;
   flex-wrap: wrap;
@@ -1006,14 +1140,12 @@ export default {
 .baidumap > .anchorBL {
   display: none !important;
 }
-</style>
-<style lang="scss" scoped>
 .left-tree {
   width: 20%;
   max-width: 480px;
   background-color: #fff;
   margin-right: 16px;
-  height: calc(100vh - 142px);
+  height: 100%;
 }
 .dropmenu .el-dropdown-menu__item {
   padding: 0;
