@@ -28,7 +28,7 @@
                         ></el-input>
                         <div class="operation_box">
                           <el-tree
-                            ref="tree"
+                            ref="dynamicTree"
                             :data="treeList"
                             class="tree"
                             :props="{
@@ -38,6 +38,7 @@
                             default-expand-all
                             :default-expanded-keys="['根节点']"
                             :expand-on-click-node="false"
+                            node-key="id"
                             @node-click="handleNodeClick"
                             :filter-node-method="filterNode"
                           >
@@ -78,7 +79,7 @@
               <!-- v-show="
                   playerData[playerIdx] &&
                   Object.keys(playerData[playerIdx]).length !== 0
-                " -->
+              "-->
               <div class="equipment-group-wrapper-bottom">
                 <!-- <div class="equipment-group-wrapper-bottom"> -->
                 <div class="wrapper-bottom-header" @click="controlColla">
@@ -96,17 +97,7 @@
               </div>
             </div>
           </div>
-          <div
-            style="
-              display: flex;
-              flex-direction: column;
-              flex: 1;
-              background-color: #fff;
-              position: relative;
-              height: 100%;
-            "
-            id="playerMain"
-          >
+          <div id="playerMain">
             <div
               ref="mainBox"
               :class="`main-box grid${spilt}`"
@@ -213,14 +204,15 @@
                         class="iconfont white"
                         :class="splitArr[spiltIndex].class"
                       />
+
                       <i class="el-icon-arrow-down iconArrow" />
                       |
                     </span>
                     <el-dropdown-menu
+                      ref="dropdownMenu"
                       slot="dropdown"
                       class="dropmenu"
                       :append-to-body="false"
-                      ref="dropdownMenu"
                     >
                       <template v-for="(item, index) in splitArr">
                         <el-dropdown-item :command="item" :key="item.num">
@@ -258,7 +250,7 @@
                 </el-tooltip>
               </div>
             </div>
-            <div ref="dropdownMenuPlace"></div>
+            <div ref="dropdownMenuPlace" class="dropdownMenuPlace"></div>
           </div>
         </div>
       </el-main>
@@ -275,6 +267,7 @@ import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 
 import { getPlayLists, getChannelPlayList } from '@/api/method/live'
 import { getVideoAraeTree } from '@/api/method/role'
+import { Local } from '@/utils/storage'
 
 export default {
   name: 'live',
@@ -351,14 +344,16 @@ export default {
       hasAudio: true,
       treeList: [],
       areaNames: 'areaNames',
-      detailsId: '',
+      detailsId: [],
       data: [],
-      filterText: ''
+      filterText: '',
+      hasChannel: false,
+      resArray: []
     }
   },
   mounted() {
     this.init()
-    this.getDeviceList()
+    // this.getDeviceList()
 
     document.addEventListener('fullscreenchange', (e) => {
       // 监听到屏幕变化，更改全屏状态，该页面不能存在多个全屏元素
@@ -441,49 +436,56 @@ export default {
             ? item.children.push(resArray)
             : (item.children = resArray)
         } else {
-          if (item.children) {
+          if ((item.children && item.children, length > 0)) {
             this.recursionTree(item.children, id, resArray)
           }
         }
       })
-
-      // console.log(11111222221, this.treeList)
       return arr
     },
-    async handleNodeClick(data) {
-      this.detailsId = data.id
-      await getChannelPlayList(data.id)
-        .then((res) => {
-          if (res.code === 0) {
-            let resArray = []
-            // let obj = {}s
-            res.data.map((item) => {
-              resArray.push({
-                onlineState: item.onlineState,
-                areaName: item.channelName,
-                areaNames: item.channelName,
-                areaPid: item.id
-              })
+    async handleNodeClick(data, node, self) {
+      if (!data.onlineState) {
+        this.resArray = []
+        if (this.detailsId.indexOf(data.id) !== -1) {
+          return
+        } else {
+          await getChannelPlayList(data.id)
+            .then((res) => {
+              if (res.code === 0) {
+                if (res.data && res.data.length > 0) {
+                  res.data.map((item) => {
+                    this.resArray.push({
+                      onlineState: item.onlineState,
+                      areaName: item.channelName,
+                      areaNames: item.channelName,
+                      areaPid: item.id,
+                      children: []
+                    })
+                  })
+
+                  this.detailsId.push(data.id)
+                  let arr = data.children
+                    ? this.resArray.concat(data.children)
+                    : this.resArray
+                  const obj = {}
+                  arr = arr.reduce((item, next) => {
+                    obj[next.areaPid]
+                      ? ''
+                      : (obj[next.areaPid] = true && item.push(next))
+                    return item
+                  }, [])
+                  this.$refs.dynamicTree.updateKeyChildren(data.id, arr)
+                  this.defaultExpandedKeys = [data.id]
+                }
+              }
             })
-            let resTreeList = JSON.parse(JSON.stringify(this.treeList))
-            this.recursionTree(resTreeList, data.id, resArray)
-            const lastList = this.recursionTree(resTreeList, data.id, resArray)
-            this.treeList = lastList
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
-    initData() {
-      // 初始化播放器数据
-      // const playerData = [];
-      // for (let index = 0; index < 16; index++) {
-      //   playerData.push({});
-      // }
-      // this.playerData = playerData;
-      // console.info("初始化播放器数据", this.playerData);
-      // this.getDeviceList();
+            .catch((error) => {
+              console.log(error)
+            })
+        }
+      } else {
+        this.getDeviceList(data.areaPid)
+      }
     },
     //设置声音
     handleSetVoice() {
@@ -607,11 +609,17 @@ export default {
       // this.playerData[i] = null;
       // this.stopPlaying(this.playerData[i])
     },
-    async getDeviceList() {
-      await getPlayLists({ channelId: 21 })
+    async getDeviceList(id) {
+      await getPlayLists({ channelId: id })
         .then((res) => {
           if (res.code === 0) {
             console.log(111111, res)
+
+            let idxTmp = this.playerIdx
+            if (this.spilt - 1 > this.playerIdx) {
+              this.playerIdx++
+            }
+            this.setPlayUrl(res.data.wsFlv, idxTmp)
             // that.total = res.data.total
 
             // that.deviceList = res.data.list.map((item) => {
@@ -723,10 +731,11 @@ export default {
         })
     },
     setPlayUrl(url, idx) {
+      console.log('url~~~~~~~~~', url)
+      console.log('idx~~~~~~~~~', idx)
       this.$set(this.videoUrl, idx, url)
-      let _this = this
       setTimeout(() => {
-        window.localStorage.setItem('videoUrl', JSON.stringify(_this.videoUrl))
+        window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
       }, 100)
       console.log(window.localStorage, '存储的播放链接videoUrl')
     },
@@ -842,6 +851,12 @@ export default {
 </script>
 <style lang="scss" scoped>
 #playerMain {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: #fff;
+  position: relative;
+  height: 100%;
   .grid1 {
     grid-template-columns: 100%;
     grid-template-rows: 100%;
@@ -892,7 +907,7 @@ export default {
 }
 
 .monitoring-content-box {
-  height: calc(100% - 56px);
+  height: calc(100% - 0px);
 }
 
 .real-time-monitoring {
@@ -1147,6 +1162,10 @@ export default {
   margin-right: 16px;
   height: 100%;
 }
+// .dropmenu{
+//   width: 70px;
+//   height: 100px;
+// }
 .dropmenu .el-dropdown-menu__item {
   padding: 0;
 }

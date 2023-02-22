@@ -119,11 +119,13 @@
 
         <el-table-column prop="port" label="端口" width="80" />
         <el-table-column prop="manufacturer" label="设备厂家" width="80" />
-        <el-table-column prop="status" label="状态" width="80">
+        <el-table-column prop="onlineState" label="状态" width="80">
           <template slot-scope="scope">
-            <span :class="scope.row.status === 1 ? 'yuan' : 'yuan1'"></span>
             <span
-              v-if="scope.row.status === 1"
+              :class="scope.row.onlineState === 1 ? 'yuan' : 'yuan1'"
+            ></span>
+            <span
+              v-if="scope.row.onlineState === 1"
               style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
               >在线</span
             >
@@ -136,7 +138,7 @@
         </el-table-column>
         <el-table-column width="120" label="操作" fixed="right" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editData(scope.row)"
+            <el-button type="text" @click="goEditPage(scope.row)"
               >编辑
             </el-button>
             <!-- <el-button type="text" @click="restart(scope.row.id)"
@@ -410,10 +412,11 @@ export default {
     synchronizationData() {
       this.$router.push(`/activeDiscovery/transfer`)
     },
-    editData(row) {
+    goEditPage(row) {
       this.$router.push({
         path: `/editEquipment`,
         query: {
+          back: 1,
           row: row
         }
       })

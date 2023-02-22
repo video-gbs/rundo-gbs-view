@@ -152,9 +152,9 @@
               </el-table>
 
               <pagination
-                :pages-data="params"
-                @size-change="sizeChange"
-                @current-change="currentChange"
+                :pages-data="params1"
+                @size-change="sizeChange1"
+                @current-change="currentChange1"
               />
             </div>
           </div>
@@ -280,11 +280,19 @@ export default {
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
-      this.init()
+      this.leftInit()
     },
     currentChange(proCount) {
       this.params.proCount = proCount
-      this.init()
+      this.leftInit()
+    },
+    sizeChange1(pageSize) {
+      this.params1.pageSize = pageSize
+      this.rightInit()
+    },
+    currentChange1(proCount) {
+      this.params1.proCount = proCount
+      this.rightInit()
     },
     goback() {
       this.$router.push({ path: '/ModuleManagement' })
@@ -512,7 +520,7 @@ export default {
   .activeDiscovery-transfer {
     // display: flex;
     // justify-content: space-between;
-    height: 90%;
+    height: calc(100% - 86px);
     margin: 20px 20px 0 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
@@ -542,7 +550,7 @@ export default {
   margin-top: 20px;
 
   position: absolute;
-  bottom: 35px;
+  bottom: 15px;
 
   right: 10px;
   text-align: right;

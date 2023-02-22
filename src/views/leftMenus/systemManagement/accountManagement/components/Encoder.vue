@@ -541,7 +541,7 @@ export default {
       this.$router.push(`/user/add`)
     },
     editEquipment(row) {
-      this.$router.push(`/editUser/${row.id}`)
+      this.$router.push({ path: '/editUser', query: { key: row.id } })
     },
     changeSwitch(row) {
       let text = row.status === 0 ? '启用' : '停用'

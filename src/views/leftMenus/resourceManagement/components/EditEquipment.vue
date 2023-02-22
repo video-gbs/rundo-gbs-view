@@ -34,8 +34,12 @@
                   placeholder="请选择"
                   style="width: 436px"
                 >
-                  <el-option label="区域一" value="0"></el-option>
-                  <el-option label="区域二" value="1"></el-option>
+                  <el-option
+                    v-for="o in allNorthTypeOptions"
+                    :label="o.label"
+                    :value="o.value"
+                    :key="o.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -79,11 +83,15 @@
               <el-form-item prop="desc" label="设备厂商">
                 <el-select
                   v-model="form.manufacturer"
-                  placeholder="请选择活动区域"
+                  placeholder="请选择"
                   style="width: 436px"
                 >
-                  <el-option label="hik" value="0"></el-option>
-                  <el-option label="jiadu" value="1"></el-option>
+                  <el-option
+                    v-for="o in manufacturerTypeOptions"
+                    :label="o.label"
+                    :value="o.value"
+                    :key="o.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -98,7 +106,7 @@
             ></el-col>
           </el-row>
           <el-row>
-            <el-col :span="8"
+            <el-col :span="12"
               ><el-form-item prop="desc" label="用户名称">
                 <el-input
                   v-model="form.username"
@@ -106,11 +114,7 @@
                 ></el-input> </el-form-item
             ></el-col>
             <el-col :span="12"
-              ><el-form-item
-                prop="desc"
-                label="密码"
-                style="margin-left: 265px"
-              >
+              ><el-form-item prop="desc" label="密码">
                 <el-input
                   v-model="form.password"
                   style="width: 436px"
@@ -128,12 +132,16 @@
           <el-form
             ref="form1"
             :model="form1"
-            label-width="120px"
+            label-width="140px"
             :rules="rules"
           >
             <el-row>
               <el-col :span="12">
-                <el-form-item prop="ip" label="IP地址">
+                <el-form-item
+                  prop="ip"
+                  label="IP地址"
+                  style="margin-left: 20px"
+                >
                   <el-input v-model="form1.ip" style="width: 436px"></el-input>
                 </el-form-item>
               </el-col>
@@ -147,23 +155,15 @@
               </el-col>
             </el-row>
             <el-row>
-              <!-- <el-col :span="12">
-                <el-form-item prop="desc" label="连接协议">
-                  <el-select
-                    v-model="form.region"
-                    placeholder="请选择活动区域"
-                    style="width: 436px"
-                  >
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col> -->
               <el-col :span="12">
-                <el-form-item prop="transport" label="传输协议">
+                <el-form-item
+                  prop="transport"
+                  label="传输协议"
+                  style="margin-left: 20px"
+                >
                   <el-select
                     v-model="form1.transport"
-                    placeholder="请选择活动区域"
+                    placeholder="请选择"
                     style="width: 436px"
                   >
                     <el-option label="tcp" value="0"></el-option>
@@ -172,23 +172,9 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <!-- <el-row>
-              <el-col :span="12">
-                <el-form-item prop="desc" label="关联PG模块">
-                  <el-select
-                    v-model="form.region"
-                    placeholder="请选择活动区域"
-                    style="width: 436px"
-                  >
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row> -->
             <el-row>
               <el-col :span="12"
-                ><el-form-item label="经度">
+                ><el-form-item label="经度" style="margin-left: 20px">
                   <el-input
                     v-model="form1.longitude"
                     style="width: 436px"
@@ -220,6 +206,8 @@
 <script>
 import { getVideoAraeTree } from '@/api/method/role'
 import { editEncoder } from '@/api/method/encoder'
+import { getAllNorthLists } from '@/api/method/moduleManagement'
+import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 export default {
   name: '',
   components: {},
@@ -258,6 +246,8 @@ export default {
         children: 'children',
         label: 'areaName'
       },
+      allNorthTypeOptions: [],
+      manufacturerTypeOptions: [],
       rules: {
         name: [
           { required: true, message: '请输入活动名称', trigger: 'blur' },
@@ -298,7 +288,7 @@ export default {
     }
   },
   created() {
-    console.log('this.$route.query.row', this.$route.query.row)
+    console.log('this.$route.query.row', this.$route.query)
     const {
       model,
       userName,
@@ -331,6 +321,8 @@ export default {
   },
   mounted() {
     this.init()
+    this.getAllNorthLists()
+    this.getManufacturerDictionaryList()
   },
   methods: {
     async init(id) {
@@ -343,6 +335,30 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    async getManufacturerDictionaryList() {
+      await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
+        if (res.code === 0) {
+          res.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.manufacturerTypeOptions.push(obj)
+          })
+        }
+      })
+    },
+    async getAllNorthLists() {
+      await getAllNorthLists().then((res) => {
+        if (res.code === 0) {
+          res.data.map((item) => {
+            let obj = {}
+            obj.label = item.name
+            obj.value = item.dispatchId
+            this.allNorthTypeOptions.push(obj)
+          })
+        }
+      })
     },
     // 点击节点选中
     nodeClickHandle(data) {
@@ -377,7 +393,11 @@ export default {
       })
     },
     goback() {
-      this.$router.push({ path: '/equipment' })
+      if (this.$route.query.back === '1') {
+        this.$router.push({ path: '/equipment' })
+      } else {
+        this.$router.push({ path: '/registrationList' })
+      }
     }
   }
 }

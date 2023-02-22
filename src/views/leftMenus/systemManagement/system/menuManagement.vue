@@ -68,7 +68,6 @@
               slot="suffix"
               :icon-class="scope.row.icon"
               class="menus-icon"
-              @click="pwdShowChange(item)"
             />
           </template>
         </el-table-column>

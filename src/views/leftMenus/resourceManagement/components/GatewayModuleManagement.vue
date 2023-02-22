@@ -177,7 +177,7 @@
                   v-for="o in signTypeOptions"
                   :label="o.label"
                   :value="o.value"
-                  :key="o"
+                  :key="o.value"
                 />
               </el-select>
             </el-form-item>
@@ -192,7 +192,7 @@
                   v-for="o in gatewayTypeOptions"
                   :label="o.label"
                   :value="o.value"
-                  :key="o"
+                  :key="o.value"
                 />
               </el-select>
             </el-form-item>
@@ -259,7 +259,7 @@
                   v-for="o in allNorthTypeOptions"
                   :label="o.label"
                   :value="o.value"
-                  :key="o"
+                  :key="o.value"
                 />
               </el-select>
             </el-form-item>
@@ -460,8 +460,8 @@ export default {
         if (res.code === 0) {
           this.correlationId = row.id
           this.dialogShowDetails = true
-          let obj = {}
           res.data.map((item) => {
+            let obj = {}
             obj.label = item.name
             obj.value = item.dispatchId
             this.allNorthTypeOptions.push(obj)

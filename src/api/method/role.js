@@ -98,3 +98,30 @@ export function getUserInfoList(params) {
     params
   )
 }
+
+// 角色新增应用类列表
+export function getAppMenuApiTree(id) {
+  return request.post(`${rundoAuthServer}/sysRoleInfo/getAppMenuApiTree/${id}`)
+}
+
+// 查看用户下信息
+export function getRelationSysUserInfo(id) {
+  return request.post(
+    `${rundoAuthServer}/sysUserInfo/getRelationSysUserInfo/${id}`
+  )
+}
+
+// 查询已关联用户列表
+export function getRelationUserByRole(data) {
+  return request.post(`${rundoAuthServer}/sysRoleInfo/relationUserByRole`, data)
+}
+
+// 提交已关联用户列表
+export function addRelationLists(data) {
+  return request.post(`${rundoAuthServer}/sysRoleInfo/relationUser/add`, data)
+}
+
+// 角色编辑时候回显信息
+export function getRoleDetail(id) {
+  return request.post(`${rundoAuthServer}/sysRoleInfo/getRoleDetail/${id}`)
+}

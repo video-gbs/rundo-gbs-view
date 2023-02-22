@@ -21,18 +21,24 @@
               />
             </div>
             <div class="level searchbox">
-              <el-checkbox v-model="checked" class="table-content-top-check"
+              <!-- <el-checkbox v-model="checked" class="table-content-top-check"
                 >已勾选 1/{{ tableData.length }}</el-checkbox
-              >
+              > -->
               <el-input
-                placeholder="请输入搜索关键字"
-                suffix-icon="el-icon-search"
+                placeholder="请输入用户账号"
                 class="search-input"
+                clearable
+                v-model="leftSearchName"
+                ><el-button
+                  icon="el-icon-search"
+                  slot="append"
+                  @click="search(1)"
+                ></el-button
               ></el-input>
             </div>
             <div class="contont">
               <el-table
-                ref="dialogEncoder"
+                ref="tableLeft"
                 class="table-content-bottom"
                 :data="tableData"
                 border
@@ -71,7 +77,9 @@
                   align="center"
                 >
                   <template slot-scope="scope">
-                    <el-button type="text" @click="viewRolesDetails(scope.row)"
+                    <el-button
+                      type="text"
+                      @click="viewRolesDetails(scope.row.id)"
                       ><span class="delete-button">查看</span></el-button
                     >
                   </template>
@@ -83,35 +91,17 @@
                 @size-change="sizeChange"
                 @current-change="currentChange"
               />
-              <el-checkbox
-                :indeterminate="isIndeterminate"
-                v-model="checkAll"
-                @change="handleCheckAllChange"
-                v-if="showCheck"
-                >全选</el-checkbox
-              >
-              <div style="margin: 15px 0"></div>
-              <el-checkbox-group
-                v-model="checkedCities"
-                @change="handleCheckedCitiesChange"
-              >
-                <el-checkbox
-                  v-for="(item, index) in list"
-                  :label="item.id"
-                  :key="index"
-                  >{{ item.channelName }}</el-checkbox
-                >
-              </el-checkbox-group>
             </div>
           </div>
           <!-- 中间按钮 -->
           <div class="vertical center3 centrebtn">
+            <svg-icon icon-class="right" class="right_svg" @click="Right" />
             <svg-icon
-              icon-class="right"
-              class="right_svg"
-              @click="singleSel()"
+              icon-class="left"
+              class="left_svg"
+              @click="Left"
+              :disabled="!selectedStaffData.length"
             />
-            <svg-icon icon-class="left" class="left_svg" @click="mutiSel()" />
           </div>
           <!-- 右边框框 -->
           <div class="transferbox">
@@ -123,21 +113,27 @@
               />
             </div>
             <div class="level searchbox">
-              <el-checkbox v-model="checked" class="table-content-top-check"
+              <!-- <el-checkbox v-model="checked" class="table-content-top-check"
                 >已勾选 1/{{ tableData.length }}</el-checkbox
-              >
+              > -->
               <el-input
-                placeholder="请输入搜索关键字"
-                suffix-icon="el-icon-search"
+                placeholder="请输入用户账号"
                 class="search-input"
+                clearable
+                v-model="rightSearchName"
+                ><el-button
+                  icon="el-icon-search"
+                  slot="append"
+                  @click="search(2)"
+                ></el-button
               ></el-input>
             </div>
 
             <div style="padding: 10px" class="contont">
               <el-table
-                ref="dialogEncoder"
+                ref="tableRight"
                 class="table-content-bottom"
-                :data="tableData"
+                :data="selectedStaffList"
                 border
                 :header-cell-style="{
                   background: 'rgba(0, 75, 173, 0.06)',
@@ -170,41 +166,73 @@
               </el-table>
 
               <pagination
-                :pages-data="params"
-                @size-change="sizeChange"
-                @current-change="currentChange"
+                :pages-data="params1"
+                @size-change="sizeChange1"
+                @current-change="currentChange1"
               />
-              <!-- <el-checkbox
-                :indeterminate="isIndeterminateThen"
-                v-model="checkAllThen"
-                @change="handleCheckAllChangeThen"
-                >全选</el-checkbox
-              > -->
-              <div style="margin: 15px 0"></div>
-              <el-checkbox-group
-                v-model="checkedCitiesThen"
-                @change="handleCheckedCitiesChangeThen"
-              >
-                <el-checkbox
-                  v-for="(item, index) in selectedData"
-                  :label="item.id"
-                  :key="index"
-                  >{{ item.channelName }}</el-checkbox
-                >
-              </el-checkbox-group>
             </div>
           </div>
         </div>
-        <div class="dialog-footer">
-          <el-button @click="goback()"
-            ><svg-icon class="svg-btn" icon-class="back-svg" />返回</el-button
-          >
-          <el-button type="primary" @click="save()"
-            ><svg-icon class="svg-btn" icon-class="save" />保存</el-button
-          >
-        </div>
       </div>
     </div>
+    <div class="dialog-footer">
+      <el-button @click="goback()"
+        ><svg-icon class="svg-btn" icon-class="back-svg" />返回</el-button
+      >
+      <el-button type="primary" @click="save()"
+        ><svg-icon class="svg-btn" icon-class="save" />保存</el-button
+      >
+    </div>
+
+    <el-dialog :title="dialog.title" :visible.sync="dialog.show" width="600px">
+      <div>
+        <el-form
+          ref="roleForm"
+          class="params-form"
+          size="mini"
+          :rules="rules"
+          label-position="left"
+          label-width="80px"
+          :model="dialog.params"
+          @keyup.enter="submit('roleForm')"
+        >
+          <el-form-item label="用户账号">
+            <span>{{ dialog.params.userAccount }}</span>
+          </el-form-item>
+          <el-form-item label="用户姓名">
+            <span>{{ dialog.params.userName }}</span>
+          </el-form-item>
+          <el-form-item label="所属部门">
+            <span>{{ dialog.params.orgName }}</span>
+          </el-form-item>
+          <el-form-item label="有效日期">
+            <span
+              >{{ dialog.params.expiryDateStart }}~{{
+                dialog.params.expiryDateEnd
+              }}</span
+            >
+          </el-form-item>
+          <el-form-item label="用户工号">
+            <span>{{ dialog.params.jobNo }}</span>
+          </el-form-item>
+          <el-form-item label="手机号码">
+            <span>{{ dialog.params.phone }}</span>
+          </el-form-item>
+          <el-form-item label="地址">
+            <span>{{ dialog.params.naaddressme }}</span>
+          </el-form-item>
+          <el-form-item label="功能角色">
+            <span>{{ dialog.params.roleName }}</span>
+          </el-form-item>
+          <el-form-item label="安防区域">
+            <span>{{ dialog.params.areaName }}</span>
+          </el-form-item>
+          <el-form-item label="描述">
+            <span>{{ dialog.params.description }}</span>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -216,7 +244,12 @@ const defaultListQuery = {
 import LineFont from '@/components/LineFont'
 import pagination from '@/components/Pagination/index.vue'
 
-import { getRelationSysUserInfoList } from '@/api/method/role'
+import {
+  getRelationSysUserInfoList,
+  getRelationSysUserInfo,
+  getRelationUserByRole,
+  addRelationLists
+} from '@/api/method/role'
 export default {
   name: '',
   components: { LineFont, pagination },
@@ -227,6 +260,29 @@ export default {
         pageNum: 1,
         pageSize: 10,
         total: 0
+      },
+      params1: {
+        pageNum: 1,
+        pageSize: 10,
+        total: 0
+      },
+      rightSearchName: '',
+      leftSearchName: '',
+      selectedStaffList: [],
+      selectedStaffData: [],
+      dialog: {
+        show: false,
+        title: '查看',
+        params: {
+          address: '',
+          areaName: '',
+          description: '',
+          email: '',
+          orgName: '',
+          phone: '',
+          roleName: '',
+          userName: ''
+        }
       },
       checked: false,
       tableData: [
@@ -258,43 +314,28 @@ export default {
         background: 'rgba(30, 86, 160, 1)',
         width: '3px',
         height: '18px'
-      },
-      defaultProps: {
-        children: 'children',
-        label: 'name',
-        isLeaf: (data, node) => {
-          return !data.hasChildren
-        }
-      },
-      checkAllThen: false,
-      checkedCitiesThen: [],
-      isIndeterminateThen: true,
-      checkAllDeatilListThen: [],
-      checkAll: false,
-      checkedCities: [],
-      isIndeterminate: true,
-      checkAllDeatilList: [],
-      parentId: null,
-      listLoading: false,
-      list: [],
-      listQuery: Object.assign({}, defaultListQuery),
-      filter: '',
-      orgData: [],
-      checkedArr: [],
-      showCheck: false,
-      showTree: true,
-      selectedData: [],
-      checkedIDArray: []
+      }
     }
   },
   mounted() {
-    this.init()
+    this.leftInit()
+    this.rightInit()
   },
   methods: {
-    async init() {
+    search(val) {
+      if (val === 1) {
+        this.params.pageNum = 1
+        this.leftInit()
+      } else {
+        this.params1.pageNum = 1
+        this.rightInit()
+      }
+    },
+    async leftInit() {
       await getRelationSysUserInfoList({
         current: this.params.pageNum,
-        pageSize: this.params.pageSize
+        pageSize: this.params.pageSize,
+        userAccount: this.leftSearchName
       })
         .then((res) => {
           if (res.code === 0) {
@@ -308,50 +349,158 @@ export default {
           console.log(error)
         })
     },
+    async rightInit() {
+      await getRelationUserByRole({
+        current: this.params1.pageNum,
+        pageSize: this.params1.pageSize,
+        userAccount: this.rightSearchName
+      })
+        .then((res) => {
+          if (res.code === 0) {
+            this.selectedStaffList = res.data.records
+            this.params1.total = res.data.total
+            this.params1.pages = res.data.pages
+            this.params1.current = res.data.current
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
-      this.init()
+      this.leftInit()
     },
     currentChange(proCount) {
       this.params.proCount = proCount
-      this.init()
+      this.leftInit()
+    },
+    sizeChange1(pageSize) {
+      this.params1.pageSize = pageSize
+      this.rightInit()
+    },
+    currentChange1(proCount) {
+      this.params1.proCount = proCount
+      this.rightInit()
+    },
+    viewRolesDetails(id) {
+      this.dialog.show = true
+      getRelationSysUserInfo(id)
+        .then((res) => {
+          if (res.code === 0) {
+            const {
+              address,
+              areaName,
+              description,
+              email,
+              orgName,
+              phone,
+              roleName,
+              userName,
+              userAccount,
+              jobNo,
+              expiryDateEnd,
+              expiryDateStart
+            } = res.data
+            this.dialog.params.address = address
+            this.dialog.params.areaName = areaName
+            this.dialog.params.description = description
+            this.dialog.params.email = email
+            this.dialog.params.orgName = orgName
+            this.dialog.params.phone = phone
+            this.dialog.params.roleName = roleName
+            this.dialog.params.userName = userName
+            this.dialog.params.userAccount = userAccount
+            this.dialog.params.jobNo = jobNo
+            this.dialog.params.expiryDateStart = expiryDateStart
+            this.dialog.params.expiryDateEnd = expiryDateEnd
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
     goback() {
-      this.$router.push({ path: '/equipment' })
+      this.$router.push({ path: '/roleManagement' })
+    },
+
+    save() {
+      let userIdList = []
+      this.selectedStaffList.map((item) => {
+        userIdList.push(item.id)
+      })
+      addRelationLists({
+        userIdList,
+        roleId: this.$router.currentRoute.query.key
+      }).then((res) => {
+        if (res.code === 0) {
+          this.$message({
+            type: 'success',
+            message: '关联成功'
+          })
+          this.goback()
+        }
+      })
     },
     //数组去重
     fn2(arr) {
       const res = new Map()
       return arr.filter((arr) => !res.has(arr.id) && res.set(arr.id, arr.id))
     },
-    onChange(nextTargetKeys) {
-      this.targetKeys = nextTargetKeys
-    },
-    getRowSelection({ disabled, selectedKeys, itemSelectAll, itemSelect }) {
-      return {
-        getCheckboxProps: (item) => ({
-          props: { disabled: disabled || item.disabled }
-        }),
-        onSelectAll(selected, selectedRows) {
-          const treeSelectedKeys = selectedRows
-            .filter((item) => !item.disabled)
-            .map(({ key }) => key)
-          const diffKeys = selected
-            ? difference(treeSelectedKeys, selectedKeys)
-            : difference(selectedKeys, treeSelectedKeys)
-          itemSelectAll(diffKeys, selected)
-        },
-        onSelect({ key }, selected) {
-          itemSelect(key, selected)
-        },
-        selectedRowKeys: selectedKeys
+    //左到右
+    Right() {
+      if (this.$refs.tableLeft.selection.length === 0) {
+        this.$notify({
+          title: '提示',
+          message: '请选择xxxxx',
+          type: 'success',
+          duration: 2000
+        })
+        return
+      } else {
+        this.selectedStaffList = this.selectedStaffList
+          ? this.selectedStaffList
+          : [].concat(this.$refs.tableLeft.selection)
+        // 复制数组对象
+        let selectList = JSON.parse(
+          JSON.stringify(this.$refs.tableLeft.selection)
+        )
+        selectList.forEach((item) => {
+          let index = this.tableData.findIndex((_item) => _item.id === item.id)
+          if (index !== undefined) {
+            this.tableData.splice(index, 1)
+          }
+        })
+        this.$refs.tableLeft.clearSelection()
       }
+    },
+    //右到左
+    Left() {
+      setTimeout(() => {
+        this.$refs['tableLeft'].clearSelection()
+        this.$refs['tableRight'].clearSelection()
+      }, 0)
+      this.selectedStaffData.forEach((item) => {
+        this.tableData.push(item)
+      })
+      //  console.log(22,this.selectedStaffList );
+      //  console.log(33,this.selectedStaffData );
+      let arr = this.selectedStaffList.filter((v) =>
+        this.selectedStaffData.every((val) => val.id != v.id)
+      )
+      this.selectedStaffList = arr
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-dialog__header {
+  border-bottom: 1px solid rgba(234, 234, 234, 1);
+}
+::v-deep .el-dialog__body {
+  padding-bottom: 0;
+}
 ::v-deep .el-dialog {
   margin-top: 4vh !important;
 }
@@ -466,7 +615,6 @@ export default {
   display: block;
 }
 .activeDiscovery-content {
-  // height: 90%;
   .panel-header-box {
     margin: 0;
     padding: 0 20px;
@@ -492,7 +640,7 @@ export default {
   }
 
   .activeDiscovery-transfer {
-    height: 90%;
+    height: calc(100% - 86px);
     margin: 20px 20px 0 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);

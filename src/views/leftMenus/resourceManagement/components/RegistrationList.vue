@@ -87,6 +87,23 @@
 
         <el-table-column prop="port" label="端口" width="80" />
         <el-table-column prop="gatewayName" label="网关" width="100" />
+        <el-table-column prop="status" label="在线" width="80">
+          <template slot-scope="scope">
+            <span
+              :class="scope.row.onlineState === 1 ? 'yuan' : 'yuan1'"
+            ></span>
+            <span
+              v-if="scope.row.onlineState === 1"
+              style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+              >在线</span
+            >
+            <span
+              v-else
+              style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
+              >离线</span
+            >
+          </template>
+        </el-table-column>
         <el-table-column prop="signState" label="注册状态" width="120">
           <template slot-scope="scope">
             <!-- <span
@@ -114,30 +131,13 @@
             >
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="在线" width="80">
-          <template slot-scope="scope">
-            <span
-              :class="scope.row.onlineState === 1 ? 'yuan' : 'yuan1'"
-            ></span>
-            <span
-              v-if="scope.row.onlineState === 1"
-              style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
-              >在线</span
-            >
-            <span
-              v-else
-              style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
-              >离线</span
-            >
-          </template>
-        </el-table-column>
         <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
             <el-button
               type="text"
-              @click="editData(scope.row)"
+              @click="goAddRouter(scope.row)"
               v-if="scope.row.signState === 1"
-              >编辑
+              >添加
             </el-button>
             <el-button
               type="text"
@@ -307,6 +307,15 @@ export default {
     },
     goback() {
       this.$router.push({ path: '/equipment' })
+    },
+    goAddRouter(row) {
+      this.$router.push({
+        path: '/editEquipment',
+        query: {
+          back: 2,
+          row: row
+        }
+      })
     },
     resetData() {
       this.searchParams = {

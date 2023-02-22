@@ -4,7 +4,7 @@
       <div>
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
-          >新建角色</span
+          >{{ this.$route.query.key === 'add' ? '新建角色' : '编辑角色' }}</span
         >
       </div>
     </div>
@@ -26,41 +26,33 @@
         >
           <el-form-item label="角色名称" prop="name">
             <el-input
-              v-model="form.params.name"
+              v-model="form.params.roleName"
               placeholder="请输入角色名称"
               style="width: 436px"
             />
           </el-form-item>
 
           <el-form-item label="描述">
-            <el-input v-model="form.params.description" type="textarea" />
+            <el-input v-model="form.params.roleDesc" type="textarea" />
           </el-form-item>
         </el-form>
       </div>
       <div class="box-card1">
         <div class="clearfix1">
-          <svg-icon icon-class="pjqktj" class="pjqktj_svg" />
+          <svg-icon icon-class="qxpz" class="pjqktj_svg" />
           <span>权限配置</span>
         </div>
         <div class="text item">
-          <el-tabs
-            v-model="activeName"
-            class="f1 f fd-c"
-            type="border-card"
-            @tab-click="handleClick"
-          >
+          <el-tabs v-model="activeName" class="f1 f fd-c" type="border-card">
             <el-tab-pane label="系统权限" name="系统权限">
               <div class="left-lists">
                 <div class="left-lists-table-menu">
                   <el-menu
-                    default-active="2"
+                    :default-active="activeIndex"
                     class="el-menu-vertical-demo"
-                    @open="handleOpen"
-                    @close="handleClose"
                   >
-                    <el-submenu index="1">
+                    <!-- <el-submenu index="1">
                       <template slot="title">
-                        <i class="el-icon-location"></i>
                         <span>菜单权限</span>
                       </template>
                       <el-menu-item-group>
@@ -70,36 +62,46 @@
                       </el-menu-item-group>
                     </el-submenu>
                     <el-menu-item index="2">
-                      <i class="el-icon-setting"></i>
                       <span slot="title">部门管理权限</span>
                     </el-menu-item>
                     <el-menu-item index="3">
-                      <i class="el-icon-setting"></i>
                       <span slot="title">安防区域权限</span>
                     </el-menu-item>
                     <el-menu-item index="4">
-                      <i class="el-icon-setting"></i>
                       <span slot="title">角色范围</span>
+                    </el-menu-item> -->
+                    <el-menu-item
+                      v-for="o in sysTypeOptions"
+                      :label="o.label"
+                      :value="o.value"
+                      :key="o.value"
+                      :index="o.active"
+                      @click="handleItem(o.value)"
+                    >
+                      <span slot="title">{{ o.name }}</span>
                     </el-menu-item>
                   </el-menu>
                 </div>
 
                 <div class="left-lists-table-tree">
                   <el-tree
-                    :data="data"
+                    :data="treeData"
                     class="tree"
                     show-checkbox
                     node-key="id"
-                    :default-expanded-keys="[2, 3]"
-                    :default-checked-keys="[5]"
-                    :props="defaultProps"
+                    :props="getDefaultProps"
                   >
+                    <span slot-scope="{ node, data }" class="custom-tree-node">
+                      <span>
+                        {{ data.orgName || data.areaName || data.name }}
+                      </span>
+                    </span>
                   </el-tree>
                 </div>
               </div>
             </el-tab-pane>
 
-            <el-tab-pane label="资源权限" name="资源权限">
+            <!-- <el-tab-pane label="资源权限" name="资源权限">
               <div class="right-lists">
                 <div class="right-lists-table-menu">
                   <el-menu
@@ -277,7 +279,7 @@
                   />
                 </div>
               </div>
-            </el-tab-pane>
+            </el-tab-pane> -->
           </el-tabs>
         </div>
         <div class="dialog-footer">
@@ -297,7 +299,12 @@
 import LineFont from '@/components/LineFont'
 import pagination from '@/components/Pagination/index.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
-import { getSysOrgTree } from '@/api/method/role'
+import {
+  getVideoAraeTree,
+  getAppMenuApiTree,
+  getDepartmentTree,
+  getRoleDetail
+} from '@/api/method/role'
 export default {
   name: '',
   components: { LineFont, pagination, leftTree },
@@ -306,73 +313,39 @@ export default {
       form: {
         show: false,
         title: '',
-        params: {}
-      },
-      activeName: '资源权限',
-      params: {
-        pageNum: 1,
-        pageSize: 10,
-        total: 0
-      },
-      checked: false,
-      data: [
-        {
-          id: 1,
-          label: '系统管理',
-          children: [
-            {
-              id: 4,
-              label: '领域管理',
-              children: [
-                {
-                  id: 9,
-                  label: '角色管理',
-                  children: [
-                    {
-                      id: 9 - 1,
-                      label: '权限分支1',
-                      children: [
-                        {
-                          id: 9 - 1 - 1,
-                          label: '权限细分1'
-                        },
-                        {
-                          id: 9 - 1 - 2,
-                          label: '权限细分2'
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          id: 2,
-          label: '客户管理',
-          children: [
-            {
-              id: 5,
-              label: '客户信息',
-              children: [
-                {
-                  id: 7,
-                  label: '菜单1'
-                },
-                {
-                  id: 8,
-                  label: '菜单2'
-                }
-              ]
-            }
-          ]
+        params: {
+          roleDesc: '',
+          roleName: ''
         }
+      },
+      activeName: '系统权限',
+      // params: {
+      //   pageNum: 1,
+      //   pageSize: 10,
+      //   total: 0
+      // },
+      activeIndex: '1',
+      sysTypeOptions: [
+        { label: '应用菜单权限', value: 1, name: '应用菜单权限', active: '1' },
+        { label: '配置菜单权限', value: 2, name: '配置菜单权限', active: '2' },
+        { label: '运维菜单权限', value: 3, name: '运维菜单权限', active: '3' },
+        { label: '部门管理权限', value: 4, name: '部门管理权限', active: '4' },
+        { label: '安防区域权限', value: 5, name: '安防区域权限', active: '5' }
       ],
+      checked: false,
+      // data: [],
       treeData: [],
       defaultProps: {
         children: 'children',
-        label: 'label'
+        label: 'name'
+      },
+      defaultProps1: {
+        children: 'children',
+        label: 'areaNames'
+      },
+      defaultProps2: {
+        children: 'children',
+        label: 'orgName'
       },
       rules: {
         name: [
@@ -386,90 +359,6 @@ export default {
         ]
       },
       tableData: [
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1,
-          previewChecked: false,
-          playbackChecked: false,
-          controlChecked: false,
-          downloadChecked: false,
-          alarmChecked: false
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1,
-          previewChecked: false,
-          playbackChecked: false,
-          controlChecked: false,
-          downloadChecked: false,
-          alarmChecked: false
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1,
-          previewChecked: false,
-          playbackChecked: false,
-          controlChecked: false,
-          downloadChecked: false,
-          alarmChecked: false
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1,
-          previewChecked: false,
-          playbackChecked: false,
-          controlChecked: false,
-          downloadChecked: false,
-          alarmChecked: false
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1,
-          previewChecked: false,
-          playbackChecked: false,
-          controlChecked: false,
-          downloadChecked: false,
-          alarmChecked: false
-        },
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1,
-          previewChecked: false,
-          playbackChecked: false,
-          controlChecked: false,
-          downloadChecked: false,
-          alarmChecked: false
-        },
         {
           name: '球机192.168……',
           coding: '4400000000111500…',
@@ -504,286 +393,312 @@ export default {
         width: '3px',
         height: '18px'
       },
-      isCheckedAll: true,
-      previewCheckAll: false,
-      playbackCheckAll: false,
-      controlCheckAll: false,
-      downloadCheckAll: false,
-      alarmCheckAll: false,
-      previewIndeterminate: false,
-      playbackIndeterminate: false,
-      controlIndeterminate: false,
-      downloadIndeterminate: false,
-      alarmIndeterminate: false
+      appIds: [],
+      areaIds: [],
+      configIds: [],
+      devopsIds: [],
+      orgIds: []
     }
+  },
+  created() {
+    console.log('this.$route.query.row', this.$route.query)
+    const { roleDesc, roleName } = this.$route.query.row
+    this.form.params.roleDesc = roleDesc
+    this.form.params.roleName = roleName
+    this.getRoleDetail()
   },
   mounted() {
     this.init()
   },
   methods: {
-    init() {
-      getSysOrgTree({ id: 1 }).then((res) => {
+    async getRoleDetail() {
+      await getRoleDetail(this.$route.query.row).then((res) => {
+        if (res.code === 0) {
+        }
+      })
+    },
+    async init() {
+      await getAppMenuApiTree(Number(this.activeIndex)).then((res) => {
         if (res.code === 0) {
           this.treeData = res.data
         }
       })
     },
-    handleClick(val, event) {},
+    async getVideoAraeTree() {
+      await getVideoAraeTree().then((res) => {
+        if (res.code === 0) {
+          this.treeData = res.data
+        }
+      })
+    },
+    async getDepartmentTree() {
+      await getDepartmentTree().then((res) => {
+        if (res.code === 0) {
+          this.treeData = res.data
+        }
+      })
+    },
+    getDefaultProps(val) {
+      if (val === 1 || val === 2 || val === 3) {
+        return this.defaultProps
+      } else if (val === 4) {
+        return this.defaultProps2
+      } else {
+        return this.defaultProp1
+      }
+    },
     goback() {
       this.$router.push({ path: '/roleManagement' })
     },
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath)
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath)
-    },
-    handleSelectionChange(v) {
-      console.log('v', v)
-    },
-    checkedAll(tableData) {
-      this.isCheckedAll = false
-      tableData.forEach((item) => {
-        item.previewChecked = true
-        item.playbackChecked = true
-        item.controlChecked = true
-        item.downloadChecked = true
-        item.alarmChecked = true
-      })
-
-      this.previewCheckAll = true
-      this.playbackCheckAll = true
-      this.controlCheckAll = true
-      this.downloadCheckAll = true
-      this.alarmCheckAll = true
-
-      // this.$refs.tableChecked.toggleRowSelection(tableData)
-    },
-    cancellCheckedAll(tableData) {
-      this.isCheckedAll = true
-
-      tableData.forEach((item) => {
-        item.previewChecked = false
-        item.playbackChecked = false
-        item.controlChecked = false
-        item.downloadChecked = false
-        item.alarmChecked = false
-      })
-      this.previewCheckAll = false
-      this.playbackCheckAll = false
-      this.controlCheckAll = false
-      this.downloadCheckAll = false
-      this.alarmCheckAll = false
-
-      this.previewIndeterminate = false
-      this.playbackIndeterminate = false
-      this.controlIndeterminate = false
-      this.downloadIndeterminate = false
-      this.alarmIndeterminate = false
-
-      // this.$refs.tableChecked.clearSelection(tableData)
-    }, // 预览列选中逻辑
-    checkColumnAll(val) {
-      // console.log(111, val.column.label)
-      // console.log(22, val._self.previewCheckAll)
-      switch (val.column.label) {
-        case '预览':
-          if (val._self.previewCheckAll) {
-            this.tableData.forEach((item) => {
-              item.previewChecked = true
-            })
-            this.previewIndeterminate = false
-          } else {
-            this.tableData.forEach((item) => {
-              item.previewChecked = false
-            })
-            this.previewIndeterminate = false
-          }
-          break
-        case '回放':
-          if (val._self.playbackCheckAll) {
-            this.tableData.forEach((item) => {
-              item.playbackChecked = true
-            })
-            this.playbackIndeterminate = false
-          } else {
-            this.tableData.forEach((item) => {
-              item.playbackChecked = false
-            })
-            this.playbackIndeterminate = false
-          }
-          break
-        case '云台控制':
-          if (val._self.controlCheckAll) {
-            this.tableData.forEach((item) => {
-              item.controlChecked = true
-            })
-            this.controlIndeterminate = false
-          } else {
-            this.tableData.forEach((item) => {
-              item.controlChecked = false
-            })
-            this.controlIndeterminate = false
-          }
-          break
-        case '录像下载':
-          if (val._self.downloadCheckAll) {
-            this.tableData.forEach((item) => {
-              item.downloadChecked = true
-            })
-            this.downloadIndeterminate = false
-          } else {
-            this.tableData.forEach((item) => {
-              item.downloadChecked = false
-            })
-            this.downloadIndeterminate = false
-          }
-          break
-        case '告警下载':
-          if (val._self.alarmCheckAll) {
-            this.tableData.forEach((item) => {
-              item.alarmChecked = true
-            })
-            this.alarmIndeterminate = false
-          } else {
-            this.tableData.forEach((item) => {
-              item.alarmChecked = false
-            })
-            this.alarmIndeterminate = false
-          }
-          break
-
-        default:
-          break
+    handleItem(val) {
+      this.getDefaultProps(val)
+      if (val === 1 || val === 2 || val === 3) {
+        this.activeIndex = val
+        this.init()
+      } else if (val === 4) {
+        this.getDepartmentTree()
+      } else {
+        this.getVideoAraeTree()
       }
-    },
-    tableCheckboxChange(name, row) {
-      console.log('222', row)
+    }
+    // checkedAll(tableData) {
+    //   this.isCheckedAll = false
+    //   tableData.forEach((item) => {
+    //     item.previewChecked = true
+    //     item.playbackChecked = true
+    //     item.controlChecked = true
+    //     item.downloadChecked = true
+    //     item.alarmChecked = true
+    //   })
 
-      let isAllTrue = ''
-      let isAllFalse = ''
-      switch (name) {
-        case '预览':
-          setTimeout(() => {
-            isAllTrue = this.tableData.every(
-              (item) => item.previewChecked === true
-            )
-            isAllFalse = this.tableData.every(
-              (item) => item.previewChecked === false
-            )
-            if (isAllTrue) {
-              this.previewIndeterminate = false
-              this.previewCheckAll = true
-            } else if (isAllFalse) {
-              this.previewIndeterminate = false
-              this.previewCheckAll = false
-            } else {
-              this.previewCheckAll = false
-              this.previewIndeterminate = true
-            }
-          }, 0)
-          break
-        case '回放':
-          setTimeout(() => {
-            isAllTrue = this.tableData.every(
-              (item) => item.playbackChecked === true
-            )
-            isAllFalse = this.tableData.every(
-              (item) => item.playbackChecked === false
-            )
-            if (isAllTrue) {
-              this.playbackIndeterminate = false
-              this.playbackCheckAll = true
-            } else if (isAllFalse) {
-              this.playbackIndeterminate = false
-              this.playbackCheckAll = false
-            } else {
-              this.playbackCheckAll = false
-              this.playbackIndeterminate = true
-            }
-          }, 0)
-          break
-        case '云台控制':
-          setTimeout(() => {
-            isAllTrue = this.tableData.every(
-              (item) => item.controlChecked === true
-            )
-            isAllFalse = this.tableData.every(
-              (item) => item.controlChecked === false
-            )
-            if (isAllTrue) {
-              this.controlIndeterminate = false
-              this.controlCheckAll = true
-            } else if (isAllFalse) {
-              this.controlIndeterminate = false
-              this.controlCheckAll = false
-            } else {
-              this.controlCheckAll = false
-              this.controlIndeterminate = true
-            }
-          }, 0)
-          break
-        case '录像下载':
-          setTimeout(() => {
-            isAllTrue = this.tableData.every(
-              (item) => item.downloadChecked === true
-            )
-            isAllFalse = this.tableData.every(
-              (item) => item.downloadChecked === false
-            )
-            if (isAllTrue) {
-              this.pdownloadIndeterminate = false
-              this.downloadCheckAll = true
-            } else if (isAllFalse) {
-              this.downloadIndeterminate = false
-              this.downloadCheckAll = false
-            } else {
-              this.downloadCheckAll = false
-              this.downloadIndeterminate = true
-            }
-          }, 0)
-          break
-        case '告警下载':
-          setTimeout(() => {
-            isAllTrue = this.tableData.every(
-              (item) => item.alarmChecked === true
-            )
-            isAllFalse = this.tableData.every(
-              (item) => item.alarmChecked === false
-            )
-            if (isAllTrue) {
-              this.alarmIndeterminate = false
-              this.alarmCheckAll = true
-            } else if (isAllFalse) {
-              this.alarmIndeterminate = false
-              this.alarmCheckAll = false
-            } else {
-              this.alarmCheckAll = false
-              this.alarmIndeterminate = true
-            }
-          }, 0)
-          break
+    //   this.previewCheckAll = true
+    //   this.playbackCheckAll = true
+    //   this.controlCheckAll = true
+    //   this.downloadCheckAll = true
+    //   this.alarmCheckAll = true
+    // },
+    // cancellCheckedAll(tableData) {
+    //   this.isCheckedAll = true
 
-        default:
-          break
-      }
-    },
-    previewChecked(row) {
-      console.log('1111', row)
-      // row.checked=false;
-    },
-    // 回放列选中逻辑
-    playbackCheckAllDetail() {},
-    playbackChecked() {},
+    //   tableData.forEach((item) => {
+    //     item.previewChecked = false
+    //     item.playbackChecked = false
+    //     item.controlChecked = false
+    //     item.downloadChecked = false
+    //     item.alarmChecked = false
+    //   })
+    //   this.previewCheckAll = false
+    //   this.playbackCheckAll = false
+    //   this.controlCheckAll = false
+    //   this.downloadCheckAll = false
+    //   this.alarmCheckAll = false
+
+    //   this.previewIndeterminate = false
+    //   this.playbackIndeterminate = false
+    //   this.controlIndeterminate = false
+    //   this.downloadIndeterminate = false
+    //   this.alarmIndeterminate = false
+
+    //   // this.$refs.tableChecked.clearSelection(tableData)
+    // },
+    // 预览列选中逻辑
+    // checkColumnAll(val) {
+    //   switch (val.column.label) {
+    //     case '预览':
+    //       if (val._self.previewCheckAll) {
+    //         this.tableData.forEach((item) => {
+    //           item.previewChecked = true
+    //         })
+    //         this.previewIndeterminate = false
+    //       } else {
+    //         this.tableData.forEach((item) => {
+    //           item.previewChecked = false
+    //         })
+    //         this.previewIndeterminate = false
+    //       }
+    //       break
+    //     case '回放':
+    //       if (val._self.playbackCheckAll) {
+    //         this.tableData.forEach((item) => {
+    //           item.playbackChecked = true
+    //         })
+    //         this.playbackIndeterminate = false
+    //       } else {
+    //         this.tableData.forEach((item) => {
+    //           item.playbackChecked = false
+    //         })
+    //         this.playbackIndeterminate = false
+    //       }
+    //       break
+    //     case '云台控制':
+    //       if (val._self.controlCheckAll) {
+    //         this.tableData.forEach((item) => {
+    //           item.controlChecked = true
+    //         })
+    //         this.controlIndeterminate = false
+    //       } else {
+    //         this.tableData.forEach((item) => {
+    //           item.controlChecked = false
+    //         })
+    //         this.controlIndeterminate = false
+    //       }
+    //       break
+    //     case '录像下载':
+    //       if (val._self.downloadCheckAll) {
+    //         this.tableData.forEach((item) => {
+    //           item.downloadChecked = true
+    //         })
+    //         this.downloadIndeterminate = false
+    //       } else {
+    //         this.tableData.forEach((item) => {
+    //           item.downloadChecked = false
+    //         })
+    //         this.downloadIndeterminate = false
+    //       }
+    //       break
+    //     case '告警下载':
+    //       if (val._self.alarmCheckAll) {
+    //         this.tableData.forEach((item) => {
+    //           item.alarmChecked = true
+    //         })
+    //         this.alarmIndeterminate = false
+    //       } else {
+    //         this.tableData.forEach((item) => {
+    //           item.alarmChecked = false
+    //         })
+    //         this.alarmIndeterminate = false
+    //       }
+    //       break
+
+    //     default:
+    //       break
+    //   }
+    // },
+    // tableCheckboxChange(name, row) {
+
+    //   let isAllTrue = ''
+    //   let isAllFalse = ''
+    //   switch (name) {
+    //     case '预览':
+    //       setTimeout(() => {
+    //         isAllTrue = this.tableData.every(
+    //           (item) => item.previewChecked === true
+    //         )
+    //         isAllFalse = this.tableData.every(
+    //           (item) => item.previewChecked === false
+    //         )
+    //         if (isAllTrue) {
+    //           this.previewIndeterminate = false
+    //           this.previewCheckAll = true
+    //         } else if (isAllFalse) {
+    //           this.previewIndeterminate = false
+    //           this.previewCheckAll = false
+    //         } else {
+    //           this.previewCheckAll = false
+    //           this.previewIndeterminate = true
+    //         }
+    //       }, 0)
+    //       break
+    //     case '回放':
+    //       setTimeout(() => {
+    //         isAllTrue = this.tableData.every(
+    //           (item) => item.playbackChecked === true
+    //         )
+    //         isAllFalse = this.tableData.every(
+    //           (item) => item.playbackChecked === false
+    //         )
+    //         if (isAllTrue) {
+    //           this.playbackIndeterminate = false
+    //           this.playbackCheckAll = true
+    //         } else if (isAllFalse) {
+    //           this.playbackIndeterminate = false
+    //           this.playbackCheckAll = false
+    //         } else {
+    //           this.playbackCheckAll = false
+    //           this.playbackIndeterminate = true
+    //         }
+    //       }, 0)
+    //       break
+    //     case '云台控制':
+    //       setTimeout(() => {
+    //         isAllTrue = this.tableData.every(
+    //           (item) => item.controlChecked === true
+    //         )
+    //         isAllFalse = this.tableData.every(
+    //           (item) => item.controlChecked === false
+    //         )
+    //         if (isAllTrue) {
+    //           this.controlIndeterminate = false
+    //           this.controlCheckAll = true
+    //         } else if (isAllFalse) {
+    //           this.controlIndeterminate = false
+    //           this.controlCheckAll = false
+    //         } else {
+    //           this.controlCheckAll = false
+    //           this.controlIndeterminate = true
+    //         }
+    //       }, 0)
+    //       break
+    //     case '录像下载':
+    //       setTimeout(() => {
+    //         isAllTrue = this.tableData.every(
+    //           (item) => item.downloadChecked === true
+    //         )
+    //         isAllFalse = this.tableData.every(
+    //           (item) => item.downloadChecked === false
+    //         )
+    //         if (isAllTrue) {
+    //           this.pdownloadIndeterminate = false
+    //           this.downloadCheckAll = true
+    //         } else if (isAllFalse) {
+    //           this.downloadIndeterminate = false
+    //           this.downloadCheckAll = false
+    //         } else {
+    //           this.downloadCheckAll = false
+    //           this.downloadIndeterminate = true
+    //         }
+    //       }, 0)
+    //       break
+    //     case '告警下载':
+    //       setTimeout(() => {
+    //         isAllTrue = this.tableData.every(
+    //           (item) => item.alarmChecked === true
+    //         )
+    //         isAllFalse = this.tableData.every(
+    //           (item) => item.alarmChecked === false
+    //         )
+    //         if (isAllTrue) {
+    //           this.alarmIndeterminate = false
+    //           this.alarmCheckAll = true
+    //         } else if (isAllFalse) {
+    //           this.alarmIndeterminate = false
+    //           this.alarmCheckAll = false
+    //         } else {
+    //           this.alarmCheckAll = false
+    //           this.alarmIndeterminate = true
+    //         }
+    //       }, 0)
+    //       break
+
+    //     default:
+    //       break
+    //   }
+    // },
+    // previewChecked(row) {
+    //   console.log('1111', row)
+    // },
+    // // 回放列选中逻辑
+    // playbackCheckAllDetail() {},
+    // playbackChecked() {},
     // 云台控制列选中逻辑
-    controlCheckAllDetail() {},
-    controlChecked() {},
+    // controlCheckAllDetail() {},
+    // controlChecked() {},
     // 下载列选中逻辑
-    downloadCheckAllDetail() {},
-    downloadChecked() {},
+    // downloadCheckAllDetail() {},
+    // downloadChecked() {},
     // 告警列选中逻辑
-    alarmCheckAllDetail() {},
-    alarmChecked() {}
+    // alarmCheckAllDetail() {},
+    // alarmChecked() {}
   }
 }
 </script>
@@ -842,7 +757,8 @@ export default {
     .left-lists {
       display: flex;
       .left-lists-table-menu {
-        width: 289px;
+        width: 189px;
+        text-align: center;
       }
       .left-lists-table-tree {
         margin-left: 20px;
