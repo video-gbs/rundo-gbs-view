@@ -207,6 +207,8 @@ export default {
       // this.$refs.loginForm.validate((valid) => {
       // if (valid) {
       this.loading = true
+      Local.setToken('')
+      Local.set('rj_token', '')
       login(this.loginForm)
         .then((res) => {
           if (res.code === 0 || res.code === 200) {

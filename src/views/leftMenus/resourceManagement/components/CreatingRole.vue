@@ -2,10 +2,10 @@
   <div class="creatingRole-content">
     <div class="panel-header-box">
       <div>
-        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
-          class="back-title"
-          >{{ this.$route.query.key === 'add' ? '新建角色' : '编辑角色' }}</span
-        >
+        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" />
+        <span class="back-title">
+          {{ this.$route.query.key === 'add' ? '新建角色' : '编辑角色' }}
+        </span>
       </div>
     </div>
     <el-card class="box-card">
@@ -24,7 +24,7 @@
           :rules="rules"
           @keyup.enter="submit('accountForm')"
         >
-          <el-form-item label="角色名称" prop="name">
+          <el-form-item label="角色名称" prop="roleName">
             <el-input
               v-model="form.params.roleName"
               placeholder="请输入角色名称"
@@ -47,56 +47,54 @@
             <el-tab-pane label="系统权限" name="系统权限">
               <div class="left-lists">
                 <div class="left-lists-table-menu">
-                  <el-menu
+                  <!-- <el-menu
                     :default-active="activeIndex"
                     class="el-menu-vertical-demo"
                   >
-                    <!-- <el-submenu index="1">
-                      <template slot="title">
-                        <span>菜单权限</span>
-                      </template>
-                      <el-menu-item-group>
-                        <el-menu-item index="1-1">应用</el-menu-item>
-                        <el-menu-item index="1-2">配置</el-menu-item>
-                        <el-menu-item index="1-3">运维</el-menu-item>
-                      </el-menu-item-group>
-                    </el-submenu>
-                    <el-menu-item index="2">
-                      <span slot="title">部门管理权限</span>
-                    </el-menu-item>
-                    <el-menu-item index="3">
-                      <span slot="title">安防区域权限</span>
-                    </el-menu-item>
-                    <el-menu-item index="4">
-                      <span slot="title">角色范围</span>
-                    </el-menu-item> -->
-                    <el-menu-item
-                      v-for="o in sysTypeOptions"
-                      :label="o.label"
-                      :value="o.value"
-                      :key="o.value"
-                      :index="o.active"
-                      @click="handleItem(o.value)"
-                    >
+                    <el-menu-item>
                       <span slot="title">{{ o.name }}</span>
                     </el-menu-item>
-                  </el-menu>
-                </div>
+                  </el-menu>-->
 
-                <div class="left-lists-table-tree">
-                  <el-tree
-                    :data="treeData"
-                    class="tree"
-                    show-checkbox
-                    node-key="id"
-                    :props="getDefaultProps"
+                  <el-tabs
+                    tab-position="left"
+                    class="el-menu-vertical-demo"
+                    v-model="activeIndex"
                   >
-                    <span slot-scope="{ node, data }" class="custom-tree-node">
-                      <span>
-                        {{ data.orgName || data.areaName || data.name }}
-                      </span>
-                    </span>
-                  </el-tree>
+                    <el-tab-pane
+                      v-for="(item, index) in sysTypeOptions"
+                      :label="item.label"
+                      :value="item.value"
+                      :key="item.value"
+                      :index="item.active"
+                      :lazy="lazyLoading"
+                      class="typeTree-pane"
+                    >
+                      <div class="left-lists-table-tree">
+                        <el-tree
+                          :ref="`addRoleTree${[index]}`"
+                          :data="allTreeData[index]"
+                          class="addRoleTree"
+                          show-checkbox
+                          node-key="id"
+                          :props="getDefaultProps(index)"
+                          :default-expand-all="true"
+                          @check-change="handleCheckChange"
+                          :default-expanded-keys="expandedList[index]"
+                          :default-checked-keys="checkedList[index]"
+                        >
+                          <span
+                            slot-scope="{ node, data }"
+                            class="custom-tree-node"
+                          >
+                            <span>
+                              {{ data.orgName || data.areaName || data.name }}
+                            </span>
+                          </span>
+                        </el-tree>
+                      </div>
+                    </el-tab-pane>
+                  </el-tabs>
                 </div>
               </div>
             </el-tab-pane>
@@ -279,16 +277,16 @@
                   />
                 </div>
               </div>
-            </el-tab-pane> -->
+            </el-tab-pane>-->
           </el-tabs>
         </div>
         <div class="dialog-footer">
-          <el-button @click="goback()"
-            ><svg-icon class="svg-btn" icon-class="back-svg" />返回</el-button
-          >
-          <el-button type="primary" @click="save()"
-            ><svg-icon class="svg-btn" icon-class="save" />保存</el-button
-          >
+          <el-button @click="goback()">
+            <svg-icon class="svg-btn" icon-class="back-svg" />返回
+          </el-button>
+          <el-button type="primary" @click="save('accountForm')">
+            <svg-icon class="svg-btn" icon-class="save" />保存
+          </el-button>
         </div>
       </div>
     </el-card>
@@ -303,7 +301,9 @@ import {
   getVideoAraeTree,
   getAppMenuApiTree,
   getDepartmentTree,
-  getRoleDetail
+  getRoleDetail,
+  editRoles,
+  addRoles
 } from '@/api/method/role'
 export default {
   name: '',
@@ -324,7 +324,9 @@ export default {
       //   pageSize: 10,
       //   total: 0
       // },
-      activeIndex: '1',
+      activeIndex: 0,
+      expandedList: [],
+      checkedList: [],
       sysTypeOptions: [
         { label: '应用菜单权限', value: 1, name: '应用菜单权限', active: '1' },
         { label: '配置菜单权限', value: 2, name: '配置菜单权限', active: '2' },
@@ -334,7 +336,7 @@ export default {
       ],
       checked: false,
       // data: [],
-      treeData: [],
+      allTreeData: [],
       defaultProps: {
         children: 'children',
         label: 'name'
@@ -348,7 +350,7 @@ export default {
         label: 'orgName'
       },
       rules: {
-        name: [
+        roleName: [
           { required: true, message: '请输入角色名称', trigger: 'blur' },
           {
             min: 0,
@@ -397,32 +399,154 @@ export default {
       areaIds: [],
       configIds: [],
       devopsIds: [],
-      orgIds: []
+      orgIds: [],
+      type: 1,
+      lazyLoading: true
+    }
+  },
+  watch: {
+    allTreeData: {
+      handler(n, o) {
+        console.log('n', n)
+      },
+      deep: true // 深度监听父组件传过来对象变化
     }
   },
   created() {
     console.log('this.$route.query.row', this.$route.query)
-    const { roleDesc, roleName } = this.$route.query.row
-    this.form.params.roleDesc = roleDesc
-    this.form.params.roleName = roleName
-    this.getRoleDetail()
+
+    if (this.$route.query.key !== 'add') {
+      this.getRoleDetail()
+    }
+    this.init()
   },
   mounted() {
-    this.init()
+    // this.handleCheckChange()
   },
   methods: {
     async getRoleDetail() {
       await getRoleDetail(this.$route.query.row).then((res) => {
         if (res.code === 0) {
+          const {
+            roleDesc,
+            roleName,
+            appIds,
+            areaIds,
+            configIds,
+            devopsIds,
+            orgIds
+          } = res.data
+          this.form.params.roleDesc = roleDesc
+          this.form.params.roleName = roleName
+          this.appIds = appIds
+          this.areaIds = areaIds
+          this.configIds = configIds
+          this.devopsIds = devopsIds
+          this.orgIds = orgIds
+          let res1 = []
+          let res2 = []
+          let res3 = []
+          appIds.map((item1) => {
+            res1.push(Number(item1.slice(2)))
+          })
+          configIds.map((item2) => {
+            res2.push(Number(item2.slice(2)))
+          })
+          devopsIds.map((item3) => {
+            res3.push(Number(item3.slice(2)))
+          })
+          console.log(res1, res2, res3)
+          ;(this.expandedList[0] = res1),
+            (this.expandedList[1] = res2),
+            (this.expandedList[2] = res3),
+            (this.expandedList[3] = orgIds),
+            (this.expandedList[4] = areaIds),
+            (this.checkedList[0] = res1),
+            (this.checkedList[1] = res2),
+            (this.checkedList[2] = res3),
+            (this.checkedList[3] = orgIds),
+            (this.checkedList[4] = areaIds)
         }
       })
     },
+
     async init() {
-      await getAppMenuApiTree(Number(this.activeIndex)).then((res) => {
-        if (res.code === 0) {
-          this.treeData = res.data
-        }
-      })
+      const tree1 = await getAppMenuApiTree(1)
+      const tree2 = await getAppMenuApiTree(2)
+      const tree3 = await getAppMenuApiTree(3)
+      const tree4 = await getDepartmentTree()
+      const tree5 = await getVideoAraeTree()
+
+      // this.$nextTick(() => {
+      this.allTreeData[0] = tree1.data ? tree1.data : []
+      this.allTreeData[1] = tree2.data ? tree2.data : []
+
+      this.allTreeData[2] = tree3.data ? tree3.data : []
+      this.allTreeData[3] = tree4.data ? tree4.data : []
+      this.allTreeData[4] = tree5.data ? tree5.data : []
+      // })
+      this.lazyLoading = false
+
+      console.log('this.allTreeData', this.allTreeData)
+    },
+
+    handleCheckChange(data, checked, indeterminate) {
+      console.log(data, checked, indeterminate)
+
+      //获取所有选中的节点 start
+      let resIds = []
+      const num = Number(this.activeIndex)
+      switch (num) {
+        case 0:
+          let res = this.$refs.addRoleTree0[0].getCheckedNodes()
+          res.forEach((item) => {
+            resIds.push(item.idStr)
+          })
+          this.appIds = resIds
+          this.expandedList[num] = resIds
+          this.checkedList[num] = resIds
+
+          console.log('this.appIds)', this.appIds)
+          break
+        case 1:
+          let res1 = this.$refs.addRoleTree1[0].getCheckedNodes()
+          res1.forEach((item) => {
+            resIds.push(item.idStr)
+          })
+          this.configIds = resIds
+          this.expandedList[num] = resIds
+          this.checkedList[num] = resIds
+          break
+        case 2:
+          let res2 = this.$refs.addRoleTree2[0].getCheckedNodes()
+          res2.forEach((item) => {
+            resIds.push(item.idStr)
+          })
+          this.devopsIds = resIds
+          this.expandedList[num] = resIds
+          this.checkedList[num] = resIds
+          break
+        case 3:
+          let res3 = this.$refs.addRoleTree3[0].getCheckedNodes()
+          res3.forEach((item) => {
+            resIds.push(item.id)
+          })
+          this.orgIds = resIds
+          this.expandedList[num] = resIds
+          this.checkedList[num] = resIds
+          break
+        case 4:
+          let res4 = this.$refs.addRoleTree4[0].getCheckedNodes()
+          res4.forEach((item) => {
+            resIds.push(item.id)
+          })
+          this.areaIds = resIds
+          this.expandedList[num] = resIds
+          this.checkedList[num] = resIds
+          break
+        default:
+          break
+      }
     },
     async getVideoAraeTree() {
       await getVideoAraeTree().then((res) => {
@@ -438,10 +562,10 @@ export default {
         }
       })
     },
-    getDefaultProps(val) {
-      if (val === 1 || val === 2 || val === 3) {
+    getDefaultProps(index) {
+      if (index === 0 || index === 1 || index === 2) {
         return this.defaultProps
-      } else if (val === 4) {
+      } else if (index === 3) {
         return this.defaultProps2
       } else {
         return this.defaultProp1
@@ -450,16 +574,61 @@ export default {
     goback() {
       this.$router.push({ path: '/roleManagement' })
     },
-    handleItem(val) {
-      this.getDefaultProps(val)
-      if (val === 1 || val === 2 || val === 3) {
-        this.activeIndex = val
-        this.init()
-      } else if (val === 4) {
-        this.getDepartmentTree()
-      } else {
-        this.getVideoAraeTree()
-      }
+    save(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          console.log('this.$route.query.key', this.$route.query.key)
+          switch (this.$route.query.key) {
+            case 'add':
+              const params = {
+                appIds: this.appIds,
+                areaIds: this.areaIds,
+                configIds: this.configIds,
+                devopsIds: this.devopsIds,
+                orgIds: this.orgIds,
+                roleDesc: this.form.params.roleDesc,
+                roleName: this.form.params.roleName
+              }
+              console.log('params', params)
+              addRoles(params).then((res) => {
+                if (res.code === 0) {
+                  this.$message({
+                    type: 'success',
+                    message: '角色新建成功'
+                  })
+                  this.goback()
+                }
+              })
+              break
+            case 'edit':
+              const params1 = {
+                appIds: this.appIds,
+                areaIds: this.areaIds,
+                configIds: this.configIds,
+                devopsIds: this.devopsIds,
+                orgIds: this.orgIds,
+                roleDesc: this.form.params.roleDesc,
+                roleName: this.form.params.roleName
+              }
+              console.log('params1', params1)
+              editRoles({ id: this.$route.query.row, ...params1 }).then(
+                (res) => {
+                  if (res.code === 0) {
+                    this.$message({
+                      type: 'success',
+                      message: '账号修改成功'
+                    })
+                    this.goback()
+                  }
+                }
+              )
+              break
+
+            default:
+              break
+          }
+        }
+      })
     }
     // checkedAll(tableData) {
     //   this.isCheckedAll = false
@@ -709,17 +878,10 @@ export default {
   height: 90px;
 }
 .el-menu-vertical-demo {
+  max-height: 500px;
   border: 1px solid rgba(234, 234, 234, 1);
 }
-// 去掉顶部线条
-.tree {
-  & > .el-tree-node::after {
-    border-top: none;
-  }
-  & > .el-tree-node::before {
-    border-left: none;
-  }
-}
+
 .creatingRole-content {
   .panel-header-box {
     margin: 0;
@@ -752,16 +914,22 @@ export default {
   }
   .box-card {
     margin: 20px 20px 0 20px;
+    height: calc(100% - 86px);
     .params-form {
     }
     .left-lists {
       display: flex;
+      max-height: 450px;
       .left-lists-table-menu {
-        width: 189px;
         text-align: center;
       }
       .left-lists-table-tree {
         margin-left: 20px;
+        .addRoleTree {
+          max-height: 600px;
+          width: 300px;
+          overflow-y: auto;
+        }
       }
     }
 
@@ -850,6 +1018,39 @@ export default {
     position: relative;
     top: 1px;
     left: -4px;
+  }
+}
+// 去掉顶部线条
+::v-deep .addRoleTree > .el-tree-node::after {
+  border-top: none !important;
+}
+::v-deep .addRoleTree > .el-tree-node::before {
+  border-left: none;
+}
+::v-deep .is-active::after {
+  display: none;
+}
+
+::v-deep .el-menu-vertical-demo {
+  .el-tabs__item {
+    text-align: center;
+    width: 289px;
+    height: 53px;
+    line-height: 53px;
+    font-size: 16px;
+    font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+    font-weight: 400;
+    color: #333333;
+    padding: 0 !important;
+    border-bottom: 1px solid #eaeaea;
+  }
+  .is-active {
+    padding: 0 !important;
+  }
+}
+::v-deep .el-menu-vertical-demo {
+  .el-tabs__nav {
+    height: 500px;
   }
 }
 </style>

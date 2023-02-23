@@ -46,6 +46,7 @@ const mutations = {
     state.rightWidth = rightWidth
   },
   SET_SHOWSIDEBAR: (state, showSidebar) => {
+    state.showSidebar = []
     state.showSidebar = showSidebar
   },
   // SET_APPTYPEROUTER: (state, showSidebar) => {

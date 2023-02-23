@@ -62,3 +62,11 @@ export function bindingNorthLists(data) {
     data
   )
 }
+
+export function unbindingNorthLists(data) {
+  // 剔除流媒体调度服务的网关
+  return request.post(
+    `${streamanege}/gateway-dispatch/north/dispatch/unbinding`,
+    data
+  )
+}

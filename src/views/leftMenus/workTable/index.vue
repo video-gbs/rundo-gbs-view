@@ -494,7 +494,7 @@ export default {
               store.dispatch('user/changeInit', false)
               store.dispatch('user/changeRightWidth', false)
               store.dispatch('user/changeShowSidebar', false)
-              this.$emit('changeSidebarHiddenStatus', true)
+              // this.$emit('changeSidebarHiddenStatus', true)
 
               this.saveComponents(1, resRouter1)
               store.dispatch('user/changeTypeRouter', this.appTypeRouter)
@@ -515,7 +515,7 @@ export default {
               store.dispatch('user/dynamicRouters', resRouter2)
               store.dispatch('user/changeRightWidth', true)
               store.dispatch('user/changeShowSidebar', true)
-              this.$emit('changeSidebarHiddenStatus', false)
+              // this.$emit('changeSidebarHiddenStatus', false)
 
               this.saveComponents(3, resRouter2)
               store.dispatch('user/changeTypeRouter', this.systemTypeRouter)
@@ -537,7 +537,7 @@ export default {
               store.dispatch('user/changeInit', false)
               store.dispatch('user/changeRightWidth', true)
               store.dispatch('user/changeShowSidebar', true)
-              this.$emit('changeSidebarHiddenStatus', false)
+              // this.$emit('changeSidebarHiddenStatus', false)
 
               store.dispatch('user/changeActiveIndex', item.appUrl)
               this.saveComponents(2, resRouter3, item.appUrl)

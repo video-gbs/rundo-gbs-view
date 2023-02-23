@@ -96,7 +96,7 @@
               inactive-color="#ff4949"
               :active-value="0"
               :inactive-value="1"
-              @change="changeSwitch(scope.row)"
+              @change="changeSwitchHidden(scope.row)"
             >
             </el-switch>
           </template>
@@ -249,6 +249,7 @@ import {
   getApplicationList,
   getApplicationTree
 } from '@/api/method/menus'
+import { changeRoleStatus, changeRoleHidden } from '@/api/method/role'
 import pagination from '@/components/Pagination/index.vue'
 export default {
   name: '',
@@ -316,21 +317,41 @@ export default {
       this.$refs.selectTree.blur()
     },
     changeSwitch(row) {
+      console.log(row)
       let text = row.status === 0 ? '启用' : '停用'
 
-      this.$confirm('确认要"' + text + '""' + row.appName + '"吗?', '警告', {
+      this.$confirm('确认要"' + text + '""' + row.title + '"吗?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then(function () {
-          changeStatus({
+        .then(() => {
+          changeRoleStatus({
             id: row.id,
             status: row.status
           }).then((res) => {})
         })
-        .catch(function () {
+        .catch(() => {
           row.status = row.status === 0 ? 1 : 0
+        })
+    },
+    changeSwitchHidden(row) {
+      console.log(row)
+      let text = row.hidden === 0 ? '显示' : '隐藏'
+
+      this.$confirm('确认要"' + text + '""' + row.title + '"吗?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          changeRoleHidden({
+            id: row.id,
+            hidden: row.hidden
+          }).then((res) => {})
+        })
+        .catch(() => {
+          row.hidden = row.hidden === 0 ? 1 : 0
         })
     },
     changeApplication(val) {

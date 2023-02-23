@@ -40,7 +40,7 @@
               <el-table
                 ref="tableLeft"
                 class="table-content-bottom"
-                :data="tableData"
+                :data="leftTableData"
                 border
                 :header-cell-style="{
                   background: 'rgba(0, 75, 173, 0.06)',
@@ -96,12 +96,7 @@
           <!-- 中间按钮 -->
           <div class="vertical center3 centrebtn">
             <svg-icon icon-class="right" class="right_svg" @click="Right" />
-            <svg-icon
-              icon-class="left"
-              class="left_svg"
-              @click="Left"
-              :disabled="!selectedStaffData.length"
-            />
+            <svg-icon icon-class="left" class="left_svg" @click="Left" />
           </div>
           <!-- 右边框框 -->
           <div class="transferbox">
@@ -133,7 +128,7 @@
               <el-table
                 ref="tableRight"
                 class="table-content-bottom"
-                :data="selectedStaffList"
+                :data="rightTableData"
                 border
                 :header-cell-style="{
                   background: 'rgba(0, 75, 173, 0.06)',
@@ -175,14 +170,14 @@
         </div>
       </div>
     </div>
-    <div class="dialog-footer">
+    <!-- <div class="dialog-footer">
       <el-button @click="goback()"
         ><svg-icon class="svg-btn" icon-class="back-svg" />返回</el-button
       >
       <el-button type="primary" @click="save()"
         ><svg-icon class="svg-btn" icon-class="save" />保存</el-button
       >
-    </div>
+    </div> -->
 
     <el-dialog :title="dialog.title" :visible.sync="dialog.show" width="600px">
       <div>
@@ -190,7 +185,6 @@
           ref="roleForm"
           class="params-form"
           size="mini"
-          :rules="rules"
           label-position="left"
           label-width="80px"
           :model="dialog.params"
@@ -248,7 +242,8 @@ import {
   getRelationSysUserInfoList,
   getRelationSysUserInfo,
   getRelationUserByRole,
-  addRelationLists
+  addRelationLists,
+  removeRelationLists
 } from '@/api/method/role'
 export default {
   name: '',
@@ -268,8 +263,6 @@ export default {
       },
       rightSearchName: '',
       leftSearchName: '',
-      selectedStaffList: [],
-      selectedStaffData: [],
       dialog: {
         show: false,
         title: '查看',
@@ -285,17 +278,8 @@ export default {
         }
       },
       checked: false,
-      tableData: [
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        }
-      ],
+      leftTableData: [],
+      rightTableData: [],
       lineTitle: {
         title: '未选择列表',
         notShowSmallTitle: false
@@ -339,7 +323,7 @@ export default {
       })
         .then((res) => {
           if (res.code === 0) {
-            this.tableData = res.data.records
+            this.leftTableData = res.data.records
             this.params.total = res.data.total
             this.params.pages = res.data.pages
             this.params.current = res.data.current
@@ -353,11 +337,12 @@ export default {
       await getRelationUserByRole({
         current: this.params1.pageNum,
         pageSize: this.params1.pageSize,
-        userAccount: this.rightSearchName
+        userAccount: this.rightSearchName,
+        roleId: this.$router.currentRoute.query.key
       })
         .then((res) => {
           if (res.code === 0) {
-            this.selectedStaffList = res.data.records
+            this.rightTableData = res.data.records
             this.params1.total = res.data.total
             this.params1.pages = res.data.pages
             this.params1.current = res.data.current
@@ -423,25 +408,6 @@ export default {
     goback() {
       this.$router.push({ path: '/roleManagement' })
     },
-
-    save() {
-      let userIdList = []
-      this.selectedStaffList.map((item) => {
-        userIdList.push(item.id)
-      })
-      addRelationLists({
-        userIdList,
-        roleId: this.$router.currentRoute.query.key
-      }).then((res) => {
-        if (res.code === 0) {
-          this.$message({
-            type: 'success',
-            message: '关联成功'
-          })
-          this.goback()
-        }
-      })
-    },
     //数组去重
     fn2(arr) {
       const res = new Map()
@@ -458,37 +424,92 @@ export default {
         })
         return
       } else {
-        this.selectedStaffList = this.selectedStaffList
-          ? this.selectedStaffList
+        this.rightTableData = this.rightTableData
+          ? this.rightTableData
           : [].concat(this.$refs.tableLeft.selection)
         // 复制数组对象
-        let selectList = JSON.parse(
+        let selectLeftList = JSON.parse(
           JSON.stringify(this.$refs.tableLeft.selection)
         )
-        selectList.forEach((item) => {
-          let index = this.tableData.findIndex((_item) => _item.id === item.id)
+        selectLeftList.forEach((item) => {
+          let index = this.leftTableData.findIndex(
+            (_item) => _item.id === item.id
+          )
           if (index !== undefined) {
-            this.tableData.splice(index, 1)
+            this.leftTableData.splice(index, 1)
           }
         })
         this.$refs.tableLeft.clearSelection()
+
+        let userIdList = []
+        selectLeftList.map((item) => {
+          userIdList.push(item.id)
+        })
+
+        console.log('userIdList', userIdList)
+        addRelationLists({
+          userIdList,
+          roleId: this.$router.currentRoute.query.key
+        }).then((res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '关联成功'
+            })
+            this.params1.pageSize = 1
+            this.rightInit()
+          }
+        })
       }
     },
     //右到左
     Left() {
-      setTimeout(() => {
-        this.$refs['tableLeft'].clearSelection()
-        this.$refs['tableRight'].clearSelection()
-      }, 0)
-      this.selectedStaffData.forEach((item) => {
-        this.tableData.push(item)
-      })
-      //  console.log(22,this.selectedStaffList );
-      //  console.log(33,this.selectedStaffData );
-      let arr = this.selectedStaffList.filter((v) =>
-        this.selectedStaffData.every((val) => val.id != v.id)
-      )
-      this.selectedStaffList = arr
+      if (this.$refs.tableRight.selection.length === 0) {
+        this.$notify({
+          title: '提示',
+          message: '请选择xxxxx',
+          type: 'success',
+          duration: 2000
+        })
+        return
+      } else {
+        this.leftTableData = this.leftTableData
+          ? this.leftTableData
+          : [].concat(this.$refs.tableRight.selection)
+        // 复制数组对象
+        let selectRightList = JSON.parse(
+          JSON.stringify(this.$refs.tableRight.selection)
+        )
+        selectRightList.forEach((item) => {
+          let index = this.rightTableData.findIndex(
+            (_item) => _item.id === item.id
+          )
+          if (index !== undefined) {
+            this.rightTableData.splice(index, 1)
+          }
+        })
+        this.$refs.tableRight.clearSelection()
+
+        let userIdList1 = []
+        selectRightList.map((item) => {
+          userIdList1.push(item.id)
+        })
+        console.log('userIdList1', userIdList1)
+
+        removeRelationLists({
+          userIdList: userIdList1,
+          roleId: this.$router.currentRoute.query.key
+        }).then((res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '解除管理用户成功'
+            })
+            this.params1.pageSize = 1
+            this.rightInit()
+          }
+        })
+      }
     }
   }
 }

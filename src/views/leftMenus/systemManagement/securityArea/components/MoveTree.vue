@@ -162,8 +162,8 @@ export default {
       // console.log('draggingNode',draggingNode)
       // console.log('dropNode',dropNode)
       let id = draggingNode.data.id
-      let orgPid = dropNode.data.id
-      moveDepart({ id, orgPid }).then((res) => {
+      let areaPid = dropNode.data.id
+      moveDepart({ id, areaPid }).then((res) => {
         if (res.code === 0) {
           this.$message({
             type: 'success',

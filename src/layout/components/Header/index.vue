@@ -151,7 +151,6 @@ export default {
   computed: {
     ...mapGetters(['routerLists', 'typeRouter']),
     changeTypeRouter() {
-      console.log(111111111111111111111, this.typeRouter)
       return this.typeRouter
     }
   },
@@ -245,7 +244,6 @@ export default {
         })
     },
     handleSelect(key, keyPath) {
-      console.log(key, this.sideBarRouterList)
       // if (key === '/resourceManagement') {
       //   this.$emit('changeSidebarLists', this.sideBarRouterList[0])
       // } else if (key === '/management') {
@@ -321,6 +319,7 @@ export default {
               data.path === item.path
             ) {
               item.children.forEach((child) => {
+                console.log('child.hidden', child.hidden, typeof child.hidden)
                 let moduleManageMent = {}
                 moduleManageMent = {
                   path: child.path,

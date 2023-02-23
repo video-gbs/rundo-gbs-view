@@ -346,109 +346,305 @@ const whiteList = ['/login']
 router.afterEach((to, from) => {
   document.title = getPageTitle(to.meta.title)
 })
+// 取到浏览器出现网址的最后"/"出现的后边的字符
+const getLastUrl = (str, yourStr) => str.slice(str.lastIndexOf(yourStr))
 
 // let isToken = true
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  console.log('进入路由守卫')
   const hasToken = Local.getToken()
   if (hasToken) {
     // 如果有 token 并且不是登录页的时候，进行权限获取
     if (to.path !== '/login') {
-      // 动态路由只能添加一次
-      // 退出登录后可重新添加
-      if (!store.state.user.init && store.state.user.routerLists.length !== 0) {
+      const lastUrl = getLastUrl(window.location.href, '/')
+
+      console.log('获取lastUrl的值', lastUrl)
+      console.log('获取init的值', store.state.user.init)
+      console.log('获取vuex的值', store.state.user.routerLists)
+      if (!store.state.user.init) {
         //从vuex中获取动态路由
-        const accessRouteses =
-          store.state.user.routerLists || Local.get('dynamicRouters')
         // //动态路由循环解析和添加
-        const childComponent = []
-        accessRouteses.forEach((item) => {
-          if (item.children && item.children.length > 0) {
-            item.children.forEach((child) => {
-              // 组装路由配置
-              const childTemp = {
-                name: child.name,
-                path: child.path,
-                meta: child.meta,
-                hidden: child.hidden === 1 ? true : false,
-                component: (resolve) =>
-                  require([`@/views${child.component}`], resolve)
+        let accessRouteses = []
+        if (lastUrl !== '/login' && lastUrl !== '/workTable') {
+          accessRouteses = JSON.parse(Local.get('dynamicRouters'))
+          console.log('刷新页面的时候动态路由获取', accessRouteses)
+
+          const homeRouters = [
+            {
+              path: '/workTable',
+              name: 'workTable',
+              component: () => import('@/views/leftMenus/workTable/index'),
+              meta: { title: '首页', icon: 'sy' }
+            }
+          ]
+          let appTypeRouter = []
+          let systemTypeRouter = []
+          let configTypeRouter = []
+          let sideBarRouterList = []
+          let sideBarRouterList1 = []
+          let sideBarRouterList2 = []
+          let sideBarRouterList3 = []
+
+          console.log('获取tree_type的值', Local.get('tree_type'))
+
+          if (Local.get('tree_type') === 1) {
+            const childComponent1 = []
+            accessRouteses.map((item1) => {
+              if (item1.children && item1.children.length > 0) {
+                item1.children.forEach((child4) => {
+                  let params2 = {}
+                  params2 = {
+                    path: child4.path,
+                    meta: child4.meta,
+                    name: child4.name,
+                    hidden: child4.hidden === 1 ? true : false,
+                    component: (resolve) =>
+                      require([`@/views${child4.component}`], resolve)
+                  }
+                  appTypeRouter.push(params2)
+                  childComponent1.push(params2)
+                })
+                const temp1 = {
+                  name: item1.name,
+                  path: item1.path,
+                  meta: item1.meta,
+                  component: Layout,
+                  children: childComponent1
+                }
+                console.log('获取temp1的值', temp1)
+                router.addRoute(temp1)
+                router.options.routes.push(temp1)
               }
-              childComponent.push(childTemp)
             })
-            const temp = {
-              name: item.name,
-              path: item.path,
-              meta: item.meta,
-              component: Layout,
-              children: childComponent
-            }
-            router.addRoute(temp)
-            router.options.routes.push(temp)
+
+            appTypeRouter = homeRouters.concat(appTypeRouter)
+            store.dispatch('user/changeActiveIndex', appTypeRouter[1].path)
+            store.dispatch('user/dynamicRouters', appTypeRouter)
+            store.dispatch('user/changeTypeRouter', appTypeRouter)
+            store.dispatch('user/changeShowSidebar', false)
+            store.dispatch('user/changeActiveIndex', appTypeRouter[1].path)
+          } else if (Local.get('tree_type') === 3) {
+            const childComponent4 = []
+            accessRouteses.map((item4) => {
+              let params1 = {}
+              params1 = {
+                path: item4.path,
+                meta: item4.meta,
+                name: item4.name,
+                component: (resolve) =>
+                  require([`@/views${item4.component}`], resolve)
+              }
+              systemTypeRouter.push(params1)
+              // 侧边栏路由
+              if (item4.children && item4.children.length > 0) {
+                item4.children.forEach((child4) => {
+                  let params2 = {}
+                  params2 = {
+                    path: child4.path,
+                    meta: child4.meta,
+                    name: child4.name,
+                    hidden: child4.hidden === 1 ? true : false,
+                    component: (resolve) =>
+                      require([`@/views${child4.component}`], resolve)
+                  }
+
+                  sideBarRouterList.push(params2)
+                  childComponent4.push(params2)
+                })
+                const temp4 = {
+                  name: item4.name,
+                  path: item4.path,
+                  meta: item4.meta,
+                  component: Layout,
+                  children: childComponent4
+                }
+                console.log('获取temp4的值', temp4)
+                router.addRoute(temp4)
+                router.options.routes.push(temp4)
+              }
+            })
+            systemTypeRouter = homeRouters.concat(systemTypeRouter)
+            store.dispatch('user/changeActiveIndex', systemTypeRouter[1].path)
+            store.dispatch('user/changeSidebarRouter', sideBarRouterList)
+            store.dispatch('user/dynamicRouters', systemTypeRouter)
+            store.dispatch('user/changeTypeRouter', systemTypeRouter)
+            store.dispatch('user/changeShowSidebar', true)
           } else {
-            const elseTemp = {
-              name: item.name,
-              path: item.path,
-              meta: item.meta,
-              component: (resolve) =>
-                require([`@/views${item.component}`], resolve)
-            }
-            router.addRoute(elseTemp)
-            router.options.routes.push(elseTemp)
+            const childComponent2 = []
+
+            const childComponent3 = []
+
+            const childComponent4 = []
+            accessRouteses.map((item2) => {
+              switch (item2.path) {
+                case '/resourceManagement':
+                  if (item2.children && item2.children.length > 0) {
+                    item2.children.forEach((child2) => {
+                      let resourceManagement = {}
+                      resourceManagement = {
+                        path: child2.path,
+                        meta: child2.meta,
+                        name: child2.name,
+                        hidden: child2.hidden,
+                        component: (resolve) =>
+                          require([`@/views${child2.component}`], resolve)
+                      }
+
+                      sideBarRouterList1.push(resourceManagement)
+                      childComponent2.push(resourceManagement)
+                    })
+                    const temp2 = {
+                      name: item2.name,
+                      path: item2.path,
+                      meta: item2.meta,
+                      component: Layout,
+                      children: childComponent2
+                    }
+                    console.log('获取temp4的值', temp2)
+                    router.addRoute(temp2)
+                    router.options.routes.push(temp2)
+                    configTypeRouter = configTypeRouter.concat([temp2])
+                  }
+
+                  store.dispatch('user/changeSidebarRouter', sideBarRouterList1)
+                  // store.dispatch('user/changeTypeRouter', homeRouters.concat(sideBarRouterList1))
+                  // this.$router.push({ path: sideBarRouterList1[0].path })
+                  break
+                case '/systemManagement':
+                  if (item2.children && item2.children.length > 0) {
+                    item2.children.forEach((child2) => {
+                      let systemManagement = {}
+                      systemManagement = {
+                        path: child2.path,
+                        meta: child2.meta,
+                        name: child2.name,
+                        hidden: child2.hidden,
+                        component: (resolve) =>
+                          require([`@/views${child2.component}`], resolve)
+                      }
+
+                      sideBarRouterList2.push(systemManagement)
+                      childComponent3.push(systemManagement)
+                    })
+                    const temp3 = {
+                      name: item2.name,
+                      path: item2.path,
+                      meta: item2.meta,
+                      component: Layout,
+                      children: childComponent3
+                    }
+                    console.log('获取temp4的值', temp3)
+                    router.addRoute(temp3)
+                    router.options.routes.push(temp3)
+                    configTypeRouter = configTypeRouter.concat([temp3])
+                  }
+
+                  store.dispatch('user/changeSidebarRouter', sideBarRouterList2)
+                  // store.dispatch('user/changeTypeRouter', homeRouters.concat(sideBarRouterList2))
+                  // this.$router.push({ path: sideBarRouterList2[0].path })
+                  break
+                case '/moduleManageMent':
+                  if (item2.children && item2.children.length > 0) {
+                    item2.children.forEach((child2) => {
+                      let moduleManageMent = {}
+                      moduleManageMent = {
+                        path: child2.path,
+                        meta: child2.meta,
+                        name: child2.name,
+                        hidden: child2.hidden,
+                        component: (resolve) =>
+                          require([`@/views${child2.component}`], resolve)
+                      }
+
+                      sideBarRouterList3.push(moduleManageMent)
+                      childComponent4.push(moduleManageMent)
+                    })
+                    const temp4 = {
+                      name: item2.name,
+                      path: item2.path,
+                      meta: item2.meta,
+                      component: Layout,
+                      children: childComponent4
+                    }
+                    console.log('获取temp3的值', temp4)
+                    router.addRoute(temp4)
+                    router.options.routes.push(temp4)
+                    configTypeRouter = configTypeRouter.concat([temp4])
+                  }
+
+                  store.dispatch('user/changeSidebarRouter', sideBarRouterList3)
+
+                  // store.dispatch('user/changeTypeRouter', homeRouters.concat(sideBarRouterList3))
+
+                  // this.$router.push({ path: sideBarRouterList3[0].path })
+                  break
+                default:
+                  break
+              }
+            })
+
+            console.log('最终的路由值', configTypeRouter)
+            store.dispatch(
+              'user/changeTypeRouter',
+              homeRouters.concat(configTypeRouter)
+            )
+            store.dispatch('user/changeActiveIndex', configTypeRouter[0].path)
+            store.dispatch('user/dynamicRouters', configTypeRouter)
+            store.dispatch('user/changeShowSidebar', true)
+            // store.dispatch('user/changeActiveIndex', configTypeRouter[1].path)
           }
-        })
-        console.log(router, 9999)
+          console.log('刷新后的最终路由', router)
+        } else {
+          accessRouteses = await store.state.user.routerLists
+
+          console.log('首页点击的时候动态路由获取', accessRouteses)
+
+          const childComponent = []
+          accessRouteses.forEach((item) => {
+            if (item.children && item.children.length > 0) {
+              item.children.forEach((child) => {
+                // 组装路由配置
+                const childTemp = {
+                  name: child.name,
+                  path: child.path,
+                  meta: child.meta,
+                  hidden: child.hidden === 1 ? true : false,
+                  component: (resolve) =>
+                    require([`@/views${child.component}`], resolve)
+                }
+                childComponent.push(childTemp)
+              })
+              const temp = {
+                name: item.name,
+                path: item.path,
+                meta: item.meta,
+                component: Layout,
+                children: childComponent
+              }
+              router.addRoute(temp)
+              router.options.routes.push(temp)
+            } else {
+              const elseTemp = {
+                name: item.name,
+                path: item.path,
+                meta: item.meta,
+                component: (resolve) =>
+                  require([`@/views${item.component}`], resolve)
+              }
+              router.addRoute(elseTemp)
+              router.options.routes.push(elseTemp)
+            }
+          })
+          console.log('首页点击后的最终路由', router)
+        }
         store.dispatch('user/changeInit', true)
         next({ ...to, replace: true })
-      } else {
-        // const accessRouteses1 = Local.get('dynamicRouters')
-        // console.log('accessRouteses1',JSON.parse(accessRouteses1))
-        // // //动态路由循环解析和添加
-        // const childComponent1 = []
-        // JSON.parse(accessRouteses1).forEach((item1) => {
-        //   if (item1.children && item1.children.length > 0) {
-        //     item1.children.forEach((child1) => {
-        //       // 组装路由配置
-        //       const childTemp = {
-        //         name: child1.name,
-        //         path: child1.path,
-        //         meta: child1.meta,
-        //         hidden: child1.hidden === 1 ? true : false,
-        //         component: (resolve) =>
-        //           require([`@/views${child1.component}`], resolve)
-        //       }
-        //       childComponent1.push(childTemp)
-        //     })
-        //     const temp = {
-        //       name: item1.name,
-        //       path: item1.path,
-        //       meta: item1.meta,
-        //       component: Layout,
-        //       children: childComponent1
-        //     }
-        //     router.addRoute(temp)
-        //     router.options.routes.push(temp)
-        //   } else {
-        //     const elseTemp = {
-        //       name: item1.name,
-        //       path: item1.path,
-        //       meta: item1.meta,
-        //       component: (resolve) =>
-        //         require([`@/views${item1.component}`], resolve)
-        //     }
-        //     router.addRoute(elseTemp)
-        //     router.options.routes.push(elseTemp)
-        //   }
-        // })
-        // console.log(router, 8888)
-        // store.dispatch('user/changeInit', false)
-        // next()
       }
     } else {
       next('/workTable')
     }
   } else {
     if (to.path !== '/login') {
-      Local.setToken('')
       next('/login')
     } else {
     }
