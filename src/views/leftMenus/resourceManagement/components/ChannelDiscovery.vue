@@ -28,13 +28,16 @@
               />
             </div>
             <div class="level searchbox">
-              <!-- <el-checkbox v-model="checked" class="table-content-top-check"
-                >已勾选 1/{{ tableData.length }}</el-checkbox
-              > -->
               <el-input
-                placeholder="请输入搜索关键字"
-                suffix-icon="el-icon-search"
+                placeholder="请输入通道名称"
                 class="search-input"
+                clearable
+                v-model="leftSearchName"
+                ><el-button
+                  icon="el-icon-search"
+                  slot="append"
+                  @click="search()"
+                ></el-button
               ></el-input>
             </div>
             <div class="contont">
@@ -85,17 +88,16 @@
             </div>
           </div>
           <!-- 中间按钮 -->
-          <div class="vertical center3 centrebtn">
+          <!-- <div class="vertical center3 centrebtn">
             <svg-icon icon-class="right" class="right_svg" @click="Right" />
             <svg-icon
               icon-class="left"
               class="left_svg"
               @click="Left"
-              :disabled="!selectedStaffData.length"
             />
-          </div>
+          </div> -->
           <!-- 右边框框 -->
-          <div class="transferbox">
+          <!-- <div class="transferbox">
             <div class="topbox">
               <LineFont
                 :line-title="lineTitle1"
@@ -158,7 +160,7 @@
                 @current-change="currentChange"
               />
             </div>
-          </div>
+          </div> -->
         </div>
         <div class="dialog-footer">
           <el-button @click="goback()"
@@ -197,12 +199,11 @@ export default {
         pageSize: 10,
         total: 0
       },
+      leftSearchName: '',
       areaNames: 'areaNames',
-      selectedStaffList: [],
-      selectedStaffData: [],
+      selectedList: [],
       treeList: [],
-      channelId: 1,
-      checked: false,
+      channelId: '',
       tableData: [
         {
           name: '球机192.168……',
@@ -258,6 +259,11 @@ export default {
           console.log(error)
         })
     },
+
+    search() {
+      this.init()
+    },
+
     childClickHandle(data) {
       this.channelId = data.id
     },
@@ -265,7 +271,7 @@ export default {
       await getFindChannelById({
         page: this.params.pageNum,
         num: this.params.pageSize,
-        nameOrOriginId: this.channelId
+        nameOrOriginId: this.leftSearchName
       })
         .then((res) => {
           if (res.code === 0) {
@@ -295,84 +301,59 @@ export default {
       const res = new Map()
       return arr.filter((arr) => !res.has(arr.id) && res.set(arr.id, arr.id))
     },
-    //将右边表格选择项存入selectedStaffData中
-    handleSelectedStaffChange(rows) {
-      this.selectedStaffData = []
-      if (rows) {
-        rows.forEach((row) => {
-          if (row) {
-            this.selectedStaffData.push(row)
-          }
+    save() {
+      console.log(111111, this.channelId)
+      if (this.channelId !== '') {
+        this.$notify({
+          title: '提示',
+          message: '请选择节点',
+          type: 'warning',
+          duration: 2000
         })
+        return
       }
-    },
-    //左到右
-    Right() {
       if (this.$refs.tableLeft.selection.length === 0) {
         this.$notify({
           title: '提示',
-          message: '请选择xxxxx',
-          type: 'success',
+          message: '请选择通道',
+          type: 'warning',
           duration: 2000
         })
         return
       } else {
-        this.selectedStaffList = this.selectedStaffList.concat(
-          this.$refs.tableLeft.selection
-        )
         // 复制数组对象
         let selectList = JSON.parse(
           JSON.stringify(this.$refs.tableLeft.selection)
         )
+        console.log('selectList~~~~~~~~', selectList)
         selectList.forEach((item) => {
           let index = this.tableData.findIndex((_item) => _item.id === item.id)
           if (index !== undefined) {
             this.tableData.splice(index, 1)
           }
         })
-        this.$refs.tableLeft.clearSelection()
-
-        console.log(this.selectedStaffList, 'this.selectedStaffList')
-      }
-    },
-    //右到左
-    Left() {
-      setTimeout(() => {
-        this.$refs['tableLeft'].clearSelection()
-        this.$refs['tableRight'].clearSelection()
-      }, 0)
-      this.selectedStaffData.forEach((item) => {
-        this.tableData.push(item)
-      })
-      //  console.log(22,this.selectedStaffList );
-      //  console.log(33,this.selectedStaffData );
-      let arr = this.selectedStaffList.filter((v) =>
-        this.selectedStaffData.every((val) => val.id != v.id)
-      )
-      console.log('--111', arr)
-      this.selectedStaffList = arr
-    },
-    save() {
-      let channelList = []
-      this.selectedStaffList.map((item) => {
-        channelList.push({
-          channelCode: item.channelCode,
-          channelName: item.channelName,
-          deviceExpansionId: item.deviceExpansionId,
-          channelId: item.channelId,
-          onlineState: item.onlineState
-        })
-      })
-      console.log('channelList', channelList)
-      addChannel({ channelList, videoAreaId: this.channelId }).then((res) => {
-        if (res.code === 0) {
-          this.$message({
-            type: 'success',
-            message: '添加通道成功'
+        console.log('this.tableData~~~~~~~~', this.tableData)
+        let channelList = []
+        selectList.map((item) => {
+          channelList.push({
+            channelCode: item.channelCode,
+            channelName: item.channelName,
+            deviceExpansionId: item.deviceExpansionId,
+            channelId: item.channelId,
+            onlineState: item.onlineState
           })
-          this.goback()
-        }
-      })
+        })
+        console.log('channelList', channelList)
+        // addChannel({ channelList, videoAreaId: this.channelId }).then((res) => {
+        //   if (res.code === 0) {
+        //     this.$message({
+        //       type: 'success',
+        //       message: '添加通道成功'
+        //     })
+        //     this.goback()
+        //   }
+        // })
+      }
     }
   }
 }
@@ -422,9 +403,10 @@ export default {
 .transferbox {
   max-height: 730px;
   overflow-y: auto;
-  width: 45%; //右边盒子的宽占比
+  width: 100%; //右边盒子的宽占比
   border: 1px solid#ebedf2;
   margin-top: 16px;
+  margin-right: 16px;
   .topbox {
     border-bottom: 1px solid #ebedf2;
     padding: 0px 10px;
@@ -549,7 +531,7 @@ export default {
   margin-top: 20px;
 
   position: absolute;
-  bottom: 35px;
+  bottom: 65px;
 
   right: 10px;
   text-align: right;

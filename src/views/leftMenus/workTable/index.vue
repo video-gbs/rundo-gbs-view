@@ -36,12 +36,10 @@
               @click="goContentList('应用', item1, index1)"
             >
               <div
+                v-cloak
                 class="top-li-div"
                 :style="{
-                  background:
-                    'url(' +
-                    require('../../../assets/imgs/' + item1.appIcon + '.png') +
-                    ') center center no-repeat'
+                  background: getBackground(item1)
                 }"
               ></div>
               <span class="top-li-span">{{ item1.appName }}</span>
@@ -64,12 +62,10 @@
             >
               <!-- :style="{ background: colorList2[index2] }" -->
               <div
+                v-cloak
                 class="top-li-div"
                 :style="{
-                  background:
-                    'url(' +
-                    require('../../../assets/imgs/' + item2.appIcon + '.png') +
-                    ') center center no-repeat'
+                  background: getBackground(item2)
                 }"
               ></div>
               <span class="top-li-span">{{ item2.appName }}</span>
@@ -92,12 +88,10 @@
             @click="goContentList('配置', item3, index3)"
           >
             <div
+              v-cloak
               class="top-li-div"
               :style="{
-                background:
-                  'url(' +
-                  require('../../../assets/imgs/' + item3.appIcon + '.png') +
-                  ') center center no-repeat'
+                background: getBackground(item3)
               }"
             ></div>
             <span class="top-li-span">{{ item3.appName }}</span>
@@ -296,6 +290,13 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    getBackground(item) {
+      return item.appIcon
+        ? 'url(' +
+            require('../../../assets/imgs/' + item.appIcon + '.png') +
+            ') center center no-repeat'
+        : ''
     },
 
     /**
@@ -554,6 +555,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+[v-cloak] {
+  display: none;
+}
 .home-page-content {
   height: 100%;
   .wrapper-header {

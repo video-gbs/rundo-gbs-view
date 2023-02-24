@@ -48,15 +48,15 @@
                             >
                               <span>
                                 <svg-icon
-                                  v-if="data.level === '1'"
+                                  v-if="data.level === 1"
                                   icon-class="tree1"
                                   class="tree1"
                                 />
                                 <svg-icon
                                   v-else-if="
-                                    data.level === '2' ||
-                                    data.level === '3' ||
-                                    data.level === '4'
+                                    data.level === 2 ||
+                                    data.level === 3 ||
+                                    data.level === 4
                                   "
                                   icon-class="tree2"
                                   class="tree2"
