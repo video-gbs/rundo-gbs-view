@@ -16,7 +16,11 @@
             ><svg-icon class="svg-btn" icon-class="del" />删除</el-button
           >
         </div>
-        <leftTree :treeData="treeList" @childClickHandle="childClickHandle" />
+        <leftTree
+          :treeData="treeList"
+          @childClickHandle="childClickHandle"
+          :defaultPropsName="areaNames"
+        />
       </div>
       <el-card class="right-box-card">
         <div slot="header" class="clearfix">
@@ -142,6 +146,7 @@ export default {
   components: { leftTree, LineFont, moveTree },
   data() {
     return {
+      areaNames: 'areaNames',
       lineTitle: {
         title: '新建分组',
         notShowSmallTitle: false
@@ -371,7 +376,7 @@ export default {
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }
   .main-content {
-    height: calc(100% - 0px);
+    height: calc(100% - 50px);
     display: flex;
     justify-content: space-between;
     .securityArea_container {

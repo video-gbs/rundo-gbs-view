@@ -5,9 +5,16 @@
     </div>
     <div class="main-content">
       <div class="securityArea_container">
-        <leftTree :treeData="treeList" @childClickHandle="childClickHandle" />
+        <leftTree
+          :treeData="treeList"
+          @childClickHandle="childClickHandle"
+          :defaultPropsName="areaNames"
+        />
       </div>
-      <div class="right-table p10">
+      <div
+        class="p10"
+        :class="!showSidebar ? 'right-table' : 'right-table-else'"
+      >
         <el-tabs
           v-model="activeName"
           class="f1 f fd-c"
@@ -30,7 +37,9 @@
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import Encoder from './components/Encoder.vue'
 import Channel from './components/Channel.vue'
-import { getSysOrgTree, getVideoAraeTree } from '@/api/method/role'
+import { getVideoAraeTree } from '@/api/method/role'
+import { Local } from '@/utils/storage'
+import { mapGetters } from 'vuex'
 export default {
   name: '',
   components: { leftTree, Encoder, Channel },
@@ -38,11 +47,26 @@ export default {
     return {
       activeName: '编码器',
       treeList: [],
-      detailsId: ''
+      detailsId: '',
+      areaNames: 'areaNames',
+      changRight: ''
     }
   },
+  created() {},
   mounted() {
     this.init()
+  },
+  computed: {
+    ...mapGetters(['rightWidth', 'showSidebar']),
+    hasChangeRightWidth() {
+      return this.rightWidth
+    }
+  },
+  watch: {
+    hasChangeRightWidth(newValue, oldValue) {
+      console.log(newValue, oldValue, 111111)
+      this.changRight = newValue
+    }
   },
   methods: {
     async init(id) {
@@ -133,7 +157,7 @@ export default {
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }
   .main-content {
-    height: calc(100% - 0px);
+    height: calc(100% - 50px);
     display: flex;
     justify-content: space-between;
     .securityArea_container {
@@ -141,10 +165,17 @@ export default {
       width: 310px;
       margin: 20px;
       background: #ffffff;
+      overflow-y: auto;
+      overflow-x: hidden;
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     }
     .right-table {
-      width: calc(100% - 40px);
+      width: 100%;
+      margin: 6px 0 0 -10px;
+      position: relative;
+    }
+    .right-table-else {
+      width: calc(100% - 350px);
       margin: 6px 0 0 -10px;
       position: relative;
     }

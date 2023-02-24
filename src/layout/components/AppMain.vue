@@ -10,9 +10,11 @@
         <router-view v-if="!$route.meta.keepAlive" :key="key" />
       </transition>
     </div>
-    <!-- <h2 class="company-title f jc-c ai-c">©2022 润建股份有限公司 版权所有</h2> -->
+    <h2 v-if="showSidebar" class="company-title f jc-c ai-c">
+      ©2023 润建股份有限公司 版权所有
+    </h2>
   </section>
-  <section class="app-main-else f1 fd-c ai-s" style="height: 100%" v-else>
+  <!-- <section class="app-main-else f1 fd-c ai-s" style="height: 100%" v-else>
     <div style="height: 100%" class="app-main-c f1 f">
       <transition name="fade-transform1" mode="out-in">
         <keep-alive>
@@ -23,10 +25,11 @@
         <router-view v-if="!$route.meta.keepAlive" :key="key" />
       </transition>
     </div>
-  </section>
+  </section> -->
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: 'AppMain',
   data() {
@@ -45,9 +48,14 @@ export default {
       },
       // 深度观察监听
       deep: true
-    }
+    },
+    changeShowSidebar(newValue, oldValue) {}
   },
   computed: {
+    ...mapGetters(['showSidebar']),
+    changeShowSidebar() {
+      return this.showSidebar
+    },
     key() {
       return this.$route.path
     }
@@ -59,10 +67,11 @@ export default {
 .app-main {
   /*50 = navbar  */
   /* min-height: calc(100vh - 136px); */
-  height: calc(100%);
+  // height: calc(100%);
+  height: calc(100% - 56px);
   width: 100%;
   position: relative;
-  overflow: auto;
+  overflow: hidden;
   overflow-x: hidden;
   padding: 0;
   background-color: #ececec;
@@ -89,7 +98,7 @@ export default {
   font-family: Microsoft YaHei-Regular, Microsoft YaHei;
   font-weight: 400;
   color: #8b8b8b;
-  bottom: 0;
+  bottom: 10px;
   left: 0;
   width: 100%;
 }

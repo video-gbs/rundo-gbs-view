@@ -429,7 +429,7 @@ export default {
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }
   .main-content {
-    height: calc(100% - 0px);
+    height: calc(100% - 50px);
     display: flex;
     justify-content: space-between;
     .securityArea_container {

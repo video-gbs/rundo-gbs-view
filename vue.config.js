@@ -25,12 +25,12 @@ const port = process.env.port || process.env.npm_config_port || 8080 // dev port
 const urls = [
   // 本地
   {
-    target: 'http://192.168.0.73:8090',
-    proxy: '/expansion'
+    target: 'http://124.71.21.11:8080',
+    proxy: '/api'
   },
   {
-    target: 'http://124.71.21.11:7821',
-    proxy: '/rundoAuthServer'
+    target: 'http://192.168.0.73:8060',
+    proxy: '/expansion'
   }
 ]
 
@@ -65,7 +65,7 @@ module.exports = {
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
   // publicPath: '/',
-  publicPath: process.env.NODE_ENV === "production" ? "./" : "/portal/",
+  publicPath: process.env.NODE_ENV === "production" ? "./" : "/login",
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: false,

@@ -116,3 +116,7 @@ div:focus {
   width: 10px;
   background-color: #e6eaed;
 }
+
+input:focus {
+  outline: none;
+}

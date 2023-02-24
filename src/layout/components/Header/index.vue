@@ -2,26 +2,44 @@
   <div class="app-header">
     <div class="app-header">
       <div class="app-header-left">
-        <i class="logo mr8" />
-        <h2>视频联网平台</h2>
+        <div>
+          <i class="logo mr8" />
+          <h2>视频联网平台</h2>
+        </div>
+      </div>
+      <div class="top-menus-content" v-if="isShowTopMenus">
+        <el-menu
+          mode="horizontal"
+          text-color="#000000"
+          active-text-color="#3989fa"
+          :default-active="activeIndex"
+          @select="handleSelect"
+          class="top-menus"
+        >
+          <el-menu-item
+            v-for="(item, index) in typeRouter"
+            :index="item.path"
+            :key="index"
+            class="top-menus-item"
+          >
+            <div class="top-menus-div" @click="clickRouter(item)">
+              <span slot="title" class="top-menus-span"
+                ><svg-icon
+                  class="top-menu-svg"
+                  :icon-class="item.meta.icon"
+                />{{ item.meta.title }}</span
+              >
+            </div>
+          </el-menu-item>
+        </el-menu>
       </div>
       <div class="header-menu">
-        <router-link
-          v-for="(item, index) in routes"
-          :key="index"
-          :to="item.path"
-          class="menu-item"
-        >
-          <!-- <i :class="item.meta.icon" /> -->
-          <!-- <svg-icon :icon-class="item.meta.icon" /> -->
-          <span>{{ item.meta.title }}</span>
-        </router-link>
         <div class="menu-user">
           <div class="user-menu">
-            <!-- <svg-icon icon-class="user3" class="user" />
-            <span class="fs14 mr10">系统操作指南</span> -->
-
-            <el-dropdown class trigger="click">
+            <svg-icon icon-class="user3" class="user" />
+            <span class="fs14 mr10">系统操作指南</span>
+            <span class="user-line" />
+            <!-- <el-dropdown class trigger="click">
               <div class="user-info">
                 <svg-icon icon-class="management" class="management" />
 
@@ -53,7 +71,7 @@
                   >
                 </el-dropdown-item>
               </el-dropdown-menu>
-            </el-dropdown>
+            </el-dropdown> -->
           </div>
           <el-dropdown class trigger="click">
             <div class="user-info">
@@ -89,68 +107,125 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-// import Message from "../Message/index.vue";
 import { Local } from '@/utils/storage'
-// import NotTips from "@/components/NotTips";
 import { logout } from '@/api/method/user'
+import store from '@/store/index'
 export default {
   components: {
     // Message,
     // NotTips,
   },
+  props: {
+    isShowTopMenus: {
+      type: Boolean,
+      default: false
+    }
+    // ,
+    // secondLevelRouters: {
+    //   type: Array,
+    //   default: [
+    //     { path: '/workTable', title: '首页', type: 1 },
+    //     { path: '/equipment', title: '应用1', type: 2 },
+    //     { path: '/test2', title: '菜单1', type: 3 },
+    //     { path: '/test3', title: '运维1', type: 1 },
+    //     { path: '/permission', title: '应用2', type: 2 },
+    //     { path: '/permission', title: '菜单2', type: 3 }
+    //   ]
+    // }
+  },
   data() {
     return {
+      activeIndex: store.state.user.activeIndex,
       showDrawer: false,
       messageData: {},
       messageCount: 0,
       lastCount: 0,
       show: false,
-      userInfo: {}
+      userInfo: {},
+      sideBarRouterList: [],
+      sideBarRouterList1: [],
+      sideBarRouterList2: [],
+      sideBarRouterList3: []
     }
   },
   computed: {
-    ...mapGetters(['user', 'systemTitle']),
-    // avatar() {
-    //   if (this.user.avatar) {
-    //     return require(`@/assets/avatar/${this.user.avatar}`);
-    //   } else {
-    //     return require(`@/assets/avatar/default.jpg`);
-    //   }
-    // },
-    /**
-     * 工作平台和系统管理菜单
-     */
-    routes() {
-      const routes = this.$router.options.routes.filter((route) => {
-        return route.systemCode
-      })
-      return routes
-    },
-    systemName() {
-      return this.$store.state.settings.systemName
-    },
-    toGreet() {
-      const now = new Date().getHours()
-      return now < 12 ? '上午好' : now > 2 ? '下午好' : '中午好'
+    ...mapGetters(['routerLists', 'typeRouter']),
+    changeTypeRouter() {
+      return this.typeRouter
+    }
+  },
+  watch: {
+    changeTypeRouter(newValue, oldValue) {
+      // this.isShowSidebar = newValue
+      // console.log(newValue, oldValue, this.isShowSidebar ,98989898)
     }
   },
   created() {
-    // if (Local.getToken()) {
-    //   // this.initNotice();
-    // }
-    // this.$socket.create({
-    //   callback: this.initNotice,
-    // });
-    // this.$socket.create(() => {
-    //   if (Local.getToken()) {
-    //     this.initNotice()
+    // const homeRouters = [
+    //   {
+    //     path: '/workTable',
+    //     name: 'workTable',
+    //     component: () => import('@/views/leftMenus/workTable/index'),
+    //     meta: { title: '首页', icon: 'sy' }
     //   }
-    // })
+    // ]
     this.userInfo.userName = localStorage.getItem('rj_userName') || '佚名用户'
     this.userInfo.userName = this.userInfo.userName
       .replace('"', '')
       .replace('"', '')
+    // if (this.routerLists && this.routerLists.length > 0) {
+    //   if (Local.get('tree_type') === 1) {
+    //     this.routerLists.map((item) => {
+    //       if (item.children && item.children.length > 0) {
+    //         item.children.forEach((child) => {
+    //           let params = {}
+    //           params = {
+    //             path: child.path,
+    //             meta: child.meta,
+    //             name: child.name,
+    //             component: (resolve) =>
+    //               require([`@/views${child.component}`], resolve)
+    //           }
+    //           this.resRouterLists.push(params)
+    //         })
+    //       }
+    //     })
+    //     this.resRouterLists = homeRouters.concat(this.resRouterLists)
+    //     this.activeIndex = this.resRouterLists[1].path
+    //     console.log('this.resRouterLists', this.resRouterLists)
+    //   } else {
+    //     this.routerLists.map((item) => {
+    //       let params1 = {}
+    //       params1 = {
+    //         path: item.path,
+    //         meta: item.meta,
+    //         name: item.name,
+    //         component: (resolve) =>
+    //           require([`@/views${item.component}`], resolve)
+    //       }
+    //       this.resRouterLists.push(params1)
+    //       // 侧边栏路由
+    //       if (item.children && item.children.length > 0) {
+    //         item.children.forEach((child) => {
+    //           let params2 = {}
+    //           params2 = {
+    //             path: child.path,
+    //             meta: child.meta,
+    //             name: child.name,
+    //             component: (resolve) =>
+    //               require([`@/views${child.component}`], resolve)
+    //           }
+    //           this.sideBarRouterList.push(params2)
+    //         })
+    //       }
+    //     })
+    //     this.resRouterLists = homeRouters.concat(this.resRouterLists)
+    //     this.activeIndex = this.resRouterLists[1].path
+    //     console.log('this.resRouterLists~~~~~~~~~', this.resRouterLists)
+    //   }
+    // }
   },
+  mounted() {},
   methods: {
     /**
      * 退出登录
@@ -168,42 +243,119 @@ export default {
           this.$router.push({ path: '/login' })
         })
     },
-    setTheme() {
-      this.$utils.setTheme('theme-blue')
+    handleSelect(key, keyPath) {
+      // if (key === '/resourceManagement') {
+      //   this.$emit('changeSidebarLists', this.sideBarRouterList[0])
+      // } else if (key === '/management') {
+      //   this.$emit('changeSidebarLists', this.sideBarRouterList)
+      // } else {
+      //   this.$emit('changeSidebarLists', this.sideBarRouterList[1])
+      // }
     },
-    reconent() {
-      this.$socket.create()
-    },
-    initNotice() {
-      this.$api.message.list().then((res) => {
-        if (res.data.data) {
-          this.messageData = {
-            rows: res.data.data
-          }
-          let count = this.messageData.rows.length
-          this.messageData.rows.forEach((item) => {
-            if (item.isRead) {
-              count--
+    clickRouter(data) {
+      console.log(1111, data)
+      this.sideBarRouterList1 = []
+      this.sideBarRouterList2 = []
+      this.sideBarRouterList3 = []
+      switch (data.path) {
+        case '/resourceManagement':
+          this.routerLists.map((item) => {
+            if (
+              item.children &&
+              item.children.length > 0 &&
+              data.path === item.path
+            ) {
+              item.children.forEach((child) => {
+                let resourceManagement = {}
+                resourceManagement = {
+                  path: child.path,
+                  meta: child.meta,
+                  name: child.name,
+                  hidden: child.hidden === 1 ? true : false,
+                  component: (resolve) =>
+                    require([`@/views${child.component}`], resolve)
+                }
+
+                this.sideBarRouterList1.push(resourceManagement)
+              })
             }
           })
-          this.messageCount = count
-          if (count > 0) {
-            if (count > this.lastCount) {
-              this.lastCount = count
-              this.show = true
+
+          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList1)
+
+          console.log(1, this.sideBarRouterList1)
+          break
+        case '/systemManagement':
+          this.routerLists.map((item) => {
+            if (
+              item.children &&
+              item.children.length > 0 &&
+              data.path === item.path
+            ) {
+              item.children.forEach((child) => {
+                let systemManagement = {}
+                systemManagement = {
+                  path: child.path,
+                  meta: child.meta,
+                  name: child.name,
+                  hidden: child.hidden === 1 ? true : false,
+                  component: (resolve) =>
+                    require([`@/views${child.component}`], resolve)
+                }
+
+                this.sideBarRouterList2.push(systemManagement)
+              })
             }
-          } else {
-            this.show = false
-          }
+          })
+
+          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList2)
+          console.log(2, this.sideBarRouterList2)
+          break
+        case '/moduleManageMent':
+          this.routerLists.map((item) => {
+            if (
+              item.children &&
+              item.children.length > 0 &&
+              data.path === item.path
+            ) {
+              item.children.forEach((child) => {
+                console.log('child.hidden', child.hidden, typeof child.hidden)
+                let moduleManageMent = {}
+                moduleManageMent = {
+                  path: child.path,
+                  meta: child.meta,
+                  name: child.name,
+                  hidden: child.hidden === 1 ? true : false,
+                  component: (resolve) =>
+                    require([`@/views${child.component}`], resolve)
+                }
+
+                this.sideBarRouterList3.push(moduleManageMent)
+              })
+            }
+          })
+
+          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList3)
+
+          console.log(3, this.sideBarRouterList3)
+          break
+        default:
+          break
+      }
+      if (Local.get('tree_type') === 2 || Local.get('tree_type') === 3) {
+        if (data.path === '/workTable') {
+          this.$router.push({ path: data.path })
+          store.dispatch('user/changeRightWidth', false)
+          store.dispatch('user/changeShowSidebar', false)
+        } else {
+          store.dispatch('user/changeShowSidebar', true)
         }
-      })
-    },
-    toMessage() {
-      this.showDrawer = true
-      this.show = false
-    },
-    closeTips() {
-      this.show = false
+      } else {
+        // if (item.path === '/workTable') {
+        this.$router.push({ path: data.path })
+        // }
+        store.dispatch('user/changeShowSidebar', false)
+      }
     }
   }
 }
@@ -215,11 +367,11 @@ export default {
   width: 100%;
   color: #fff;
   display: flex;
-  position: fixed;
-  top: 0;
-  left: 0;
+  // position: fixed;
+  // top: 0;
+  // left: 0;
   z-index: 999;
-  padding: 0 2rem;
+  padding: 0 10px;
   align-items: center;
   opacity: 1;
   justify-content: space-between;
@@ -230,6 +382,56 @@ export default {
   background-image: url('../../../assets/imgs/top-bg.png');
   background-repeat: no-repeat;
   background-size: cover;
+
+  .top-menus-content {
+    position: absolute;
+    left: 260px;
+    .top-menus {
+      background-color: transparent;
+      height: 60px;
+      border: 0 none;
+      .top-menus-item {
+        background-color: transparent;
+        border: 0 none !important;
+        &::after {
+          display: none;
+        }
+        &.is-active {
+          background-color: transparent !important;
+          border: 0 none !important;
+          .top-menus-span {
+            background: linear-gradient(
+              180deg,
+              rgba(66, 148, 255, 0.5) 0%,
+              rgba(2, 112, 255, 0.03) 100%
+            );
+            box-shadow: inset 0px 0px 12px 1px rgba(255, 255, 255, 0.16);
+            border-radius: 15px 15px 15px 15px;
+          }
+        }
+        .top-menus-div {
+          height: 21px;
+
+          .top-menu-svg {
+            widows: 1rem;
+            height: 1rem;
+            position: relative;
+            top: 0px;
+            left: -8px;
+          }
+          .top-menus-span {
+            font-size: 16px;
+            font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+            font-weight: 400;
+            color: #ffffff;
+            display: inline;
+            padding: 3px 15px;
+            margin-left: 10px;
+          }
+        }
+      }
+    }
+  }
   .app-header-left {
     position: relative;
 

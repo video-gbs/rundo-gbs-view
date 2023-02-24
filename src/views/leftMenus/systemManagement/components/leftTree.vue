@@ -11,9 +11,8 @@
       <el-tree
         ref="tree"
         :data="treeData"
-        node-key="orgName"
         class="tree"
-        :props="defaultProps"
+        :props="{ children: 'children', label: this.defaultPropsName }"
         default-expand-all
         :default-expanded-keys="['根节点']"
         :expand-on-click-node="false"
@@ -23,13 +22,13 @@
         <span slot-scope="{ node, data }" class="custom-tree-node">
           <span>
             <svg-icon
-              v-if="data.level === '1'"
+              v-if="data.level === 1"
               icon-class="tree1"
               class="tree1"
             />
             <svg-icon
               v-else-if="
-                data.level === '2' || data.level === '3' || data.level === '4'
+                data.level === 2 || data.level === 3 || data.level === 4
               "
               icon-class="tree2"
               class="tree2"
@@ -47,115 +46,7 @@
 export default {
   data() {
     return {
-      data: [
-        {
-          id: '1',
-          label: '根节点',
-          level: 1,
-          children: [
-            {
-              id: '1-1',
-              label: '广东省',
-              level: 2,
-              children: [
-                {
-                  id: '1-1-1',
-                  label: '天河区',
-                  level: 3,
-                  children: [
-                    {
-                      id: '1-1-1-1',
-                      label: '某某街道1',
-                      level: 4,
-                      children: [
-                        {
-                          id: '1-1-1-1-1',
-                          label: '网络1',
-                          level: 5
-                        },
-                        {
-                          id: '1-1-1-1-2',
-                          label: '网络2',
-                          level: 5
-                        }
-                      ]
-                    },
-                    {
-                      id: '1-1-1-2',
-                      label: '某某街道2',
-                      level: 4
-                    },
-                    {
-                      id: '1-1-1-3',
-                      label: '某某街道3',
-                      level: 4
-                    },
-                    {
-                      id: '1-1-1-4',
-                      label: '某某街道4',
-                      level: 4
-                    }
-                  ]
-                },
-                {
-                  id: '1-1-2',
-                  label: '越秀区',
-                  level: 3
-                },
-                {
-                  id: '1-1-3',
-                  label: '黄浦区',
-                  level: 3
-                },
-                {
-                  id: '1-1-4',
-                  label: '番禺区',
-                  level: 3
-                }
-              ]
-            },
-            {
-              id: '1-2',
-              label: '湖南省',
-              level: 2,
-              children: [
-                {
-                  id: '1-2-1',
-                  label: '长沙市',
-                  level: 3,
-                  children: [
-                    {
-                      id: '1-2-1-1',
-                      label: '岳阳市',
-                      level: 4
-                    }
-                  ]
-                },
-                {
-                  id: '1-2-2',
-                  label: '岳阳市',
-                  level: 3
-                },
-                {
-                  id: '1-2-3',
-                  label: '某某市',
-                  level: 3
-                },
-                {
-                  id: '1-2-4',
-                  label: '某某市',
-                  level: 3
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      defaultProps: {
-        // 用于修改节点指定标签的属性值
-        children: 'children',
-        label: 'orgName'
-      },
+      data: [],
       filterText: ''
     }
   },
@@ -165,6 +56,10 @@ export default {
       default: function () {
         return []
       }
+    },
+    defaultPropsName: {
+      type: String,
+      default: 'orgName'
     }
   },
   watch: {
@@ -185,15 +80,12 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true
-      return data.orgName.indexOf(value) !== -1
+      if (this.$props.defaultPropsName === 'orgName') {
+        return data.orgName && data.orgName.indexOf(value) !== -1
+      } else {
+        return data.areaNames && data.areaNames.indexOf(value) !== -1
+      }
     }
-    // init() {
-    //   getSysOrgTree({ id: 1 }).then((res) => {
-    //     if (res.code === 0) {
-    //       this.data = res.data
-    //     }
-    //   })
-    // }
   }
 }
 </script>
@@ -244,7 +136,8 @@ export default {
   border-width: 1px;
 }
 .el-tree-node__expand-icon.is-leaf {
-  display: none;
+  // display: none;
+  padding-left: 4px;
 }
 
 .el-tree-node:before {
@@ -260,7 +153,7 @@ export default {
 
 .el-tree-node:after {
   content: '';
-  width: 10px;
+  width: 24px;
   height: 20px;
   position: absolute;
   left: -4px;

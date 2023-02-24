@@ -22,7 +22,7 @@
 </template>
 <script>
 import PEditorVue from '@/components/PEditorVue'
-import { getInfo, editInfo } from '@/api/method/informationManagement'
+// import { getInfo, editInfo } from '@/api/method/informationManagement'
 
 export default {
   name: '',
@@ -44,7 +44,7 @@ export default {
     }
   },
   mounted() {
-    this.getFn()
+    // this.getFn()
   },
   methods: {
     getContent(v) {

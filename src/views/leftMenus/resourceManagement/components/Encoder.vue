@@ -12,6 +12,7 @@
           <el-select
             v-model="searchParams.deviceType"
             class="mr10"
+            clearable
             placeholder="请选择"
           >
             <el-option
@@ -26,6 +27,7 @@
           <el-select
             v-model="searchParams.onlineState"
             class="mr10"
+            clearable
             placeholder="请选择"
           >
             <el-option
@@ -42,10 +44,11 @@
             v-model="searchParams.ip"
             placeholder="请输入IP地址"
             class="mr10"
+            clearable
           ></el-input>
         </el-form-item>
         <el-form-item style="float: right; margin-right: 20px">
-          <el-button
+          <el-button @click="resetData"
             ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
           >
           <el-button type="primary" @click="cxData"
@@ -67,8 +70,8 @@
           <el-button @click="moveEquipment"
             ><svg-icon class="svg-btn" icon-class="move" />移动</el-button
           >
-          <el-button @click="addEquipment"
-            ><svg-icon class="svg-btn" icon-class="move" />代注册列表</el-button
+          <el-button @click="goRegistrationList"
+            ><svg-icon class="svg-btn" icon-class="move" />待注册列表</el-button
           >
           <el-button type="primary" @click="addEquipment"
             ><svg-icon class="svg-btn" icon-class="add" />新增</el-button
@@ -116,11 +119,13 @@
 
         <el-table-column prop="port" label="端口" width="80" />
         <el-table-column prop="manufacturer" label="设备厂家" width="80" />
-        <el-table-column prop="status" label="状态" width="80">
+        <el-table-column prop="onlineState" label="状态" width="80">
           <template slot-scope="scope">
-            <span :class="scope.row.status === 1 ? 'yuan' : 'yuan1'"></span>
             <span
-              v-if="scope.row.status === 1"
+              :class="scope.row.onlineState === 1 ? 'yuan' : 'yuan1'"
+            ></span>
+            <span
+              v-if="scope.row.onlineState === 1"
               style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
               >在线</span
             >
@@ -133,7 +138,7 @@
         </el-table-column>
         <el-table-column width="120" label="操作" fixed="right" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editData(scope.row)"
+            <el-button type="text" @click="goEditPage(scope.row)"
               >编辑
             </el-button>
             <!-- <el-button type="text" @click="restart(scope.row.id)"
@@ -407,10 +412,11 @@ export default {
     synchronizationData() {
       this.$router.push(`/activeDiscovery/transfer`)
     },
-    editData(row) {
+    goEditPage(row) {
       this.$router.push({
         path: `/editEquipment`,
         query: {
+          back: 1,
           row: row
         }
       })
@@ -461,9 +467,21 @@ export default {
         })
       })
     },
-    cxData() {},
+    resetData() {
+      this.searchParams = {
+        deviceType: '',
+        ip: '',
+        onlineState: ''
+      }
+    },
+    cxData() {
+      this.getList()
+    },
     addEquipment() {
-      this.$router.push(`/addEquipment/add`)
+      this.$router.push(`/addEquipment`)
+    },
+    goRegistrationList() {
+      this.$router.push(`/registrationList`)
     },
     moveEquipment() {
       this.dialogShow = true

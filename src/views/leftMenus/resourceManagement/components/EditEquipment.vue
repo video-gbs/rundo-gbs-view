@@ -1,5 +1,5 @@
 <template>
-  <div class="addequipment-content">
+  <div class="editEquipment-content">
     <div class="panel-header-box">
       <div>
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
@@ -28,14 +28,18 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item prop="desc" label="关联设备接入网关">
+              <el-form-item prop="gatewayId" label="关联设备接入网关">
                 <el-select
                   v-model="form.gatewayId"
                   placeholder="请选择"
                   style="width: 436px"
                 >
-                  <el-option label="区域一" value="0"></el-option>
-                  <el-option label="区域二" value="1"></el-option>
+                  <el-option
+                    v-for="o in allNorthTypeOptions"
+                    :label="o.label"
+                    :value="o.value"
+                    :key="o.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -43,11 +47,15 @@
           <el-row>
             <el-col :span="12">
               <el-form-item prop="name" label="设备名称">
-                <el-input v-model="form.name" style="width: 436px"></el-input>
+                <el-input
+                  v-model="form.name"
+                  style="width: 436px"
+                  clearable
+                ></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item prop="desc" label="安防区域">
+              <el-form-item prop="videoAreaId" label="安防区域">
                 <el-select
                   ref="selectTree"
                   v-model="form.videoAreaId"
@@ -56,9 +64,9 @@
                   style="width: 436px"
                   class="selectTree"
                 >
-                  <el-option :value="List">
+                  <el-option :value="form.videoAreaId">
                     <el-tree
-                      class="unit-tree"
+                      class="editEquipment-treeForm"
                       :data="treeList"
                       node-key="id"
                       :props="defaultProps"
@@ -76,14 +84,18 @@
           </el-row>
           <el-row>
             <el-col :span="23">
-              <el-form-item prop="desc" label="设备厂商">
+              <el-form-item prop="manufacturer" label="设备厂商">
                 <el-select
                   v-model="form.manufacturer"
-                  placeholder="请选择活动区域"
+                  placeholder="请选择"
                   style="width: 436px"
                 >
-                  <el-option label="hik" value="0"></el-option>
-                  <el-option label="jiadu" value="1"></el-option>
+                  <el-option
+                    v-for="o in manufacturerTypeOptions"
+                    :label="o.label"
+                    :value="o.value"
+                    :key="o.value"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -94,26 +106,25 @@
                 <el-input
                   v-model="form.model"
                   style="width: 436px"
+                  clearable
                 ></el-input> </el-form-item
             ></el-col>
           </el-row>
           <el-row>
-            <el-col :span="8"
-              ><el-form-item prop="desc" label="用户名称">
+            <el-col :span="12"
+              ><el-form-item prop="username" label="用户名称">
                 <el-input
                   v-model="form.username"
                   style="width: 436px"
+                  clearable
                 ></el-input> </el-form-item
             ></el-col>
             <el-col :span="12"
-              ><el-form-item
-                prop="desc"
-                label="密码"
-                style="margin-left: 265px"
-              >
+              ><el-form-item prop="password" label="密码">
                 <el-input
                   v-model="form.password"
                   style="width: 436px"
+                  clearable
                 ></el-input> </el-form-item
             ></el-col>
           </el-row>
@@ -128,13 +139,21 @@
           <el-form
             ref="form1"
             :model="form1"
-            label-width="120px"
+            label-width="140px"
             :rules="rules"
           >
             <el-row>
               <el-col :span="12">
-                <el-form-item prop="ip" label="IP地址">
-                  <el-input v-model="form1.ip" style="width: 436px"></el-input>
+                <el-form-item
+                  prop="ip"
+                  label="IP地址"
+                  style="margin-left: 20px"
+                >
+                  <el-input
+                    v-model="form1.ip"
+                    style="width: 436px"
+                    clearable
+                  ></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
@@ -142,56 +161,40 @@
                   <el-input
                     v-model="form1.port"
                     style="width: 436px"
+                    clearable
                   ></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
-              <!-- <el-col :span="12">
-                <el-form-item prop="desc" label="连接协议">
-                  <el-select
-                    v-model="form.region"
-                    placeholder="请选择活动区域"
-                    style="width: 436px"
-                  >
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col> -->
               <el-col :span="12">
-                <el-form-item prop="transport" label="传输协议">
+                <el-form-item
+                  prop="transport"
+                  label="传输协议"
+                  style="margin-left: 20px"
+                >
                   <el-select
                     v-model="form1.transport"
-                    placeholder="请选择活动区域"
+                    placeholder="请选择"
                     style="width: 436px"
                   >
-                    <el-option label="tcp" value="0"></el-option>
-                    <el-option label="区域二" value="1"></el-option>
+                    <el-option
+                      v-for="o in transportProtocolTypeOptions"
+                      :label="o.label"
+                      :value="o.value"
+                      :key="o.value"
+                    />
                   </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
-            <!-- <el-row>
-              <el-col :span="12">
-                <el-form-item prop="desc" label="关联PG模块">
-                  <el-select
-                    v-model="form.region"
-                    placeholder="请选择活动区域"
-                    style="width: 436px"
-                  >
-                    <el-option label="区域一" value="shanghai"></el-option>
-                    <el-option label="区域二" value="beijing"></el-option>
-                  </el-select>
-                </el-form-item>
-              </el-col>
-            </el-row> -->
             <el-row>
               <el-col :span="12"
-                ><el-form-item label="经度">
+                ><el-form-item label="经度" style="margin-left: 20px">
                   <el-input
                     v-model="form1.longitude"
                     style="width: 436px"
+                    clearable
                   ></el-input> </el-form-item
               ></el-col>
               <el-col :span="12"
@@ -199,6 +202,7 @@
                   <el-input
                     v-model="form1.latitude"
                     style="width: 436px"
+                    clearable
                   ></el-input> </el-form-item
               ></el-col>
             </el-row>
@@ -220,6 +224,8 @@
 <script>
 import { getVideoAraeTree } from '@/api/method/role'
 import { editEncoder } from '@/api/method/encoder'
+import { getAllNorthLists } from '@/api/method/moduleManagement'
+import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 export default {
   name: '',
   components: {},
@@ -240,7 +246,8 @@ export default {
         manufacturer: '',
         videoAreaId: '',
         name: '',
-        password: ''
+        password: '',
+        gatewayId: ''
       },
       form1: {
         ip: '',
@@ -254,17 +261,30 @@ export default {
       Ids: [],
       Id: '',
       editId: '',
+      resName: '',
       defaultProps: {
         children: 'children',
         label: 'areaName'
       },
+      allNorthTypeOptions: [],
+      manufacturerTypeOptions: [],
+      transportProtocolTypeOptions: [],
       rules: {
         name: [
           { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+          { min: 3, max: 15, message: '长度在 3 到 15 个字符', trigger: 'blur' }
         ],
-        region: [
-          { required: true, message: '请选择活动区域', trigger: 'change' }
+        manufacturer: [
+          { required: true, message: '请选择厂商', trigger: 'change' }
+        ],
+        gatewayId: [
+          { required: true, message: '请选择网关', trigger: 'change' }
+        ],
+        transport: [
+          { required: true, message: '请选择传输协议', trigger: 'change' }
+        ],
+        videoAreaId: [
+          { required: true, message: '请选择安防区域', trigger: 'change' }
         ],
         date1: [
           {
@@ -293,12 +313,18 @@ export default {
         resource: [
           { required: true, message: '请选择活动资源', trigger: 'change' }
         ],
-        ip: [{ required: true, message: '请填写ip', trigger: 'blur' }]
+        model: [{ required: true, message: '请填写型号', trigger: 'blur' }],
+        ip: [{ required: true, message: '请填写ip', trigger: 'blur' }],
+        username: [
+          { required: true, message: '请填写用户名称', trigger: 'blur' }
+        ],
+        password: [{ required: true, message: '请填写密码', trigger: 'blur' }],
+        port: [{ required: true, message: '请填写设备端口', trigger: 'blur' }]
       }
     }
   },
   created() {
-    console.log('this.$route.query.row', this.$route.query.row)
+    console.log('this.$route.query.row', this.$route.query)
     const {
       model,
       userName,
@@ -311,7 +337,8 @@ export default {
       latitude,
       longitude,
       port,
-      ip
+      ip,
+      gatewayId
     } = this.$route.query.row
     this.form1.ip = ip
     this.form1.transport = transport
@@ -321,30 +348,84 @@ export default {
     this.form.password = password
     this.form.name = name
     this.form.password = password
-    this.form.videoAreaId = videoAreaId
+    this.form.videoAreaId = String(videoAreaId)
     this.form.manufacturer = manufacturer
     this.form.model = model
     this.form.userName = userName
     this.form.deviceType = deviceType + ''
-    this.form.gatewayId = 7
+    this.form.gatewayId = gatewayId
     this.editId = this.$route.query.row.id
-    console.log('form', this.form)
-    console.log('form1', this.form1)
   },
   mounted() {
     this.init()
+    this.getAllNorthLists()
+    this.getManufacturerDictionaryList()
+    this.getManufacturerDictionaryList1()
   },
   methods: {
+    getTreeName(arr, id) {
+      arr.map((item) => {
+        if (item.id === id) {
+          this.resName = item.areaName
+          this.Id = id
+          return
+        } else {
+          if (item.children && item.children.length > 0) {
+            this.getTreeName(item.children, id)
+          }
+        }
+      })
+    },
     async init(id) {
       await getVideoAraeTree()
         .then((res) => {
           if (res.code === 0) {
             this.treeList = res.data
+            this.$nextTick(() => {
+              this.getTreeName(this.treeList, this.form.videoAreaId)
+              this.form.videoAreaId = this.resName
+            })
           }
         })
         .catch((error) => {
           console.log(error)
         })
+    },
+    async getManufacturerDictionaryList() {
+      await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
+        if (res.code === 0) {
+          res.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.manufacturerTypeOptions.push(obj)
+          })
+        }
+      })
+    },
+    async getManufacturerDictionaryList1() {
+      await getManufacturerDictionaryList('TransportProtocol').then((res) => {
+        if (res.code === 0) {
+          res.data.map((item) => {
+            let obj1 = {}
+            obj1.label = item.itemName
+            obj1.value = item.itemValue
+            this.transportProtocolTypeOptions.push(obj1)
+          })
+        }
+      })
+    },
+    async getAllNorthLists() {
+      await getAllNorthLists().then((res) => {
+        if (res.code === 0) {
+          res.data.map((item) => {
+            let obj = {}
+            obj.label = item.name
+            obj.value = item.dispatchId
+            this.allNorthTypeOptions.push(obj)
+          })
+        }
+      })
     },
     // 点击节点选中
     nodeClickHandle(data) {
@@ -360,13 +441,19 @@ export default {
       ]).then(() => {
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
-        this.form.gatewayId = 7
 
         editEncoder({
           ...this.form,
           ...this.form1,
-          deviceId: 1,
-          id: this.editId
+          deviceId:
+            this.$route.query.back === '1'
+              ? this.$route.query.row.id
+              : this.$route.query.row.originId,
+          id:
+            this.$route.query.back === '1'
+              ? this.$route.query.row.id
+              : this.$route.query.row.deviceId
+          // onlineState: this.$route.query.row.onlineState
         }).then((res) => {
           if (res.code === 0) {
             this.$message({
@@ -379,7 +466,11 @@ export default {
       })
     },
     goback() {
-      this.$router.push({ path: '/equipment' })
+      if (this.$route.query.back === '1') {
+        this.$router.push({ path: '/equipment' })
+      } else {
+        this.$router.push({ path: '/registrationList' })
+      }
     }
   }
 }
@@ -401,7 +492,15 @@ export default {
 ::v-deep .el-card__body {
   padding-bottom: 0;
 }
-.addequipment-content {
+
+// 去掉顶部线条
+::v-deep .editEquipment-treeForm > .el-tree-node::after {
+  border-top: none !important;
+}
+::v-deep .editEquipment-treeForm > .el-tree-node::before {
+  border-left: none;
+}
+.editEquipment-content {
   .panel-header-box {
     margin: 0;
     padding: 0 20px;

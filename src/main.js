@@ -1,12 +1,11 @@
 import Vue from 'vue'
 
-import 'normalize.css/normalize.css' // A modern alternative to CSS resets
+import 'normalize.css/normalize.css'
 
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-// import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 Vue.use(ElementUI, { size: 'small' })
-import '@/styles/index.scss' // global css
+import '@/styles/index.scss'
 import '../static/fonts/iconfont/iconfont.css'
 
 import App from './App'
@@ -14,8 +13,8 @@ import store from './store'
 import router from './router'
 import { Local } from './utils/storage'
 
-import '@/icons' // icon
-import '@/permission' // permission control
+import '@/icons'
+import '@/permission'
 import '@/utils/extends'
 // import '@/utils/rem'
 import '@/plugin'
@@ -34,19 +33,10 @@ import _dict from '@/dict/index'
 
 Vue.prototype.$dict = _dict
 
-// console.log(config)
 import config from '@/config/index'
 Vue.prototype.$_config = config
 Vue.prototype.$photoUrl = config.photoUrlApi
 Vue.prototype.$filePreview = config.filePreview
-/**
- * If you don't want to use mock-server
- * you want to use MockJs for mock api
- * you can execute: mockXHR()
- *
- * Currently MockJs will be used in the production environment,
- * please remove it before going online ! ! !
- */
 
 // 退出登录
 Vue.prototype.$logout = () => {
@@ -54,17 +44,13 @@ Vue.prototype.$logout = () => {
   window.location.reload()
 }
 
-// set ElementUI lang to EN
 Vue.use(ElementUI)
-
-// 如果想要中文版 element-ui，按如下方式声明
-// Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
 new Vue({
   el: '#app',
-  router,
   store,
+  router,
   render: (h) => h(App)
 })

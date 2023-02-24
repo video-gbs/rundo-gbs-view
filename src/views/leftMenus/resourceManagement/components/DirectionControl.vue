@@ -5,7 +5,7 @@
       <div class="hover-arrow" />
       <div
         v-for="item in DIRECTIONS_CLASS"
-        :key="item"
+        :key="item.command"
         :class="item.className"
         @mousedown="ptzCamera(item.command)"
         @mouseup="ptzCamera('stop')"
@@ -44,6 +44,9 @@ export const DIRECTIONS_CLASS = [
   { className: 'bottom-left', command: 'downleft' },
   { className: 'bottom-right', command: 'downright' }
 ]
+
+import { ptzControl } from '@/api/method/live'
+
 export default {
   name: 'DirectionControl',
   props: ['deviceData'],
@@ -51,12 +54,24 @@ export default {
     return {
       speed: 30, //云台控制速度
       hoverClass: '', //鼠标移动的位置
-      DIRECTIONS_CLASS
+      DIRECTIONS_CLASS,
+      status: {
+        up: 8,
+        left: 2,
+        right: 1,
+        down: 4,
+        upleft: 10,
+        upright: 9,
+        downleft: 6,
+        downright: 5,
+        stop: 0
+      }
     }
   },
   methods: {
     // 鼠标在方向按键上
     handleHoverWheel(direction) {
+      console.log('direction~~~~~~~', direction)
       this.hoverClass = direction
     },
     // 鼠标已开方向键
@@ -64,17 +79,17 @@ export default {
       this.hoverClass = ''
     },
     // 云台控制
-    ptzCamera: function (command) {
-      const { deviceID, channelId } = this.deviceData
-      this.$axios({
-        method: 'post',
-        url: `/api/ptz/control/${deviceID}/${channelId}?=`,
-        params: {
-          command,
-          horizonSpeed: this.speed,
-          verticalSpeed: this.speed,
-          zoomSpeed: this.speed
-        }
+    ptzCamera(cmdCode) {
+      // const { channelId } = this.deviceData
+
+      console.log('cmdCode~~~~~~~', cmdCode)
+      ptzControl({
+        channelId: 21,
+        cmdCode: this.status[cmdCode],
+        horizonSpeed: this.speed,
+        verticalSpeed: this.speed,
+        zoomSpeed: this.speed,
+        totalSpeed: this.speed
       })
     }
   }

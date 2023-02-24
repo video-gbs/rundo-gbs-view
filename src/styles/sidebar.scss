@@ -1,15 +1,15 @@
 #app {
   .main-container {
-    min-height: 100%;
-    transition: margin-left 0.28s;
-    margin-left: $sideBarWidth;
+    // min-height: 100%;
+    // transition: margin-left 0.28s;
+    // margin-left: $sideBarWidth;
     position: relative;
   }
 
   .sidebar-container {
     transition: width 0.28s;
     width: $sideBarWidth !important;
-    background-color: $bg-color1;
+    background-color: #fff;
     height: calc(100% - 3.5rem);
     position: fixed;
     font-size: 0px;

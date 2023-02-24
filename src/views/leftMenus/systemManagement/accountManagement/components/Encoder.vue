@@ -233,20 +233,18 @@
 
 <script>
 import pagination from '@/components/Pagination/index.vue'
-import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import LineFont from '@/components/LineFont'
 
 import {
   getUserLists,
   deteleUser,
-  editUser,
   changeUserStatus,
   deteleAllUser
 } from '@/api/method/user'
 
 export default {
   name: '',
-  components: { pagination, leftTree, LineFont },
+  components: { pagination, LineFont },
   data() {
     return {
       params: {
@@ -467,8 +465,8 @@ export default {
     },
     resetData() {
       this.searchParams = {
-        appIp: '',
-        appName: ''
+        userName: '',
+        userAccount: ''
       }
     },
     saveId(id) {
@@ -543,7 +541,7 @@ export default {
       this.$router.push(`/user/add`)
     },
     editEquipment(row) {
-      this.$router.push(`/editUser/${row.id}`)
+      this.$router.push({ path: '/editUser', query: { key: row.id } })
     },
     changeSwitch(row) {
       let text = row.status === 0 ? '启用' : '停用'

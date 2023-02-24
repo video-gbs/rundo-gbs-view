@@ -3,6 +3,7 @@ import request from '@/api/fetch'
 import baseUrls from '@/utils/baseUrlConfig'
 
 const expansion = baseUrls.base2
+const expansionTest = baseUrls.base5
 // 通道
 // 新增通道
 export function addChannel(params) {
@@ -11,7 +12,7 @@ export function addChannel(params) {
 
 // 发现通道列表
 export function getFindChannelById(params) {
-  return request.post(`${expansion}/channel/findList`, params)
+  return request.get(`${expansion}/channel/findList`, params)
 }
 
 // 通道列表

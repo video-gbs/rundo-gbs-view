@@ -103,7 +103,9 @@
                   </el-form-item>
                 </el-form>
                 <div class="login-footer-button">
-                  <button @click="handleLogin">登录</button>
+                  <el-button @click="handleLogin" :loading="loading"
+                    >登录</el-button
+                  >
                 </div>
               </div>
             </div>
@@ -111,9 +113,9 @@
         </div>
       </div>
     </div>
-    <div class="wrap-footer">
-      <span>©2022 润建股份版权所有</span>
-    </div>
+    <!-- <div class="wrap-footer">
+      <span>©2023 润建股份版权所有</span>
+    </div> -->
   </div>
 </template>
 
@@ -123,6 +125,8 @@ import Code from '@/views/leftMenus/systemManagement//components/Code'
 import { validUsername } from '@/utils/validate'
 import { login } from '@/api/method/user'
 import { Local } from '@/utils/storage'
+import store from '@/store/index'
+import { getRouters } from '@/api/method/menus'
 export default {
   name: 'Login',
   components: { Code },
@@ -184,6 +188,7 @@ export default {
       immediate: true
     }
   },
+  mounted() {},
   methods: {
     pwdShowChange() {
       this.passwordType = this.passwordType === 'password' ? 'type' : 'password'
@@ -202,15 +207,21 @@ export default {
       // this.$refs.loginForm.validate((valid) => {
       // if (valid) {
       this.loading = true
+      Local.setToken('')
+      Local.set('rj_token', '')
       login(this.loginForm)
         .then((res) => {
-          if (res.code === 0) {
+          if (res.code === 0 || res.code === 200) {
             const { deptType, username, token } = res.data
-            Local.setToken(token)
-            Local.set('rj_token', token)
             Local.set('rj_deptType', 0)
             Local.set('rj_userName', username)
+            Local.setToken(token)
+            Local.set('rj_token', token)
+            console.log('this.$router', this.$router)
+            // getRouters().then((res) => {
+            //   store.dispatch('user/dynamicRouters', res)
             this.$router.push({ path: '/workTable' })
+            // })
             this.loading = false
           }
         })
@@ -267,7 +278,7 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
-  height: 96vh;
+  height: 100vh;
   position: relative;
   overflow: hidden;
   margin: 0;

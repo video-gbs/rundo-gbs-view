@@ -42,7 +42,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item style="float: right; margin-right: 20px">
-          <el-button
+          <el-button @click="resetData"
             ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
           >
           <el-button type="primary" @click="cxData"
@@ -60,7 +60,7 @@
           <el-button @click="deteleAll()"
             ><svg-icon class="svg-btn" icon-class="del" />批量删除</el-button
           >
-          <el-button type="primary" @click="addEquipment"
+          <el-button type="primary" @click="goCreatingRole"
             ><svg-icon class="svg-btn" icon-class="add" />新建</el-button
           >
         </div>
@@ -105,7 +105,7 @@
             <el-button type="text" @click="goActiveDiscovery(scope.row.id)"
               >关联用户
             </el-button>
-            <el-button type="text" @click="dialogShow(0, scope.row)"
+            <el-button type="text" @click="goEditRole(scope.row)"
               >编辑</el-button
             >
             <el-button type="text" @click="deleteRole(scope.row)"
@@ -120,53 +120,6 @@
         @current-change="currentChange"
       />
     </div>
-    <el-dialog
-      :title="dialog.title"
-      :visible.sync="dialog.show"
-      width="400px"
-      :before-close="handleClose"
-    >
-      <div>
-        <el-form
-          ref="roleForm"
-          class="params-form"
-          size="mini"
-          :rules="rules"
-          label-position="left"
-          label-width="80px"
-          :model="dialog.params"
-          @keyup.enter="submit('roleForm')"
-        >
-          <el-form-item label="角色名称" prop="name">
-            <el-input v-model="dialog.params.name" clearable :maxlength="15" />
-          </el-form-item>
-          <el-form-item label="角色说明">
-            <el-input
-              v-model="dialog.params.detail"
-              type="textarea"
-              :rows="2"
-              :maxlength="50"
-            />
-          </el-form-item>
-          <el-form-item label="角色状态">
-            <el-row>
-              <el-col>
-                <el-radio v-model="dialog.params.status" :label="1"
-                  >启用</el-radio
-                >
-                <el-radio v-model="dialog.params.status" :label="0"
-                  >禁用</el-radio
-                >
-              </el-col>
-            </el-row>
-          </el-form-item>
-        </el-form>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="submit('roleForm')">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -206,24 +159,6 @@ export default {
       ],
       tableData: [],
       permissionTableData: [],
-      dialog: {
-        show: false,
-        title: '新增角色',
-        params: {
-          detail: '',
-          name: '',
-          status: 1
-        }
-      },
-      permissionDialog: {
-        show: false,
-        title: '编辑权限',
-        params: {
-          detail: '',
-          name: '',
-          status: 1
-        }
-      },
       searchParams: {
         userAccount: '',
         roleName: '',
@@ -277,6 +212,13 @@ export default {
       this.params.proCount = proCount
       this.getList()
     },
+    resetData() {
+      this.searchParams = {
+        userAccount: '',
+        roleName: '',
+        time: ''
+      }
+    },
     cxData() {
       this.getList()
     },
@@ -323,7 +265,16 @@ export default {
       })
     },
     goActiveDiscovery(id) {
-      this.$router.push(`/activeDiscovery/${id}`)
+      this.$router.push({ path: '/userDiscovery', query: { key: id } })
+    },
+    goCreatingRole() {
+      this.$router.push({ path: '/creatingRole', query: { key: 'add' } })
+    },
+    goEditRole(row) {
+      this.$router.push({
+        path: '/creatingRole',
+        query: { key: 'edit', row: row.id }
+      })
     },
     checkMenu(list) {
       list.forEach((item) => {
@@ -420,41 +371,41 @@ export default {
           }
         })
       })
-    },
-    submit(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          switch (this.dialog.title) {
-            case '添加角色':
-              addRoles(this.dialog.params).then((res) => {
-                if (res.code === 10000) {
-                  this.$message({
-                    type: 'success',
-                    message: '添加角色成功'
-                  })
-                  this.dialog.show = false
-                  this.getList()
-                }
-              })
-              break
-            case '编辑角色':
-              editRoles({ id: this.editId, ...this.dialog.params }).then(
-                (res) => {
-                  if (res.code === 10000) {
-                    this.$message.success('编辑成功')
-                    this.dialog.show = false
-                    this.getList()
-                  }
-                }
-              )
-              break
-
-            default:
-              break
-          }
-        }
-      })
     }
+    // submit(formName) {
+    //   this.$refs[formName].validate((valid) => {
+    //     if (valid) {
+    //       switch (this.dialog.title) {
+    //         case '添加角色':
+    //           addRoles(this.dialog.params).then((res) => {
+    //             if (res.code === 10000) {
+    //               this.$message({
+    //                 type: 'success',
+    //                 message: '添加角色成功'
+    //               })
+    //               this.dialog.show = false
+    //               this.getList()
+    //             }
+    //           })
+    //           break
+    //         case '编辑角色':
+    //           editRoles({ id: this.editId, ...this.dialog.params }).then(
+    //             (res) => {
+    //               if (res.code === 10000) {
+    //                 this.$message.success('编辑成功')
+    //                 this.dialog.show = false
+    //                 this.getList()
+    //               }
+    //             }
+    //           )
+    //           break
+
+    //         default:
+    //           break
+    //       }
+    //     }
+    //   })
+    // }
   }
 }
 </script>

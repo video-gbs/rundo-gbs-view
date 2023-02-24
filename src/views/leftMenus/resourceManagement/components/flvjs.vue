@@ -198,13 +198,14 @@ export default {
       if (that.timerId !== null) {
         clearInterval(that.timerId)
       }
-      console.info('this.videoUrl', this.videoUrl)
+      console.info('this.videoUrl', this.$props.videoUrl)
       const videoElement = document.getElementById(that.idx)
       if (flvjs.isSupported()) {
         that.flvPlayer = flvjs.createPlayer(
           {
             type: 'flv',
-            url: this.videoUrl,
+            url: this.$props.videoUrl,
+            // url:"ws://192.168.0.73:80/rtp/LIVE_23.live.flv",
             isLive: true
           },
           {

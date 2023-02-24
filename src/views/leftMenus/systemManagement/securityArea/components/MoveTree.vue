@@ -41,15 +41,13 @@
             <span slot-scope="{ node, data }" class="custom-tree-node">
               <span>
                 <svg-icon
-                  v-if="data.level === '1'"
+                  v-if="data.level === 1"
                   icon-class="tree1"
                   class="tree1"
                 />
                 <svg-icon
                   v-else-if="
-                    data.level === '2' ||
-                    data.level === '3' ||
-                    data.level === '4'
+                    data.level === 2 || data.level === 3 || data.level === 4
                   "
                   icon-class="tree2"
                   class="tree2"
@@ -162,8 +160,8 @@ export default {
       // console.log('draggingNode',draggingNode)
       // console.log('dropNode',dropNode)
       let id = draggingNode.data.id
-      let orgPid = dropNode.data.id
-      moveDepart({ id, orgPid }).then((res) => {
+      let areaPid = dropNode.data.id
+      moveDepart({ id, areaPid }).then((res) => {
         if (res.code === 0) {
           this.$message({
             type: 'success',
