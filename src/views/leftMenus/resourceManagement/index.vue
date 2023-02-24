@@ -81,7 +81,10 @@ export default {
           console.log(error)
         })
     },
-    handleClick(val, event) {},
+    handleClick(val, event) {
+      // console.log('val',val)
+      this.activeName = val.label
+    },
     childClickHandle(data) {
       this.detailsId = data.id
     }
