@@ -224,7 +224,7 @@
 <script>
 import { getVideoAraeTree } from '@/api/method/role'
 import { addEncoder } from '@/api/method/encoder'
-import { getAllNorthLists } from '@/api/method/moduleManagement'
+import { getAllGatewayLists } from '@/api/method/moduleManagement'
 import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 export default {
   name: '',
@@ -314,7 +314,7 @@ export default {
   },
   mounted() {
     this.init()
-    this.getAllNorthLists()
+    this.getAllGatewayLists()
     this.getManufacturerDictionaryList()
     this.getManufacturerDictionaryList1()
   },
@@ -354,13 +354,13 @@ export default {
         }
       })
     },
-    async getAllNorthLists() {
-      await getAllNorthLists().then((res) => {
+    async getAllGatewayLists() {
+      await getAllGatewayLists().then((res) => {
         if (res.code === 0) {
           res.data.map((item) => {
             let obj = {}
             obj.label = item.name
-            obj.value = item.dispatchId
+            obj.value = item.id
             this.allNorthTypeOptions.push(obj)
           })
         }

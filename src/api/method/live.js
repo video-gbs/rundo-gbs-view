@@ -21,3 +21,8 @@ export function ptzControl(data) {
 export function getChannelPlayList(id) {
   return request.get(`${expansion}/channel/playList/?videoAreaId=${id}`)
 }
+
+export function getPlayBackUrlLists(data) {
+  // 网关列表
+  return request.post(`${expansion}/play/back`, data)
+}
