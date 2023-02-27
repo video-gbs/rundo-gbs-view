@@ -122,13 +122,13 @@
   content: "\ea84";
 }
 
-/* .icon-a-15gongge:before {
-  content: "\ea85";
+.icon-a-15gongge:before {
+  content: "\e900";
 }
 
 .icon-a-17gongge:before {
-  content: "\ea85";
-} */
+  content: "\e901";
+}
 
 .icon-tuichuquanping:before {
   content: "\ea7d";

@@ -302,16 +302,6 @@ export default {
       return arr.filter((arr) => !res.has(arr.id) && res.set(arr.id, arr.id))
     },
     save() {
-      console.log(111111, this.channelId)
-      if (this.channelId !== '') {
-        this.$notify({
-          title: '提示',
-          message: '请选择节点',
-          type: 'warning',
-          duration: 2000
-        })
-        return
-      }
       if (this.$refs.tableLeft.selection.length === 0) {
         this.$notify({
           title: '提示',
@@ -321,6 +311,16 @@ export default {
         })
         return
       } else {
+        console.log(111111, this.channelId.length)
+        if (this.channelId === '' && this.channelId.length === 0) {
+          this.$notify({
+            title: '提示',
+            message: '请选择节点',
+            type: 'warning',
+            duration: 2000
+          })
+          return
+        }
         // 复制数组对象
         let selectList = JSON.parse(
           JSON.stringify(this.$refs.tableLeft.selection)
@@ -344,15 +344,15 @@ export default {
           })
         })
         console.log('channelList', channelList)
-        // addChannel({ channelList, videoAreaId: this.channelId }).then((res) => {
-        //   if (res.code === 0) {
-        //     this.$message({
-        //       type: 'success',
-        //       message: '添加通道成功'
-        //     })
-        //     this.goback()
-        //   }
-        // })
+        addChannel({ channelList, videoAreaId: this.channelId }).then((res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '添加通道成功'
+            })
+            this.goback()
+          }
+        })
       }
     }
   }
@@ -531,7 +531,7 @@ export default {
   margin-top: 20px;
 
   position: absolute;
-  bottom: 65px;
+  bottom: 35px;
 
   right: 10px;
   text-align: right;

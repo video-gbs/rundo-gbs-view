@@ -412,8 +412,8 @@ export default {
   methods: {
     async init() {
       await getModuleLists({
-        num: this.params.pageNum,
-        page: this.params.pageSize
+        num: this.params.pageSize,
+        page: this.params.pageNum
       }).then((res) => {
         if (res.code === 0) {
           this.tableData = res.data.list
@@ -425,9 +425,11 @@ export default {
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
+      this.init()
     },
     currentChange(proCount) {
       this.params.proCount = proCount
+      this.init()
     },
     childClickHandle(data) {
       if (data.areaName === '网关模块') {

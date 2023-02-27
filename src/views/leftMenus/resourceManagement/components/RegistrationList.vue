@@ -58,8 +58,8 @@
           color: '#333333'
         }"
       >
-        <el-table-column type="selection" width="80" align="center">
-        </el-table-column>
+        <!-- <el-table-column type="selection" width="80" align="center">
+        </el-table-column> -->
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
         <el-table-column
@@ -76,6 +76,7 @@
           prop="deviceId"
           label="设备序列号（平台）"
           :show-overflow-tooltip="true"
+          width="160"
         />
         <el-table-column prop="deviceType" label="设备类型" />
         <el-table-column
@@ -86,7 +87,7 @@
         />
 
         <el-table-column prop="port" label="端口" width="80" />
-        <el-table-column prop="gatewayName" label="网关" width="100" />
+        <el-table-column prop="gatewayName" label="网关" />
         <el-table-column prop="status" label="在线" width="80">
           <template slot-scope="scope">
             <span
@@ -266,8 +267,8 @@ export default {
     },
     async init() {
       await getDeviceList({
-        num: this.params.pageNum,
-        page: this.params.pageSize,
+        num: this.params.pageSize,
+        page: this.params.pageNum,
         ...this.searchParams
       }).then((res) => {
         console.log('res', res)
@@ -404,6 +405,7 @@ export default {
   }
   .table-content {
     background: #ffffff;
+    max-height: 900px;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     padding: 18px;
@@ -419,6 +421,8 @@ export default {
     }
     .table-content-bottom {
       // padding: 0 18px;
+      max-height: 790px;
+      overflow-y: auto !important;
     }
     .yuan {
       display: inline-block;
