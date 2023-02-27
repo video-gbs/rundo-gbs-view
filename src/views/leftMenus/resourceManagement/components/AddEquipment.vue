@@ -415,7 +415,7 @@ export default {
 ::v-deep .el-card__body {
   padding-bottom: 0;
 }
-.addequipment-content {
+.addEquipment-content {
   .panel-header-box {
     margin: 0;
     padding: 0 20px;
