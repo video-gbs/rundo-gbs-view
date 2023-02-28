@@ -28,7 +28,7 @@
                         ></el-input>
                         <div class="operation_box">
                           <el-tree
-                            ref="dynamicTree"
+                            ref="liveTree"
                             :data="treeList"
                             class="tree"
                             :props="{
@@ -474,7 +474,7 @@ export default {
                       : (obj[next.areaPid] = true && item.push(next))
                     return item
                   }, [])
-                  this.$refs.dynamicTree.updateKeyChildren(data.id, arr)
+                  this.$refs.liveTree.updateKeyChildren(data.id, arr)
                   this.defaultExpandedKeys = [data.id]
                 }
               }

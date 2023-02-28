@@ -353,6 +353,7 @@ const getLastUrl = (str, yourStr) => str.slice(str.lastIndexOf(yourStr))
 router.beforeEach(async (to, from, next) => {
   console.log('进入路由守卫')
   const hasToken = Local.getToken()
+  console.log('hasToken', hasToken)
   if (hasToken) {
     // 如果有 token 并且不是登录页的时候，进行权限获取
     if (to.path !== '/login') {
@@ -361,11 +362,12 @@ router.beforeEach(async (to, from, next) => {
       console.log('获取lastUrl的值', lastUrl)
       console.log('获取init的值', store.state.user.init)
       console.log('获取vuex的值', store.state.user.routerLists)
+
       if (!store.state.user.init) {
         //从vuex中获取动态路由
         // //动态路由循环解析和添加
         let accessRouteses = []
-        if (lastUrl !== '/login' && lastUrl !== '/workTable') {
+        if (lastUrl !== '/login' || lastUrl !== '/workTable') {
           accessRouteses = JSON.parse(Local.get('dynamicRouters'))
           console.log('刷新页面的时候动态路由获取', accessRouteses)
 
@@ -419,7 +421,7 @@ router.beforeEach(async (to, from, next) => {
 
             appTypeRouter = homeRouters.concat(appTypeRouter)
             store.dispatch('user/changeActiveIndex', appTypeRouter[1].path)
-            store.dispatch('user/dynamicRouters', appTypeRouter)
+            // store.dispatch('user/dynamicRouters', appTypeRouter)
             store.dispatch('user/changeTypeRouter', appTypeRouter)
             store.dispatch('user/changeShowSidebar', false)
             store.dispatch('user/changeActiveIndex', appTypeRouter[1].path)
@@ -466,7 +468,7 @@ router.beforeEach(async (to, from, next) => {
             systemTypeRouter = homeRouters.concat(systemTypeRouter)
             store.dispatch('user/changeActiveIndex', systemTypeRouter[1].path)
             store.dispatch('user/changeSidebarRouter', sideBarRouterList)
-            store.dispatch('user/dynamicRouters', systemTypeRouter)
+            // store.dispatch('user/dynamicRouters', systemTypeRouter)
             store.dispatch('user/changeTypeRouter', systemTypeRouter)
             store.dispatch('user/changeShowSidebar', true)
           } else {
@@ -589,11 +591,13 @@ router.beforeEach(async (to, from, next) => {
               homeRouters.concat(configTypeRouter)
             )
             store.dispatch('user/changeActiveIndex', configTypeRouter[0].path)
-            store.dispatch('user/dynamicRouters', configTypeRouter)
+            // store.dispatch('user/dynamicRouters', configTypeRouter)
             store.dispatch('user/changeShowSidebar', true)
             // store.dispatch('user/changeActiveIndex', configTypeRouter[1].path)
           }
           console.log('刷新后的最终路由', router)
+
+          store.dispatch('user/changeInit', true)
         } else {
           accessRouteses = await store.state.user.routerLists
 
@@ -636,17 +640,23 @@ router.beforeEach(async (to, from, next) => {
             }
           })
           console.log('首页点击后的最终路由', router)
+
+          store.dispatch('user/changeInit', true)
         }
-        store.dispatch('user/changeInit', true)
         next({ ...to, replace: true })
+      } else {
+        console.log(12345678)
       }
     } else {
       next('/workTable')
     }
   } else {
     if (to.path !== '/login') {
+      console.log('不在登录页跳转')
       next('/login')
     } else {
+      console.log('在登录页跳转')
+      next()
     }
   }
   next()

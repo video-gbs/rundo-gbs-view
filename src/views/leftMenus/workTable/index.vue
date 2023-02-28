@@ -333,7 +333,6 @@ export default {
           })
           this.appTypeRouter = homeRouters.concat(this.appTypeRouter)
 
-          store.dispatch('user/changeActiveIndex', this.appTypeRouter[1].path)
           console.log('this.appTypeRouter', this.appTypeRouter)
         } else {
           data.map((item4) => {
@@ -500,7 +499,8 @@ export default {
               this.saveComponents(1, resRouter1)
               store.dispatch('user/changeTypeRouter', this.appTypeRouter)
 
-              this.$router.push({ path: resRouter1[0].children[0].path })
+              store.dispatch('user/changeActiveIndex', item.appUrl)
+              this.$router.push({ path: item.appUrl })
             }
           })
           break
