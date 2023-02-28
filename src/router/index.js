@@ -356,6 +356,7 @@ router.beforeEach(async (to, from, next) => {
   console.log('hasToken', hasToken)
   if (hasToken) {
     // 如果有 token 并且不是登录页的时候，进行权限获取
+    console.log('获取to.path的值', to.path)
     if (to.path !== '/login') {
       const lastUrl = getLastUrl(window.location.href, '/')
 
@@ -367,7 +368,7 @@ router.beforeEach(async (to, from, next) => {
         //从vuex中获取动态路由
         // //动态路由循环解析和添加
         let accessRouteses = []
-        if (lastUrl !== '/login' || lastUrl !== '/workTable') {
+        if (lastUrl !== '/workTable' && to.path !== '/workTable') {
           accessRouteses = JSON.parse(Local.get('dynamicRouters'))
           console.log('刷新页面的时候动态路由获取', accessRouteses)
 
