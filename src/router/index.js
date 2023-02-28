@@ -19,6 +19,10 @@ export const staticRouters = [
     component: () => import('@/views/login/index')
   },
   {
+    path: '/',
+    redirect: '/login'
+  },
+  {
     path: '/workTable',
     name: 'workTable',
     component: () => import('@/views/leftMenus/workTable/index'),
