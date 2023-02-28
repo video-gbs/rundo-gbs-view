@@ -70,3 +70,13 @@ export function unbindingNorthLists(data) {
     data
   )
 }
+
+export function getAllGatewayLists(data) {
+  // 获取所有下拉网关
+  return request.get(`${device}/gateway/north/name`, data)
+}
+
+export function getPlaybackList(data) {
+  // 获取所有下拉网关
+  return request.get(`${device}/channel/north/record`, data)
+}

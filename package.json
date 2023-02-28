@@ -33,7 +33,8 @@
     "vue-seamless-scroll": "^1.1.23",
     "vuedraggable": "^2.24.3",
     "vuex": "3.1.0",
-    "wangeditor": "^4.7.12"
+    "wangeditor": "^4.7.12",
+    "@liveqing/liveplayer": "^2.6.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "4.4.4",
@@ -60,7 +61,11 @@
     "serve-static": "1.13.2",
     "svg-sprite-loader": "4.1.3",
     "svgo": "1.2.2",
-    "vue-template-compiler": "2.6.14"
+    "vue-template-compiler": "2.6.14",
+    "@easydarwin/easyplayer": "^4.1.0",
+    "@easydarwin/easywasmplayer": "^4.0.13",
+    "easy-player": "^2.2.7",
+    "copy-webpack-plugin": "^4.5.2"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

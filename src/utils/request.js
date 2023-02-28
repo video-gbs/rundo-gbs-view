@@ -64,6 +64,7 @@ service.interceptors.response.use(
    */
   (response) => {
     const res = response.data
+    console.log('res~~~~~~~~~~~~~~~~', res)
 
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 200 && res.code !== 0) {
@@ -89,6 +90,13 @@ service.interceptors.response.use(
           type: 'error',
           duration: 5 * 1000
         })
+      } else if (res.code === 401) {
+        Message({
+          message: res.message || '登录过期,请重新登录',
+          type: 'error',
+          duration: 5 * 1000
+        })
+        logoutFn()
       } else {
         Message({
           message: res.message || '发生错误',
