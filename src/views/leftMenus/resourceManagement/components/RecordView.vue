@@ -71,7 +71,7 @@
             </div>
             <div class="equipment-group-wrapper-bottom">
               <div class="date-select">
-                <el-select
+                <!-- <el-select
                   size="small"
                   v-model="formData.type"
                   placeholder="录像类型"
@@ -79,7 +79,7 @@
                 >
                   <el-option value="device" label="设备录像" />
                   <el-option value="cloud" label="云端录像" />
-                </el-select>
+                </el-select>-->
 
                 <!-- :disabled="!selData.isLeaf" -->
                 <el-button
@@ -87,19 +87,18 @@
                   type="primary"
                   size="small"
                   :loading="formData.loading"
-                  style="float: right; margin-right: 16px !important"
+                  style="float: right; margin: 16px 16px 0 0 !important"
                   >查询</el-button
                 >
 
-                <!-- @focus="addEvent" -->
                 <el-date-picker
+                  @focus="addEvent"
+                  popper-class="form-date-picker-popper"
                   size="small"
                   class="date"
                   v-model="formData.date"
-                  type="datetimerange"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
+                  type="date"
+                  :clearable="false"
                   :picker-options="cloudDateOptions"
                   placeholder="请选择日期"
                 />
@@ -295,9 +294,7 @@
                       }`"
                     />
                   </el-tooltip>
-                  <span class="speed-text">
-                    {{ speedArr[currentSpeed] }}x
-                  </span>
+                  <span class="speed-text">{{ speedArr[currentSpeed] }}x</span>
                   <el-tooltip effect="dark" content="快进" placement="top">
                     <span
                       @click="handleChangeSpeed('plus')"
@@ -459,11 +456,11 @@ export default {
       tabsActiveName: this.$route.params.type || 'device',
       formData: {
         type: '',
-        date: '',
+        date: new Date(),
         loading: false
       },
       deviceId: this.$route.params.deviceId,
-      channelId: this.$route.params.channelId,
+      channelId: '',
       selData: {},
       // recordsLoading: false,
       // mediaServerObj: new MediaServer(),
@@ -533,8 +530,6 @@ export default {
 
   mounted() {
     this.init()
-    // this.initData();
-    // this.getPlaybackList()
 
     document.addEventListener('fullscreenchange', (e) => {
       // 监听到屏幕变化，更改全屏状态，该页面不能存在多个全屏元素
@@ -553,34 +548,45 @@ export default {
           console.log(error)
         })
     },
-    async getPlayBackUrlLists(id) {
-      await getPlayBackUrlLists({ channelId: id })
+
+    async getPlaybackList(date, playStartTime = this.playTime) {
+      console.log(11111111, date, playStartTime, this.playTime)
+      this.videoUrl = ''
+      this.videoHistory.searchHistoryResult = []
+      let listData = this.deviceVideoList[date] || []
+      console.log('listData~~~~~~~~~~~~', this.deviceVideoList[date], listData)
+      // if (!listData.length) {
+
+      await getPlaybackList({
+        channelId: this.channelId,
+        startTime: `${date} 00:00:00`,
+        endTime: `${date} 23:59:59`
+      })
         .then((res) => {
           if (res.code === 0) {
-            console.log(res)
-            // this.treeList = res.data
+            console.log('getPlaybackList', res.data)
+            if (res.data && res.data.recordList.length > 0) {
+              listData = res.data.recordList.map((item) => {
+                const { startTime, endTime } = item
+                item.duration =
+                  (new Date(endTime).getTime() -
+                    new Date(startTime).getTime()) /
+                  1000 // ms
+                return item
+              })
+
+              this.deviceVideoList = {
+                [date]: listData
+              }
+            }
           }
         })
         .catch((error) => {
           console.log(error)
         })
-    },
-    async getPlaybackList(id) {
-      console.log(1111, this.formData.date)
-      // await getPlaybackList({
-      //   channelId: id,
-      //   startTime: '',
-      //   endTime: ''
-      // })
-      //   .then((res) => {
-      //     if (res.code === 0) {
-      //       console.log('getPlaybackList', res)
-      //       // this.treeList = res.data
-      //     }
-      //   })
-      //   .catch((error) => {
-      //     console.log(error)
-      //   })
+
+      this.formData.loading = false
+      this.playRecord(1, date)
     },
 
     filterNode(value, data) {
@@ -641,8 +647,7 @@ export default {
             })
         }
       } else {
-        this.getPlayBackUrlLists(data.areaPid)
-        this.getPlaybackList(data.areaPid)
+        this.channelId = data.areaPid
       }
     },
     initData() {
@@ -667,7 +672,6 @@ export default {
       if (this.tabsActiveName === 'device') {
         const date = this.playTime.format('YYYY-MM-DD')
         this.playTime = moment(`${date} ${timeString}`)
-        // this.queryRecords(date , moment(`${date} ${timeString}`));
       } else {
         const date = this.cloudPlayTime.format('YYYY-MM-DD')
         this.cloudPlayTime = moment(`${date} ${timeString}`)
@@ -700,16 +704,27 @@ export default {
     },
     // 查询视频
     handleSearch() {
-      if (this.cloudPlayerUrl || this.videoUrl) {
-        this.$message.info('修改选项前请先关闭录像流!')
+      if (this.channelId === '' && this.channelId.length === 0) {
+        this.$notify({
+          title: '提示',
+          message: '请选择节点',
+          type: 'warning',
+          duration: 2000
+        })
         return
-      }
+      } else if (this.formData.date === '' && this.formData.date.length === 0) {
+        this.$notify({
+          title: '提示',
+          message: '请选择时间',
+          type: 'warning',
+          duration: 2000
+        })
+        return
+      } else {
+        this.formData.loading = true
 
-      this.tabsActiveName = this.formData.type
-      this.channelId = this.selData.channelId
-      this.deviceId = this.selData.deviceId
-      this.id = this.selData.id
-      this.dateChange(this.formData.date)
+        this.dateChange(this.formData.date)
+      }
     },
     // 设备滚动控制放大缩小
     handleMouseWheel() {
@@ -717,19 +732,6 @@ export default {
       this.isZoom = event.wheelDeltaY > 0 ? ZOOM_TYPE.in : ZOOM_TYPE.out
       this.handleClickPlayer(event)
     },
-
-    // :(function () {
-    //   let timer;
-    //   return function(event){
-    //
-    //     if(timer) clearTimeout(timer);
-    //
-    //     timer = setTimeout(()=>{
-    //       this.isZoom = false;
-    //     }, 300)
-    //
-    //   }
-    // })(),
     // 放大缩小事件
     handleClickPlayer(event) {
       if (this.isZoom) {
@@ -868,16 +870,6 @@ export default {
           console.log('拖拽结束--没数据')
           this.isDragging = false
           this.handleCloseVideo()
-          // const date = curTime.format("YYYY-MM-DD");
-          // if(this.deviceVideoList[date]){ //数据已经加载过了
-          //   if(this.play){
-          //     this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause();
-          //     this.play = false;
-          //   }
-          // }else{
-          //      console.log("滚动时间轴事件");
-          //   this.queryRecords(date, curTime);
-          // }
 
           break
 
@@ -1020,6 +1012,7 @@ export default {
     },
     //点击暂停播放按钮
     handlePauseOrPlay() {
+      console.log('点击了播放', this.play)
       if (this.play) {
         //暂停
         this.cloudPlay = this.play = false
@@ -1111,46 +1104,17 @@ export default {
     },
     // 日期更改
     dateChange(val) {
-      this.formData.loading = true
       const date = moment(val).format('YYYY-MM-DD')
       if (this.tabsActiveName === 'device') {
         this.videoHistory.date = date
         this.playTime = moment(val)
-        this.queryRecords(this.videoHistory.date)
+        // this.queryRecords(this.videoHistory.date)
+        this.getPlaybackList(this.videoHistory.date)
       } else {
         this.cloudPlayTime = moment(val)
         this.getCloudRecordVideo(date)
       }
     },
-    // 播放器工具栏日期时间修改
-    // playerDateChange(val) {
-    //   const date = moment(val)
-    //   if(this.tabsActiveName === "device"){
-    //     // this.playTime = date;
-    //     this.queryRecords(val.split(" ")[0], date);
-    //   }else{
-    //     this.cloudPlayTime = date;
-    //     this.getCloudRecordVideo(val.split(" ")[0], date);
-    //   }
-    // },
-    // 云端录像日期更改2
-    // cloundDateChange2(val) {
-    //     const date = this.cloudPlayTime.format("YYYY-MM-DD");
-    //     this.cloudSliderMIn = 0;
-    //     this.cloudSliderMax = 86400;
-    //     this.getCloudRecordVideo(undefined, null, false, () => {
-    //         if (this.recordVideoData.length > 0) {
-    //         let firstVideoData = this.recordVideoData[0];
-    //         let lastVideoData = this.recordVideoData[this.recordVideoData.length - 1];
-    //         let startTime = new Date(firstVideoData.startTime).getTime();
-    //         startTime = startTime - new Date(date + " 00:00:00").getTime();
-    //         let endTime = new Date(lastVideoData.endTime).getTime();
-    //         endTime = endTime - new Date(date + " 00:00:00").getTime();
-    //           this.cloudSliderMIn = parseInt(startTime / 1000 - ((startTime / 1000) % (60 * 60)));
-    //         this.cloudSliderMax = parseInt(endTime / 1000 - ((endTime / 1000) % (60 * 60))) + 60 * 60;
-    //         }
-    //     });
-    // },
     /**
      * 获取某日全部录像文件
      * @param callback
@@ -1256,35 +1220,6 @@ export default {
     },
     // 秒转换成时分秒
     formatSeconds(value) {
-      // var secondTime = parseInt(value);// 秒
-      // var minuteTime = 0;// 分
-      // var hourTime = 0;// 小时
-      // if(secondTime > 60) {//如果秒数大于60，将秒数转换成整数
-      //     //获取分钟，除以60取整数，得到整数分钟
-      //     minuteTime = parseInt(secondTime / 60);
-      //     //获取秒数，秒数取佘，得到整数秒数
-      //     secondTime = parseInt(secondTime % 60);
-      //     //如果分钟大于60，将分钟转换成小时
-      //     if(minuteTime > 60) {
-      //         //获取小时，获取分钟除以60，得到整数小时
-      //         hourTime = parseInt(minuteTime / 60);
-      //         //获取小时后取佘的分，获取分钟除以60取佘的分
-      //         minuteTime = parseInt(minuteTime % 60);
-      //     }
-      // }
-      // // var result = "" + parseInt(secondTime) + "秒";
-      // var result = "" + parseInt(secondTime);
-
-      // if(minuteTime > 0) {
-      //     // result = "" + parseInt(minuteTime) + "分" + result;
-      //     result = "" + parseInt(minuteTime) + ":" + result;
-      // }
-      // if(hourTime > 0) {
-      //     // result = "" + parseInt(hourTime) + "小时" + result;
-      //     result = "" + parseInt(hourTime) + ":" + result;
-      // }
-      // return result;
-
       // 转换为式分秒
       let h = parseInt((value / 60 / 60) % 24)
       h = h < 10 ? '0' + h : h
@@ -1355,6 +1290,7 @@ export default {
 
     // 请求设备录像
     queryRecords: async function (date, playStartTime = this.playTime) {
+      console.log(11111111, date, playStartTime, this.playTime)
       this.videoUrl = ''
       this.videoHistory.searchHistoryResult = []
       let listData = this.deviceVideoList[date] || []
@@ -1412,9 +1348,7 @@ export default {
       }
       if (!this.play) {
         //没有自动播放
-        setTimeout(() => {
-          // that.clickRecordList(that.videoHistory.searchHistoryResult[0], 0)
-        }, 0)
+        setTimeout(() => {}, 0)
       }
     },
     stopPlayRecord: function (callback) {
@@ -1836,120 +1770,21 @@ export default {
       // this.queryRecords()
     },
     playRecord: (function () {
-      //还是采用队列形式，重复请求会有问题
-      /**********************seek快进方法*****************
-          let lock = false, lastPlayData;
-          return async function(row, playTime) {
-            let that = this;
-            const startTime = row.startTime.split(" ")[0] + " 00:00:00";
-            this.skipTime = playTime? playTime.diff(startTime) : moment(row.startTime).diff(startTime);
-            this.currentList = `${row.startTime}_${row.endTime}`;
-            if(!playTime)
-              this.playTime = moment(row.startTime);
-
-            if(lock) return lastPlayData = {row, playTime} ;
-            lock = true;
-            // 之前已经把流拉下来了，但是播放视频的时间不在同一天，先把之前的流停了在重新拉
-            if (that.streamId && (this.recordStartTime.split(" ")[0] != ( playTime ? playTime.format("YYYY-MM-DD") : row.startTime.split(" ")[0]))) {
-             await that.stopPlayRecord(function() {
-               return new Promise(resolve =>{
-                 setTimeout(async()=>{
-                   that.streamId = "";
-                  await that.playRecord(row, playTime);
-                   resolve()
-                 }, 100)
-               })
-              });
-            } else if(that.streamId){ //测试发现流最大只能拿一天（如果连续播放可以播放超出一天）
-              // 如然日期不同则通过快进，报错后重新再拉一次
-             await that.playTimeChange(that.skipTime, that.videoUrl, row, playTime);
-          }else{
-            this.recordStartTime = startTime;
-
-            await  this.$axios({
-              method: "get",
-              url: "/api/playback/start/" + this.deviceId + "/" + this.channelId + "?startTime=" + startTime + "&endTime=" + row.endTime.split(" ")[0] + " 24:00:00"
-            }).then(async function(res) {
-              var streamInfo = res.data.data;
-              that.app = streamInfo.app;
-              // 此stream实际上跟打开播放接口的streamId不是同一个的
-              that.streamId = streamInfo.stream;
-              that.mediaServerId = streamInfo.mediaServerId;
-              await that.playTimeChange(that.skipTime, that.getUrlByStreamInfo(streamInfo), row, playTime);
-              that.recordPlay = true;
-              if(that.isShowStream)
-                that.getStreamInfo()
-            }).catch(e=>{ });
-          }
-          **********************************/
-      let lock = false,
-        lastPlayData
       return async function (row, playTime) {
-        let that = this
-        const startTime = playTime
-          ? playTime.format('YYYY-MM-DD HH:mm:ss')
-          : row.startTime
-        this.skipTime = 0
-        this.currentList = `${row.startTime}_${row.endTime}`
-        if (!playTime) this.playTime = moment(row.startTime)
-
-        if (lock) return (lastPlayData = { row, playTime })
-        lock = true
-
-        if (that.streamId) {
-          //测试发现流最大只能拿一天（如果连续播放可以播放超出一天）
-          // 如然日期不同则通过快进，报错后重新再拉一次
-          await that.stopPlayRecord(function () {
-            return new Promise((resolve) => {
-              setTimeout(async () => {
-                that.streamId = ''
-                await that.playRecord(row, playTime)
-                resolve()
-              }, 100)
-            })
+        console.log(2222222222222, row, playTime)
+        await getPlayBackUrlLists({
+          channelId: this.channelId,
+          startTime: `${playTime} 00:00:00`,
+          endTime: `${playTime} 23:59:59`
+        })
+          .then((res) => {
+            if (res.code === 0) {
+              this.videoUrl = res.data.wsFlv
+            }
           })
-        } else {
-          this.recordStartTime = startTime
-
-          await this.$axios({
-            method: 'get',
-            url:
-              '/api/playback/start/' +
-              this.deviceId +
-              '/' +
-              this.channelId +
-              '?startTime=' +
-              startTime +
-              '&endTime=' +
-              row.endTime.split(' ')[0] +
-              ' 24:00:00'
+          .catch((error) => {
+            console.log(error)
           })
-            .then(async function (res) {
-              var streamInfo = res.data.data
-              that.app = streamInfo.app
-              // 此stream实际上跟打开播放接口的streamId不是同一个的
-              that.streamId = streamInfo.stream
-              that.mediaServerId = streamInfo.mediaServerId
-              // that.videoUrl=that.getUrlByStreamInfo(streamInfo);
-              await that.playTimeChange(
-                that.skipTime,
-                that.getUrlByStreamInfo(streamInfo),
-                row,
-                playTime
-              )
-              that.recordPlay = true
-              if (that.isShowStream) that.getStreamInfo()
-            })
-            .catch((e) => {})
-        }
-
-        lock = false
-        if (lastPlayData) {
-          row = lastPlayData.row
-          playTime = lastPlayData.playTime
-          lastPlayData = null
-          that.playRecord(row, playTime)
-        }
       }
     })(),
     gbPlay() {
@@ -2371,7 +2206,7 @@ export default {
   color: rgba(0, 0, 0, 0.85);
 }
 .date {
-  width: 92% !important;
+  width: 65% !important;
   // padding: 16px;
   margin: 16px;
 }
