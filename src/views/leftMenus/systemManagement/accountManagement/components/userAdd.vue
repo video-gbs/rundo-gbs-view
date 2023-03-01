@@ -1,5 +1,5 @@
 <template>
-  <div class="addequipment-content">
+  <div class="userAdd-content">
     <div class="panel-header-box">
       <div>
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" />
@@ -74,7 +74,7 @@
                 >
                   <el-option :value="List">
                     <el-tree
-                      class="unit-tree"
+                      class="userAddTree"
                       :data="treeList"
                       node-key="id"
                       :props="defaultProps"
@@ -429,21 +429,15 @@ export default {
 ::v-deep .el-card__body {
   padding-bottom: 0;
 }
-// .el-select-dropdown__item {
-//   height: 200px !important;
-//   min-width: 260px;
-//   overflow-y: scroll !important;
-//   background: #fff !important;
-// }
-.selectTree {
-  .el-select-dropdown__item {
-    height: 200px !important;
-    min-width: 260px;
-    overflow-y: scroll !important;
-    background: #fff !important;
-  }
+
+// 去掉顶部线条
+::v-deep .userAddTree > .el-tree-node::after {
+  border-top: none !important;
 }
-.addequipment-content {
+::v-deep .userAddTree > .el-tree-node::before {
+  border-left: none;
+}
+.userAdd-content {
   .panel-header-box {
     margin: 0;
     padding: 0 20px;
@@ -469,6 +463,8 @@ export default {
   }
   .box-card {
     margin: 20px 20px 0 20px;
+    height: calc(100% - 86px);
+    overflow-y: auto;
 
     .clearfix {
       height: 80px;

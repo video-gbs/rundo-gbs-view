@@ -538,7 +538,7 @@ export default {
       this.getList()
     },
     addEquipment() {
-      this.$router.push(`/user/add`)
+      this.$router.push(`/user`)
     },
     editEquipment(row) {
       this.$router.push({ path: '/editUser', query: { key: row.id } })
