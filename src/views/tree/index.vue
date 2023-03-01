@@ -12,6 +12,7 @@
       :props="defaultProps"
       :filter-node-method="filterNode"
       class="filter-tree"
+      highlight-current
       default-expand-all
     />
   </div>

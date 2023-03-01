@@ -619,7 +619,8 @@ export default {
     border-radius: 12px;
     margin: 24px 24px 0 24px;
     display: flex;
-    justify-content: space-between;
+    // justify-content: space-between;
+    justify-content: flex-start;
     .container-middle-left {
     }
     .container-middle-right {
