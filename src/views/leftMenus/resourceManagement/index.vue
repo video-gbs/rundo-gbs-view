@@ -22,10 +22,10 @@
           @tab-click="handleClick"
         >
           <el-tab-pane label="编码器" name="编码器">
-            <Encoder :detailsId="detailsId" />
+            <Encoder ref="encoder" :detailsId="detailsId" />
           </el-tab-pane>
           <el-tab-pane label="通道" name="通道">
-            <Channel />
+            <Channel ref="channel" />
           </el-tab-pane>
         </el-tabs>
       </div>
@@ -87,6 +87,8 @@ export default {
     },
     childClickHandle(data) {
       this.detailsId = data.id
+      this.$refs.encoder.getList(data.id)
+      this.$refs.channel.getList(data.id)
     }
   }
 }

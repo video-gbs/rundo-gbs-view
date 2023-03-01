@@ -4,7 +4,7 @@
       <div>
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
-          >编辑设备</span
+          >编辑编码器设备</span
         >
       </div>
     </div>
@@ -17,22 +17,12 @@
         <el-form ref="form" :model="form" label-width="140px" :rules="rules">
           <el-row>
             <el-col :span="12">
-              <el-form-item label="设备类型">
-                <el-radio-group v-model="form.deviceType">
-                  <el-radio label="1">DVR</el-radio>
-                  <el-radio label="2">NVR</el-radio>
-                  <el-radio label="3">CVR</el-radio>
-                  <el-radio label="4">DVS</el-radio>
-                  <el-radio label="5">IPS</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
               <el-form-item prop="gatewayId" label="关联设备接入网关">
                 <el-select
                   v-model="form.gatewayId"
                   placeholder="请选择"
                   style="width: 436px"
+                  :disabled="true"
                 >
                   <el-option
                     v-for="o in allNorthTypeOptions"
@@ -43,17 +33,30 @@
                 </el-select>
               </el-form-item>
             </el-col>
+            <el-col :span="12">
+              <el-form-item label="设备类型">
+                <el-radio-group v-model="form.deviceType">
+                  <el-radio label="1">DVR</el-radio>
+                  <el-radio label="2">NVR</el-radio>
+                  <el-radio label="3">CVR</el-radio>
+                  <el-radio label="4">DVS</el-radio>
+                  <el-radio label="5">IPS</el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
           </el-row>
+
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="name" label="设备名称">
+              <el-form-item prop="deviceId" label="国标编码">
                 <el-input
-                  v-model="form.name"
+                  v-model="form.deviceId"
                   style="width: 436px"
-                  clearable
+                  :disabled="true"
                 ></el-input>
               </el-form-item>
             </el-col>
+
             <el-col :span="12">
               <el-form-item prop="videoAreaId" label="安防区域">
                 <el-select
@@ -79,6 +82,18 @@
                     </el-tree>
                   </el-option>
                 </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="23">
+              <el-form-item prop="name" label="设备名称">
+                <el-input
+                  v-model="form.name"
+                  style="width: 436px"
+                  clearable
+                ></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -110,9 +125,9 @@
                 ></el-input> </el-form-item
             ></el-col>
           </el-row>
-          <el-row>
+          <el-row v-if="isRequired">
             <el-col :span="12"
-              ><el-form-item prop="username" label="用户名称">
+              ><el-form-item prop="username" label="用户账号">
                 <el-input
                   v-model="form.username"
                   style="width: 436px"
@@ -121,6 +136,24 @@
             ></el-col>
             <el-col :span="12"
               ><el-form-item prop="password" label="密码">
+                <el-input
+                  v-model="form.password"
+                  style="width: 436px"
+                  clearable
+                ></el-input> </el-form-item
+            ></el-col>
+          </el-row>
+          <el-row v-else>
+            <el-col :span="12"
+              ><el-form-item label="用户名称">
+                <el-input
+                  v-model="form.username"
+                  style="width: 436px"
+                  clearable
+                ></el-input> </el-form-item
+            ></el-col>
+            <el-col :span="12"
+              ><el-form-item label="密码">
                 <el-input
                   v-model="form.password"
                   style="width: 436px"
@@ -224,7 +257,7 @@
 <script>
 import { getVideoAraeTree } from '@/api/method/role'
 import { editEncoder } from '@/api/method/encoder'
-import { getAllNorthLists } from '@/api/method/moduleManagement'
+import { getAllGatewayLists } from '@/api/method/moduleManagement'
 import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 export default {
   name: '',
@@ -262,6 +295,7 @@ export default {
       Id: '',
       editId: '',
       resName: '',
+      isRequired: false,
       defaultProps: {
         children: 'children',
         label: 'areaName'
@@ -319,7 +353,10 @@ export default {
           { required: true, message: '请填写用户名称', trigger: 'blur' }
         ],
         password: [{ required: true, message: '请填写密码', trigger: 'blur' }],
-        port: [{ required: true, message: '请填写设备端口', trigger: 'blur' }]
+        port: [{ required: true, message: '请填写设备端口', trigger: 'blur' }],
+        deviceId: [
+          { required: true, message: '请填写设备端口', trigger: 'blur' }
+        ]
       }
     }
   },
@@ -327,7 +364,7 @@ export default {
     console.log('this.$route.query.row', this.$route.query)
     const {
       model,
-      userName,
+      username,
       deviceType,
       manufacturer,
       videoAreaId,
@@ -338,7 +375,8 @@ export default {
       longitude,
       port,
       ip,
-      gatewayId
+      gatewayId,
+      deviceId
     } = this.$route.query.row
     this.form1.ip = ip
     this.form1.transport = transport
@@ -351,14 +389,16 @@ export default {
     this.form.videoAreaId = String(videoAreaId)
     this.form.manufacturer = manufacturer
     this.form.model = model
-    this.form.userName = userName
+    this.form.username = username
+    this.form.deviceId = deviceId
     this.form.deviceType = deviceType + ''
-    this.form.gatewayId = gatewayId
+    this.form.gatewayId = String(gatewayId)
     this.editId = this.$route.query.row.id
   },
   mounted() {
     this.init()
-    this.getAllNorthLists()
+    this.getAllGatewayLists()
+    // this.getAllGatewayLists1()
     this.getManufacturerDictionaryList()
     this.getManufacturerDictionaryList1()
   },
@@ -415,18 +455,35 @@ export default {
         }
       })
     },
-    async getAllNorthLists() {
-      await getAllNorthLists().then((res) => {
+    async getAllGatewayLists() {
+      await getAllGatewayLists({
+        gatewayId: this.$route.query.row.gatewayId
+      }).then((res) => {
         if (res.code === 0) {
-          res.data.map((item) => {
-            let obj = {}
-            obj.label = item.name
-            obj.value = item.dispatchId
-            this.allNorthTypeOptions.push(obj)
-          })
+          if (res.data && res.data.length > 0) {
+            if (res.data[0].protocol === 'GB28181') {
+              this.isRequired = true
+            } else {
+              this.isRequired = false
+            }
+
+            res.data.map((item) => {
+              let obj = {}
+              obj.label = item.name
+              obj.value = item.id
+              this.allNorthTypeOptions.push(obj)
+            })
+          }
         }
       })
     },
+    // async getAllGatewayLists1() {
+    //   await getAllGatewayLists().then((res) => {
+    //     if (res.code === 0) {
+    //       console.log('res~~~~~~',res)
+    //     }
+    //   })
+    // },
     // 点击节点选中
     nodeClickHandle(data) {
       this.form.videoAreaId = data.areaName

@@ -17,6 +17,23 @@
         <el-form ref="form" :model="form" label-width="140px" :rules="rules">
           <el-row>
             <el-col :span="12">
+              <el-form-item prop="gatewayId" label="关联设备接入网关">
+                <el-select
+                  v-model="form.gatewayId"
+                  placeholder="请选择"
+                  style="width: 436px"
+                  @change="changeRequired"
+                >
+                  <el-option
+                    v-for="o in allNorthTypeOptions"
+                    :label="o.label"
+                    :value="o"
+                    :key="o.value"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
               <el-form-item label="设备类型">
                 <el-radio-group v-model="form.deviceType">
                   <el-radio label="1">DVR</el-radio>
@@ -27,28 +44,12 @@
                 </el-radio-group>
               </el-form-item>
             </el-col>
-            <el-col :span="12">
-              <el-form-item prop="gatewayId" label="关联设备接入网关">
-                <el-select
-                  v-model="form.gatewayId"
-                  placeholder="请选择"
-                  style="width: 436px"
-                >
-                  <el-option
-                    v-for="o in allNorthTypeOptions"
-                    :label="o.label"
-                    :value="o.value"
-                    :key="o.value"
-                  />
-                </el-select>
-              </el-form-item>
-            </el-col>
           </el-row>
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="name" label="设备名称">
+              <el-form-item prop="deviceId" label="国标编码">
                 <el-input
-                  v-model="form.name"
+                  v-model="form.deviceId"
                   style="width: 436px"
                   clearable
                 ></el-input>
@@ -84,6 +85,17 @@
           </el-row>
           <el-row>
             <el-col :span="23">
+              <el-form-item prop="name" label="设备名称">
+                <el-input
+                  v-model="form.name"
+                  style="width: 436px"
+                  clearable
+                ></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="23">
               <el-form-item prop="manufacturer" label="设备厂商">
                 <el-select
                   v-model="form.manufacturer"
@@ -110,9 +122,9 @@
                 ></el-input> </el-form-item
             ></el-col>
           </el-row>
-          <el-row>
+          <el-row v-if="isRequired">
             <el-col :span="12"
-              ><el-form-item prop="username" label="用户名称">
+              ><el-form-item prop="username" label="用户账号">
                 <el-input
                   v-model="form.username"
                   style="width: 436px"
@@ -121,6 +133,24 @@
             ></el-col>
             <el-col :span="12"
               ><el-form-item prop="password" label="密码">
+                <el-input
+                  v-model="form.password"
+                  style="width: 436px"
+                  clearable
+                ></el-input> </el-form-item
+            ></el-col>
+          </el-row>
+          <el-row v-else>
+            <el-col :span="12"
+              ><el-form-item label="用户名称">
+                <el-input
+                  v-model="form.username"
+                  style="width: 436px"
+                  clearable
+                ></el-input> </el-form-item
+            ></el-col>
+            <el-col :span="12"
+              ><el-form-item label="密码">
                 <el-input
                   v-model="form.password"
                   style="width: 436px"
@@ -237,6 +267,7 @@ export default {
         deviceType: '',
         manufacturer: '',
         videoAreaId: '',
+        deviceId: '',
         name: '',
         password: ''
       },
@@ -247,6 +278,7 @@ export default {
         port: '',
         ip: ''
       },
+      isRequired: true,
       treeList: [],
       List: '',
       Ids: [],
@@ -308,13 +340,17 @@ export default {
           { required: true, message: '请填写用户名称', trigger: 'blur' }
         ],
         password: [{ required: true, message: '请填写密码', trigger: 'blur' }],
-        port: [{ required: true, message: '请填写设备端口', trigger: 'blur' }]
+        port: [{ required: true, message: '请填写设备端口', trigger: 'blur' }],
+        deviceId: [
+          { required: true, message: '请填写设备端口', trigger: 'blur' }
+        ]
       }
     }
   },
   mounted() {
     this.init()
     this.getAllGatewayLists()
+    // this.getAllGatewayLists1()
     this.getManufacturerDictionaryList()
     this.getManufacturerDictionaryList1()
   },
@@ -361,10 +397,19 @@ export default {
             let obj = {}
             obj.label = item.name
             obj.value = item.id
+            obj.protocol = item.protocol
             this.allNorthTypeOptions.push(obj)
           })
         }
       })
+    },
+    changeRequired(val) {
+      console.log(val)
+      if (val.protocol === 'GB28181') {
+        this.isRequired = true
+      } else {
+        this.isRequired = false
+      }
     },
     // 点击节点选中
     nodeClickHandle(data) {
@@ -380,8 +425,9 @@ export default {
       ]).then(() => {
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
-        this.form.gatewayId = 7
-        addEncoder({ ...this.form, ...this.form1, deviceId: 1 }).then((res) => {
+        this.form.gatewayId = this.form.gatewayId.value
+        // console.log('this.form',this.form)
+        addEncoder({ ...this.form, ...this.form1 }).then((res) => {
           if (res.code === 0) {
             this.$message({
               type: 'success',
