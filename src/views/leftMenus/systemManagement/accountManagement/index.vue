@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <div class="panel-header-box">
-      <div>用户管理</div>
+      <div class="panel-header-box-border">用户管理</div>
     </div>
     <div class="main-content">
       <div class="securityArea_container">
@@ -102,7 +102,7 @@ export default {
 ::v-deep .el-tabs--border-card > .el-tabs__header .el-tabs__item {
   border: 0 none;
   height: 36px;
-  margin: 0 4px 4px 0;
+  margin: 0 4px 0px 0;
   border-radius: 2px;
   background: #f6f6f6 !important;
 }
@@ -120,16 +120,22 @@ export default {
 .main {
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
     width: 100%;
     height: 50px;
     line-height: 50px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
+    }
   }
   .main-content {
-    height: calc(100% - 50px);
+    height: calc(100% - 60px);
     display: flex;
     justify-content: space-between;
     .securityArea_container {
@@ -141,7 +147,8 @@ export default {
     }
     .right-table {
       width: 100%;
-      margin: 6px 0 0 -10px;
+      height: calc(100% - 16px);
+      margin: 10px 0 0 -10px;
       position: relative;
     }
   }

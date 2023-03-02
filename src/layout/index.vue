@@ -23,6 +23,7 @@
       :class="[!showSidebar ? 'main-container' : 'main-container-else']"
       class="f fd-c ai-s"
     >
+      <Breadcrumb v-if="showSidebar" />
       <app-main />
     </div>
   </div>
@@ -31,6 +32,7 @@
 <script>
 import { Header, Sidebar, AppMain, Navbar, TagsView } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
+import Breadcrumb from '../components/Breadcrumb'
 import store from '@/store/index'
 import { mapGetters } from 'vuex'
 
@@ -41,7 +43,8 @@ export default {
     AppMain,
     Header,
     Navbar,
-    TagsView
+    TagsView,
+    Breadcrumb
   },
   mixins: [ResizeMixin],
   data() {
@@ -57,7 +60,6 @@ export default {
   computed: {
     ...mapGetters(['showSidebar']),
     changeShowSidebar() {
-      console.log(111111111111111111111, this.showSidebar)
       return this.showSidebar
     },
     sidebar() {
@@ -94,7 +96,6 @@ export default {
   created() {
     this.nowRouter = this.$route.matched.filter((item) => item.name)
 
-    console.log('this.nowRouter', this.nowRouter)
     // if (this.nowRouter[0].name === 'workTable') {
     //   this.isShowSidebar = false
     // } else {
@@ -113,7 +114,6 @@ export default {
     // },
     changeSidebarLists(val) {
       this.sidebarLists = val
-      console.log(777, this.sidebarLists)
     },
 
     initTabList() {
@@ -157,7 +157,16 @@ export default {
 @import '~@/styles/mixin.scss';
 @import '~@/styles/variables.scss';
 @import '~@/styles/element-variables.scss';
-
+::v-deep .sidebar-container {
+  .scrollbar-wrapper {
+    margin-right: -8px !important;
+  }
+}
+::v-deep .sidebar-container {
+  .el-scrollbar__wrap {
+    margin-right: -8px !important;
+  }
+}
 .app-wrapper {
   @include clearfix;
   position: relative;

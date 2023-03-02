@@ -1,7 +1,7 @@
 <template>
   <div class="addEquipment-content">
     <div class="panel-header-box">
-      <div>
+      <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
           >添加设备</span
@@ -162,7 +162,7 @@
       </div>
       <div class="box-card1">
         <div class="clearfix1">
-          <svg-icon icon-class="pjqktj" class="pjqktj_svg" />
+          <svg-icon icon-class="csxx" class="pjqktj_svg" />
           <span>参数信息</span>
         </div>
         <div class="text item">
@@ -404,7 +404,6 @@ export default {
       })
     },
     changeRequired(val) {
-      console.log(val)
       if (val.protocol === 'GB28181') {
         this.isRequired = true
       } else {
@@ -464,8 +463,7 @@ export default {
 .addEquipment-content {
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
     width: 100%;
     height: 50px;
     line-height: 50px;
@@ -483,6 +481,13 @@ export default {
       font-size: 18px;
       font-family: Microsoft YaHei-Regular, Microsoft YaHei;
       font-weight: 400;
+    }
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
     }
   }
   .box-card {

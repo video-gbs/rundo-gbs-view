@@ -62,7 +62,6 @@ export default {
   },
   watch: {
     statisticalData(newValue, oldValue) {
-      console.log(newValue, oldValue)
       this.$props.statisticalData.map((item) => {
         this.chartData.series.name = item.resultName
         this.chartData.series.value = item.resultCount

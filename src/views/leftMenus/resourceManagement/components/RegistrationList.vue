@@ -1,7 +1,7 @@
 <template>
   <div class="registrationList-content">
     <div class="panel-header-box">
-      <div>
+      <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
           >待注册列表</span
@@ -271,7 +271,6 @@ export default {
         page: this.params.pageNum,
         ...this.searchParams
       }).then((res) => {
-        console.log('res', res)
         if (res.code === 0) {
           this.tableData = res.data.list
           this.params.total = res.data.total
@@ -369,8 +368,8 @@ export default {
 .registrationList-content {
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
+    border-top: 1px solid #eaeaea;
     width: 100%;
     height: 50px;
     line-height: 50px;
@@ -388,6 +387,13 @@ export default {
       font-size: 18px;
       font-family: Microsoft YaHei-Regular, Microsoft YaHei;
       font-weight: 400;
+    }
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
     }
   }
   .search {
@@ -417,6 +423,22 @@ export default {
       }
       .btn-lists {
         float: right;
+        .btn-span {
+          position: relative;
+          top: -2px;
+          font-size: 14px;
+          font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+          font-weight: 400;
+        }
+        .svg-btn {
+          position: relative;
+          top: -1px;
+          left: -6px;
+        }
+        .el-button {
+          width: 80px;
+          height: 32px;
+        }
       }
     }
     .table-content-bottom {

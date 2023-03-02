@@ -1,7 +1,7 @@
 <template>
   <div class="creatingRole-content">
     <div class="panel-header-box">
-      <div>
+      <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" />
         <span class="back-title">
           {{ this.$route.query.key === 'add' ? '新建角色' : '编辑角色' }}
@@ -407,15 +407,11 @@ export default {
   },
   watch: {
     allTreeData: {
-      handler(n, o) {
-        console.log('n', n)
-      },
+      handler(n, o) {},
       deep: true // 深度监听父组件传过来对象变化
     }
   },
   created() {
-    console.log('this.$route.query.row', this.$route.query)
-
     if (this.$route.query.key !== 'add') {
       this.getRoleDetail()
     }
@@ -456,7 +452,6 @@ export default {
           devopsIds.map((item3) => {
             res3.push(Number(item3.slice(2)))
           })
-          console.log(res1, res2, res3)
           ;(this.expandedList[0] = res1),
             (this.expandedList[1] = res2),
             (this.expandedList[2] = res3),
@@ -487,13 +482,9 @@ export default {
       this.allTreeData[4] = tree5.data ? tree5.data : []
       // })
       this.lazyLoading = false
-
-      console.log('this.allTreeData', this.allTreeData)
     },
 
     handleCheckChange(data, checked, indeterminate) {
-      console.log(data, checked, indeterminate)
-
       //获取所有选中的节点 start
       let resIds = []
       const num = Number(this.activeIndex)
@@ -506,8 +497,6 @@ export default {
           this.appIds = resIds
           this.expandedList[num] = resIds
           this.checkedList[num] = resIds
-
-          console.log('this.appIds)', this.appIds)
           break
         case 1:
           let res1 = this.$refs.addRoleTree1[0].getCheckedNodes()
@@ -578,7 +567,6 @@ export default {
     save(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          console.log('this.$route.query.key', this.$route.query.key)
           switch (this.$route.query.key) {
             case 'add':
               const params = {
@@ -590,7 +578,6 @@ export default {
                 roleDesc: this.form.params.roleDesc,
                 roleName: this.form.params.roleName
               }
-              console.log('params', params)
               addRoles(params).then((res) => {
                 if (res.code === 0) {
                   this.$message({
@@ -611,7 +598,6 @@ export default {
                 roleDesc: this.form.params.roleDesc,
                 roleName: this.form.params.roleName
               }
-              console.log('params1', params1)
               editRoles({ id: this.$route.query.row, ...params1 }).then(
                 (res) => {
                   if (res.code === 0) {
@@ -886,8 +872,8 @@ export default {
 .creatingRole-content {
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
+    border-top: 1px solid #eaeaea;
     width: 100%;
     height: 50px;
     line-height: 50px;
@@ -905,6 +891,13 @@ export default {
       font-size: 18px;
       font-family: Microsoft YaHei-Regular, Microsoft YaHei;
       font-weight: 400;
+    }
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
     }
   }
 
