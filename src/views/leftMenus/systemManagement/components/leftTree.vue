@@ -16,6 +16,7 @@
         default-expand-all
         :default-expanded-keys="['根节点']"
         :expand-on-click-node="false"
+        highlight-current
         @node-click="handleNodeClick"
         :filter-node-method="filterNode"
       >

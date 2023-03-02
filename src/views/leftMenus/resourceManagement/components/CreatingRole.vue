@@ -79,6 +79,7 @@
                           node-key="id"
                           :props="getDefaultProps(index)"
                           :default-expand-all="true"
+                          highlight-current
                           @check-change="handleCheckChange"
                           :default-expanded-keys="expandedList[index]"
                           :default-checked-keys="checkedList[index]"

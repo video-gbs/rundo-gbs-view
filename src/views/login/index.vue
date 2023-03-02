@@ -86,13 +86,12 @@
                       />
                     </div>
                   </el-form-item>
-                  <div
+                  <!-- <div
                     @click="refreshCode()"
                     class="get-codes"
                     title="点击切换验证码"
                   >
-                    <!-- <Code :identifyCode="identifyCode" /> -->
-                  </div>
+                  </div> -->
 
                   <el-form-item>
                     <el-checkbox v-model="checked"
@@ -238,6 +237,9 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+input::-ms-reveal {
+  display: none;
+}
 body {
   margin: 0;
   padding: 0;
@@ -405,12 +407,9 @@ body {
     min-width: 50px;
     height: 48px;
     padding: 0px 14px;
-    // margin-bottom: 20px;
-    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-    color: red;
     border: 1px solid #f2f2f2;
     border-radius: 2px;
-    background-color: #fcfeff;
+    background-color: #fff;
     background-image: none;
     box-shadow: none;
     font-size: 14px;

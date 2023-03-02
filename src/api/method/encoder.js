@@ -31,9 +31,14 @@ export function moveEncoder(params) {
   return request.put(`${expansion}/device/move`, params)
 }
 
-// 编辑
+// 编辑编码器
 export function editEncoder(params) {
   return request.put(`${expansion}/device/edit`, params)
+}
+
+// 编辑通道
+export function editChannel(params) {
+  return request.put(`${expansion}/channel/edit`, params)
 }
 
 // 代注册列表

@@ -226,7 +226,7 @@
 
 <script>
 import pagination from '@/components/Pagination/index.vue'
-import { getVideoAraeTree, getUserInfoList } from '@/api/method/role'
+import { getDepartmentTree, getUserInfoList } from '@/api/method/role'
 import { addUser } from '@/api/method/user'
 import moment from 'moment'
 export default {
@@ -246,7 +246,7 @@ export default {
       Id: '',
       defaultProps: {
         children: 'children',
-        label: 'areaName'
+        label: 'orgName'
       },
       form: {
         userAccount: '',
@@ -317,7 +317,7 @@ export default {
   },
   methods: {
     async init(id) {
-      await getVideoAraeTree()
+      await getDepartmentTree()
         .then((res) => {
           if (res.code === 0) {
             this.treeList = res.data
@@ -428,6 +428,14 @@ export default {
 }
 ::v-deep .el-card__body {
   padding-bottom: 0;
+}
+.selectTree {
+  .el-select-dropdown__item {
+    height: 200px !important;
+    min-width: 260px;
+    overflow-y: scroll !important;
+    background: #fff !important;
+  }
 }
 
 // 去掉顶部线条
