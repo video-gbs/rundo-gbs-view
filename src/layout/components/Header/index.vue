@@ -253,7 +253,6 @@ export default {
       // }
     },
     clickRouter(data) {
-      console.log(1111, data)
       this.sideBarRouterList1 = []
       this.sideBarRouterList2 = []
       this.sideBarRouterList3 = []
@@ -283,7 +282,7 @@ export default {
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList1)
 
-          console.log(1, this.sideBarRouterList1)
+          // console.log(1, this.sideBarRouterList1)
           break
         case '/systemManagement':
           this.routerLists.map((item) => {
@@ -309,7 +308,7 @@ export default {
           })
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList2)
-          console.log(2, this.sideBarRouterList2)
+          // console.log(2, this.sideBarRouterList2)
           break
         case '/moduleManageMent':
           this.routerLists.map((item) => {
@@ -319,7 +318,6 @@ export default {
               data.path === item.path
             ) {
               item.children.forEach((child) => {
-                console.log('child.hidden', child.hidden, typeof child.hidden)
                 let moduleManageMent = {}
                 moduleManageMent = {
                   path: child.path,
@@ -337,7 +335,7 @@ export default {
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList3)
 
-          console.log(3, this.sideBarRouterList3)
+          // console.log(3, this.sideBarRouterList3)
           break
         default:
           break

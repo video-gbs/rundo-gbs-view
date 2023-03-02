@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <div class="panel-header-box">
-      <div>流媒体调度服务模块</div>
+      <div class="panel-header-box-border">流媒体调度服务模块</div>
     </div>
     <div class="main-content">
       <div class="moduleManagement_container">
@@ -77,12 +77,7 @@
                   >
                 </template>
               </el-table-column>
-              <el-table-column
-                width="180"
-                label="操作"
-                fixed="right"
-                align="center"
-              >
+              <el-table-column width="180" label="操作" align="center">
                 <template slot-scope="scope">
                   <el-button type="text" @click="editData(scope.row)"
                     >编辑
@@ -293,7 +288,6 @@ export default {
       this.init()
     },
     childClickHandle(data) {
-      console.log(data, 1111)
       if (data.areaName === '网关模块') {
         this.$router.push({ path: '/gatewayModuleManagement' })
       } else {
@@ -341,19 +335,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/*表格表头全选*/
-// ::v-deep .disabledSelection .cell .el-checkbox__inner{
-//   margin-left: -30px;
-//   position:relative;
-// }
-// ::v-deep .disabledSelection .cell:before{
-//   content:"序号";
-//   position:absolute;
-//   right:11px;
-// }
-// ::v-deep .el-input__inner {
-//   width: 216px;
-// }
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid rgba(234, 234, 234, 1);
   padding: 0 20px;
@@ -391,7 +372,7 @@ export default {
 ::v-deep .el-tabs--border-card > .el-tabs__header .el-tabs__item {
   border: 0 none;
   height: 36px;
-  margin: 0 4px 4px 0;
+  margin: 0 4px 0px 0;
   border-radius: 2px;
   background: #f6f6f6 !important;
 }
@@ -406,23 +387,56 @@ export default {
 ::v-deep .el-tabs__item {
   box-shadow: none !important;
 }
+
+// 滚动条大小设置
+::v-deep .table-content-bottom::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .table-content-bottom::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .table-content-bottom::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .table-content-bottom::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
+}
 .main {
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
     width: 100%;
     height: 50px;
     line-height: 50px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
+    }
   }
   .main-content {
     height: calc(100% - 50px);
     display: flex;
     justify-content: space-between;
     .moduleManagement_container {
-      height: calc(100% - 40px);
+      height: calc(100% - 50px);
       width: 310px;
       margin: 20px;
       background: #ffffff;
@@ -434,11 +448,16 @@ export default {
       position: relative;
       .table-list {
         width: calc(100% - 0px);
+        height: calc(100% - 22px);
         background: #ffffff;
         box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
         border-radius: 2px;
         padding: 18px;
         // margin: 20px;
+        .table-content-bottom {
+          height: calc(100% - 100px);
+          overflow-y: auto;
+        }
         .yuan {
           display: inline-block;
           width: 6px;
@@ -456,7 +475,7 @@ export default {
       }
     }
     .right-table-else {
-      width: calc(100% - 350px);
+      width: calc(100% - 340px);
       margin: 6px 0 0 -10px;
       position: relative;
     }

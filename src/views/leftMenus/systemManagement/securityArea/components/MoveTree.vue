@@ -33,7 +33,6 @@
             highlight-current
             node-key="id"
             default-expand-all
-            @node-click="handleNodeClick"
             @node-drop="handleDrop"
             draggable
             :allow-drag="allowDrag"
@@ -122,6 +121,7 @@ export default {
     handleClose(done) {
       done()
     },
+    handleNodeClick(data, index) {},
     allowDrag(draggingNode) {
       return true
     },

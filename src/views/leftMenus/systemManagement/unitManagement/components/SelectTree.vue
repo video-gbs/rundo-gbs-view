@@ -101,9 +101,7 @@ export default {
 
   methods: {
     handleTreeClick(data, self, child) {
-      console.log(111, this.$refs.selectTree.getCheckedNodes())
       let datalist = this.$refs.selectTree.getCheckedNodes()
-      console.log(222, datalist)
       this.selectTree = []
       this.value = []
       datalist.forEach((item) => {

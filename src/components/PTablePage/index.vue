@@ -98,7 +98,6 @@ export default {
       }
     },
     handlePageChange(val) {
-      console.log(val, this.autoQuery, this.$parent.$refs.query)
       // 自动查询下一页
       if (this.autoQuery) {
         if (this.$parent.$refs.query) {

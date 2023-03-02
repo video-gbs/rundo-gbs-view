@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <div class="panel-header-box">
-      <div>前端设备</div>
+      <div class="panel-header-box-border">前端设备</div>
     </div>
     <div class="main-content">
       <div class="securityArea_container">
@@ -17,7 +17,7 @@
       >
         <el-tabs
           v-model="activeName"
-          class="f1 f fd-c"
+          class="f1 f fd-c table-content"
           type="border-card"
           @tab-click="handleClick"
         >
@@ -64,7 +64,6 @@ export default {
   },
   watch: {
     hasChangeRightWidth(newValue, oldValue) {
-      console.log(newValue, oldValue, 111111)
       this.changRight = newValue
     }
   },
@@ -95,16 +94,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/*表格表头全选*/
-// ::v-deep .disabledSelection .cell .el-checkbox__inner{
-//   margin-left: -30px;
-//   position:relative;
-// }
-// ::v-deep .disabledSelection .cell:before{
-//   content:"序号";
-//   position:absolute;
-//   right:11px;
-// }
 ::v-deep .el-tabs__content {
   flex: 1;
 }
@@ -135,14 +124,14 @@ export default {
 ::v-deep .el-tabs--border-card > .el-tabs__header .el-tabs__item {
   border: 0 none;
   height: 36px;
-  margin: 0 4px 4px 0;
+  margin: 0 4px 0px 0;
   border-radius: 2px;
   background: #f6f6f6 !important;
 }
 
 ::v-deep .el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active {
   position: relative;
-  top: 4px;
+  // top: 4px;
 }
 ::v-deep .el-tabs__nav > .is-active {
   background: #f9f9f9 !important;
@@ -153,16 +142,22 @@ export default {
 .main {
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
     width: 100%;
     height: 50px;
     line-height: 50px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
+    }
   }
   .main-content {
-    height: calc(100% - 50px);
+    height: calc(100% - 60px);
     display: flex;
     justify-content: space-between;
     .securityArea_container {
@@ -176,13 +171,21 @@ export default {
     }
     .right-table {
       width: 100%;
+      height: calc(100% - 16px);
       margin: 6px 0 0 -10px;
       position: relative;
+      .table-content {
+        height: 100%;
+      }
     }
     .right-table-else {
-      width: calc(100% - 350px);
+      width: calc(100% - 340px);
+      height: calc(100% - 16px);
       margin: 6px 0 0 -10px;
       position: relative;
+      .table-content {
+        height: 100%;
+      }
     }
   }
 }

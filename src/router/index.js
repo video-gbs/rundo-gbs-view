@@ -357,7 +357,6 @@ const getLastUrl = (str, yourStr) => str.slice(str.lastIndexOf(yourStr))
 router.beforeEach(async (to, from, next) => {
   console.log('进入路由守卫')
   const hasToken = Local.getToken()
-  console.log('hasToken', hasToken)
   if (hasToken) {
     // 如果有 token 并且不是登录页的时候，进行权限获取
     console.log('获取to.path的值', to.path)
@@ -415,6 +414,7 @@ router.beforeEach(async (to, from, next) => {
                   name: item1.name,
                   path: item1.path,
                   meta: item1.meta,
+                  redirect: item1.redirect,
                   component: Layout,
                   children: childComponent1
                 }
@@ -462,6 +462,7 @@ router.beforeEach(async (to, from, next) => {
                   name: item4.name,
                   path: item4.path,
                   meta: item4.meta,
+                  redirect: item4.redirect,
                   component: Layout,
                   children: childComponent4
                 }
@@ -504,6 +505,7 @@ router.beforeEach(async (to, from, next) => {
                       name: item2.name,
                       path: item2.path,
                       meta: item2.meta,
+                      redirect: item2.redirect,
                       component: Layout,
                       children: childComponent2
                     }
@@ -537,6 +539,7 @@ router.beforeEach(async (to, from, next) => {
                       name: item2.name,
                       path: item2.path,
                       meta: item2.meta,
+                      redirect: item2.redirect,
                       component: Layout,
                       children: childComponent3
                     }
@@ -570,6 +573,7 @@ router.beforeEach(async (to, from, next) => {
                       name: item2.name,
                       path: item2.path,
                       meta: item2.meta,
+                      redirect: item2.redirect,
                       component: Layout,
                       children: childComponent4
                     }
@@ -627,6 +631,7 @@ router.beforeEach(async (to, from, next) => {
                 name: item.name,
                 path: item.path,
                 meta: item.meta,
+                redirect: item.redirect,
                 component: Layout,
                 children: childComponent
               }
@@ -637,6 +642,7 @@ router.beforeEach(async (to, from, next) => {
                 name: item.name,
                 path: item.path,
                 meta: item.meta,
+                redirect: item.redirect,
                 component: (resolve) =>
                   require([`@/views${item.component}`], resolve)
               }

@@ -6,15 +6,18 @@
     <div class="main-content">
       <div class="securityArea_container">
         <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow()"
-            ><svg-icon class="svg-btn" icon-class="add" />新增</el-button
-          >
-          <el-button @click="dialogMoveShow()"
-            ><svg-icon class="svg-btn" icon-class="move" />移动</el-button
-          >
-          <el-button @click="deleteAccount()"
-            ><svg-icon class="svg-btn" icon-class="del" />删除</el-button
-          >
+          <el-button type="primary" @click.stop="dialogShow()">
+            <svg-icon class="svg-btn" icon-class="add" />
+            <span class="btn-span">新增</span>
+          </el-button>
+          <el-button @click.stop="dialogMoveShow()">
+            <svg-icon class="svg-btn" icon-class="move" />
+            <span class="btn-span">移动</span>
+          </el-button>
+          <el-button @click="deleteAccount()">
+            <svg-icon class="svg-btn" icon-class="del" />
+            <span class="btn-span">删除</span>
+          </el-button>
         </div>
         <leftTree :treeData="treeList" @childClickHandle="childClickHandle" />
       </div>
@@ -53,9 +56,9 @@
         </el-form>
 
         <div class="dialog-footer">
-          <el-button type="primary" @click="save('savePasswordForm')"
-            ><svg-icon class="svg-btn" icon-class="save" />保 存</el-button
-          >
+          <el-button type="primary" @click="save('savePasswordForm')">
+            <svg-icon class="svg-btn" icon-class="save" />保 存
+          </el-button>
         </div>
       </el-card>
     </div>
@@ -63,7 +66,7 @@
       v-if="editShow"
       :title="dialog.title"
       :visible.sync="dialog.show"
-      width="748px"
+      width="600px"
       :before-close="handleClose"
     >
       <div slot="title" class="dialog-title">
@@ -78,7 +81,7 @@
           ref="accountForm"
           class="params-form"
           label-position="right"
-          label-width="120px"
+          label-width="auto"
           :model="dialog.params"
           :rules="rules"
           @keyup.enter="submit('accountForm')"
@@ -89,7 +92,7 @@
               v-model="dialog.params.orgPid"
               placeholder="请选择"
               :popper-append-to-body="false"
-              style="width: 272px"
+              style="width: 436px"
               class="selectTree"
             >
               <el-option :value="List">
@@ -103,8 +106,7 @@
                   highlight-current
                   :expand-on-click-node="false"
                   @node-click="nodeClickHandle"
-                >
-                </el-tree>
+                ></el-tree>
               </el-option>
             </el-select>
           </el-form-item>
@@ -113,6 +115,7 @@
             <el-input
               v-model="dialog.params.orgName"
               placeholder="最多40个字符"
+              style="width: 436px"
             />
           </el-form-item>
 
@@ -120,6 +123,7 @@
             <el-input
               v-model="dialog.params.orgLeader"
               placeholder="最多40个字符"
+              style="width: 436px"
             />
           </el-form-item>
 
@@ -127,6 +131,7 @@
             <el-input
               v-model="dialog.params.phone"
               placeholder="最多40个字符"
+              style="width: 436px"
             />
           </el-form-item>
 
@@ -237,7 +242,6 @@ export default {
   },
   watch: {
     form(val) {
-      console.log(1111, val)
       //  this.form=val
     }
   },
@@ -420,8 +424,8 @@ export default {
 .department_main {
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
+    border-top: 1px solid #eaeaea;
     width: 100%;
     height: 50px;
     line-height: 50px;
@@ -429,7 +433,7 @@ export default {
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }
   .main-content {
-    height: calc(100% - 50px);
+    height: calc(100% - 60px);
     display: flex;
     justify-content: space-between;
     .securityArea_container {
@@ -442,10 +446,21 @@ export default {
         display: flex;
         justify-content: space-between;
         padding: 10px 10px 0 10px;
+        .btn-span {
+          position: relative;
+          top: -2px;
+          font-size: 14px;
+          font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+          font-weight: 400;
+        }
         .svg-btn {
           position: relative;
-          top: 1px;
-          left: -4px;
+          top: -1px;
+          left: -6px;
+        }
+        .el-button {
+          width: 80px;
+          height: 32px;
         }
       }
     }

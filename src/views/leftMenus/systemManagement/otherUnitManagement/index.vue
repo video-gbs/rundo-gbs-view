@@ -450,7 +450,6 @@ export default {
     }
   },
   mounted() {
-    console.log('this.$route.params.pid', this.$route)
     this.search.deptId = this.$route.params?.pid || ''
     this.dialog.params.deptId = this.$route.params?.pid || ''
     // this.checkPassworLevel()

@@ -1,7 +1,7 @@
 <template>
   <div class="editEquipment-content">
     <div class="panel-header-box">
-      <div>
+      <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
           >编辑编码器设备</span
@@ -165,7 +165,7 @@
       </div>
       <div class="box-card1">
         <div class="clearfix1">
-          <svg-icon icon-class="pjqktj" class="pjqktj_svg" />
+          <svg-icon icon-class="csxx" class="pjqktj_svg" />
           <span>参数信息</span>
         </div>
         <div class="text item">
@@ -361,7 +361,6 @@ export default {
     }
   },
   created() {
-    console.log('this.$route.query.row', this.$route.query)
     const {
       model,
       username,
@@ -498,19 +497,20 @@ export default {
       ]).then(() => {
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
-
+        console.log(this.form)
+        console.log(this.$route.query)
         editEncoder({
           ...this.form,
           ...this.form1,
           deviceId:
             this.$route.query.back === '1'
-              ? this.$route.query.row.id
+              ? this.$route.query.row.deviceId
               : this.$route.query.row.originId,
           id:
             this.$route.query.back === '1'
               ? this.$route.query.row.id
-              : this.$route.query.row.deviceId
-          // onlineState: this.$route.query.row.onlineState
+              : this.$route.query.row.deviceId,
+          onlineState: this.$route.query.row.onlineState
         }).then((res) => {
           if (res.code === 0) {
             this.$message({
@@ -560,8 +560,8 @@ export default {
 .editEquipment-content {
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
+    border-top: 1px solid #eaeaea;
     width: 100%;
     height: 50px;
     line-height: 50px;
@@ -579,6 +579,13 @@ export default {
       font-size: 18px;
       font-family: Microsoft YaHei-Regular, Microsoft YaHei;
       font-weight: 400;
+    }
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
     }
   }
   .box-card {

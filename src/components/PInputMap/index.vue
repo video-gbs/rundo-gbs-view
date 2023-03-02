@@ -138,7 +138,6 @@ export default {
       if (this.value) {
         this.points = JSON.parse(this.value)
       }
-      console.log('initData', this.value, this.points)
     },
     submitForm() {
       if (this.inputMapType === 'polygon') {
@@ -231,7 +230,6 @@ export default {
       }
     },
     setCenter(data, zoom = 18) {
-      console.log('setCenter', data)
       let lng, lat
       switch (this.inputMapType) {
         case 'marker':
@@ -245,7 +243,6 @@ export default {
         default:
           break
       }
-      console.log({ lng, lat }, zoom)
       const center = { lng, lat }
       this.$refs.map.centerAndZoom({ center, zoom })
     }

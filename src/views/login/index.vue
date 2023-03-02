@@ -112,9 +112,6 @@
         </div>
       </div>
     </div>
-    <!-- <div class="wrap-footer">
-      <span>©2023 润建股份版权所有</span>
-    </div> -->
   </div>
 </template>
 

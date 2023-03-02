@@ -112,11 +112,9 @@ export default {
   watch: {
     value: {
       handler(n, o) {
-        console.log('value', n)
         if (!this.changeStatus) {
           this.initData()
         }
-        console.log(this.regionForm)
       },
       deep: true
     }
@@ -125,7 +123,6 @@ export default {
     this.initData()
   },
   mounted() {
-    console.log(this.value)
     // 默认省份为广西，不做选择
     if (!this.provinceDisabled) {
       this.getRegion(this.parentCode, 'province')
@@ -169,13 +166,11 @@ export default {
       for (const key in regionForm) {
         regions.push(regionForm[key].code)
       }
-      console.log(regions)
       this.changeStatus = true
       this.$emit('input', regions)
       this.changeStatus = false
     },
     provinceChange(val) {
-      console.log('provinceChange')
       this.setRegionName('province', val)
       if (this.regionForm.city.code) {
         this.regionForm.city.code = ''
@@ -185,7 +180,6 @@ export default {
       this.getRegion(val, 'city')
     },
     cityChange(val) {
-      console.log('cityChange')
       this.setRegionName('city', val)
       if (this.regionForm.district.code) {
         this.regionForm.district.code = ''
@@ -196,7 +190,6 @@ export default {
       this.getRegion(val, 'district')
     },
     districtChange(val) {
-      console.log('districtChange')
       this.setRegionName('district', val)
       this.regionChange()
     },

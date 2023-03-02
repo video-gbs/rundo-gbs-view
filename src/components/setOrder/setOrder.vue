@@ -40,7 +40,6 @@ export default {
   watch: {
     config: {
       handler: function (n) {
-        console.log('n', n)
         this.orderForm = n
       }
     }

@@ -1,13 +1,11 @@
 export default {
   methods: {
     handleSizeChange(v) {
-      console.log('v')
       this.params.size = v
       this.getList()
       // 执行搜索
     },
     paginationCurrentChange(v) {
-      console.log('v2')
       this.params.current = v
       this.getList()
       // 执行搜索

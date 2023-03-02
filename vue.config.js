@@ -52,7 +52,6 @@ function getProxys() {
       }
     }
   })
-  console.log('proxys', proxys)
   return proxys
 }
 

@@ -20,6 +20,7 @@
           :key="route.path"
           :item="route"
           :base-path="route.path"
+          class="left-menus"
         />
       </el-menu>
     </el-scrollbar>
@@ -52,7 +53,6 @@ export default {
   computed: {
     ...mapGetters(['sidebarRouter']),
     changeSidebarRouter() {
-      console.log(22, this.sidebarRouter)
       return this.sidebarRouter
     },
     routes() {
@@ -64,7 +64,6 @@ export default {
       if (meta.activeMenu) {
         return meta.activeMenu
       }
-      console.log('route~~~~~', route, path)
       return path
     },
     variables() {
@@ -75,25 +74,20 @@ export default {
     }
   },
   watch: {
-    changeSidebarRouter(newValue, oldValue) {
-      console.log(newValue, oldValue, 111111)
-    }
+    changeSidebarRouter(newValue, oldValue) {}
   },
 
   mounted() {
     this.select(this.$route.path)
     this.myRouter = Object.assign([], this.sidebarRouter)
-    console.log(this.myRouter)
     const ut = localStorage.getItem('rj_deptType') || 9999
     this.setHide(this.myRouter, ut * 1)
-    // console.log("routes`~~~~~~~~~~~``", this.myRouter);
   },
   methods: {
     setHide(v, ut) {
       v.forEach((i) => {
         if (i.author !== null && i.author !== undefined) {
           this.$set(i, 'authorHidden', false)
-          // console.log(i.author, ut, i.author.includes(ut));
           !i.author.includes(ut) && this.$set(i, 'authorHidden', true)
         }
         if (i.children && i.children.length) {
@@ -116,6 +110,13 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+::v-deep .left-menus {
+  .el-menu-item {
+    > span {
+      margin-left: 30px;
+    }
+  }
+}
 .bottom-logo {
   position: absolute;
   height: 62px;

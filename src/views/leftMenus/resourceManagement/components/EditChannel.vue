@@ -1,7 +1,7 @@
 <template>
   <div class="editChannel-content">
     <div class="panel-header-box">
-      <div>
+      <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
           >编辑通道设备</span
@@ -43,7 +43,7 @@
                   style="width: 436px"
                 >
                   <el-option
-                    v-for="o in allNorthTypeOptions"
+                    v-for="o in channelTypeOptions"
                     :label="o.label"
                     :value="o.value"
                     :key="o.value"
@@ -232,7 +232,7 @@ export default {
         children: 'children',
         label: 'areaName'
       },
-      allNorthTypeOptions: [],
+      channelTypeOptions: [],
       towardTypeOptions: [],
       appearanceTypeOptions: [],
       rules: {
@@ -258,7 +258,6 @@ export default {
     }
   },
   created() {
-    console.log('this.$route.query.row', this.$route.query)
     const {
       channelCode,
       channelName,
@@ -289,9 +288,9 @@ export default {
   },
   mounted() {
     this.init()
-    this.getAllNorthLists()
-    this.getManufacturerDictionaryList()
-    this.getManufacturerDictionaryList1()
+    this.getTowardTypeOptionsList()
+    this.getAppearanceTypeOptionsList()
+    this.getChannelTypeList()
   },
   methods: {
     getTreeName(arr, id) {
@@ -322,7 +321,7 @@ export default {
           console.log(error)
         })
     },
-    async getManufacturerDictionaryList() {
+    async getTowardTypeOptionsList() {
       await getManufacturerDictionaryList('Toward').then((res) => {
         if (res.code === 0) {
           res.data.map((item) => {
@@ -334,7 +333,7 @@ export default {
         }
       })
     },
-    async getManufacturerDictionaryList1() {
+    async getAppearanceTypeOptionsList() {
       await getManufacturerDictionaryList('Appearance').then((res) => {
         if (res.code === 0) {
           res.data.map((item) => {
@@ -346,14 +345,14 @@ export default {
         }
       })
     },
-    async getAllNorthLists() {
-      await getAllNorthLists().then((res) => {
+    async getChannelTypeList() {
+      await getManufacturerDictionaryList('ChannelType').then((res) => {
         if (res.code === 0) {
           res.data.map((item) => {
-            let obj = {}
-            obj.label = item.name
-            obj.value = item.dispatchId
-            this.allNorthTypeOptions.push(obj)
+            let obj1 = {}
+            obj1.label = item.itemName
+            obj1.value = item.itemValue
+            this.channelTypeOptions.push(obj1)
           })
         }
       })
@@ -420,7 +419,7 @@ export default {
   .panel-header-box {
     margin: 0;
     padding: 0 20px;
-    border: 1px solid #eaeaea;
+    border-top: 1px solid #eaeaea;
     width: 100%;
     height: 50px;
     line-height: 50px;
@@ -438,6 +437,13 @@ export default {
       font-size: 18px;
       font-family: Microsoft YaHei-Regular, Microsoft YaHei;
       font-weight: 400;
+    }
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
     }
   }
   .box-card {
