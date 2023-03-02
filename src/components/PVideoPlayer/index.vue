@@ -76,14 +76,13 @@ export default {
   },
   methods: {
     onPlayer({ src }) {
-      console.log(src)
       this.player.src(src)
     },
     onPlayerPlay(e) {
-      console.log(e)
+      // console.log(e)
     },
     onPlayerPause(e) {
-      console.log(e)
+      // console.log(e)
     }
   }
 }

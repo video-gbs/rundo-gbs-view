@@ -33,7 +33,6 @@
             highlight-current
             node-key="id"
             default-expand-all
-            @node-click="handleNodeClick"
             @node-drop="handleDrop"
             draggable
             :allow-drag="allowDrag"
@@ -117,9 +116,7 @@ export default {
       this.$refs.tree.filter(val)
     }
   },
-  mounted() {
-    console.log(this.$props.treeData)
-  },
+  mounted() {},
   methods: {
     handleClose(done) {
       done()

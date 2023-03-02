@@ -45,7 +45,6 @@ export default {
   watch: {
     value: {
       handler(n, o) {
-        console.log('value', n)
         if (this.changeForm) {
           this.inputVal = n
         }

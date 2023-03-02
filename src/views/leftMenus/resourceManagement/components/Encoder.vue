@@ -47,12 +47,17 @@
             clearable
           ></el-input>
         </el-form-item>
-        <el-form-item style="float: right; margin-right: 20px">
+        <el-form-item
+          style="float: right; margin-right: 20px"
+          class="form-btn-list"
+        >
           <el-button @click="resetData"
-            ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
+            ><svg-icon class="svg-btn" icon-class="cz" />
+            <span class="btn-span">重置</span></el-button
           >
           <el-button type="primary" @click="cxData"
-            ><svg-icon class="svg-btn" icon-class="cx" />查询</el-button
+            ><svg-icon class="svg-btn" icon-class="cx" />
+            <span class="btn-span">搜索</span></el-button
           >
         </el-form-item>
       </el-form>
@@ -64,17 +69,21 @@
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deteleAll()"
-            ><svg-icon class="svg-btn" icon-class="del" />批量删除</el-button
+          <el-button @click="deteleAll()" style="width: 100px"
+            ><svg-icon class="svg-btn" icon-class="del" />
+            <span class="btn-span">批量删除</span></el-button
           >
           <el-button @click="moveEquipment"
-            ><svg-icon class="svg-btn" icon-class="move" />移动</el-button
+            ><svg-icon class="svg-btn" icon-class="move" />
+            <span class="btn-span">移动</span></el-button
           >
-          <el-button @click="goRegistrationList"
-            ><svg-icon class="svg-btn" icon-class="move" />待注册列表</el-button
+          <el-button @click="goRegistrationList" style="width: 120px"
+            ><svg-icon class="svg-btn" icon-class="move" />
+            <span class="btn-span">待注册列表</span></el-button
           >
           <el-button type="primary" @click="addEquipment"
-            ><svg-icon class="svg-btn" icon-class="add" />新增</el-button
+            ><svg-icon class="svg-btn" icon-class="add" />
+            <span class="btn-span">新增</span></el-button
           >
         </div>
       </div>
@@ -118,7 +127,7 @@
         />
 
         <el-table-column prop="port" label="端口" width="80" />
-        <el-table-column prop="manufacturer" label="设备厂家" width="80" />
+        <el-table-column prop="manufacturer" label="设备厂家" width="100" />
         <el-table-column prop="onlineState" label="状态" width="80">
           <template slot-scope="scope">
             <span
@@ -394,7 +403,6 @@ export default {
         videoAreaId: orgId ? orgId : 1,
         ...this.searchParams
       }).then((res) => {
-        console.log('res', res)
         if (res.code === 0) {
           this.tableData = res.data.records
           this.params.total = res.data.total
@@ -405,9 +413,11 @@ export default {
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
+      this.getList()
     },
     currentChange(proCount) {
       this.params.proCount = proCount
+      this.getList()
     },
     synchronizationData() {
       this.$router.push(`/activeDiscovery/transfer`)
@@ -436,7 +446,6 @@ export default {
         this.$refs.encoderTable.selection.map((item) => {
           roleIds.push(item.id)
         })
-        console.log('roleIds', roleIds)
         deleteEncoders(roleIds).then((res) => {
           if (res.code === 0) {
             this.$message({
@@ -526,6 +535,22 @@ export default {
       }
       .btn-lists {
         float: right;
+        .btn-span {
+          position: relative;
+          top: -2px;
+          font-size: 14px;
+          font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+          font-weight: 400;
+        }
+        .svg-btn {
+          position: relative;
+          top: -1px;
+          left: -6px;
+        }
+        .el-button {
+          width: 80px;
+          height: 32px;
+        }
       }
     }
     .table-content-bottom {
@@ -556,6 +581,20 @@ export default {
     margin: 10px;
     // background: #ffffff;
     // box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+  }
+}
+.form-btn-list {
+  .btn-span {
+    position: relative;
+    top: -1px;
+    font-size: 14px;
+    font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+    font-weight: 400;
+  }
+  .svg-btn {
+    position: relative;
+    top: -1px;
+    left: -6px;
   }
 }
 .dialog-footer {

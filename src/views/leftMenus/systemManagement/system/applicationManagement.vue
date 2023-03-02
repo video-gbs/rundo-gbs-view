@@ -1,7 +1,7 @@
 <template>
   <div class="applicationManagement_container">
     <div class="panel-header-box">
-      <div>应用管理</div>
+      <div class="panel-header-box-border">应用管理</div>
     </div>
 
     <div class="search">
@@ -29,12 +29,17 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item style="float: right; margin-right: 20px">
+        <el-form-item
+          style="float: right; margin-right: 20px"
+          class="form-btn-list"
+        >
           <el-button @click="resetData"
-            ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
+            ><svg-icon class="svg-btn" icon-class="cz" />
+            <span class="btn-span">重置</span></el-button
           >
           <el-button type="primary" @click="cxData"
-            ><svg-icon class="svg-btn" icon-class="cx" />搜索</el-button
+            ><svg-icon class="svg-btn" icon-class="cx" />
+            <span class="btn-span">搜索</span></el-button
           >
         </el-form-item>
       </el-form>
@@ -43,13 +48,15 @@
       <div class="securityArea_container">
         <div class="btn-lists">
           <el-button type="primary" @click="dialogShow(1)"
-            ><svg-icon class="svg-btn" icon-class="add" />新建</el-button
+            ><svg-icon class="svg-btn" icon-class="add" />
+            <span class="btn-span">新建</span></el-button
           >
         </div>
       </div>
       <el-table
         :data="tableData"
         style="width: 100%"
+        class="applicationManagement-table"
         border
         :header-cell-style="{
           background: 'rgba(0, 75, 173, 0.06)',
@@ -78,7 +85,7 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column width="200" label="操作" fixed="right">
+        <el-table-column width="200" label="操作">
           <template slot-scope="scope">
             <el-button type="text" @click="dialogShow(0, scope.row)"
               >编辑</el-button
@@ -366,7 +373,6 @@ export default {
       })
     },
     dialogShow(act, data) {
-      console.log(11111, act, data)
       if (act === 0) {
         const { appName, appPort, status, appDesc, appIp } = data
         this.dialog.params.appPort = appPort
@@ -517,22 +523,50 @@ export default {
 ::v-deep .el-dialog__footer {
   border-top: 1px solid #eaeaea;
 }
-// ::v-deep .el-switch__label--left>span{
-//   position: relative;
-//   top:0;
-//   left: 30px;
-// }
+// 滚动条大小设置
+::v-deep .applicationManagement-table::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+
+// 滚动条滑块样式设置
+::v-deep .applicationManagement-table::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .applicationManagement-table::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .applicationManagement-table::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
+}
 .applicationManagement_container {
   width: 100%;
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
     width: 100%;
     height: 50px;
     line-height: 50px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
+    }
   }
 
   .search {
@@ -552,11 +586,34 @@ export default {
     margin: 20px;
     padding: 20px;
     background: #ffffff;
+    height: calc(100% - 210px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
+    .applicationManagement-table {
+      height: calc(100% - 100px);
+      overflow-y: auto;
+    }
     .securityArea_container {
       margin-bottom: 20px;
+      .btn-lists {
+        .btn-span {
+          position: relative;
+          top: -2px;
+          font-size: 14px;
+          font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+          font-weight: 400;
+        }
+        .svg-btn {
+          position: relative;
+          top: -1px;
+          left: -6px;
+        }
+        .el-button {
+          width: 80px;
+          height: 32px;
+        }
+      }
     }
   }
 }
@@ -591,12 +648,20 @@ export default {
     }
   }
 }
-
-// ::v-deep .el-form-item__content {
-//   // height: 28px;
-//   display: flex;
-//   align-items: center;
-// }
+.form-btn-list {
+  .btn-span {
+    position: relative;
+    top: -1px;
+    font-size: 14px;
+    font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+    font-weight: 400;
+  }
+  .svg-btn {
+    position: relative;
+    top: -1px;
+    left: -6px;
+  }
+}
 .delete-button {
   color: red !important;
 }

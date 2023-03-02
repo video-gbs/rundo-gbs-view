@@ -1,7 +1,7 @@
 <template>
   <div class="userAdd-content">
     <div class="panel-header-box">
-      <div>
+      <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" />
         <span class="back-title">新建用户</span>
       </div>
@@ -108,7 +108,7 @@
       </div>
       <div class="box-card1">
         <div class="clearfix1">
-          <svg-icon icon-class="pjqktj" class="pjqktj_svg" />
+          <svg-icon icon-class="xxxx" class="pjqktj_svg" />
           <span>详细信息</span>
         </div>
         <div class="text item">
@@ -120,7 +120,11 @@
           >
             <el-row>
               <el-col :span="12">
-                <el-form-item prop="desc" label="用户工号">
+                <el-form-item
+                  prop="desc"
+                  label="用户工号"
+                  style="margin-left: 35px"
+                >
                   <el-input
                     v-model="form1.jobNo"
                     style="width: 436px"
@@ -128,7 +132,11 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item prop="desc" label="手机号码">
+                <el-form-item
+                  prop="desc"
+                  label="手机号码"
+                  style="margin-left: 10px"
+                >
                   <el-input
                     v-model="form1.phone"
                     style="width: 436px"
@@ -138,7 +146,11 @@
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item prop="desc" label="地址">
+                <el-form-item
+                  prop="desc"
+                  label="地址"
+                  style="margin-left: 35px"
+                >
                   <el-input
                     v-model="form1.address"
                     style="width: 436px"
@@ -146,7 +158,11 @@
                 </el-form-item>
               </el-col>
               <el-col :span="10">
-                <el-form-item prop="desc" label="描述">
+                <el-form-item
+                  prop="desc"
+                  label="描述"
+                  style="margin-left: 10px"
+                >
                   <el-input
                     v-model="form1.description"
                     type="textarea"
@@ -161,7 +177,7 @@
       </div>
       <div class="box-card-last">
         <div slot="header" class="clearfix">
-          <svg-icon icon-class="pjqktj" class="pjqktj_svg" />
+          <svg-icon icon-class="yhxx" class="pjqktj_svg" />
           <span>角色</span>
         </div>
         <div class="last-table">
@@ -383,14 +399,9 @@ export default {
         }
         this.form.orgId = this.Id
         const roleIds = []
-        console.log(
-          'this.$refs.userTable.selection',
-          this.$refs.userTable.selection
-        )
         this.$refs.userTable.selection.map((item) => {
           roleIds.push(item.id)
         })
-        console.log('roleIds', roleIds)
         addUser({ roleIds, ...this.form, ...this.form1 }).then((res) => {
           if (res.code === 0) {
             this.$message({
@@ -448,8 +459,8 @@ export default {
 .userAdd-content {
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
+    border-top: 1px solid #eaeaea;
     width: 100%;
     height: 50px;
     line-height: 50px;
@@ -468,10 +479,17 @@ export default {
       font-family: Microsoft YaHei-Regular, Microsoft YaHei;
       font-weight: 400;
     }
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
+    }
   }
   .box-card {
     margin: 20px 20px 0 20px;
-    height: calc(100% - 86px);
+    height: calc(100% - 110px);
     overflow-y: auto;
 
     .clearfix {

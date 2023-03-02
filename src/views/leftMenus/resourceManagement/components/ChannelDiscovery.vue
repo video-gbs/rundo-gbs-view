@@ -1,7 +1,7 @@
 <template>
   <div class="activeDiscovery-content">
     <div class="panel-header-box">
-      <div>
+      <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
           >添加通道</span
@@ -311,7 +311,6 @@ export default {
         })
         return
       } else {
-        console.log(111111, this.channelId.length)
         if (this.channelId === '' && this.channelId.length === 0) {
           this.$notify({
             title: '提示',
@@ -325,14 +324,12 @@ export default {
         let selectList = JSON.parse(
           JSON.stringify(this.$refs.tableLeft.selection)
         )
-        console.log('selectList~~~~~~~~', selectList)
         selectList.forEach((item) => {
           let index = this.tableData.findIndex((_item) => _item.id === item.id)
           if (index !== undefined) {
             this.tableData.splice(index, 1)
           }
         })
-        console.log('this.tableData~~~~~~~~', this.tableData)
         let channelList = []
         selectList.map((item) => {
           channelList.push({
@@ -343,7 +340,6 @@ export default {
             onlineState: item.onlineState
           })
         })
-        console.log('channelList', channelList)
         addChannel({ channelList, videoAreaId: this.channelId }).then((res) => {
           if (res.code === 0) {
             this.$message({
@@ -478,7 +474,7 @@ export default {
   .panel-header-box {
     margin: 0;
     padding: 0 20px;
-    border: 1px solid #eaeaea;
+    border-top: 1px solid #eaeaea;
     width: 100%;
     height: 50px;
     line-height: 50px;
@@ -497,12 +493,19 @@ export default {
       font-family: Microsoft YaHei-Regular, Microsoft YaHei;
       font-weight: 400;
     }
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
+    }
   }
 
   .activeDiscovery-transfer {
     // display: flex;
     // justify-content: space-between;
-    height: 90%;
+    height: calc(100% - 106px);
     margin: 20px 20px 0 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);

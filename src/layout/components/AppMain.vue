@@ -98,7 +98,7 @@ export default {
   font-family: Microsoft YaHei-Regular, Microsoft YaHei;
   font-weight: 400;
   color: #8b8b8b;
-  bottom: 10px;
+  bottom: -5px;
   left: 0;
   width: 100%;
 }

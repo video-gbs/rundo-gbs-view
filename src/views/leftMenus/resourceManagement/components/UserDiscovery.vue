@@ -1,7 +1,7 @@
 <template>
   <div class="activeDiscovery-content">
     <div class="panel-header-box">
-      <div>
+      <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
           >关联用户</span
@@ -446,7 +446,6 @@ export default {
           userIdList.push(item.id)
         })
 
-        console.log('userIdList', userIdList)
         addRelationLists({
           userIdList,
           roleId: this.$router.currentRoute.query.key
@@ -494,7 +493,6 @@ export default {
         selectRightList.map((item) => {
           userIdList1.push(item.id)
         })
-        console.log('userIdList1', userIdList1)
 
         removeRelationLists({
           userIdList: userIdList1,
@@ -638,8 +636,8 @@ export default {
 .activeDiscovery-content {
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
+    border-top: 1px solid #eaeaea;
     width: 100%;
     height: 50px;
     line-height: 50px;
@@ -657,6 +655,13 @@ export default {
       font-size: 18px;
       font-family: Microsoft YaHei-Regular, Microsoft YaHei;
       font-weight: 400;
+    }
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
     }
   }
 

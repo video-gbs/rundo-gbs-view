@@ -1,13 +1,12 @@
 <template>
   <el-breadcrumb class="app-breadcrumb" separator="/">
     <transition-group name="breadcrumb">
-      <el-breadcrumb-item v-for="(item, index) in levelList" :key="item.path">
-        <span
-          v-if="item.redirect === 'noRedirect' || index == levelList.length - 1"
-          class="no-redirect"
-          >{{ item.meta.title }}</span
-        >
-        <a v-else @click.prevent="handleLink(item)">{{ item.meta.title }}</a>
+      <el-breadcrumb-item v-for="item in levelList" :key="item.path">
+        <!-- <span v-if="item.redirect === 'noRedirect'" class="no-redirect">{{
+          item.meta.title
+        }}</span> -->
+        <!--  -->
+        <a @click.prevent="handleLink(item)">{{ item.meta.title }}</a>
       </el-breadcrumb-item>
     </transition-group>
   </el-breadcrumb>
@@ -32,21 +31,16 @@ export default {
   },
   methods: {
     getBreadcrumb() {
-      // only show routes with meta.title
+      console.log('this.$route', this.$route)
       let matched = this.$route.matched.filter(
         (item) => item.meta && item.meta.title
       )
       const first = matched[0]
-
-      // if (!this.isDashboard(first)) {
-      //   matched = [{ path: "/workTable", meta: { title: "问政管理" } }].concat(
-      //     matched
-      //   );
-      // }
-
+      console.log('matched', matched)
       this.levelList = matched.filter(
         (item) => item.meta && item.meta.title && item.meta.breadcrumb !== false
       )
+      console.log('this.levelList', this.levelList)
     },
     isDashboard(route) {
       const name = route && route.name
@@ -96,7 +90,10 @@ export default {
   font-size: 14px;
   line-height: 50px;
   text-align: center;
-  margin-left: 8px;
+  padding-left: 8px;
+  background: #ffffff;
+  box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
+  // border: 1px solid #eaeaea;
 
   .no-redirect {
     color: #97a8be;

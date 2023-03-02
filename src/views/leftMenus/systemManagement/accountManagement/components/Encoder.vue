@@ -18,12 +18,17 @@
         <el-form-item label="用户姓名:">
           <el-input v-model="searchParams.userName" clearable :maxlength="15" />
         </el-form-item>
-        <el-form-item style="float: right; margin-right: 20px">
+        <el-form-item
+          style="float: right; margin-right: 20px"
+          class="form-btn-list"
+        >
           <el-button @click="resetData"
-            ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
+            ><svg-icon class="svg-btn" icon-class="cz" />
+            <span class="btn-span">重置</span></el-button
           >
           <el-button type="primary" @click="cxData"
-            ><svg-icon class="svg-btn" icon-class="cx" />查询</el-button
+            ><svg-icon class="svg-btn" icon-class="cx" />
+            <span class="btn-span">重置</span></el-button
           >
         </el-form-item>
       </el-form>
@@ -35,11 +40,13 @@
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deteleAll()"
-            ><svg-icon class="svg-btn" icon-class="del" />批量删除</el-button
+          <el-button @click="deteleAll()" style="width: 100px"
+            ><svg-icon class="svg-btn" icon-class="del" />
+            <span class="btn-span">批量删除</span></el-button
           >
           <el-button type="primary" @click="addEquipment"
-            ><svg-icon class="svg-btn" icon-class="add" />新增</el-button
+            ><svg-icon class="svg-btn" icon-class="add" />
+            <span class="btn-span">新增</span></el-button
           >
         </div>
       </div>
@@ -566,6 +573,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+// 滚动条大小设置
+::v-deep .table-content-bottom::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+
+// 滚动条滑块样式设置
+::v-deep .table-content-bottom::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .table-content-bottom::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .table-content-bottom::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
+}
+
 ::v-deep .el-dialog__body {
   padding-bottom: 0;
 }
@@ -575,6 +610,7 @@ export default {
 }
 
 .encoder-content {
+  height: 100%;
   .search {
     width: 100%;
     height: 80px;
@@ -590,6 +626,7 @@ export default {
     }
   }
   .table-content {
+    height: calc(100% - 104px);
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
@@ -601,12 +638,31 @@ export default {
       }
       .btn-lists {
         float: right;
+        .btn-span {
+          position: relative;
+          top: -2px;
+          font-size: 14px;
+          font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+          font-weight: 400;
+        }
+        .svg-btn {
+          position: relative;
+          top: -1px;
+          left: -6px;
+        }
+        .el-button {
+          width: 80px;
+          height: 32px;
+        }
       }
     }
     .table-content-bottom {
       // padding: 0 18px;
+      max-height: calc(100% - 154px);
+      overflow-y: auto;
     }
   }
+
   .delete-button {
     color: red !important;
   }
@@ -631,6 +687,21 @@ export default {
     margin: 10px;
     // background: #ffffff;
     // box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.form-btn-list {
+  .btn-span {
+    position: relative;
+    top: -1px;
+    font-size: 14px;
+    font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+    font-weight: 400;
+  }
+  .svg-btn {
+    position: relative;
+    top: -1px;
+    left: -6px;
   }
 }
 .dialog-footer {

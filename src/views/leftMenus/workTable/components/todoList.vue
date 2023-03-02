@@ -157,15 +157,9 @@ export default {
   },
   methods: {
     init() {
-      console.log(this.noticeList, this.noticeList1)
       // 判断哪些账号类型可以显示哪些处理模块
       this.userDeptType = +(localStorage.getItem('rj_deptType') || 123)
 
-      console.log(
-        'this.userDeptType',
-        this.userDeptType,
-        typeof this.userDeptType
-      )
       this.noticeList.forEach((i) => {
         i.author.includes(this.userDeptType) && this.nl.push(i)
       })

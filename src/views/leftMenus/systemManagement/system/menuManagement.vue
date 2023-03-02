@@ -1,7 +1,7 @@
 <template>
   <div class="menuManagement_container">
     <div class="panel-header-box">
-      <div>菜单管理</div>
+      <div class="panel-header-box-border">菜单管理</div>
     </div>
 
     <div class="search">
@@ -29,12 +29,17 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item style="float: right; margin-right: 20px">
+        <el-form-item
+          style="float: right; margin-right: 20px"
+          class="form-btn-list"
+        >
           <el-button @click="resetData"
-            ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
+            ><svg-icon class="svg-btn" icon-class="cz" />
+            <span class="btn-span">重置</span></el-button
           >
           <el-button type="primary" @click="cxData"
-            ><svg-icon class="svg-btn" icon-class="cx" />搜索</el-button
+            ><svg-icon class="svg-btn" icon-class="cx" />
+            <span class="btn-span">搜索</span></el-button
           >
         </el-form-item>
       </el-form>
@@ -43,15 +48,17 @@
       <div class="securityArea_container">
         <div class="btn-lists">
           <el-button type="primary" @click="dialogShow(1)"
-            ><svg-icon class="svg-btn" icon-class="add" />新建</el-button
+            ><svg-icon class="svg-btn" icon-class="add" /><span class="btn-span"
+              >新建</span
+            ></el-button
           >
         </div>
       </div>
       <el-table
         :data="tableData"
-        style="height: 100%; width: 100%"
         border
         row-key="id"
+        class="menuManagement-table"
         height="700"
         :tree-props="{ children: 'children' }"
         :header-cell-style="{
@@ -311,13 +318,11 @@ export default {
       }
     },
     nodeClickHandle(data) {
-      console.log('data', data)
       this.dialogForm.params.menuPid = data.title
       this.Id = data.id
       this.$refs.selectTree.blur()
     },
     changeSwitch(row) {
-      console.log(row)
       let text = row.status === 0 ? '启用' : '停用'
 
       this.$confirm('确认要"' + text + '""' + row.title + '"吗?', '警告', {
@@ -336,7 +341,6 @@ export default {
         })
     },
     changeSwitchHidden(row) {
-      console.log(row)
       let text = row.hidden === 0 ? '显示' : '隐藏'
 
       this.$confirm('确认要"' + text + '""' + row.title + '"吗?', '警告', {
@@ -363,7 +367,6 @@ export default {
       })
     },
     dialogShow(type, row) {
-      console.log('rw~~~~~~~~~~~~~~', typeof type, row)
       this.applicationOption = []
       this.isDisabled = true
       getApplicationList().then((res) => {
@@ -493,6 +496,29 @@ export default {
   overflow: auto;
 }
 
+::v-deep .menuManagement-table::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+
+// 滚动条滑块样式设置
+::v-deep .menuManagement-table::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .menuManagement-table::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .menuManagement-table::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+
 // 滚动条大小设置
 ::v-deep .el-table__body-wrapper::-webkit-scrollbar {
   /*纵向滚动条*/
@@ -540,13 +566,19 @@ export default {
   width: 100%;
   .panel-header-box {
     margin: 0;
-    padding: 0 20px;
-    border: 1px solid #eaeaea;
+    padding: 0 16px;
     width: 100%;
     height: 50px;
     line-height: 50px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+    .panel-header-box-border {
+      border-top: 1px solid #eaeaea;
+      font-size: 18px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #011f53;
+    }
   }
   .params-form {
     .el-input,
@@ -579,11 +611,34 @@ export default {
     margin: 20px;
     padding: 20px;
     background: #ffffff;
+    height: calc(100% - 210px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
+    .menuManagement-table {
+      height: calc(100% - 100px);
+      overflow-y: auto;
+    }
     .securityArea_container {
       margin-bottom: 20px;
+      .btn-lists {
+        .btn-span {
+          position: relative;
+          top: -2px;
+          font-size: 14px;
+          font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+          font-weight: 400;
+        }
+        .svg-btn {
+          position: relative;
+          top: -1px;
+          left: -6px;
+        }
+        .el-button {
+          width: 80px;
+          height: 32px;
+        }
+      }
     }
   }
 }
@@ -618,12 +673,20 @@ export default {
     }
   }
 }
-
-// ::v-deep .el-form-item__content {
-//   // height: 28px;
-//   display: flex;
-//   align-items: center;
-// }
+.form-btn-list {
+  .btn-span {
+    position: relative;
+    top: -1px;
+    font-size: 14px;
+    font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+    font-weight: 400;
+  }
+  .svg-btn {
+    position: relative;
+    top: -1px;
+    left: -6px;
+  }
+}
 .delete-button {
   color: red !important;
 }

@@ -333,7 +333,7 @@ export default {
           })
           this.appTypeRouter = homeRouters.concat(this.appTypeRouter)
 
-          console.log('this.appTypeRouter', this.appTypeRouter)
+          // console.log('this.appTypeRouter', this.appTypeRouter)
         } else {
           data.map((item4) => {
             let params1 = {}
@@ -341,6 +341,7 @@ export default {
               path: item4.path,
               meta: item4.meta,
               name: item4.name,
+              redirect: item4.redirect,
               component: (resolve) =>
                 require([`@/views${item4.component}`], resolve)
             }
@@ -392,7 +393,7 @@ export default {
                 this.sideBarRouterList1
               )
 
-              console.log(1, this.sideBarRouterList1)
+              // console.log(1, this.sideBarRouterList1)
               this.$router.push({ path: this.sideBarRouterList1[0].path })
               break
             case '/systemManagement':
@@ -422,7 +423,7 @@ export default {
                 'user/changeSidebarRouter',
                 this.sideBarRouterList2
               )
-              console.log(2, this.sideBarRouterList2)
+              // console.log(2, this.sideBarRouterList2)
               this.$router.push({ path: this.sideBarRouterList2[0].path })
               break
             case '/moduleManageMent':
@@ -453,7 +454,7 @@ export default {
                 this.sideBarRouterList3
               )
 
-              console.log(3, this.sideBarRouterList3)
+              // console.log(3, this.sideBarRouterList3)
               this.$router.push({ path: this.sideBarRouterList3[0].path })
               break
             default:
@@ -461,12 +462,6 @@ export default {
           }
           if (val === 3) {
             this.systemTypeRouter = homeRouters.concat(this.systemTypeRouter)
-
-            console.log(
-              'this.systemTypeRouter',
-              this.systemTypeRouter,
-              this.sideBarRouterList
-            )
             store.dispatch(
               'user/changeActiveIndex',
               this.systemTypeRouter[1].path
@@ -474,7 +469,7 @@ export default {
             store.dispatch('user/changeSidebarRouter', this.sideBarRouterList)
           } else {
             this.configTypeRouter = homeRouters.concat(this.configTypeRouter)
-            console.log('this.configTypeRouter', this.configTypeRouter)
+            // console.log('this.configTypeRouter', this.configTypeRouter)
           }
         }
       }
@@ -526,7 +521,6 @@ export default {
           })
           break
         case '配置':
-          console.log(111111111, item)
           Local.set('tree_type', 2)
           getTypeTreeMenus(2).then((res3) => {
             if (res3.code === 0) {
