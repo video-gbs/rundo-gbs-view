@@ -303,20 +303,16 @@ export default {
     },
     save() {
       if (this.$refs.tableLeft.selection.length === 0) {
-        this.$notify({
-          title: '提示',
+        this.$message({
           message: '请选择通道',
-          type: 'warning',
-          duration: 2000
+          type: 'warning'
         })
         return
       } else {
         if (this.channelId === '' && this.channelId.length === 0) {
-          this.$notify({
-            title: '提示',
+          this.$message({
             message: '请选择节点',
-            type: 'warning',
-            duration: 2000
+            type: 'warning'
           })
           return
         }

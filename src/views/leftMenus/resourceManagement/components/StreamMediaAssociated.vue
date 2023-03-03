@@ -49,6 +49,7 @@
                   fontWeight: 'bold',
                   color: '#333333'
                 }"
+                @select="selectRows('left')"
               >
                 <el-table-column type="selection" width="80" align="center">
                 </el-table-column>
@@ -82,8 +83,16 @@
           </div>
           <!-- 中间按钮 -->
           <div class="vertical center3 centrebtn">
-            <svg-icon icon-class="right" class="right_svg" @click="Right" />
-            <svg-icon icon-class="left" class="left_svg" @click="Left" />
+            <svg-icon
+              :icon-class="isRightClicked ? 'unClickRight' : 'clickRight'"
+              class="right_svg"
+              @click="isRightClicked ? '' : Right()"
+            />
+            <svg-icon
+              :icon-class="isLeftClicked ? 'unClickLeft' : 'clickLeft'"
+              class="left_svg"
+              @click="isLeftClicked ? '' : Left()"
+            />
           </div>
           <!-- 右边框框 -->
           <div class="transferbox">
@@ -121,6 +130,7 @@
                   fontWeight: 'bold',
                   color: '#333333'
                 }"
+                @select="selectRows('right')"
               >
                 <el-table-column type="selection" width="80" align="center">
                 </el-table-column>
@@ -196,6 +206,8 @@ export default {
         pageSize: 10,
         total: 0
       },
+      isRightClicked: true,
+      isLeftClicked: true,
       rightSearchName: '',
       leftSearchName: '',
       checked: false,
@@ -296,14 +308,33 @@ export default {
       const res = new Map()
       return arr.filter((arr) => !res.has(arr.id) && res.set(arr.id, arr.id))
     },
+    selectRows(val) {
+      if (val === 'left') {
+        if (this.$refs.tableLeft.selection.length === 0) {
+          this.isRightClicked = true
+        } else {
+          this.isRightClicked = false
+        }
+      } else {
+        if (this.$refs.tableRight.selection.length === 0) {
+          this.isLeftClicked = true
+        } else {
+          this.isLeftClicked = false
+        }
+      }
+    },
     //左到右
     Right() {
       if (this.$refs.tableLeft.selection.length === 0) {
-        this.$notify({
-          title: '提示',
-          message: '请选择xxxxx',
-          type: 'success',
-          duration: 2000
+        // this.$notify({
+        //   title: '提示',
+        //   message: '',
+        //   type: 'warning',
+        //   duration: 2000
+        // })
+        this.$message({
+          message: '请勾选左边的模块',
+          type: 'warning'
         })
         return
       } else {
@@ -349,11 +380,9 @@ export default {
     //右到左
     Left() {
       if (this.$refs.tableRight.selection.length === 0) {
-        this.$notify({
-          title: '提示',
-          message: '请选择xxxxx',
-          type: 'success',
-          duration: 2000
+        this.$message({
+          message: '请勾选右边的模块',
+          type: 'warning'
         })
         return
       } else {

@@ -706,19 +706,15 @@ export default {
     // 查询视频
     handleSearch() {
       if (this.channelId === '' && this.channelId.length === 0) {
-        this.$notify({
-          title: '提示',
+        this.$message({
           message: '请选择节点',
-          type: 'warning',
-          duration: 2000
+          type: 'warning'
         })
         return
       } else if (this.formData.date === '' && this.formData.date.length === 0) {
-        this.$notify({
-          title: '提示',
+        this.$message({
           message: '请选择时间',
-          type: 'warning',
-          duration: 2000
+          type: 'warning'
         })
         return
       } else {
