@@ -278,8 +278,7 @@ export default {
             type: 'success',
             message: '编辑成功'
           })
-          this.init(res.data.id)
-          // this.getUnitDetailsData()
+          this.init(this.detailsId)
         }
       })
     },

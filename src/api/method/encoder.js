@@ -51,6 +51,11 @@ export function deleteDevice(id) {
   return request.delete(`${device}/device/north/delete/?deviceId=${id}`)
 }
 
+// 编码器同步
+export function syncChannel(id) {
+  return request.get(`${expansion}//channel/channelSync/?deviceId=${id}`)
+}
+
 // 代注册列表编辑
 // export function deleteDevice(id) {
 //   return request.delete(`${device}/device/north/delete/?deviceId=${id}`)

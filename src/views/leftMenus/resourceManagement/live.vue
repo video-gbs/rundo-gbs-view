@@ -54,6 +54,11 @@
                                   class="tree1"
                                 />
                                 <svg-icon
+                                  v-else
+                                  :icon-class="getIconType(data)"
+                                  class="tree2"
+                                />
+                                <!-- <svg-icon
                                   v-else-if="
                                     data.level === 2 ||
                                     data.level === 3 ||
@@ -66,7 +71,7 @@
                                   v-else
                                   icon-class="tree3"
                                   class="tree3"
-                                />
+                                /> -->
                                 {{ data.orgName || data.areaName }}
                               </span>
                             </span>
@@ -422,6 +427,70 @@ export default {
           console.log(error)
         })
     },
+    getIconType(data) {
+      console.log('data~~~~~~~~', data)
+      if (data.level) {
+        if (data.level === 2) {
+          return 'tree2'
+        } else {
+          return 'tree3'
+        }
+      } else {
+        switch (data.ptzType) {
+          case 1:
+            if (data.onlineState === 0) {
+              return 'qiangjilx'
+            } else {
+              return 'qiangjizx'
+            }
+            break
+          case 2:
+            if (data.onlineState === 0) {
+              return 'qjlx'
+            } else {
+              return 'qjzx'
+            }
+            break
+          case 3:
+            if (data.onlineState === 0) {
+              return 'bqlx'
+            } else {
+              return 'bqzx'
+            }
+            break
+          case 4:
+            if (data.onlineState === 0) {
+              return 'ytqjlx'
+            } else {
+              return 'ytqjzx'
+            }
+            break
+          case 5:
+            if (data.onlineState === 0) {
+              return 'arqjlx'
+            } else {
+              return 'arqjzx'
+            }
+            break
+          case 6:
+            if (data.onlineState === 0) {
+              return 'quanjinglx'
+            } else {
+              return 'quanjingzx'
+            }
+            break
+          case 7:
+            if (data.onlineState === 0) {
+              return 'qitalx'
+            } else {
+              return 'qitazx'
+            }
+            break
+          default:
+            break
+        }
+      }
+    },
     filterNode(value, data) {
       if (!value) return true
       // if (this.defaultPropsName === 'orgName') {
@@ -460,6 +529,7 @@ export default {
                       areaName: item.channelName,
                       areaNames: item.channelName,
                       areaPid: item.id,
+                      ptzType: item.ptzType,
                       children: []
                     })
                   })
@@ -475,6 +545,8 @@ export default {
                       : (obj[next.areaPid] = true && item.push(next))
                     return item
                   }, [])
+
+                  console.log('arr~~~~~~~~~~~~~~~', arr)
                   this.$refs.liveTree.updateKeyChildren(data.id, arr)
                   this.defaultExpandedKeys = [data.id]
                 }

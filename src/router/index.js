@@ -515,9 +515,18 @@ router.beforeEach(async (to, from, next) => {
                     configTypeRouter = configTypeRouter.concat([temp2])
                   }
 
+                  console.log(
+                    'sideBarRouterList1~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
+                    sideBarRouterList1
+                  )
+
                   store.dispatch('user/changeSidebarRouter', sideBarRouterList1)
-                  // store.dispatch('user/changeTypeRouter', homeRouters.concat(sideBarRouterList1))
-                  // this.$router.push({ path: sideBarRouterList1[0].path })
+                  store.dispatch(
+                    'user/changeTypeRouter',
+                    homeRouters.concat(configTypeRouter)
+                  )
+                  // store.dispatch('user/changeActiveIndex', configTypeRouter[0].path)
+                  // router.push({ path: sideBarRouterList1[0].path })
                   break
                 case '/systemManagement':
                   if (item2.children && item2.children.length > 0) {
@@ -549,9 +558,18 @@ router.beforeEach(async (to, from, next) => {
                     configTypeRouter = configTypeRouter.concat([temp3])
                   }
 
+                  console.log(
+                    'sideBarRouterList2~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
+                    sideBarRouterList2
+                  )
+
                   store.dispatch('user/changeSidebarRouter', sideBarRouterList2)
-                  // store.dispatch('user/changeTypeRouter', homeRouters.concat(sideBarRouterList2))
-                  // this.$router.push({ path: sideBarRouterList2[0].path })
+                  store.dispatch(
+                    'user/changeTypeRouter',
+                    homeRouters.concat(configTypeRouter)
+                  )
+                  // store.dispatch('user/changeActiveIndex', configTypeRouter[1].path)
+                  // router.push({ path: sideBarRouterList2[0].path })
                   break
                 case '/moduleManageMent':
                   if (item2.children && item2.children.length > 0) {
@@ -583,11 +601,20 @@ router.beforeEach(async (to, from, next) => {
                     configTypeRouter = configTypeRouter.concat([temp4])
                   }
 
+                  console.log(
+                    'sideBarRouterList3~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
+                    sideBarRouterList3
+                  )
+
                   store.dispatch('user/changeSidebarRouter', sideBarRouterList3)
 
-                  // store.dispatch('user/changeTypeRouter', homeRouters.concat(sideBarRouterList3))
+                  store.dispatch(
+                    'user/changeTypeRouter',
+                    homeRouters.concat(configTypeRouter)
+                  )
 
-                  // this.$router.push({ path: sideBarRouterList3[0].path })
+                  // store.dispatch('user/changeActiveIndex', configTypeRouter[2].path)
+                  // router.push({ path: sideBarRouterList3[0].path })
                   break
                 default:
                   break
@@ -595,14 +622,14 @@ router.beforeEach(async (to, from, next) => {
             })
 
             console.log('最终的路由值', configTypeRouter)
-            store.dispatch(
-              'user/changeTypeRouter',
-              homeRouters.concat(configTypeRouter)
-            )
-            store.dispatch('user/changeActiveIndex', configTypeRouter[0].path)
+            // store.dispatch(
+            //   'user/changeTypeRouter',
+            //   homeRouters.concat(configTypeRouter)
+            // )
+
             // store.dispatch('user/dynamicRouters', configTypeRouter)
             store.dispatch('user/changeShowSidebar', true)
-            // store.dispatch('user/changeActiveIndex', configTypeRouter[1].path)
+            store.dispatch('user/changeActiveIndex', configTypeRouter[0].path)
           }
           console.log('刷新后的最终路由', router)
 

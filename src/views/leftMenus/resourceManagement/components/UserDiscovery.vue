@@ -39,7 +39,7 @@
             <div class="contont">
               <el-table
                 ref="tableLeft"
-                class="table-content-bottom"
+                class="left-table user-table"
                 :data="leftTableData"
                 border
                 :header-cell-style="{
@@ -49,6 +49,7 @@
                   fontWeight: 'bold',
                   color: '#333333'
                 }"
+                @select="selectRows('left')"
               >
                 <el-table-column type="selection" width="80" align="center">
                 </el-table-column>
@@ -70,12 +71,7 @@
                   :show-overflow-tooltip="true"
                 />
                 <el-table-column prop="orgName;" label="所属部门" width="240" />
-                <el-table-column
-                  width="80"
-                  label="操作"
-                  fixed="right"
-                  align="center"
-                >
+                <el-table-column width="80" label="操作" align="center">
                   <template slot-scope="scope">
                     <el-button
                       type="text"
@@ -94,9 +90,21 @@
             </div>
           </div>
           <!-- 中间按钮 -->
-          <div class="vertical center3 centrebtn">
+          <!-- <div class="vertical center3 centrebtn">
             <svg-icon icon-class="right" class="right_svg" @click="Right" />
             <svg-icon icon-class="left" class="left_svg" @click="Left" />
+          </div> -->
+          <div class="vertical center3 centrebtn">
+            <svg-icon
+              :icon-class="isRightClicked ? 'unClickRight' : 'clickRight'"
+              class="right_svg"
+              @click="isRightClicked ? '' : Right()"
+            />
+            <svg-icon
+              :icon-class="isLeftClicked ? 'unClickLeft' : 'clickLeft'"
+              class="left_svg"
+              @click="isLeftClicked ? '' : Left()"
+            />
           </div>
           <!-- 右边框框 -->
           <div class="transferbox">
@@ -127,7 +135,7 @@
             <div style="padding: 10px" class="contont">
               <el-table
                 ref="tableRight"
-                class="table-content-bottom"
+                class="right-table user-table"
                 :data="rightTableData"
                 border
                 :header-cell-style="{
@@ -137,6 +145,7 @@
                   fontWeight: 'bold',
                   color: '#333333'
                 }"
+                @select="selectRows('right')"
               >
                 <el-table-column type="selection" width="80" align="center">
                 </el-table-column>
@@ -261,6 +270,8 @@ export default {
         pageSize: 10,
         total: 0
       },
+      isRightClicked: true,
+      isLeftClicked: true,
       rightSearchName: '',
       leftSearchName: '',
       dialog: {
@@ -413,14 +424,27 @@ export default {
       const res = new Map()
       return arr.filter((arr) => !res.has(arr.id) && res.set(arr.id, arr.id))
     },
+    selectRows(val) {
+      if (val === 'left') {
+        if (this.$refs.tableLeft.selection.length === 0) {
+          this.isRightClicked = true
+        } else {
+          this.isRightClicked = false
+        }
+      } else {
+        if (this.$refs.tableRight.selection.length === 0) {
+          this.isLeftClicked = true
+        } else {
+          this.isLeftClicked = false
+        }
+      }
+    },
     //左到右
     Right() {
       if (this.$refs.tableLeft.selection.length === 0) {
-        this.$notify({
-          title: '提示',
-          message: '请选择xxxxx',
-          type: 'success',
-          duration: 2000
+        this.$message({
+          message: '请勾选左边的模块',
+          type: 'warning'
         })
         return
       } else {
@@ -464,11 +488,9 @@ export default {
     //右到左
     Left() {
       if (this.$refs.tableRight.selection.length === 0) {
-        this.$notify({
-          title: '提示',
-          message: '请选择xxxxx',
-          type: 'success',
-          duration: 2000
+        this.$message({
+          message: '请勾选右边的模块',
+          type: 'warning'
         })
         return
       } else {
@@ -526,6 +548,33 @@ export default {
 ::v-deep .el-dialog__body {
   padding: 20px;
 }
+// 滚动条大小设置
+::v-deep .user-table::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+
+// 滚动条滑块样式设置
+::v-deep .user-table::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .user-table::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .user-table::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
+}
 .detail-row {
   margin-bottom: 25px;
 
@@ -559,13 +608,20 @@ export default {
 }
 ///@at-root
 ///
-
+.left-table {
+  height: calc(100% - 100px);
+  overflow-y: auto;
+}
+.right-table {
+  height: calc(100% - 100px);
+  overflow-y: auto;
+}
 .transferbox {
   max-height: 730px;
-  overflow-y: auto;
   width: 45%; //右边盒子的宽占比
   border: 1px solid#ebedf2;
   margin-top: 16px;
+
   .topbox {
     border-bottom: 1px solid #ebedf2;
     padding: 0px 10px;
@@ -584,6 +640,9 @@ export default {
       width: 286px;
     }
     // float: right;
+  }
+  .contont {
+    height: 100%;
   }
 }
 .centrebtn {
