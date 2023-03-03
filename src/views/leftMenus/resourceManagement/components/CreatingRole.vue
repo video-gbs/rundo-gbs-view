@@ -42,7 +42,7 @@
           <svg-icon icon-class="qxpz" class="pjqktj_svg" />
           <span>权限配置</span>
         </div>
-        <div class="text item">
+        <div class="text item tree-bottom">
           <el-tabs v-model="activeName" class="f1 f fd-c" type="border-card">
             <el-tab-pane label="系统权限" name="系统权限">
               <div class="left-lists">
@@ -870,6 +870,8 @@ export default {
 }
 
 .creatingRole-content {
+  height: calc(100% - 16px);
+  overflow-y: auto;
   .panel-header-box {
     margin: 0;
     padding: 0 16px;
@@ -913,14 +915,14 @@ export default {
     }
     .left-lists {
       display: flex;
-      max-height: 450px;
+      max-height: 480px;
       .left-lists-table-menu {
         text-align: center;
       }
       .left-lists-table-tree {
         margin-left: 20px;
         .addRoleTree {
-          max-height: 600px;
+          max-height: 480px;
           width: 300px;
           overflow-y: auto;
         }
@@ -992,8 +994,38 @@ export default {
     }
     .text {
       margin-top: 20px;
+      height: 480px;
+      overflow: auto;
     }
   }
+}
+
+// 滚动条大小设置
+::v-deep .tree-bottom::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+
+// 滚动条滑块样式设置
+::v-deep .tree-bottom::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .tree-bottom::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .tree-bottom::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
 }
 .dialog-footer {
   width: 100%;

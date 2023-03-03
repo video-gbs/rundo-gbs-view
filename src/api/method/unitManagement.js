@@ -31,5 +31,5 @@ export function getUnitDetails(id) {
 
 export function moveDepart(params) {
   // 移动部门信息
-  return request.post('${rundoAuthServer}/sysOrg/move', params)
+  return request.post(`${rundoAuthServer}/sysOrg/move`, params)
 }

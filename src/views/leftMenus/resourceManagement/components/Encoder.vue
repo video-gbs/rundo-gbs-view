@@ -16,7 +16,7 @@
             placeholder="请选择"
           >
             <el-option
-              v-for="obj in optionsList"
+              v-for="obj in deviceTypesOptionsList"
               :key="obj.value"
               :label="obj.label"
               :value="obj.value"
@@ -89,7 +89,7 @@
       </div>
       <el-table
         ref="encoderTable"
-        class="table-content-bottom"
+        class="encoder-table"
         :data="tableData"
         border
         :header-cell-style="{
@@ -119,7 +119,15 @@
           label="国标编码"
           :show-overflow-tooltip="true"
         />
-        <el-table-column prop="deviceType" label="设备类型" width="80" />
+        <el-table-column prop="deviceType" label="设备类型" width="100">
+          <template slot-scope="scope">
+            <span v-if="scope.row.deviceType === 1">DVR</span>
+            <span v-else-if="scope.row.deviceType === 2">NVR</span>
+            <span v-else-if="scope.row.deviceType === 3">CVR</span>
+            <span v-else-if="scope.row.deviceType === 4">DVS</span>
+            <span v-else>IPC</span>
+          </template>
+        </el-table-column>
         <el-table-column
           prop="ip"
           label="IP地址"
@@ -147,14 +155,17 @@
         </el-table-column>
         <el-table-column width="120" label="操作" fixed="right" align="center">
           <template slot-scope="scope">
+            <el-button
+              type="text"
+              :disabled="scope.row.onlineState !== 1"
+              @click="synchronizationData(scope.row.id)"
+              >同步
+            </el-button>
             <el-button type="text" @click="goEditPage(scope.row)"
               >编辑
             </el-button>
             <!-- <el-button type="text" @click="restart(scope.row.id)"
               >重启
-            </el-button>
-            <el-button type="text" @click="synchronizationData(scope.row.id)"
-              >同步
             </el-button>
             <el-button type="text" @click="deploymentData(scope.row.id)"
               >布防
@@ -302,8 +313,10 @@ import {
   getEncoderById,
   deleteEncoders,
   deleteEncoder,
-  moveEncoder
+  moveEncoder,
+  syncChannel
 } from '@/api/method/encoder'
+import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 
 export default {
   name: '',
@@ -354,6 +367,7 @@ export default {
         onlineState: ''
       },
       query: {},
+      deviceTypesOptionsList: [],
       optionsList: [
         {
           label: '离线',
@@ -393,11 +407,12 @@ export default {
   },
   mounted() {
     this.getList()
+    this.getDeviceTypesDictionaryList()
   },
   methods: {
-    getList(orgId) {
+    async getList(orgId) {
       // : '1620396812466147329'
-      getEncoderById({
+      await getEncoderById({
         pageNum: this.params.pageNum,
         pageSize: this.params.pageSize,
         videoAreaId: orgId ? orgId : 1,
@@ -411,6 +426,18 @@ export default {
         }
       })
     },
+    async getDeviceTypesDictionaryList() {
+      await getManufacturerDictionaryList('DeviceTypes').then((res) => {
+        if (res.code === 0) {
+          res.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.deviceTypesOptionsList.push(obj)
+          })
+        }
+      })
+    },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
       this.getList()
@@ -419,8 +446,17 @@ export default {
       this.params.proCount = proCount
       this.getList()
     },
-    synchronizationData() {
-      this.$router.push(`/activeDiscovery/transfer`)
+    synchronizationData(id) {
+      syncChannel(id).then((res) => {
+        if (res.code === 0) {
+          this.$message({
+            type: 'success',
+            message: '同步成功'
+          })
+          this.params.pageNum = 1
+          this.getList()
+        }
+      })
     },
     goEditPage(row) {
       this.$router.push({
@@ -508,6 +544,33 @@ export default {
   padding: 0 20px;
 }
 
+// 滚动条大小设置
+::v-deep .encoder-table::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .encoder-table::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .encoder-table::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .encoder-table::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
+}
+
 .encoder-content {
   .search {
     width: 100%;
@@ -553,8 +616,9 @@ export default {
         }
       }
     }
-    .table-content-bottom {
-      // padding: 0 18px;
+    .encoder-table {
+      height: calc(100% - 100px);
+      overflow-y: auto;
     }
   }
   .delete-button {

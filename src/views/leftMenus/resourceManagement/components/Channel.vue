@@ -85,7 +85,7 @@
       </div>
       <el-table
         ref="encoderTable"
-        class="table-content-bottom"
+        class="channel-table"
         :data="tableData"
         border
         :header-cell-style="{
@@ -424,6 +424,33 @@ export default {
   padding: 0 20px;
 }
 
+// 滚动条大小设置
+::v-deep .channel-table::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .channel-table::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .channel-table::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .channel-table::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
+}
+
 .encoder-content {
   .search {
     width: 100%;
@@ -469,8 +496,9 @@ export default {
         }
       }
     }
-    .table-content-bottom {
-      // padding: 0 18px;
+    .channel-table {
+      height: calc(100% - 100px);
+      overflow-y: auto;
     }
   }
   .delete-button {

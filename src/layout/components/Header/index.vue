@@ -151,6 +151,7 @@ export default {
   computed: {
     ...mapGetters(['routerLists', 'typeRouter']),
     changeTypeRouter() {
+      console.log('this.typeRouter', this.typeRouter)
       return this.typeRouter
     }
   },
@@ -253,12 +254,22 @@ export default {
       // }
     },
     clickRouter(data) {
+      // console.log('data~~~~~~~~~~~~~~~~~~~~~~~~', data, this.routerLists)
       this.sideBarRouterList1 = []
       this.sideBarRouterList2 = []
       this.sideBarRouterList3 = []
+      const resArray =
+        this.routerLists && this.routerLists.length > 0
+          ? this.routerLists
+          : JSON.parse(Local.get('dynamicRouters'))
+      // console.log(
+      //   '~~~~~~~~~~~~~~~~~~~~~~~~',
+      //   JSON.parse(Local.get('dynamicRouters'))
+      // )
+      // console.log('resArray~~~~~~~~~~~~~~~~~~~~~~~~', resArray)
       switch (data.path) {
         case '/resourceManagement':
-          this.routerLists.map((item) => {
+          resArray.map((item) => {
             if (
               item.children &&
               item.children.length > 0 &&
@@ -282,10 +293,10 @@ export default {
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList1)
 
-          // console.log(1, this.sideBarRouterList1)
+          console.log(1, this.sideBarRouterList1)
           break
         case '/systemManagement':
-          this.routerLists.map((item) => {
+          resArray.map((item) => {
             if (
               item.children &&
               item.children.length > 0 &&
@@ -308,10 +319,10 @@ export default {
           })
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList2)
-          // console.log(2, this.sideBarRouterList2)
+          console.log(2, this.sideBarRouterList2)
           break
         case '/moduleManageMent':
-          this.routerLists.map((item) => {
+          resArray.map((item) => {
             if (
               item.children &&
               item.children.length > 0 &&
@@ -335,7 +346,7 @@ export default {
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList3)
 
-          // console.log(3, this.sideBarRouterList3)
+          console.log(3, this.sideBarRouterList3)
           break
         default:
           break
