@@ -6,15 +6,15 @@
     <div class="main-content">
       <div class="securityArea_container">
         <div class="btn-lists">
-          <el-button type="primary" @click.stop="dialogShow()">
+          <el-button type="primary" @click="dialogShow">
             <svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span>
           </el-button>
-          <el-button @click.stop="dialogMoveShow()">
+          <el-button @click="dialogMoveShow">
             <svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
-          <el-button @click="deleteAccount()">
+          <el-button @click="deleteAccount">
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">删除</span>
           </el-button>
@@ -37,21 +37,25 @@
         >
           <el-form-item label="部门信息" prop="orgName">
             <div class="f fd-c mr30">
-              <el-input v-model="form.orgName" placeholder="6~20字符" />
+              <el-input v-model="form.orgName" placeholder="请输入" />
             </div>
           </el-form-item>
-          <el-form-item label="部门负责人">
+          <el-form-item label="部门负责人" prop="orgLeader">
             <div class="f fd-c mr30">
-              <el-input v-model="form.orgLeader" placeholder="6~20字符" />
+              <el-input v-model="form.orgLeader" placeholder="请输入" />
             </div>
           </el-form-item>
-          <el-form-item label="手机号码">
+          <el-form-item label="手机号码" prop="phone">
             <div class="f fd-c mr30">
-              <el-input v-model="form.phone" placeholder="6~20字符" />
+              <el-input v-model="form.phone" placeholder="请输入" />
             </div>
           </el-form-item>
-          <el-form-item label="描述">
-            <el-input v-model="form.description" type="textarea" />
+          <el-form-item label="描述" prop="description">
+            <el-input
+              v-model="form.description"
+              type="textarea"
+              placeholder="多行输入"
+            />
           </el-form-item>
         </el-form>
 
@@ -83,7 +87,7 @@
           label-position="right"
           label-width="auto"
           :model="dialog.params"
-          :rules="rules"
+          :rules="dialogRules"
           @keyup.enter="submit('accountForm')"
         >
           <el-form-item label="上级部门" prop="orgPid">
@@ -111,32 +115,36 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="部门名称">
+          <el-form-item label="部门名称" prop="orgName">
             <el-input
               v-model="dialog.params.orgName"
-              placeholder="最多40个字符"
+              placeholder="请输入"
               style="width: 436px"
             />
           </el-form-item>
 
-          <el-form-item label="部门负责人">
+          <el-form-item label="部门负责人" prop="orgLeader">
             <el-input
               v-model="dialog.params.orgLeader"
-              placeholder="最多40个字符"
+              placeholder="请输入"
               style="width: 436px"
             />
           </el-form-item>
 
-          <el-form-item label="手机号码">
+          <el-form-item label="手机号码" prop="phone">
             <el-input
               v-model="dialog.params.phone"
-              placeholder="最多40个字符"
+              placeholder="请输入"
               style="width: 436px"
             />
           </el-form-item>
 
-          <el-form-item label="描述">
-            <el-input v-model="dialog.params.description" type="textarea" />
+          <el-form-item label="描述" prop="description">
+            <el-input
+              v-model="dialog.params.description"
+              type="textarea"
+              placeholder="多行输入"
+            />
           </el-form-item>
         </el-form>
       </div>
@@ -148,7 +156,7 @@
       </div>
     </el-dialog>
 
-    <moveTree :moveShow="moveShow" :treeData="treeList" @init="init" />
+    <moveTree ref="moveTree" :treeData="treeList" @init="init" />
   </div>
 </template>
 
@@ -167,16 +175,33 @@ import LineFont from '@/components/LineFont'
 
 import { getDepartmentTree } from '@/api/method/role'
 
-// import TreeSelect from '@riophae/vue-treeselect'
-// import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-
 export default {
   name: '',
   components: { leftTree, LineFont, moveTree },
   data() {
+    const checkOrgName = (rule, value, cb) => {
+      const regOrgName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
+      if (regOrgName.test(value)) {
+        return cb()
+      }
+      cb(
+        new Error(
+          `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
+        )
+      )
+    }
+    const checkPhone = (rule, value, cb) => {
+      const regPhone =
+        /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+      if (regPhone.test(value)) {
+        return cb()
+      }
+      cb(new Error(`1～11个数字。`))
+    }
+
     return {
       lineTitle: {
-        title: '新建分组',
+        title: '新建部门',
         notShowSmallTitle: false
       },
       textStyle: {
@@ -209,22 +234,62 @@ export default {
         orgLeader: ''
       },
       rules: {
-        orgName: {
-          required: true,
-          message: '不能为空',
+        orgName: [
+          {
+            validator: checkOrgName,
+            // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+            // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+            required: true,
+            trigger: 'blur'
+          }
+        ],
+        orgLeader: [
+          {
+            validator: checkOrgName,
+            trigger: 'blur'
+          }
+        ],
+        phone: [
+          {
+            validator: checkPhone,
+            trigger: 'blur'
+          }
+        ],
+        description: {
+          message: '支持最大长度128个字符。',
           trigger: 'blur',
-          max: 20
+          max: 128
+        }
+      },
+      dialogRules: {
+        orgName: [
+          {
+            validator: checkOrgName,
+            required: true,
+            trigger: 'blur'
+          }
+        ],
+        orgLeader: [
+          {
+            validator: checkOrgName,
+            trigger: 'blur'
+          }
+        ],
+        phone: [
+          {
+            validator: checkPhone,
+            trigger: 'blur'
+          }
+        ],
+        description: {
+          message: '支持最大长度128个字符。',
+          trigger: 'blur',
+          max: 128
         },
         orgPid: {
           required: true,
-          message: '不能为空',
+          message: '此为必填项。',
           trigger: 'change'
-        },
-        fzmc: {
-          required: true,
-          message: '不能为空',
-          trigger: 'blur',
-          max: 40
         }
       },
       treeData: [],
@@ -237,7 +302,8 @@ export default {
         label: 'orgName'
       },
       detailsId: '',
-      moveShow: false
+      treeMsg: '',
+      isMore: false
     }
   },
   watch: {
@@ -257,6 +323,13 @@ export default {
     },
 
     childClickHandle(data) {
+      if (data.children && data.children.length > 0) {
+        this.isMore = true
+        this.treeMsg = data.orgName
+      } else {
+        this.isMore = false
+        this.treeMsg = data.orgName
+      }
       this.detailsId = data.id
       this.getUnitDetailsData()
     },
@@ -290,6 +363,7 @@ export default {
       done()
     },
     dialogShow() {
+      this.editShow = true
       ;(this.dialog.params = {
         orgPid: '',
         description: '',
@@ -297,12 +371,10 @@ export default {
         orgName: '',
         phone: ''
       }),
-        (this.editShow = true)
-
-      this.dialog.show = !this.dialog.show
+        (this.dialog.show = !this.dialog.show)
     },
     dialogMoveShow() {
-      this.moveShow = !this.moveShow
+      this.$refs.moveTree.changeMoveTreeShow()
     },
     save() {
       unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
@@ -316,11 +388,17 @@ export default {
       })
     },
     deleteAccount() {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
+      this.$confirm(
+        !this.isMore
+          ? `确定删除分组${this.treeMsg}？`
+          : `此操作将删除${this.treeMsg}及其下级节点,确定删除？`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
         unitDelete(this.detailsId).then((res) => {
           if (res.code === 0) {
             this.$message({
@@ -384,17 +462,13 @@ export default {
 ::v-deep .el-dialog__footer {
   padding: 0;
 }
-// ::v-deep .el-select-dropdown__item {
-//   background-color: #fff !important;
-//   padding: 0;
-//   margin: 0 20px;
-// }
-// .el-select-dropdown__item {
-//   height: 200px !important;
-//   min-width: 260px;
-//   overflow-y: scroll !important;
-//   background: #fff !important;
-// }
+// 去掉顶部线条
+::v-deep .unit-tree > .el-tree-node::after {
+  border-top: none !important;
+}
+::v-deep .unit-tree > .el-tree-node::before {
+  border-left: none;
+}
 .selectTree {
   .el-select-dropdown__item {
     height: 200px !important;

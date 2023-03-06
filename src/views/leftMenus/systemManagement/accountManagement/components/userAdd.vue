@@ -19,6 +19,7 @@
                 <el-input
                   v-model="form.userAccount"
                   style="width: 436px"
+                  clearable
                 ></el-input>
               </el-form-item>
             </el-col>
@@ -27,16 +28,18 @@
                 <el-input
                   v-model="form.password"
                   style="width: 436px"
+                  clearable
                 ></el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="desc" label="用户姓名">
+              <el-form-item prop="userName" label="用户姓名">
                 <el-input
                   v-model="form.userName"
                   style="width: 436px"
+                  clearable
                 ></el-input>
               </el-form-item>
             </el-col>
@@ -45,6 +48,7 @@
                 <el-input
                   v-model="form.rePassword"
                   style="width: 436px"
+                  clearable
                 ></el-input>
               </el-form-item>
             </el-col>
@@ -57,6 +61,7 @@
                   type="datetime"
                   placeholder="开始日期"
                   style="width: 436px"
+                  clearable
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
                 ></el-date-picker>
@@ -96,6 +101,7 @@
                   v-model="form.expiryDateEnd"
                   type="datetime"
                   placeholder="结束日期"
+                  clearable
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
                   style="width: 436px"
@@ -121,25 +127,27 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item
-                  prop="desc"
+                  prop="jobNo"
                   label="用户工号"
                   style="margin-left: 35px"
                 >
                   <el-input
                     v-model="form1.jobNo"
                     style="width: 436px"
+                    clearable
                   ></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item
-                  prop="desc"
+                  prop="phone"
                   label="手机号码"
                   style="margin-left: 10px"
                 >
                   <el-input
                     v-model="form1.phone"
                     style="width: 436px"
+                    clearable
                   ></el-input>
                 </el-form-item>
               </el-col>
@@ -147,19 +155,20 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item
-                  prop="desc"
+                  prop="address"
                   label="地址"
                   style="margin-left: 35px"
                 >
                   <el-input
                     v-model="form1.address"
                     style="width: 436px"
+                    clearable
                   ></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="10">
                 <el-form-item
-                  prop="desc"
+                  prop="description"
                   label="描述"
                   style="margin-left: 10px"
                 >
@@ -249,6 +258,14 @@ export default {
   name: '',
   components: { pagination },
   data() {
+    const checkPhone = (rule, value, cb) => {
+      const regPhone =
+        /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+      if (regPhone.test(value)) {
+        return cb()
+      }
+      cb(new Error(`1～11个数字。`))
+    }
     return {
       tableData: [],
       params: {
@@ -281,20 +298,40 @@ export default {
       },
       roleIds: [],
       rules: {
-        userAccount: [
-          { required: true, message: '请输入用户账号', trigger: 'blur' },
-          { min: 3, max: 15, message: '长度在 3 到 15 个字符', trigger: 'blur' }
-        ],
+        userAccount: {
+          required: true,
+          max: 32,
+          min: 1,
+          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          trigger: 'blur'
+        },
+        userName: {
+          max: 32,
+          min: 1,
+          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          trigger: 'blur'
+        },
         password: {
           required: true,
-          message: '不能为空',
+          max: 20,
+          min: 8,
+          message:
+            '8~20个字符;至少由大写字母、小写字母、数字、特殊字符任意两种组成。',
+          pattern: /(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\W_]).{8,20}/,
           trigger: 'blur'
         },
         rePassword: {
           required: true,
-          message: '不能为空',
+          max: 20,
+          min: 8,
+          message:
+            '8~20个字符;至少由大写字母、小写字母、数字、特殊字符任意两种组成。',
+          pattern: /(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\W_]).{8,20}/,
           trigger: 'blur'
         },
+
         orgId: [
           {
             required: true,
@@ -305,10 +342,33 @@ export default {
         expiryDateStart: [
           {
             required: true,
-            message: '请选择时间',
+            message: '此为必填项。',
             trigger: 'change'
           }
-        ]
+        ],
+        jobNo: {
+          max: 32,
+          min: 1,
+          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          trigger: 'blur'
+        },
+        address: {
+          message: '支持最大长度128个字符。',
+          trigger: 'blur',
+          max: 128
+        },
+        phone: [
+          {
+            validator: checkPhone,
+            trigger: 'blur'
+          }
+        ],
+        description: {
+          message: '支持最大长度128个字符。',
+          trigger: 'blur',
+          max: 128
+        }
       }
     }
   },
@@ -419,9 +479,11 @@ export default {
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
+      this.getLists()
     },
     currentChange(proCount) {
       this.params.proCount = proCount
+      this.getLists()
     },
     nodeClickHandle(data) {
       this.form.orgId = data.areaName

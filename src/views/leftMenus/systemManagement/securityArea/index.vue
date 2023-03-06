@@ -6,15 +6,15 @@
     <div class="main-content">
       <div class="securityArea_container">
         <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow()">
+          <el-button type="primary" @click="dialogShow">
             <svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span>
           </el-button>
-          <el-button @click="dialogMoveShow()"
+          <el-button @click="dialogMoveShow"
             ><svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
-          <el-button @click="deleteAccount()"
+          <el-button @click="deleteAccount"
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">删除</span>
           </el-button>
@@ -44,7 +44,7 @@
               <el-input v-model="form.areaName" placeholder="6~20字符" />
             </div>
           </el-form-item>
-          <el-form-item label="描述">
+          <el-form-item label="描述" prop="description">
             <el-input v-model="form.description" type="textarea" />
           </el-form-item>
         </el-form>
@@ -92,7 +92,7 @@
             >
               <el-option :value="List">
                 <el-tree
-                  class="unit-tree"
+                  class="securityArea-tree"
                   :data="treeList"
                   node-key="id"
                   :props="defaultProps"
@@ -110,13 +110,17 @@
           <el-form-item label="分组名称" prop="areaName">
             <el-input
               v-model="dialog.params.areaName"
-              placeholder="最多40个字符"
+              placeholder="请输入"
               style="width: 436px"
             />
           </el-form-item>
 
-          <el-form-item label="描述">
-            <el-input v-model="dialog.params.description" type="textarea" />
+          <el-form-item label="描述" prop="description">
+            <el-input
+              v-model="dialog.params.description"
+              type="textarea"
+              placeholder="多行输入"
+            />
           </el-form-item>
         </el-form>
       </div>
@@ -127,7 +131,7 @@
         >
       </div>
     </el-dialog>
-    <moveTree :moveShow="moveShow" :treeData="treeList" @init="init" />
+    <moveTree ref="moveTree" :treeData="treeList" @init="init" />
   </div>
 </template>
 
@@ -183,20 +187,21 @@ export default {
       rules: {
         areaName: {
           required: true,
-          message: '不能为空',
-          trigger: 'blur',
-          max: 20
+          max: 32,
+          min: 1,
+          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          trigger: 'blur'
         },
         areaPid: {
           required: true,
-          message: '不能为空',
+          message: '此为必填项。',
           trigger: 'change'
         },
-        fzmc: {
-          required: true,
-          message: '不能为空',
+        description: {
+          message: '支持最大长度128个字符。',
           trigger: 'blur',
-          max: 40
+          max: 128
         }
       },
       treeList: [],
@@ -208,7 +213,9 @@ export default {
         label: 'areaName'
       },
       detailsId: '',
-      moveShow: false
+      moveShow: false,
+      treeMsg: '',
+      isMore: false
     }
   },
   watch: {
@@ -228,6 +235,13 @@ export default {
     },
 
     childClickHandle(data) {
+      if (data.children && data.children.length > 0) {
+        this.isMore = true
+        this.treeMsg = data.areaName
+      } else {
+        this.isMore = false
+        this.treeMsg = data.areaName
+      }
       this.detailsId = data.id
       this.getUnitDetailsData()
     },
@@ -269,7 +283,7 @@ export default {
       this.dialog.show = !this.dialog.show
     },
     dialogMoveShow() {
-      this.moveShow = !this.moveShow
+      this.$refs.moveTree.changeMoveTreeShow()
     },
     save() {
       unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
@@ -283,11 +297,17 @@ export default {
       })
     },
     deleteAccount() {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
+      this.$confirm(
+        !this.isMore
+          ? `确定删除分组${this.treeMsg}？`
+          : `此操作将删除${this.treeMsg}及其下级节点,确定删除？`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
         unitDelete(this.detailsId).then((res) => {
           if (res.code === 0) {
             this.$message({
@@ -350,6 +370,13 @@ export default {
 }
 ::v-deep .el-dialog__footer {
   padding: 0;
+}
+// 去掉顶部线条
+::v-deep .securityArea-tree > .el-tree-node::after {
+  border-top: none !important;
+}
+::v-deep .securityArea-tree > .el-tree-node::before {
+  border-left: none;
 }
 .selectTree {
   .el-select-dropdown__item {

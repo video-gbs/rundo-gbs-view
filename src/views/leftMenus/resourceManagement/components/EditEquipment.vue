@@ -223,7 +223,11 @@
             </el-row>
             <el-row>
               <el-col :span="12"
-                ><el-form-item label="经度" style="margin-left: 20px">
+                ><el-form-item
+                  label="经度"
+                  style="margin-left: 20px"
+                  prop="longitude"
+                >
                   <el-input
                     v-model="form1.longitude"
                     style="width: 436px"
@@ -231,7 +235,7 @@
                   ></el-input> </el-form-item
               ></el-col>
               <el-col :span="12"
-                ><el-form-item label="纬度">
+                ><el-form-item label="纬度" prop="latitude">
                   <el-input
                     v-model="form1.latitude"
                     style="width: 436px"
@@ -304,59 +308,53 @@ export default {
       manufacturerTypeOptions: [],
       transportProtocolTypeOptions: [],
       rules: {
-        name: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 3, max: 15, message: '长度在 3 到 15 个字符', trigger: 'blur' }
-        ],
+        name: {
+          required: true,
+          max: 32,
+          min: 1,
+          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          trigger: 'blur'
+        },
         manufacturer: [
-          { required: true, message: '请选择厂商', trigger: 'change' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         gatewayId: [
-          { required: true, message: '请选择网关', trigger: 'change' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         transport: [
-          { required: true, message: '请选择传输协议', trigger: 'change' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         videoAreaId: [
-          { required: true, message: '请选择安防区域', trigger: 'change' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
-        date1: [
-          {
-            type: 'date',
-            required: true,
-            message: '请选择日期',
-            trigger: 'change'
-          }
-        ],
-        date2: [
-          {
-            type: 'date',
-            required: true,
-            message: '请选择时间',
-            trigger: 'change'
-          }
-        ],
-        type: [
-          {
-            type: 'array',
-            required: true,
-            message: '请至少选择一个活动性质',
-            trigger: 'change'
-          }
-        ],
-        resource: [
-          { required: true, message: '请选择活动资源', trigger: 'change' }
-        ],
-        model: [{ required: true, message: '请填写型号', trigger: 'blur' }],
-        ip: [{ required: true, message: '请填写ip', trigger: 'blur' }],
+        model: [{ required: true, message: '1~128个字符。', trigger: 'blur' }],
+        ip: [{ required: true, message: '此为必填项。', trigger: 'blur' }],
         username: [
-          { required: true, message: '请填写用户名称', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'blur' }
         ],
-        password: [{ required: true, message: '请填写密码', trigger: 'blur' }],
-        port: [{ required: true, message: '请填写设备端口', trigger: 'blur' }],
-        deviceId: [
-          { required: true, message: '请填写设备端口', trigger: 'blur' }
-        ]
+        password: [
+          { required: true, message: '此为必填项。', trigger: 'blur' }
+        ],
+        port: {
+          required: true,
+          message: '此为数字。',
+          pattern: /^[0-9]*$/,
+          trigger: 'blur'
+        },
+        longitude: {
+          message: '范围从-180~180的数字，支持小数点后6位。',
+          pattern:
+            /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180)$/,
+          trigger: 'blur'
+        },
+        latitude: {
+          message: '范围从-180~180的数字，支持小数点后6位。',
+          pattern:
+            /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180)$/,
+          trigger: 'blur'
+        },
+        deviceId: [{ required: true, message: '此为必填项。', trigger: 'blur' }]
       }
     }
   },
