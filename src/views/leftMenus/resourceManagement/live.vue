@@ -480,6 +480,7 @@ export default {
             }
             break
           case 7:
+          case 0:
             if (data.onlineState === 0) {
               return 'qitalx'
             } else {

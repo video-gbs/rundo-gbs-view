@@ -94,7 +94,7 @@
 
           <el-row>
             <el-col :span="12"
-              ><el-form-item label="经度">
+              ><el-form-item label="经度" prop="longitude">
                 <el-input
                   v-model="form.longitude"
                   style="width: 436px"
@@ -103,7 +103,7 @@
             ></el-col>
 
             <el-col :span="12"
-              ><el-form-item label="纬度">
+              ><el-form-item label="纬度" prop="latitude">
                 <el-input
                   v-model="form.latitude"
                   style="width: 436px"
@@ -146,7 +146,7 @@
           </el-row>
           <el-row>
             <el-col :span="12"
-              ><el-form-item label="安装地点">
+              ><el-form-item label="安装地点" prop="installLocation">
                 <el-input
                   v-model="form.installLocation"
                   style="width: 436px"
@@ -240,20 +240,44 @@ export default {
           { required: true, message: '请选择通道类型', trigger: 'change' }
         ],
         videoAreaId: [
-          { required: true, message: '请选择安防区域', trigger: 'change' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         ptzType: [
-          { required: true, message: '请选择外观类型', trigger: 'change' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         channelCode: [
-          { required: true, message: '请填写通道编号', trigger: 'blur' }
+          { required: true, message: '1~128个字符。', trigger: 'blur' }
         ],
-        channelName: [
-          { required: true, message: '请填写通道名称', trigger: 'blur' }
-        ],
+        channelName: {
+          required: true,
+          max: 32,
+          min: 1,
+          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          trigger: 'blur'
+        },
+        installLocation: [{ message: '1~128个字符。', trigger: 'blur' }],
+        height: {
+          message: '支持小数点后2位。',
+          pattern: /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/,
+          trigger: 'blur'
+        },
+
         deviceId: [
           { required: true, message: '请填写设备端口', trigger: 'blur' }
-        ]
+        ],
+        longitude: {
+          message: '范围从-180~180的数字，支持小数点后6位。',
+          pattern:
+            /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180)$/,
+          trigger: 'blur'
+        },
+        latitude: {
+          message: '范围从-180~180的数字，支持小数点后6位。',
+          pattern:
+            /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180)$/,
+          trigger: 'blur'
+        }
       }
     }
   },

@@ -29,10 +29,11 @@
               v-model="form.params.roleName"
               placeholder="请输入角色名称"
               style="width: 436px"
+              clearable
             />
           </el-form-item>
 
-          <el-form-item label="描述">
+          <el-form-item label="描述" prop="roleDesc">
             <el-input v-model="form.params.roleDesc" type="textarea" />
           </el-form-item>
         </el-form>
@@ -351,15 +352,19 @@ export default {
         label: 'orgName'
       },
       rules: {
-        roleName: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' },
-          {
-            min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
-            trigger: 'blur'
-          }
-        ]
+        roleName: {
+          required: true,
+          max: 32,
+          min: 1,
+          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          trigger: 'blur'
+        },
+        roleDesc: {
+          message: '支持最大长度128个字符。',
+          trigger: 'blur',
+          max: 128
+        }
       },
       tableData: [
         {
