@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     title="移动位置"
-    :visible.sync="moveShow"
+    :visible.sync="moveTreeShow"
     width="748px"
     :before-close="handleClose"
   >
@@ -60,8 +60,8 @@
       </div>
     </div>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="moveShow = false">取 消</el-button>
-      <el-button type="primary" @click="moveShow = false">确 定</el-button>
+      <el-button @click="moveTreeShow = false">取 消</el-button>
+      <el-button type="primary" @click="moveTreeShow = false">确 定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -73,11 +73,6 @@ export default {
   name: '',
   components: { LineFont },
   props: {
-    moveShow: {
-      type: Boolean,
-      default: false
-    },
-
     treeData: {
       type: Array,
       default: function () {
@@ -87,6 +82,7 @@ export default {
   },
   data() {
     return {
+      moveTreeShow: false,
       defaultProps: {
         // 用于修改节点指定标签的属性值
         children: 'children',
@@ -121,6 +117,10 @@ export default {
     handleClose(done) {
       done()
     },
+    changeMoveTreeShow() {
+      this.moveTreeShow = true
+    },
+
     allowDrag(draggingNode) {
       return true
     },

@@ -292,6 +292,7 @@ export default {
           })
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList1)
+          this.$router.push({ path: this.sideBarRouterList1[0].path })
 
           console.log(1, this.sideBarRouterList1)
           break
@@ -319,6 +320,7 @@ export default {
           })
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList2)
+          this.$router.push({ path: this.sideBarRouterList2[0].path })
           console.log(2, this.sideBarRouterList2)
           break
         case '/moduleManageMent':
@@ -345,6 +347,7 @@ export default {
           })
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList3)
+          this.$router.push({ path: this.sideBarRouterList3[1].path })
 
           console.log(3, this.sideBarRouterList3)
           break

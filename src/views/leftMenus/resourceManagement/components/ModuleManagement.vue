@@ -109,7 +109,7 @@
           />
         </div>
         <div>
-          <el-form label-width="100px" :model="dialogForm">
+          <el-form label-width="100px" :model="dialogForm" :rules="rules">
             <el-form-item label="模块名称：">
               <el-input
                 v-model="dialogForm.name"
