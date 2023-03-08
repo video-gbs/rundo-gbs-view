@@ -1,9 +1,6 @@
 import request from '@/api/fetch'
 
-import baseUrls from '@/utils/baseUrlConfig'
-
-const expansion = baseUrls.base2
-const expansionTest = baseUrls.base5
+const expansion = '/api/expserver/expansion'
 // 通道
 // 新增通道
 export function addChannel(params) {
