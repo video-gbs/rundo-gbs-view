@@ -18,7 +18,7 @@ COPY ./ /home
          # 编译前端界面
 WORKDIR /home/
 RUN  npm install && \
-     npm run build:stage  && \
+     npm run build:dev  && \
      mkdir -pv /opt/html && \
      cp -rf /home/dist/* /opt/html/
 
