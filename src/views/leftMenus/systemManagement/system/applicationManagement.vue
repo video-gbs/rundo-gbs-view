@@ -114,29 +114,38 @@
           class="params-form"
           size="mini"
           :rules="rules"
-          label-position="left"
+          label-position="right"
           label-width="120px"
           :model="dialog.params"
           @keyup.enter="submit('roleForm')"
         >
+          <el-form-item label="应用分类" prop="appType">
+            <el-select v-model="dialog.params.appType" placeholder="请选择">
+              <el-option
+                v-for="o in appTypeOptions"
+                :label="o.label"
+                :value="o.value"
+                :key="o.value"
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item label="应用名称" prop="appName">
-            <el-input
-              v-model="dialog.params.appName"
-              clearable
-              :maxlength="15"
-            />
+            <el-input v-model="dialog.params.appName" clearable />
           </el-form-item>
-          <el-form-item label="应用所在IP">
-            <el-input v-model="dialog.params.appIp" clearable :maxlength="15" />
+          <el-form-item label="应用所在IP" prop="appIp">
+            <el-input v-model="dialog.params.appIp" clearable />
           </el-form-item>
-          <el-form-item label="应用服务端口">
-            <el-input
-              v-model="dialog.params.appPort"
-              clearable
-              :maxlength="15"
-            />
+          <el-form-item label="应用服务端口" prop="appPort">
+            <el-input v-model="dialog.params.appPort" clearable />
           </el-form-item>
-          <el-form-item label="应用简介">
+
+          <el-form-item label="图标" prop="icon">
+            <el-input v-model="dialog.params.icon" clearable />
+          </el-form-item>
+          <el-form-item label="URL" prop="appUrl">
+            <el-input v-model="dialog.params.appUrl" clearable />
+          </el-form-item>
+          <el-form-item label="应用简介" prop="appDesc">
             <el-input
               v-model="dialog.params.appDesc"
               type="textarea"
@@ -243,11 +252,14 @@ import {
   changeStatus
 } from '@/api/method/user'
 import pagination from '@/components/Pagination/index.vue'
+
+import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 export default {
   name: '',
   components: { pagination },
   data() {
     return {
+      appTypeOptions: [],
       switchValue: true,
       search: {
         userName: '',
@@ -292,24 +304,28 @@ export default {
         appName: ''
       },
       rules: {
-        appName: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' },
-          {
-            min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
-            trigger: 'blur'
-          }
+        appName: {
+          required: true,
+          max: 32,
+          min: 1,
+          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          trigger: 'blur'
+        },
+        appType: [
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
-        name: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' },
-          {
-            min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
-            trigger: 'blur'
-          }
-        ]
+        appDesc: {
+          message: '支持最大长度128个字符。',
+          trigger: 'blur',
+          max: 128
+        },
+        appPort: {
+          message: '此为数字。',
+          pattern: /^[0-9]*$/,
+          trigger: 'blur'
+        },
+        appIp: [{ message: '此为必填项。', trigger: 'blur' }]
       },
       roleId: '',
       checkList: [],
@@ -319,13 +335,25 @@ export default {
   },
   mounted() {
     this.getList()
-    // this.init()
+    this.getManufacturerDictionaryList()
   },
   methods: {
     init() {
       getSysOrgTree({ id: 1 }).then((res) => {
         if (res.code === 0) {
           this.treeData = res.data
+        }
+      })
+    },
+    async getManufacturerDictionaryList() {
+      await getManufacturerDictionaryList('AppTypes').then((res) => {
+        if (res.code === 0) {
+          res.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.appTypeOptions.push(obj)
+          })
         }
       })
     },
@@ -374,13 +402,27 @@ export default {
     },
     dialogShow(act, data) {
       if (act === 0) {
-        const { appName, appPort, status, appDesc, appIp } = data
+        const { appName, appPort, status, appDesc, appIp, appType, appIcon } =
+          data
         this.dialog.params.appPort = appPort
         this.dialog.params.appName = appName
         this.dialog.params.appIp = appIp
         this.dialog.params.appDesc = appDesc
+        this.dialog.params.appType = appType
+
+        this.dialog.params.appIcon = appIcon
         this.dialog.params.status = Number(status)
         this.editId = data.id
+      } else {
+        this.dialog.params = {
+          appPort: '',
+          appName: '',
+          status: 1,
+          appIp: '',
+          appDesc: '',
+          appIcon: '',
+          appType: ''
+        }
       }
       this.dialog.title = act ? '新建' : '编辑'
       this.dialog.show = !this.dialog.show

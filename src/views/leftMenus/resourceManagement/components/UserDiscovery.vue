@@ -21,9 +21,13 @@
               />
             </div>
             <div class="level searchbox">
-              <!-- <el-checkbox v-model="checked" class="table-content-top-check"
-                >已勾选 1/{{ tableData.length }}</el-checkbox
-              > -->
+              <el-checkbox
+                v-model="isRightClicked"
+                class="table-content-top-check"
+                >已勾选 {{ tableLeftSelectionLength }}/{{
+                  params.total
+                }}</el-checkbox
+              >
               <el-input
                 placeholder="请输入用户账号"
                 class="search-input"
@@ -96,14 +100,14 @@
           </div> -->
           <div class="vertical center3 centrebtn">
             <svg-icon
-              :icon-class="isRightClicked ? 'unClickRight' : 'clickRight'"
+              :icon-class="!isRightClicked ? 'unClickRight' : 'clickRight'"
               class="right_svg"
-              @click="isRightClicked ? '' : Right()"
+              @click="!isRightClicked ? '' : Right()"
             />
             <svg-icon
-              :icon-class="isLeftClicked ? 'unClickLeft' : 'clickLeft'"
+              :icon-class="!isLeftClicked ? 'unClickLeft' : 'clickLeft'"
               class="left_svg"
-              @click="isLeftClicked ? '' : Left()"
+              @click="!isLeftClicked ? '' : Left()"
             />
           </div>
           <!-- 右边框框 -->
@@ -116,9 +120,13 @@
               />
             </div>
             <div class="level searchbox">
-              <!-- <el-checkbox v-model="checked" class="table-content-top-check"
-                >已勾选 1/{{ tableData.length }}</el-checkbox
-              > -->
+              <el-checkbox
+                v-model="isLeftClicked"
+                class="table-content-top-check"
+                >已勾选 {{ tableRightSelectionLength }}/{{
+                  params1.total
+                }}</el-checkbox
+              >
               <el-input
                 placeholder="请输入用户账号"
                 class="search-input"
@@ -189,6 +197,13 @@
     </div> -->
 
     <el-dialog :title="dialog.title" :visible.sync="dialog.show" width="600px">
+      <div slot="title" class="dialog-title">
+        <LineFont
+          :line-title="lineTitle3"
+          :text-style="textStyle"
+          :line-blue-style="lineBlueStyle"
+        />
+      </div>
       <div>
         <el-form
           ref="roleForm"
@@ -200,38 +215,101 @@
           @keyup.enter="submit('roleForm')"
         >
           <el-form-item label="用户账号">
-            <span>{{ dialog.params.userAccount }}</span>
+            <el-input
+              v-model="dialog.params.userAccount"
+              placeholder="请输入"
+              style="width: 436px"
+            />
+            <!-- <span>{{ dialog.params.userAccount }}</span> -->
           </el-form-item>
           <el-form-item label="用户姓名">
-            <span>{{ dialog.params.userName }}</span>
+            <el-input
+              v-model="dialog.params.userName"
+              placeholder="请输入"
+              style="width: 436px"
+            />
+            <!-- <span>{{ dialog.params.userName }}</span> -->
           </el-form-item>
           <el-form-item label="所属部门">
-            <span>{{ dialog.params.orgName }}</span>
+            <el-input
+              v-model="dialog.params.orgName"
+              placeholder="请输入"
+              style="width: 436px"
+            />
+            <!-- <span>{{ dialog.params.orgName }}</span> -->
           </el-form-item>
           <el-form-item label="有效日期">
+            <!-- <el-input
+              v-model="dialog.params.expiryDateStart"
+              placeholder="请输入"
+
+            /> -->
             <span
+              style="
+                display: inline-block;
+                height: 32px;
+                width: 436px;
+                border-radius: 4px;
+                border: 1px solid #dcdfe6;
+                padding-left: 10px;
+                font-size: 14px;
+                font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+                font-weight: 400;
+                color: #333333;
+              "
               >{{ dialog.params.expiryDateStart }}~{{
                 dialog.params.expiryDateEnd
               }}</span
             >
           </el-form-item>
           <el-form-item label="用户工号">
-            <span>{{ dialog.params.jobNo }}</span>
+            <el-input
+              v-model="dialog.params.jobNo"
+              placeholder="请输入"
+              style="width: 436px"
+            />
+            <!-- <span>{{ dialog.params.jobNo }}</span> -->
           </el-form-item>
           <el-form-item label="手机号码">
-            <span>{{ dialog.params.phone }}</span>
+            <el-input
+              v-model="dialog.params.phone"
+              placeholder="请输入"
+              style="width: 436px"
+            />
+            <!-- <span>{{ dialog.params.phone }}</span> -->
           </el-form-item>
           <el-form-item label="地址">
-            <span>{{ dialog.params.naaddressme }}</span>
+            <el-input
+              v-model="dialog.params.address"
+              placeholder="请输入"
+              style="width: 436px"
+            />
+            <!-- <span>{{ dialog.params.address }}</span> -->
           </el-form-item>
           <el-form-item label="功能角色">
-            <span>{{ dialog.params.roleName }}</span>
+            <el-input
+              v-model="dialog.params.roleName"
+              placeholder="请输入"
+              style="width: 436px"
+            />
+            <!-- <span>{{ dialog.params.roleName }}</span> -->
           </el-form-item>
           <el-form-item label="安防区域">
+            <el-input
+              v-model="dialog.params.phone"
+              placeholder="请输入"
+              style="width: 436px"
+            />
             <span>{{ dialog.params.areaName }}</span>
           </el-form-item>
           <el-form-item label="描述">
-            <span>{{ dialog.params.description }}</span>
+            <el-input
+              v-model="dialog.params.description"
+              type="textarea"
+              placeholder="多行输入"
+              style="width: 436px"
+            />
+            <!-- <span>{{ dialog.params.description }}</span> -->
           </el-form-item>
         </el-form>
       </div>
@@ -270,8 +348,10 @@ export default {
         pageSize: 10,
         total: 0
       },
-      isRightClicked: true,
-      isLeftClicked: true,
+      tableLeftSelectionLength: 0,
+      tableRightSelectionLength: 0,
+      isRightClicked: false,
+      isLeftClicked: false,
       rightSearchName: '',
       leftSearchName: '',
       dialog: {
@@ -297,6 +377,10 @@ export default {
       },
       lineTitle1: {
         title: '已选择列表',
+        notShowSmallTitle: false
+      },
+      lineTitle3: {
+        title: '查看',
         notShowSmallTitle: false
       },
       textStyle: {
@@ -427,15 +511,20 @@ export default {
     selectRows(val) {
       if (val === 'left') {
         if (this.$refs.tableLeft.selection.length === 0) {
-          this.isRightClicked = true
-        } else {
           this.isRightClicked = false
+          this.tableLeftSelectionLength = 0
+        } else {
+          this.isRightClicked = true
+          this.tableLeftSelectionLength = this.$refs.tableLeft.selection.length
         }
       } else {
         if (this.$refs.tableRight.selection.length === 0) {
-          this.isLeftClicked = true
-        } else {
           this.isLeftClicked = false
+          this.tableRightSelectionLength = 0
+        } else {
+          this.isLeftClicked = true
+          this.tableRightSelectionLength =
+            this.$refs.tableRight.selection.length
         }
       }
     },
@@ -479,8 +568,10 @@ export default {
               type: 'success',
               message: '关联成功'
             })
-            this.params1.pageSize = 1
+            this.isRightClicked = false
+            this.tableLeftSelectionLength = 0
             this.rightInit()
+            this.leftInit()
           }
         })
       }
@@ -525,8 +616,10 @@ export default {
               type: 'success',
               message: '解除管理用户成功'
             })
-            this.params1.pageSize = 1
+            this.isLeftClicked = false
+            this.tableRightSelectionLength = 0
             this.rightInit()
+            this.leftInit()
           }
         })
       }
@@ -536,11 +629,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-dialog__footer {
+  padding: 0;
+}
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid rgba(234, 234, 234, 1);
+  padding: 0 20px;
 }
-::v-deep .el-dialog__body {
-  padding-bottom: 0;
+::v-deep .el-input__inner {
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #333333;
+}
+::v-deep .el-textarea__inner {
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #333333;
 }
 ::v-deep .el-dialog {
   margin-top: 4vh !important;
@@ -725,7 +831,7 @@ export default {
   }
 
   .activeDiscovery-transfer {
-    height: calc(100% - 86px);
+    height: calc(100% - 100px);
     margin: 20px 20px 0 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);

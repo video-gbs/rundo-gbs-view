@@ -28,14 +28,15 @@
               icon-class="tree1"
               class="tree1"
             />
-            <svg-icon
+            <!-- <svg-icon
               v-else-if="
                 data.level === 2 || data.level === 3 || data.level === 4
               "
               icon-class="tree2"
               class="tree2"
-            />
-            <svg-icon v-else icon-class="tree3" class="tree3" />
+            /> -->
+            <svg-icon v-else icon-class="tree2" class="tree2" />
+            <!-- <svg-icon v-else icon-class="tree3" class="tree3" /> -->
             {{ data.orgName || data.areaName }}
           </span>
         </span>

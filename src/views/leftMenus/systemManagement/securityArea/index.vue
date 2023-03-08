@@ -76,7 +76,7 @@
           ref="accountForm"
           class="params-form"
           size="mini"
-          label-position="left"
+          label-position="right"
           label-width="80px"
           :model="dialog.params"
           :rules="rules"
@@ -306,17 +306,19 @@ export default {
       })
     },
     deleteAccount() {
-      this.$confirm(
-        !this.isMore
+      const h = this.$createElement
+      this.$confirm('提示', {
+        title: '提示',
+        message: !this.isMore
           ? `确定删除分组${this.treeMsg}？`
-          : `此操作将删除${this.treeMsg}及其下级节点,确定删除？`,
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).then(() => {
+          : h('div', [
+              h('p', `此操作将删除${this.treeMsg}及其下级节点`),
+              h('p', { style: 'position:relative;top:20px;' }, '确定删除？')
+            ]),
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
         unitDelete(this.detailsId).then((res) => {
           if (res.code === 0) {
             this.$message({

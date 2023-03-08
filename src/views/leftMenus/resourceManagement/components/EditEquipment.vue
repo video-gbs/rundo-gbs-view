@@ -366,7 +366,6 @@ export default {
       deviceType,
       manufacturer,
       videoAreaId,
-      name,
       password,
       transport,
       latitude,
@@ -378,10 +377,12 @@ export default {
     } = this.$route.query.row
     if (this.$route.query.back === '2') {
       this.form.deviceId = this.$route.query.row.originId
+      this.form.name = this.$route.query.row.deviceName
       this.form.videoAreaId = '1'
     } else {
       this.form.deviceId = deviceId
       this.form.videoAreaId = String(videoAreaId)
+      this.form.name = this.$route.query.row.name
     }
     this.form1.ip = ip
     this.form1.transport = transport
@@ -389,7 +390,6 @@ export default {
     this.form1.longitude = longitude
     this.form1.port = port
     this.form.password = password
-    this.form.name = name
     this.form.password = password
     this.form.manufacturer = manufacturer
     this.form.model = model
@@ -502,11 +502,10 @@ export default {
       ]).then(() => {
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
-        // console.log(1, this.form)
-        // console.log(2, this.$route.query)
+        console.log(1, this.form)
+        console.log(2, this.$route.query)
+        console.log(3, this.form1)
         editEncoder({
-          ...this.form,
-          ...this.form1,
           deviceId:
             this.$route.query.back === '1'
               ? this.$route.query.row.deviceId
@@ -515,7 +514,9 @@ export default {
             this.$route.query.back === '1'
               ? this.$route.query.row.id
               : this.$route.query.row.deviceId,
-          onlineState: this.$route.query.row.onlineState
+          onlineState: this.$route.query.row.onlineState,
+          ...this.form,
+          ...this.form1
         }).then((res) => {
           if (res.code === 0) {
             this.$message({

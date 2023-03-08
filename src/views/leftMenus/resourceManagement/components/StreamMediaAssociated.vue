@@ -21,9 +21,13 @@
               />
             </div>
             <div class="level searchbox">
-              <!-- <el-checkbox v-model="checked" class="table-content-top-check"
-                >已勾选 1/{{ tableData.length }}</el-checkbox
-              > -->
+              <el-checkbox
+                v-model="isRightClicked"
+                class="table-content-top-check"
+                >已勾选 {{ tableLeftSelectionLength }}/{{
+                  params1.total
+                }}</el-checkbox
+              >
               <el-input
                 placeholder="请输入模块名称"
                 class="search-input"
@@ -84,14 +88,14 @@
           <!-- 中间按钮 -->
           <div class="vertical center3 centrebtn">
             <svg-icon
-              :icon-class="isRightClicked ? 'unClickRight' : 'clickRight'"
+              :icon-class="!isRightClicked ? 'unClickRight' : 'clickRight'"
               class="right_svg"
-              @click="isRightClicked ? '' : Right()"
+              @click="!isRightClicked ? '' : Right()"
             />
             <svg-icon
-              :icon-class="isLeftClicked ? 'unClickLeft' : 'clickLeft'"
+              :icon-class="!isLeftClicked ? 'unClickLeft' : 'clickLeft'"
               class="left_svg"
-              @click="isLeftClicked ? '' : Left()"
+              @click="!isLeftClicked ? '' : Left()"
             />
           </div>
           <!-- 右边框框 -->
@@ -104,6 +108,13 @@
               />
             </div>
             <div class="level searchbox">
+              <el-checkbox
+                v-model="isLeftClicked"
+                class="table-content-top-check"
+                >已勾选 {{ tableRightSelectionLength }}/{{
+                  params1.total
+                }}</el-checkbox
+              >
               <el-input
                 placeholder="请输入模块名称"
                 class="search-input"
@@ -206,10 +217,12 @@ export default {
         pageSize: 10,
         total: 0
       },
-      isRightClicked: true,
-      isLeftClicked: true,
       rightSearchName: '',
       leftSearchName: '',
+      tableLeftSelectionLength: 0,
+      tableRightSelectionLength: 0,
+      isRightClicked: false,
+      isLeftClicked: false,
       checked: false,
       leftTableData: [],
       rightTableData: [],
@@ -311,15 +324,24 @@ export default {
     selectRows(val) {
       if (val === 'left') {
         if (this.$refs.tableLeft.selection.length === 0) {
-          this.isRightClicked = true
-        } else {
           this.isRightClicked = false
+          this.tableLeftSelectionLength = 0
+        } else {
+          this.isRightClicked = true
+          console.log(
+            'this.$refs.tableLeft.selection.length',
+            this.$refs.tableLeft.selection.length
+          )
+          this.tableLeftSelectionLength = this.$refs.tableLeft.selection.length
         }
       } else {
         if (this.$refs.tableRight.selection.length === 0) {
-          this.isLeftClicked = true
-        } else {
           this.isLeftClicked = false
+          this.tableRightSelectionLength = 0
+        } else {
+          this.isLeftClicked = true
+          this.tableRightSelectionLength =
+            this.$refs.tableRight.selection.length
         }
       }
     },
@@ -386,6 +408,7 @@ export default {
         })
         return
       } else {
+        this.tableRightSelectionLength = this.$refs.tableLeft.selection.length
         this.leftTableData = this.leftTableData
           ? this.leftTableData
           : [].concat(this.$refs.tableRight.selection)
