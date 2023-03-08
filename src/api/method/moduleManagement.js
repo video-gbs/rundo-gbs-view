@@ -1,10 +1,8 @@
 // 模块管理
 import request from '@/api/fetch'
 
-import baseUrls from '@/utils/baseUrlConfig'
-
-const device = baseUrls.base3
-const streamanege = baseUrls.base4
+const device = '/api/device-control'
+const streamanege = '/api/stream-manage'
 
 export function getModuleLists(data) {
   // 网关列表
