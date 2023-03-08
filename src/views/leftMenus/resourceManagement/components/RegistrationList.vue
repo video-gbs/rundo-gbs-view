@@ -33,12 +33,17 @@
             class="mr10"
           ></el-input>
         </el-form-item>
-        <el-form-item style="float: right; margin-right: 20px">
+        <el-form-item
+          style="float: right; margin-right: 20px"
+          class="form-btn-list"
+        >
           <el-button @click="resetData"
-            ><svg-icon class="svg-btn" icon-class="cz" />重置</el-button
+            ><svg-icon class="svg-btn" icon-class="cz" />
+            <span class="btn-span">重置</span></el-button
           >
           <el-button type="primary" @click="cxData"
-            ><svg-icon class="svg-btn" icon-class="cx" />查询</el-button
+            ><svg-icon class="svg-btn" icon-class="cx" />
+            <span class="btn-span">搜索</span></el-button
           >
         </el-form-item>
       </el-form>
@@ -140,10 +145,9 @@
               v-if="scope.row.signState === 1"
               >添加
             </el-button>
-            <el-button
-              type="text"
-              @click="editData(scope.row)"
-              v-if="scope.row.signState === 2"
+
+            <!-- @click="register(scope.row)" -->
+            <el-button type="text" v-if="scope.row.signState === 2"
               >注册
             </el-button>
             <el-button
@@ -481,6 +485,20 @@ export default {
       top: 1px;
       left: -4px;
     }
+  }
+}
+.form-btn-list {
+  .btn-span {
+    position: relative;
+    top: -1px;
+    font-size: 14px;
+    font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+    font-weight: 400;
+  }
+  .svg-btn {
+    position: relative;
+    top: -1px;
+    left: -6px;
   }
 }
 </style>

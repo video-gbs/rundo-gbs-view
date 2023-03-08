@@ -472,11 +472,19 @@ export default {
       this.dialogShow1 = true
     },
     deteleAll(row) {
-      this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
+      this.$confirm(
+        `此操作将同时删除设备及归属于设备的通道信息且不可恢复。确定删除所选的${
+          this.$refs.encoderTable.selection.length > 0
+            ? this.$refs.encoderTable.selection.length
+            : 0
+        }个设备？`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
         const roleIds = []
         // console.log('this.$refs.encoderTable.selection',this.$refs)
         this.$refs.encoderTable.selection.map((item) => {
@@ -495,11 +503,15 @@ export default {
       })
     },
     deleteEncoder(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
+      this.$confirm(
+        `此操作将同时删除设备及归属于设备的通道信息且不可恢复。确定删除设备${row.name}？`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
         deleteEncoder(row.id).then((res) => {
           if (res.code === 0) {
             this.$message({
@@ -518,6 +530,8 @@ export default {
         ip: '',
         onlineState: ''
       }
+      this.params.pageNum = 1
+      this.getList()
     },
     cxData() {
       this.getList()
