@@ -1,11 +1,9 @@
 // 实施监控
 import request from '@/api/fetch'
 
-import baseUrls from '@/utils/baseUrlConfig'
+const expansion = '/api/expserver/expansion'
 
-const expansion = baseUrls.base2
-
-const device = baseUrls.base3
+const device = '/api/device-control'
 
 export function getPlayLists(data) {
   // 网关列表

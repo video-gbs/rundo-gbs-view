@@ -359,6 +359,7 @@ export default {
     }
   },
   created() {
+    console.log('this.$route.query', this.$route.query)
     const {
       model,
       username,
@@ -375,6 +376,13 @@ export default {
       gatewayId,
       deviceId
     } = this.$route.query.row
+    if (this.$route.query.back === '2') {
+      this.form.deviceId = this.$route.query.row.originId
+      this.form.videoAreaId = '1'
+    } else {
+      this.form.deviceId = deviceId
+      this.form.videoAreaId = String(videoAreaId)
+    }
     this.form1.ip = ip
     this.form1.transport = transport
     this.form1.latitude = latitude
@@ -383,11 +391,10 @@ export default {
     this.form.password = password
     this.form.name = name
     this.form.password = password
-    this.form.videoAreaId = String(videoAreaId)
     this.form.manufacturer = manufacturer
     this.form.model = model
     this.form.username = username
-    this.form.deviceId = deviceId
+    // this.form.deviceId = this.$route.query.back === '1'?deviceId:originId
     this.form.deviceType = deviceType + ''
     this.form.gatewayId = String(gatewayId)
     this.editId = this.$route.query.row.id
@@ -495,8 +502,8 @@ export default {
       ]).then(() => {
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
-        console.log(this.form)
-        console.log(this.$route.query)
+        // console.log(1, this.form)
+        // console.log(2, this.$route.query)
         editEncoder({
           ...this.form,
           ...this.form1,

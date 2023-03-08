@@ -1,9 +1,7 @@
 // 字典管理
 import request from '@/api/fetch'
 
-import baseUrls from '@/utils/baseUrlConfig'
-
-const auth = baseUrls.base1
+const auth = '/api/auth'
 
 export function getManufacturerDictionaryList(data) {
   // 网关列表
