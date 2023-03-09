@@ -28,7 +28,7 @@
           >
           <el-button type="primary" @click="cxData"
             ><svg-icon class="svg-btn" icon-class="cx" />
-            <span class="btn-span">重置</span></el-button
+            <span class="btn-span">查询</span></el-button
           >
         </el-form-item>
       </el-form>
@@ -475,19 +475,14 @@ export default {
         userName: '',
         userAccount: ''
       }
+      this.params.pageNum = 1
+      this.getList()
     },
     saveId(id) {
       this.orgId = id
     },
-    // editEquipment(row) {
-    //   getEditRolesDetail(row.id).then((res) => {
-    //     if (res.code === 0) {
-    //       this.editRolesDetail=res.data
-    //     }
-    //   })
-    // },
     deleteUser(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+      this.$confirm(`确定删除用户${row.userName}？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -505,11 +500,19 @@ export default {
       })
     },
     deteleAll() {
-      this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
+      this.$confirm(
+        `确定删除${
+          this.$refs.encoderTable.selection.length > 0
+            ? this.$refs.encoderTable.selection.length
+            : 0
+        }个用户？`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
         const roleIds = []
         // console.log('this.$refs.encoderTable.selection',this.$refs)
         this.$refs.encoderTable.selection.map((item) => {

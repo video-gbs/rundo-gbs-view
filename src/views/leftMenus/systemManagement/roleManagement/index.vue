@@ -73,7 +73,7 @@
         </div>
       </div>
       <el-table
-        ref="encoderTable"
+        ref="roleTable"
         :data="tableData"
         style="width: 100%"
         class="role-table"
@@ -340,14 +340,22 @@ export default {
       })
     },
     deteleAll() {
-      this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
+      this.$confirm(
+        `确定删除${
+          this.$refs.roleTable.selection.length > 0
+            ? this.$refs.roleTable.selection.length
+            : 0
+        }个角色？`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(() => {
         const roleIds = []
-        // console.log('this.$refs.encoderTable.selection',this.$refs)
-        this.$refs.encoderTable.selection.map((item) => {
+        // console.log('this.$refs.roleTable.selection',this.$refs)
+        this.$refs.roleTable.selection.map((item) => {
           roleIds.push(item.id)
         })
         deleteAllRoles(roleIds).then((res) => {
@@ -363,7 +371,7 @@ export default {
       })
     },
     deleteRole(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+      this.$confirm(`确定删除角色${row.roleName}？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

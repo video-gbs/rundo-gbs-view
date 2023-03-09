@@ -385,6 +385,9 @@ export default {
     }
   },
   watch: {
+    filterText(val) {
+      this.$refs.liveTree.filter(val)
+    },
     videoActiveArr(n) {
       console.log('nnnnn', n)
     },
@@ -430,11 +433,11 @@ export default {
     getIconType(data) {
       console.log('data~~~~~~~~', data)
       if (data.level) {
-        if (data.level === 2) {
-          return 'tree2'
-        } else {
-          return 'tree3'
-        }
+        // if (data.level === 2) {
+        //   return 'tree2'
+        // } else {
+        return 'tree2'
+        // }
       } else {
         switch (data.ptzType) {
           case 1:
@@ -993,8 +996,6 @@ export default {
     width: 360px;
     margin-top: -15px;
     background: #ffffff;
-    overflow-y: auto;
-    overflow-x: hidden;
     // box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }
 }
