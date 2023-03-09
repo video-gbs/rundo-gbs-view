@@ -13,13 +13,10 @@ WORKDIR /home
 RUN rm -rf /home/* && rm -rf /opt/*
 
 COPY ./ /home
-RUN ls
-
 
          # 编译前端界面
 WORKDIR /home/
-RUN  rm -r package-lock.json node-modules &&\
-     npm cache clean --force &&\
+RUN  npm cache clean --force &&\
      npm install && \
      npm run build:stage  && \
      mkdir -pv /opt/html && \
