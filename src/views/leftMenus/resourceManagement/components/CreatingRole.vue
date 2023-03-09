@@ -281,14 +281,15 @@
               </div>
             </el-tab-pane>-->
           </el-tabs>
-        </div>
-        <div class="dialog-footer">
-          <el-button @click="goback()">
-            <svg-icon class="svg-btn" icon-class="back-svg" />返回
-          </el-button>
-          <el-button type="primary" @click="save('accountForm')">
-            <svg-icon class="svg-btn" icon-class="save" />保存
-          </el-button>
+
+          <div class="dialog-footer">
+            <el-button @click="goback()">
+              <svg-icon class="svg-btn" icon-class="back-svg" />返回
+            </el-button>
+            <el-button type="primary" @click="save('accountForm')">
+              <svg-icon class="svg-btn" icon-class="save" />保存
+            </el-button>
+          </div>
         </div>
       </div>
     </el-card>
@@ -311,6 +312,23 @@ export default {
   name: '',
   components: { LineFont, pagination, leftTree },
   data() {
+    const checkRoleName = (rule, value, cb) => {
+      const regRoleName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (regRoleName.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
+            )
+          )
+        }
+      }, 500)
+    }
     return {
       form: {
         show: false,
@@ -355,9 +373,9 @@ export default {
         roleName: {
           required: true,
           max: 32,
-          min: 1,
-          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          validator: checkRoleName,
+          // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
           trigger: 'blur'
         },
         roleDesc: {

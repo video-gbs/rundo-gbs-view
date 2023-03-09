@@ -287,9 +287,9 @@ export default {
       rules: {
         menuPid: [{ required: true, message: '请选择', trigger: 'change' }],
         appId: [{ required: true, message: '请选择', trigger: 'change' }],
-        ip: [{ required: true, message: '请填写ip', trigger: 'blur' }],
-        icon: [{ required: true, message: '请填写图标', trigger: 'blur' }],
-        title: [{ required: true, message: '请填写名称', trigger: 'blur' }]
+        ip: [{ required: true, message: '请填写ip', trigger: 'change' }],
+        icon: [{ required: true, message: '请填写图标', trigger: 'change' }],
+        title: [{ required: true, message: '请填写名称', trigger: 'change' }]
       },
       treeData: [],
       editId: '',

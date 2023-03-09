@@ -165,10 +165,10 @@ export default {
       loginLoading: false,
       loginRules: {
         username: [
-          { required: true, trigger: 'blur', validator: validateUsername }
+          { required: true, trigger: 'change', validator: validateUsername }
         ],
         password: [
-          { required: true, trigger: 'blur', validator: validatePassword }
+          { required: true, trigger: 'change', validator: validatePassword }
         ]
       },
       loading: false,
@@ -213,7 +213,6 @@ export default {
             Local.set('rj_userName', username)
             Local.setToken(token)
             Local.set('rj_token', token)
-            console.log('this.$router', this.$router)
             // getRouters().then((res) => {
             //   store.dispatch('user/dynamicRouters', res)
             this.$router.push({ path: '/workTable' })

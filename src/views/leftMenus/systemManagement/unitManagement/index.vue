@@ -28,7 +28,7 @@
         </div>
 
         <el-form
-          ref="save"
+          ref="unitManagementForm"
           :model="form"
           :rules="rules"
           label-position="right"
@@ -37,17 +37,21 @@
         >
           <el-form-item label="部门信息" prop="orgName">
             <div class="f fd-c mr30">
-              <el-input v-model="form.orgName" placeholder="请输入" />
+              <el-input v-model="form.orgName" placeholder="请输入" clearable />
             </div>
           </el-form-item>
           <el-form-item label="部门负责人" prop="orgLeader">
             <div class="f fd-c mr30">
-              <el-input v-model="form.orgLeader" placeholder="请输入" />
+              <el-input
+                v-model="form.orgLeader"
+                placeholder="请输入"
+                clearable
+              />
             </div>
           </el-form-item>
           <el-form-item label="手机号码" prop="phone">
             <div class="f fd-c mr30">
-              <el-input v-model="form.phone" placeholder="请输入" />
+              <el-input v-model="form.phone" placeholder="请输入" clearable />
             </div>
           </el-form-item>
           <el-form-item label="描述" prop="description">
@@ -119,6 +123,7 @@
             <el-input
               v-model="dialog.params.orgName"
               placeholder="请输入"
+              clearable
               style="width: 436px"
             />
           </el-form-item>
@@ -127,6 +132,7 @@
             <el-input
               v-model="dialog.params.orgLeader"
               placeholder="请输入"
+              clearable
               style="width: 436px"
             />
           </el-form-item>
@@ -135,6 +141,7 @@
             <el-input
               v-model="dialog.params.phone"
               placeholder="请输入"
+              clearable
               style="width: 436px"
             />
           </el-form-item>
@@ -156,7 +163,12 @@
       </div>
     </el-dialog>
 
-    <moveTree ref="moveTree" :treeData="treeList" @init="init" />
+    <moveTree
+      ref="moveTree"
+      :treeData="treeList"
+      @init="init"
+      :fatherId="fatherId"
+    />
   </div>
 </template>
 
@@ -181,21 +193,50 @@ export default {
   data() {
     const checkOrgName = (rule, value, cb) => {
       const regOrgName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
-      if (regOrgName.test(value)) {
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (regOrgName.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
+            )
+          )
+        }
+      }, 500)
+    }
+    const checkOrgName1 = (rule, value, cb) => {
+      const regOrgName1 = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
+      if (value.length === 0) {
         return cb()
       }
-      cb(
-        new Error(
-          `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
-        )
-      )
+      setTimeout(() => {
+        if (regOrgName1.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
+            )
+          )
+        }
+      }, 500)
     }
     const checkPhone = (rule, value, cb) => {
       const regPhone = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
-      if (regPhone.test(value)) {
+      if (value.length === 0) {
         return cb()
       }
-      cb(new Error(`1～11个数字。`))
+      setTimeout(() => {
+        if (regPhone.test(value)) {
+          return cb()
+        } else {
+          return cb(new Error(`1～11个数字。`))
+        }
+      }, 1000)
     }
 
     return {
@@ -236,21 +277,19 @@ export default {
         orgName: [
           {
             validator: checkOrgName,
-            // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-            // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+            max: 32,
             required: true,
             trigger: 'blur'
           }
         ],
         orgLeader: [
           {
-            validator: checkOrgName,
+            validator: checkOrgName1,
             trigger: 'blur'
           }
         ],
         phone: [
           {
-            min: 1,
             max: 11,
             validator: checkPhone,
             trigger: 'blur'
@@ -272,7 +311,7 @@ export default {
         ],
         orgLeader: [
           {
-            validator: checkOrgName,
+            validator: checkOrgName1,
             trigger: 'blur'
           }
         ],
@@ -290,7 +329,7 @@ export default {
         orgPid: {
           required: true,
           message: '此为必填项。',
-          trigger: 'change'
+          trigger: 'blur'
         }
       },
       treeData: [],
@@ -298,6 +337,7 @@ export default {
       List: '',
       Ids: [],
       Id: '',
+      fatherId: '',
       defaultProps: {
         children: 'children',
         label: 'orgName'
@@ -324,6 +364,7 @@ export default {
     },
 
     childClickHandle(data) {
+      this.fatherId = data.id
       if (data.children && data.children.length > 0) {
         this.isMore = true
         this.treeMsg = data.orgName

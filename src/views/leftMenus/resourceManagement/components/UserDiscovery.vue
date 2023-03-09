@@ -54,6 +54,7 @@
                   color: '#333333'
                 }"
                 @select="selectRows('left')"
+                @selection-change="handleSelectionChange"
               >
                 <el-table-column type="selection" width="80" align="center">
                 </el-table-column>
@@ -154,6 +155,7 @@
                   color: '#333333'
                 }"
                 @select="selectRows('right')"
+                @selection-change="handleSelectionChange1"
               >
                 <el-table-column type="selection" width="80" align="center">
                 </el-table-column>
@@ -507,6 +509,24 @@ export default {
     fn2(arr) {
       const res = new Map()
       return arr.filter((arr) => !res.has(arr.id) && res.set(arr.id, arr.id))
+    },
+    handleSelectionChange(data) {
+      if (this.$refs.tableLeft.selection.length === 0) {
+        this.isRightClicked = false
+        this.tableLeftSelectionLength = 0
+      } else {
+        this.isRightClicked = true
+        this.tableLeftSelectionLength = data.length
+      }
+    },
+    handleSelectionChange1(data) {
+      if (this.$refs.tableRight.selection.length === 0) {
+        this.isLeftClicked = false
+        this.tableRightSelectionLength = 0
+      } else {
+        this.isLeftClicked = true
+        this.tableRightSelectionLength = data.length
+      }
     },
     selectRows(val) {
       if (val === 'left') {

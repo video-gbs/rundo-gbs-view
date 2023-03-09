@@ -275,6 +275,23 @@ export default {
     }
   },
   data() {
+    const checkName = (rule, value, cb) => {
+      const regName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (regName.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
+            )
+          )
+        }
+      }, 500)
+    }
     return {
       form: {
         model: '',
@@ -311,22 +328,22 @@ export default {
         name: {
           required: true,
           max: 32,
-          min: 1,
-          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          validator: checkName,
+          // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
           trigger: 'blur'
         },
         manufacturer: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
+          { required: true, message: '此为必填项。', trigger: 'blur' }
         ],
         gatewayId: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
+          { required: true, message: '此为必填项。', trigger: 'blur' }
         ],
         transport: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
+          { required: true, message: '此为必填项。', trigger: 'blur' }
         ],
         videoAreaId: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
+          { required: true, message: '此为必填项。', trigger: 'blur' }
         ],
         model: [{ required: true, message: '1~128个字符。', trigger: 'blur' }],
         ip: [{ required: true, message: '此为必填项。', trigger: 'blur' }],

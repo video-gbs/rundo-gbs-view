@@ -226,7 +226,26 @@
                             @click="clickSpilt(item, index)"
                             style="padding: 0 16px"
                           >
+                            <svg-icon
+                              v-if="item.num === 6"
+                              class="iconfont btn fenping"
+                              @mouseenter="changeHover(1)"
+                              @mouseleave="changeHover(2)"
+                              :icon-class="
+                                !isHover6 ? '6fenping' : '6fenpinged'
+                              "
+                            />
+                            <svg-icon
+                              v-else-if="item.num === 8"
+                              class="iconfont btn fenping"
+                              @mouseenter="changeHover(3)"
+                              @mouseleave="changeHover(4)"
+                              :icon-class="
+                                !isHover8 ? '8fenping' : '8fenpinged'
+                              "
+                            />
                             <i
+                              v-else
                               class="iconfont btn"
                               :class="[
                                 { active: item.num === spilt },
@@ -354,7 +373,9 @@ export default {
       data: [],
       filterText: '',
       hasChannel: false,
-      resArray: []
+      resArray: [],
+      isHover6: false,
+      isHover8: false
     }
   },
   mounted() {
@@ -429,6 +450,34 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    changeHover(num) {
+      console.log(num)
+      switch (num) {
+        case 1:
+          this.isHover6 = true
+          break
+        case 2:
+          this.isHover6 = false
+          break
+        case 3:
+          this.isHover8 = true
+          break
+        case 4:
+          this.isHover8 = false
+          break
+
+        default:
+          break
+      }
+
+      if (this.spilt === 6) {
+        this.isHover6 = true
+      }
+
+      if (this.spilt === 8) {
+        this.isHover8 = true
+      }
     },
     getIconType(data) {
       console.log('data~~~~~~~~', data)
@@ -992,7 +1041,7 @@ export default {
     padding: 0px 24px 0;
   }
   .securityArea_container {
-    height: 780px;
+    height: 660px;
     width: 360px;
     margin-top: -15px;
     background: #ffffff;
@@ -1260,5 +1309,9 @@ export default {
 }
 .el-tab-pane {
   padding: 0 24px;
+}
+.fenping {
+  width: 16px;
+  height: 16px;
 }
 </style>

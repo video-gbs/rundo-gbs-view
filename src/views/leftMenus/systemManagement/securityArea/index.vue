@@ -42,7 +42,11 @@
         >
           <el-form-item label="分组名称" prop="areaName">
             <div class="f fd-c mr30">
-              <el-input v-model="form.areaName" placeholder="6~20字符" />
+              <el-input
+                v-model="form.areaName"
+                placeholder="请输入"
+                clearable
+              />
             </div>
           </el-form-item>
           <el-form-item label="描述" prop="description">
@@ -112,6 +116,7 @@
             <el-input
               v-model="dialog.params.areaName"
               placeholder="请输入"
+              clearable
               style="width: 436px"
             />
           </el-form-item>
@@ -135,7 +140,12 @@
         >
       </div>
     </el-dialog>
-    <moveTree ref="moveTree" :treeData="treeList" @init="init" />
+    <moveTree
+      ref="moveTree"
+      :treeData="treeList"
+      @init="init"
+      :fatherId="fatherId"
+    />
   </div>
 </template>
 
@@ -153,10 +163,29 @@ import {
   getUnitDetails
 } from '@/api/method/securityArea'
 
+import { antiShake } from '@/utils/index.js'
+
 export default {
   name: '',
   components: { leftTree, LineFont, moveTree },
   data() {
+    const checkAreaName = (rule, value, cb) => {
+      const regAreaName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (regAreaName.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
+            )
+          )
+        }
+      }, 500)
+    }
     return {
       areaNames: 'areaNames',
       lineTitle: {
@@ -191,11 +220,9 @@ export default {
       isLoading: false,
       rules: {
         areaName: {
+          validator: checkAreaName,
           required: true,
           max: 32,
-          min: 1,
-          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
           trigger: 'blur'
         },
         areaPid: {
@@ -205,7 +232,7 @@ export default {
         },
         description: {
           message: '支持最大长度128个字符。',
-          trigger: 'blur',
+          trigger: 'change',
           max: 128
         }
       },
@@ -213,6 +240,7 @@ export default {
       List: '',
       Ids: [],
       Id: '',
+      fatherId: '',
       defaultProps: {
         children: 'children',
         label: 'areaName'
@@ -240,6 +268,7 @@ export default {
     },
 
     childClickHandle(data) {
+      this.fatherId = data.id
       if (data.children && data.children.length > 0) {
         this.isMore = true
         this.treeMsg = data.areaName
@@ -332,7 +361,7 @@ export default {
         })
       })
     },
-    submit(formName) {
+    submit: antiShake(function (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
@@ -359,7 +388,7 @@ export default {
           }
         }
       })
-    }
+    })
   }
 }
 </script>

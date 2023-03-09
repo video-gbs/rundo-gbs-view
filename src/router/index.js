@@ -629,7 +629,24 @@ router.beforeEach(async (to, from, next) => {
 
             // store.dispatch('user/dynamicRouters', configTypeRouter)
             store.dispatch('user/changeShowSidebar', true)
-            store.dispatch('user/changeActiveIndex', configTypeRouter[0].path)
+            if (
+              lastUrl === '/gatewayModuleManagement' ||
+              lastUrl === '/ModuleManagement' ||
+              lastUrl.indexOf('/streamMediaAssociated') === 0
+            ) {
+              store.dispatch('user/changeActiveIndex', configTypeRouter[2].path)
+            } else if (
+              lastUrl === '/equipment' ||
+              lastUrl === '/addEquipment' ||
+              lastUrl === '/registrationList' ||
+              lastUrl === '/channelDiscovery' ||
+              lastUrl.indexOf('/editEquipment') === 0 ||
+              lastUrl.indexOf('/editChannel') === 0
+            ) {
+              store.dispatch('user/changeActiveIndex', configTypeRouter[0].path)
+            } else {
+              store.dispatch('user/changeActiveIndex', configTypeRouter[1].path)
+            }
           }
           console.log('刷新后的最终路由', router)
 

@@ -65,7 +65,7 @@
 
     <div class="table-content">
       <div class="table-content-top">
-        <el-checkbox v-model="checked" class="table-content-top-check"
+        <el-checkbox v-model="includeEquipment" class="table-content-top-check"
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
@@ -158,7 +158,7 @@
             >
           </template>
         </el-table-column>
-        <el-table-column width="120" label="操作" fixed="right" align="center">
+        <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
             <el-button type="text" @click="editData(scope.row)"
               >编辑
@@ -229,6 +229,7 @@ import {
 } from '@/api/method/channel'
 
 import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+import { Local } from '@/utils/storage'
 
 export default {
   name: '',
@@ -246,6 +247,7 @@ export default {
         pageSize: 10,
         total: 0
       },
+      includeEquipment: false,
       lineTitle: {
         title: '移动位置',
         notShowSmallTitle: false
@@ -317,6 +319,10 @@ export default {
       ]
     }
   },
+  created() {
+    this.params.pageNum = Local.get('channelPageNum')
+    Local.remove('channelPageNum')
+  },
   mounted() {
     this.getList()
     this.getDeviceTypesDictionaryList()
@@ -328,6 +334,7 @@ export default {
         pageNum: this.params.pageNum,
         pageSize: this.params.pageSize,
         videoAreaId: orgId ? orgId : 1,
+        includeEquipment: this.includeEquipment,
         ...this.searchParams
       }).then((res) => {
         if (res.code === 0) {
@@ -359,6 +366,8 @@ export default {
       this.getList()
     },
     editData(row) {
+      Local.set('channelPageNum', this.params.pageNum)
+      Local.set('equipmentActiveName', '通道')
       this.$router.push({
         path: `/editChannel`,
         query: {

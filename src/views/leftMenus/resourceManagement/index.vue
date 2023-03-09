@@ -52,7 +52,12 @@ export default {
       changRight: ''
     }
   },
-  created() {},
+  created() {
+    this.activeName = Local.get('equipmentActiveName')
+      ? Local.get('equipmentActiveName')
+      : '编码器'
+    Local.remove('equipmentActiveName')
+  },
   mounted() {
     this.init()
   },
@@ -81,7 +86,7 @@ export default {
         })
     },
     handleClick(val, event) {
-      // console.log('val',val)
+      console.log('val', val)
       this.activeName = val.label
     },
     childClickHandle(data) {

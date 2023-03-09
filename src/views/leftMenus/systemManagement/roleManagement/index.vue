@@ -144,6 +144,7 @@ import {
   getSysOrgTree
 } from '@/api/method/role'
 import pagination from '@/components/Pagination/index.vue'
+import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { pagination },
@@ -174,12 +175,12 @@ export default {
       },
       rules: {
         name: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' },
+          { required: true, message: '请输入角色名称', trigger: 'change' },
           {
             min: 0,
             max: 15,
             message: '长度在 3 到 15 个字符',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ]
       },
@@ -188,6 +189,10 @@ export default {
       buttonLoading: false,
       treeData: []
     }
+  },
+  created() {
+    this.params.pageNum = Local.get('rolePageNum')
+    Local.remove('rolePageNum')
   },
   mounted() {
     this.getList()
@@ -279,6 +284,7 @@ export default {
       this.$router.push({ path: '/creatingRole', query: { key: 'add' } })
     },
     goEditRole(row) {
+      Local.set('rolePageNum', this.params.pageNum)
       this.$router.push({
         path: '/creatingRole',
         query: { key: 'edit', row: row.id }

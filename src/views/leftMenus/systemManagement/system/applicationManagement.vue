@@ -258,6 +258,23 @@ export default {
   name: '',
   components: { pagination },
   data() {
+    const checkAppName = (rule, value, cb) => {
+      const regAppName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (regAppName.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
+            )
+          )
+        }
+      }, 500)
+    }
     return {
       appTypeOptions: [],
       switchValue: true,
@@ -307,14 +324,12 @@ export default {
         appName: {
           required: true,
           max: 32,
-          min: 1,
-          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          validator: checkAppName,
+          // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
           trigger: 'blur'
         },
-        appType: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
-        ],
+        appType: [{ required: true, message: '此为必填项。', trigger: 'blur' }],
         appDesc: {
           message: '支持最大长度128个字符。',
           trigger: 'blur',

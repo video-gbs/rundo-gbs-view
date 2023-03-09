@@ -150,9 +150,11 @@
             <el-button type="text" v-if="scope.row.signState === 2"
               >注册
             </el-button>
+
+            <!-- @click="editData(scope.row)" -->
             <el-button
               type="text"
-              @click="editData(scope.row)"
+              @click="goAddRouter(scope.row)"
               v-if="scope.row.signState === -1"
               >恢复
             </el-button>
@@ -220,8 +222,8 @@ export default {
       },
       rules: {
         name: [
-          { required: true, message: '请输入活动名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+          { required: true, message: '请输入活动名称', trigger: 'change' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'change' }
         ],
         region: [
           { required: true, message: '请选择活动区域', trigger: 'change' }
@@ -253,7 +255,7 @@ export default {
         resource: [
           { required: true, message: '请选择活动资源', trigger: 'change' }
         ],
-        ip: [{ required: true, message: '请填写ip', trigger: 'blur' }]
+        ip: [{ required: true, message: '请填写ip', trigger: 'change' }]
       }
     }
   },
