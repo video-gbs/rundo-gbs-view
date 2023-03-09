@@ -16,11 +16,12 @@ COPY ./ /home
 
          # 编译前端界面
 WORKDIR /home/
+
 RUN  npm cache clean --force &&\
      npm install && \
-     npm run build  && \
+     npm run build
      mkdir -pv /opt/html && \
-     cp -rf /home/dist/* /opt/html/ &&\
+     cp -rf /home/dist/* /opt/html/
 
 FROM harbor.runjian.com/syy-open/nginx:1.20
 
