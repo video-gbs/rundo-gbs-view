@@ -268,7 +268,7 @@ export default {
       form: {
         model: '',
         username: '',
-        deviceType: '',
+        deviceType: '1',
         manufacturer: '',
         videoAreaId: '',
         deviceId: '',

@@ -1,9 +1,7 @@
 // 首页管理
 import request from '@/api/fetch'
 
-import baseUrls from '@/utils/baseUrlConfig'
-
-const rundoAuthServer = baseUrls.base1
+const rundoAuthServer = '/api/auth'
 
 export function getHomeLists(data) {
   // 权限树

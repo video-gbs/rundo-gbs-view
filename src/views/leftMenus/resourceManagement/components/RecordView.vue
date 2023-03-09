@@ -8,7 +8,11 @@
         <div style="display: flex; flex-direction: row; height: 100%">
           <div class="left-tree" v-show="isShowMenu">
             <div class="equipment-group-wrapper-top">
-              <el-tabs v-model="activeTab" class="real-time-monitoring">
+              <el-tabs
+                v-model="activeTab"
+                @tab-click="switchTab"
+                class="real-time-monitoring"
+              >
                 <el-tab-pane label="安防通道分组" name="equipmentGroup">
                   <div class="securityArea_container">
                     <div class="tree-content">
@@ -47,18 +51,9 @@
                                 class="tree1"
                               />
                               <svg-icon
-                                v-else-if="
-                                  data.level === 2 ||
-                                  data.level === 3 ||
-                                  data.level === 4
-                                "
-                                icon-class="tree2"
-                                class="tree2"
-                              />
-                              <svg-icon
                                 v-else
-                                icon-class="tree3"
-                                class="tree3"
+                                :icon-class="getIconType(data)"
+                                class="tree2"
                               />
                               {{ data.orgName || data.areaName }}
                             </span>
@@ -526,6 +521,10 @@ export default {
   watch: {
     treeList(n) {
       this.treeList = n
+    },
+    filterText(val) {
+      console.log(val)
+      this.$refs.recordViewTree.filter(val)
     }
   },
 
@@ -548,6 +547,12 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    filterNode(value, data) {
+      console.log(value, data)
+      if (!value) return true
+      return data.areaNames && data.areaNames.indexOf(value) !== -1
+      // }
     },
 
     async getPlaybackList(date, playStartTime = this.playTime) {
@@ -589,11 +594,73 @@ export default {
       this.formData.loading = false
       this.playRecord(1, date)
     },
-
-    filterNode(value, data) {
-      if (!value) return true
-      return data.areaNames && data.areaNames.indexOf(value) !== -1
-      // }
+    switchTab(tab, event) {
+      console.log(tab, event)
+    },
+    getIconType(data) {
+      console.log('data~~~~~~~~', data)
+      if (data.level) {
+        // if (data.level === 2) {
+        //   return 'tree2'
+        // } else {
+        return 'tree2'
+        // }
+      } else {
+        switch (data.ptzType) {
+          case 1:
+            if (data.onlineState === 0) {
+              return 'qiangjilx'
+            } else {
+              return 'qiangjizx'
+            }
+            break
+          case 2:
+            if (data.onlineState === 0) {
+              return 'qjlx'
+            } else {
+              return 'qjzx'
+            }
+            break
+          case 3:
+            if (data.onlineState === 0) {
+              return 'bqlx'
+            } else {
+              return 'bqzx'
+            }
+            break
+          case 4:
+            if (data.onlineState === 0) {
+              return 'ytqjlx'
+            } else {
+              return 'ytqjzx'
+            }
+            break
+          case 5:
+            if (data.onlineState === 0) {
+              return 'arqjlx'
+            } else {
+              return 'arqjzx'
+            }
+            break
+          case 6:
+            if (data.onlineState === 0) {
+              return 'quanjinglx'
+            } else {
+              return 'quanjingzx'
+            }
+            break
+          case 7:
+          case 0:
+            if (data.onlineState === 0) {
+              return 'qitalx'
+            } else {
+              return 'qitazx'
+            }
+            break
+          default:
+            break
+        }
+      }
     },
     async getDeviceList(id) {
       await getPlayLists({ channelId: id })
@@ -623,6 +690,7 @@ export default {
                       areaName: item.channelName,
                       areaNames: item.channelName,
                       areaPid: item.id,
+                      ptzType: item.ptzType,
                       children: []
                     })
                   })
@@ -2083,8 +2151,6 @@ export default {
     width: 340px;
     margin-top: 5px;
     background: #ffffff;
-    overflow-y: auto;
-    overflow-x: hidden;
     margin-left: 10px;
     // box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }

@@ -20,6 +20,7 @@
           </el-button>
         </div>
         <leftTree
+          ref="securityAreaTree"
           :treeData="treeList"
           @childClickHandle="childClickHandle"
           :defaultPropsName="areaNames"
@@ -75,7 +76,7 @@
           ref="accountForm"
           class="params-form"
           size="mini"
-          label-position="left"
+          label-position="right"
           label-width="80px"
           :model="dialog.params"
           :rules="rules"
@@ -126,7 +127,10 @@
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="submit('accountForm')"
+        <el-button
+          type="primary"
+          @click="submit('accountForm')"
+          :loading="isLoading"
           >确 定</el-button
         >
       </div>
@@ -184,6 +188,7 @@ export default {
         areaName: '',
         description: ''
       },
+      isLoading: false,
       rules: {
         areaName: {
           required: true,
@@ -273,12 +278,15 @@ export default {
       done()
     },
     dialogShow() {
-      ;(this.dialog.params = {
-        areaPid: '',
-        description: '',
-        areaName: ''
-      }),
-        (this.editShow = true)
+      if (this.$refs.accountForm) {
+        this.$refs.accountForm.resetFields()
+        // this.dialog.params = {
+        //   areaPid: '',
+        //   description: '',
+        //   areaName: ''
+        // }
+      }
+      this.editShow = true
 
       this.dialog.show = !this.dialog.show
     },
@@ -292,22 +300,25 @@ export default {
             type: 'success',
             message: '编辑成功'
           })
+          this.$refs.securityAreaTree.chooseId(this.detailsId)
           this.init(this.detailsId)
         }
       })
     },
     deleteAccount() {
-      this.$confirm(
-        !this.isMore
+      const h = this.$createElement
+      this.$confirm('提示', {
+        title: '提示',
+        message: !this.isMore
           ? `确定删除分组${this.treeMsg}？`
-          : `此操作将删除${this.treeMsg}及其下级节点,确定删除？`,
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).then(() => {
+          : h('div', [
+              h('p', `此操作将删除${this.treeMsg}及其下级节点`),
+              h('p', { style: 'position:relative;top:20px;' }, '确定删除？')
+            ]),
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
         unitDelete(this.detailsId).then((res) => {
           if (res.code === 0) {
             this.$message({
@@ -327,32 +338,22 @@ export default {
           switch (this.dialog.title) {
             case '新建部门':
               this.dialog.params.areaPid = this.Id
+              this.isLoading = true
               unitAdd(this.dialog.params).then((res) => {
                 if (res.code === 0) {
                   this.$message({
                     type: 'success',
                     message: '新建成功'
                   })
-
+                  this.isLoading = false
                   this.dialog.show = false
                   this.detailsId = res.data.id
                   this.init(this.detailsId)
-                  // this.getUnitDetailsData()
+
+                  this.$refs.securityAreaTree.chooseId(this.Id)
                 }
               })
               break
-            case '编辑':
-              editApplication({ id: this.editId, ...this.dialog.params }).then(
-                (res) => {
-                  if (res.code === 0) {
-                    this.$message.success('编辑成功')
-                    this.dialog.show = false
-                    this.getList()
-                  }
-                }
-              )
-              break
-
             default:
               break
           }

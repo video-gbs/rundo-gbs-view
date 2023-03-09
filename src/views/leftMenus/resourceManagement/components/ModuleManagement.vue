@@ -100,7 +100,7 @@
         </div>
       </div>
 
-      <el-dialog title="编辑" :visible.sync="dialogShow" width="30%">
+      <el-dialog title="编辑" :visible.sync="dialogShow" width="600px">
         <div slot="title" class="dialog-title">
           <LineFont
             :line-title="lineTitle"
@@ -109,7 +109,7 @@
           />
         </div>
         <div>
-          <el-form label-width="100px" :model="dialogForm" :rules="rules">
+          <el-form label-width="100px" :model="dialogForm">
             <el-form-item label="模块名称：">
               <el-input
                 v-model="dialogForm.name"

@@ -17,6 +17,7 @@
         :default-expanded-keys="['根节点']"
         :expand-on-click-node="false"
         highlight-current
+        node-key="id"
         @node-click="handleNodeClick"
         :filter-node-method="filterNode"
       >
@@ -27,14 +28,15 @@
               icon-class="tree1"
               class="tree1"
             />
-            <svg-icon
+            <!-- <svg-icon
               v-else-if="
                 data.level === 2 || data.level === 3 || data.level === 4
               "
               icon-class="tree2"
               class="tree2"
-            />
-            <svg-icon v-else icon-class="tree3" class="tree3" />
+            /> -->
+            <svg-icon v-else icon-class="tree2" class="tree2" />
+            <!-- <svg-icon v-else icon-class="tree3" class="tree3" /> -->
             {{ data.orgName || data.areaName }}
           </span>
         </span>
@@ -79,6 +81,11 @@ export default {
     handleNodeClose(data) {
       // data.icon = 'tree2'
     },
+    chooseId(id) {
+      this.$nextTick(() => {
+        this.$refs.tree.setCurrentKey(id)
+      })
+    },
     filterNode(value, data) {
       if (!value) return true
       if (this.$props.defaultPropsName === 'orgName') {
@@ -92,7 +99,9 @@ export default {
 </script>
 
 <style lang="scss" scope>
-// .operation_box {
+.operation_box {
+  height: 100%;
+}
 ::v-deep .tree {
   margin-left: 0px;
 }
@@ -167,6 +176,8 @@ export default {
 }
 // 去掉顶部线条
 .tree {
+  max-height: calc(100% - 100px);
+  overflow-y: auto;
   & > .el-tree-node::after {
     border-top: none;
   }
@@ -174,6 +185,30 @@ export default {
     border-left: none;
   }
 }
+
+// 滚动条大小设置
+.tree::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+.tree::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+.tree::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+.tree::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+
 .tree1,
 .tree2,
 .tree3 {
