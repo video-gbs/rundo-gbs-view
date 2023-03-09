@@ -8,7 +8,7 @@
         :model="searchParams"
         label-width="100px"
       >
-        <el-form-item label="外类型:">
+        <el-form-item label="外类类型:">
           <el-select
             v-model="searchParams.deviceType"
             class="mr10"
@@ -16,7 +16,7 @@
             placeholder="请选择"
           >
             <el-option
-              v-for="obj in optionsList"
+              v-for="obj in deviceTypesOptionsList"
               :key="obj.value"
               :label="obj.label"
               :value="obj.value"
@@ -228,6 +228,8 @@ import {
   deleteChannel
 } from '@/api/method/channel'
 
+import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+
 export default {
   name: '',
   components: { pagination, leftTree, LineFont },
@@ -287,6 +289,7 @@ export default {
           value: 1
         }
       ],
+      deviceTypesOptionsList: [],
       checked: false,
       dialogShow: false,
       dialogShow1: false,
@@ -316,6 +319,7 @@ export default {
   },
   mounted() {
     this.getList()
+    this.getDeviceTypesDictionaryList()
   },
   methods: {
     getList(orgId) {
@@ -331,6 +335,18 @@ export default {
           this.params.total = res.data.total
           this.params.pages = res.data.pages
           this.params.current = res.data.current
+        }
+      })
+    },
+    async getDeviceTypesDictionaryList() {
+      await getManufacturerDictionaryList('Appearance').then((res) => {
+        if (res.code === 0) {
+          res.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.deviceTypesOptionsList.push(obj)
+          })
         }
       })
     },
@@ -350,7 +366,6 @@ export default {
         }
       })
     },
-    restart() {},
     deploymentData() {
       this.dialogShow1 = true
     },
@@ -401,6 +416,8 @@ export default {
         ip: '',
         onlineState: ''
       }
+      this.params.pageNum = 1
+      this.getList()
     },
     cxData() {
       this.getList()

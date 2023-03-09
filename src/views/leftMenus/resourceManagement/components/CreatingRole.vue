@@ -608,7 +608,7 @@ export default {
                   if (res.code === 0) {
                     this.$message({
                       type: 'success',
-                      message: '账号修改成功'
+                      message: '修改角色成功'
                     })
                     this.goback()
                   }
@@ -927,7 +927,7 @@ export default {
       .left-lists-table-tree {
         margin-left: 20px;
         .addRoleTree {
-          max-height: 480px;
+          max-height: 440px;
           width: 300px;
           overflow-y: auto;
         }
@@ -999,7 +999,7 @@ export default {
     }
     .text {
       margin-top: 20px;
-      height: 480px;
+      height: 440px;
       overflow: auto;
     }
   }

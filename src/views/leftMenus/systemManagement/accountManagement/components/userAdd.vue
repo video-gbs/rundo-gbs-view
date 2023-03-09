@@ -319,7 +319,8 @@ export default {
           min: 8,
           message:
             '8~20个字符;至少由大写字母、小写字母、数字、特殊字符任意两种组成。',
-          pattern: /(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\W_]).{8,20}/,
+          pattern:
+            /^(?!^\d+$)(?!^[a-z]+$)(?!^[A-Z]+$)(?!^[^a-z0-9]+$)(?!^[^A-Z0-9]+$)(?!^.*[\u4E00-\u9FA5].*$)^\S*$/,
           trigger: 'blur'
         },
         rePassword: {
@@ -328,7 +329,8 @@ export default {
           min: 8,
           message:
             '8~20个字符;至少由大写字母、小写字母、数字、特殊字符任意两种组成。',
-          pattern: /(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\W_]).{8,20}/,
+          pattern:
+            /^(?!^\d+$)(?!^[a-z]+$)(?!^[A-Z]+$)(?!^[^a-z0-9]+$)(?!^[^A-Z0-9]+$)(?!^.*[\u4E00-\u9FA5].*$)^\S*$/,
           trigger: 'blur'
         },
 
@@ -447,7 +449,6 @@ export default {
       return true
     },
     save(formName) {
-      // console.log(1111,this.$refs.userTable.selection)
       Promise.all([
         this.$refs.form.validate(),
         this.$refs.form1.validate()
@@ -486,7 +487,7 @@ export default {
       this.getLists()
     },
     nodeClickHandle(data) {
-      this.form.orgId = data.areaName
+      this.form.orgId = data.orgName
       this.Id = data.id
       this.$refs.selectTree.blur()
     }

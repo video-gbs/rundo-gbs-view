@@ -1,8 +1,6 @@
 import request from '@/api/fetch'
 
-import baseUrls from '@/utils/baseUrlConfig'
-
-const auth = baseUrls.base1
+const auth = '/api/auth'
 // 菜单管理
 // 新增菜单
 export function addMenuInfo(params) {
