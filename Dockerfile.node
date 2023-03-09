@@ -13,6 +13,7 @@ WORKDIR /home
 RUN rm -rf /home/* && rm -rf /opt/*
 
 COPY ./ /home
+RUN ls
 
 
          # 编译前端界面
