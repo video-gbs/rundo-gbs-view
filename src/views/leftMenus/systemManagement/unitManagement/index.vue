@@ -191,8 +191,7 @@ export default {
       )
     }
     const checkPhone = (rule, value, cb) => {
-      const regPhone =
-        /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+      const regPhone = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
       if (regPhone.test(value)) {
         return cb()
       }
@@ -251,6 +250,8 @@ export default {
         ],
         phone: [
           {
+            min: 1,
+            max: 11,
             validator: checkPhone,
             trigger: 'blur'
           }
