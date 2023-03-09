@@ -18,9 +18,9 @@ COPY ./ /home
 WORKDIR /home/
 
 RUN  npm cache clean --force &&\
-     npm install && \
-     npm run build
-     mkdir -pv /opt/html && \
+     npm install &&\
+     npm run build &&\
+     mkdir -pv /opt/html &&\
      cp -rf /home/dist/* /opt/html/
 
 FROM harbor.runjian.com/syy-open/nginx:1.20
