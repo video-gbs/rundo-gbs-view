@@ -82,12 +82,12 @@
                 >
                   <el-option :value="List">
                     <el-tree
-                      class="unit-tree"
+                      ref="userEditTree"
+                      class="userEdit-tree"
                       :data="treeList"
                       node-key="id"
                       :props="defaultProps"
                       :default-expanded-keys="Ids"
-                      ref="tree"
                       highlight-current
                       :expand-on-click-node="false"
                       @node-click="nodeClickHandle"
@@ -269,8 +269,7 @@ export default {
   components: { pagination },
   data() {
     const checkPhone = (rule, value, cb) => {
-      const regPhone =
-        /^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+      const regPhone = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
       if (regPhone.test(value)) {
         return cb()
       }
@@ -370,6 +369,8 @@ export default {
         },
         phone: [
           {
+            min: 1,
+            max: 11,
             validator: checkPhone,
             trigger: 'blur'
           }
@@ -520,7 +521,7 @@ export default {
       this.getLists()
     },
     nodeClickHandle(data) {
-      this.form.orgId = data.areaName
+      this.form.orgId = data.orgName
       this.Id = data.id
       this.$refs.selectTree.blur()
     }
@@ -529,6 +530,40 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+// 滚动条大小设置
+::v-deep .box-card::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+
+// 滚动条滑块样式设置
+::v-deep .box-card::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .box-card::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .box-card::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
+}
+// 去掉顶部线条
+::v-deep .userEdit-tree > .el-tree-node::after {
+  border-top: none !important;
+}
+::v-deep .userEdit-tree > .el-tree-node::before {
+  border-left: none;
+}
 ::v-deep .el-card__header {
   padding: 0 16px;
   height: 62px;
