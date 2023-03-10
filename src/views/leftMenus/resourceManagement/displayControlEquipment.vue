@@ -167,28 +167,28 @@ export default {
       editorCxt: '',
 
       rules: {
-        content: [{ validator: checkContent, trigger: 'blur' }],
+        content: [{ validator: checkContent, trigger: 'change' }],
         title: [
-          { required: true, message: '请输入标题', trigger: 'blur' },
+          { required: true, message: '请输入标题', trigger: 'change' },
           {
             min: 2,
             max: 50,
             message: '长度在 2 到 50 个字符',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         pageUrl: [
-          // { required: true, message: '请输入链接地址', trigger: 'blur' },
+          // { required: true, message: '请输入链接地址', trigger: 'change' },
           { validator: checkPageUrl, trigger: ['blur', 'change'] },
           {
             min: 10,
             max: 200,
             message: '长度在 10 到 200 个字符',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         photoUrl: [
-          { required: true, message: '请上传一张轮播图', trigger: 'blur' }
+          { required: true, message: '请上传一张轮播图', trigger: 'change' }
         ]
       }
     }

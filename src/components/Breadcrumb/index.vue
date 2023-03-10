@@ -40,6 +40,13 @@ export default {
       this.levelList = matched.filter(
         (item) => item.meta && item.meta.title && item.meta.breadcrumb !== false
       )
+      if (this.$route.query.key === 'edit') {
+        this.levelList[1].meta.title = '编辑角色'
+      } else if (this.$route.query.key === 'add') {
+        this.levelList[1].meta.title = '新建角色'
+      } else {
+        this.levelList[1].meta.title = this.levelList[1].meta.title
+      }
       console.log('this.levelList', this.levelList)
     },
     isDashboard(route) {

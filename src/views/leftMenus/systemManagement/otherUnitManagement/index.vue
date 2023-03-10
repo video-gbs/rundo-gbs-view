@@ -343,31 +343,31 @@ export default {
       passwordVisible: false,
       rules: {
         account: [
-          { required: true, message: '不能为空', trigger: 'blur' },
+          { required: true, message: '不能为空', trigger: 'change' },
           {
             min: 6,
             max: 20,
             message: '长度为6-20个字符',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         name: {
           required: true,
           message: '不能为空,长度不能超过20个字符',
-          trigger: 'blur',
+          trigger: 'change',
           max: 20
         },
         mobile: {
           pattern: /^(1[3-9]\d{9})$/,
           message: '请输入正确的手机号码',
-          trigger: 'blur',
+          trigger: 'change',
           required: false
         },
         password: [
           {
             required: true,
             message: '不能为空,长度为6-20个字符',
-            trigger: 'blur',
+            trigger: 'change',
             min: 6,
             max: 20
           },
@@ -379,20 +379,20 @@ export default {
                 callback('密码强度不够，至少包含数字/字母/字符两种组合')
               }
             },
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         rePassword: {
           required: true,
           message: '不能为空,长度为6-20个字符',
-          trigger: 'blur',
+          trigger: 'change',
           min: 6,
           max: 20
         },
         nickName: {
           required: true,
           message: '不能为空',
-          trigger: 'blur',
+          trigger: 'change',
           max: 40
         },
         email: {
@@ -400,17 +400,17 @@ export default {
             /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9_\.\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
           required: true,
           message: '请输入正确的邮箱',
-          trigger: 'blur'
+          trigger: 'change'
         },
         deptId: {
           required: true,
           message: '不能为空',
-          trigger: 'blur'
+          trigger: 'change'
         }
         // roleId: {
         //   required: true,
         //   message: '不能为空',
-        //   trigger: 'blur'
+        //   trigger: 'change'
         // }
       },
       params: {

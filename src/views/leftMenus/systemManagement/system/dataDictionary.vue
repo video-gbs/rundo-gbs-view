@@ -274,39 +274,39 @@ export default {
       },
       rules: {
         groupName: [
-          { required: true, message: '请输入字典名称', trigger: 'blur' },
+          { required: true, message: '请输入字典名称', trigger: 'change' },
           {
             min: 0,
             max: 15,
             message: '长度在 3 到 15 个字符',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         itemValue: [
-          { required: true, message: '请输入字典项Value', trigger: 'blur' },
+          { required: true, message: '请输入字典项Value', trigger: 'change' },
           {
             min: 0,
             max: 15,
             message: '长度在 3 到 15 个字符',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         groupCode: [
-          { required: true, message: '请输入字典编码', trigger: 'blur' },
+          { required: true, message: '请输入字典编码', trigger: 'change' },
           {
             min: 0,
             max: 15,
             message: '长度在 3 到 15 个字符',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         itemName: [
-          { required: true, message: '请输入字典项名称', trigger: 'blur' },
+          { required: true, message: '请输入字典项名称', trigger: 'change' },
           {
             min: 0,
             max: 15,
             message: '长度在 3 到 15 个字符',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ]
       },
@@ -393,7 +393,7 @@ export default {
       this.permissionDialog.show = !this.permissionDialog.show
       this.roleId = id
       permissionTree(id).then((res) => {
-        if (res.code === 10000) {
+        if (res.code === 0) {
           this.permissionTableData = res.data
         }
       })
@@ -417,7 +417,7 @@ export default {
         permissionIds: this.checkList
       }).then((res) => {
         this.buttonLoading = false
-        if (res.code === 10000) {
+        if (res.code === 0) {
           this.$message({
             message: '保存成功！',
             type: 'success'
@@ -448,7 +448,7 @@ export default {
         type: 'warning'
       }).then(() => {
         deleteDictionary(row.id).then((res) => {
-          if (res.code === 10000) {
+          if (res.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'

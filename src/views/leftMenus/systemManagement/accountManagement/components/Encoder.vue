@@ -249,6 +249,8 @@ import {
   deteleAllUser
 } from '@/api/method/user'
 
+import { Local } from '@/utils/storage'
+
 export default {
   name: '',
   components: { pagination, LineFont },
@@ -326,6 +328,10 @@ export default {
       orgId: '',
       editRolesDetail: []
     }
+  },
+  created() {
+    this.params.pageNum = Local.get('accountManagementPageNum')
+    Local.remove('accountManagementPageNum')
   },
   mounted() {},
   methods: {
@@ -425,6 +431,7 @@ export default {
       this.$router.push(`/user`)
     },
     editEquipment(row) {
+      Local.set('accountManagementPageNum', this.params.pageNum)
       this.$router.push({ path: '/editUser', query: { key: row.id } })
     },
     changeSwitch(row) {
@@ -535,7 +542,7 @@ export default {
     }
     .table-content-bottom {
       // padding: 0 18px;
-      max-height: calc(100% - 154px);
+      max-height: calc(100% - 185px);
       overflow-y: auto;
     }
   }

@@ -33,10 +33,11 @@
             highlight-current
             node-key="id"
             default-expand-all
-            @node-drop="handleDrop"
-            draggable
-            :allow-drag="allowDrag"
+            @node-click="handleNodeClick"
           >
+            <!-- @node-drop="handleDrop"
+            draggable
+            :allow-drag="allowDrag" -->
             <span slot-scope="{ node, data }" class="custom-tree-node">
               <span>
                 <svg-icon
@@ -61,7 +62,9 @@
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click="moveTreeShow = false">取 消</el-button>
-      <el-button type="primary" @click="moveTreeShow = false">确 定</el-button>
+      <el-button type="primary" @click="moveTree" :loading="isLoading"
+        >确 定</el-button
+      >
     </div>
   </el-dialog>
 </template>
@@ -73,6 +76,10 @@ export default {
   name: '',
   components: { LineFont },
   props: {
+    fatherId: {
+      type: String,
+      default: () => ''
+    },
     treeData: {
       type: Array,
       default: function () {
@@ -103,7 +110,9 @@ export default {
         height: '18px'
       },
       filterText: '',
-      moveTreeShow: false
+      moveTreeShow: false,
+      childId: '',
+      isLoading: false
     }
   },
 
@@ -112,15 +121,36 @@ export default {
       this.$refs.tree.filter(val)
     }
   },
-  mounted() {},
+  mounted() {
+    console.log('this.$props.fatherId', this.$props.fatherId)
+  },
   methods: {
     handleClose(done) {
       done()
     },
+    moveTree() {
+      this.loading = true
+      // console.log('this.$props.fatherId', this.$props.fatherId)
+      moveDepart({ id: this.$props.fatherId, areaPid: this.childId }).then(
+        (res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '移动成功'
+            })
+          }
+          this.$emit('init')
+          this.loading = false
+          this.moveTreeShow = false
+        }
+      )
+    },
     changeMoveTreeShow() {
       this.moveTreeShow = true
     },
-    handleNodeClick(data, index) {},
+    handleNodeClick(data, index) {
+      this.childId = data.id
+    },
     allowDrag(draggingNode) {
       return true
     },
@@ -160,16 +190,6 @@ export default {
       // console.log('dropNode',dropNode)
       let id = draggingNode.data.id
       let areaPid = dropNode.data.id
-      moveDepart({ id, areaPid }).then((res) => {
-        if (res.code === 0) {
-          this.$message({
-            type: 'success',
-            message: '移动成功'
-          })
-        }
-        this.$emit('init')
-        this.loading = false
-      })
     }
   }
 }

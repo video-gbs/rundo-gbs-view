@@ -33,9 +33,7 @@
             highlight-current
             node-key="id"
             default-expand-all
-            @node-drop="handleDrop"
-            draggable
-            :allow-drag="allowDrag"
+            @node-click="handleNodeClick"
           >
             <span slot-scope="{ node, data }" class="custom-tree-node">
               <span>
@@ -61,7 +59,9 @@
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button @click="moveTreeShow = false">取 消</el-button>
-      <el-button type="primary" @click="moveTreeShow = false">确 定</el-button>
+      <el-button type="primary" @click="moveTree" :loading="isLoading"
+        >确 定</el-button
+      >
     </div>
   </el-dialog>
 </template>
@@ -73,6 +73,10 @@ export default {
   name: '',
   components: { LineFont },
   props: {
+    fatherId: {
+      type: String,
+      default: () => ''
+    },
     treeData: {
       type: Array,
       default: function () {
@@ -103,7 +107,9 @@ export default {
         width: '3px',
         height: '18px'
       },
-      filterText: ''
+      filterText: '',
+      childId: '',
+      isLoading: false
     }
   },
 
@@ -116,6 +122,26 @@ export default {
   methods: {
     handleClose(done) {
       done()
+    },
+    moveTree() {
+      this.isLoading = true
+      // console.log('this.$props.fatherId', this.$props.fatherId)
+      moveDepart({ id: this.$props.fatherId, orgPid: this.childId }).then(
+        (res) => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '移动成功'
+            })
+          }
+          this.$emit('init')
+          this.isLoading = false
+          this.moveTreeShow = false
+        }
+      )
+    },
+    handleNodeClick(data, index) {
+      this.childId = data.id
     },
     changeMoveTreeShow() {
       this.moveTreeShow = true

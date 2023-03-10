@@ -193,6 +193,18 @@
         <div slot="header" class="clearfix">
           <svg-icon icon-class="yhxx" class="pjqktj_svg" />
           <span>角色</span>
+          <el-input
+            placeholder="请输入角色名称"
+            class="search-input"
+            clearable
+            v-model="roleName"
+            style="width: 240px; float: right; margin: 20px 20px 0 0"
+            ><el-button
+              icon="el-icon-search"
+              slot="append"
+              @click="search()"
+            ></el-button
+          ></el-input>
         </div>
         <div class="last-table">
           <el-table
@@ -270,13 +282,73 @@ export default {
   data() {
     const checkPhone = (rule, value, cb) => {
       const regPhone = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
-      if (regPhone.test(value)) {
+
+      if (value.length === 0) {
         return cb()
       }
-      cb(new Error(`1～11个数字。`))
+      setTimeout(() => {
+        if (regPhone.test(value)) {
+          return cb()
+        } else {
+          return cb(new Error(`1～11个数字。`))
+        }
+      }, 500)
+    }
+    const checkUserAccount = (rule, value, cb) => {
+      const regUserAccount = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (regUserAccount.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
+            )
+          )
+        }
+      }, 500)
+    }
+    const checkUserAccount1 = (rule, value, cb) => {
+      const regUserAccount1 = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
+      if (value.length === 0) {
+        return cb()
+      }
+      setTimeout(() => {
+        if (regUserAccount1.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
+            )
+          )
+        }
+      }, 500)
+    }
+    const checkPassword = (rule, value, cb) => {
+      const regPassword =
+        /^(?!^\d+$)(?!^[a-z]+$)(?!^[A-Z]+$)(?!^[^a-z0-9]+$)(?!^[^A-Z0-9]+$)(?!^.*[\u4E00-\u9FA5].*$)^\S*$/
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (regPassword.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              '8~20个字符;至少由大写字母、小写字母、数字、特殊字符任意两种组成。'
+            )
+          )
+        }
+      }, 500)
     }
     return {
       tableData: [],
+      roleName: '',
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -310,34 +382,36 @@ export default {
         userAccount: {
           required: true,
           max: 32,
-          min: 1,
-          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          validator: checkUserAccount,
+          // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
           trigger: 'blur'
         },
         userName: {
           max: 32,
-          min: 1,
-          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          validator: checkUserAccount1,
+          // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
           trigger: 'blur'
         },
         password: {
           required: true,
           max: 20,
           min: 8,
-          message:
-            '8~20个字符;至少由大写字母、小写字母、数字、特殊字符任意两种组成。',
-          pattern: /(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\W_]).{8,20}/,
+          validator: checkPassword,
+          // message:
+          //   '8~20个字符;至少由大写字母、小写字母、数字、特殊字符任意两种组成。',
+          // pattern: /(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\W_]).{8,20}/,
           trigger: 'blur'
         },
         rePassword: {
           required: true,
           max: 20,
           min: 8,
-          message:
-            '8~20个字符;至少由大写字母、小写字母、数字、特殊字符任意两种组成。',
-          pattern: /(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\W_]).{8,20}/,
+          validator: checkPassword,
+          // message:
+          //   '8~20个字符;至少由大写字母、小写字母、数字、特殊字符任意两种组成。',
+          // pattern: /(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\W_]).{8,20}/,
           trigger: 'blur'
         },
 
@@ -345,21 +419,21 @@ export default {
           {
             required: true,
             message: '请选择部门',
-            trigger: 'change'
+            trigger: 'blur'
           }
         ],
         expiryDateStart: [
           {
             required: true,
             message: '此为必填项。',
-            trigger: 'change'
+            trigger: 'blur'
           }
         ],
         jobNo: {
           max: 32,
-          min: 1,
-          message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-          pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
+          validator: checkUserAccount1,
           trigger: 'blur'
         },
         address: {
@@ -369,7 +443,6 @@ export default {
         },
         phone: [
           {
-            min: 1,
             max: 11,
             validator: checkPhone,
             trigger: 'blur'
@@ -399,10 +472,14 @@ export default {
           console.log(error)
         })
     },
+    search() {
+      this.getLists()
+    },
     async getLists(id) {
       await getUserInfoList({
         current: this.params.pageNum,
-        pageSize: this.params.pageSize
+        pageSize: this.params.pageSize,
+        roleName: this.roleName
       })
         .then((res) => {
           if (res.code === 0) {
