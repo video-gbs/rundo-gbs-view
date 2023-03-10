@@ -379,18 +379,13 @@ export default {
   width: 100%;
   color: #fff;
   display: flex;
-  // position: fixed;
-  // top: 0;
-  // left: 0;
   z-index: 999;
   padding: 0 10px;
   align-items: center;
   opacity: 1;
   justify-content: space-between;
   background-color: rgba(0, 49, 116, 1);
-  // background: rgba(0, 75, 173, 1);
   box-shadow: 0px 3px 6px 1px rgba(51, 51, 51, 0.16);
-  // box-shadow: 0px 3px 6px 1px rgba(51, 51, 51, 0.16);
   background-image: url('../../../assets/imgs/top-bg.png');
   background-repeat: no-repeat;
   background-size: cover;
@@ -470,7 +465,6 @@ export default {
       font-weight: bold;
       font-size: 1rem;
       display: flex;
-      // margin-right: 3rem;
       cursor: pointer;
       i {
         font-size: 1.5rem;
@@ -579,15 +573,12 @@ export default {
   }
 }
 .user-info-container {
-  // width: 200px;
-  // height: 250px;
   .logout {
     cursor: pointer;
   }
 }
 .close-bar {
   width: 100%;
-  // height: 40px;
   padding: 9px 0;
   left: 0;
   top: 60px;
@@ -606,8 +597,5 @@ export default {
   width: 1rem;
   height: 1rem;
   margin-right: 1rem;
-  // position: absolute;
-  // top: 0;
-  // left: -1.5rem;
 }
 </style>

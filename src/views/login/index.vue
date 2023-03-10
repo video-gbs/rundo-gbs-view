@@ -68,7 +68,7 @@
                     </div>
                   </el-form-item>
 
-                  <el-form-item prop="code">
+                  <!-- <el-form-item prop="code">
                     <div
                       class="login-middle-input-last login-middle-input"
                       data-validate="Valid email is: a@b.c"
@@ -85,7 +85,7 @@
                         placeholder="输入验证码"
                       />
                     </div>
-                  </el-form-item>
+                  </el-form-item> -->
                   <!-- <div
                     @click="refreshCode()"
                     class="get-codes"
@@ -93,13 +93,13 @@
                   >
                   </div> -->
 
-                  <el-form-item>
+                  <!-- <el-form-item>
                     <el-checkbox v-model="checked"
                       ><span class="rember-span"
                         >记住密码，下次自动登录</span
                       ></el-checkbox
                     >
-                  </el-form-item>
+                  </el-form-item> -->
                 </el-form>
                 <div class="login-footer-button">
                   <el-button @click="handleLogin" :loading="loading"
@@ -249,6 +249,8 @@ body {
 .login {
   margin: 0;
   padding: 0;
+  height: 100%;
+  width: 100%;
   position: relative;
 
   .wrap-middle-right {
@@ -276,7 +278,7 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
-  height: 100vh;
+  height: 100%;
   position: relative;
   overflow: hidden;
   margin: 0;

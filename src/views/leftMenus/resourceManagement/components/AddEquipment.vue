@@ -281,6 +281,24 @@ export default {
         }
       }, 500)
     }
+    const checkPassword = (rule, value, cb) => {
+      const regPassword =
+        /^(?!^\d+$)(?!^[a-z]+$)(?!^[A-Z]+$)(?!^[^a-z0-9]+$)(?!^[^A-Z0-9]+$)(?!^.*[\u4E00-\u9FA5].*$)^\S*$/
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (regPassword.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              '8~20个字符;至少由大写字母、小写字母、数字、特殊字符任意两种组成。'
+            )
+          )
+        }
+      }, 500)
+    }
     return {
       form: {
         model: '',
@@ -304,6 +322,8 @@ export default {
       List: '',
       Ids: [],
       Id: '',
+      resAreaName: '',
+      resLabel: '',
       defaultProps: {
         children: 'children',
         label: 'areaName'
@@ -338,7 +358,13 @@ export default {
           { required: true, message: '此为必填项。', trigger: 'blur' }
         ],
         password: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          {
+            required: true,
+            max: 20,
+            min: 8,
+            validator: checkPassword,
+            trigger: 'blur'
+          }
         ],
         port: {
           required: true,
@@ -429,6 +455,7 @@ export default {
     nodeClickHandle(data) {
       this.form.videoAreaId = data.areaName
       this.Id = data.id
+      this.resAreaName = data.areaName
       this.$refs.selectTree.blur()
     },
     save() {
@@ -440,16 +467,22 @@ export default {
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
         this.form.gatewayId = this.form.gatewayId.value
-        // console.log('this.form',this.form)
-        addEncoder({ ...this.form, ...this.form1 }).then((res) => {
-          if (res.code === 0) {
-            this.$message({
-              type: 'success',
-              message: '新建成功'
-            })
-            this.goback()
-          }
-        })
+        this.resLabel = this.form.gatewayId.label
+        addEncoder({ ...this.form, ...this.form1 })
+          .then((res) => {
+            if (res.code === 0) {
+              this.$message({
+                type: 'success',
+                message: '新建成功'
+              })
+              this.goback()
+            }
+          })
+          .catch((error) => {
+            this.form.deviceType = String(this.form.deviceType)
+            this.form.videoAreaId = this.resAreaName
+            console.log(error)
+          })
       })
     },
     goback() {

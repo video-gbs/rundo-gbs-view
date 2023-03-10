@@ -15,7 +15,11 @@
                   @tab-click="switchTab"
                   class="real-time-monitoring"
                 >
-                  <el-tab-pane label="安防通道分组" name="equipmentGroup">
+                  <el-tab-pane
+                    label="安防"
+                    name="equipmentGroup"
+                    class="live-pane"
+                  >
                     <!-- <monitor-equipment-group :sendDevicePush="sendDevicePush" /> -->
                     <div class="securityArea_container">
                       <div class="tree-content">
@@ -976,6 +980,37 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+::v-deep .el-tabs__nav-scroll {
+  &::after {
+    display: none;
+  }
+}
+::v-deep .el-tabs__active-bar {
+  margin-left: 16px;
+  // &::after {
+  //   content: '';
+  //   position: absolute;
+  //   left: 0;
+  //   bottom: 0;
+  //   width: 10px;
+  //   height: 2px;
+  //   background-color: #dfe4ed;
+  //   z-index: 1;
+  // }
+}
+
+::v-deep .el-tabs__item {
+  background-color: #fff !important;
+  margin-left: 16px;
+  font-size: 16px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #0270ff;
+  &::after {
+    display: none;
+  }
+}
+
 #playerMain {
   display: flex;
   flex-direction: column;
@@ -1034,19 +1069,6 @@ export default {
 
 .monitoring-content-box {
   height: calc(100% - 0px);
-}
-
-.real-time-monitoring {
-  .el-tabs__nav-wrap {
-    padding: 0px 24px 0;
-  }
-  .securityArea_container {
-    height: 660px;
-    width: 360px;
-    margin-top: -15px;
-    background: #ffffff;
-    // box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
-  }
 }
 
 .btn {
@@ -1135,6 +1157,15 @@ export default {
     .el-tabs__content {
       flex: 1;
       overflow-y: auto;
+    }
+    .el-tabs__nav-wrap {
+      padding: 0px 24px 0;
+    }
+    .securityArea_container {
+      height: 660px;
+      width: 360px;
+      margin-top: -15px;
+      background: #ffffff;
     }
   }
 }

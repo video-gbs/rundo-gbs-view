@@ -104,7 +104,7 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column width="120" label="操作" fixed="right" align="center">
+        <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
             <el-button type="text" @click="editEquipment(scope.row)"
               >编辑
@@ -542,7 +542,7 @@ export default {
     }
     .table-content-bottom {
       // padding: 0 18px;
-      max-height: calc(100% - 185px);
+      max-height: calc(100% - 90px);
       overflow-y: auto;
     }
   }

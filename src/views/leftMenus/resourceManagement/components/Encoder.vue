@@ -1,5 +1,5 @@
 <template>
-  <div class="encoder-content">
+  <div class="encoder-content" ref="appRef">
     <div class="search">
       <el-form
         ref="query"
@@ -319,9 +319,12 @@ import {
 import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 import { Local } from '@/utils/storage'
 
+// import drawMixin from '@/utils/drawMixin'
+
 export default {
   name: '',
   components: { pagination, leftTree, LineFont },
+  // mixins: [drawMixin],
   props: {
     detailsId: {
       type: String,
@@ -335,7 +338,7 @@ export default {
         pageSize: 10,
         total: 0
       },
-      includeEquipment: false,
+      includeEquipment: true,
       lineTitle: {
         title: '移动位置',
         notShowSmallTitle: false
@@ -595,25 +598,27 @@ export default {
 }
 
 .encoder-content {
+  height: 100%;
+  width: 100%;
+  padding: 12px 20px 26px 20px;
   .search {
     width: 100%;
-    height: 80px;
-    // line-height: 80px;
-    margin-bottom: 20px;
+    min-height: 80px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     .search-form {
-      position: relative;
-      top: 60%;
-      transform: translate(0%, -50%);
+      padding-top: 25px;
     }
   }
   .table-content {
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
-    padding: 18px;
+    padding: 17px;
+    width: 100%;
+    height: calc(100% - 96px);
+    margin-top: 16px;
     .table-content-top {
       .table-content-top-check {
         float: left;
@@ -640,7 +645,7 @@ export default {
       }
     }
     .encoder-table {
-      height: calc(100% - 100px);
+      max-height: calc(100% - 145px);
       overflow-y: auto;
     }
   }

@@ -110,6 +110,8 @@ import store from '@/store/index'
 import router from '../../../router/index'
 import { Local } from '@/utils/storage'
 
+import { antiShake } from '@/utils/index.js'
+
 export default {
   components: {
     LineFont,
@@ -474,7 +476,7 @@ export default {
         }
       }
     },
-    goContentList(name, item, index) {
+    goContentList: antiShake(function (name, item, index) {
       switch (name) {
         case '应用':
           Local.set('tree_type', 1)
@@ -543,7 +545,7 @@ export default {
         default:
           break
       }
-    }
+    })
   }
 }
 </script>

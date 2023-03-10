@@ -176,7 +176,7 @@ export default {
 }
 // 去掉顶部线条
 .tree {
-  max-height: calc(100% - 100px);
+  max-height: calc(100% - 70px);
   overflow-y: auto;
   & > .el-tree-node::after {
     border-top: none;

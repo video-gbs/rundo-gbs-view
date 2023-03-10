@@ -90,11 +90,19 @@
         </el-table-column>
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
-        <el-table-column prop="roleName" label="角色名称" />
+        <el-table-column
+          prop="roleName"
+          label="角色名称"
+          :show-overflow-tooltip="true"
+        />
         <el-table-column prop="userAccount" label="创建者" />
         <el-table-column prop="createdTime" label="创建时间" />
         <el-table-column prop="updatedTime" label="更新时间" />
-        <el-table-column prop="roleDesc" label="描述" />
+        <el-table-column
+          prop="roleDesc"
+          label="描述"
+          :show-overflow-tooltip="true"
+        />
         <el-table-column prop="status" label="状态" width="80">
           <template slot-scope="scope">
             <el-switch
@@ -467,7 +475,9 @@ export default {
 }
 .role_container {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 30px);
+  // display: flex;
+  // flex-direction: column;
   .panel-header-box {
     margin: 0;
     padding: 0 16px;
@@ -487,15 +497,14 @@ export default {
 
   .search {
     width: calc(100% - 40px);
-    height: 80px;
+    // height: 80px;
+    min-height: 80px;
     margin: 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     .search-form {
-      position: relative;
-      top: 60%;
-      transform: translate(0%, -50%);
+      padding-top: 25px;
     }
   }
 
@@ -504,16 +513,13 @@ export default {
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     padding: 18px;
-    margin: 20px;
-    height: calc(100% - 200px);
+    margin: 0 20px 20px 20px;
+    height: calc(100% - 170px);
     .role-table {
-      height: calc(100% - 100px);
+      max-height: calc(100% - 80px);
       overflow-y: auto;
     }
     .table-content-top {
-      // .table-content-top-check {
-      //   float: left;
-      // }
       .btn-lists {
         float: right;
 

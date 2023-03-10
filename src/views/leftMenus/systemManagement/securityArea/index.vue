@@ -28,8 +28,8 @@
       </div>
       <el-card class="right-box-card">
         <div slot="header" class="clearfix">
-          <svg-icon icon-class="zzgl" class="tzgg_svg" />
-          <span>分组信息</span>
+          <svg-icon icon-class="fzxx" class="tzgg_svg" />
+          <span class="right-box-card-span">分组信息</span>
         </div>
 
         <el-form
@@ -488,6 +488,17 @@ export default {
           left: -4px;
         }
       }
+      .tzgg_svg {
+        position: relative;
+        top: 1px;
+        left: -4px;
+      }
+      .right-box-card-span {
+        font-size: 20px;
+        font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+        font-weight: 400;
+        color: #004bad;
+      }
     }
   }
 }
@@ -516,7 +527,7 @@ export default {
 }
 ::v-deep .el-textarea__inner {
   width: 436px;
-  height: 300px;
+  height: 168px;
 }
 
 .setstyle {

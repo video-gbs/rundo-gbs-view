@@ -31,7 +31,7 @@
 
 <script>
 import { Header, Sidebar, AppMain, Navbar, TagsView } from './components'
-import ResizeMixin from './mixin/ResizeHandler'
+// import resize from '@/utils/resize'
 import Breadcrumb from '../components/Breadcrumb'
 import store from '@/store/index'
 import { mapGetters } from 'vuex'
@@ -46,7 +46,7 @@ export default {
     TagsView,
     Breadcrumb
   },
-  mixins: [ResizeMixin],
+  // mixins: [resize],
   data() {
     return {
       nowWidth: '',
@@ -54,7 +54,8 @@ export default {
       nowRouter: [],
       isShowTopMenus: false,
       sidebarClass: true,
-      sidebarLists: []
+      sidebarLists: [],
+      windowWidth: null
     }
   },
   computed: {
@@ -88,23 +89,24 @@ export default {
     }
   },
   watch: {
-    changeShowSidebar(newValue, oldValue) {
-      // this.isShowSidebar = newValue
-      // console.log(newValue, oldValue, this.isShowSidebar ,98989898)
+    changeShowSidebar() {},
+    windowWidth: {
+      handler: function (val, oldVal) {
+        const h = document.getElementsByTagName('HTML')[0]
+        h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+
+        this.$forceUpdate()
+      },
+      immediate: true
     }
   },
   created() {
     this.nowRouter = this.$route.matched.filter((item) => item.name)
-
-    // if (this.nowRouter[0].name === 'workTable') {
-    //   this.isShowSidebar = false
-    // } else {
-    //   this.isShowSidebar = true
-    // }
     this.setScale()
     this.initTabList()
   },
   mounted() {
+    this.windowWidth = document.documentElement.clientWidth
     window.onresize = this.throttle(this.setScale, 500, 500)
   },
   methods: {
@@ -139,36 +141,25 @@ export default {
     },
     setScale() {
       // 以1920px为标准宽度
-      const baseW = this.nowWidth || 1920
-      const w = document.body.clientWidth
-      // this.nowWidth = w
-      // this.baseW = w
-
-      const h = document.getElementsByTagName('HTML')[0]
-      this.nowWidth = 1920 / (w / baseW)
-      h.style.setProperty('--web-zoom', w / baseW)
-      this.$forceUpdate()
+      this.windowWidth = document.documentElement.clientWidth
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-@import '~@/styles/mixin.scss';
+// @import '~@/styles/mixin.scss';
 @import '~@/styles/variables.scss';
 @import '~@/styles/element-variables.scss';
 ::v-deep .sidebar-container {
-  .scrollbar-wrapper {
-    margin-right: -8px !important;
-  }
-}
-::v-deep .sidebar-container {
+  box-shadow: 2px 0px 6px 1px rgba(51, 51, 51, 0.16);
   .el-scrollbar__wrap {
-    margin-right: -8px !important;
+    margin-right: 0px !important;
+    overflow: hidden;
   }
 }
 .app-wrapper {
-  @include clearfix;
+  // @include clearfix;
   position: relative;
   height: 100%;
   width: 100%;

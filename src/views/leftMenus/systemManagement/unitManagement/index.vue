@@ -631,7 +631,7 @@ export default {
 }
 ::v-deep .el-textarea__inner {
   width: 436px;
-  height: 300px;
+  height: 128px;
 }
 .setstyle {
   min-height: 200px;

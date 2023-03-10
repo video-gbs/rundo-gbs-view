@@ -16,7 +16,7 @@ import { Local } from './utils/storage'
 import '@/icons'
 import '@/permission'
 import '@/utils/extends'
-// import '@/utils/rem'
+// import '@/utils/flexible'
 import '@/plugin'
 import * as echarts from 'echarts'
 Vue.prototype.$echarts = echarts
