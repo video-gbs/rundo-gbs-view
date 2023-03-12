@@ -33,7 +33,7 @@
           style="float: right; margin-right: 20px"
           class="form-btn-list"
         >
-          <el-button @click="resetData"
+          <el-button @click="resetData($event)"
             ><svg-icon class="svg-btn" icon-class="cz" />
             <span class="btn-span">重置</span></el-button
           >
@@ -59,7 +59,6 @@
         border
         row-key="id"
         class="menuManagement-table"
-        height="700"
         :tree-props="{ children: 'children' }"
         :header-cell-style="{
           background: 'rgba(0, 75, 173, 0.06)',
@@ -311,11 +310,18 @@ export default {
     cxData() {
       this.getList()
     },
-    resetData() {
+    resetData(e) {
       this.searchParams = {
         menuName: '',
         url: ''
       }
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      }
+      target.blur()
+      this.params.pageNum = 1
+      this.getList()
     },
     nodeClickHandle(data) {
       this.dialogForm.params.menuPid = data.title
@@ -490,12 +496,15 @@ export default {
 ::v-deep .el-dialog__footer {
   border-top: 1px solid #eaeaea;
 }
+
 ::v-deep .el-table .el-table__body-rapper {
   width: 100%;
   height: calc(100% - 40px);
   overflow: auto;
 }
-
+::v-deep .menuManagement-table .el-table__fixed-right {
+  height: 100% !important;
+}
 ::v-deep .menuManagement-table::-webkit-scrollbar {
   /*纵向滚动条*/
   width: 5px;
@@ -519,6 +528,9 @@ export default {
   background-color: #111;
 }
 
+::v-deep .dataDictionary-table .el-table__fixed-right {
+  height: 100% !important;
+}
 // 滚动条大小设置
 ::v-deep .el-table__body-wrapper::-webkit-scrollbar {
   /*纵向滚动条*/
@@ -616,7 +628,7 @@ export default {
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
     .menuManagement-table {
-      height: calc(100% - 100px);
+      max-height: calc(100% - 100px);
       overflow-y: auto;
     }
     .securityArea_container {

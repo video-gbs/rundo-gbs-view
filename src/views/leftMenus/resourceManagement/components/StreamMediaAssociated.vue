@@ -9,8 +9,8 @@
       </div>
     </div>
     <div class="activeDiscovery-transfer">
-      <div class="right-contnet">
-        <div class="level">
+      <div class="left-contnet">
+        <div class="level" style="height: 100%">
           <!-- 左边框框 -->
           <div class="transferbox">
             <div class="topbox">
@@ -43,7 +43,7 @@
             <div class="contont">
               <el-table
                 ref="tableLeft"
-                class="table-content-bottom"
+                class="left-table"
                 :data="leftTableData"
                 border
                 :header-cell-style="{
@@ -75,8 +75,8 @@
                   label="序列号"
                   :show-overflow-tooltip="true"
                 />
-                <el-table-column prop="protocol" label="协议" width="240" />
-                <el-table-column prop="ip" label="IP" width="240" />
+                <el-table-column prop="protocol" label="协议" />
+                <el-table-column prop="ip" label="IP" />
               </el-table>
 
               <pagination
@@ -132,7 +132,7 @@
             <div style="padding: 10px" class="contont">
               <el-table
                 ref="tableRight"
-                class="table-content-bottom"
+                class="right-table"
                 :data="rightTableData"
                 border
                 :header-cell-style="{
@@ -164,8 +164,8 @@
                   label="序列号"
                   :show-overflow-tooltip="true"
                 />
-                <el-table-column prop="protocol" label="协议" width="240" />
-                <el-table-column prop="ip" label="IP" width="240" />
+                <el-table-column prop="protocol" label="协议" />
+                <el-table-column prop="ip" label="IP" />
               </el-table>
 
               <pagination
@@ -470,6 +470,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table::before {
+  height: 0;
+}
 ::v-deep .el-dialog {
   margin-top: 4vh !important;
 }
@@ -511,9 +514,8 @@ export default {
 ///
 
 .transferbox {
-  max-height: 730px;
-  overflow-y: auto;
-  width: 50%; //右边盒子的宽占比
+  height: calc(100% - 16px);
+  width: 50%;
   border: 1px solid#ebedf2;
   margin-top: 16px;
   .topbox {
@@ -534,6 +536,9 @@ export default {
       width: 286px;
       float: right;
     }
+  }
+  .contont {
+    height: calc(100% - 110px);
   }
 }
 .centrebtn {
@@ -616,14 +621,11 @@ export default {
   }
 
   .activeDiscovery-transfer {
-    // display: flex;
-    // justify-content: space-between;
-    height: calc(100% - 86px);
-    margin: 20px 20px 0 20px;
+    height: calc(100% - 100px);
+    margin: 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     .securityArea_container {
-      // height: calc(100% - 50px);
       float: left;
       max-height: 730px;
       overflow-y: auto;
@@ -633,9 +635,9 @@ export default {
       background: #ffffff;
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     }
-    .right-contnet {
+    .left-contnet {
       width: calc(100% - 0px);
-      // margin-right: 10px;
+      height: 100%;
       padding: 0 20px;
       float: right;
     }
@@ -661,5 +663,13 @@ export default {
     top: 1px;
     left: -4px;
   }
+}
+.left-table {
+  max-height: calc(100% - 120px);
+  overflow-y: auto;
+}
+.right-table {
+  max-height: calc(100% - 120px);
+  overflow-y: auto;
 }
 </style>

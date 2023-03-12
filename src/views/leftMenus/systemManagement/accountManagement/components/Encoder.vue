@@ -22,7 +22,7 @@
           style="float: right; margin-right: 20px"
           class="form-btn-list"
         >
-          <el-button @click="resetData"
+          <el-button @click="resetData($event)"
             ><svg-icon class="svg-btn" icon-class="cz" />
             <span class="btn-span">重置</span></el-button
           >
@@ -40,7 +40,7 @@
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deteleAll()" style="width: 100px"
+          <el-button @click="deteleAll($event)" style="width: 100px" plain
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span></el-button
           >
@@ -335,11 +335,11 @@ export default {
   },
   mounted() {},
   methods: {
-    getList(orgId) {
+    getList(id) {
       getUserLists({
         current: this.params.pageNum,
         pageSize: this.params.pageSize,
-        orgId,
+        orgId: id ? id : this.orgId,
         ...this.searchParams
       }).then((res) => {
         if (res.code === 0) {
@@ -350,11 +350,16 @@ export default {
         }
       })
     },
-    resetData() {
+    resetData(e) {
       this.searchParams = {
         userName: '',
         userAccount: ''
       }
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      }
+      target.blur()
       this.params.pageNum = 1
       this.getList()
     },
@@ -379,7 +384,8 @@ export default {
         })
       })
     },
-    deteleAll() {
+    deteleAll(e) {
+      let target = e.target
       this.$confirm(
         `确定删除${
           this.$refs.encoderTable.selection.length > 0
@@ -404,6 +410,10 @@ export default {
               type: 'success',
               message: '删除成功'
             })
+            if (target.nodeName === 'SPAN' || target.nodeName === 'use') {
+              target = e.target.parentNode.parentNode
+            }
+            target.blur()
             this.params.pageNum = 1
             this.getList(this.orgId)
           }
@@ -457,6 +467,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .table-content-bottom .el-table__fixed-right {
+  height: 100% !important;
+}
 // 滚动条大小设置
 ::v-deep .table-content-bottom::-webkit-scrollbar {
   /*纵向滚动条*/
@@ -610,5 +623,8 @@ export default {
   position: relative;
   top: 1px;
   left: -4px;
+}
+::v-deep .el-table::before {
+  height: 0;
 }
 </style>

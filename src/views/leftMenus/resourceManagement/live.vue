@@ -15,11 +15,7 @@
                   @tab-click="switchTab"
                   class="real-time-monitoring"
                 >
-                  <el-tab-pane
-                    label="安防"
-                    name="equipmentGroup"
-                    class="live-pane"
-                  >
+                  <el-tab-pane label="安防" name="security" class="live-pane">
                     <!-- <monitor-equipment-group :sendDevicePush="sendDevicePush" /> -->
                     <div class="securityArea_container">
                       <div class="tree-content">
@@ -95,8 +91,8 @@
                 <div class="wrapper-bottom-header" @click="controlColla">
                   <div class="bottom-header-name">云台控制</div>
                   <transition name="el-zoom-in-center">
-                    <i class="el-icon-arrow-down" v-if="showContent"></i>
-                    <i class="el-icon-arrow-right" v-else></i>
+                    <i class="el-icon-arrow-up" v-if="showContent"></i>
+                    <i class="el-icon-arrow-down" v-else></i>
                   </transition>
                 </div>
                 <transition name="el-fade-in-linear">
@@ -111,7 +107,7 @@
             <div
               ref="mainBox"
               :class="`main-box grid${spilt}`"
-              :style="`height: calc(100vh - ${splitFullscreen ? 0 : 190}px)`"
+              :style="`height: calc(100vh - ${splitFullscreen ? 0 : 145}px)`"
             >
               <div
                 v-for="i in spilt"
@@ -210,9 +206,9 @@
                 <div class="split-box">
                   <el-dropdown @command="switchSplit">
                     <span class="split-text">
-                      <i
+                      <svg-icon
                         class="iconfont white"
-                        :class="splitArr[spiltIndex].class"
+                        :icon-class="splitArr[spiltIndex].class"
                       />
 
                       <i class="el-icon-arrow-down iconArrow" />
@@ -231,31 +227,31 @@
                             style="padding: 0 16px"
                           >
                             <svg-icon
-                              v-if="item.num === 6"
+                              v-if="item.num === spilt"
                               class="iconfont btn fenping"
-                              @mouseenter="changeHover(1)"
-                              @mouseleave="changeHover(2)"
-                              :icon-class="
-                                !isHover6 ? '6fenping' : '6fenpinged'
-                              "
+                              :icon-class="`${item.num}fenpinged`"
                             />
                             <svg-icon
-                              v-else-if="item.num === 8"
+                              v-else
                               class="iconfont btn fenping"
-                              @mouseenter="changeHover(3)"
-                              @mouseleave="changeHover(4)"
+                              @mouseenter="changeHover(1, item.num)"
+                              @mouseleave="changeHover(2, item.num)"
                               :icon-class="
-                                !isHover8 ? '8fenping' : '8fenpinged'
+                                !isMouseHover
+                                  ? `${item.num}fenping`
+                                  : index === isHoverNum
+                                  ? splitArr[isHoverNum].fenpinged
+                                  : `${item.num}fenping`
                               "
                             />
-                            <i
+                            <!-- <i
                               v-else
                               class="iconfont btn"
                               :class="[
                                 { active: item.num === spilt },
                                 item.class
                               ]"
-                            />
+                            /> -->
                           </div>
                         </el-dropdown-item>
                       </template>
@@ -309,7 +305,7 @@ export default {
   },
   data() {
     return {
-      activeTab: 'equipmentGroup',
+      activeTab: 'security',
       showVideoDialog: true,
       hasAudio: false, //设置默认是否静音
       videoUrl: [''],
@@ -320,27 +316,39 @@ export default {
       splitArr: [
         {
           num: 1,
-          class: 'icon-yigongge'
+          class: '1fenpingw',
+          fenpinged: '1fenpinged',
+          fenping: '1fenping'
         },
         {
           num: 4,
-          class: 'icon-sigongge'
+          class: '4fenpingw',
+          fenpinged: '4fenpinged',
+          fenping: '4fenping'
         },
         {
           num: 6,
-          class: 'icon-a-15gongge'
+          class: '6fenpingw',
+          fenpinged: '6fenpinged',
+          fenping: '6fenping'
         },
         {
           num: 8,
-          class: 'icon-a-17gongge'
+          class: '8fenpingw',
+          fenpinged: '8fenpinged',
+          fenping: '8fenping'
         },
         {
           num: 9,
-          class: 'icon-jiugongge'
+          class: '9fenpingw',
+          fenpinged: '9fenpinged',
+          fenping: '9fenping'
         },
         {
           num: 16,
-          class: 'icon-a-16gongge'
+          class: '1fenpingw',
+          fenpinged: '1fenpinged',
+          fenping: '1fenping'
         }
       ],
       playerIdx: 0, //激活播放器
@@ -378,8 +386,8 @@ export default {
       filterText: '',
       hasChannel: false,
       resArray: [],
-      isHover6: false,
-      isHover8: false
+      isMouseHover: false,
+      isHoverNum: 0
     }
   },
   mounted() {
@@ -455,32 +463,57 @@ export default {
           console.log(error)
         })
     },
-    changeHover(num) {
-      console.log(num)
-      switch (num) {
-        case 1:
-          this.isHover6 = true
-          break
-        case 2:
-          this.isHover6 = false
-          break
-        case 3:
-          this.isHover8 = true
-          break
-        case 4:
-          this.isHover8 = false
-          break
+    changeHover(num, value) {
+      console.log(num, value)
 
-        default:
-          break
-      }
-
-      if (this.spilt === 6) {
-        this.isHover6 = true
-      }
-
-      if (this.spilt === 8) {
-        this.isHover8 = true
+      if (num === 1) {
+        this.isMouseHover = true
+        switch (value) {
+          case 16:
+            this.isHoverNum = 5
+            break
+          case 9:
+            this.isHoverNum = 4
+            break
+          case 8:
+            this.isHoverNum = 3
+            break
+          case 6:
+            this.isHoverNum = 2
+            break
+          case 4:
+            this.isHoverNum = 1
+            break
+          case 1:
+            this.isHoverNum = 0
+            break
+          default:
+            break
+        }
+      } else {
+        this.isMouseHover = false
+        switch (value) {
+          case 16:
+            this.isHoverNum = 5
+            break
+          case 9:
+            this.isHoverNum = 4
+            break
+          case 8:
+            this.isHoverNum = 3
+            break
+          case 6:
+            this.isHoverNum = 2
+            break
+          case 4:
+            this.isHoverNum = 1
+            break
+          case 1:
+            this.isHoverNum = 0
+            break
+          default:
+            break
+        }
       }
     },
     getIconType(data) {
@@ -549,6 +582,7 @@ export default {
       }
     },
     filterNode(value, data) {
+      console.log(1111111111)
       if (!value) return true
       // if (this.defaultPropsName === 'orgName') {
       //   return data.orgName && data.orgName.indexOf(value) !== -1
@@ -987,16 +1021,6 @@ export default {
 }
 ::v-deep .el-tabs__active-bar {
   margin-left: 16px;
-  // &::after {
-  //   content: '';
-  //   position: absolute;
-  //   left: 0;
-  //   bottom: 0;
-  //   width: 10px;
-  //   height: 2px;
-  //   background-color: #dfe4ed;
-  //   z-index: 1;
-  // }
 }
 
 ::v-deep .el-tabs__item {
@@ -1166,6 +1190,10 @@ export default {
       width: 360px;
       margin-top: -15px;
       background: #ffffff;
+      .tree {
+        max-height: calc(100% - 90px);
+        overflow-y: auto;
+      }
     }
   }
 }

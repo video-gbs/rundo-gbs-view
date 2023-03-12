@@ -62,8 +62,3 @@ export function syncChannel(id) {
 // export function syncDevice(id) {
 //   return request.put(`${device}/device/north/sync`)
 // }
-
-// 代注册列表恢复
-// export function syncDevice(id) {
-//   return request.put(`${device}/device/north/sync`)
-// }

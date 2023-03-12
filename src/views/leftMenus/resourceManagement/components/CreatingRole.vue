@@ -10,10 +10,10 @@
     </div>
     <el-card class="box-card">
       <div slot="header" class="clearfix">
-        <svg-icon icon-class="pjqktj" class="pjqktj_svg" />
+        <svg-icon icon-class="jibenxinxi" class="pjqktj_svg" />
         <span>基本信息</span>
       </div>
-      <div class="text item">
+      <div class="text item" style="margin-top: 18px">
         <el-form
           ref="accountForm"
           class="params-form"
@@ -24,7 +24,11 @@
           :rules="rules"
           @keyup.enter="submit('accountForm')"
         >
-          <el-form-item label="角色名称" prop="roleName">
+          <el-form-item
+            label="角色名称"
+            prop="roleName"
+            style="margin-bottom: 40px"
+          >
             <el-input
               v-model="form.params.roleName"
               placeholder="请输入角色名称"
@@ -33,7 +37,11 @@
             />
           </el-form-item>
 
-          <el-form-item label="描述" prop="roleDesc">
+          <el-form-item
+            label="描述"
+            prop="roleDesc"
+            style="margin-bottom: 50px"
+          >
             <el-input v-model="form.params.roleDesc" type="textarea" />
           </el-form-item>
         </el-form>
@@ -44,8 +52,12 @@
           <span>权限配置</span>
         </div>
         <div class="text item tree-bottom">
-          <el-tabs v-model="activeName" class="f1 f fd-c" type="border-card">
-            <el-tab-pane label="系统权限" name="系统权限">
+          <el-tabs
+            v-model="activeName"
+            class="f1 f fd-c top-pane"
+            type="border-card"
+          >
+            <el-tab-pane label="系统权限" name="系统权限" class="role-pane">
               <div class="left-lists">
                 <div class="left-lists-table-menu">
                   <!-- <el-menu
@@ -281,18 +293,18 @@
               </div>
             </el-tab-pane>-->
           </el-tabs>
-
-          <div class="dialog-footer">
-            <el-button @click="goback()">
-              <svg-icon class="svg-btn" icon-class="back-svg" />返回
-            </el-button>
-            <el-button type="primary" @click="save('accountForm')">
-              <svg-icon class="svg-btn" icon-class="save" />保存
-            </el-button>
-          </div>
         </div>
       </div>
     </el-card>
+
+    <div class="dialog-footer">
+      <el-button @click="goback()">
+        <svg-icon class="svg-btn" icon-class="back-svg" />返回
+      </el-button>
+      <el-button type="primary" @click="save('accountForm')">
+        <svg-icon class="svg-btn" icon-class="save" />保存
+      </el-button>
+    </div>
   </div>
 </template>
 
@@ -883,18 +895,88 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .top-pane {
+  border: 0 none;
+  box-shadow: none;
+  height: 100%;
+}
+::v-deep .top-pane > .el-tabs__header {
+  background: #fff;
+  border: 0 none;
+}
+::v-deep .top-pane > .el-tabs__header > .el-tabs__nav-wrap {
+  > .el-tabs__nav-scroll {
+    &::after {
+      content: '';
+      position: absolute;
+      left: 15px;
+      bottom: 0;
+      width: 80px;
+      height: 2px;
+      background-color: #1e56a0;
+      z-index: 1;
+    }
+    > .el-tabs__nav {
+      background-color: #1e56a0;
+      z-index: 1;
+      -webkit-transition: -webkit-transform 0.3s
+        cubic-bezier(0.645, 0.045, 0.355, 1);
+      transition: -webkit-transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+      transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+      transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+        -webkit-transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+      list-style: none;
+      > .el-tabs__item {
+        background-color: #fff !important;
+        font-size: 18px;
+        font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+        font-weight: 400;
+        border: 0 none;
+        color: #0270ff;
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+  .el-tabs__active-bar {
+    margin-left: 16px;
+  }
+}
 ::v-deep .el-textarea__inner {
   width: 436px;
   height: 90px;
 }
-.el-menu-vertical-demo {
-  max-height: 500px;
-  border: 1px solid rgba(234, 234, 234, 1);
+
+::v-deep .el-card__header {
+  padding: 0 20px;
+  height: 62px;
+}
+::v-deep .el-card__body {
+  padding-bottom: 0;
+  height: calc(100% - 62px);
+}
+::v-deep .top-pane > .el-tabs__content {
+  height: calc(100% - 94px);
+}
+::v-deep .role-pane {
+  max-height: calc(100% - 10px);
+  overflow-y: auto;
+}
+
+::v-deep .el-menu-vertical-demo > .el-tabs__header {
+  border: 1px solid #eaeaea;
+  box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+  border-right: 0;
+  > .el-tabs__nav-wrap {
+    padding-top: 0;
+  }
 }
 
 .creatingRole-content {
   height: calc(100% - 16px);
   overflow-y: auto;
+  position: relative;
   .panel-header-box {
     margin: 0;
     padding: 0 16px;
@@ -938,14 +1020,21 @@ export default {
     }
     .left-lists {
       display: flex;
-      max-height: 480px;
+      height: calc(100% - 0px);
       .left-lists-table-menu {
+        height: 100%;
         text-align: center;
+        .el-menu-vertical-demo {
+          height: 100%;
+          border: 0 none;
+          .el-tabs__content {
+          }
+        }
       }
       .left-lists-table-tree {
         margin-left: 20px;
         .addRoleTree {
-          max-height: 440px;
+          max-height: 350px;
           width: 300px;
           overflow-y: auto;
         }
@@ -972,6 +1061,7 @@ export default {
   }
   .box-card1 {
     margin: 0 -20px;
+    height: calc(100% - 226px);
 
     .clearfix1 {
       height: 62px;
@@ -1015,9 +1105,9 @@ export default {
         }
       }
     }
-    .text {
+    .tree-bottom {
       margin-top: 20px;
-      height: 440px;
+      height: calc(100% - 82px);
       overflow: auto;
     }
   }
@@ -1050,14 +1140,20 @@ export default {
 ::v-deep .el-table__header .has-gutter th.gutter {
   display: none !important;
 }
+::v-deep .el-menu-vertical-demo {
+  .el-tabs__content {
+    height: 100%;
+  }
+}
 .dialog-footer {
-  width: 100%;
+  width: calc(100% + 30px);
   height: 52px;
   line-height: 52px;
   margin-top: 20px;
-  position: relative;
-  bottom: 0;
-  right: 0px;
+  position: absolute;
+  bottom: 20px;
+  right: 16px;
+  margin-left: -15px;
   text-align: right;
   border-top: 1px solid #eaeaea;
   > .el-button {
@@ -1099,7 +1195,52 @@ export default {
 }
 ::v-deep .el-menu-vertical-demo {
   .el-tabs__nav {
-    height: 500px;
+    height: 100%;
   }
+}
+::v-deep .addRoleTree::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+
+// 滚动条滑块样式设置
+::v-deep .addRoleTree::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .addRoleTree::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .addRoleTree::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 滚动条大小设置
+::v-deep .role-pane::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+
+// 滚动条滑块样式设置
+::v-deep .role-pane::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .role-pane::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .role-pane::-webkit-scrollbar-corner {
+  background-color: #111;
 }
 </style>

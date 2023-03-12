@@ -604,6 +604,32 @@ export default {
 ::v-deep .editEquipment-treeForm > .el-tree-node::before {
   border-left: none;
 }
+// 滚动条大小设置
+::v-deep .box-card::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .box-card::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .box-card::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .box-card::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
+}
 .editEquipment-content {
   .panel-header-box {
     margin: 0;
@@ -637,6 +663,9 @@ export default {
   }
   .box-card {
     margin: 20px 20px 0 20px;
+    max-height: 750px;
+    height: 700px;
+    overflow-y: auto;
 
     .clearfix {
       height: 80px;

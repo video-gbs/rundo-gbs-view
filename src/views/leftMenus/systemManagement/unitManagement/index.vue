@@ -14,7 +14,7 @@
             <svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
-          <el-button @click="deleteAccount">
+          <el-button @click="deleteAccount($event)">
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">删除</span>
           </el-button>
@@ -64,7 +64,7 @@
         </el-form>
 
         <div class="dialog-footer">
-          <el-button type="primary" @click="save('savePasswordForm')">
+          <el-button type="primary" @click="save('unitManagementForm')">
             <svg-icon class="svg-btn" icon-class="save" />保 存
           </el-button>
         </div>
@@ -418,18 +418,22 @@ export default {
     dialogMoveShow() {
       this.$refs.moveTree.changeMoveTreeShow()
     },
-    save() {
-      unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
-        if (res.code === 0) {
-          this.$message({
-            type: 'success',
-            message: '编辑成功'
+    save(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
+            if (res.code === 0) {
+              this.$message({
+                type: 'success',
+                message: '编辑成功'
+              })
+              this.init(this.detailsId)
+            }
           })
-          this.init(this.detailsId)
         }
       })
     },
-    deleteAccount() {
+    deleteAccount(e) {
       const h = this.$createElement
       this.$confirm('提示', {
         title: '提示',
@@ -449,6 +453,11 @@ export default {
               type: 'success',
               message: '删除成功'
             })
+            let target = e.target
+            if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+              target = e.target.parentNode.parentNode
+            }
+            target.blur()
             this.init()
             this.detailsId = this.treeList[0].id
             this.getUnitDetailsData()

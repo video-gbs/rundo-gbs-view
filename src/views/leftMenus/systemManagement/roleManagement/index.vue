@@ -45,7 +45,7 @@
           style="float: right; margin-right: 20px"
           class="form-btn-list"
         >
-          <el-button @click="resetData"
+          <el-button @click="resetData($event)"
             ><svg-icon class="svg-btn" icon-class="cz" />
             <span class="btn-span">重置</span></el-button
           >
@@ -62,7 +62,7 @@
           >包含下级组织</el-checkbox
         > -->
         <div class="btn-lists">
-          <el-button @click="deteleAll()" style="width: 100px"
+          <el-button @click="deteleAll($event)" style="width: 100px" plain
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span>
           </el-button>
@@ -233,12 +233,19 @@ export default {
       this.params.proCount = proCount
       this.getList()
     },
-    resetData() {
+    resetData(e) {
       this.searchParams = {
         userAccount: '',
         roleName: '',
         time: ''
       }
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      }
+      target.blur()
+      this.params.pageNum = 1
+      this.getList()
     },
     cxData() {
       this.getList()
@@ -353,7 +360,8 @@ export default {
         }
       })
     },
-    deteleAll() {
+    deteleAll(e) {
+      let target = e.target
       this.$confirm(
         `确定删除${
           this.$refs.roleTable.selection.length > 0
@@ -372,12 +380,18 @@ export default {
         this.$refs.roleTable.selection.map((item) => {
           roleIds.push(item.id)
         })
+        console.log('target.nodeName', target.nodeName, e.target.parentNode)
         deleteAllRoles(roleIds).then((res) => {
           if (res.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
             })
+
+            if (target.nodeName === 'SPAN' || target.nodeName === 'use') {
+              target = e.target.parentNode.parentNode
+            }
+            target.blur()
             this.params.pageNum = 1
             this.getList()
           }
@@ -446,6 +460,9 @@ export default {
 }
 ::v-deep .el-dialog__footer {
   border-top: 1px solid #eaeaea;
+}
+::v-deep .role-table .el-table__fixed-right {
+  height: 100% !important;
 }
 // 滚动条大小设置
 ::v-deep .role-table::-webkit-scrollbar {

@@ -51,40 +51,43 @@
           style="float: right; margin-right: 20px"
           class="form-btn-list"
         >
-          <el-button @click="resetData"
-            ><svg-icon class="svg-btn" icon-class="cz" />
-            <span class="btn-span">重置</span></el-button
-          >
-          <el-button type="primary" @click="cxData"
-            ><svg-icon class="svg-btn" icon-class="cx" />
-            <span class="btn-span">搜索</span></el-button
-          >
+          <el-button @click="resetData($event)">
+            <svg-icon class="svg-btn" icon-class="cz" />
+            <span class="btn-span">重置</span>
+          </el-button>
+          <el-button type="primary" @click="cxData">
+            <svg-icon class="svg-btn" icon-class="cx" />
+            <span class="btn-span">搜索</span>
+          </el-button>
         </el-form-item>
       </el-form>
     </div>
 
     <div class="table-content">
       <div class="table-content-top">
-        <el-checkbox v-model="includeEquipment" class="table-content-top-check"
+        <el-checkbox
+          v-model="includeEquipment"
+          class="table-content-top-check"
+          @change="changeOrganization"
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deteleAll()" style="width: 100px"
-            ><svg-icon class="svg-btn" icon-class="del" />
-            <span class="btn-span">批量删除</span></el-button
-          >
-          <el-button @click="moveEquipment"
-            ><svg-icon class="svg-btn" icon-class="move" />
-            <span class="btn-span">移动</span></el-button
-          >
-          <el-button type="primary" @click="goChannelDiscovery"
-            ><svg-icon class="svg-btn" icon-class="add" />
-            <span class="btn-span">新增</span></el-button
-          >
+          <el-button @click="deteleAll($event)" style="width: 100px" plain>
+            <svg-icon class="svg-btn" icon-class="del" />
+            <span class="btn-span">批量删除</span>
+          </el-button>
+          <el-button @click="moveEquipment">
+            <svg-icon class="svg-btn" icon-class="move" />
+            <span class="btn-span">移动</span>
+          </el-button>
+          <el-button type="primary" @click="goChannelDiscovery">
+            <svg-icon class="svg-btn" icon-class="add" />
+            <span class="btn-span">新增</span>
+          </el-button>
         </div>
       </div>
       <el-table
-        ref="encoderTable"
+        ref="channelTable"
         class="channel-table"
         :data="tableData"
         border
@@ -95,11 +98,19 @@
           fontWeight: 'bold',
           color: '#333333'
         }"
+        @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="80" align="center">
-        </el-table-column>
-        <el-table-column type="index" width="50" align="center" label="序号">
-        </el-table-column>
+        <el-table-column
+          type="selection"
+          width="80"
+          align="center"
+        ></el-table-column>
+        <el-table-column
+          type="index"
+          width="50"
+          align="center"
+          label="序号"
+        ></el-table-column>
         <el-table-column
           prop="channelName"
           label="通道名称"
@@ -160,9 +171,7 @@
         </el-table-column>
         <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editData(scope.row)"
-              >编辑
-            </el-button>
+            <el-button type="text" @click="editData(scope.row)">编辑</el-button>
             <!-- <el-button type="text" @click="restart(scope.row.id)"
               >重启
             </el-button>
@@ -171,10 +180,10 @@
             </el-button>
             <el-button type="text" @click="deploymentData(scope.row.id)"
               >布防
-            </el-button> -->
-            <el-button type="text" @click="deleteEncoder(scope.row)"
-              ><span class="delete-button">删除</span></el-button
-            >
+            </el-button>-->
+            <el-button type="text" @click="deleteEncoder(scope.row)">
+              <span class="delete-button">删除</span>
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -194,9 +203,7 @@
         />
       </div>
       <el-form label-width="100px" :model="dialogForm">
-        <el-form-item label="设备数量：">
-          {{ dialogForm.num }}
-        </el-form-item>
+        <el-form-item label="设备数量：">{{ dialogForm.num }}</el-form-item>
         <el-form-item label="设备名称：">
           <span class="dialogEquipmentName">{{
             dialogForm.dialogEquipmentName
@@ -204,14 +211,18 @@
         </el-form-item>
       </el-form>
       <div class="securityArea_container">
-        <leftTree />
+        <leftTree
+          :treeData="treeList"
+          @childClickHandle="childClickHandle"
+          :defaultPropsName="areaNames"
+        />
       </div>
 
       <div class="dialog-footer">
         <el-button @click="dialogShow = false">取消</el-button>
-        <el-button type="primary"
-          ><svg-icon class="svg-btn" icon-class="save" />确认</el-button
-        >
+        <el-button type="primary" @click="dialogMove">
+          <svg-icon class="svg-btn" icon-class="save" />确认
+        </el-button>
       </div>
     </el-dialog>
   </div>
@@ -225,7 +236,8 @@ import LineFont from '@/components/LineFont'
 import {
   getChannelById,
   deleteChannels,
-  deleteChannel
+  deleteChannel,
+  moveChannel
 } from '@/api/method/channel'
 
 import { getManufacturerDictionaryList } from '@/api/method/dictionary'
@@ -238,6 +250,10 @@ export default {
     detailsId: {
       type: String,
       default: ''
+    },
+    treeList: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -268,9 +284,8 @@ export default {
         height: '18px'
       },
       dialogForm: {
-        num: 3,
-        dialogEquipmentName:
-          '海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ;'
+        num: null,
+        dialogEquipmentName: ''
       },
       dialogForm1: {
         inputValue: ''
@@ -316,7 +331,10 @@ export default {
           manufacturer: '海康',
           status: 1
         }
-      ]
+      ],
+      areaNames: 'areaNames',
+      idList: [],
+      dialogVideoAreaId: ''
     }
   },
   created() {
@@ -342,6 +360,42 @@ export default {
           this.params.total = res.data.total
           this.params.pages = res.data.pages
           this.params.current = res.data.current
+        }
+      })
+    },
+    changeOrganization() {
+      this.getList()
+    },
+    handleSelectionChange(data) {
+      console.log(data, 'handleSelectionChange')
+      const resName = []
+      if (data && data.length > 0) {
+        data.map((item) => {
+          this.idList.push(item.id)
+          resName.push(item.deviceName)
+        })
+        this.dialogForm.num = data.length
+        this.dialogForm.dialogEquipmentName = resName.join(';')
+      }
+      console.log(data, 'handleSelectionChange')
+    },
+    childClickHandle(data) {
+      this.dialogVideoAreaId = data.id
+      console.log(data, 'childClickHandle')
+    },
+    dialogMove() {
+      moveChannel({
+        idList: this.idList,
+        videoAreaId: this.dialogVideoAreaId
+      }).then((res) => {
+        if (res.code === 0) {
+          this.$message({
+            type: 'success',
+            message: '移动成功'
+          })
+          dialogShow = false
+          this.params.pageNum = 1
+          this.getList()
         }
       })
     },
@@ -378,7 +432,8 @@ export default {
     deploymentData() {
       this.dialogShow1 = true
     },
-    deteleAll(row) {
+    deteleAll(e) {
+      let target = e.target
       this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -386,7 +441,7 @@ export default {
       }).then(() => {
         const roleIds = []
         // console.log('this.$refs.encoderTable.selection',this.$refs)
-        this.$refs.encoderTable.selection.map((item) => {
+        this.$refs.channelTable.selection.map((item) => {
           roleIds.push(item.id)
         })
         deleteChannels(roleIds).then((res) => {
@@ -395,6 +450,10 @@ export default {
               type: 'success',
               message: '删除成功'
             })
+            if (target.nodeName === 'SPAN' || target.nodeName === 'use') {
+              target = e.target.parentNode.parentNode
+            }
+            target.blur()
             this.params.pageNum = 1
             this.getList()
           }
@@ -419,12 +478,17 @@ export default {
         })
       })
     },
-    resetData() {
+    resetData(e) {
       this.searchParams = {
         deviceType: '',
         ip: '',
         onlineState: ''
       }
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      }
+      target.blur()
       this.params.pageNum = 1
       this.getList()
     },
@@ -435,6 +499,13 @@ export default {
       this.$router.push(`/channelDiscovery`)
     },
     moveEquipment() {
+      if (this.$refs.channelTable.selection.length === 0) {
+        this.$message({
+          message: '请勾选通道',
+          type: 'warning'
+        })
+        return
+      }
       this.dialogShow = true
     }
   }
@@ -448,6 +519,10 @@ export default {
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid rgba(234, 234, 234, 1);
   padding: 0 20px;
+}
+
+::v-deep .channel-table .el-table__fixed-right {
+  height: 100% !important;
 }
 
 // 滚动条大小设置
@@ -548,7 +623,7 @@ export default {
   }
 
   .securityArea_container {
-    height: calc(100% - 40px);
+    height: 500px;
     width: 310px;
     margin: 10px;
     // background: #ffffff;

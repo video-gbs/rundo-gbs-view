@@ -51,7 +51,7 @@
           style="float: right; margin-right: 20px"
           class="form-btn-list"
         >
-          <el-button @click="resetData"
+          <el-button @click="resetData($event)"
             ><svg-icon class="svg-btn" icon-class="cz" />
             <span class="btn-span">重置</span></el-button
           >
@@ -65,11 +65,14 @@
 
     <div class="table-content">
       <div class="table-content-top">
-        <el-checkbox v-model="includeEquipment" class="table-content-top-check"
+        <el-checkbox
+          v-model="includeEquipment"
+          class="table-content-top-check"
+          @change="changeOrganization"
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deteleAll()" style="width: 100px"
+          <el-button @click="deteleAll($event)" style="width: 100px" plain
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span></el-button
           >
@@ -99,6 +102,7 @@
           fontWeight: 'bold',
           color: '#333333'
         }"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="80" align="center">
         </el-table-column>
@@ -202,12 +206,16 @@
         </el-form-item>
       </el-form>
       <div class="securityArea_container">
-        <leftTree />
+        <leftTree
+          :treeData="treeList"
+          @childClickHandle="childClickHandle"
+          :defaultPropsName="areaNames"
+        />
       </div>
 
       <div class="dialog-footer">
         <el-button @click="dialogShow = false">取消</el-button>
-        <el-button type="primary"
+        <el-button type="primary" @click="dialogMove"
           ><svg-icon class="svg-btn" icon-class="save" />确认</el-button
         >
       </div>
@@ -329,6 +337,10 @@ export default {
     detailsId: {
       type: String,
       default: ''
+    },
+    treeList: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -359,9 +371,8 @@ export default {
         height: '18px'
       },
       dialogForm: {
-        num: 3,
-        dialogEquipmentName:
-          '海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ;'
+        num: null,
+        dialogEquipmentName: ''
       },
       dialogForm1: {
         inputValue: ''
@@ -407,7 +418,10 @@ export default {
           manufacturer: '海康',
           status: 1
         }
-      ]
+      ],
+      areaNames: 'areaNames',
+      idList: [],
+      dialogVideoAreaId: ''
     }
   },
   created() {
@@ -419,12 +433,11 @@ export default {
     this.getDeviceTypesDictionaryList()
   },
   methods: {
-    async getList(orgId) {
-      // : '1620396812466147329'
+    async getList(id) {
       await getEncoderById({
         pageNum: this.params.pageNum,
         pageSize: this.params.pageSize,
-        videoAreaId: orgId ? orgId : 1,
+        videoAreaId: id ? id : 1,
         includeEquipment: this.includeEquipment,
         ...this.searchParams
       }).then((res) => {
@@ -447,6 +460,42 @@ export default {
           })
         }
       })
+    },
+    handleSelectionChange(data) {
+      console.log(data, 'handleSelectionChange')
+      const resName = []
+      if (data && data.length > 0) {
+        data.map((item) => {
+          this.idList.push(item.id)
+          resName.push(item.name)
+        })
+        this.dialogForm.num = data.length
+        this.dialogForm.dialogEquipmentName = resName.join(';')
+      }
+    },
+    childClickHandle(data) {
+      this.dialogVideoAreaId = data.id
+      console.log(data, 'childClickHandle')
+    },
+
+    dialogMove() {
+      moveEncoder({
+        idList: this.idList,
+        videoAreaId: this.dialogVideoAreaId
+      }).then((res) => {
+        if (res.code === 0) {
+          this.$message({
+            type: 'success',
+            message: '移动成功'
+          })
+          dialogShow = false
+          this.params.pageNum = 1
+          this.getList()
+        }
+      })
+    },
+    changeOrganization() {
+      this.getList()
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
@@ -479,11 +528,11 @@ export default {
         }
       })
     },
-    restart() {},
     deploymentData() {
       this.dialogShow1 = true
     },
-    deteleAll(row) {
+    deteleAll(e) {
+      let target = e.target
       this.$confirm(
         `此操作将同时删除设备及归属于设备的通道信息且不可恢复。确定删除所选的${
           this.$refs.encoderTable.selection.length > 0
@@ -508,6 +557,10 @@ export default {
               type: 'success',
               message: '删除成功'
             })
+            if (target.nodeName === 'SPAN' || target.nodeName === 'use') {
+              target = e.target.parentNode.parentNode
+            }
+            target.blur()
             this.params.pageNum = 1
             this.getList()
           }
@@ -536,14 +589,19 @@ export default {
         })
       })
     },
-    resetData() {
+    resetData(e) {
       this.searchParams = {
         deviceType: '',
         ip: '',
         onlineState: ''
       }
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      }
+      target.blur()
       this.params.pageNum = 1
-      this.getList()
+      this.getList(this.$props.detailsId)
     },
     cxData() {
       this.getList()
@@ -554,7 +612,14 @@ export default {
     goRegistrationList() {
       this.$router.push(`/registrationList`)
     },
-    moveEquipment() {
+    moveEquipment(row) {
+      if (this.$refs.encoderTable.selection.length === 0) {
+        this.$message({
+          message: '请勾选编码器',
+          type: 'warning'
+        })
+        return
+      }
       this.dialogShow = true
     }
   }
@@ -570,6 +635,9 @@ export default {
   padding: 0 20px;
 }
 
+::v-deep .encoder-table .el-table__fixed-right {
+  height: 100% !important;
+}
 // 滚动条大小设置
 ::v-deep .encoder-table::-webkit-scrollbar {
   /*纵向滚动条*/
@@ -668,7 +736,7 @@ export default {
   }
 
   .securityArea_container {
-    height: calc(100% - 40px);
+    height: 500px;
     width: 310px;
     margin: 10px;
     // background: #ffffff;

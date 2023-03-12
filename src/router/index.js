@@ -520,7 +520,7 @@ router.beforeEach(async (to, from, next) => {
                     sideBarRouterList1
                   )
 
-                  store.dispatch('user/changeSidebarRouter', sideBarRouterList1)
+                  // store.dispatch('user/changeSidebarRouter', sideBarRouterList1)
                   store.dispatch(
                     'user/changeTypeRouter',
                     homeRouters.concat(configTypeRouter)
@@ -563,7 +563,7 @@ router.beforeEach(async (to, from, next) => {
                     sideBarRouterList2
                   )
 
-                  store.dispatch('user/changeSidebarRouter', sideBarRouterList2)
+                  // store.dispatch('user/changeSidebarRouter', sideBarRouterList2)
                   store.dispatch(
                     'user/changeTypeRouter',
                     homeRouters.concat(configTypeRouter)
@@ -606,7 +606,7 @@ router.beforeEach(async (to, from, next) => {
                     sideBarRouterList3
                   )
 
-                  store.dispatch('user/changeSidebarRouter', sideBarRouterList3)
+                  // store.dispatch('user/changeSidebarRouter', sideBarRouterList3)
 
                   store.dispatch(
                     'user/changeTypeRouter',
@@ -635,6 +635,8 @@ router.beforeEach(async (to, from, next) => {
               lastUrl.indexOf('/streamMediaAssociated') === 0
             ) {
               store.dispatch('user/changeActiveIndex', configTypeRouter[2].path)
+
+              store.dispatch('user/changeSidebarRouter', sideBarRouterList3)
             } else if (
               lastUrl === '/equipment' ||
               lastUrl === '/addEquipment' ||
@@ -644,8 +646,12 @@ router.beforeEach(async (to, from, next) => {
               lastUrl.indexOf('/editChannel') === 0
             ) {
               store.dispatch('user/changeActiveIndex', configTypeRouter[0].path)
+
+              store.dispatch('user/changeSidebarRouter', sideBarRouterList1)
             } else {
               store.dispatch('user/changeActiveIndex', configTypeRouter[1].path)
+
+              store.dispatch('user/changeSidebarRouter', sideBarRouterList2)
             }
           }
           console.log('刷新后的最终路由', router)

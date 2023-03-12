@@ -215,12 +215,18 @@ export default {
   }
 }
 // 去掉顶部线条
-.tree {
-  & > .el-tree-node::after {
-    border-top: none;
-  }
-  & > .el-tree-node::before {
-    border-left: none;
+.operation_box {
+  height: 500px;
+
+  .tree {
+    max-height: calc(100% - 0px);
+    overflow-y: auto;
+    & > .el-tree-node::after {
+      border-top: none;
+    }
+    & > .el-tree-node::before {
+      border-left: none;
+    }
   }
 }
 </style>

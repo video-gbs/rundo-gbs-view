@@ -9,8 +9,8 @@
       </div>
     </div>
     <div class="activeDiscovery-transfer">
-      <div>
-        <div class="level">
+      <div style="height: 100%">
+        <div class="level" style="height: 100%">
           <!-- 左边框框 -->
           <div class="transferbox">
             <div class="topbox">
@@ -674,6 +674,9 @@ export default {
 ::v-deep .el-dialog__body {
   padding: 20px;
 }
+::v-deep .user-table .el-table__fixed-right {
+  height: 100% !important;
+}
 // 滚动条大小设置
 ::v-deep .user-table::-webkit-scrollbar {
   /*纵向滚动条*/
@@ -735,15 +738,15 @@ export default {
 ///@at-root
 ///
 .left-table {
-  height: calc(100% - 100px);
+  max-height: calc(100% - 120px);
   overflow-y: auto;
 }
 .right-table {
-  height: calc(100% - 100px);
+  max-height: calc(100% - 120px);
   overflow-y: auto;
 }
 .transferbox {
-  max-height: 730px;
+  height: calc(100% - 16px);
   width: 45%; //右边盒子的宽占比
   border: 1px solid#ebedf2;
   margin-top: 16px;
@@ -768,7 +771,7 @@ export default {
     // float: right;
   }
   .contont {
-    height: 100%;
+    height: calc(100% - 60px);
   }
 }
 .centrebtn {
@@ -852,7 +855,7 @@ export default {
 
   .activeDiscovery-transfer {
     height: calc(100% - 100px);
-    margin: 20px 20px 0 20px;
+    margin: 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }

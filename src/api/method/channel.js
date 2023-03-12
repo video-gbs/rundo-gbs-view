@@ -36,3 +36,8 @@ export function moveChannel(params) {
 export function editChannel(params) {
   return request.put(`${expansion}/channel/edit`, params)
 }
+
+// // 移动
+// export function moveChannel(params) {
+//   return request.put(`${expansion}/channel/move`,params)
+// }

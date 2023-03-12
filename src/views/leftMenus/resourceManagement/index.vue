@@ -26,14 +26,18 @@
             name="编码器"
             class="encoder-pane pane-content"
           >
-            <Encoder ref="encoder" :detailsId="detailsId" />
+            <Encoder
+              ref="encoder"
+              :detailsId="detailsId"
+              :treeList="treeList"
+            />
           </el-tab-pane>
           <el-tab-pane
             label="通道"
             name="通道"
             class="channel-pane pane-content"
           >
-            <Channel ref="channel" />
+            <Channel ref="channel" :treeList="treeList" />
           </el-tab-pane>
         </el-tabs>
       </div>
@@ -94,7 +98,6 @@ export default {
         })
     },
     handleClick(val, event) {
-      console.log('val', val)
       this.activeName = val.label
     },
     childClickHandle(data) {

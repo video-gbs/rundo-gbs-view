@@ -298,6 +298,7 @@ export default {
     }
   },
   created() {
+    console.log('this.$route.query', this.$route.query)
     const {
       channelCode,
       channelName,
@@ -314,13 +315,13 @@ export default {
     } = this.$route.query.row
     this.form.channelCode = channelCode
     this.form.channelName = channelName
-    this.form.channelType = channelType
+    this.form.channelType = String(channelType)
     this.form.videoAreaId = videoAreaId
     this.form.gb28181Code = gb28181Code
     this.form.longitude = longitude
     this.form.latitude = latitude
     this.form.faceLocation = faceLocation
-    this.form.ptzType = ptzType
+    this.form.ptzType = String(ptzType)
     this.form.installLocation = installLocation
     this.form.height = height
     this.form.installTime = installTime

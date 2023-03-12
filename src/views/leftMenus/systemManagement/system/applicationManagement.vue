@@ -33,7 +33,7 @@
           style="float: right; margin-right: 20px"
           class="form-btn-list"
         >
-          <el-button @click="resetData"
+          <el-button @click="resetData($event)"
             ><svg-icon class="svg-btn" icon-class="cz" />
             <span class="btn-span">重置</span></el-button
           >
@@ -383,11 +383,18 @@ export default {
     cxData() {
       this.getList()
     },
-    resetData() {
+    resetData(e) {
       this.searchParams = {
         appIp: '',
         appName: ''
       }
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      }
+      target.blur()
+      this.params.pageNum = 1
+      this.getList()
     },
     changeSwitch(row) {
       let text = row.status === 0 ? '启用' : '停用'
@@ -579,6 +586,10 @@ export default {
 }
 ::v-deep .el-dialog__footer {
   border-top: 1px solid #eaeaea;
+}
+
+::v-deep .applicationManagement-table .el-table__fixed-right {
+  height: 100% !important;
 }
 // 滚动条大小设置
 ::v-deep .applicationManagement-table::-webkit-scrollbar {
