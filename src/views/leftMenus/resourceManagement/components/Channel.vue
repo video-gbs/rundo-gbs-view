@@ -351,7 +351,7 @@ export default {
       getChannelById({
         pageNum: this.params.pageNum,
         pageSize: this.params.pageSize,
-        videoAreaId: orgId ? orgId : 1,
+        videoAreaId: orgId ? orgId : this.$props.detailsId,
         includeEquipment: this.includeEquipment,
         ...this.searchParams
       }).then((res) => {

@@ -107,7 +107,7 @@
             <div
               ref="mainBox"
               :class="`main-box grid${spilt}`"
-              :style="`height: calc(100vh - ${splitFullscreen ? 0 : 145}px)`"
+              style="height: 100%"
             >
               <div
                 v-for="i in spilt"
@@ -346,9 +346,9 @@ export default {
         },
         {
           num: 16,
-          class: '1fenpingw',
-          fenpinged: '1fenpinged',
-          fenping: '1fenping'
+          class: '16fenpingw',
+          fenpinged: '16fenpinged',
+          fenping: '16fenping'
         }
       ],
       playerIdx: 0, //激活播放器
@@ -380,6 +380,7 @@ export default {
       isShowMenu: true, //是否展示菜单
       hasAudio: true,
       treeList: [],
+      initData: [],
       areaNames: 'areaNames',
       detailsId: [],
       data: [],
@@ -457,6 +458,8 @@ export default {
         .then((res) => {
           if (res.code === 0) {
             this.treeList = res.data
+
+            this.initData = res.data
           }
         })
         .catch((error) => {
@@ -517,7 +520,6 @@ export default {
       }
     },
     getIconType(data) {
-      console.log('data~~~~~~~~', data)
       if (data.level) {
         // if (data.level === 2) {
         //   return 'tree2'
@@ -582,7 +584,6 @@ export default {
       }
     },
     filterNode(value, data) {
-      console.log(1111111111)
       if (!value) return true
       // if (this.defaultPropsName === 'orgName') {
       //   return data.orgName && data.orgName.indexOf(value) !== -1
@@ -626,16 +627,22 @@ export default {
                   })
 
                   this.detailsId.push(data.id)
-                  let arr = data.children
-                    ? this.resArray.concat(data.children)
-                    : this.resArray
-                  const obj = {}
-                  arr = arr.reduce((item, next) => {
-                    obj[next.areaPid]
-                      ? ''
-                      : (obj[next.areaPid] = true && item.push(next))
-                    return item
-                  }, [])
+                  let arr = []
+                  if (data.id === '1') {
+                    arr = this.resArray.concat(this.initData[0].children)
+                  } else {
+                    arr = data.children
+                      ? this.resArray.concat(data.children)
+                      : this.resArray
+
+                    const obj = {}
+                    arr = arr.reduce((item, next) => {
+                      obj[next.areaPid]
+                        ? ''
+                        : (obj[next.areaPid] = true && item.push(next))
+                      return item
+                    }, [])
+                  }
 
                   console.log('arr~~~~~~~~~~~~~~~', arr)
                   this.$refs.liveTree.updateKeyChildren(data.id, arr)
@@ -644,7 +651,7 @@ export default {
               }
             })
             .catch((error) => {
-              console.log(error)
+              // console.log(1111111,error)
             })
         }
       } else {

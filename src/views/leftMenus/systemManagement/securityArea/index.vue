@@ -277,6 +277,7 @@ export default {
         this.treeMsg = data.areaName
       }
       this.detailsId = data.id
+      this.$refs['securityAreaForm'].resetFields()
       this.getUnitDetailsData()
     },
     getUnitDetailsData() {

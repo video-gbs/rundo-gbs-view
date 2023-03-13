@@ -98,7 +98,7 @@ service.interceptors.response.use(
         logoutFn()
       } else {
         Message({
-          message: res.message || '发生错误',
+          message: res.msg || res.message || '发生错误',
           type: 'error',
           duration: 5 * 1000
         })

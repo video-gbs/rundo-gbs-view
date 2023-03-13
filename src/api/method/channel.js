@@ -29,7 +29,7 @@ export function deleteChannel(id) {
 
 // 移动
 export function moveChannel(params) {
-  return request.put(`${expansion}/channel/move`, params)
+  return request.post(`${expansion}/channel/move`, params)
 }
 
 // 编辑

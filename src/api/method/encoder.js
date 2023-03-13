@@ -25,7 +25,7 @@ export function deleteEncoder(id) {
 
 // 移动
 export function moveEncoder(params) {
-  return request.put(`${expansion}/device/move`, params)
+  return request.post(`${expansion}/device/move`, params)
 }
 
 // 编辑编码器

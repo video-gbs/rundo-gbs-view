@@ -418,6 +418,7 @@ export default {
     return {
       filterText: '',
       treeList: [],
+      initData: [],
       activeTab: 'equipmentGroup',
       detailsId: [],
       datePickerPlayTime: new Date(new Date().setHours(0, 0, 0, 0)),
@@ -537,6 +538,7 @@ export default {
         .then((res) => {
           if (res.code === 0) {
             this.treeList = res.data
+            this.initData = res.data
           }
         })
         .catch((error) => {
@@ -691,16 +693,23 @@ export default {
                   })
 
                   this.detailsId.push(data.id)
-                  let arr = data.children
-                    ? this.resArray.concat(data.children)
-                    : this.resArray
-                  const obj = {}
-                  arr = arr.reduce((item, next) => {
-                    obj[next.areaPid]
-                      ? ''
-                      : (obj[next.areaPid] = true && item.push(next))
-                    return item
-                  }, [])
+                  let arr = []
+                  if (data.id === '1') {
+                    arr = this.resArray.concat(this.initData[0].children)
+                  } else {
+                    arr = data.children
+                      ? this.resArray.concat(data.children)
+                      : this.resArray
+
+                    const obj = {}
+                    arr = arr.reduce((item, next) => {
+                      obj[next.areaPid]
+                        ? ''
+                        : (obj[next.areaPid] = true && item.push(next))
+                      return item
+                    }, [])
+                  }
+
                   this.$refs.recordViewTree.updateKeyChildren(data.id, arr)
                   this.defaultExpandedKeys = [data.id]
                 }

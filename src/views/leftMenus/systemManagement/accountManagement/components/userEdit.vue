@@ -419,14 +419,14 @@ export default {
           {
             required: true,
             message: '请选择部门',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         expiryDateStart: [
           {
             required: true,
             message: '此为必填项。',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         jobNo: {

@@ -84,7 +84,7 @@
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          prop="roleNameStr"
+          prop="roleName"
           label="角色"
           :show-overflow-tooltip="true"
         />

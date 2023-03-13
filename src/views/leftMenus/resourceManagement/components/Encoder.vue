@@ -437,7 +437,7 @@ export default {
       await getEncoderById({
         pageNum: this.params.pageNum,
         pageSize: this.params.pageSize,
-        videoAreaId: id ? id : 1,
+        videoAreaId: id ? id : this.$props.detailsId,
         includeEquipment: this.includeEquipment,
         ...this.searchParams
       }).then((res) => {

@@ -329,7 +329,7 @@ export default {
         orgPid: {
           required: true,
           message: '此为必填项。',
-          trigger: 'blur'
+          trigger: 'change'
         }
       },
       treeData: [],
@@ -373,6 +373,7 @@ export default {
         this.treeMsg = data.orgName
       }
       this.detailsId = data.id
+      this.$refs['unitManagementForm'].resetFields()
       this.getUnitDetailsData()
     },
     getUnitDetailsData() {

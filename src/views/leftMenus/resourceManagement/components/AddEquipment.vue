@@ -299,6 +299,18 @@ export default {
         }
       }, 500)
     }
+    const checkModel = (rule, value, cb) => {
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (value.length <= 128) {
+          return cb()
+        } else {
+          return cb(new Error('1~128个字符。'))
+        }
+      }, 500)
+    }
     return {
       form: {
         model: '',
@@ -341,18 +353,18 @@ export default {
           trigger: 'blur'
         },
         manufacturer: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         gatewayId: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         transport: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         videoAreaId: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
-        model: [{ required: true, message: '1~128个字符。', trigger: 'blur' }],
+        model: [{ required: true, trigger: 'blur', validator: checkModel }],
         ip: [{ required: true, message: '此为必填项。', trigger: 'blur' }],
         username: [
           { required: true, message: '此为必填项。', trigger: 'blur' }

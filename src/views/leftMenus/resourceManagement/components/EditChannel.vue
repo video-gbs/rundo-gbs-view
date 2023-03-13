@@ -254,12 +254,14 @@ export default {
       appearanceTypeOptions: [],
       rules: {
         channelType: [
-          { required: true, message: '请选择通道类型', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         videoAreaId: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
-        ptzType: [{ required: true, message: '此为必填项。', trigger: 'blur' }],
+        ptzType: [
+          { required: true, message: '此为必填项。', trigger: 'change' }
+        ],
         channelCode: [
           { required: true, message: '1~128个字符。', trigger: 'blur' }
         ],

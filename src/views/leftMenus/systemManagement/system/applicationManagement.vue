@@ -329,7 +329,9 @@ export default {
           // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
           trigger: 'blur'
         },
-        appType: [{ required: true, message: '此为必填项。', trigger: 'blur' }],
+        appType: [
+          { required: true, message: '此为必填项。', trigger: 'change' }
+        ],
         appDesc: {
           message: '支持最大长度128个字符。',
           trigger: 'blur',
