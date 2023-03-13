@@ -242,6 +242,10 @@ export default {
       let target = e.target
       if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
         target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
       }
       target.blur()
       this.params.pageNum = 1
@@ -363,6 +367,15 @@ export default {
     },
     deteleAll(e) {
       let target = e.target
+
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
       this.$confirm(
         `确定删除${
           this.$refs.roleTable.selection.length > 0
@@ -389,10 +402,6 @@ export default {
               message: '删除成功'
             })
 
-            if (target.nodeName === 'SPAN' || target.nodeName === 'use') {
-              target = e.target.parentNode.parentNode
-            }
-            target.blur()
             this.params.pageNum = 1
             this.getList()
           }

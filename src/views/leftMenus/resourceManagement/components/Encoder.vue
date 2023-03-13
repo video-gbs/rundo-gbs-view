@@ -488,7 +488,7 @@ export default {
             type: 'success',
             message: '移动成功'
           })
-          dialogShow = false
+          this.dialogShow = false
           this.params.pageNum = 1
           this.getList()
         }
@@ -533,6 +533,14 @@ export default {
     },
     deteleAll(e) {
       let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
       this.$confirm(
         `此操作将同时删除设备及归属于设备的通道信息且不可恢复。确定删除所选的${
           this.$refs.encoderTable.selection.length > 0
@@ -557,10 +565,6 @@ export default {
               type: 'success',
               message: '删除成功'
             })
-            if (target.nodeName === 'SPAN' || target.nodeName === 'use') {
-              target = e.target.parentNode.parentNode
-            }
-            target.blur()
             this.params.pageNum = 1
             this.getList()
           }
@@ -596,8 +600,13 @@ export default {
         onlineState: ''
       }
       let target = e.target
+
       if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
         target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
       }
       target.blur()
       this.params.pageNum = 1

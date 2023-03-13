@@ -393,7 +393,7 @@ export default {
             type: 'success',
             message: '移动成功'
           })
-          dialogShow = false
+          this.dialogShow = false
           this.params.pageNum = 1
           this.getList()
         }
@@ -434,6 +434,14 @@ export default {
     },
     deteleAll(e) {
       let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
       this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -450,10 +458,6 @@ export default {
               type: 'success',
               message: '删除成功'
             })
-            if (target.nodeName === 'SPAN' || target.nodeName === 'use') {
-              target = e.target.parentNode.parentNode
-            }
-            target.blur()
             this.params.pageNum = 1
             this.getList()
           }
@@ -487,6 +491,10 @@ export default {
       let target = e.target
       if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
         target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
       }
       target.blur()
       this.params.pageNum = 1

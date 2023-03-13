@@ -393,7 +393,12 @@ export default {
       let target = e.target
       if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
         target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
       }
+
       target.blur()
       this.params.pageNum = 1
       this.getList()

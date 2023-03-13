@@ -436,6 +436,15 @@ export default {
     },
     deleteAccount(e) {
       const h = this.$createElement
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
       this.$confirm('提示', {
         title: '提示',
         message: !this.isMore
@@ -454,11 +463,6 @@ export default {
               type: 'success',
               message: '删除成功'
             })
-            let target = e.target
-            if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
-              target = e.target.parentNode.parentNode
-            }
-            target.blur()
             this.init()
             this.detailsId = this.treeList[0].id
             this.getUnitDetailsData()
