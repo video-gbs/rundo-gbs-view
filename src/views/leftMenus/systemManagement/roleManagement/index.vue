@@ -293,6 +293,7 @@ export default {
       })
     },
     goActiveDiscovery(id) {
+      Local.set('rolePageNum', this.params.pageNum)
       this.$router.push({ path: '/userDiscovery', query: { key: id } })
     },
     goCreatingRole() {

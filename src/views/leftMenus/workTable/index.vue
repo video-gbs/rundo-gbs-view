@@ -270,13 +270,26 @@ export default {
       sideBarRouterList: [],
       sideBarRouterList1: [],
       sideBarRouterList2: [],
-      sideBarRouterList3: []
+      sideBarRouterList3: [],
+      windowWidth: null
     }
   },
-  watch: {},
+  watch: {
+    windowWidth: {
+      handler: function (val, oldVal) {
+        const h = document.getElementsByTagName('HTML')[0]
+        h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+
+        this.$forceUpdate()
+      },
+      immediate: true
+    }
+  },
   created() {},
   mounted() {
     this.init()
+    this.windowWidth = document.documentElement.clientWidth
+    window.onresize = this.throttle(this.setScale, 500, 500)
   },
   methods: {
     async init() {
@@ -292,6 +305,10 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    setScale() {
+      // 以1920px为标准宽度
+      this.windowWidth = document.documentElement.clientWidth
     },
     getBackground(item) {
       return item.appIcon

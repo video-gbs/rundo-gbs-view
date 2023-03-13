@@ -1016,6 +1016,15 @@ export default {
     // 控制面板展开收起
     controlColla() {
       this.showContent = !this.showContent
+      if (!this.showContent) {
+        document.getElementsByClassName(
+          'securityArea_container'
+        )[0].style.height = '920px'
+      } else {
+        document.getElementsByClassName(
+          'securityArea_container'
+        )[0].style.height = '660px'
+      }
     }
   }
 }

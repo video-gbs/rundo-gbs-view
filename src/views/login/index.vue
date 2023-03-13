@@ -173,7 +173,8 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      windowWidth: null
     }
   },
   watch: {
@@ -182,12 +183,28 @@ export default {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
+    },
+    windowWidth: {
+      handler: function (val, oldVal) {
+        const h = document.getElementsByTagName('HTML')[0]
+        h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+
+        this.$forceUpdate()
+      },
+      immediate: true
     }
   },
-  mounted() {},
+  mounted() {
+    this.windowWidth = document.documentElement.clientWidth
+    window.onresize = this.throttle(this.setScale, 500, 500)
+  },
   methods: {
     pwdShowChange() {
       this.passwordType = this.passwordType === 'password' ? 'type' : 'password'
+    },
+    setScale() {
+      // 以1920px为标准宽度
+      this.windowWidth = document.documentElement.clientWidth
     },
     showPwd() {
       if (this.passwordType === 'password') {
@@ -259,7 +276,7 @@ body {
     display: flex;
     justify-content: flex-start;
     position: relative;
-    top: -130px;
+    top: 260px;
   }
 }
 .get-codes {
@@ -295,12 +312,12 @@ body {
   flex: 1;
   display: flex;
   justify-content: flex-end;
-  height: 400px;
+  height: 1080px;
 
   .left-img {
-    max-width: 800px;
+    max-width: 775px;
     width: 100%;
-    height: 400px;
+    // height: 400px;
     background: url('../../assets/imgs/tysp.png') 100% no-repeat;
     background-size: cover;
   }
@@ -463,7 +480,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  /*padding-top: 20px;*/
+  padding-top: 95px;
 
   button {
     font-family: Poppins-Medium;

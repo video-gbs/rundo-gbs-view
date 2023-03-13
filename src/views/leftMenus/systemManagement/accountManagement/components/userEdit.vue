@@ -395,7 +395,7 @@ export default {
           trigger: 'blur'
         },
         password: {
-          required: true,
+          // required: true,
           max: 20,
           min: 8,
           validator: checkPassword,
@@ -405,7 +405,7 @@ export default {
           trigger: 'blur'
         },
         rePassword: {
-          required: true,
+          // required: true,
           max: 20,
           min: 8,
           validator: checkPassword,

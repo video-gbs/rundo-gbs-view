@@ -311,26 +311,26 @@ export default {
       dialogShow: false,
       dialogShow1: false,
       dialogTableData: [
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        }
+        // {
+        //   name: '球机192.168……',
+        //   coding: '4400000000111500…',
+        //   type: 'IPC',
+        //   ip: '192.168.119.152',
+        //   city: '广东省/广州市/珠海区/新竹街道…',
+        //   manufacturer: '海康',
+        //   status: 1
+        // }
       ],
       tableData: [
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        }
+        // {
+        //   name: '球机192.168……',
+        //   coding: '4400000000111500…',
+        //   type: 'IPC',
+        //   ip: '192.168.119.152',
+        //   port: 8000,
+        //   manufacturer: '海康',
+        //   status: 1
+        // }
       ],
       areaNames: 'areaNames',
       idList: [],
