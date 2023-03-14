@@ -487,6 +487,7 @@ export default {
           devopsIds.map((item3) => {
             res3.push(item3.slice(2))
           })
+          console.log(res1)
           ;(this.expandedList[0] = res1),
             (this.expandedList[1] = res2),
             (this.expandedList[2] = res3),
