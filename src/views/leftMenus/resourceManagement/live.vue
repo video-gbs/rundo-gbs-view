@@ -97,7 +97,10 @@
                 </div>
                 <transition name="el-fade-in-linear">
                   <div class="wrapper-bottom-content" v-show="showContent">
-                    <cloud-control :deviceData="playerData[playerIdx]" />
+                    <cloud-control
+                      :deviceData="playerData[playerIdx]"
+                      :cloudId="cloudId"
+                    />
                   </div>
                 </transition>
               </div>
@@ -388,7 +391,8 @@ export default {
       hasChannel: false,
       resArray: [],
       isMouseHover: false,
-      isHoverNum: 0
+      isHoverNum: 0,
+      cloudId: null
     }
   },
   mounted() {
@@ -802,6 +806,7 @@ export default {
       // this.stopPlaying(this.playerData[i])
     },
     async getDeviceList(id) {
+      Local.set('cloudId', id)
       await getPlayLists({ channelId: id })
         .then((res) => {
           if (res.code === 0) {

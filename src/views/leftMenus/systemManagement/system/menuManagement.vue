@@ -253,9 +253,10 @@ import {
   getMenuInfoLists,
   deleteMenuInfo,
   getApplicationList,
-  getApplicationTree
+  getApplicationTree,
+  changeMenusStatus,
+  changeMenusHidden
 } from '@/api/method/menus'
-import { changeRoleStatus, changeRoleHidden } from '@/api/method/role'
 import pagination from '@/components/Pagination/index.vue'
 export default {
   name: '',
@@ -341,7 +342,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          changeRoleStatus({
+          changeMenusStatus({
             id: row.id,
             status: row.status
           }).then((res) => {})
@@ -359,7 +360,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          changeRoleHidden({
+          changeMenusHidden({
             id: row.id,
             hidden: row.hidden
           }).then((res) => {})

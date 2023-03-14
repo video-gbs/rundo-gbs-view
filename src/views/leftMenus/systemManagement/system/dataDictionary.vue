@@ -519,9 +519,12 @@ export default {
 ::v-deep .dataDictionary-table .el-table__fixed-right {
   height: 100% !important;
 }
-::v-deep .el-table--enable-row-transition {
-  height: 100% !important;
-}
+// ::v-deep .el-table--enable-row-transition {
+//   height: 100% !important;
+// }
+// ::v-deep .el-table::before {
+//   height: 0;
+// }
 // 滚动条大小设置
 ::v-deep .dataDictionary-table::-webkit-scrollbar {
   /*纵向滚动条*/
@@ -589,7 +592,7 @@ export default {
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
     .dataDictionary-table {
-      height: calc(100% - 100px);
+      max-height: calc(100% - 100px);
       overflow-y: auto;
     }
     .securityArea_container {
@@ -737,5 +740,8 @@ export default {
 }
 .button-back {
   margin-right: 20px;
+}
+::v-deep .el-table::before {
+  height: 0;
 }
 </style>
