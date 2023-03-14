@@ -628,6 +628,7 @@ export default {
                         areaName: item.channelName,
                         areaNames: item.channelName,
                         areaPid: item.id,
+                        id: item.id,
                         ptzType: item.ptzType,
                         children: []
                       })
@@ -636,10 +637,11 @@ export default {
                     this.detailsId.push(data.id)
                     let arr = []
                     if (data.id === '1') {
-                      console.log('1~~~~~~~~~~~~~~~~')
                       arr = this.resArray.concat(this.initData[0].children)
                     } else {
                       console.log('else~~~~~~~~~~~~~~~~', data.children)
+
+                      console.log('1~~~~~~~~~~~~~~~~', this.resArray)
                       arr = data.children
                         ? this.resArray.concat(data.children)
                         : this.resArray

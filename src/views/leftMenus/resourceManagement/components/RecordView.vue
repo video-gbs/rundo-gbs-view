@@ -687,6 +687,7 @@ export default {
                       areaName: item.channelName,
                       areaNames: item.channelName,
                       areaPid: item.id,
+                      id: item.id,
                       ptzType: item.ptzType,
                       children: []
                     })
