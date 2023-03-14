@@ -458,9 +458,9 @@ export default {
     },
     changeRequired(val) {
       if (val.protocol === 'GB28181') {
-        this.isRequired = true
-      } else {
         this.isRequired = false
+      } else {
+        this.isRequired = true
       }
     },
     // 点击节点选中

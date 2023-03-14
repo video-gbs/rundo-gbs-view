@@ -596,7 +596,7 @@ export default {
       }
       setTimeout(() => {
         this.isGoContentListClicked = false
-      }, 5000)
+      }, 10000)
     })
   }
 }

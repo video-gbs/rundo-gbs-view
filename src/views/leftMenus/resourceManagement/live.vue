@@ -204,7 +204,7 @@
                   />
                 </el-tooltip>
                 <div class="split-box">
-                  <el-dropdown @command="switchSplit">
+                  <el-dropdown @command="switchSplit" placement="top">
                     <span class="split-text">
                       <svg-icon
                         class="iconfont white"
@@ -400,6 +400,15 @@ export default {
       this.splitFullscreen = !this.splitFullscreen
     })
     this.$refs.dropdownMenuPlace.appendChild(this.$refs.dropdownMenu.popperElm)
+    if (document.documentElement.clientHeight < 800) {
+      document.getElementsByClassName(
+        'securityArea_container'
+      )[0].style.height = '540px'
+    } else {
+      document.getElementsByClassName(
+        'securityArea_container'
+      )[0].style.height = '680px'
+    }
   },
   created() {
     // this.checkPlayByParam()
@@ -1022,13 +1031,29 @@ export default {
     controlColla() {
       this.showContent = !this.showContent
       if (!this.showContent) {
-        document.getElementsByClassName(
-          'securityArea_container'
-        )[0].style.height = '920px'
+        console.log(
+          'document.documentElement.clientHeight',
+          document.documentElement.clientHeight
+        )
+        if (document.documentElement.clientHeight < 800) {
+          document.getElementsByClassName(
+            'securityArea_container'
+          )[0].style.height = '840px'
+        } else {
+          document.getElementsByClassName(
+            'securityArea_container'
+          )[0].style.height = '960px'
+        }
       } else {
-        document.getElementsByClassName(
-          'securityArea_container'
-        )[0].style.height = '660px'
+        if (document.documentElement.clientHeight < 800) {
+          document.getElementsByClassName(
+            'securityArea_container'
+          )[0].style.height = '540px'
+        } else {
+          document.getElementsByClassName(
+            'securityArea_container'
+          )[0].style.height = '680px'
+        }
       }
     }
   }
@@ -1207,12 +1232,11 @@ export default {
       padding: 0px 24px 0;
     }
     .securityArea_container {
-      height: 660px;
       width: 360px;
       margin-top: -15px;
       background: #ffffff;
       .tree {
-        max-height: calc(100% - 110px);
+        max-height: calc(100% - 90px);
         overflow-y: auto;
       }
     }

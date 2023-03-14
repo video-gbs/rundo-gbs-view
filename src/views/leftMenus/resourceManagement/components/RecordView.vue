@@ -400,7 +400,11 @@ import MonitorEquipmentGroup from './monitorEquipmentGroup'
 import DownloadVideoModal from '../recordComponents/DownloadVideoModal'
 import { getVideoAraeTree } from '@/api/method/role'
 import { getPlaybackList } from '@/api/method/moduleManagement'
-import { getPlayBackUrlLists, getChannelPlayList } from '@/api/method/live'
+import {
+  getPlayBackUrlLists,
+  getChannelPlayList,
+  playStop
+} from '@/api/method/live'
 
 // import flvJs from './flvJs'
 const ZOOM_TYPE = {
@@ -681,6 +685,7 @@ export default {
         })
     },
     async handleNodeClick(data, node, self) {
+      console.log(data)
       if (!data.onlineState) {
         this.resArray = []
         if (this.detailsId.indexOf(data.id) !== -1) {
@@ -730,7 +735,7 @@ export default {
             })
         }
       } else {
-        this.channelId = data.areaPid
+        this.channelId = data.areaPid || data.id
       }
     },
     initData() {
@@ -787,6 +792,7 @@ export default {
     },
     // 查询视频
     handleSearch() {
+      console.log('this.channelId', this.channelId)
       if (this.channelId === '' && this.channelId.length === 0) {
         this.$message({
           message: '请选择节点',
@@ -1852,19 +1858,25 @@ export default {
     playRecord: (function () {
       return async function (row, playTime) {
         console.log(2222222222222, row, playTime)
-        await getPlayBackUrlLists({
-          channelId: this.channelId,
-          startTime: row.startTime ? row.startTime : `${playTime} 00:00:00`,
-          endTime: row.endTime ? row.endTime : `${playTime} 23:59:59`
+        await playStop({
+          streamId: this.channelId
+        }).then((res) => {
+          if (res.code === 0) {
+            getPlayBackUrlLists({
+              channelId: this.channelId,
+              startTime: row.startTime ? row.startTime : `${playTime} 00:00:00`,
+              endTime: row.endTime ? row.endTime : `${playTime} 23:59:59`
+            })
+              .then((res) => {
+                if (res.code === 0) {
+                  this.videoUrl = res.data.wsFlv
+                }
+              })
+              .catch((error) => {
+                console.log(error)
+              })
+          }
         })
-          .then((res) => {
-            if (res.code === 0) {
-              this.videoUrl = res.data.wsFlv
-            }
-          })
-          .catch((error) => {
-            console.log(error)
-          })
       }
     })(),
     gbPlay() {
