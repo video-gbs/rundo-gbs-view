@@ -132,21 +132,15 @@
         <el-table-column prop="channelType" label="通道类型" width="120">
           <template slot-scope="scope">
             <!-- <span :class="scope.row.deviceType === 1 ? 'yuan' : 'yuan1'"></span> -->
-            <span
-              v-if="scope.row.deviceType === 0"
-              style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+            <span v-if="scope.row.channelType === 0" style="margin-left: 10px"
               >视频</span
             >
             <span
-              v-else-if="scope.row.deviceType === 1"
-              style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
+              v-else-if="scope.row.channelType === 1"
+              style="margin-left: 10px"
               >音频</span
             >
-            <span
-              v-else
-              style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
-              >告警</span
-            >
+            <span v-else style="margin-left: 10px">告警</span>
           </template>
         </el-table-column>
         <el-table-column prop="ip" label="IP地址" width="120" />

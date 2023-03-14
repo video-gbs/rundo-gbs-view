@@ -611,48 +611,56 @@ export default {
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
         } else {
-          await getChannelPlayList(data.id)
-            .then((res) => {
-              if (res.code === 0) {
-                if (res.data && res.data.length > 0) {
-                  res.data.map((item) => {
-                    this.resArray.push({
-                      onlineState: item.onlineState,
-                      areaName: item.channelName,
-                      areaNames: item.channelName,
-                      areaPid: item.id,
-                      ptzType: item.ptzType,
-                      children: []
+          if (data.onlineState === 0) {
+            this.$message({
+              message: '设备已经离线',
+              type: 'warning'
+            })
+            return
+          } else {
+            await getChannelPlayList(data.id)
+              .then((res) => {
+                if (res.code === 0) {
+                  if (res.data && res.data.length > 0) {
+                    res.data.map((item) => {
+                      this.resArray.push({
+                        onlineState: item.onlineState,
+                        areaName: item.channelName,
+                        areaNames: item.channelName,
+                        areaPid: item.id,
+                        ptzType: item.ptzType,
+                        children: []
+                      })
                     })
-                  })
 
-                  this.detailsId.push(data.id)
-                  let arr = []
-                  if (data.id === '1') {
-                    arr = this.resArray.concat(this.initData[0].children)
-                  } else {
-                    arr = data.children
-                      ? this.resArray.concat(data.children)
-                      : this.resArray
+                    this.detailsId.push(data.id)
+                    let arr = []
+                    if (data.id === '1') {
+                      arr = this.resArray.concat(this.initData[0].children)
+                    } else {
+                      arr = data.children
+                        ? this.resArray.concat(data.children)
+                        : this.resArray
 
-                    const obj = {}
-                    arr = arr.reduce((item, next) => {
-                      obj[next.areaPid]
-                        ? ''
-                        : (obj[next.areaPid] = true && item.push(next))
-                      return item
-                    }, [])
+                      const obj = {}
+                      arr = arr.reduce((item, next) => {
+                        obj[next.areaPid]
+                          ? ''
+                          : (obj[next.areaPid] = true && item.push(next))
+                        return item
+                      }, [])
+                    }
+
+                    console.log('arr~~~~~~~~~~~~~~~', arr)
+                    this.$refs.liveTree.updateKeyChildren(data.id, arr)
+                    this.defaultExpandedKeys = [data.id]
                   }
-
-                  console.log('arr~~~~~~~~~~~~~~~', arr)
-                  this.$refs.liveTree.updateKeyChildren(data.id, arr)
-                  this.defaultExpandedKeys = [data.id]
                 }
-              }
-            })
-            .catch((error) => {
-              // console.log(1111111,error)
-            })
+              })
+              .catch((error) => {
+                // console.log(1111111,error)
+              })
+          }
         }
       } else {
         this.getDeviceList(data.areaPid)
@@ -791,13 +799,6 @@ export default {
               this.playerIdx++
             }
             this.setPlayUrl(res.data.wsFlv, idxTmp)
-            // that.total = res.data.total
-
-            // that.deviceList = res.data.list.map((item) => {
-            //   return { deviceChannelList: [], ...item }
-            // })
-            // that.deviceList_ = that.deviceList
-            // that.getDeviceListLoading = false
           }
         })
         .catch(function (error) {

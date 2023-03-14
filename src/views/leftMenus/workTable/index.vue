@@ -33,7 +33,11 @@
               v-for="(item1, index1) in appList"
               :key="index1"
               class="top-li"
-              @click="goContentList('应用', item1, index1)"
+              @click="
+                !isGoContentListClicked
+                  ? goContentList('应用', item1, index1)
+                  : ''
+              "
             >
               <div
                 v-cloak
@@ -271,7 +275,8 @@ export default {
       sideBarRouterList1: [],
       sideBarRouterList2: [],
       sideBarRouterList3: [],
-      windowWidth: null
+      windowWidth: null,
+      isGoContentListClicked: false
     }
   },
   watch: {
@@ -305,6 +310,24 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    throttle(method, delay, duration) {
+      var timer = null
+      var begin = new Date()
+      return function () {
+        var context = this
+        var args = arguments
+        var current = new Date()
+        clearTimeout(timer)
+        if (current - begin >= duration) {
+          method.apply(context, args)
+          begin = current
+        } else {
+          timer = setTimeout(function () {
+            method.apply(context, args)
+          }, delay)
+        }
+      }
     },
     setScale() {
       // 以1920px为标准宽度
@@ -494,6 +517,7 @@ export default {
       }
     },
     goContentList: antiShake(function (name, item, index) {
+      this.isGoContentListClicked = true
       switch (name) {
         case '应用':
           Local.set('tree_type', 1)
@@ -562,6 +586,7 @@ export default {
         default:
           break
       }
+      this.isGoContentListClicked = false
     })
   }
 }
