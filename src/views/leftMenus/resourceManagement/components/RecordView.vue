@@ -703,9 +703,9 @@ export default {
 
                     const obj = {}
                     arr = arr.reduce((item, next) => {
-                      obj[next.areaPid]
+                      obj[next.id]
                         ? ''
-                        : (obj[next.areaPid] = true && item.push(next))
+                        : (obj[next.id] = true && item.push(next))
                       return item
                     }, [])
                   }

@@ -636,17 +636,19 @@ export default {
                     this.detailsId.push(data.id)
                     let arr = []
                     if (data.id === '1') {
+                      console.log('1~~~~~~~~~~~~~~~~')
                       arr = this.resArray.concat(this.initData[0].children)
                     } else {
+                      console.log('else~~~~~~~~~~~~~~~~', data.children)
                       arr = data.children
                         ? this.resArray.concat(data.children)
                         : this.resArray
 
                       const obj = {}
                       arr = arr.reduce((item, next) => {
-                        obj[next.areaPid]
+                        obj[next.id]
                           ? ''
-                          : (obj[next.areaPid] = true && item.push(next))
+                          : (obj[next.id] = true && item.push(next))
                         return item
                       }, [])
                     }
