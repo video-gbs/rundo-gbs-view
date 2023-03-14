@@ -341,10 +341,10 @@ export default {
     },
     getList() {
       const createdTimeEnd = this.searchParams.time
-        ? this.searchParams.time[0]
+        ? this.searchParams.time[1]
         : ''
       const createdTimeStart = this.searchParams.time
-        ? this.searchParams.time[1]
+        ? this.searchParams.time[0]
         : ''
       const roleName = this.searchParams.roleName
       const userAccount = this.searchParams.userAccount
