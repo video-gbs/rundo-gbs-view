@@ -107,7 +107,7 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column width="100" label="操作" fixed="right">
+        <el-table-column width="100" label="操作">
           <template slot-scope="scope">
             <el-button type="text" @click="dialogShow(0, scope.row)"
               >编辑</el-button
@@ -507,6 +507,9 @@ export default {
   overflow: auto;
 }
 ::v-deep .menuManagement-table .el-table__fixed-right {
+  height: 100% !important;
+}
+::v-deep .el-table--enable-row-transition {
   height: 100% !important;
 }
 ::v-deep .menuManagement-table::-webkit-scrollbar {

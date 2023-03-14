@@ -8,56 +8,57 @@
         <!-- padding: 16px 24px 0px -->
         <div style="display: flex; flex-direction: row; height: 100%">
           <div class="left-tree" v-show="isShowMenu">
-            <div class="equipment-group-wrapper-top">
-              <el-tabs
-                v-model="activeTab"
-                @tab-click="switchTab"
-                class="real-time-monitoring"
-              >
-                <el-tab-pane label="安防" name="security" class="live-pane">
-                  <!-- <monitor-equipment-group :sendDevicePush="sendDevicePush" /> -->
-                  <div class="securityArea_container">
-                    <div class="tree-content">
-                      <el-input
-                        placeholder="请输入搜索关键字"
-                        suffix-icon="el-icon-search"
-                        class="search-input"
-                        v-model="filterText"
-                        clearable
-                      ></el-input>
-                      <div class="operation_box">
-                        <el-tree
-                          ref="liveTree"
-                          :data="treeList"
-                          class="tree"
-                          :props="{
-                            children: 'children',
-                            label: 'areaNames'
-                          }"
-                          default-expand-all
-                          :default-expanded-keys="['根节点']"
-                          :expand-on-click-node="false"
-                          node-key="id"
-                          highlight-current
-                          @node-click="handleNodeClick"
-                          :filter-node-method="filterNode"
-                        >
-                          <span
-                            slot-scope="{ node, data }"
-                            class="custom-tree-node"
+            <div class="equipment-group-wrapper">
+              <div class="equipment-group-wrapper-top">
+                <el-tabs
+                  v-model="activeTab"
+                  @tab-click="switchTab"
+                  class="real-time-monitoring"
+                >
+                  <el-tab-pane label="安防" name="security" class="live-pane">
+                    <!-- <monitor-equipment-group :sendDevicePush="sendDevicePush" /> -->
+                    <div class="securityArea_container">
+                      <div class="tree-content">
+                        <el-input
+                          placeholder="请输入搜索关键字"
+                          suffix-icon="el-icon-search"
+                          class="search-input"
+                          v-model="filterText"
+                          clearable
+                        ></el-input>
+                        <div class="operation_box">
+                          <el-tree
+                            ref="liveTree"
+                            :data="treeList"
+                            class="tree"
+                            :props="{
+                              children: 'children',
+                              label: 'areaNames'
+                            }"
+                            default-expand-all
+                            :default-expanded-keys="['根节点']"
+                            :expand-on-click-node="false"
+                            node-key="id"
+                            highlight-current
+                            @node-click="handleNodeClick"
+                            :filter-node-method="filterNode"
                           >
-                            <span>
-                              <svg-icon
-                                v-if="data.level === 1"
-                                icon-class="tree1"
-                                class="tree1"
-                              />
-                              <svg-icon
-                                v-else
-                                :icon-class="getIconType(data)"
-                                class="tree2"
-                              />
-                              <!-- <svg-icon
+                            <span
+                              slot-scope="{ node, data }"
+                              class="custom-tree-node"
+                            >
+                              <span>
+                                <svg-icon
+                                  v-if="data.level === 1"
+                                  icon-class="tree1"
+                                  class="tree1"
+                                />
+                                <svg-icon
+                                  v-else
+                                  :icon-class="getIconType(data)"
+                                  class="tree2"
+                                />
+                                <!-- <svg-icon
                                   v-else-if="
                                     data.level === 2 ||
                                     data.level === 3 ||
@@ -71,34 +72,35 @@
                                   icon-class="tree3"
                                   class="tree3"
                                 /> -->
-                              {{ data.orgName || data.areaName }}
+                                {{ data.orgName || data.areaName }}
+                              </span>
                             </span>
-                          </span>
-                        </el-tree>
+                          </el-tree>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </el-tab-pane>
-              </el-tabs>
-            </div>
-            <!-- v-show="
+                  </el-tab-pane>
+                </el-tabs>
+              </div>
+              <!-- v-show="
                   playerData[playerIdx] &&
                   Object.keys(playerData[playerIdx]).length !== 0
               "-->
-            <div class="equipment-group-wrapper-bottom">
-              <!-- <div class="equipment-group-wrapper-bottom"> -->
-              <div class="wrapper-bottom-header" @click="controlColla">
-                <div class="bottom-header-name">云台控制</div>
-                <transition name="el-zoom-in-center">
-                  <i class="el-icon-arrow-up" v-if="showContent"></i>
-                  <i class="el-icon-arrow-down" v-else></i>
+              <div class="equipment-group-wrapper-bottom">
+                <!-- <div class="equipment-group-wrapper-bottom"> -->
+                <div class="wrapper-bottom-header" @click="controlColla">
+                  <div class="bottom-header-name">云台控制</div>
+                  <transition name="el-zoom-in-center">
+                    <i class="el-icon-arrow-up" v-if="showContent"></i>
+                    <i class="el-icon-arrow-down" v-else></i>
+                  </transition>
+                </div>
+                <transition name="el-fade-in-linear">
+                  <div class="wrapper-bottom-content" v-show="showContent">
+                    <cloud-control :deviceData="playerData[playerIdx]" />
+                  </div>
                 </transition>
               </div>
-              <transition name="el-fade-in-linear">
-                <div class="wrapper-bottom-content" v-show="showContent">
-                  <cloud-control :deviceData="playerData[playerIdx]" />
-                </div>
-              </transition>
             </div>
           </div>
           <div id="playerMain">
@@ -1182,10 +1184,10 @@ export default {
   display: block;
 }
 .equipment-group-wrapper {
-  // height: 100%;
-  // display: flex;
-  // flex-direction: column;
-  // overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .equipment-group-wrapper-top {
   flex: 1;
@@ -1210,7 +1212,7 @@ export default {
       margin-top: -15px;
       background: #ffffff;
       .tree {
-        max-height: calc(100% - 90px);
+        max-height: calc(100% - 110px);
         overflow-y: auto;
       }
     }

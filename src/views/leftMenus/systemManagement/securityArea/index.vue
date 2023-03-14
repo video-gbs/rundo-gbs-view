@@ -24,6 +24,7 @@
           :treeData="treeList"
           @childClickHandle="childClickHandle"
           :defaultPropsName="areaNames"
+          class="securityAreaTree"
         />
       </div>
       <el-card class="right-box-card">
@@ -588,5 +589,9 @@ export default {
   & > .el-tree-node::before {
     border-left: none;
   }
+}
+.securityAreaTree {
+  // height: 10;
+  height: calc(100% - 70px) !important;
 }
 </style>

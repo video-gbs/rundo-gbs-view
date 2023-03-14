@@ -2194,7 +2194,7 @@ export default {
     margin-top: -15px;
     background: #ffffff;
     .tree {
-      max-height: calc(100% - 90px);
+      max-height: calc(100% - 110px);
       overflow-y: auto;
     }
   }
