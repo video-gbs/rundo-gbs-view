@@ -398,6 +398,13 @@ export default {
         target = e.target
       }
       target.blur()
+      if (this.$refs.encoderTable.selection.length === 0) {
+        this.$message({
+          message: '请勾选用户',
+          type: 'warning'
+        })
+        return
+      }
       this.$confirm(
         `确定删除${
           this.$refs.encoderTable.selection.length > 0

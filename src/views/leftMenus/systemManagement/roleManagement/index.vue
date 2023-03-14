@@ -376,6 +376,13 @@ export default {
         target = e.target
       }
       target.blur()
+      if (this.$refs.roleTable.selection.length === 0) {
+        this.$message({
+          message: '请勾选角色',
+          type: 'warning'
+        })
+        return
+      }
       this.$confirm(
         `确定删除${
           this.$refs.roleTable.selection.length > 0
@@ -394,7 +401,6 @@ export default {
         this.$refs.roleTable.selection.map((item) => {
           roleIds.push(item.id)
         })
-        console.log('target.nodeName', target.nodeName, e.target.parentNode)
         deleteAllRoles(roleIds).then((res) => {
           if (res.code === 0) {
             this.$message({

@@ -3,9 +3,9 @@
     <div class="panel-header-box">
       <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" />
-        <span class="back-title">
-          {{ this.$route.query.key === 'add' ? '新建角色' : '编辑角色' }}
-        </span>
+        <span class="back-title">{{
+          this.$route.query.key === 'add' ? '新建角色' : '编辑角色'
+        }}</span>
       </div>
     </div>
     <el-card class="box-card">
@@ -101,9 +101,9 @@
                             slot-scope="{ node, data }"
                             class="custom-tree-node"
                           >
-                            <span>
-                              {{ data.orgName || data.areaName || data.name }}
-                            </span>
+                            <span>{{
+                              data.orgName || data.areaName || data.name
+                            }}</span>
                           </span>
                         </el-tree>
                       </div>
@@ -479,13 +479,13 @@ export default {
           let res2 = []
           let res3 = []
           appIds.map((item1) => {
-            res1.push(Number(item1.slice(2)))
+            res1.push(item1.slice(2))
           })
           configIds.map((item2) => {
-            res2.push(Number(item2.slice(2)))
+            res2.push(item2.slice(2))
           })
           devopsIds.map((item3) => {
-            res3.push(Number(item3.slice(2)))
+            res3.push(item3.slice(2))
           })
           ;(this.expandedList[0] = res1),
             (this.expandedList[1] = res2),

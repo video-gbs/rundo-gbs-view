@@ -372,7 +372,7 @@ export default {
       if (data && data.length > 0) {
         data.map((item) => {
           this.idList.push(item.id)
-          resName.push(item.deviceName)
+          resName.push(item.channelName)
         })
         this.dialogForm.num = data.length
         this.dialogForm.dialogEquipmentName = resName.join(';')

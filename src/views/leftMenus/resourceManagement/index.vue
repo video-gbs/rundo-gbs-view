@@ -37,7 +37,11 @@
             name="通道"
             class="channel-pane pane-content"
           >
-            <Channel ref="channel" :treeList="treeList" />
+            <Channel
+              ref="channel"
+              :treeList="treeList"
+              :detailsId="detailsId"
+            />
           </el-tab-pane>
         </el-tabs>
       </div>
