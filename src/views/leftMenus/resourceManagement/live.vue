@@ -628,6 +628,7 @@ export default {
                         areaName: item.channelName,
                         areaNames: item.channelName,
                         areaPid: item.id,
+                        id: item.id,
                         ptzType: item.ptzType,
                         children: []
                       })
@@ -638,15 +639,18 @@ export default {
                     if (data.id === '1') {
                       arr = this.resArray.concat(this.initData[0].children)
                     } else {
+                      console.log('else~~~~~~~~~~~~~~~~', data.children)
+
+                      console.log('1~~~~~~~~~~~~~~~~', this.resArray)
                       arr = data.children
                         ? this.resArray.concat(data.children)
                         : this.resArray
 
                       const obj = {}
                       arr = arr.reduce((item, next) => {
-                        obj[next.areaPid]
+                        obj[next.id]
                           ? ''
-                          : (obj[next.areaPid] = true && item.push(next))
+                          : (obj[next.id] = true && item.push(next))
                         return item
                       }, [])
                     }

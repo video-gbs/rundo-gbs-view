@@ -62,7 +62,11 @@
               v-for="(item2, index2) in devOpsList"
               :key="index2"
               class="top-li"
-              @click="goContentList('运维', item2, index2)"
+              @click="
+                !isGoContentListClicked
+                  ? goContentList('运维', item2, index2)
+                  : ''
+              "
             >
               <!-- :style="{ background: colorList2[index2] }" -->
               <div
@@ -89,7 +93,11 @@
             v-for="(item3, index3) in configList"
             :key="index3"
             class="top-li"
-            @click="goContentList('配置', item3, index3)"
+            @click="
+              !isGoContentListClicked
+                ? goContentList('配置', item3, index3)
+                : ''
+            "
           >
             <div
               v-cloak
@@ -586,7 +594,9 @@ export default {
         default:
           break
       }
-      this.isGoContentListClicked = false
+      setTimeout(() => {
+        this.isGoContentListClicked = false
+      }, 5000)
     })
   }
 }
