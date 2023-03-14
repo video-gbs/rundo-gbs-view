@@ -388,6 +388,9 @@ export default {
   box-shadow: none !important;
 }
 
+::v-deep .table-content-bottom .el-table__fixed-right {
+  height: 100% !important;
+}
 // 滚动条大小设置
 ::v-deep .table-content-bottom::-webkit-scrollbar {
   /*纵向滚动条*/

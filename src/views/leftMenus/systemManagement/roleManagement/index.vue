@@ -45,7 +45,7 @@
           style="float: right; margin-right: 20px"
           class="form-btn-list"
         >
-          <el-button @click="resetData"
+          <el-button @click="resetData($event)"
             ><svg-icon class="svg-btn" icon-class="cz" />
             <span class="btn-span">重置</span></el-button
           >
@@ -62,7 +62,7 @@
           >包含下级组织</el-checkbox
         > -->
         <div class="btn-lists">
-          <el-button @click="deteleAll()" style="width: 100px"
+          <el-button @click="deteleAll($event)" style="width: 100px" plain
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span>
           </el-button>
@@ -90,11 +90,19 @@
         </el-table-column>
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
-        <el-table-column prop="roleName" label="角色名称" />
+        <el-table-column
+          prop="roleName"
+          label="角色名称"
+          :show-overflow-tooltip="true"
+        />
         <el-table-column prop="userAccount" label="创建者" />
         <el-table-column prop="createdTime" label="创建时间" />
         <el-table-column prop="updatedTime" label="更新时间" />
-        <el-table-column prop="roleDesc" label="描述" />
+        <el-table-column
+          prop="roleDesc"
+          label="描述"
+          :show-overflow-tooltip="true"
+        />
         <el-table-column prop="status" label="状态" width="80">
           <template slot-scope="scope">
             <el-switch
@@ -225,12 +233,23 @@ export default {
       this.params.proCount = proCount
       this.getList()
     },
-    resetData() {
+    resetData(e) {
       this.searchParams = {
         userAccount: '',
         roleName: '',
         time: ''
       }
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
+      this.params.pageNum = 1
+      this.getList()
     },
     cxData() {
       this.getList()
@@ -278,6 +297,7 @@ export default {
       })
     },
     goActiveDiscovery(id) {
+      Local.set('rolePageNum', this.params.pageNum)
       this.$router.push({ path: '/userDiscovery', query: { key: id } })
     },
     goCreatingRole() {
@@ -345,7 +365,24 @@ export default {
         }
       })
     },
-    deteleAll() {
+    deteleAll(e) {
+      let target = e.target
+
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
+      if (this.$refs.roleTable.selection.length === 0) {
+        this.$message({
+          message: '请勾选角色',
+          type: 'warning'
+        })
+        return
+      }
       this.$confirm(
         `确定删除${
           this.$refs.roleTable.selection.length > 0
@@ -370,6 +407,7 @@ export default {
               type: 'success',
               message: '删除成功'
             })
+
             this.params.pageNum = 1
             this.getList()
           }
@@ -439,6 +477,9 @@ export default {
 ::v-deep .el-dialog__footer {
   border-top: 1px solid #eaeaea;
 }
+::v-deep .role-table .el-table__fixed-right {
+  height: 100% !important;
+}
 // 滚动条大小设置
 ::v-deep .role-table::-webkit-scrollbar {
   /*纵向滚动条*/
@@ -467,7 +508,9 @@ export default {
 }
 .role_container {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 30px);
+  // display: flex;
+  // flex-direction: column;
   .panel-header-box {
     margin: 0;
     padding: 0 16px;
@@ -487,15 +530,14 @@ export default {
 
   .search {
     width: calc(100% - 40px);
-    height: 80px;
+    // height: 80px;
+    min-height: 80px;
     margin: 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     .search-form {
-      position: relative;
-      top: 60%;
-      transform: translate(0%, -50%);
+      padding-top: 25px;
     }
   }
 
@@ -504,16 +546,13 @@ export default {
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     padding: 18px;
-    margin: 20px;
-    height: calc(100% - 200px);
+    margin: 0 20px 20px 20px;
+    height: calc(100% - 170px);
     .role-table {
-      height: calc(100% - 100px);
+      max-height: calc(100% - 80px);
       overflow-y: auto;
     }
     .table-content-top {
-      // .table-content-top-check {
-      //   float: left;
-      // }
       .btn-lists {
         float: right;
 

@@ -395,7 +395,7 @@ export default {
           trigger: 'blur'
         },
         password: {
-          required: true,
+          // required: true,
           max: 20,
           min: 8,
           validator: checkPassword,
@@ -405,7 +405,7 @@ export default {
           trigger: 'blur'
         },
         rePassword: {
-          required: true,
+          // required: true,
           max: 20,
           min: 8,
           validator: checkPassword,
@@ -419,14 +419,14 @@ export default {
           {
             required: true,
             message: '请选择部门',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         expiryDateStart: [
           {
             required: true,
             message: '此为必填项。',
-            trigger: 'blur'
+            trigger: 'change'
           }
         ],
         jobNo: {

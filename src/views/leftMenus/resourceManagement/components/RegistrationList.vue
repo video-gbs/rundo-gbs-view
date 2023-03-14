@@ -37,7 +37,7 @@
           style="float: right; margin-right: 20px"
           class="form-btn-list"
         >
-          <el-button @click="resetData"
+          <el-button @click="resetData($event)"
             ><svg-icon class="svg-btn" icon-class="cz" />
             <span class="btn-span">重置</span></el-button
           >
@@ -219,43 +219,6 @@ export default {
       defaultProps: {
         children: 'children',
         label: 'areaName'
-      },
-      rules: {
-        name: [
-          { required: true, message: '请输入活动名称', trigger: 'change' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'change' }
-        ],
-        region: [
-          { required: true, message: '请选择活动区域', trigger: 'change' }
-        ],
-        date1: [
-          {
-            type: 'date',
-            required: true,
-            message: '请选择日期',
-            trigger: 'change'
-          }
-        ],
-        date2: [
-          {
-            type: 'date',
-            required: true,
-            message: '请选择时间',
-            trigger: 'change'
-          }
-        ],
-        type: [
-          {
-            type: 'array',
-            required: true,
-            message: '请至少选择一个活动性质',
-            trigger: 'change'
-          }
-        ],
-        resource: [
-          { required: true, message: '请选择活动资源', trigger: 'change' }
-        ],
-        ip: [{ required: true, message: '请填写ip', trigger: 'change' }]
       }
     }
   },
@@ -323,11 +286,21 @@ export default {
         }
       })
     },
-    resetData() {
+    resetData(e) {
       this.searchParams = {
         deviceName: '',
         ip: ''
       }
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
+      this.params.pageNum = 1
       this.init()
     },
     cxData() {
@@ -356,6 +329,35 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .table-content-bottom .el-table__fixed-right {
+  height: 100% !important;
+}
+// 滚动条大小设置
+::v-deep .table-content-bottom::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .table-content-bottom::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .table-content-bottom::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .table-content-bottom::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
+}
 .selectTree {
   .el-select-dropdown__item {
     height: 200px !important;

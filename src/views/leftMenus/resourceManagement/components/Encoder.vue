@@ -1,5 +1,5 @@
 <template>
-  <div class="encoder-content">
+  <div class="encoder-content" ref="appRef">
     <div class="search">
       <el-form
         ref="query"
@@ -51,7 +51,7 @@
           style="float: right; margin-right: 20px"
           class="form-btn-list"
         >
-          <el-button @click="resetData"
+          <el-button @click="resetData($event)"
             ><svg-icon class="svg-btn" icon-class="cz" />
             <span class="btn-span">重置</span></el-button
           >
@@ -65,11 +65,14 @@
 
     <div class="table-content">
       <div class="table-content-top">
-        <el-checkbox v-model="includeEquipment" class="table-content-top-check"
+        <el-checkbox
+          v-model="includeEquipment"
+          class="table-content-top-check"
+          @change="changeOrganization"
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deteleAll()" style="width: 100px"
+          <el-button @click="deteleAll($event)" style="width: 100px" plain
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span></el-button
           >
@@ -99,6 +102,7 @@
           fontWeight: 'bold',
           color: '#333333'
         }"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="80" align="center">
         </el-table-column>
@@ -202,12 +206,16 @@
         </el-form-item>
       </el-form>
       <div class="securityArea_container">
-        <leftTree />
+        <leftTree
+          :treeData="treeList"
+          @childClickHandle="childClickHandle"
+          :defaultPropsName="areaNames"
+        />
       </div>
 
       <div class="dialog-footer">
         <el-button @click="dialogShow = false">取消</el-button>
-        <el-button type="primary"
+        <el-button type="primary" @click="dialogMove"
           ><svg-icon class="svg-btn" icon-class="save" />确认</el-button
         >
       </div>
@@ -319,13 +327,20 @@ import {
 import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 import { Local } from '@/utils/storage'
 
+// import drawMixin from '@/utils/drawMixin'
+
 export default {
   name: '',
   components: { pagination, leftTree, LineFont },
+  // mixins: [drawMixin],
   props: {
     detailsId: {
       type: String,
       default: ''
+    },
+    treeList: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -335,7 +350,7 @@ export default {
         pageSize: 10,
         total: 0
       },
-      includeEquipment: false,
+      includeEquipment: true,
       lineTitle: {
         title: '移动位置',
         notShowSmallTitle: false
@@ -356,9 +371,8 @@ export default {
         height: '18px'
       },
       dialogForm: {
-        num: 3,
-        dialogEquipmentName:
-          '海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ;'
+        num: null,
+        dialogEquipmentName: ''
       },
       dialogForm1: {
         inputValue: ''
@@ -384,27 +398,30 @@ export default {
       dialogShow: false,
       dialogShow1: false,
       dialogTableData: [
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        }
+        // {
+        //   name: '球机192.168……',
+        //   coding: '4400000000111500…',
+        //   type: 'IPC',
+        //   ip: '192.168.119.152',
+        //   city: '广东省/广州市/珠海区/新竹街道…',
+        //   manufacturer: '海康',
+        //   status: 1
+        // }
       ],
       tableData: [
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        }
-      ]
+        // {
+        //   name: '球机192.168……',
+        //   coding: '4400000000111500…',
+        //   type: 'IPC',
+        //   ip: '192.168.119.152',
+        //   port: 8000,
+        //   manufacturer: '海康',
+        //   status: 1
+        // }
+      ],
+      areaNames: 'areaNames',
+      idList: [],
+      dialogVideoAreaId: ''
     }
   },
   created() {
@@ -416,12 +433,11 @@ export default {
     this.getDeviceTypesDictionaryList()
   },
   methods: {
-    async getList(orgId) {
-      // : '1620396812466147329'
+    async getList(id) {
       await getEncoderById({
         pageNum: this.params.pageNum,
         pageSize: this.params.pageSize,
-        videoAreaId: orgId ? orgId : 1,
+        videoAreaId: id ? id : this.$props.detailsId,
         includeEquipment: this.includeEquipment,
         ...this.searchParams
       }).then((res) => {
@@ -444,6 +460,42 @@ export default {
           })
         }
       })
+    },
+    handleSelectionChange(data) {
+      console.log(data, 'handleSelectionChange')
+      const resName = []
+      if (data && data.length > 0) {
+        data.map((item) => {
+          this.idList.push(item.id)
+          resName.push(item.name)
+        })
+        this.dialogForm.num = data.length
+        this.dialogForm.dialogEquipmentName = resName.join(';')
+      }
+    },
+    childClickHandle(data) {
+      this.dialogVideoAreaId = data.id
+      console.log(data, 'childClickHandle')
+    },
+
+    dialogMove() {
+      moveEncoder({
+        idList: this.idList,
+        videoAreaId: this.dialogVideoAreaId
+      }).then((res) => {
+        if (res.code === 0) {
+          this.$message({
+            type: 'success',
+            message: '移动成功'
+          })
+          this.dialogShow = false
+          this.params.pageNum = 1
+          this.getList()
+        }
+      })
+    },
+    changeOrganization() {
+      this.getList()
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
@@ -476,11 +528,19 @@ export default {
         }
       })
     },
-    restart() {},
     deploymentData() {
       this.dialogShow1 = true
     },
-    deteleAll(row) {
+    deteleAll(e) {
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
       this.$confirm(
         `此操作将同时删除设备及归属于设备的通道信息且不可恢复。确定删除所选的${
           this.$refs.encoderTable.selection.length > 0
@@ -533,14 +593,24 @@ export default {
         })
       })
     },
-    resetData() {
+    resetData(e) {
       this.searchParams = {
         deviceType: '',
         ip: '',
         onlineState: ''
       }
+      let target = e.target
+
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
       this.params.pageNum = 1
-      this.getList()
+      this.getList(this.$props.detailsId)
     },
     cxData() {
       this.getList()
@@ -551,7 +621,14 @@ export default {
     goRegistrationList() {
       this.$router.push(`/registrationList`)
     },
-    moveEquipment() {
+    moveEquipment(row) {
+      if (this.$refs.encoderTable.selection.length === 0) {
+        this.$message({
+          message: '请勾选编码器',
+          type: 'warning'
+        })
+        return
+      }
       this.dialogShow = true
     }
   }
@@ -567,6 +644,9 @@ export default {
   padding: 0 20px;
 }
 
+::v-deep .encoder-table .el-table__fixed-right {
+  height: 100% !important;
+}
 // 滚动条大小设置
 ::v-deep .encoder-table::-webkit-scrollbar {
   /*纵向滚动条*/
@@ -595,25 +675,27 @@ export default {
 }
 
 .encoder-content {
+  height: 100%;
+  width: 100%;
+  padding: 12px 20px 26px 20px;
   .search {
     width: 100%;
-    height: 80px;
-    // line-height: 80px;
-    margin-bottom: 20px;
+    min-height: 80px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     .search-form {
-      position: relative;
-      top: 60%;
-      transform: translate(0%, -50%);
+      padding-top: 25px;
     }
   }
   .table-content {
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
-    padding: 18px;
+    padding: 17px;
+    width: 100%;
+    height: calc(100% - 96px);
+    margin-top: 16px;
     .table-content-top {
       .table-content-top-check {
         float: left;
@@ -640,7 +722,7 @@ export default {
       }
     }
     .encoder-table {
-      height: calc(100% - 100px);
+      max-height: calc(100% - 145px);
       overflow-y: auto;
     }
   }
@@ -663,7 +745,7 @@ export default {
   }
 
   .securityArea_container {
-    height: calc(100% - 40px);
+    height: 500px;
     width: 310px;
     margin: 10px;
     // background: #ffffff;

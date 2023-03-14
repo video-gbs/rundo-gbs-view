@@ -15,7 +15,7 @@
                   @tab-click="switchTab"
                   class="real-time-monitoring"
                 >
-                  <el-tab-pane label="安防通道分组" name="equipmentGroup">
+                  <el-tab-pane label="安防" name="security" class="live-pane">
                     <!-- <monitor-equipment-group :sendDevicePush="sendDevicePush" /> -->
                     <div class="securityArea_container">
                       <div class="tree-content">
@@ -91,8 +91,8 @@
                 <div class="wrapper-bottom-header" @click="controlColla">
                   <div class="bottom-header-name">云台控制</div>
                   <transition name="el-zoom-in-center">
-                    <i class="el-icon-arrow-down" v-if="showContent"></i>
-                    <i class="el-icon-arrow-right" v-else></i>
+                    <i class="el-icon-arrow-up" v-if="showContent"></i>
+                    <i class="el-icon-arrow-down" v-else></i>
                   </transition>
                 </div>
                 <transition name="el-fade-in-linear">
@@ -107,7 +107,7 @@
             <div
               ref="mainBox"
               :class="`main-box grid${spilt}`"
-              :style="`height: calc(100vh - ${splitFullscreen ? 0 : 190}px)`"
+              style="height: 100%"
             >
               <div
                 v-for="i in spilt"
@@ -206,9 +206,9 @@
                 <div class="split-box">
                   <el-dropdown @command="switchSplit">
                     <span class="split-text">
-                      <i
+                      <svg-icon
                         class="iconfont white"
-                        :class="splitArr[spiltIndex].class"
+                        :icon-class="splitArr[spiltIndex].class"
                       />
 
                       <i class="el-icon-arrow-down iconArrow" />
@@ -227,31 +227,31 @@
                             style="padding: 0 16px"
                           >
                             <svg-icon
-                              v-if="item.num === 6"
+                              v-if="item.num === spilt"
                               class="iconfont btn fenping"
-                              @mouseenter="changeHover(1)"
-                              @mouseleave="changeHover(2)"
-                              :icon-class="
-                                !isHover6 ? '6fenping' : '6fenpinged'
-                              "
+                              :icon-class="`${item.num}fenpinged`"
                             />
                             <svg-icon
-                              v-else-if="item.num === 8"
+                              v-else
                               class="iconfont btn fenping"
-                              @mouseenter="changeHover(3)"
-                              @mouseleave="changeHover(4)"
+                              @mouseenter="changeHover(1, item.num)"
+                              @mouseleave="changeHover(2, item.num)"
                               :icon-class="
-                                !isHover8 ? '8fenping' : '8fenpinged'
+                                !isMouseHover
+                                  ? `${item.num}fenping`
+                                  : index === isHoverNum
+                                  ? splitArr[isHoverNum].fenpinged
+                                  : `${item.num}fenping`
                               "
                             />
-                            <i
+                            <!-- <i
                               v-else
                               class="iconfont btn"
                               :class="[
                                 { active: item.num === spilt },
                                 item.class
                               ]"
-                            />
+                            /> -->
                           </div>
                         </el-dropdown-item>
                       </template>
@@ -305,7 +305,7 @@ export default {
   },
   data() {
     return {
-      activeTab: 'equipmentGroup',
+      activeTab: 'security',
       showVideoDialog: true,
       hasAudio: false, //设置默认是否静音
       videoUrl: [''],
@@ -316,27 +316,39 @@ export default {
       splitArr: [
         {
           num: 1,
-          class: 'icon-yigongge'
+          class: '1fenpingw',
+          fenpinged: '1fenpinged',
+          fenping: '1fenping'
         },
         {
           num: 4,
-          class: 'icon-sigongge'
+          class: '4fenpingw',
+          fenpinged: '4fenpinged',
+          fenping: '4fenping'
         },
         {
           num: 6,
-          class: 'icon-a-15gongge'
+          class: '6fenpingw',
+          fenpinged: '6fenpinged',
+          fenping: '6fenping'
         },
         {
           num: 8,
-          class: 'icon-a-17gongge'
+          class: '8fenpingw',
+          fenpinged: '8fenpinged',
+          fenping: '8fenping'
         },
         {
           num: 9,
-          class: 'icon-jiugongge'
+          class: '9fenpingw',
+          fenpinged: '9fenpinged',
+          fenping: '9fenping'
         },
         {
           num: 16,
-          class: 'icon-a-16gongge'
+          class: '16fenpingw',
+          fenpinged: '16fenpinged',
+          fenping: '16fenping'
         }
       ],
       playerIdx: 0, //激活播放器
@@ -368,14 +380,15 @@ export default {
       isShowMenu: true, //是否展示菜单
       hasAudio: true,
       treeList: [],
+      initData: [],
       areaNames: 'areaNames',
       detailsId: [],
       data: [],
       filterText: '',
       hasChannel: false,
       resArray: [],
-      isHover6: false,
-      isHover8: false
+      isMouseHover: false,
+      isHoverNum: 0
     }
   },
   mounted() {
@@ -445,42 +458,68 @@ export default {
         .then((res) => {
           if (res.code === 0) {
             this.treeList = res.data
+
+            this.initData = res.data
           }
         })
         .catch((error) => {
           console.log(error)
         })
     },
-    changeHover(num) {
-      console.log(num)
-      switch (num) {
-        case 1:
-          this.isHover6 = true
-          break
-        case 2:
-          this.isHover6 = false
-          break
-        case 3:
-          this.isHover8 = true
-          break
-        case 4:
-          this.isHover8 = false
-          break
+    changeHover(num, value) {
+      console.log(num, value)
 
-        default:
-          break
-      }
-
-      if (this.spilt === 6) {
-        this.isHover6 = true
-      }
-
-      if (this.spilt === 8) {
-        this.isHover8 = true
+      if (num === 1) {
+        this.isMouseHover = true
+        switch (value) {
+          case 16:
+            this.isHoverNum = 5
+            break
+          case 9:
+            this.isHoverNum = 4
+            break
+          case 8:
+            this.isHoverNum = 3
+            break
+          case 6:
+            this.isHoverNum = 2
+            break
+          case 4:
+            this.isHoverNum = 1
+            break
+          case 1:
+            this.isHoverNum = 0
+            break
+          default:
+            break
+        }
+      } else {
+        this.isMouseHover = false
+        switch (value) {
+          case 16:
+            this.isHoverNum = 5
+            break
+          case 9:
+            this.isHoverNum = 4
+            break
+          case 8:
+            this.isHoverNum = 3
+            break
+          case 6:
+            this.isHoverNum = 2
+            break
+          case 4:
+            this.isHoverNum = 1
+            break
+          case 1:
+            this.isHoverNum = 0
+            break
+          default:
+            break
+        }
       }
     },
     getIconType(data) {
-      console.log('data~~~~~~~~', data)
       if (data.level) {
         // if (data.level === 2) {
         //   return 'tree2'
@@ -572,42 +611,56 @@ export default {
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
         } else {
-          await getChannelPlayList(data.id)
-            .then((res) => {
-              if (res.code === 0) {
-                if (res.data && res.data.length > 0) {
-                  res.data.map((item) => {
-                    this.resArray.push({
-                      onlineState: item.onlineState,
-                      areaName: item.channelName,
-                      areaNames: item.channelName,
-                      areaPid: item.id,
-                      ptzType: item.ptzType,
-                      children: []
+          if (data.onlineState === 0) {
+            this.$message({
+              message: '设备已经离线',
+              type: 'warning'
+            })
+            return
+          } else {
+            await getChannelPlayList(data.id)
+              .then((res) => {
+                if (res.code === 0) {
+                  if (res.data && res.data.length > 0) {
+                    res.data.map((item) => {
+                      this.resArray.push({
+                        onlineState: item.onlineState,
+                        areaName: item.channelName,
+                        areaNames: item.channelName,
+                        areaPid: item.id,
+                        ptzType: item.ptzType,
+                        children: []
+                      })
                     })
-                  })
 
-                  this.detailsId.push(data.id)
-                  let arr = data.children
-                    ? this.resArray.concat(data.children)
-                    : this.resArray
-                  const obj = {}
-                  arr = arr.reduce((item, next) => {
-                    obj[next.areaPid]
-                      ? ''
-                      : (obj[next.areaPid] = true && item.push(next))
-                    return item
-                  }, [])
+                    this.detailsId.push(data.id)
+                    let arr = []
+                    if (data.id === '1') {
+                      arr = this.resArray.concat(this.initData[0].children)
+                    } else {
+                      arr = data.children
+                        ? this.resArray.concat(data.children)
+                        : this.resArray
 
-                  console.log('arr~~~~~~~~~~~~~~~', arr)
-                  this.$refs.liveTree.updateKeyChildren(data.id, arr)
-                  this.defaultExpandedKeys = [data.id]
+                      const obj = {}
+                      arr = arr.reduce((item, next) => {
+                        obj[next.areaPid]
+                          ? ''
+                          : (obj[next.areaPid] = true && item.push(next))
+                        return item
+                      }, [])
+                    }
+
+                    console.log('arr~~~~~~~~~~~~~~~', arr)
+                    this.$refs.liveTree.updateKeyChildren(data.id, arr)
+                    this.defaultExpandedKeys = [data.id]
+                  }
                 }
-              }
-            })
-            .catch((error) => {
-              console.log(error)
-            })
+              })
+              .catch((error) => {
+                // console.log(1111111,error)
+              })
+          }
         }
       } else {
         this.getDeviceList(data.areaPid)
@@ -746,13 +799,6 @@ export default {
               this.playerIdx++
             }
             this.setPlayUrl(res.data.wsFlv, idxTmp)
-            // that.total = res.data.total
-
-            // that.deviceList = res.data.list.map((item) => {
-            //   return { deviceChannelList: [], ...item }
-            // })
-            // that.deviceList_ = that.deviceList
-            // that.getDeviceListLoading = false
           }
         })
         .catch(function (error) {
@@ -971,11 +1017,41 @@ export default {
     // 控制面板展开收起
     controlColla() {
       this.showContent = !this.showContent
+      if (!this.showContent) {
+        document.getElementsByClassName(
+          'securityArea_container'
+        )[0].style.height = '920px'
+      } else {
+        document.getElementsByClassName(
+          'securityArea_container'
+        )[0].style.height = '660px'
+      }
     }
   }
 }
 </script>
 <style lang="scss" scoped>
+::v-deep .el-tabs__nav-scroll {
+  &::after {
+    display: none;
+  }
+}
+::v-deep .el-tabs__active-bar {
+  margin-left: 16px;
+}
+
+::v-deep .el-tabs__item {
+  background-color: #fff !important;
+  margin-left: 16px;
+  font-size: 16px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #0270ff;
+  &::after {
+    display: none;
+  }
+}
+
 #playerMain {
   display: flex;
   flex-direction: column;
@@ -1034,19 +1110,6 @@ export default {
 
 .monitoring-content-box {
   height: calc(100% - 0px);
-}
-
-.real-time-monitoring {
-  .el-tabs__nav-wrap {
-    padding: 0px 24px 0;
-  }
-  .securityArea_container {
-    height: 660px;
-    width: 360px;
-    margin-top: -15px;
-    background: #ffffff;
-    // box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
-  }
 }
 
 .btn {
@@ -1135,6 +1198,19 @@ export default {
     .el-tabs__content {
       flex: 1;
       overflow-y: auto;
+    }
+    .el-tabs__nav-wrap {
+      padding: 0px 24px 0;
+    }
+    .securityArea_container {
+      height: 660px;
+      width: 360px;
+      margin-top: -15px;
+      background: #ffffff;
+      .tree {
+        max-height: calc(100% - 90px);
+        overflow-y: auto;
+      }
     }
   }
 }

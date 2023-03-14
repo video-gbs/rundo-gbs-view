@@ -523,6 +523,7 @@ export default {
 // ::v-deep .el-input__inner {
 //   width: 216px;
 // }
+
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid rgba(234, 234, 234, 1);
   padding: 0 20px;
@@ -576,6 +577,9 @@ export default {
   box-shadow: none !important;
 }
 
+::v-deep .table-content-bottom .el-table__fixed-right {
+  height: 100% !important;
+}
 // 滚动条大小设置
 ::v-deep .table-content-bottom::-webkit-scrollbar {
   /*纵向滚动条*/

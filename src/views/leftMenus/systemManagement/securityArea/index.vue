@@ -14,7 +14,7 @@
             ><svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
-          <el-button @click="deleteAccount"
+          <el-button @click="deleteAccount($event)"
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">删除</span>
           </el-button>
@@ -28,12 +28,12 @@
       </div>
       <el-card class="right-box-card">
         <div slot="header" class="clearfix">
-          <svg-icon icon-class="zzgl" class="tzgg_svg" />
-          <span>分组信息</span>
+          <svg-icon icon-class="fzxx" class="tzgg_svg" />
+          <span class="right-box-card-span">分组信息</span>
         </div>
 
         <el-form
-          ref="save"
+          ref="securityAreaForm"
           :model="form"
           :rules="rules"
           label-position="right"
@@ -55,7 +55,7 @@
         </el-form>
 
         <div class="dialog-footer">
-          <el-button type="primary" @click="save('savePasswordForm')"
+          <el-button type="primary" @click="save('securityAreaForm')"
             ><svg-icon class="svg-btn" icon-class="save" />保 存</el-button
           >
         </div>
@@ -277,6 +277,7 @@ export default {
         this.treeMsg = data.areaName
       }
       this.detailsId = data.id
+      this.$refs['securityAreaForm'].resetFields()
       this.getUnitDetailsData()
     },
     getUnitDetailsData() {
@@ -322,20 +323,33 @@ export default {
     dialogMoveShow() {
       this.$refs.moveTree.changeMoveTreeShow()
     },
-    save() {
-      unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
-        if (res.code === 0) {
-          this.$message({
-            type: 'success',
-            message: '编辑成功'
+    save(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
+            if (res.code === 0) {
+              this.$message({
+                type: 'success',
+                message: '编辑成功'
+              })
+              this.$refs.securityAreaTree.chooseId(this.detailsId)
+              this.init(this.detailsId)
+            }
           })
-          this.$refs.securityAreaTree.chooseId(this.detailsId)
-          this.init(this.detailsId)
         }
       })
     },
-    deleteAccount() {
+    deleteAccount(e) {
       const h = this.$createElement
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
       this.$confirm('提示', {
         title: '提示',
         message: !this.isMore
@@ -354,6 +368,7 @@ export default {
               type: 'success',
               message: '删除成功'
             })
+
             this.init()
             this.detailsId = this.treeList[0].id
             this.getUnitDetailsData()
@@ -407,6 +422,34 @@ export default {
 }
 ::v-deep .securityArea-tree > .el-tree-node::before {
   border-left: none;
+}
+
+// 滚动条大小设置
+::v-deep .securityArea-tree::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+
+// 滚动条滑块样式设置
+::v-deep .securityArea-tree::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .securityArea-tree::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .securityArea-tree::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
 }
 .selectTree {
   .el-select-dropdown__item {
@@ -488,6 +531,17 @@ export default {
           left: -4px;
         }
       }
+      .tzgg_svg {
+        position: relative;
+        top: 1px;
+        left: -4px;
+      }
+      .right-box-card-span {
+        font-size: 20px;
+        font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+        font-weight: 400;
+        color: #004bad;
+      }
     }
   }
 }
@@ -516,7 +570,7 @@ export default {
 }
 ::v-deep .el-textarea__inner {
   width: 436px;
-  height: 300px;
+  height: 168px;
 }
 
 .setstyle {

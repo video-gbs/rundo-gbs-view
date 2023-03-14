@@ -14,7 +14,7 @@
             <svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
-          <el-button @click="deleteAccount">
+          <el-button @click="deleteAccount($event)">
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">删除</span>
           </el-button>
@@ -64,7 +64,7 @@
         </el-form>
 
         <div class="dialog-footer">
-          <el-button type="primary" @click="save('savePasswordForm')">
+          <el-button type="primary" @click="save('unitManagementForm')">
             <svg-icon class="svg-btn" icon-class="save" />保 存
           </el-button>
         </div>
@@ -329,7 +329,7 @@ export default {
         orgPid: {
           required: true,
           message: '此为必填项。',
-          trigger: 'blur'
+          trigger: 'change'
         }
       },
       treeData: [],
@@ -373,6 +373,7 @@ export default {
         this.treeMsg = data.orgName
       }
       this.detailsId = data.id
+      this.$refs['unitManagementForm'].resetFields()
       this.getUnitDetailsData()
     },
     getUnitDetailsData() {
@@ -418,19 +419,32 @@ export default {
     dialogMoveShow() {
       this.$refs.moveTree.changeMoveTreeShow()
     },
-    save() {
-      unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
-        if (res.code === 0) {
-          this.$message({
-            type: 'success',
-            message: '编辑成功'
+    save(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
+            if (res.code === 0) {
+              this.$message({
+                type: 'success',
+                message: '编辑成功'
+              })
+              this.init(this.detailsId)
+            }
           })
-          this.init(this.detailsId)
         }
       })
     },
-    deleteAccount() {
+    deleteAccount(e) {
       const h = this.$createElement
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
       this.$confirm('提示', {
         title: '提示',
         message: !this.isMore
@@ -631,7 +645,7 @@ export default {
 }
 ::v-deep .el-textarea__inner {
   width: 436px;
-  height: 300px;
+  height: 128px;
 }
 .setstyle {
   min-height: 200px;

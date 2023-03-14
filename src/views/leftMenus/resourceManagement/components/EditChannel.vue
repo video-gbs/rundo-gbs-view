@@ -254,12 +254,14 @@ export default {
       appearanceTypeOptions: [],
       rules: {
         channelType: [
-          { required: true, message: '请选择通道类型', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         videoAreaId: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
-        ptzType: [{ required: true, message: '此为必填项。', trigger: 'blur' }],
+        ptzType: [
+          { required: true, message: '此为必填项。', trigger: 'change' }
+        ],
         channelCode: [
           { required: true, message: '1~128个字符。', trigger: 'blur' }
         ],
@@ -298,6 +300,7 @@ export default {
     }
   },
   created() {
+    console.log('this.$route.query', this.$route.query)
     const {
       channelCode,
       channelName,
@@ -314,13 +317,13 @@ export default {
     } = this.$route.query.row
     this.form.channelCode = channelCode
     this.form.channelName = channelName
-    this.form.channelType = channelType
+    this.form.channelType = String(channelType)
     this.form.videoAreaId = videoAreaId
     this.form.gb28181Code = gb28181Code
     this.form.longitude = longitude
     this.form.latitude = latitude
     this.form.faceLocation = faceLocation
-    this.form.ptzType = ptzType
+    this.form.ptzType = String(ptzType)
     this.form.installLocation = installLocation
     this.form.height = height
     this.form.installTime = installTime

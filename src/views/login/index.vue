@@ -68,7 +68,7 @@
                     </div>
                   </el-form-item>
 
-                  <el-form-item prop="code">
+                  <!-- <el-form-item prop="code">
                     <div
                       class="login-middle-input-last login-middle-input"
                       data-validate="Valid email is: a@b.c"
@@ -85,7 +85,7 @@
                         placeholder="输入验证码"
                       />
                     </div>
-                  </el-form-item>
+                  </el-form-item> -->
                   <!-- <div
                     @click="refreshCode()"
                     class="get-codes"
@@ -93,13 +93,13 @@
                   >
                   </div> -->
 
-                  <el-form-item>
+                  <!-- <el-form-item>
                     <el-checkbox v-model="checked"
                       ><span class="rember-span"
                         >记住密码，下次自动登录</span
                       ></el-checkbox
                     >
-                  </el-form-item>
+                  </el-form-item> -->
                 </el-form>
                 <div class="login-footer-button">
                   <el-button @click="handleLogin" :loading="loading"
@@ -173,7 +173,8 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      windowWidth: null
     }
   },
   watch: {
@@ -182,12 +183,46 @@ export default {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
+    },
+    windowWidth: {
+      handler: function (val, oldVal) {
+        const h = document.getElementsByTagName('HTML')[0]
+        h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+
+        this.$forceUpdate()
+      },
+      immediate: true
     }
   },
-  mounted() {},
+  mounted() {
+    this.windowWidth = document.documentElement.clientWidth
+    window.onresize = this.throttle(this.setScale, 500, 500)
+  },
   methods: {
     pwdShowChange() {
       this.passwordType = this.passwordType === 'password' ? 'type' : 'password'
+    },
+    throttle(method, delay, duration) {
+      var timer = null
+      var begin = new Date()
+      return function () {
+        var context = this
+        var args = arguments
+        var current = new Date()
+        clearTimeout(timer)
+        if (current - begin >= duration) {
+          method.apply(context, args)
+          begin = current
+        } else {
+          timer = setTimeout(function () {
+            method.apply(context, args)
+          }, delay)
+        }
+      }
+    },
+    setScale() {
+      // 以1920px为标准宽度
+      this.windowWidth = document.documentElement.clientWidth
     },
     showPwd() {
       if (this.passwordType === 'password') {
@@ -249,6 +284,8 @@ body {
 .login {
   margin: 0;
   padding: 0;
+  height: 100%;
+  width: 100%;
   position: relative;
 
   .wrap-middle-right {
@@ -257,7 +294,7 @@ body {
     display: flex;
     justify-content: flex-start;
     position: relative;
-    top: -130px;
+    top: 260px;
   }
 }
 .get-codes {
@@ -276,7 +313,7 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
-  height: 100vh;
+  height: 100%;
   position: relative;
   overflow: hidden;
   margin: 0;
@@ -293,12 +330,12 @@ body {
   flex: 1;
   display: flex;
   justify-content: flex-end;
-  height: 400px;
+  height: 1080px;
 
   .left-img {
-    max-width: 800px;
+    max-width: 775px;
     width: 100%;
-    height: 400px;
+    // height: 400px;
     background: url('../../assets/imgs/tysp.png') 100% no-repeat;
     background-size: cover;
   }
@@ -461,7 +498,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  /*padding-top: 20px;*/
+  padding-top: 95px;
 
   button {
     font-family: Poppins-Medium;

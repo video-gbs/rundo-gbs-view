@@ -21,11 +21,27 @@
           type="border-card"
           @tab-click="handleClick"
         >
-          <el-tab-pane label="编码器" name="编码器">
-            <Encoder ref="encoder" :detailsId="detailsId" />
+          <el-tab-pane
+            label="编码器"
+            name="编码器"
+            class="encoder-pane pane-content"
+          >
+            <Encoder
+              ref="encoder"
+              :detailsId="detailsId"
+              :treeList="treeList"
+            />
           </el-tab-pane>
-          <el-tab-pane label="通道" name="通道">
-            <Channel ref="channel" />
+          <el-tab-pane
+            label="通道"
+            name="通道"
+            class="channel-pane pane-content"
+          >
+            <Channel
+              ref="channel"
+              :treeList="treeList"
+              :detailsId="detailsId"
+            />
           </el-tab-pane>
         </el-tabs>
       </div>
@@ -86,7 +102,6 @@ export default {
         })
     },
     handleClick(val, event) {
-      console.log('val', val)
       this.activeName = val.label
     },
     childClickHandle(data) {
@@ -116,7 +131,7 @@ export default {
   border: 0 none;
 }
 ::v-deep .el-tabs--border-card > .el-tabs__content {
-  padding: 20px 24px;
+  padding: 0;
 }
 ::v-deep .el-tabs--border-card {
   background: #f9f9f9;
@@ -170,8 +185,6 @@ export default {
       width: 310px;
       margin: 20px;
       background: #ffffff;
-      overflow-y: auto;
-      overflow-x: hidden;
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     }
     .right-table {
@@ -180,7 +193,12 @@ export default {
       margin: 6px 0 0 -10px;
       position: relative;
       .table-content {
+        width: 100%;
         height: 100%;
+        .pane-content {
+          width: 100%;
+          height: 100%;
+        }
       }
     }
     .right-table-else {
@@ -189,7 +207,12 @@ export default {
       margin: 6px 0 0 -10px;
       position: relative;
       .table-content {
+        width: 100%;
         height: 100%;
+        .pane-content {
+          width: 100%;
+          height: 100%;
+        }
       }
     }
   }

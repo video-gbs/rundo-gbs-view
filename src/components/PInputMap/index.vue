@@ -82,8 +82,8 @@ export default {
       buttonLoading: false,
       points: [],
       form: {},
-      width: this.initWidth(),
-      height: this.initHeight(),
+      // width: this.initWidth(),
+      // height: this.initHeight(),
       initMapStatus: false,
       controls: ['Zoom']
     }
@@ -103,12 +103,12 @@ export default {
   },
   created() {
     // this.initData()
-    window.onresize = () => {
-      return (() => {
-        this.width = this.initWidth()
-        this.height = this.initHeight()
-      })()
-    }
+    // window.onresize = () => {
+    //   return (() => {
+    //     this.width = this.initWidth()
+    //     this.height = this.initHeight()
+    //   })()
+    // }
   },
   methods: {
     /**

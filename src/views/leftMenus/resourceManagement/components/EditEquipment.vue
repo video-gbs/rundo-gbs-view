@@ -292,11 +292,41 @@ export default {
         }
       }, 500)
     }
+    const checkPassword = (rule, value, cb) => {
+      const regPassword =
+        /^(?!^\d+$)(?!^[a-z]+$)(?!^[A-Z]+$)(?!^[^a-z0-9]+$)(?!^[^A-Z0-9]+$)(?!^.*[\u4E00-\u9FA5].*$)^\S*$/
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (regPassword.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              '8~20个字符;至少由大写字母、小写字母、数字、特殊字符任意两种组成。'
+            )
+          )
+        }
+      }, 500)
+    }
+    const checkModel = (rule, value, cb) => {
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (value.length <= 128) {
+          return cb()
+        } else {
+          return cb(new Error('1~128个字符。'))
+        }
+      }, 500)
+    }
     return {
       form: {
         model: '',
         username: '',
-        deviceType: '',
+        deviceType: '1',
         manufacturer: '',
         videoAreaId: '',
         name: '',
@@ -334,24 +364,30 @@ export default {
           trigger: 'blur'
         },
         manufacturer: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         gatewayId: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         transport: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         videoAreaId: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          { required: true, message: '此为必填项。', trigger: 'change' }
         ],
-        model: [{ required: true, message: '1~128个字符。', trigger: 'blur' }],
+        model: [{ required: true, trigger: 'blur', validator: checkModel }],
         ip: [{ required: true, message: '此为必填项。', trigger: 'blur' }],
         username: [
           { required: true, message: '此为必填项。', trigger: 'blur' }
         ],
         password: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
+          {
+            required: true,
+            max: 20,
+            min: 8,
+            validator: checkPassword,
+            trigger: 'blur'
+          }
         ],
         port: {
           required: true,
@@ -580,6 +616,32 @@ export default {
 ::v-deep .editEquipment-treeForm > .el-tree-node::before {
   border-left: none;
 }
+// 滚动条大小设置
+::v-deep .box-card::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .box-card::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .box-card::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .box-card::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
+}
 .editEquipment-content {
   .panel-header-box {
     margin: 0;
@@ -613,6 +675,9 @@ export default {
   }
   .box-card {
     margin: 20px 20px 0 20px;
+    max-height: 750px;
+    height: 700px;
+    overflow-y: auto;
 
     .clearfix {
       height: 80px;

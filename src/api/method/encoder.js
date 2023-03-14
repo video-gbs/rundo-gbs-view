@@ -25,7 +25,7 @@ export function deleteEncoder(id) {
 
 // 移动
 export function moveEncoder(params) {
-  return request.put(`${expansion}/device/move`, params)
+  return request.post(`${expansion}/device/move`, params)
 }
 
 // 编辑编码器
@@ -50,7 +50,7 @@ export function deleteDevice(id) {
 
 // 编码器同步
 export function syncChannel(id) {
-  return request.get(`${expansion}//channel/channelSync/?deviceId=${id}`)
+  return request.get(`${expansion}/channel/channelSync/?deviceId=${id}`)
 }
 
 // 代注册列表编辑
@@ -59,11 +59,6 @@ export function syncChannel(id) {
 // }
 
 // 代注册列表同步
-// export function syncDevice(id) {
-//   return request.put(`${device}/device/north/sync`)
-// }
-
-// 代注册列表恢复
 // export function syncDevice(id) {
 //   return request.put(`${device}/device/north/sync`)
 // }

@@ -33,7 +33,11 @@
               v-for="(item1, index1) in appList"
               :key="index1"
               class="top-li"
-              @click="goContentList('应用', item1, index1)"
+              @click="
+                !isGoContentListClicked
+                  ? goContentList('应用', item1, index1)
+                  : ''
+              "
             >
               <div
                 v-cloak
@@ -109,6 +113,8 @@ import { getHomeLists, getTypeTreeMenus } from '@/api/method/home'
 import store from '@/store/index'
 import router from '../../../router/index'
 import { Local } from '@/utils/storage'
+
+import { antiShake } from '@/utils/index.js'
 
 export default {
   components: {
@@ -268,13 +274,27 @@ export default {
       sideBarRouterList: [],
       sideBarRouterList1: [],
       sideBarRouterList2: [],
-      sideBarRouterList3: []
+      sideBarRouterList3: [],
+      windowWidth: null,
+      isGoContentListClicked: false
     }
   },
-  watch: {},
+  watch: {
+    windowWidth: {
+      handler: function (val, oldVal) {
+        const h = document.getElementsByTagName('HTML')[0]
+        h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+
+        this.$forceUpdate()
+      },
+      immediate: true
+    }
+  },
   created() {},
   mounted() {
     this.init()
+    this.windowWidth = document.documentElement.clientWidth
+    window.onresize = this.throttle(this.setScale, 500, 500)
   },
   methods: {
     async init() {
@@ -290,6 +310,28 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    throttle(method, delay, duration) {
+      var timer = null
+      var begin = new Date()
+      return function () {
+        var context = this
+        var args = arguments
+        var current = new Date()
+        clearTimeout(timer)
+        if (current - begin >= duration) {
+          method.apply(context, args)
+          begin = current
+        } else {
+          timer = setTimeout(function () {
+            method.apply(context, args)
+          }, delay)
+        }
+      }
+    },
+    setScale() {
+      // 以1920px为标准宽度
+      this.windowWidth = document.documentElement.clientWidth
     },
     getBackground(item) {
       return item.appIcon
@@ -474,7 +516,8 @@ export default {
         }
       }
     },
-    goContentList(name, item, index) {
+    goContentList: antiShake(function (name, item, index) {
+      this.isGoContentListClicked = true
       switch (name) {
         case '应用':
           Local.set('tree_type', 1)
@@ -543,7 +586,8 @@ export default {
         default:
           break
       }
-    }
+      this.isGoContentListClicked = false
+    })
   }
 }
 </script>

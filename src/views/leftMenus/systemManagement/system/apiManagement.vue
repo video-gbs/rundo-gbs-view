@@ -33,7 +33,7 @@
           style="float: right; margin-right: 20px"
           class="form-btn-list"
         >
-          <el-button @click="resetData"
+          <el-button @click="resetData($event)"
             ><svg-icon class="svg-btn" icon-class="cz" />
             <span class="btn-span">重置</span></el-button
           >
@@ -339,11 +339,22 @@ export default {
     cxData() {
       this.getList()
     },
-    resetData() {
+    resetData(e) {
       this.searchParams = {
         itemName: '',
         itemValue: ''
       }
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
+      this.params.pageNum = 1
+      this.getList()
     },
     goPage(path, query) {
       this.$router.push(path)
@@ -503,6 +514,10 @@ export default {
 }
 ::v-deep .el-dialog__footer {
   border-top: 1px solid #eaeaea;
+}
+
+::v-deep .api-table .el-table__fixed-right {
+  height: 100% !important;
 }
 // 滚动条大小设置
 ::v-deep .api-table::-webkit-scrollbar {

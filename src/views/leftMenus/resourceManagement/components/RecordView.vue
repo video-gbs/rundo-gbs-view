@@ -13,7 +13,11 @@
                 @tab-click="switchTab"
                 class="real-time-monitoring"
               >
-                <el-tab-pane label="安防通道分组" name="equipmentGroup">
+                <el-tab-pane
+                  label="安防通道分组"
+                  name="equipmentGroup"
+                  class="recordView-pane"
+                >
                   <div class="securityArea_container">
                     <div class="tree-content">
                       <el-input
@@ -414,6 +418,7 @@ export default {
     return {
       filterText: '',
       treeList: [],
+      initData: [],
       activeTab: 'equipmentGroup',
       detailsId: [],
       datePickerPlayTime: new Date(new Date().setHours(0, 0, 0, 0)),
@@ -518,15 +523,6 @@ export default {
       ScurrentPage: this.$route.params.ScurrentPage
     }
   },
-  watch: {
-    treeList(n) {
-      this.treeList = n
-    },
-    filterText(val) {
-      console.log(val)
-      this.$refs.recordViewTree.filter(val)
-    }
-  },
 
   mounted() {
     this.init()
@@ -542,6 +538,7 @@ export default {
         .then((res) => {
           if (res.code === 0) {
             this.treeList = res.data
+            this.initData = res.data
           }
         })
         .catch((error) => {
@@ -549,7 +546,7 @@ export default {
         })
     },
     filterNode(value, data) {
-      console.log(value, data)
+      console.log(11111111111, value, data)
       if (!value) return true
       return data.areaNames && data.areaNames.indexOf(value) !== -1
       // }
@@ -696,16 +693,23 @@ export default {
                   })
 
                   this.detailsId.push(data.id)
-                  let arr = data.children
-                    ? this.resArray.concat(data.children)
-                    : this.resArray
-                  const obj = {}
-                  arr = arr.reduce((item, next) => {
-                    obj[next.areaPid]
-                      ? ''
-                      : (obj[next.areaPid] = true && item.push(next))
-                    return item
-                  }, [])
+                  let arr = []
+                  if (data.id === '1') {
+                    arr = this.resArray.concat(this.initData[0].children)
+                  } else {
+                    arr = data.children
+                      ? this.resArray.concat(data.children)
+                      : this.resArray
+
+                    const obj = {}
+                    arr = arr.reduce((item, next) => {
+                      obj[next.areaPid]
+                        ? ''
+                        : (obj[next.areaPid] = true && item.push(next))
+                      return item
+                    }, [])
+                  }
+
                   this.$refs.recordViewTree.updateKeyChildren(data.id, arr)
                   this.defaultExpandedKeys = [data.id]
                 }
@@ -2092,6 +2096,13 @@ export default {
     },
     cloudPlayTime(newVal, oldVal) {
       this.datePickerCloudPlayTime = newVal.toDate()
+    },
+    filterText(val) {
+      this.$refs.recordViewTree.filter(val)
+    },
+    treeList(n) {
+      console.log('nnnnnn')
+      this.treeList = n
     }
   },
   beforeDestroy() {
@@ -2104,6 +2115,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-tabs__nav-scroll {
+  &::after {
+    display: none;
+  }
+}
+::v-deep .el-tabs__active-bar {
+  margin-left: 16px;
+}
+
+::v-deep .el-tabs__item {
+  background-color: #fff !important;
+  margin-left: 16px;
+  font-size: 16px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #0270ff;
+  &::after {
+    display: none;
+  }
+}
 .monitoring-content-box {
   height: calc(100% - 0px);
   .left-tree {
@@ -2147,12 +2178,16 @@ export default {
     }
   }
   .securityArea_container {
-    height: 480px;
-    width: 340px;
-    margin-top: 5px;
     background: #ffffff;
     margin-left: 10px;
-    // box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+    height: 660px;
+    width: 360px;
+    margin-top: -15px;
+    background: #ffffff;
+    .tree {
+      max-height: calc(100% - 90px);
+      overflow-y: auto;
+    }
   }
 }
 .player-container-full {
