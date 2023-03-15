@@ -598,6 +598,12 @@ export default {
 ::v-deep .applicationManagement-table .el-table__fixed-right {
   height: 100% !important;
 }
+// ::v-deep .el-table--enable-row-transition {
+//   height: 100% !important;
+// }
+// ::v-deep .el-table::before {
+//   height: 0;
+// }
 // 滚动条大小设置
 ::v-deep .applicationManagement-table::-webkit-scrollbar {
   /*纵向滚动条*/

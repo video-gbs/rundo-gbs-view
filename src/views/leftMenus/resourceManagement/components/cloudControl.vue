@@ -121,10 +121,6 @@ export default {
         }
       }
     }
-    //  data(val) {
-    //    console.info("云台控制是个忽悠忽悠", val);
-    //    this.queryPreset(val);
-    //  }
   },
   methods: {
     callPosition(deviceId, channelId) {

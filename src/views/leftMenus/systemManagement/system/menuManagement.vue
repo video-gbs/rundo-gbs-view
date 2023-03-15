@@ -107,7 +107,7 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column width="100" label="操作" fixed="right">
+        <el-table-column width="100" label="操作">
           <template slot-scope="scope">
             <el-button type="text" @click="dialogShow(0, scope.row)"
               >编辑</el-button
@@ -253,9 +253,10 @@ import {
   getMenuInfoLists,
   deleteMenuInfo,
   getApplicationList,
-  getApplicationTree
+  getApplicationTree,
+  changeMenusStatus,
+  changeMenusHidden
 } from '@/api/method/menus'
-import { changeRoleStatus, changeRoleHidden } from '@/api/method/role'
 import pagination from '@/components/Pagination/index.vue'
 export default {
   name: '',
@@ -341,7 +342,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          changeRoleStatus({
+          changeMenusStatus({
             id: row.id,
             status: row.status
           }).then((res) => {})
@@ -359,7 +360,7 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          changeRoleHidden({
+          changeMenusHidden({
             id: row.id,
             hidden: row.hidden
           }).then((res) => {})
@@ -507,6 +508,9 @@ export default {
   overflow: auto;
 }
 ::v-deep .menuManagement-table .el-table__fixed-right {
+  height: 100% !important;
+}
+::v-deep .el-table--enable-row-transition {
   height: 100% !important;
 }
 ::v-deep .menuManagement-table::-webkit-scrollbar {

@@ -46,6 +46,7 @@ export const DIRECTIONS_CLASS = [
 ]
 
 import { ptzControl } from '@/api/method/live'
+import { Local } from '@/utils/storage'
 
 export default {
   name: 'DirectionControl',
@@ -82,9 +83,9 @@ export default {
     ptzCamera(cmdCode) {
       // const { channelId } = this.deviceData
 
-      console.log('cmdCode~~~~~~~', cmdCode)
+      console.log('cmdCode~~~~~~~', cmdCode, Local.get('cloudId'))
       ptzControl({
-        channelId: 21,
+        channelId: Local.get('cloudId'),
         cmdCode: this.status[cmdCode],
         horizonSpeed: this.speed,
         verticalSpeed: this.speed,

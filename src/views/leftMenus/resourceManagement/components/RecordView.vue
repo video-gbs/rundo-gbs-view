@@ -106,9 +106,8 @@
             </div>
           </div>
           <div
-            class="player-container"
+            :class="isShowMenu ? 'player-container' : 'player-container-else'"
             id="recordPlayerLayout"
-            :style="`margin-left:${isShowMenu ? '' : '16px'}`"
           >
             <div
               class="player-box playerBox"
@@ -261,7 +260,12 @@
               </div>
               <div class="tool-center">
                 <el-tooltip effect="dark" content="关闭视频" placement="top">
-                  <i class="close-video" @click="handleCloseVideo" />
+                  <!-- <i class="close-video" @click="handleCloseVideo" /> -->
+                  <svg-icon
+                    class="iconfont white close-video"
+                    icon-class="close-video"
+                    @click="handleCloseVideo"
+                  />
                 </el-tooltip>
 
                 <el-time-picker
@@ -396,7 +400,11 @@ import MonitorEquipmentGroup from './monitorEquipmentGroup'
 import DownloadVideoModal from '../recordComponents/DownloadVideoModal'
 import { getVideoAraeTree } from '@/api/method/role'
 import { getPlaybackList } from '@/api/method/moduleManagement'
-import { getPlayBackUrlLists, getChannelPlayList } from '@/api/method/live'
+import {
+  getPlayBackUrlLists,
+  getChannelPlayList,
+  playStop
+} from '@/api/method/live'
 
 // import flvJs from './flvJs'
 const ZOOM_TYPE = {
@@ -418,7 +426,7 @@ export default {
     return {
       filterText: '',
       treeList: [],
-      initData: [],
+      initDatas: [],
       activeTab: 'equipmentGroup',
       detailsId: [],
       datePickerPlayTime: new Date(new Date().setHours(0, 0, 0, 0)),
@@ -538,7 +546,7 @@ export default {
         .then((res) => {
           if (res.code === 0) {
             this.treeList = res.data
-            this.initData = res.data
+            this.initDatas = res.data
           }
         })
         .catch((error) => {
@@ -581,6 +589,13 @@ export default {
               this.deviceVideoList = {
                 [date]: listData
               }
+
+              this.playRecord(1, date)
+            } else {
+              this.$message({
+                message: '设备没有录像数据',
+                type: 'warning'
+              })
             }
           }
         })
@@ -589,13 +604,11 @@ export default {
         })
 
       this.formData.loading = false
-      this.playRecord(1, date)
     },
     switchTab(tab, event) {
       console.log(tab, event)
     },
     getIconType(data) {
-      console.log('data~~~~~~~~', data)
       if (data.level) {
         // if (data.level === 2) {
         //   return 'tree2'
@@ -672,6 +685,7 @@ export default {
         })
     },
     async handleNodeClick(data, node, self) {
+      console.log(data)
       if (!data.onlineState) {
         this.resArray = []
         if (this.detailsId.indexOf(data.id) !== -1) {
@@ -696,7 +710,7 @@ export default {
                   this.detailsId.push(data.id)
                   let arr = []
                   if (data.id === '1') {
-                    arr = this.resArray.concat(this.initData[0].children)
+                    arr = this.resArray.concat(this.initDatas[0].children)
                   } else {
                     arr = data.children
                       ? this.resArray.concat(data.children)
@@ -721,7 +735,7 @@ export default {
             })
         }
       } else {
-        this.channelId = data.areaPid
+        this.channelId = data.areaPid || data.id
       }
     },
     initData() {
@@ -778,6 +792,7 @@ export default {
     },
     // 查询视频
     handleSearch() {
+      console.log('this.channelId', this.channelId)
       if (this.channelId === '' && this.channelId.length === 0) {
         this.$message({
           message: '请选择节点',
@@ -928,11 +943,12 @@ export default {
     },
     //滚动时间轴事件
     handleChangePlayTime(curTime, isDragEnd, record) {
+      // console.log('curTime',curTime)
       switch (true) {
         case !!(isDragEnd && record): {
           //拖拽完成,并且该时间有播放内容数据
           console.log('拖拽结束')
-          this.playRecord(record, curTime)
+          this.playRecord(record)
           this.isDragging = false
           break
         }
@@ -1842,19 +1858,25 @@ export default {
     playRecord: (function () {
       return async function (row, playTime) {
         console.log(2222222222222, row, playTime)
-        await getPlayBackUrlLists({
-          channelId: this.channelId,
-          startTime: `${playTime} 00:00:00`,
-          endTime: `${playTime} 23:59:59`
+        await playStop({
+          streamId: this.channelId
+        }).then((res) => {
+          if (res.code === 0) {
+            getPlayBackUrlLists({
+              channelId: this.channelId,
+              startTime: row.startTime ? row.startTime : `${playTime} 00:00:00`,
+              endTime: row.endTime ? row.endTime : `${playTime} 23:59:59`
+            })
+              .then((res) => {
+                if (res.code === 0) {
+                  this.videoUrl = res.data.wsFlv
+                }
+              })
+              .catch((error) => {
+                console.log(error)
+              })
+          }
         })
-          .then((res) => {
-            if (res.code === 0) {
-              this.videoUrl = res.data.wsFlv
-            }
-          })
-          .catch((error) => {
-            console.log(error)
-          })
       }
     })(),
     gbPlay() {
@@ -2145,11 +2167,6 @@ export default {
     margin-right: 16px;
     height: 100%;
   }
-  .real-time-monitoring {
-    .el-tabs__nav-wrap {
-      padding: 0px 24px 0;
-    }
-  }
   .equipment-group-wrapper-top {
     flex: 1;
     overflow: hidden;
@@ -2163,6 +2180,9 @@ export default {
       .el-tabs__content {
         flex: 1;
         overflow-y: auto;
+      }
+      .el-tabs__nav-wrap {
+        padding: 0px 24px 0;
       }
     }
   }
@@ -2186,7 +2206,7 @@ export default {
     margin-top: -15px;
     background: #ffffff;
     .tree {
-      max-height: calc(100% - 90px);
+      max-height: calc(100% - 110px);
       overflow-y: auto;
     }
   }
@@ -2247,9 +2267,9 @@ export default {
     flex: 1;
   }
   .el-tab-pane {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+    // height: 100%;
+    // display: flex;
+    // flex-direction: column;
   }
 }
 .recordView .el-container {
@@ -2308,6 +2328,29 @@ export default {
   width: 65% !important;
   // padding: 16px;
   margin: 16px;
+}
+.player-container-else {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #545556;
+  position: relative;
+  .trank {
+    width: 80%;
+    height: 180px;
+    text-align: left;
+    padding: 0 10%;
+    overflow: auto;
+    position: absolute;
+    color: white;
+    font-size: 12px;
+    bottom: 112px;
+  }
+  .trankInfo {
+    width: 80%;
+    padding: 0 10%;
+  }
 }
 .player-container {
   height: 100%;
@@ -2469,6 +2512,7 @@ export default {
     .toolbar-date-picker {
       height: 100%;
       width: 184px;
+      margin-top: 8px;
 
       input {
         padding: 0;
@@ -2487,20 +2531,21 @@ export default {
 
     .play-btn {
       margin-left: 20px;
-      width: 16px;
-      height: 16px;
+      width: 24px;
+      height: 24px;
       cursor: pointer;
       display: inline-block;
+      position: relative;
+      top: 7px;
+      left: 0px;
 
       &.play {
-        background: url('../../../../assets/imgs/icon_player_play.png')
-          no-repeat;
+        background: url('../../../../assets/imgs/player_pause.png') no-repeat;
         background-size: cover;
       }
 
       &.pause {
-        background: url('../../../../assets/imgs/icon_player_pause.png')
-          no-repeat;
+        background: url('../../../../assets/imgs/player_play.png') no-repeat;
         background-size: cover;
       }
     }
@@ -2551,11 +2596,12 @@ export default {
 
     .close-video {
       display: inline-block;
-      width: 10px;
-      height: 10px;
+      width: 24px;
+      height: 24px;
       cursor: pointer;
-      background-color: #fff;
-      margin-right: 24px;
+      position: relative;
+      top: 5px;
+      left: -20px;
     }
   }
   .disabled {

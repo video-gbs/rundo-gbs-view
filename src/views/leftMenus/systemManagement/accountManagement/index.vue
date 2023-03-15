@@ -5,7 +5,11 @@
     </div>
     <div class="main-content">
       <div class="securityArea_container">
-        <leftTree :treeData="treeData" @childClickHandle="childClickHandle" />
+        <leftTree
+          :treeData="treeData"
+          @childClickHandle="childClickHandle"
+          class="accountTree"
+        />
       </div>
       <div class="right-table p10">
         <Encoder ref="encoder" />
@@ -144,7 +148,12 @@ export default {
       margin: 20px;
       background: #ffffff;
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+      .accountTree {
+        // height: 10;
+        height: calc(100% - 70px) !important;
+      }
     }
+
     .right-table {
       width: 100%;
       height: calc(100% - 16px);

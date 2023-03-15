@@ -36,7 +36,10 @@
 
     <div class="table-content">
       <div class="table-content-top">
-        <el-checkbox v-model="checked" class="table-content-top-check"
+        <el-checkbox
+          v-model="accountChecked"
+          class="table-content-top-check"
+          @change="changeAccountChecked"
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
@@ -313,6 +316,7 @@ export default {
           status: 1
         }
       ],
+      accountChecked: true,
       tableData: [
         {
           name: '球机192.168……',
@@ -340,6 +344,7 @@ export default {
         current: this.params.pageNum,
         pageSize: this.params.pageSize,
         orgId: id ? id : this.orgId,
+        contain: this.accountChecked ? 1 : 0,
         ...this.searchParams
       }).then((res) => {
         if (res.code === 0) {
@@ -349,6 +354,9 @@ export default {
           this.params.current = res.data.current
         }
       })
+    },
+    changeAccountChecked(val) {
+      this.getList()
     },
     resetData(e) {
       this.searchParams = {
@@ -483,6 +491,9 @@ export default {
 
 <style lang="scss" scoped>
 ::v-deep .table-content-bottom .el-table__fixed-right {
+  height: 100% !important;
+}
+::v-deep .el-table--enable-row-transition {
   height: 100% !important;
 }
 // 滚动条大小设置
@@ -639,7 +650,7 @@ export default {
   top: 1px;
   left: -4px;
 }
-::v-deep .el-table::before {
-  height: 0;
-}
+// ::v-deep .el-table::before {
+//   height: 0;
+// }
 </style>

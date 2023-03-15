@@ -127,7 +127,7 @@
           :show-overflow-tooltip="true"
           width="160"
         />
-        <el-table-column prop="deviceName" label="所属设备" width="120" />
+        <el-table-column prop="deviceName" label="所属设备" width="140" />
 
         <el-table-column prop="channelType" label="通道类型" width="120">
           <template slot-scope="scope">
@@ -197,8 +197,8 @@
         />
       </div>
       <el-form label-width="100px" :model="dialogForm">
-        <el-form-item label="设备数量：">{{ dialogForm.num }}</el-form-item>
-        <el-form-item label="设备名称：">
+        <el-form-item label="通道数量：">{{ dialogForm.num }}</el-form-item>
+        <el-form-item label="通道名称：">
           <span class="dialogEquipmentName">{{
             dialogForm.dialogEquipmentName
           }}</span>
@@ -498,6 +498,8 @@ export default {
       this.getList()
     },
     goChannelDiscovery() {
+      Local.set('channelPageNum', this.params.pageNum)
+      Local.set('equipmentActiveName', '通道')
       this.$router.push(`/channelDiscovery`)
     },
     moveEquipment() {
@@ -524,6 +526,9 @@ export default {
 }
 
 ::v-deep .channel-table .el-table__fixed-right {
+  height: 100% !important;
+}
+::v-deep .el-table--enable-row-transition {
   height: 100% !important;
 }
 

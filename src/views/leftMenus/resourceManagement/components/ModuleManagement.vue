@@ -391,6 +391,9 @@ export default {
 ::v-deep .table-content-bottom .el-table__fixed-right {
   height: 100% !important;
 }
+::v-deep .el-table--enable-row-transition {
+  height: 100% !important;
+}
 // 滚动条大小设置
 ::v-deep .table-content-bottom::-webkit-scrollbar {
   /*纵向滚动条*/

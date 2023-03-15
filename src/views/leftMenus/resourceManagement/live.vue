@@ -97,7 +97,10 @@
                 </div>
                 <transition name="el-fade-in-linear">
                   <div class="wrapper-bottom-content" v-show="showContent">
-                    <cloud-control :deviceData="playerData[playerIdx]" />
+                    <cloud-control
+                      :deviceData="playerData[playerIdx]"
+                      :cloudId="cloudId"
+                    />
                   </div>
                 </transition>
               </div>
@@ -204,7 +207,7 @@
                   />
                 </el-tooltip>
                 <div class="split-box">
-                  <el-dropdown @command="switchSplit">
+                  <el-dropdown @command="switchSplit" placement="top">
                     <span class="split-text">
                       <svg-icon
                         class="iconfont white"
@@ -388,7 +391,8 @@ export default {
       hasChannel: false,
       resArray: [],
       isMouseHover: false,
-      isHoverNum: 0
+      isHoverNum: 0,
+      cloudId: null
     }
   },
   mounted() {
@@ -400,6 +404,15 @@ export default {
       this.splitFullscreen = !this.splitFullscreen
     })
     this.$refs.dropdownMenuPlace.appendChild(this.$refs.dropdownMenu.popperElm)
+    if (document.documentElement.clientHeight < 800) {
+      document.getElementsByClassName(
+        'securityArea_container'
+      )[0].style.height = '540px'
+    } else {
+      document.getElementsByClassName(
+        'securityArea_container'
+      )[0].style.height = '680px'
+    }
   },
   created() {
     // this.checkPlayByParam()
@@ -793,6 +806,7 @@ export default {
       // this.stopPlaying(this.playerData[i])
     },
     async getDeviceList(id) {
+      Local.set('cloudId', id)
       await getPlayLists({ channelId: id })
         .then((res) => {
           if (res.code === 0) {
@@ -1022,13 +1036,29 @@ export default {
     controlColla() {
       this.showContent = !this.showContent
       if (!this.showContent) {
-        document.getElementsByClassName(
-          'securityArea_container'
-        )[0].style.height = '920px'
+        console.log(
+          'document.documentElement.clientHeight',
+          document.documentElement.clientHeight
+        )
+        if (document.documentElement.clientHeight < 800) {
+          document.getElementsByClassName(
+            'securityArea_container'
+          )[0].style.height = '840px'
+        } else {
+          document.getElementsByClassName(
+            'securityArea_container'
+          )[0].style.height = '960px'
+        }
       } else {
-        document.getElementsByClassName(
-          'securityArea_container'
-        )[0].style.height = '660px'
+        if (document.documentElement.clientHeight < 800) {
+          document.getElementsByClassName(
+            'securityArea_container'
+          )[0].style.height = '540px'
+        } else {
+          document.getElementsByClassName(
+            'securityArea_container'
+          )[0].style.height = '680px'
+        }
       }
     }
   }
@@ -1207,7 +1237,6 @@ export default {
       padding: 0px 24px 0;
     }
     .securityArea_container {
-      height: 660px;
       width: 360px;
       margin-top: -15px;
       background: #ffffff;

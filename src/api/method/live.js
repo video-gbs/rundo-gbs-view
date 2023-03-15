@@ -5,6 +5,8 @@ const expansion = '/api/expserver/expansion'
 
 const device = '/api/device-control'
 
+const streamanege = '/api/stream-manage'
+
 export function getPlayLists(data) {
   // 网关列表
   return request.post(`${expansion}/play/live`, data)
@@ -23,4 +25,9 @@ export function getChannelPlayList(id) {
 export function getPlayBackUrlLists(data) {
   // 网关列表
   return request.post(`${expansion}/play/back`, data)
+}
+
+export function playStop(data) {
+  // 关闭流
+  return request.put(`${streamanege}/stream/north/play/stop`, data)
 }

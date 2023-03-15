@@ -54,7 +54,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="160" />
-        <el-table-column width="200" label="操作" fixed="right">
+        <el-table-column width="200" label="操作">
           <template slot-scope="scope">
             <el-button type="text" @click="editPassword(scope.row)"
               >修改密码</el-button

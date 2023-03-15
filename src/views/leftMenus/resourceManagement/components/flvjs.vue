@@ -104,7 +104,8 @@ export default {
       statusMsg: '摄像机未开启，请联系',
       lastDecodedFrame: null,
       isShowStream: false,
-      tracks: []
+      tracks: [],
+      resVideoUrl: ''
     }
   },
   props: [
@@ -118,6 +119,7 @@ export default {
     'stretch'
   ],
   created() {
+    this.resVideoUrl = this.$props.videoUrl
     if (this.timerId) {
       clearInterval(this.timerId)
       this.timerId = null
@@ -136,6 +138,25 @@ export default {
     this.$nextTick(async () => {
       this.setsrc()
     })
+  },
+  watch: {
+    '$props.videoUrl': {
+      handler: function (params) {
+        this.$nextTick(() => {
+          this.resVideoUrl = params
+          this.createVideo()
+        })
+      },
+      deep: true
+    },
+    MaxHeight: {
+      handler: function (v) {
+        this.$nextTick(() => {
+          this.MaxHeight_ = v
+        })
+      },
+      deep: true
+    }
   },
   computed() {},
   methods: {
@@ -189,7 +210,7 @@ export default {
     createVideo() {
       this.reconnectIng = true
       let that = this
-      console.log(that.flvPlayer)
+      console.log(that.flvPlayer, that.resVideoUrl, 11111111)
       if (that.flvPlayer) {
         that.flvPlayer.pause()
         that.flvPlayer.destroy()
@@ -198,13 +219,12 @@ export default {
       if (that.timerId !== null) {
         clearInterval(that.timerId)
       }
-      console.info('this.videoUrl', this.$props.videoUrl)
       const videoElement = document.getElementById(that.idx)
       if (flvjs.isSupported()) {
         that.flvPlayer = flvjs.createPlayer(
           {
             type: 'flv',
-            url: this.$props.videoUrl,
+            url: that.resVideoUrl,
             // url:"ws://192.168.0.73:80/rtp/LIVE_23.live.flv",
             isLive: true
           },

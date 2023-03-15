@@ -425,11 +425,16 @@ router.beforeEach(async (to, from, next) => {
             })
 
             appTypeRouter = homeRouters.concat(appTypeRouter)
-            store.dispatch('user/changeActiveIndex', appTypeRouter[1].path)
+            // store.dispatch('user/changeActiveIndex', appTypeRouter[1].path)
             // store.dispatch('user/dynamicRouters', appTypeRouter)
             store.dispatch('user/changeTypeRouter', appTypeRouter)
             store.dispatch('user/changeShowSidebar', false)
-            store.dispatch('user/changeActiveIndex', appTypeRouter[1].path)
+            // store.dispatch('user/changeActiveIndex', appTypeRouter[1].path)
+            if (lastUrl === '/recordView') {
+              store.dispatch('user/changeActiveIndex', appTypeRouter[2].path)
+            } else {
+              store.dispatch('user/changeActiveIndex', appTypeRouter[1].path)
+            }
           } else if (Local.get('tree_type') === 3) {
             const childComponent4 = []
             accessRouteses.map((item4) => {

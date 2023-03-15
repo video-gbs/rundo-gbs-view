@@ -341,10 +341,10 @@ export default {
     },
     getList() {
       const createdTimeEnd = this.searchParams.time
-        ? this.searchParams.time[0]
+        ? this.searchParams.time[1]
         : ''
       const createdTimeStart = this.searchParams.time
-        ? this.searchParams.time[1]
+        ? this.searchParams.time[0]
         : ''
       const roleName = this.searchParams.roleName
       const userAccount = this.searchParams.userAccount
@@ -478,6 +478,9 @@ export default {
   border-top: 1px solid #eaeaea;
 }
 ::v-deep .role-table .el-table__fixed-right {
+  height: 100% !important;
+}
+::v-deep .el-table--enable-row-transition {
   height: 100% !important;
 }
 // 滚动条大小设置

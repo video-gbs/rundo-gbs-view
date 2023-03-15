@@ -114,12 +114,7 @@
                   >
                 </template>
               </el-table-column>
-              <el-table-column
-                width="180"
-                label="操作"
-                fixed="right"
-                align="center"
-              >
+              <el-table-column width="180" label="操作" align="center">
                 <template slot-scope="scope">
                   <el-button type="text" @click="editData(scope.row)"
                     >编辑
@@ -578,6 +573,9 @@ export default {
 }
 
 ::v-deep .table-content-bottom .el-table__fixed-right {
+  height: 100% !important;
+}
+::v-deep .el-table--enable-row-transition {
   height: 100% !important;
 }
 // 滚动条大小设置

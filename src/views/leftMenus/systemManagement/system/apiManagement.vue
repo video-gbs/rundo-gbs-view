@@ -516,8 +516,14 @@ export default {
   border-top: 1px solid #eaeaea;
 }
 
-::v-deep .api-table .el-table__fixed-right {
-  height: 100% !important;
+// ::v-deep .api-table .el-table__fixed-right {
+//   height: 100% !important;
+// }
+// ::v-deep .el-table--enable-row-transition {
+//   height: 100% !important;
+// }
+::v-deep .el-table::before {
+  height: 0;
 }
 // 滚动条大小设置
 ::v-deep .api-table::-webkit-scrollbar {
@@ -587,7 +593,7 @@ export default {
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
     .api-table {
-      height: calc(100% - 100px);
+      max-height: calc(100% - 100px);
       overflow-y: auto;
     }
     .securityArea_container {

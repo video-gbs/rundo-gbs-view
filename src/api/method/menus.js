@@ -31,3 +31,13 @@ export function getApplicationList(params) {
 export function getApplicationTree(params) {
   return request.post(`${auth}/sysMenuInfo/tree`, params)
 }
+
+// 角色状态切换
+export function changeMenusStatus(data) {
+  return request.post(`${auth}/sysMenuInfo/status/change`, data)
+}
+
+// 角色隐藏切换
+export function changeMenusHidden(data) {
+  return request.post(`${auth}/sysMenuInfo/hidden/change`, data)
+}

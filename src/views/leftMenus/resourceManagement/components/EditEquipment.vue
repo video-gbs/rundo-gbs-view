@@ -346,7 +346,7 @@ export default {
       Id: '',
       editId: '',
       resName: '',
-      isRequired: false,
+      isRequired: true,
       defaultProps: {
         children: 'children',
         label: 'areaName'
@@ -519,9 +519,9 @@ export default {
         if (res.code === 0) {
           if (res.data && res.data.length > 0) {
             if (res.data[0].protocol === 'GB28181') {
-              this.isRequired = true
-            } else {
               this.isRequired = false
+            } else {
+              this.isRequired = true
             }
 
             res.data.map((item) => {

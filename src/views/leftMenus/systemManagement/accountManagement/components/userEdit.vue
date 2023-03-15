@@ -332,7 +332,7 @@ export default {
       const regPassword =
         /^(?!^\d+$)(?!^[a-z]+$)(?!^[A-Z]+$)(?!^[^a-z0-9]+$)(?!^[^A-Z0-9]+$)(?!^.*[\u4E00-\u9FA5].*$)^\S*$/
       if (value.length === 0) {
-        return cb(new Error('此为必填项。'))
+        return cb()
       }
       setTimeout(() => {
         if (regPassword.test(value)) {
@@ -346,6 +346,7 @@ export default {
         }
       }, 500)
     }
+
     return {
       tableData: [],
       roleName: '',
@@ -563,11 +564,11 @@ export default {
         this.$refs.form.validate(),
         this.$refs.form1.validate()
       ]).then(() => {
-        if (
-          !this.handlePasswordCheck(this.form.password, this.form.rePassword)
-        ) {
-          return
-        }
+        // if (
+        //   !this.handlePasswordCheck(this.form.password, this.form.rePassword)
+        // ) {
+        //   return
+        // }
         this.form.orgId = this.Id
         const roleIds = []
 
