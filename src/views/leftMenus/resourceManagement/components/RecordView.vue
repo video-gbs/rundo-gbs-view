@@ -2707,31 +2707,31 @@ export default {
   margin-left: 0px;
 }
 /* 树形结构节点添加连线 */
-.el-tree-node {
+::v-deep .el-tree-node {
   position: relative;
   padding-left: 8px;
 }
-.el-tree-node__content {
+::v-deep .el-tree-node__content {
   height: 32px;
   padding-left: 0px !important;
 }
 
-.el-tree-node__children {
+::v-deep .el-tree-node__children {
   padding-left: 14px;
 }
 
-.el-tree-node :last-child:before {
+::v-deep .el-tree-node :last-child:before {
   height: 38px;
 }
 
-.el-tree > .el-tree-node:before {
+::v-deep .el-tree > .el-tree-node:before {
   border-left: none;
 }
-.tree-container .el-tree > .el-tree-node:after {
+::v-deep .tree-container .el-tree > .el-tree-node:after {
   border-top: none;
 }
 
-.el-tree-node__children .el-tree-node:before {
+::v-deep .el-tree-node__children .el-tree-node:before {
   content: '';
   left: -4px;
   position: absolute;
@@ -2739,19 +2739,19 @@ export default {
   border-width: 1px;
 }
 
-.el-tree-node:after {
+::v-deep .el-tree-node:after {
   content: '';
   left: -4px;
   position: absolute;
   right: auto;
   border-width: 1px;
 }
-.el-tree-node__expand-icon.is-leaf {
+::v-deep .el-tree-node__expand-icon.is-leaf {
   // display: none;
   padding-left: 4px;
 }
 
-.el-tree-node:before {
+::v-deep .el-tree-node:before {
   content: '';
   height: 100%;
   width: 1px;
@@ -2762,7 +2762,7 @@ export default {
   border-left: 1px solid #dddddd;
 }
 
-.el-tree-node:after {
+::v-deep .el-tree-node:after {
   content: '';
   width: 24px;
   height: 20px;
@@ -2776,7 +2776,7 @@ export default {
   // padding-left: 10px;
 }
 // 去掉顶部线条
-.tree {
+::v-deep .tree {
   max-height: calc(100% - 70px);
   overflow-y: auto;
   & > .el-tree-node::after {

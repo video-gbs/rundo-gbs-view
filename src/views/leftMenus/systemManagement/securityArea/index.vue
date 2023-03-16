@@ -363,18 +363,31 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        unitDelete(this.detailsId).then((res) => {
-          if (res.code === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            })
+        unitDelete(this.detailsId)
+          .then((res) => {
+            if (res.code === 0) {
+              this.$message({
+                type: 'success',
+                message: '删除成功'
+              })
 
-            this.init()
-            this.detailsId = this.treeList[0].id
-            this.getUnitDetailsData()
-          }
-        })
+              this.init()
+              this.detailsId = this.treeList[0].id
+              this.getUnitDetailsData()
+            }
+          })
+          .catch((error) => {
+            if (err.code === 10011) {
+              this.$message({
+                type: 'warning',
+                message: res.msg
+              })
+
+              this.init()
+              this.detailsId = this.treeList[0].id
+              this.getUnitDetailsData()
+            }
+          })
       })
     },
     submit: antiShake(function (formName) {
