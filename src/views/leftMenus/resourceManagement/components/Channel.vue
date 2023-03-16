@@ -10,7 +10,7 @@
       >
         <el-form-item label="外类类型:">
           <el-select
-            v-model="searchParams.deviceType"
+            v-model="searchParams.ptzType"
             class="mr10"
             clearable
             placeholder="请选择"
@@ -131,7 +131,7 @@
 
         <el-table-column prop="channelType" label="通道类型" width="120">
           <template slot-scope="scope">
-            <!-- <span :class="scope.row.deviceType === 1 ? 'yuan' : 'yuan1'"></span> -->
+            <!-- <span :class="scope.row.ptzType === 1 ? 'yuan' : 'yuan1'"></span> -->
             <span v-if="scope.row.channelType === 0" style="margin-left: 10px"
               >视频</span
             >
@@ -285,7 +285,7 @@ export default {
         inputValue: ''
       },
       searchParams: {
-        deviceType: '',
+        ptzType: '',
         ip: '',
         onlineState: ''
       },
@@ -478,7 +478,7 @@ export default {
     },
     resetData(e) {
       this.searchParams = {
-        deviceType: '',
+        ptzType: '',
         ip: '',
         onlineState: ''
       }
