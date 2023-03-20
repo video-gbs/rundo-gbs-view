@@ -1,5 +1,5 @@
 {
-    "proxy": "/",
+    "proxy": "/api",
     "previewUrl": "https://yq-manage.runjian.com:18303/preview/onlinePreview?url=",
     "webSocketUrl": "ws://api.duprice.com/ws"
 }

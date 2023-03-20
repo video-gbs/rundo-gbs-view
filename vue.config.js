@@ -30,14 +30,15 @@ const port = process.env.port || process.env.npm_config_port || 8080 // dev port
 
 // 转发配置数组
 const urls = [
-  // 本地
+  // test 测试
+  // {
+  //   target: 'http://124.71.21.11:8080',
+  //   proxy: '/api'
+  // },
+  // dev  本地
   {
-    target: 'http://124.71.21.11:8080',
+    target: 'http://124.71.20.118:8080',
     proxy: '/api'
-  },
-  {
-    target: 'http://192.168.0.73:8060',
-    proxy: '/expansion'
   }
 ]
 

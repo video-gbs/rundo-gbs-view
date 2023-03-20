@@ -784,4 +784,7 @@ export default {
 .button-back {
   margin-right: 20px;
 }
+::v-deep .el-table::before {
+  height: 0;
+}
 </style>
