@@ -40,7 +40,7 @@
                   <el-radio label="2">NVR</el-radio>
                   <el-radio label="3">CVR</el-radio>
                   <el-radio label="4">DVS</el-radio>
-                  <el-radio label="5">IPS</el-radio>
+                  <el-radio label="5">IPC</el-radio>
                 </el-radio-group>
               </el-form-item>
             </el-col>

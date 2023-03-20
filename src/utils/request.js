@@ -6,13 +6,14 @@ import router from '@/router'
 import { Local } from '@/utils/storage'
 
 const requestTimeOut = 20 * 100000
-const isShowLogin = false
+// const baseURL = window.ipConfig.baseURL
 const noToken = ['/politics/sys/login', '/politics/v1/file/batchUploadImg']
 // create an axios instance
 // console.log('process.env.VUE_APP_BASE_API',process.env)
 // axios.defaults.transformResponse = jb
+console.log('process.env.NODE_ENV', process.env.NODE_ENV)
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
+  baseURL: process.env.NODE_ENV === 'production' ? 'api/' : 'api/', // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: requestTimeOut // request timeout
 })
