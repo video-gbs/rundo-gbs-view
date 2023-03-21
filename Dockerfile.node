@@ -1,0 +1,30 @@
+FROM  harbor.runjian.com/syy-open/ubuntu-boot:20.04 AS build
+ENV TZ=Asia/Shanghai
+ENV NGINX_PORT=8080
+EXPOSE 8080/tcp
+ENV LC_ALL zh_CN.UTF-8
+
+# 使用了自己的settings.xml作为maven的源,加快打包速度
+RUN apt-get update && \
+        DEBIAN_FRONTEND="noninteractive" && \
+         apt-get install -y --no-install-recommends   nodejs npm nginx
+WORKDIR /home
+
+RUN rm -rf /home/* && rm -rf /opt/*
+
+COPY ./ /home
+
+
+         # 编译前端界面
+WORKDIR /home/
+RUN  npm install && \
+     npm run build:stage  && \
+     mkdir -pv /opt/html && \
+     cp -rf /home/dist/* /opt/html/ &&\
+     cp /home/nginx.conf /etc/nginx/conf.d/
+
+FROM harbor.runjian.com/syy-open/nginx:1.20
+
+COPY --from=build /opt/ /opt/
+COPY --from=build /etc/nginx/conf.d/ /etc/nginx/conf.d/
+CMD ["nginx","-g","daemon off;"]

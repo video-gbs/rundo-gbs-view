@@ -1,0 +1,290 @@
+{
+    "400": {
+        "msg": "请求参数有误！",
+        "status": 0,
+        "type": "error"
+    },
+    "401": {
+        "msg": "用户未登录！",
+        "status": 1,
+        "type": "error",
+        "logout": true
+    },
+    "403": {
+        "msg": "用户没有权限！",
+        "status": 1,
+        "type": "error"
+    },
+    "404": {
+        "msg": "接口不存在",
+        "status": 1,
+        "type": "error"
+    },
+    "500": {
+        "msg": "请求失败！",
+        "status": 0,
+        "type": "error"
+    },
+    "500000": {
+        "msg": "系统繁忙，请稍后访问！",
+        "status": 1,
+        "type": "error"
+    },
+    "500001": {
+        "msg": "远程请求中，请稍后访问",
+        "status": 1,
+        "type": "error"
+    },
+    "500002": {
+        "msg": "令牌不能为空",
+        "status": 1,
+        "type": "error"
+    },
+    "500003": {
+        "msg": "令牌错误！",
+        "status": 1,
+        "type": "error"
+    },
+    "500004": {
+        "msg": "令牌已失效！",
+        "status": 1,
+        "type": "error",
+        "logout": true
+    },
+    "500005": {
+        "msg": "用户未登录",
+        "status": 1,
+        "type": "error",
+        "logout": true
+    },
+    "500006": {
+        "msg": "签名不能为空",
+        "status": 1,
+        "type": "error"
+    },
+    "500007": {
+        "msg": "签名错误",
+        "status": 1,
+        "type": "error"
+    },
+    "500008": {
+        "msg": "权限中心请求失败",
+        "status": 1,
+        "type": "error"
+    },
+    "500009": {
+        "msg": "访问拒绝",
+        "status": 1,
+        "type": "error"
+    },
+    "500010": {
+        "msg": "权限不足！",
+        "status": 1,
+        "type": "error"
+    },
+    "500012": {
+        "msg": "请勿重复操作！",
+        "status": 1,
+        "type": "error"
+    },
+    "500013": {
+        "msg": "枚举不存在",
+        "status": 1,
+        "type": "error"
+    },
+    "500014": {
+        "msg": "乐观锁已变化,请刷新数据！",
+        "status": 1,
+        "type": "error"
+    },
+    "500015": {
+        "msg": "记录不存在或已下架！",
+        "status": 1,
+        "type": "error"
+    },
+    "500016": {
+        "msg": "记录已下架！",
+        "status": 1,
+        "type": "error"
+    },
+    "500020": {
+        "msg": "记录不存在",
+        "status": 1,
+        "type": "error"
+    },
+    "500021": {
+        "msg": "记录新增失败",
+        "status": 1,
+        "type": "error"
+    },
+    "500022": {
+        "msg": "记录更新失败",
+        "status": 1,
+        "type": "error"
+    },
+    "500023": {
+        "msg": "记录删除失败",
+        "status": 0,
+        "type": "error"
+    },
+    "500024": {
+        "msg": "数据异常！",
+        "status": 1,
+        "type": "error"
+    },
+    "500025": {
+        "msg": "数据已存在！",
+        "status": 1,
+        "type": "error"
+    },
+    "500026": {
+        "msg": "文件没有找到",
+        "status": 1,
+        "type": "error"
+    },
+    "500027": {
+        "msg": "操作频繁,请稍后访问！",
+        "status": 1,
+        "type": "error"
+    },
+    "500100": {
+        "msg": "当前用户信息不存在！",
+        "status": 1,
+        "type": "error"
+    },
+    "500101": {
+        "msg": "账号不存在！",
+        "status": 1,
+        "type": "error"
+    },
+    "500102": {
+        "msg": "账号或密码不正确！",
+        "status": 1,
+        "type": "error"
+    },
+    "500103": {
+        "msg": "当前账号被禁用，请联系系统管理员！",
+        "status": 1,
+        "type": "error"
+    },
+    "500104": {
+        "msg": "手机号已存在！",
+        "status": 1,
+        "type": "error"
+    },
+    "500105": {
+        "msg": "验证码错误！",
+        "status": 1,
+        "type": "error"
+    },
+    "500106": {
+        "msg": "无法进行操作",
+        "status": 1,
+        "type": "error"
+    },
+    "500107": {
+        "msg": "默认数据不能操作",
+        "status": 1,
+        "type": "error"
+    },
+    "500108": {
+        "msg": "请求失败,该设备已被绑定！",
+        "status": 1,
+        "type": "error"
+    },
+    "500109": {
+        "msg": "请求失败,该设备数据异常！",
+        "status": 1,
+        "type": "error"
+    },
+    "503002": {
+        "msg": "系统Id不能为空！",
+        "status": 1,
+        "type": "error"
+    },
+    "503003": {
+        "msg": "注册失败！",
+        "status": 1,
+        "type": "error"
+    },
+    "503004": {
+        "msg": "登录失败！",
+        "status": 1,
+        "type": "error"
+    },
+    "503005": {
+        "msg": "发送短信失败！",
+        "status": 1,
+        "type": "error"
+    },
+    "503006": {
+        "msg": "发送短信过于频繁！",
+        "status": 1,
+        "type": "error"
+    },
+    "503007": {
+        "msg": "账号不能为空！",
+        "status": 1,
+        "type": "error"
+    },
+    "503008": {
+        "msg": "密码不能为空！",
+        "status": 1,
+        "type": "error"
+    },
+    "503009": {
+        "msg": "短信验证码不能为空！",
+        "status": 1,
+        "type": "error"
+    },
+    "503010": {
+        "msg": "手机号码不能为空！",
+        "status": 1,
+        "type": "error"
+    },
+    "503011": {
+        "msg": "微信授权登录失败！",
+        "status": 1,
+        "type": "error"
+    },
+    "503012": {
+        "msg": "微信未绑定用户！",
+        "status": 1,
+        "type": "error"
+    },
+    "503013": {
+        "msg": "手机号绑定失败！",
+        "status": 1,
+        "type": "error"
+    },
+    "503014": {
+        "msg": "手机号已经存在！",
+        "status": 1,
+        "type": "error"
+    },
+    "503015": {
+        "msg": "微信授权失败！",
+        "status": 1,
+        "type": "error"
+    },
+    "503016": {
+        "msg": "绑定微信失败！",
+        "status": 1,
+        "type": "error"
+    },
+    "503017": {
+        "msg": "手机号解绑失败！",
+        "status": 1,
+        "type": "error"
+    },
+    "503018": {
+        "msg": "该密码强度弱,请修改密码！",
+        "status": 1,
+        "type": "error"
+    },
+    "503019": {
+        "msg": "微信授权成功,请绑定手机号！",
+        "status": 1,
+        "type": "error"
+    }
+}

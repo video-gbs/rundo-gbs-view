@@ -1,0 +1,54 @@
+// 主题色
+// $theme: var(--theme, #D8711C);
+$theme: var(--theme, #1e56a0);
+$theme-1: var(--theme-1, #d8711c);
+$theme-2: var(--theme-2, #333);
+
+// header
+$headerBg: var(--headerBg, #fff);
+$headerText: var(--headerText, #333);
+
+// sidebar
+$menuBg: var(--menuBg, #fff);
+$menuText: var(--menuText, #333333);
+$menuHover: var(--menuHover, #e9f4ff);
+$menuActive: var(--menuActive, #e9f4ff);
+$menuActiveText: #1e56a0;
+
+$subMenuBg: var(--subMenuBg, #fff);
+$subMenuHover: var(--subMenuHover, #e9f4ff);
+$subMenuActiveText: #333333;
+
+$sideBarWidth: 13.75rem;
+
+// tags
+$tagBg: var(--tagBg, #fff);
+$tagText: var(--tagText, #333333);
+$tagActive: var(--tagActive, #e9f4ff);
+$tagActiveText: var(--tagActiveText, #333333);
+
+// main
+$mainBg: var(--mainBg, #eeeeee);
+// the :export directive is the magic sauce for webpack
+// https://www.bluematador.com/blog/how-to-share-variables-between-js-and-sass
+
+:export {
+  theme: $theme;
+  theme-1: $theme-1;
+  theme-2: $theme-2;
+  // themeColor: $theme;
+  // themeColorBg: $theme-2;
+  menuBg: $menuBg;
+  menuText: $menuText;
+  menuHover: $menuHover;
+  menuActiveText: $menuActiveText;
+  subMenuBg: $subMenuBg;
+  subMenuHover: $subMenuHover;
+  subMenuActiveText: $subMenuActiveText;
+  sideBarWidth: $sideBarWidth;
+  tagBg: $tagBg;
+  tagText: $tagText;
+  tagActive: $tagActive;
+  tagActiveText: $tagActiveText;
+  mainBg: $mainBg;
+}
