@@ -587,7 +587,7 @@ export default {
   .table-list {
     margin: 20px;
     padding: 20px;
-    height: calc(100% - 210px);
+    height: calc(100% - 200px);
     background: #ffffff;
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
