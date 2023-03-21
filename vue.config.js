@@ -32,7 +32,7 @@ const port = process.env.port || process.env.npm_config_port || 8080 // dev port
 const urls = [
   // test 测试
   {
-    target: 'http://124.71.21.11:8080',
+    target: 'http://124.71.21.11:8080/',
     proxy: '/api'
   },
   // dev  本地
@@ -54,7 +54,10 @@ function getProxys() {
         target: item.target,
         changeOrigin: true,
         pathRewrite: {
-          [`^` + item.proxy]: ''
+          //打包
+          // [`^` + item.proxy]: ''
+          //本地
+          [`^` + item.proxy]: item.proxy
         }
       }
     }

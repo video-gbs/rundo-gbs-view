@@ -139,7 +139,20 @@
         />
 
         <el-table-column prop="port" label="端口" width="80" />
-        <el-table-column prop="manufacturer" label="设备厂家" width="100" />
+        <el-table-column prop="manufacturer" label="设备厂家" width="100">
+          <template slot-scope="scope">
+            <span
+              v-for="item in equipmentCompanyOptionsList"
+              :key="item.value"
+              >{{
+                item.value.toLowerCase() ===
+                scope.row.manufacturer.toLowerCase()
+                  ? item.label
+                  : ''
+              }}</span
+            >
+          </template>
+        </el-table-column>
         <el-table-column prop="onlineState" label="状态" width="80">
           <template slot-scope="scope">
             <span
@@ -421,16 +434,19 @@ export default {
       ],
       areaNames: 'areaNames',
       idList: [],
-      dialogVideoAreaId: ''
+      dialogVideoAreaId: '',
+      equipmentCompanyOptionsList: []
     }
   },
   created() {
     this.params.pageNum = Local.get('encoderPageNum')
     Local.remove('encoderPageNum')
+
+    this.getDeviceTypesDictionaryList()
+    this.getDeviceTypesDictionaryList1()
   },
   mounted() {
     this.getList()
-    this.getDeviceTypesDictionaryList()
   },
   methods: {
     async getList(id) {
@@ -457,6 +473,18 @@ export default {
             obj.label = item.itemName
             obj.value = item.itemValue
             this.deviceTypesOptionsList.push(obj)
+          })
+        }
+      })
+    },
+    async getDeviceTypesDictionaryList1() {
+      await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
+        if (res.code === 0) {
+          res.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.equipmentCompanyOptionsList.push(obj)
           })
         }
       })

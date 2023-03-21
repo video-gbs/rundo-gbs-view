@@ -631,7 +631,7 @@ export default {
     margin: 20px;
     padding: 20px;
     background: #ffffff;
-    height: calc(100% - 210px);
+    height: calc(100% - 200px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
