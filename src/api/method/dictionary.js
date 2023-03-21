@@ -1,7 +1,7 @@
 // 字典管理
 import request from '@/api/fetch'
 
-const auth = '/api/auth'
+const auth = '/auth'
 
 export function getManufacturerDictionaryList(data) {
   // 网关列表

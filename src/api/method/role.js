@@ -1,7 +1,7 @@
 // 角色管理
 import request from '@/api/fetch'
 
-const rundoAuthServer = '/api/auth'
+const rundoAuthServer = '/auth'
 
 // 角色管理
 //列表

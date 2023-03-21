@@ -1,11 +1,11 @@
 // 实施监控
 import request from '@/api/fetch'
 
-const expansion = '/api/expserver/expansion'
+const expansion = '/expserver/expansion'
 
-const device = '/api/device-control'
+const device = '/device-control'
 
-const streamanege = '/api/stream-manage'
+const streamanege = '/stream-manage'
 
 export function getPlayLists(data) {
   // 网关列表

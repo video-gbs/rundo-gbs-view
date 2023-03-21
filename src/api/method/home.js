@@ -1,7 +1,7 @@
 // 首页管理
 import request from '@/api/fetch'
 
-const rundoAuthServer = '/api/auth'
+const rundoAuthServer = '/auth'
 
 export function getHomeLists(data) {
   // 权限树
