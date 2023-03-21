@@ -1,8 +1,8 @@
 // 模块管理
 import request from '@/api/fetch'
 
-const device = '/api/device-control'
-const streamanege = '/api/stream-manage'
+const device = '/device-control'
+const streamanege = '/stream-manage'
 
 export function getModuleLists(data) {
   // 网关列表

@@ -1,6 +1,6 @@
 import request from '@/api/fetch'
 
-const rundoAuthServer = '/api/auth'
+const rundoAuthServer = '/auth'
 
 export function login(data) {
   return request.post(`${rundoAuthServer}/user/login`, data)

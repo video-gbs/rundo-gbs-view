@@ -1,7 +1,7 @@
 import request from '@/api/fetch'
 
-const expansion = '/api/expserver/expansion'
-const device = '/api/device-control'
+const expansion = '/expserver/expansion'
+const device = '/device-control'
 // 编码器
 // 新增编码器
 export function addEncoder(params) {

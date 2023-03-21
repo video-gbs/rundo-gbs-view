@@ -1,6 +1,6 @@
 import request from '@/api/fetch'
 
-const auth = '/api/auth'
+const auth = '/auth'
 // 菜单管理
 // 新增菜单
 export function addMenuInfo(params) {

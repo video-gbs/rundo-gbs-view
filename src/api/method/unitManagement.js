@@ -1,7 +1,7 @@
 // 单位管理
 import request from '@/api/fetch'
 
-const rundoAuthServer = '/api/auth'
+const rundoAuthServer = '/auth'
 
 export function unitAdd(params) {
   // 新增
