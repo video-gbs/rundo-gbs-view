@@ -98,7 +98,7 @@
                   class="date"
                   v-model="formData.date"
                   type="date"
-                  :clearable="false"
+                  :clearable="true"
                   :picker-options="cloudDateOptions"
                   placeholder="请选择日期"
                 />
@@ -512,7 +512,7 @@ export default {
         }
       },
       showBackBtn: false,
-
+      resOnlineState: '',
       //缓存通道管理页面的数据
       SchannelId: this.$route.params.SchannelId,
       SchannelName: this.$route.params.SchannelName,
@@ -685,7 +685,8 @@ export default {
         })
     },
     async handleNodeClick(data, node, self) {
-      console.log(data)
+      console.log(222222, data, !data.onlineState)
+      this.resOnlineState = data.onlineState ? data.onlineState : ''
       if (!data.onlineState) {
         this.resArray = []
         if (this.detailsId.indexOf(data.id) !== -1) {
@@ -792,23 +793,35 @@ export default {
     },
     // 查询视频
     handleSearch() {
-      console.log('this.channelId', this.channelId)
-      if (this.channelId === '' && this.channelId.length === 0) {
-        this.$message({
-          message: '请选择节点',
-          type: 'warning'
-        })
-        return
-      } else if (this.formData.date === '' && this.formData.date.length === 0) {
-        this.$message({
-          message: '请选择时间',
-          type: 'warning'
-        })
-        return
-      } else {
+      console.log('this.channelId', this.channelId, this.formData.date)
+      if (this.channelId && this.channelId.length > 0) {
+        if (this.resOnlineState === 0) {
+          this.$message({
+            message: '设备离线',
+            type: 'warning'
+          })
+          return
+        }
+        if (
+          this.formData.date === '' ||
+          this.formData.date === null ||
+          this.formData.date === undefined
+        ) {
+          this.$message({
+            message: '请选择时间',
+            type: 'warning'
+          })
+          return
+        }
         this.formData.loading = true
 
         this.dateChange(this.formData.date)
+      } else {
+        this.$message({
+          message: '请选择设备节点',
+          type: 'warning'
+        })
+        return
       }
     },
     // 设备滚动控制放大缩小
