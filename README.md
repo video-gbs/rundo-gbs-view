@@ -1,21 +1,20 @@
-rundo-gbs-view
+# rundo-gbs-view
 
-Build Setup
-
-clone the project
+## Build Setup
+# clone the project
 git clone https://coding.runjian.com:12001/rundogbs/rundo-gbs-view.git
 
-install dependency
+# install dependency
 npm install
 
-develop
+# develop
 npm run dev
-This will automatically open http://localhost:8080
 
-Build
+This will automatically open http://localhost:9528
 
-build for test environment
+## Build
+# build for test environment
 npm run build:test
 
-build for dev environment
+# build for production environment
 npm run build
