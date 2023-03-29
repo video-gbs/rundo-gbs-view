@@ -5,7 +5,6 @@
         style="display: flex; flex-direction: column"
         class="monitoring-content-box"
       >
-        <!-- padding: 16px 24px 0px -->
         <div style="display: flex; flex-direction: row; height: 100%">
           <div class="left-tree" v-show="isShowMenu">
             <div class="equipment-group-wrapper">
@@ -16,7 +15,6 @@
                   class="real-time-monitoring"
                 >
                   <el-tab-pane label="安防" name="security" class="live-pane">
-                    <!-- <monitor-equipment-group :sendDevicePush="sendDevicePush" /> -->
                     <div class="securityArea_container">
                       <div class="tree-content">
                         <el-input
@@ -58,20 +56,6 @@
                                   :icon-class="getIconType(data)"
                                   class="tree2"
                                 />
-                                <!-- <svg-icon
-                                  v-else-if="
-                                    data.level === 2 ||
-                                    data.level === 3 ||
-                                    data.level === 4
-                                  "
-                                  icon-class="tree2"
-                                  class="tree2"
-                                />
-                                <svg-icon
-                                  v-else
-                                  icon-class="tree3"
-                                  class="tree3"
-                                /> -->
                                 {{ data.orgName || data.areaName }}
                               </span>
                             </span>
@@ -82,12 +66,7 @@
                   </el-tab-pane>
                 </el-tabs>
               </div>
-              <!-- v-show="
-                  playerData[playerIdx] &&
-                  Object.keys(playerData[playerIdx]).length !== 0
-              "-->
               <div class="equipment-group-wrapper-bottom">
-                <!-- <div class="equipment-group-wrapper-bottom"> -->
                 <div class="wrapper-bottom-header" @click="controlColla">
                   <div class="bottom-header-name">云台控制</div>
                   <transition name="el-zoom-in-center">
@@ -106,6 +85,7 @@
               </div>
             </div>
           </div>
+
           <div id="playerMain">
             <div
               ref="mainBox"
@@ -132,7 +112,7 @@
                   :class="fullPlayerIdx === i ? 'full-play-box' : ''"
                 >
                   <div v-if="!videoUrl[i - 1]" class="empty-player"></div>
-                  <div v-else class="player-box">
+                  <div v-else class="player-box" :ref="'videoBox' + i">
                     <player
                       :ref="'player' + i"
                       :videoUrl="videoUrl[i - 1]"
@@ -148,6 +128,27 @@
                       :stretch="isFill"
                       :hasAudio="hasAudio"
                     ></player>
+                    <div ref="rectArea" class="rect"></div>
+
+                    <div :ref="'videoZoom' + i" class="video-zoom">
+                      <div class="player-box-mini">
+                        <playerMini
+                          :ref="'player1' + i"
+                          :videoUrl="videoUrl[i - 1]"
+                          :deviceData="playerData[i - 1] || {}"
+                          fluent
+                          autoplay
+                          :height="true"
+                          :idx="'player1' + i"
+                          :index="i - 1"
+                          @screenshot="shot"
+                          @destroy="destroy"
+                          @close="closeVideo"
+                          :stretch="isFill"
+                          :hasAudio="hasAudio"
+                        ></playerMini>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -247,14 +248,6 @@
                                   : `${item.num}fenping`
                               "
                             />
-                            <!-- <i
-                              v-else
-                              class="iconfont btn"
-                              :class="[
-                                { active: item.num === spilt },
-                                item.class
-                              ]"
-                            /> -->
                           </div>
                         </el-dropdown-item>
                       </template>
@@ -288,6 +281,8 @@
 
 <script>
 import player from './components/flvjs.vue'
+import playerMini from './components/flvjsMini.vue'
+
 import PlayerTool from './components/playerTool.vue'
 import monitorEquipmentGroup from './components/monitorEquipmentGroup.vue'
 import cloudControl from './components/cloudControl.vue'
@@ -301,6 +296,7 @@ export default {
   name: 'live',
   components: {
     player,
+    playerMini,
     PlayerTool,
     monitorEquipmentGroup,
     cloudControl,
@@ -308,14 +304,43 @@ export default {
   },
   data() {
     return {
+      videoZoomShow: false,
+      videoShow: true,
+      videoZoomFlag: false,
+      player: {},
+      videoUrl: '',
+      // 视频播放窗口起始点位置
+      top: 0,
+      left: 0,
+      // 记录鼠标按下时的坐标
+      downX: 0,
+      downY: 0,
+      // 记录鼠标抬起时候的坐标
+      mouseX2: 0,
+      mouseY2: 0,
+      //拖拽选择框DOM元素
+      rect: null,
+      // 是否需要(允许)处理鼠标的移动事件,默认识不处理
+      select: false,
+      // 监控局部放大请求数据
+      rectInfo: {
+        videoWidth: 0,
+        videoHeight: 0,
+        rectWidth: 0,
+        rectHeight: 0,
+        rectCenterOffsetX: 0,
+        rectCenterOffsetY: 0
+      },
+      isBoxSelection: false,
       activeTab: 'security',
       showVideoDialog: true,
       hasAudio: false, //设置默认是否静音
       videoUrl: [''],
       showContent: true, // 展示面板内容
-      spilt: 1, //分屏
-      spiltIndex: 0,
-      isFill: false, //是否拉伸视频
+      spilt: 4, //分屏
+      spilt1: 4, //分屏
+      spiltIndex: 1,
+      isFill: true, //是否拉伸视频
       splitArr: [
         {
           num: 1,
@@ -436,10 +461,10 @@ export default {
       this.$refs.liveTree.filter(val)
     },
     videoActiveArr(n) {
-      console.log('nnnnn', n)
+      // console.log('nnnnn', n)
     },
     treeList(n) {
-      console.log('nnnnn', n)
+      // console.log('nnnnn', n)
       this.treeList = n
     },
     spilt(newValue) {
@@ -457,7 +482,24 @@ export default {
           }
         })
       }
-      window.localStorage.setItem('split', newValue)
+      window.localStorage.setItem('split1', newValue)
+    },
+    spilt1(newValue) {
+      console.log('切换画幅1;' + newValue)
+      let that = this
+      for (let i = 1; i <= newValue; i++) {
+        if (!that.$refs['player1' + i]) {
+          continue
+        }
+        this.$nextTick(() => {
+          if (that.$refs['player1' + i] instanceof Array) {
+            that.$refs['player1' + i][0].resize()
+          } else {
+            that.$refs['player1' + i].resize()
+          }
+        })
+      }
+      window.localStorage.setItem('split1', newValue)
     },
     '$route.fullPath': 'checkPlayByParam'
   },
@@ -479,9 +521,196 @@ export default {
           console.log(error)
         })
     },
-    changeHover(num, value) {
-      console.log(num, value)
 
+    //  为视频播放窗口初始化拉框放大功能
+    rectZoomInit(index) {
+      console.log('进入框选', index, this.$refs)
+      console.log('进入框选1', this.$refs[`videoBox${index}`])
+      this.$refs[`videoBox${index}`].addEventListener('mousedown', this.down)
+      this.$refs[`videoBox${index}`].addEventListener('mousemove', this.move)
+    },
+    // 鼠标按下
+    down($event) {
+      console.log('鼠标按下', $event)
+
+      if (!this.rect) {
+        // 获取鼠标按下时的坐标位置
+        this.downX = $event.clientX
+        this.downY = $event.clientY
+        // 鼠标按下时才允许处理鼠标的移动事件
+        this.select = true
+        this.rect = this.$refs[`rectArea${this.playerIdx}`]
+        // 播放器窗口离浏览器窗口顶部距离
+        this.top = this.$refs[`videoBox${index}`].getBoundingClientRect().top
+        // 播放器窗口离浏览器窗口左侧距离
+        this.left = this.$refs[`videoBox${index}`].getBoundingClientRect().left
+        // 获取播放器窗口大小
+        this.rectInfo.videoHeight = this.$refs[`videoBox${index}`].offsetHeight
+        this.rectInfo.videoWidth = this.$refs[`videoBox${index}`].offsetWidth
+        this.$refs[`videoBox${index}`].style.height =
+          this.rectInfo.videoHeight + 'px'
+        // 添加鼠标抬起事件
+        document.addEventListener('mouseup', this.up)
+      }
+    },
+    //  鼠标移动
+    move($event) {
+      if (this.select) {
+        // 获取鼠标移动时的坐标位置
+        this.mouseX2 = $event.clientX
+        this.mouseY2 = $event.clientY
+        // A(左上) part
+        if (this.mouseX2 < this.downX && this.mouseY2 < this.downY) {
+          this.rect.style.left = this.mouseX2 - this.left + 'px'
+          this.rect.style.top = this.mouseY2 - this.top + 'px'
+          this.videoZoomFlag = false
+        }
+        // B(右上) part
+        if (this.mouseX2 > this.downX && this.mouseY2 < this.downY) {
+          this.rect.style.left = this.downX - this.left + 'px'
+          this.rect.style.top = this.mouseY2 - this.top + 'px'
+          this.videoZoomFlag = false
+        }
+        // C(左下) part
+        if (this.mouseX2 < this.downX && this.mouseY2 > this.downY) {
+          this.rect.style.left = this.mouseX2 - this.left + 'px'
+          this.rect.style.top = this.downY - this.top + 'px'
+          this.videoZoomFlag = false
+        }
+        // D(右下) part
+        if (this.mouseX2 > this.downX && this.mouseY2 > this.downY) {
+          this.rect.style.left = this.downX - this.left + 'px'
+          this.rect.style.top = this.downY - this.top + 'px'
+          this.videoZoomFlag = true
+        }
+        // 选择框大小
+        this.rect.style.width = Math.abs(this.mouseX2 - this.downX) + 'px'
+        this.rect.style.height = Math.abs(this.mouseY2 - this.downY) + 'px'
+        // 选择框显示
+        this.rect.style.visibility = 'visible'
+      }
+    },
+    //  鼠标抬起
+    up() {
+      //鼠标抬起后不允许处理鼠标移动事件
+      this.select = false
+      if (this.rect.style.visibility !== 'hidden') {
+        //获取选择框大小
+        this.rectInfo.rectWidth = Math.abs(this.mouseX2 - this.downX)
+        this.rectInfo.rectHeight = Math.abs(this.mouseY2 - this.downY)
+        //获取选择框中心坐标
+        this.rectInfo.rectCenterOffsetX =
+          parseInt(this.rect.style.left) + this.rectInfo.rectWidth / 2
+        this.rectInfo.rectCenterOffsetY =
+          parseInt(this.rect.style.top) + this.rectInfo.rectHeight / 2
+        //框选区域大小按视频播放窗口宽高比转换使框选部分放大后显示不失真
+        let rectRate = this.rectInfo.rectWidth / this.rectInfo.rectHeight
+        let videoRate = this.rectInfo.videoWidth / this.rectInfo.videoHeight
+        if (rectRate < videoRate) {
+          // 处理框选部分宽高比小于播放窗口宽高比的情况
+          this.rectInfo.rectWidth = this.rectInfo.rectHeight * videoRate
+          if (this.rectInfo.rectCenterOffsetX < this.rectInfo.rectWidth / 2) {
+            // 框选部分在播放窗口左侧边缘的特
+            this.rectInfo.rectCenterOffsetX = this.rectInfo.rectWidth / 2
+          }
+          if (
+            this.rectInfo.rectCenterOffsetX + this.rectInfo.rectWidth / 2 >
+            this.rectInfo.videoWidth
+          ) {
+            //
+            this.rectInfo.rectCenterOffsetX =
+              this.rectInfo.videoWidth - this.rectInfo.rectWidth / 2
+          }
+        } else if (rectRate > videoRate) {
+          // 处理框选部分宽高比大于播放窗口宽高比的情况
+          this.rectInfo.rectHeight = this.rectInfo.rectWidth / videoRate
+          if (this.rectInfo.rectCenterOffsetY < this.rectInfo.rectHeight / 2) {
+            // 处理框选部分在播放窗口顶部边
+            this.rectInfo.rectCenterOffsetY = this.rectInfo.rectHeight / 2
+          }
+          if (
+            this.rectInfo.rectCenterOffsetY + this.rectInfo.rectHeight / 2 >
+            this.rectInfo.videoHeight
+          ) {
+            //
+            this.rectInfo.rectCenterOffsetY =
+              this.rectInfo.videoHeight - this.rectInfo.rectHeight / 2
+          }
+        }
+        //  处理视频
+        this.handleVideo()
+      }
+      //重置选择框
+      this.resetRect()
+    },
+    //  视频处理
+    handleVideo() {
+      if (
+        this.rectInfo.videoWidth / this.rectInfo.rectWidth <= 10 &&
+        this.videoZoomFlag
+      ) {
+        // 视频放大显示
+        // 放大倍数
+        let times = this.rectInfo.videoWidth / this.rectInfo.rectWidth
+        if (this.videoZoomShow) {
+          // 当前视频为放大后视频
+          // 视频放大后大小
+          this.$refs[`videoZoom${this.playerIdx}`].style.width =
+            this.$refs[`videoZoom${this.playerIdx}`].offsetWidth * times + 'px'
+          // 移动放大后视频使框选区域显示在原播放窗口
+          this.$refs[`videoZoom${this.playerIdx}`].style.top =
+            parseInt(this.$refs[`videoZoom${this.playerIdx}`].style.top) -
+            this.rectInfo.rectHeight
+          this.$refs[`videoZoom${this.playerIdx}`].style.left =
+            parseInt(this.$refs[`videoZoom${this.playerIdx}`].style.left) -
+            this.rectInfo.rectWidth
+        } else {
+          // 视频放大后大小
+          this.$refs[`videoZoom${this.playerIdx}`].style.width =
+            this.rectInfo.videoWidth * times + 'px'
+          // 移动放大后视频使框选区域显示在原播放窗口
+          this.$refs[`videoZoom${this.playerIdx}`].style.top = -(
+            this.rectInfo.rectCenterOffsetY -
+            this.rectInfo.rectHeight / 2
+          )
+          this.$refs[`videoZoom${this.playerIdx}`].style.left = -(
+            this.rectInfo.rectCenterOffsetX -
+            this.rectInfo.rectWidth / 2
+          )
+          //  隐藏原视频，显示放大后视频
+          this.videoShow = false
+          this.videoZoomShow = true
+        }
+      } else {
+        // 隐藏放大后视频，显示原视频
+        this.videoShow = true
+        this.videoZoomShow = false
+      }
+    },
+    //重置选择框
+    resetRect() {
+      document.removeEventListener('mouseup', this.up)
+      this.rect.style.visibility = 'hidden'
+      this.rect.style.width = '0px'
+      this.rect.style.height = '0px'
+      this.top = 0
+      this.left = 0
+      this.downX = 0
+      this.downY = 0
+      this.mouseX2 = 0
+      this.mouseY2 = 0
+      this.rect = null
+      this.rectInfo = {
+        videoWidth: 0,
+        videoHeight: 0,
+        rectWidth: 0,
+        rectHeight: 0,
+        rectCenterOffsetX: 0,
+        rectCenterOffsetY: 0
+      }
+    },
+
+    changeHover(num, value) {
       if (num === 1) {
         this.isMouseHover = true
         switch (value) {
@@ -652,9 +881,9 @@ export default {
                     if (data.id === '1') {
                       arr = this.resArray.concat(this.initData[0].children)
                     } else {
-                      console.log('else~~~~~~~~~~~~~~~~', data.children)
+                      // console.log('else~~~~~~~~~~~~~~~~', data.children)
 
-                      console.log('1~~~~~~~~~~~~~~~~', this.resArray)
+                      // console.log('1~~~~~~~~~~~~~~~~', this.resArray)
                       arr = data.children
                         ? this.resArray.concat(data.children)
                         : this.resArray
@@ -668,7 +897,7 @@ export default {
                       }, [])
                     }
 
-                    console.log('arr~~~~~~~~~~~~~~~', arr)
+                    // console.log('arr~~~~~~~~~~~~~~~', arr)
                     this.$refs.liveTree.updateKeyChildren(data.id, arr)
                     this.defaultExpandedKeys = [data.id]
                   }
@@ -806,17 +1035,20 @@ export default {
       // this.stopPlaying(this.playerData[i])
     },
     async getDeviceList(id) {
+      console.log(111111)
       Local.set('cloudId', id)
       await getPlayLists({ channelId: id })
         .then((res) => {
           if (res.code === 0) {
-            console.log(111111, res)
+            // console.log(111111, res)
 
             let idxTmp = this.playerIdx
             if (this.spilt - 1 > this.playerIdx) {
               this.playerIdx++
             }
             this.setPlayUrl(res.data.wsFlv, idxTmp)
+            const testNum = idxTmp + 1
+            this.rectZoomInit(testNum)
           }
         })
         .catch(function (error) {
@@ -924,6 +1156,7 @@ export default {
       console.log('url~~~~~~~~~', url)
       console.log('idx~~~~~~~~~', idx)
       this.$set(this.videoUrl, idx, url)
+
       setTimeout(() => {
         window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
       }, 100)
@@ -1086,6 +1319,61 @@ export default {
   }
 }
 
+// 滚动条大小设置
+::v-deep .wrapper-bottom-content::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .wrapper-bottom-content::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .wrapper-bottom-content::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .wrapper-bottom-content::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+// 去除滚动条上方多余显示
+::v-deep .el-table__header .has-gutter th.gutter {
+  display: none !important;
+}
+
+.video-zoom {
+  position: relative;
+}
+.video {
+  position: relative;
+  top: 50px;
+  left: 250px;
+  width: 70%;
+  overflow: hidden;
+}
+.rect {
+  position: absolute;
+  border: 2px solid red;
+  left: 0px;
+  top: 0px;
+  width: 0px;
+  height: 0px;
+  background-color: transparent;
+  visibility: hidden;
+  z-index: 100;
+}
+
+.video-zoom {
+  position: absolute;
+  width: 50%;
+  right: 1px;
+  bottom: 40px;
+}
 #playerMain {
   display: flex;
   flex-direction: column;
@@ -1206,6 +1494,7 @@ export default {
   height: 100%;
 }
 .player-box {
+  position: relative;
   background-color: transparent !important;
   height: 100%;
   width: 100%;

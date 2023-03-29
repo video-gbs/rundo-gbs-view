@@ -29,6 +29,89 @@
       </el-slider>
       <span class="text width25">{{ speed }}</span>
     </div>
+
+    <!--    按钮控制-->
+    <div class="cloudBtns-control">
+      <div class="cloudBtns-control-top">
+        <div class="cloudBtns-control-top-content">
+          <el-tooltip effect="dark" content="缩小" placement="top">
+            <svg-icon
+              class="cloudBtn"
+              :icon-class="!isCloudBtnsHover ? 'suofang-h' : 'suofang'"
+            />
+          </el-tooltip>
+
+          <span class="cloudBtns-control-top-line"></span>
+          <el-tooltip effect="dark" content="放大" placement="top">
+            <svg-icon
+              class="cloudBtn cloudBtn-right"
+              :icon-class="!isCloudBtnsHover ? 'fangda-h' : 'fangda'"
+            />
+          </el-tooltip>
+        </div>
+
+        <div class="cloudBtns-control-top-content">
+          <el-tooltip effect="dark" content="焦点拉进" placement="top">
+            <svg-icon
+              class="cloudBtn"
+              :icon-class="
+                !isCloudBtnsHover ? 'jiaodianlajin-h' : 'jiaodianlajin'
+              "
+            />
+          </el-tooltip>
+
+          <span class="cloudBtns-control-top-line"></span>
+          <el-tooltip effect="dark" content="焦点拉远" placement="top">
+            <svg-icon
+              class="cloudBtn cloudBtn-right"
+              :icon-class="
+                !isCloudBtnsHover ? 'jiaodianlayuan-h' : 'jiaodianlayuan'
+              "
+            />
+          </el-tooltip>
+        </div>
+
+        <div class="cloudBtns-control-top-content">
+          <el-tooltip effect="dark" content="光圈缩小" placement="top">
+            <svg-icon
+              class="cloudBtn"
+              :icon-class="
+                !isCloudBtnsHover ? 'guangquansuofang-h' : 'guangquansuofang'
+              "
+            />
+          </el-tooltip>
+
+          <span class="cloudBtns-control-top-line"></span>
+          <el-tooltip effect="dark" content="光圈放大" placement="top">
+            <svg-icon
+              class="cloudBtn cloudBtn-right"
+              :icon-class="
+                !isCloudBtnsHover ? 'guangquanfangda-h' : 'guangquanfangda'
+              "
+            />
+          </el-tooltip>
+        </div>
+      </div>
+
+      <div class="cloudBtns-control-bottom">
+        <div class="cloudBtns-control-content">
+          <el-tooltip effect="dark" content="一键聚焦" placement="top">
+            <svg-icon
+              class="cloudBtn"
+              :icon-class="!isCloudBtnsHover ? 'jujiao-h' : 'jujiao'"
+            />
+          </el-tooltip>
+
+          <span class="cloudBtns-control-line"></span>
+          <el-tooltip effect="dark" content="3D放大" placement="top">
+            <svg-icon
+              class="cloudBtn cloudBtn-right"
+              :icon-class="!isCloudBtnsHover ? '3Dfangda-h' : '3Dfangda'"
+            />
+          </el-tooltip>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -53,6 +136,7 @@ export default {
   props: ['deviceData'],
   data() {
     return {
+      isCloudBtnsHover: false,
       speed: 30, //云台控制速度
       hoverClass: '', //鼠标移动的位置
       DIRECTIONS_CLASS,
@@ -72,7 +156,7 @@ export default {
   methods: {
     // 鼠标在方向按键上
     handleHoverWheel(direction) {
-      console.log('direction~~~~~~~', direction)
+      // console.log('direction~~~~~~~', direction)
       this.hoverClass = direction
     },
     // 鼠标已开方向键
@@ -83,7 +167,7 @@ export default {
     ptzCamera(cmdCode) {
       // const { channelId } = this.deviceData
 
-      console.log('cmdCode~~~~~~~', cmdCode, Local.get('cloudId'))
+      // console.log('cmdCode~~~~~~~', cmdCode, Local.get('cloudId'))
       ptzControl({
         channelId: Local.get('cloudId'),
         cmdCode: this.status[cmdCode],
@@ -283,6 +367,71 @@ export default {
       &.bottom {
         left: calc(50% - 21px);
         bottom: 13px;
+      }
+    }
+  }
+}
+
+.cloudBtns-control {
+  .cloudBtns-control-top {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    .cloudBtns-control-top-content {
+      width: 96px;
+      height: 36px;
+      background: #ffffff;
+      border-radius: 4px;
+      border: 1px solid #ecf0f3;
+      display: flex;
+      justify-content: space-between;
+      .cloudBtn {
+        position: relative;
+        top: 5px;
+        left: 12px;
+        width: 24px;
+        height: 24px;
+      }
+      .cloudBtn-right {
+        left: -10px;
+      }
+      .cloudBtns-control-top-line {
+        display: inline-block;
+        position: relative;
+        top: 8px;
+        width: 1px;
+        height: 20px;
+        background: #ecf0f3;
+      }
+    }
+  }
+  .cloudBtns-control-bottom {
+    padding: 10px 20px;
+    .cloudBtns-control-content {
+      width: 100%;
+      height: 36px;
+      background: #ffffff;
+      border-radius: 4px;
+      border: 1px solid #ecf0f3;
+      display: flex;
+      justify-content: space-between;
+      .cloudBtn {
+        position: relative;
+        top: 5px;
+        left: 25%;
+        width: 24px;
+        height: 24px;
+      }
+      .cloudBtn-right {
+        left: -25%;
+      }
+      .cloudBtns-control-line {
+        display: inline-block;
+        position: relative;
+        top: 8px;
+        width: 1px;
+        height: 20px;
+        background: #ecf0f3;
       }
     }
   }

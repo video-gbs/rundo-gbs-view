@@ -326,6 +326,53 @@
                     :class="`iconfont icon-zishiying ${isFill ? 'active' : ''}`"
                   ></i>
                 </el-tooltip>
+                <div class="split-box">
+                  <el-dropdown placement="top">
+                    <span class="split-text">
+                      <svg-icon
+                        class="iconfont white"
+                        :icon-class="splitArr[spiltIndex].class"
+                      />
+
+                      <i class="el-icon-arrow-down iconArrow" />
+                      <!-- | -->
+                    </span>
+                    <el-dropdown-menu
+                      ref="dropdownMenu"
+                      slot="dropdown"
+                      class="dropmenu"
+                      :append-to-body="false"
+                    >
+                      <template v-for="(item, index) in splitArr">
+                        <el-dropdown-item :command="item" :key="item.num">
+                          <div
+                            @click="clickSpilt(item, index)"
+                            style="padding: 0 16px"
+                          >
+                            <svg-icon
+                              v-if="item.num === spilt"
+                              class="iconfont btn fenping"
+                              :icon-class="`${item.num}fenpinged`"
+                            />
+                            <svg-icon
+                              v-else
+                              class="iconfont btn fenping"
+                              @mouseenter="changeHover(1, item.num)"
+                              @mouseleave="changeHover(2, item.num)"
+                              :icon-class="
+                                !isMouseHover
+                                  ? `${item.num}fenping`
+                                  : index === isHoverNum
+                                  ? splitArr[isHoverNum].fenpinged
+                                  : `${item.num}fenping`
+                              "
+                            />
+                          </div>
+                        </el-dropdown-item>
+                      </template>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </div>
                 <el-tooltip
                   effect="dark"
                   :content="isFullScreen ? '退出全屏' : '全屏'"
@@ -424,6 +471,48 @@ export default {
   },
   data() {
     return {
+      spilt: 4, //分屏
+      spiltIndex: 1,
+      fullPlayerIdx: -1, //当前全屏的下标
+      isMouseHover: false,
+      splitArr: [
+        {
+          num: 1,
+          class: '1fenpingw',
+          fenpinged: '1fenpinged',
+          fenping: '1fenping'
+        },
+        {
+          num: 4,
+          class: '4fenpingw',
+          fenpinged: '4fenpinged',
+          fenping: '4fenping'
+        },
+        {
+          num: 6,
+          class: '6fenpingw',
+          fenpinged: '6fenpinged',
+          fenping: '6fenping'
+        },
+        {
+          num: 8,
+          class: '8fenpingw',
+          fenpinged: '8fenpinged',
+          fenping: '8fenping'
+        },
+        {
+          num: 9,
+          class: '9fenpingw',
+          fenpinged: '9fenpinged',
+          fenping: '9fenping'
+        },
+        {
+          num: 16,
+          class: '16fenpingw',
+          fenpinged: '16fenpinged',
+          fenping: '16fenping'
+        }
+      ],
       filterText: '',
       treeList: [],
       initDatas: [],
@@ -443,7 +532,7 @@ export default {
       cloudPlayTime: moment().startOf('days'),
       currentCloudList: '',
       isMuted: true, //音量
-      isFill: false, //是否拉伸视频
+      isFill: true, //是否拉伸视频
       isShowStream: false, //是否显示码流
       tracks: [],
       cloudPlay: false,
@@ -552,6 +641,65 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    // 点击分屏
+    clickSpilt(item, i) {
+      this.fullPlayerIdx = -1
+      this.spilt = item.num
+      this.spiltIndex = i
+    },
+    changeHover(num, value) {
+      console.log(num, value)
+
+      if (num === 1) {
+        this.isMouseHover = true
+        switch (value) {
+          case 16:
+            this.isHoverNum = 5
+            break
+          case 9:
+            this.isHoverNum = 4
+            break
+          case 8:
+            this.isHoverNum = 3
+            break
+          case 6:
+            this.isHoverNum = 2
+            break
+          case 4:
+            this.isHoverNum = 1
+            break
+          case 1:
+            this.isHoverNum = 0
+            break
+          default:
+            break
+        }
+      } else {
+        this.isMouseHover = false
+        switch (value) {
+          case 16:
+            this.isHoverNum = 5
+            break
+          case 9:
+            this.isHoverNum = 4
+            break
+          case 8:
+            this.isHoverNum = 3
+            break
+          case 6:
+            this.isHoverNum = 2
+            break
+          case 4:
+            this.isHoverNum = 1
+            break
+          case 1:
+            this.isHoverNum = 0
+            break
+          default:
+            break
+        }
+      }
     },
     filterNode(value, data) {
       console.log(11111111111, value, data)

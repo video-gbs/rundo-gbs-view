@@ -8,69 +8,17 @@
       width="100%"
       height="100%"
     ></video>
-    <div class="player-header">
-      <span class="head-left">{{
-        deviceData.sourceType
-          ? deviceData.selfChannelName
-          : deviceData.channelName
-      }}</span>
-      <div class="head-right">
-        <span>正在实时预览</span>
-        <i class="el-icon-close icon-close" @click="closeVideo"></i>
-      </div>
-    </div>
-    <DirectionControl :deviceData="deviceData" v-if="showControl" />
-    <playerTool
-      ref="playerTool"
-      :idx="idx"
-      :player="player"
-      :deviceData="deviceData"
-      :onOpenControl="handleOpenControl"
-      :showControl="showControl"
-      :isShowStream="isShowStream"
-      :onShowStream="handleShowStream"
-      :onBoxSelection="handBoxSelection"
-      :hasAudio="hasAudio"
-    ></playerTool>
-
-    <div class="trank" v-if="isShowStream">
-      <div
-        :key="index"
-        v-for="(item, index) in tracks"
-        style="width: 50%; float: left"
-        loading
-      >
-        <span>流 {{ index }}</span>
-        <div class="trankInfo" v-if="item.codec_type == 0">
-          <p>格式: {{ item.codec_id_name }}</p>
-          <p>类型: 视频</p>
-          <p>分辨率: {{ item.width }} x {{ item.height }}</p>
-          <p>帧率: {{ item.fps }}</p>
-        </div>
-        <div class="trankInfo" v-if="item.codec_type == 1">
-          <p>格式: {{ item.codec_id_name }}</p>
-          <p>类型: 音频</p>
-          <p>采样位数: {{ item.sample_bit }}</p>
-          <p>采样率: {{ item.sample_rate }}</p>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
-import PlayerTool from './playerTool.vue'
 import flvjs from 'flv.js'
-import DirectionControl from './DirectionControl'
 
 const IS_CONTROL_TYPES = [1, 4] //有云台功能的ptztype
 
 export default {
   name: 'jessibuca',
-  components: {
-    PlayerTool,
-    DirectionControl
-  },
+  components: {},
   data() {
     return {
       showControl: false,

@@ -121,9 +121,7 @@ export default {
       this.$refs.tree.filter(val)
     }
   },
-  mounted() {
-    console.log('this.$props.fatherId', this.$props.fatherId)
-  },
+  mounted() {},
   methods: {
     handleClose(done) {
       done()

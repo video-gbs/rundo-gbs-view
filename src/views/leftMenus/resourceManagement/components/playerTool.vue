@@ -16,6 +16,16 @@
     </div>
     <el-tooltip
       effect="dark"
+      :content="isBoxSelection ? '关闭框选放大' : '框选放大'"
+      placement="top"
+    >
+      <i
+        :class="`iconfont ${isShowStream ? 'active' : ''}`"
+        @click.stop="onBoxSelection"
+      ></i>
+    </el-tooltip>
+    <el-tooltip
+      effect="dark"
       :content="showControl ? '关闭云台控制器' : '打开云台控制器'"
       placement="top"
     >
@@ -69,6 +79,7 @@ export default {
       jessibuca: null,
       hasVoice: true, //播放声音
       recordIng: false, //正在录像
+      isBoxSelection: false,
       data: {}
     }
   },
@@ -80,7 +91,8 @@ export default {
     'showControl',
     'onShowStream',
     'isShowStream',
-    'hasAudio'
+    'hasAudio',
+    'onBoxSelection'
   ],
 
   mounted() {

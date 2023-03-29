@@ -2,11 +2,10 @@
   <!-- 云台控制 -->
   <div class="cloud-control-container">
     <DirectionControl :device-data="deviceData" />
-    <!-- <div class="control-operate-box">
+    <div class="control-operate-box">
       <div class="preliminary-position">
         <div class="position-title" style="margin-bottom: 0px">预置位</div>
-        <div class="position-control-panel">
-        </div>
+        <div class="position-control-panel"></div>
         <div class="position-preset">
           <div class="position-preset-middle">
             <div>
@@ -25,31 +24,41 @@
               </el-select>
             </div>
 
-            <el-button
-              type="primary"
-              size="small"
-              plain
-              @click="addPresetPosition()"
-              :disabled="nowPreset == ''"
-              >编辑</el-button
-            >
-            <el-button
-              :disabled="!presetEnable"
-              class="btn-call"
-              type="primary"
-              size="small"
-              plain
-              @click="presetPosition(130, presetPos)"
-              >调用</el-button
-            >
-            <el-button
-              :disabled="!presetEnable"
-              type="primary"
-              size="small"
-              plain
-              @click="presetPosition(131, presetPos)"
-              >删除</el-button
-            >
+            <div class="yuzhiwei-control-content">
+              <el-tooltip effect="dark" content="预置位播放" placement="top">
+                <svg-icon
+                  class="cloudBtn"
+                  @click="presetPosition(130, presetPos)"
+                  :icon-class="
+                    !isCloudBtnsHover ? 'yuzhiweibofang-h' : 'yuzhiweibofang'
+                  "
+                />
+              </el-tooltip>
+
+              <el-tooltip
+                effect="dark"
+                content="预置位名称修改"
+                placement="top"
+              >
+                <svg-icon
+                  class="cloudBtn cloudBtn-right"
+                  @click="addPresetPosition()"
+                  :icon-class="
+                    !isCloudBtnsHover ? 'yuzhiweixiugai-h' : 'yuzhiweixiugai'
+                  "
+                />
+              </el-tooltip>
+
+              <el-tooltip effect="dark" content="预置位删除" placement="top">
+                <svg-icon
+                  class="cloudBtn cloudBtn-right"
+                  @click="presetPosition(131, presetPos)"
+                  :icon-class="
+                    !isCloudBtnsHover ? 'yuzhiweishanchu-h' : 'yuzhiweishanchu'
+                  "
+                />
+              </el-tooltip>
+            </div>
           </div>
 
           <div class="preset-input-box" v-if="inputBoxDisplay">
@@ -75,7 +84,7 @@
           </div>
         </div>
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -88,6 +97,8 @@ export default {
   },
   data() {
     return {
+      isCloudBtnsHover: false,
+      isHoverNum: null,
       videoUrl: '',
       controSpeed: 30, //云台控制速度
       presetPos: 0,
@@ -123,6 +134,67 @@ export default {
     }
   },
   methods: {
+    changeHover(num, value) {
+      if (num === 1) {
+        switch (value) {
+          case 0:
+            this.isHoverNum = 0
+            break
+          case 1:
+            this.isHoverNum = 1
+            break
+          case 2:
+            this.isHoverNum = 2
+            break
+          case 3:
+            this.isHoverNum = 3
+            break
+          case 4:
+            this.isHoverNum = 4
+            break
+          case 5:
+            this.isHoverNum = 5
+            break
+          case 6:
+            this.isHoverNum = 6
+            break
+          case 7:
+            this.isHoverNum = 7
+            break
+          default:
+            break
+        }
+      } else {
+        switch (value) {
+          case 0:
+            this.isHoverNum = 0
+            break
+          case 1:
+            this.isHoverNum = 1
+            break
+          case 2:
+            this.isHoverNum = 2
+            break
+          case 3:
+            this.isHoverNum = 3
+            break
+          case 4:
+            this.isHoverNum = 4
+            break
+          case 5:
+            this.isHoverNum = 5
+            break
+          case 6:
+            this.isHoverNum = 6
+            break
+          case 7:
+            this.isHoverNum = 7
+            break
+          default:
+            break
+        }
+      }
+    },
     callPosition(deviceId, channelId) {
       this.$axios({
         method: 'post',
@@ -313,16 +385,15 @@ export default {
   padding-bottom: 20px;
 
   div {
-    width: 140px;
-    margin-right: 20px;
-    //  padding-top: 10px;
+    width: 178px;
+    height: 36px;
     .el-input--suffix .el-input__inner {
       padding-right: 30px;
       height: 32px;
       border-radius: 2px;
     }
     .el-select .el-input .el-select__caret {
-      display: none;
+      // display: none;
     }
   }
 }
@@ -334,11 +405,6 @@ export default {
     background: #fff !important;
   }
 }
-// .el-select-dropdown__item {
-//   line-height: 24px;
-//   font-family: PingFangSC-Regular, PingFang SC;
-//   overflow: hidden;
-// }
 .position-preset-middle .el-button--primary {
   height: 32px;
   font-size: 14px;
@@ -367,6 +433,20 @@ export default {
   .preset-span {
     float: left;
     padding-bottom: 8px;
+  }
+}
+.yuzhiwei-control-content {
+  width: 100%;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 20px;
+  .cloudBtn {
+    position: relative;
+    top: 5px;
+    left: 25px;
+    width: 24px;
+    height: 24px;
   }
 }
 </style>

@@ -490,7 +490,6 @@ export default {
       })
     },
     handleSelectionChange(data) {
-      console.log(data, 'handleSelectionChange')
       const resName = []
       if (data && data.length > 0) {
         data.map((item) => {
@@ -503,7 +502,6 @@ export default {
     },
     childClickHandle(data) {
       this.dialogVideoAreaId = data.id
-      console.log(data, 'childClickHandle')
     },
 
     dialogMove() {
