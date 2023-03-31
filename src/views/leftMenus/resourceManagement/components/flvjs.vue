@@ -31,6 +31,8 @@
       :onShowStream="handleShowStream"
       :onBoxSelection="handBoxSelection"
       :hasAudio="hasAudio"
+      v-bind="$attrs"
+      v-on="$listeners"
     ></playerTool>
 
     <div class="trank" v-if="isShowStream">
@@ -73,6 +75,7 @@ export default {
   },
   data() {
     return {
+      videoCover: {},
       showControl: false,
       jessibuca: null,
       playing: false,

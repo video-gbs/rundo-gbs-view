@@ -16,16 +16,6 @@
     </div>
     <el-tooltip
       effect="dark"
-      :content="isBoxSelection ? '关闭框选放大' : '框选放大'"
-      placement="top"
-    >
-      <i
-        :class="`iconfont ${isShowStream ? 'active' : ''}`"
-        @click.stop="onBoxSelection"
-      ></i>
-    </el-tooltip>
-    <el-tooltip
-      effect="dark"
       :content="showControl ? '关闭云台控制器' : '打开云台控制器'"
       placement="top"
     >
@@ -47,23 +37,36 @@
         @click.stop="onVoice"
       ></i>
     </el-tooltip>
-    <!--    <i :class="`iconfont icon-zhiboluzhi ${recordIng ? 'recording' : ''}`" @click="record"></i>-->
-    <el-tooltip effect="dark" content="放大" placement="top">
-      <i
-        class="iconfont icon-fangda"
-        @mousedown.stop="ptzCamera('zoomin')"
-        @mouseup.stop="ptzCamera('stop')"
-      >
-      </i>
+
+    <el-tooltip
+      v-if="isBoxSelection"
+      effect="dark"
+      content="放大"
+      placement="top"
+    >
+      <svg-icon
+        class="iconfont boxSelection-icon"
+        style="width: 24px; height: 24px"
+        icon-class="icon-fangda"
+        @click.stop="onBoxSelection(1)"
+      />
     </el-tooltip>
-    <el-tooltip effect="dark" content="缩小" placement="top">
+    <el-tooltip effect="dark" v-else content="再次点击取消" placement="top">
+      <svg-icon
+        class="iconfont boxSelection-icon"
+        style="width: 24px; height: 24px"
+        icon-class="fangda-active"
+        @click.stop="onBoxSelection(2)"
+      />
+    </el-tooltip>
+    <!-- <el-tooltip effect="dark" content="缩小" placement="top">
       <i
         class="iconfont icon-suoxiao"
         @mousedown.stop="ptzCamera('zoomout')"
         @mouseup.stop="ptzCamera('stop')"
       >
       </i>
-    </el-tooltip>
+    </el-tooltip> -->
     <!-- <i class="iconfont icon-xianshimaliuxinxi"></i> -->
     <!-- <span @click="jieping">截屏</span> -->
     <!-- <span @click="record">开始录像</span>
@@ -79,7 +82,7 @@ export default {
       jessibuca: null,
       hasVoice: true, //播放声音
       recordIng: false, //正在录像
-      isBoxSelection: false,
+      isBoxSelection: true,
       data: {}
     }
   },
@@ -92,7 +95,7 @@ export default {
     'onShowStream',
     'isShowStream',
     'hasAudio',
-    'onBoxSelection'
+    'boxSelectionNum'
   ],
 
   mounted() {
@@ -192,6 +195,21 @@ export default {
     onVoice() {
       this.hasVoice = !this.hasVoice
       this.video.muted = this.hasVoice
+    },
+    // 点击放大
+    onBoxSelection(value) {
+      this.isBoxSelection = !this.isBoxSelection
+      console.log(
+        'this.$props.rectAreaNum',
+        this.$props.boxSelectionNum,
+        this.$listeners,
+        value
+      )
+      if (value === 1) {
+        this.$listeners.showPlayerBoxMini(this.$props.boxSelectionNum, true)
+      } else {
+        this.$listeners.showPlayerBoxMini(this.$props.boxSelectionNum, false)
+      }
     }
   },
   destroyed() {
@@ -266,5 +284,12 @@ export default {
 }
 .player-box:hover .player-tool {
   display: flex;
+}
+.boxSelection-icon {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  top: -1px;
+  right: 8px;
 }
 </style>

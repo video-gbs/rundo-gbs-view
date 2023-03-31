@@ -136,7 +136,7 @@ export default {
   props: ['deviceData'],
   data() {
     return {
-      isCloudBtnsHover: false,
+      isCloudBtnsHover: true,
       speed: 30, //云台控制速度
       hoverClass: '', //鼠标移动的位置
       DIRECTIONS_CLASS,

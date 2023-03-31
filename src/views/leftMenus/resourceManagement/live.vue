@@ -112,7 +112,7 @@
                   :class="fullPlayerIdx === i ? 'full-play-box' : ''"
                 >
                   <div v-if="!videoUrl[i - 1]" class="empty-player"></div>
-                  <div v-else class="player-box" :ref="'videoBox' + i">
+                  <div v-else class="player-box" ref="videoBox">
                     <player
                       :ref="'player' + i"
                       :videoUrl="videoUrl[i - 1]"
@@ -127,10 +127,16 @@
                       @close="closeVideo"
                       :stretch="isFill"
                       :hasAudio="hasAudio"
+                      :boxSelectionNum="i - 1"
+                      @showPlayerBoxMini="showPlayerBoxMini"
                     ></player>
                     <div ref="rectArea" class="rect"></div>
 
-                    <div :ref="'videoZoom' + i" class="video-zoom">
+                    <div
+                      ref="videoZoom"
+                      class="video-zoom"
+                      v-show="isClicked[i]"
+                    >
                       <div class="player-box-mini">
                         <playerMini
                           :ref="'player1' + i"
@@ -320,6 +326,7 @@ export default {
       mouseY2: 0,
       //拖拽选择框DOM元素
       rect: null,
+      rectAreaNum: 0,
       // 是否需要(允许)处理鼠标的移动事件,默认识不处理
       select: false,
       // 监控局部放大请求数据
@@ -331,6 +338,7 @@ export default {
         rectCenterOffsetX: 0,
         rectCenterOffsetY: 0
       },
+      isClicked: [],
       isBoxSelection: false,
       activeTab: 'security',
       showVideoDialog: true,
@@ -422,7 +430,6 @@ export default {
   },
   mounted() {
     this.init()
-    // this.getDeviceList()
 
     document.addEventListener('fullscreenchange', (e) => {
       // 监听到屏幕变化，更改全屏状态，该页面不能存在多个全屏元素
@@ -438,10 +445,13 @@ export default {
         'securityArea_container'
       )[0].style.height = '680px'
     }
+
+    for (let i = 0; i < this.spilt; i++) {
+      this.isClicked[i] = false
+    }
+    console.log('init.isClicked', this.isClicked)
   },
-  created() {
-    // this.checkPlayByParam()
-  },
+  created() {},
 
   computed: {
     liveStyle() {
@@ -469,36 +479,26 @@ export default {
     },
     spilt(newValue) {
       console.log('切换画幅;' + newValue)
-      let that = this
+      // let that = this
+
+      this.isClicked = []
+      for (let i = 0; i < newValue; i++) {
+        this.isClicked[i] = false
+      }
       for (let i = 1; i <= newValue; i++) {
-        if (!that.$refs['player' + i]) {
+        if (!this.$refs['player' + i]) {
           continue
         }
         this.$nextTick(() => {
-          if (that.$refs['player' + i] instanceof Array) {
-            that.$refs['player' + i][0].resize()
+          if (this.$refs['player' + i] instanceof Array) {
+            // console.log(this.$refs,this.$refs['player' + i])
+            // this.$refs['player' + i][0].resize()
           } else {
-            that.$refs['player' + i].resize()
+            this.$refs['player' + i].resize()
           }
         })
       }
-      window.localStorage.setItem('split1', newValue)
-    },
-    spilt1(newValue) {
-      console.log('切换画幅1;' + newValue)
-      let that = this
-      for (let i = 1; i <= newValue; i++) {
-        if (!that.$refs['player1' + i]) {
-          continue
-        }
-        this.$nextTick(() => {
-          if (that.$refs['player1' + i] instanceof Array) {
-            that.$refs['player1' + i][0].resize()
-          } else {
-            that.$refs['player1' + i].resize()
-          }
-        })
-      }
+      console.log('this.isClicked', this.isClicked)
       window.localStorage.setItem('split1', newValue)
     },
     '$route.fullPath': 'checkPlayByParam'
@@ -525,9 +525,11 @@ export default {
     //  为视频播放窗口初始化拉框放大功能
     rectZoomInit(index) {
       console.log('进入框选', index, this.$refs)
-      console.log('进入框选1', this.$refs[`videoBox${index}`])
-      this.$refs[`videoBox${index}`].addEventListener('mousedown', this.down)
-      this.$refs[`videoBox${index}`].addEventListener('mousemove', this.move)
+
+      this.$nextTick(() => {
+        this.$refs.videoBox[index].addEventListener('mousedown', this.down)
+        this.$refs.videoBox[index].addEventListener('mousemove', this.move)
+      })
     },
     // 鼠标按下
     down($event) {
@@ -537,18 +539,26 @@ export default {
         // 获取鼠标按下时的坐标位置
         this.downX = $event.clientX
         this.downY = $event.clientY
+
         // 鼠标按下时才允许处理鼠标的移动事件
         this.select = true
-        this.rect = this.$refs[`rectArea${this.playerIdx}`]
+        this.rect = this.$refs.rectArea[this.rectAreaNum]
         // 播放器窗口离浏览器窗口顶部距离
-        this.top = this.$refs[`videoBox${index}`].getBoundingClientRect().top
+        this.top =
+          this.$refs.videoBox[this.rectAreaNum].getBoundingClientRect().top
         // 播放器窗口离浏览器窗口左侧距离
-        this.left = this.$refs[`videoBox${index}`].getBoundingClientRect().left
+
+        this.left =
+          this.$refs.videoBox[this.rectAreaNum].getBoundingClientRect().left
+
         // 获取播放器窗口大小
-        this.rectInfo.videoHeight = this.$refs[`videoBox${index}`].offsetHeight
-        this.rectInfo.videoWidth = this.$refs[`videoBox${index}`].offsetWidth
-        this.$refs[`videoBox${index}`].style.height =
+        this.rectInfo.videoHeight =
+          this.$refs.videoBox[this.rectAreaNum].offsetHeight
+        this.rectInfo.videoWidth =
+          this.$refs.videoBox[this.rectAreaNum].offsetWidth
+        this.$refs.videoBox[this.rectAreaNum].style.height =
           this.rectInfo.videoHeight + 'px'
+
         // 添加鼠标抬起事件
         document.addEventListener('mouseup', this.up)
       }
@@ -557,8 +567,12 @@ export default {
     move($event) {
       if (this.select) {
         // 获取鼠标移动时的坐标位置
-        this.mouseX2 = $event.clientX
-        this.mouseY2 = $event.clientY
+        this.mouseX2 = $event.pageX
+        this.mouseY2 = $event.pageY
+
+        // console.log('获取鼠标按下时的坐标位置~~~~~',this.downX, this.downY)
+        // console.log('获取鼠标移动时的坐标位置！！！！！',this.mouseX2, this.mouseY2)
+
         // A(左上) part
         if (this.mouseX2 < this.downX && this.mouseY2 < this.downY) {
           this.rect.style.left = this.mouseX2 - this.left + 'px'
@@ -598,26 +612,49 @@ export default {
         //获取选择框大小
         this.rectInfo.rectWidth = Math.abs(this.mouseX2 - this.downX)
         this.rectInfo.rectHeight = Math.abs(this.mouseY2 - this.downY)
+
+        console.log(
+          '获取选择框大小Width~~~~~~~~~~~~~`',
+          this.rectInfo.rectWidth
+        )
+        console.log(
+          '获取选择框大小Height~~~~~~~~~~~~~',
+          this.rectInfo.rectHeight
+        )
         //获取选择框中心坐标
         this.rectInfo.rectCenterOffsetX =
           parseInt(this.rect.style.left) + this.rectInfo.rectWidth / 2
+
+        console.log(
+          '获取选择框中心坐标X~~~~~~~~~~~~~`',
+          this.rectInfo.rectCenterOffsetX
+        )
         this.rectInfo.rectCenterOffsetY =
           parseInt(this.rect.style.top) + this.rectInfo.rectHeight / 2
+
+        console.log(
+          '获取选择框中心坐标Y~~~~~~~~~~~~~',
+          this.rectInfo.rectCenterOffsetY
+        )
         //框选区域大小按视频播放窗口宽高比转换使框选部分放大后显示不失真
         let rectRate = this.rectInfo.rectWidth / this.rectInfo.rectHeight
+
         let videoRate = this.rectInfo.videoWidth / this.rectInfo.videoHeight
+
+        console.log('获取播放窗口宽高比~~~~~~~~~~~~~', rectRate)
+
+        console.log('获取初始化播放窗口宽高比~~~~~~~~~~~~~', videoRate)
         if (rectRate < videoRate) {
           // 处理框选部分宽高比小于播放窗口宽高比的情况
           this.rectInfo.rectWidth = this.rectInfo.rectHeight * videoRate
           if (this.rectInfo.rectCenterOffsetX < this.rectInfo.rectWidth / 2) {
-            // 框选部分在播放窗口左侧边缘的特
+            // 框选部分在播放窗口左侧边缘
             this.rectInfo.rectCenterOffsetX = this.rectInfo.rectWidth / 2
           }
           if (
             this.rectInfo.rectCenterOffsetX + this.rectInfo.rectWidth / 2 >
             this.rectInfo.videoWidth
           ) {
-            //
             this.rectInfo.rectCenterOffsetX =
               this.rectInfo.videoWidth - this.rectInfo.rectWidth / 2
           }
@@ -645,46 +682,45 @@ export default {
     },
     //  视频处理
     handleVideo() {
-      if (
-        this.rectInfo.videoWidth / this.rectInfo.rectWidth <= 10 &&
-        this.videoZoomFlag
-      ) {
-        // 视频放大显示
-        // 放大倍数
-        let times = this.rectInfo.videoWidth / this.rectInfo.rectWidth
-        if (this.videoZoomShow) {
-          // 当前视频为放大后视频
-          // 视频放大后大小
-          this.$refs[`videoZoom${this.playerIdx}`].style.width =
-            this.$refs[`videoZoom${this.playerIdx}`].offsetWidth * times + 'px'
-          // 移动放大后视频使框选区域显示在原播放窗口
-          this.$refs[`videoZoom${this.playerIdx}`].style.top =
-            parseInt(this.$refs[`videoZoom${this.playerIdx}`].style.top) -
-            this.rectInfo.rectHeight
-          this.$refs[`videoZoom${this.playerIdx}`].style.left =
-            parseInt(this.$refs[`videoZoom${this.playerIdx}`].style.left) -
-            this.rectInfo.rectWidth
-        } else {
-          // 视频放大后大小
-          this.$refs[`videoZoom${this.playerIdx}`].style.width =
-            this.rectInfo.videoWidth * times + 'px'
-          // 移动放大后视频使框选区域显示在原播放窗口
-          this.$refs[`videoZoom${this.playerIdx}`].style.top = -(
-            this.rectInfo.rectCenterOffsetY -
-            this.rectInfo.rectHeight / 2
-          )
-          this.$refs[`videoZoom${this.playerIdx}`].style.left = -(
-            this.rectInfo.rectCenterOffsetX -
-            this.rectInfo.rectWidth / 2
-          )
-          //  隐藏原视频，显示放大后视频
-          this.videoShow = false
-          this.videoZoomShow = true
-        }
+      if (!this.videoZoomFlag) {
+        return
+      }
+      // 视频放大显示
+      // 放大倍数
+      let resMultiple = this.rectInfo.rectHeight / this.rectInfo.rectWidth
+      let initMultiple = this.rectInfo.videoHeight / this.rectInfo.videoWidth
+
+      console.log(resMultiple, initMultiple)
+
+      if (this.isClicked[this.rectAreaNum]) {
+        console.log(111111, this.rectAreaNum)
+        // 当前视频为放大后视频
+        // 视频放大后大小
+        this.$refs.videoBox[this.rectAreaNum].style.width =
+          (this.rectInfo.videoWidth * resMultiple) / initMultiple + 'px'
+        this.$refs.videoBox[this.rectAreaNum].style.height =
+          (this.rectInfo.videoHeight * resMultiple) / initMultiple + 'px'
+        // 移动放大后视频使框选区域显示在原播放窗口
+        this.$refs.videoBox[this.rectAreaNum].style.top =
+          parseInt(this.$refs.videoBox[this.rectAreaNum].style.top) -
+          this.rectInfo.rectHeight
+        this.$refs.videoBox[this.rectAreaNum].style.left =
+          parseInt(this.$refs.videoBox[this.rectAreaNum].style.left) -
+          this.rectInfo.rectWidth
       } else {
-        // 隐藏放大后视频，显示原视频
-        this.videoShow = true
-        this.videoZoomShow = false
+        console.log(22222, this.rectAreaNum)
+        // 视频放大后大小
+        this.$refs.videoBox[this.rectAreaNum].style.width =
+          this.rectInfo.videoWidth * times + 'px'
+        // 移动放大后视频使框选区域显示在原播放窗口
+        this.$refs.videoBox[this.rectAreaNum].style.top = -(
+          this.rectInfo.rectCenterOffsetY -
+          this.rectInfo.rectHeight / 2
+        )
+        this.$refs.videoBox[this.rectAreaNum].style.left = -(
+          this.rectInfo.rectCenterOffsetX -
+          this.rectInfo.rectWidth / 2
+        )
       }
     },
     //重置选择框
@@ -708,6 +744,19 @@ export default {
         rectCenterOffsetX: 0,
         rectCenterOffsetY: 0
       }
+    },
+
+    showPlayerBoxMini(val, showValue) {
+      console.log(val, 9999, showValue)
+      this.isClicked[val] = showValue
+      const videoZoomDom = document.getElementsByClassName('video-zoom')
+      if (showValue) {
+        videoZoomDom[val].style.display = 'block'
+      } else {
+        videoZoomDom[val].style.display = 'none'
+      }
+      this.rectZoomInit(val)
+      // console.log(this.isClicked)
     },
 
     changeHover(num, value) {
@@ -1043,12 +1092,13 @@ export default {
             // console.log(111111, res)
 
             let idxTmp = this.playerIdx
+
+            this.rectAreaNum = idxTmp
+            console.log(' this.rectAreaNum', this.rectAreaNum)
             if (this.spilt - 1 > this.playerIdx) {
               this.playerIdx++
             }
             this.setPlayUrl(res.data.wsFlv, idxTmp)
-            const testNum = idxTmp + 1
-            this.rectZoomInit(testNum)
           }
         })
         .catch(function (error) {
@@ -1358,7 +1408,7 @@ export default {
 }
 .rect {
   position: absolute;
-  border: 2px solid red;
+  border: 1px solid #ffd502;
   left: 0px;
   top: 0px;
   width: 0px;
@@ -1372,7 +1422,7 @@ export default {
   position: absolute;
   width: 50%;
   right: 1px;
-  bottom: 40px;
+  bottom: 60px;
 }
 #playerMain {
   display: flex;
