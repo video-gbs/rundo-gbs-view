@@ -25,7 +25,10 @@ export default {
     }
   },
   props: {
-    videoUrl: String,
+    videoUrl: {
+      type: Array,
+      default: () => []
+    },
     playbackRate: {
       type: Number,
       default: 1
@@ -91,7 +94,7 @@ export default {
       //   dom1.playbackRate = 4;
       // }, 3000);
       // dom && (dom.style.height = (9 / 16) * dom.clientWidth + "px");
-      if (typeof this.videoUrl == 'undefined') {
+      if (typeof this.videoUrl === 'undefined') {
         this.videoUrl = paramUrl
       }
       console.info('this.$refs.videoPlayer', this.$refs.videoPlayer)
@@ -156,7 +159,6 @@ export default {
       var dataURL = canvas.toDataURL('image/png') //将图片转成base64格式
       // document.getElementById("cutImage").appendChild(img);   //显示在页面中
       this.downFile(dataURL, '截图.jpg') //下载截图
-      // this.$refs.videoPlayer.snap()
     },
     //下载截图
     downFile(data, fileName) {

@@ -31,3 +31,20 @@ export function playStop(data) {
   // 关闭流
   return request.put(`${streamanege}/stream/north/play/stop`, data)
 }
+
+export function pauseRecordView(data) {
+  // 录像暂停
+  return request.put(`${expansion}/play/record/pause`, data)
+}
+export function resumeRecordView(data) {
+  // 录像恢复
+  return request.put(`${expansion}/play/record/resume`, data)
+}
+export function seekRecordView(data) {
+  // 录像拖拉
+  return request.put(`${expansion}/play/record/seek`, data)
+}
+export function speedRecordView(data) {
+  // 录像倍速
+  return request.put(`${expansion}/play/record/speed`, data)
+}

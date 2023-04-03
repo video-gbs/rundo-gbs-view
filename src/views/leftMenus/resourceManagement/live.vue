@@ -314,7 +314,6 @@ export default {
       videoShow: true,
       videoZoomFlag: false,
       player: {},
-      videoUrl: '',
       // 视频播放窗口起始点位置
       top: 0,
       left: 0,
