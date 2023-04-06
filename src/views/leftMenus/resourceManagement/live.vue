@@ -79,6 +79,8 @@
                     <cloud-control
                       :deviceData="playerData[playerIdx]"
                       :cloudId="cloudId"
+                      :showContent="videoUrl"
+                      :playerIdx="playerIdx"
                     />
                   </div>
                 </transition>
@@ -101,7 +103,7 @@
                   redborder: playerIdx == i - 1,
                   isFull: fullPlayerIdx !== -1
                 }"
-                @click="playerIdx = i - 1"
+                @click="videoClick(i)"
                 v-loading="playerData[i - 1] && !videoUrl[i - 1]"
                 element-loading-text="拼命加载中"
                 element-loading-background="transparent"
@@ -337,13 +339,14 @@ export default {
         rectCenterOffsetX: 0,
         rectCenterOffsetY: 0
       },
+      hasVideoUrl: [],
       isClicked: [],
       isBoxSelection: false,
       activeTab: 'security',
       showVideoDialog: true,
       hasAudio: false, //设置默认是否静音
       videoUrl: [''],
-      showContent: true, // 展示面板内容
+      showContent: false, // 展示面板内容
       spilt: 4, //分屏
       spilt1: 4, //分屏
       spiltIndex: 1,
@@ -435,22 +438,24 @@ export default {
       this.splitFullscreen = !this.splitFullscreen
     })
     this.$refs.dropdownMenuPlace.appendChild(this.$refs.dropdownMenu.popperElm)
-    if (document.documentElement.clientHeight < 800) {
-      document.getElementsByClassName(
-        'securityArea_container'
-      )[0].style.height = '540px'
-    } else {
-      document.getElementsByClassName(
-        'securityArea_container'
-      )[0].style.height = '680px'
-    }
-
+    // if (document.documentElement.clientHeight < 800) {
+    //   document.getElementsByClassName(
+    //     'securityArea_container'
+    //   )[0].style.height = '540px'
+    // } else {
+    //   document.getElementsByClassName(
+    //     'securityArea_container'
+    //   )[0].style.height = 'calc(100% - 30px)'
+    // }
+    this.videoUrl = []
     for (let i = 0; i < this.spilt; i++) {
       this.isClicked[i] = false
+      this.videoUrl[i] = ''
     }
-    console.log('init.isClicked', this.isClicked)
   },
-  created() {},
+  created() {
+    window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
+  },
 
   computed: {
     liveStyle() {
@@ -478,8 +483,22 @@ export default {
     },
     spilt(newValue) {
       console.log('切换画幅;' + newValue)
+      let resVideoUrl = []
       // let that = this
-
+      if (newValue < this.videoUrl.length) {
+        this.videoUrl = this.videoUrl.slice(0, newValue)
+        console.log('切换画幅小于之前', this.videoUrl)
+      } else if (newValue > this.videoUrl.length) {
+        for (let i = 0; i < newValue; i++) {
+          if (i >= this.videoUrl.length) {
+            resVideoUrl.push('')
+          }
+        }
+        this.videoUrl = this.videoUrl.concat(resVideoUrl)
+        console.log('切换画幅大于之前', this.videoUrl)
+      } else {
+        console.log('切换画幅等于之前', this.videoUrl)
+      }
       this.isClicked = []
       for (let i = 0; i < newValue; i++) {
         this.isClicked[i] = false
@@ -1098,11 +1117,11 @@ export default {
               this.playerIdx++
             }
             this.setPlayUrl(res.data.wsFlv, idxTmp)
+            this.hasVideoUrl = true
           }
         })
         .catch(function (error) {
           console.log(error)
-          // this.getDeviceListLoading = false
         })
     },
     // 切换播放器全屏
@@ -1281,6 +1300,10 @@ export default {
         }
       })
     },
+    videoClick(i) {
+      console.log('(~~~~~~~~~~~~~~~,', i, this.videoUrl)
+      this.playerIdx = i - 1
+    },
     // 放大缩小视频容器
     toogleVideo(i) {
       if (this.fullPlayerIdx === -1) {
@@ -1317,36 +1340,68 @@ export default {
     // 控制面板展开收起
     controlColla() {
       this.showContent = !this.showContent
-      if (!this.showContent) {
-        console.log(
-          'document.documentElement.clientHeight',
-          document.documentElement.clientHeight
-        )
-        if (document.documentElement.clientHeight < 800) {
-          document.getElementsByClassName(
-            'securityArea_container'
-          )[0].style.height = '840px'
-        } else {
-          document.getElementsByClassName(
-            'securityArea_container'
-          )[0].style.height = '960px'
-        }
-      } else {
-        if (document.documentElement.clientHeight < 800) {
-          document.getElementsByClassName(
-            'securityArea_container'
-          )[0].style.height = '540px'
-        } else {
-          document.getElementsByClassName(
-            'securityArea_container'
-          )[0].style.height = '680px'
-        }
-      }
+      // if (!this.showContent) {
+      //   console.log(
+      //     'document.documentElement.clientHeight',
+      //     document.documentElement.clientHeight
+      //   )
+      //   if (document.documentElement.clientHeight < 800) {
+      //     document.getElementsByClassName(
+      //       'securityArea_container'
+      //     )[0].style.height = '840px'
+      //   } else {
+      //     document.getElementsByClassName(
+      //       'securityArea_container'
+      //     )[0].style.height = '960px'
+      //   }
+      // } else {
+      //   if (document.documentElement.clientHeight < 800) {
+      //     document.getElementsByClassName(
+      //       'securityArea_container'
+      //     )[0].style.height = '540px'
+      //   } else {
+      //     document.getElementsByClassName(
+      //       'securityArea_container'
+      //     )[0].style.height = 'calc(100% - 30px)'
+      //   }
+      // }
     }
   }
 }
 </script>
 <style lang="scss" scoped>
+::v-deep .tree .el-tree-node__expand-icon.expanded {
+  -webkit-transform: rotate(0deg);
+  transform: rotate(0deg);
+}
+// 没有展开且有子节点
+::v-deep .tree .el-icon-caret-right:before {
+  background: url('~@/assets/imgs/treeOpen.png') no-repeat 0 0;
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  top: 1px;
+}
+// 已经展开且有子节点
+::v-deep .tree .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
+  background: url('~@/assets/imgs/treeClose.png') no-repeat 0 0;
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  top: 1px;
+}
+// 没有子节点
+::v-deep .tree .el-tree-node__expand-icon.is-leaf::before {
+  // background: url("~@/assets/imgs/tree+.png") no-repeat 0 3px;
+  content: '';
+  display: none;
+  width: 8px;
+  height: 8px;
+}
 ::v-deep .el-tabs__nav-scroll {
   &::after {
     display: none;
@@ -1366,6 +1421,28 @@ export default {
   &::after {
     display: none;
   }
+}
+// 滚动条大小设置
+::v-deep .real-time-monitoring > .el-tabs__content::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .real-time-monitoring > .el-tabs__content::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .real-time-monitoring > .el-tabs__content::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .real-time-monitoring > .el-tabs__content::-webkit-scrollbar-corner {
+  background-color: #111;
 }
 
 // 滚动条大小设置
@@ -1395,6 +1472,9 @@ export default {
   display: none !important;
 }
 
+::v-deep .el-tabs__content {
+  overflow-y: auto;
+}
 .video-zoom {
   position: relative;
 }
@@ -1419,7 +1499,7 @@ export default {
 
 .video-zoom {
   position: absolute;
-  width: 50%;
+  width: 40%;
   right: 1px;
   bottom: 60px;
 }
@@ -1577,6 +1657,7 @@ export default {
     .securityArea_container {
       width: 360px;
       margin-top: -15px;
+      padding-bottom: 20px;
       background: #ffffff;
       .tree {
         max-height: calc(100% - 90px);
@@ -1731,7 +1812,7 @@ export default {
   max-width: 480px;
   background-color: #fff;
   margin-right: 16px;
-  height: 100%;
+  // height: calc(100vh - 142px);
 }
 // .dropmenu{
 //   width: 70px;

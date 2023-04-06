@@ -1,10 +1,14 @@
 <template>
   <!-- 云台控制 -->
   <div class="cloud-control-container">
-    <DirectionControl :device-data="deviceData" />
+    <DirectionControl
+      :device-data="deviceData"
+      v-bind="$attrs"
+      v-on="$listeners"
+    />
     <div class="control-operate-box">
       <div class="preliminary-position">
-        <div class="position-title" style="margin-bottom: 0px">预置位</div>
+        <div class="position-title">预置位</div>
         <div class="position-control-panel"></div>
         <div class="position-preset">
           <div class="position-preset-middle">
@@ -349,6 +353,11 @@ export default {
 <style lang="scss">
 .cloud-control-container {
   position: relative;
+  .position-title {
+    margin-bottom: 0px;
+    border-bottom: 1px solid #e8e8e8;
+    padding-bottom: 10px;
+  }
 
   .direction-control {
     .steering-wheel {
