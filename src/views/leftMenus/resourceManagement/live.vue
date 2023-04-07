@@ -77,10 +77,15 @@
                 <transition name="el-fade-in-linear">
                   <div class="wrapper-bottom-content" v-show="showContent">
                     <cloud-control
+                      ref="cloudControl"
                       :deviceData="playerData[playerIdx]"
+                      :childOptionLists="childOptionLists"
+                      :channelExpansionId="channelExpansionId"
                       :cloudId="cloudId"
-                      :showContent="videoUrl"
+                      :showContentList="videoUrl"
                       :playerIdx="playerIdx"
+                      :showContent1="videoUrl"
+                      :playerIdx1="playerIdx"
                     />
                   </div>
                 </transition>
@@ -299,6 +304,7 @@ import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import { getPlayLists, getChannelPlayList } from '@/api/method/live'
 import { getVideoAraeTree } from '@/api/method/role'
 import { Local } from '@/utils/storage'
+import { ptzPresetLists } from '@/api/method/live'
 
 export default {
   name: 'live',
@@ -312,6 +318,7 @@ export default {
   },
   data() {
     return {
+      channelExpansionId: [],
       videoZoomShow: false,
       videoShow: true,
       videoZoomFlag: false,
@@ -427,7 +434,8 @@ export default {
       resArray: [],
       isMouseHover: false,
       isHoverNum: 0,
-      cloudId: null
+      cloudId: null,
+      childOptionLists: []
     }
   },
   mounted() {
@@ -451,6 +459,8 @@ export default {
     for (let i = 0; i < this.spilt; i++) {
       this.isClicked[i] = false
       this.videoUrl[i] = ''
+      this.childOptionLists[i] = []
+      this.channelExpansionId[i] = []
     }
   },
   created() {
@@ -484,18 +494,28 @@ export default {
     spilt(newValue) {
       console.log('切换画幅;' + newValue)
       let resVideoUrl = []
+      let resChildOptionLists = []
+      let resChannelExpansionId = []
       // let that = this
       if (newValue < this.videoUrl.length) {
         this.videoUrl = this.videoUrl.slice(0, newValue)
-        console.log('切换画幅小于之前', this.videoUrl)
+        this.childOptionLists = this.childOptionLists.slice(0, newValue)
+        this.channelExpansionId = this.channelExpansionId.slice(0, newValue)
+        console.log('切换画幅小于之前', this.videoUrl, this.childOptionLists)
       } else if (newValue > this.videoUrl.length) {
         for (let i = 0; i < newValue; i++) {
           if (i >= this.videoUrl.length) {
             resVideoUrl.push('')
+            resChildOptionLists.push([])
           }
         }
         this.videoUrl = this.videoUrl.concat(resVideoUrl)
-        console.log('切换画幅大于之前', this.videoUrl)
+        this.childOptionLists =
+          this.childOptionLists.concat(resChildOptionLists)
+        this.channelExpansionId = this.channelExpansionId.concat(
+          resChannelExpansionId
+        )
+        console.log('切换画幅大于之前', this.videoUrl, this.childOptionLists)
       } else {
         console.log('切换画幅等于之前', this.videoUrl)
       }
@@ -538,6 +558,17 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    async getPtzPresetLists(id, index) {
+      await ptzPresetLists({ channelExpansionId: id }).then((res) => {
+        if (res.code === 0) {
+          this.childOptionLists[index] = res.data
+
+          this.channelExpansionId[index] = id
+
+          // console.log(1111, this.childOptionLists)
+        }
+      })
     },
 
     //  为视频播放窗口初始化拉框放大功能
@@ -963,8 +994,6 @@ export default {
                         return item
                       }, [])
                     }
-
-                    // console.log('arr~~~~~~~~~~~~~~~', arr)
                     this.$refs.liveTree.updateKeyChildren(data.id, arr)
                     this.defaultExpandedKeys = [data.id]
                   }
@@ -977,6 +1006,7 @@ export default {
         }
       } else {
         this.getDeviceList(data.areaPid)
+        this.getPtzPresetLists(data.areaPid, this.playerIdx)
       }
     },
     //设置声音
@@ -1067,7 +1097,7 @@ export default {
       this.$on('closeAll')
       this.videoUrl = ['']
       this.playerData = []
-      // this.playerData.forEach(item => this.stopPlaying(item));
+      this.childOptionLists = []
     },
     destroy(idx) {
       console.log(idx)
@@ -1098,11 +1128,9 @@ export default {
       this.videoUrl.splice(i, 1, '')
       this.videoUrl = [...this.videoUrl]
       this.playerData = []
-      // this.playerData[i] = null;
-      // this.stopPlaying(this.playerData[i])
+      this.childOptionLists = []
     },
     async getDeviceList(id) {
-      console.log(111111)
       Local.set('cloudId', id)
       await getPlayLists({ channelId: id })
         .then((res) => {
@@ -1112,7 +1140,6 @@ export default {
             let idxTmp = this.playerIdx
 
             this.rectAreaNum = idxTmp
-            console.log(' this.rectAreaNum', this.rectAreaNum)
             if (this.spilt - 1 > this.playerIdx) {
               this.playerIdx++
             }
@@ -1155,7 +1182,6 @@ export default {
     sendDevicePush: function (itemData, index) {
       const { name } = itemData
       this.closeVideo(this.playerIdx)
-      // this.stopPlaying(this.playerData[this.playerIdx])
       if (index && this.videoActiveArr.includes(index)) {
         return
       }
@@ -1221,14 +1247,12 @@ export default {
         })
     },
     setPlayUrl(url, idx) {
-      console.log('url~~~~~~~~~', url)
-      console.log('idx~~~~~~~~~', idx)
       this.$set(this.videoUrl, idx, url)
 
       setTimeout(() => {
         window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
       }, 100)
-      console.log(window.localStorage, '存储的播放链接videoUrl')
+      this.showContent = true
     },
     checkPlayByParam() {
       let { deviceId, channelId } = this.$route.query
@@ -1301,7 +1325,11 @@ export default {
       })
     },
     videoClick(i) {
-      console.log('(~~~~~~~~~~~~~~~,', i, this.videoUrl)
+      console.log(i)
+      this.$refs.cloudControl.$refs.directionControl.changeType(
+        i - 1,
+        this.isClicked.length
+      )
       this.playerIdx = i - 1
     },
     // 放大缩小视频容器

@@ -166,7 +166,6 @@ export default {
   methods: {
     //获取码流信息
     getStreamInfo() {
-      console.log(this.deviceData)
       const { mediaServerId, app, stream } = this.deviceData
       if (mediaServerId && app && stream) {
         const that = this
@@ -217,7 +216,6 @@ export default {
     createVideo() {
       this.reconnectIng = true
       let that = this
-      console.log(that.flvPlayer, that.resVideoUrl, 11111111)
       if (that.flvPlayer) {
         that.flvPlayer.pause()
         that.flvPlayer.destroy()
@@ -297,7 +295,6 @@ export default {
       })
 
       that.flvPlayer.attachMediaElement(videoElement)
-      console.info('that.flvPlayer', that.flvPlayer)
       that.flvPlayer.load()
       that.flvPlayer.play()
       if (that.timerId !== null) {

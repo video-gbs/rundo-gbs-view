@@ -17,6 +17,35 @@ export function ptzControl(data) {
   return request.put(`${device}/channel/north/ptz/control`, data)
 }
 
+// 1.2通道云台控制
+export function ptzControl1(data) {
+  return request.put(`${expansion}/ptz/operation`, data)
+}
+
+// 预置位执行
+
+export function ptzPreset(data) {
+  return request.put(`${expansion}/ptz/preset/delete`, data)
+}
+
+// 预置位编辑
+
+export function ptzPresetEdit(data) {
+  return request.put(`${expansion}/ptz/preset/edit`, data)
+}
+
+// 预置位删除
+
+export function ptzPresetDelete(data) {
+  return request.delete1(`${expansion}/ptz/preset/delete`, data)
+}
+
+// 预置位查询
+
+export function ptzPresetLists(data) {
+  return request.get(`${expansion}/ptz/preset/select`, data)
+}
+
 // 获取通道
 export function getChannelPlayList(id) {
   return request.get(`${expansion}/channel/playList/?videoAreaId=${id}`)

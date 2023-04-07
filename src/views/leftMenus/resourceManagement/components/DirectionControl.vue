@@ -1,21 +1,33 @@
 <template>
   <div class="direction-control">
     <!--    方向盘-->
-    <div :class="`steering-wheel ${hoverClass}`">
+    <div
+      :class="`steering-wheel ${hoverClass}`"
+      v-if="initTopType[resPlayerIdx]"
+    >
       <div class="hover-arrow" />
       <div
         v-for="item in DIRECTIONS_CLASS"
         :key="item.command"
         :class="item.className"
         @mousedown="ptzCamera(item.command)"
-        @mouseup="ptzCamera('stop')"
+        @mouseup="ptzCameraStop(item.command)"
         @mouseout="handleMouseout"
         @mouseover="handleHoverWheel(item.className)"
       />
     </div>
 
+    <div :class="`steering-wheel-else ${hoverClass}`" v-else>
+      <div class="hover-arrow" />
+      <div
+        v-for="item in DIRECTIONS_CLASS"
+        :key="item.command"
+        :class="item.className"
+      />
+    </div>
+
     <!--    速度控制-->
-    <div class="speed-control">
+    <div class="speed-control" v-if="initTopType[resPlayerIdx]">
       <span class="text">速度</span>
       <el-slider
         class="el-slider-component"
@@ -23,8 +35,25 @@
         :step="1"
         :min="0"
         :max="255"
-        :show-tooltip="false"
         @change="$emit('change-speed')"
+        :show-tooltip="false"
+      >
+      </el-slider>
+      <span class="text width25">{{ speed }}</span>
+    </div>
+
+    <!--    速度控制-->
+    <div class="speed-control-else" v-else>
+      <span class="text">速度</span>
+      <el-slider
+        class="el-slider-component"
+        v-model="speed"
+        :step="1"
+        :min="0"
+        :max="255"
+        disabled
+        @change="$emit('change-speed')"
+        :show-tooltip="false"
       >
       </el-slider>
       <span class="text width25">{{ speed }}</span>
@@ -41,10 +70,10 @@
           <el-tooltip effect="dark" :content="item.showName1" placement="top">
             <svg-icon
               :class="
-                initTopType[[resPlayerIdx]] ? 'cloudBtn' : 'cloudBtnDisable'
+                initTopType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
               "
               :icon-class="
-                initTopType[[resPlayerIdx]]
+                initTopType[resPlayerIdx]
                   ? !isTopHover
                     ? getIconClass(item.showName1, index)
                     : getHoverIconClass(item.showName1, index)
@@ -59,7 +88,9 @@
           <el-tooltip effect="dark" :content="item.showName2" placement="top">
             <svg-icon
               class="cloudBtn-right"
-              :class="!initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'"
+              :class="
+                initTopType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
+              "
               :icon-class="
                 initTopType[resPlayerIdx]
                   ? !isTopHover
@@ -78,9 +109,9 @@
         <div class="cloudBtns-control-content">
           <el-tooltip effect="dark" content="一键聚焦" placement="top">
             <svg-icon
-              :class="!initType ? 'cloudBtn' : 'cloudBtnDisable'"
+              :class="initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'"
               :icon-class="
-                !initType
+                initType[resPlayerIdx]
                   ? isJujiaoHover
                     ? 'jujiao-h'
                     : 'jujiao'
@@ -95,9 +126,9 @@
           <el-tooltip effect="dark" content="3D放大" placement="top">
             <svg-icon
               class="cloudBtn-right"
-              :class="!initType ? 'cloudBtn' : 'cloudBtnDisable'"
+              :class="initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'"
               :icon-class="
-                !initType
+                initType[resPlayerIdx]
                   ? is3DHover
                     ? '3Dfangda-h'
                     : '3Dfangda'
@@ -126,12 +157,12 @@ export const DIRECTIONS_CLASS = [
   { className: 'bottom-right', command: 'downright' }
 ]
 
-import { ptzControl } from '@/api/method/live'
+import { ptzControl, ptzControl1 } from '@/api/method/live'
 import { Local } from '@/utils/storage'
 
 export default {
   name: 'DirectionControl',
-  props: ['deviceData', 'showContent', 'playerIdx'],
+  props: ['deviceData', 'showContentList', 'playerIdx'],
   data() {
     return {
       isHoverNum: 0,
@@ -156,7 +187,7 @@ export default {
       initTopType: [],
       resPlayerIdx: 0,
       hoverNum: 0,
-      initType: true,
+      initType: [],
       speed: 30, //云台控制速度
       hoverClass: '', //鼠标移动的位置
       DIRECTIONS_CLASS,
@@ -170,29 +201,51 @@ export default {
         upright: 9,
         downleft: 6,
         downright: 5,
-        stop: 0
+        pztstop: 0,
+        fstop: 40
       }
     }
   },
   watch: {
-    showContent(val) {
-      console.log('~~~~~~~', val)
+    showContentList(val) {
       this.resShowContent = val
+
+      if (
+        this.resShowContent.length > 1 &&
+        this.resShowContent.length - 1 === val &&
+        this.resShowContent[this.resShowContent.length - 1] !== ''
+      ) {
+        // this.$nextTick(() => {
+        this.initTopType[this.resShowContent.length - 1] = true
+        this.initType[this.resShowContent.length - 1] = true
+
+        // })
+      }
     },
     playerIdx(val) {
-      console.log('~~~~~~~resPlayerIdx', val)
       this.resPlayerIdx = val
+
       this.resShowContent.map((item, index) => {
         if (item && item !== '' && item.length > 0) {
-          this.topBtnLists.map((item, j) => {
-            if (index === this.resPlayerIdx) {
-              console.log('chang')
-              this.initTopType[this.resPlayerIdx] = true
-            } else {
-              console.log('changelse')
-              this.initTopType[this.resPlayerIdx] = false
-            }
-          })
+          // this.topBtnLists.map((item, j) => {
+          // if (index === this.resPlayerIdx) {
+          this.initTopType[index] = true
+          this.initType[index] = true
+        } else {
+          this.initTopType[index] = false
+          this.initType[index] = false
+
+          if (
+            this.resShowContent.length > 1 &&
+            this.resShowContent.length - 1 === val &&
+            this.resShowContent[this.resShowContent.length - 1] !== ''
+          ) {
+            // this.$nextTick(() => {
+            this.initTopType[this.resShowContent.length - 1] = true
+            this.initType[this.resShowContent.length - 1] = true
+
+            // })
+          }
         }
       })
     },
@@ -201,17 +254,29 @@ export default {
   },
 
   created() {
-    this.resShowContent = Local.get('videoUrl') || this.$props.showContent
+    this.resShowContent = Local.get('videoUrl') || this.$props.showContentList
 
     this.resPlayerIdx = this.$props.playerIdx
-
     this.initTopType = []
-    for (let i = 0; i < this.$props.showContent; i++) {
+    this.initType = []
+    for (let i = 0; i < this.$props.showContentList.length; i++) {
       this.initTopType[i] = false
+      this.initType[i] = false
     }
   },
   mounted() {},
   methods: {
+    changeType(i, splitNum) {
+      if (splitNum === 1) {
+        this.initTopType = []
+        this.initType = []
+        this.initTopType[i] = true
+        this.initType[i] = true
+      } else {
+        this.initTopType[i] = true
+        this.initType[i] = true
+      }
+    },
     getInitIconClass(value, index) {
       switch (index) {
         case 0:
@@ -240,7 +305,6 @@ export default {
       }
     },
     getHoverIconClass(item, k) {
-      console.log(item, this.hoverNum)
       switch (this.hoverNum) {
         case 1:
           switch (item) {
@@ -391,7 +455,6 @@ export default {
       }
     },
     getIconClass(item, j) {
-      console.log(333)
       switch (j) {
         case 0:
           if (item === '缩小') {
@@ -500,13 +563,17 @@ export default {
       // const { channelId } = this.deviceData
 
       // console.log('cmdCode~~~~~~~', cmdCode, Local.get('cloudId'))
-      ptzControl({
-        channelId: Local.get('cloudId'),
-        cmdCode: this.status[cmdCode],
-        horizonSpeed: this.speed,
-        verticalSpeed: this.speed,
-        zoomSpeed: this.speed,
-        totalSpeed: this.speed
+      ptzControl1({
+        channelExpansionId: Local.get('cloudId'),
+        ptzOperationType: this.status[cmdCode],
+        operationValue: this.speed
+      })
+    },
+    ptzCameraStop(cmdCode) {
+      ptzControl1({
+        channelExpansionId: Local.get('cloudId'),
+        ptzOperationType: 40,
+        operationValue: this.speed
       })
     }
   }
@@ -567,11 +634,195 @@ export default {
       width: 25px;
     }
   }
+  .speed-control-else {
+    width: 214px;
+    height: 46px;
+    // margin-left: -7px;
+    margin: 24px auto 2px;
+    // background: rgba(16, 85, 189, 0.3);
+    border-radius: 8px 8px 8px 8px;
+    opacity: 1;
+    margin-top: 16px;
+    padding: 12px 24px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .el-slider-component {
+      width: 82px;
+      height: 6px;
+
+      .el-slider__runway {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 3px 3px 3px 3px;
+        margin: 0;
+      }
+
+      .el-slider__button {
+        display: none;
+      }
+
+      .el-slider__bar {
+        border-radius: 3px;
+      }
+    }
+
+    // &:hover .el-slider__button {
+    //   display: inline-block !important;
+    // }
+
+    .el-slider__bar {
+      background-color: #ccc !important;
+    }
+
+    .text {
+      font-size: 14px;
+      font-family: PingFang SC-Regular, PingFang SC;
+      font-weight: 400;
+      color: #ccc;
+      line-height: 22px;
+    }
+    .width25 {
+      width: 25px;
+    }
+  }
 
   .front-wheel {
     display: grid;
     grid-auto-columns: 60px;
     grid-auto-rows: 100px;
+  }
+  .steering-wheel-else {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    margin: 24px auto 2px;
+
+    &::before {
+      content: ' ';
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: url('../../../../assets/imgs/ctrl_bg1.png') no-repeat;
+      background-size: cover;
+      opacity: 0.1;
+      z-index: -1;
+
+      cursor: not-allowed;
+    }
+    &:active .hover-arrow {
+      opacity: 0.8;
+    }
+
+    .hover-arrow {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 200px;
+      height: 200px;
+      background: url('../../../../assets/imgs/ctrl_right_arrow.png') no-repeat;
+      background-size: cover !important;
+      opacity: 0.6;
+      z-index: 0;
+    }
+
+    &::after {
+      display: block;
+      content: ' ';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 200px;
+      height: 200px;
+      background: url('../../../../assets/imgs/ctrl_bg2.png') no-repeat;
+      background-size: cover !important;
+      opacity: 0.3;
+    }
+
+    &.top .hover-arrow {
+      display: block;
+    }
+    &.right .hover-arrow {
+      display: block;
+      transform: rotateZ(90deg);
+    }
+    &.left .hover-arrow {
+      display: block;
+      transform: rotateZ(-90deg);
+    }
+    &.bottom .hover-arrow {
+      display: block;
+      transform: rotateZ(180deg);
+    }
+    &.bottom-left .hover-arrow {
+      display: block;
+      background: url('../../../../assets/imgs/ctrl_top_right_arrow.png')
+        no-repeat;
+      transform: rotateZ(180deg);
+    }
+    &.bottom-right .hover-arrow {
+      display: block;
+      background: url('../../../../assets/imgs/ctrl_top_right_arrow.png')
+        no-repeat;
+      transform: rotateZ(90deg);
+    }
+    &.top-left .hover-arrow {
+      display: block;
+      background: url('../../../../assets/imgs/ctrl_top_right_arrow.png')
+        no-repeat;
+      transform: rotateZ(-90deg);
+    }
+    &.top-right .hover-arrow {
+      display: block;
+      background: url('../../../../assets/imgs/ctrl_top_right_arrow.png')
+        no-repeat;
+    }
+
+    & > div {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      //background: rgba(255,255,255,.5); //调试
+      cursor: pointer;
+      z-index: 1;
+
+      //按键方向
+      &.top-left {
+        top: 37px;
+        left: 37px;
+      }
+      &.top-right {
+        top: 37px;
+        right: 37px;
+      }
+      &.bottom-left {
+        bottom: 37px;
+        left: 37px;
+      }
+      &.bottom-right {
+        bottom: 37px;
+        right: 37px;
+      }
+      &.left {
+        top: calc(50% - 21px);
+        left: 13px;
+      }
+      &.right {
+        top: calc(50% - 21px);
+        right: 13px;
+      }
+      &.top {
+        left: calc(50% - 21px);
+        top: 13px;
+      }
+      &.bottom {
+        left: calc(50% - 21px);
+        bottom: 13px;
+      }
+    }
   }
 
   .steering-wheel {

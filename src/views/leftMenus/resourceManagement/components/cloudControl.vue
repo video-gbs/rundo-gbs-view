@@ -2,6 +2,7 @@
   <!-- 云台控制 -->
   <div class="cloud-control-container">
     <DirectionControl
+      ref="directionControl"
       :device-data="deviceData"
       v-bind="$attrs"
       v-on="$listeners"
@@ -19,10 +20,10 @@
                 @change="handleChange"
               >
                 <el-option
-                  v-for="item in presetList"
-                  :key="item.preset"
-                  :value="item.preset"
-                  style="height: 24px"
+                  v-for="item in optionLists"
+                  :key="item.presetId"
+                  :value="item.presetId"
+                  :label="item.presetName"
                 >
                 </el-option>
               </el-select>
@@ -31,11 +32,19 @@
             <div class="yuzhiwei-control-content">
               <el-tooltip effect="dark" content="预置位播放" placement="top">
                 <svg-icon
-                  class="cloudBtn"
                   @click="presetPosition(130, presetPos)"
-                  :icon-class="
-                    !isCloudBtnsHover ? 'yuzhiweibofang-h' : 'yuzhiweibofang'
+                  :class="
+                    initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
                   "
+                  :icon-class="
+                    initType[resPlayerIdx]
+                      ? isBofangHover
+                        ? 'yuzhiweibofang-h'
+                        : 'yuzhiweibofang'
+                      : 'yuzhiweibofanghidden'
+                  "
+                  @mouseenter="changeHover(1, '移入')"
+                  @mouseleave="changeHover(1, '移出')"
                 />
               </el-tooltip>
 
@@ -45,21 +54,41 @@
                 placement="top"
               >
                 <svg-icon
-                  class="cloudBtn cloudBtn-right"
+                  class="cloudBtn-right"
                   @click="addPresetPosition()"
-                  :icon-class="
-                    !isCloudBtnsHover ? 'yuzhiweixiugai-h' : 'yuzhiweixiugai'
+                  :class="
+                    initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
                   "
+                  :icon-class="
+                    initType[resPlayerIdx]
+                      ? isXiugaiHover
+                        ? 'yuzhiweixiugai-h'
+                        : 'yuzhiweixiugai'
+                      : 'yuzhiweixiugaihidden'
+                  "
+                  @mouseenter="changeHover(2, '移入')"
+                  @mouseleave="changeHover(2, '移出')"
                 />
               </el-tooltip>
 
               <el-tooltip effect="dark" content="预置位删除" placement="top">
                 <svg-icon
-                  class="cloudBtn cloudBtn-right"
-                  @click="presetPosition(131, presetPos)"
-                  :icon-class="
-                    !isCloudBtnsHover ? 'yuzhiweishanchu-h' : 'yuzhiweishanchu'
+                  class="cloudBtn-right"
+                  @click="
+                    initType[resPlayerIdx] ? deletePreset(131, presetPos) : ''
                   "
+                  :class="
+                    initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
+                  "
+                  :icon-class="
+                    initType[resPlayerIdx]
+                      ? isShanchuHover
+                        ? 'yuzhiweishanchu-h'
+                        : 'yuzhiweishanchu'
+                      : 'yuzhiweishanchuhidden'
+                  "
+                  @mouseenter="changeHover(3, '移入')"
+                  @mouseleave="changeHover(3, '移出')"
                 />
               </el-tooltip>
             </div>
@@ -94,6 +123,12 @@
 
 <script>
 import DirectionControl from './DirectionControl'
+import {
+  ptzPresetLists,
+  ptzPresetDelete,
+  ptzPresetEdit,
+  ptzPreset
+} from '@/api/method/live'
 export default {
   name: 'cloudControl',
   components: {
@@ -101,6 +136,15 @@ export default {
   },
   data() {
     return {
+      resChannelId: '',
+      optionLists: [],
+      resShowContent: [],
+      isBofangHover: false,
+      isXiugaiHover: false,
+      isShanchuHover: false,
+      resPlayerIdx: 0,
+      hoverNum: 0,
+      initType: [],
       isCloudBtnsHover: false,
       isHoverNum: null,
       videoUrl: '',
@@ -115,105 +159,92 @@ export default {
       presetEnable: false //是否禁用删除或调用
     }
   },
-  props: {
-    deviceData: Object
-  },
-  mounted() {
-    // setTimeout(() => {
-    //   this.queryPreset();
-    // }, 0);
-    // this.$bus.$on("ptzCamera", (type) => {
-    //   console.info("bus.type", type);
-    //   this.ptzCamera(type);
-    // });
-  },
-  watch: {
-    deviceData: {
-      deep: true,
-      handler(newVal, oldVal) {
-        if (newVal.deviceID) {
-          this.queryPreset(newVal)
-        }
-      }
+  props: [
+    'deviceData',
+    'showContent1',
+    'playerIdx1',
+    'childOptionLists',
+    'channelExpansionId'
+  ],
+  created() {
+    this.resShowContent = this.$props.showContent1
+
+    this.resPlayerIdx = this.$props.playerIdx1
+
+    this.optionLists = this.$props.childOptionLists[this.$props.playerIdx1]
+
+    this.resChannelId = this.$props.channelExpansionId[this.$props.playerIdx1]
+
+    console.log(111111, this.$props.playerIdx1, this.$props.showContent1)
+    this.initType = []
+    for (let i = 0; i < this.$props.showContent1.length; i++) {
+      this.initType[i] = false
     }
+  },
+  mounted() {},
+  watch: {
+    showContent1(val) {
+      this.resShowContent = val
+    },
+    playerIdx1(val) {
+      // console.log(1111,val)
+      this.optionLists = this.$props.childOptionLists[val]
+      this.resChannelId = this.$props.channelExpansionId[val]
+
+      this.resPlayerIdx = val
+      this.resShowContent.map((item, index) => {
+        if (item && item !== '' && item.length > 0) {
+          if (index === this.resPlayerIdx) {
+            this.initType[this.resPlayerIdx] = true
+          } else {
+            this.initType[this.resPlayerIdx] = false
+          }
+        }
+      })
+    },
+    deep: true,
+    immediate: true
   },
   methods: {
     changeHover(num, value) {
-      if (num === 1) {
-        switch (value) {
-          case 0:
-            this.isHoverNum = 0
-            break
-          case 1:
-            this.isHoverNum = 1
-            break
-          case 2:
-            this.isHoverNum = 2
-            break
-          case 3:
-            this.isHoverNum = 3
-            break
-          case 4:
-            this.isHoverNum = 4
-            break
-          case 5:
-            this.isHoverNum = 5
-            break
-          case 6:
-            this.isHoverNum = 6
-            break
-          case 7:
-            this.isHoverNum = 7
-            break
-          default:
-            break
-        }
-      } else {
-        switch (value) {
-          case 0:
-            this.isHoverNum = 0
-            break
-          case 1:
-            this.isHoverNum = 1
-            break
-          case 2:
-            this.isHoverNum = 2
-            break
-          case 3:
-            this.isHoverNum = 3
-            break
-          case 4:
-            this.isHoverNum = 4
-            break
-          case 5:
-            this.isHoverNum = 5
-            break
-          case 6:
-            this.isHoverNum = 6
-            break
-          case 7:
-            this.isHoverNum = 7
-            break
-          default:
-            break
+      if (this.initType) {
+        if (num === 1) {
+          switch (value) {
+            case '移入':
+              this.isBofangHover = true
+              break
+            case '移出':
+              this.isBofangHover = false
+              break
+            default:
+              break
+          }
+        } else if (num === 2) {
+          switch (value) {
+            case '移入':
+              this.isXiugaiHover = true
+              break
+            case '移出':
+              this.isXiugaiHover = false
+              break
+            default:
+              break
+          }
+        } else {
+          switch (value) {
+            case '移入':
+              this.isShanchuHover = true
+              break
+            case '移出':
+              this.isShanchuHover = false
+              break
+            default:
+              break
+          }
         }
       }
     },
-    callPosition(deviceId, channelId) {
-      this.$axios({
-        method: 'post',
-        url: `/api/ptz/front_end_command/${deviceId}/${channelId}`
-      })
-        .then((res) => {
-          console.info('=====#####111', res)
-        })
-        .catch(() => {
-          that.$message({
-            message: '调用失败！',
-            type: 'error'
-          })
-        })
-    },
+
     presetPosition: function (cmdCode, presetPos, presetName) {
       const reg = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,15}$/
       if (!reg.test(presetName)) {
@@ -223,25 +254,20 @@ export default {
         })
       }
       const { deviceID, channelId } = this.deviceData
-      // console.log(this.deviceData,"deviceData")
       // console.log('预置位控制：' + this.presetPos + ' : 0x' + cmdCode.toString(16));
-      this.$axios({
-        method: 'post',
-        // url: '/api/ptz/front_end_command/' + deviceID + '/' + channelId + '?cmdCode=' + cmdCode + '&parameter1=0&parameter2=' + presetPos + '&combindCode2=0'
-        url: '/api/ptz/front_end_command',
-        params: {
-          deviceId: { deviceID }.deviceID,
-          channelId: { channelId }.channelId,
-          cmdCode: cmdCode,
-          parameter1: 0,
-          parameter2: presetPos,
-          combindCode2: 0,
-          presetName: presetName
-        }
-      }).then((res) => {
-        this.inputBoxDisplay = false
-        this.queryPreset(this.deviceData)
+    },
+    async deletePreset() {
+      await ptzPresetDelete({
+        channelExpansionId: this.resChannelId,
+        presetId: this.nowPreset
       })
+        .then((res) => {
+          if (res.code === 0) {
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
     // 设置预置位
     addPresetPosition() {
@@ -251,7 +277,7 @@ export default {
         this.nowPreset.indexOf('-') + 1
       )
     },
-    handleChange() {
+    handleChange(val) {
       this.presetPos = this.nowPreset.substring(0, this.nowPreset.indexOf('-'))
       this.inputPresetName = this.nowPreset.substring(
         this.nowPreset.indexOf('-') + 1
@@ -275,72 +301,9 @@ export default {
       // console.log(this.presetExistence,"已经批量新建的")
       if (!this.presetExistence.includes(batchPreset)) {
         this.presetExistence.push(batchPreset)
-        //往数据库批量添加
-        this.batchPresetPosition({ deviceID }.deviceID, { channelId }.channelId)
-        // console.log(this.presetExistence,"数据库中不存在")
       } else {
         // console.log("数据库中已经存在")
       }
-      this.$axios({
-        method: 'get',
-        // url: `/api/ptz/preset/query/${deviceID}/${channelId}`
-        url: '/api/ptz/preset/query',
-        params: {
-          deviceId: { deviceID }.deviceID,
-          channelId: { channelId }.channelId
-        }
-      }).then((res) => {
-        // console.log(res,"预置位列表")
-        if (res.data.data && Array.isArray(res.data.data)) {
-          this.presetList = res.data.data
-          this.presetList.forEach((element) => {
-            const preset = element.presetId + '-' + element.presetName
-            element.preset = preset
-          })
-          const currentPreset =
-            this.presetList[
-              this.nowPreset.substring(0, this.nowPreset.indexOf('-')) - 1
-            ]
-          this.nowPreset = currentPreset.preset
-          this.presetEnable = currentPreset.enable
-          // console.log(this.presetEnable,"是否启动")
-        }
-        // console.log(this.presetList,"预置位列表")
-      })
-    },
-    //批量添加预置位（默认预置位）
-    batchPresetPosition(deviceId, channelId) {
-      this.$axios({
-        method: 'get',
-        url: '/api/ptz/preset/batchAdd',
-        params: {
-          deviceId: deviceId,
-          channelId: channelId,
-          count: this.count
-        }
-      }).then(() => {})
-    },
-    // 云台控制
-    ptzCamera: function (command) {
-      const { deviceID, channelId } = this.deviceData
-      console.log('云台控制数据：' + this.deviceData)
-      console.log('云台控制：' + command)
-      this.$axios({
-        method: 'post',
-        url:
-          '/api/ptz/control/' +
-          deviceID +
-          '/' +
-          channelId +
-          '?command=' +
-          command +
-          '&horizonSpeed=' +
-          this.controSpeed +
-          '&verticalSpeed=' +
-          this.controSpeed +
-          '&zoomSpeed=' +
-          this.controSpeed
-      }).then(function (res) {})
     },
     changePos: function (params) {
       this.presetPos = params.presetId
@@ -456,6 +419,14 @@ export default {
     left: 25px;
     width: 24px;
     height: 24px;
+  }
+  .cloudBtnDisable {
+    position: relative;
+    top: 5px;
+    left: 25px;
+    width: 24px;
+    height: 24px;
+    cursor: not-allowed;
   }
 }
 </style>
