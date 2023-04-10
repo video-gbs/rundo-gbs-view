@@ -77,3 +77,8 @@ export function speedRecordView(data) {
   // 录像倍速
   return request.put(`${expansion}/play/record/speed`, data)
 }
+
+export function getStreamInfo(data) {
+  // 录像倍速
+  return request.get(`${expansion}/play/streamId/info`, data)
+}

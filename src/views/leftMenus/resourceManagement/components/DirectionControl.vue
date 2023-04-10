@@ -72,6 +72,14 @@
               :class="
                 initTopType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
               "
+              @mousedown="
+                initTopType[resPlayerIdx] ? handleLeftBtn(item.showName1) : ''
+              "
+              @mouseup="
+                initTopType[resPlayerIdx]
+                  ? handleLeftBtnStop(item.showName1)
+                  : ''
+              "
               :icon-class="
                 initTopType[resPlayerIdx]
                   ? !isTopHover
@@ -90,6 +98,14 @@
               class="cloudBtn-right"
               :class="
                 initTopType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
+              "
+              @mousedown="
+                initTopType[resPlayerIdx] ? handleRightBtn(item.showName2) : ''
+              "
+              @mouseup="
+                initTopType[resPlayerIdx]
+                  ? handleRightBtnStop(item.showName2)
+                  : ''
               "
               :icon-class="
                 initTopType[resPlayerIdx]
@@ -210,17 +226,16 @@ export default {
     showContentList(val) {
       this.resShowContent = val
 
-      if (
-        this.resShowContent.length > 1 &&
-        this.resShowContent.length - 1 === val &&
-        this.resShowContent[this.resShowContent.length - 1] !== ''
-      ) {
-        // this.$nextTick(() => {
-        this.initTopType[this.resShowContent.length - 1] = true
-        this.initType[this.resShowContent.length - 1] = true
-
-        // })
-      }
+      this.resShowContent.map((item, index) => {
+        if (item && item.length > 0) {
+          this.initTopType[index] = true
+          this.initType[index] = true
+        } else {
+          this.initTopType[index] = false
+          this.initType[index] = false
+        }
+      })
+      this.$forceUpdate()
     },
     playerIdx(val) {
       this.resPlayerIdx = val
@@ -266,6 +281,114 @@ export default {
   },
   mounted() {},
   methods: {
+    handleLeftBtn(name) {
+      switch (name) {
+        case '缩小':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 16,
+            operationValue: this.speed
+          })
+          break
+        case '焦点拉进':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 66,
+            operationValue: this.speed
+          })
+          break
+        case '光圈缩小':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 72,
+            operationValue: this.speed
+          })
+          break
+        default:
+          break
+      }
+    },
+    handleRightBtn(name) {
+      switch (name) {
+        case '放大':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 32,
+            operationValue: this.speed
+          })
+          break
+        case '焦点拉远':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 65,
+            operationValue: this.speed
+          })
+          break
+        case '光圈放大':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 68,
+            operationValue: this.speed
+          })
+          break
+        default:
+          break
+      }
+    },
+    handleLeftBtnStop(name) {
+      switch (name) {
+        case '缩小':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 64,
+            operationValue: this.speed
+          })
+          break
+        case '焦点拉进':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 64,
+            operationValue: this.speed
+          })
+          break
+        case '光圈缩小':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 64,
+            operationValue: this.speed
+          })
+          break
+        default:
+          break
+      }
+    },
+    handleRightBtnStop(name) {
+      switch (name) {
+        case '放大':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 64,
+            operationValue: this.speed
+          })
+          break
+        case '焦点拉远':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 64,
+            operationValue: this.speed
+          })
+          break
+        case '光圈放大':
+          ptzControl1({
+            channelExpansionId: Local.get('cloudId'),
+            ptzOperationType: 64,
+            operationValue: this.speed
+          })
+          break
+        default:
+          break
+      }
+    },
     changeType(i, splitNum) {
       if (splitNum === 1) {
         this.initTopType = []
@@ -276,6 +399,7 @@ export default {
         this.initTopType[i] = true
         this.initType[i] = true
       }
+      this.$forceUpdate()
     },
     getInitIconClass(value, index) {
       switch (index) {
@@ -572,7 +696,7 @@ export default {
     ptzCameraStop(cmdCode) {
       ptzControl1({
         channelExpansionId: Local.get('cloudId'),
-        ptzOperationType: 40,
+        ptzOperationType: 0,
         operationValue: this.speed
       })
     }

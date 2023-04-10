@@ -86,6 +86,8 @@
                       :playerIdx="playerIdx"
                       :showContent1="videoUrl"
                       :playerIdx1="playerIdx"
+                      @changeOptionLists="changeOptionLists"
+                      @changeChildOptionLists="changeChildOptionLists"
                     />
                   </div>
                 </transition>
@@ -123,6 +125,8 @@
                     <player
                       :ref="'player' + i"
                       :videoUrl="videoUrl[i - 1]"
+                      :flvStreamId="flvStreamId[i - 1]"
+                      :flvCloudId="flvCloudId[i - 1]"
                       :deviceData="playerData[i - 1] || {}"
                       fluent
                       autoplay
@@ -135,6 +139,8 @@
                       :stretch="isFill"
                       :hasAudio="hasAudio"
                       :boxSelectionNum="i - 1"
+                      :channelExpansionId="channelExpansionId"
+                      :playerIdx="playerIdx"
                       @showPlayerBoxMini="showPlayerBoxMini"
                     ></player>
                     <div ref="rectArea" class="rect"></div>
@@ -353,6 +359,8 @@ export default {
       showVideoDialog: true,
       hasAudio: false, //设置默认是否静音
       videoUrl: [''],
+      flvStreamId: [''],
+      flvCloudId: [''],
       showContent: false, // 展示面板内容
       spilt: 4, //分屏
       spilt1: 4, //分屏
@@ -446,15 +454,6 @@ export default {
       this.splitFullscreen = !this.splitFullscreen
     })
     this.$refs.dropdownMenuPlace.appendChild(this.$refs.dropdownMenu.popperElm)
-    // if (document.documentElement.clientHeight < 800) {
-    //   document.getElementsByClassName(
-    //     'securityArea_container'
-    //   )[0].style.height = '540px'
-    // } else {
-    //   document.getElementsByClassName(
-    //     'securityArea_container'
-    //   )[0].style.height = 'calc(100% - 30px)'
-    // }
     this.videoUrl = []
     for (let i = 0; i < this.spilt; i++) {
       this.isClicked[i] = false
@@ -486,6 +485,9 @@ export default {
     },
     videoActiveArr(n) {
       // console.log('nnnnn', n)
+    },
+    childOptionLists(n) {
+      console.log('nnnnn', n)
     },
     treeList(n) {
       // console.log('nnnnn', n)
@@ -559,14 +561,32 @@ export default {
           console.log(error)
         })
     },
+    changeOptionLists(index, id) {
+      this.childOptionLists[index] = this.childOptionLists[index].filter(
+        (item) => {
+          return item.presetId !== this.id
+        }
+      )
+    },
+    async changeChildOptionLists(id, index) {
+      await ptzPresetLists({ channelExpansionId: id }).then((res) => {
+        if (res.code === 0) {
+          this.$nextTick(() => {
+            this.childOptionLists[index] = res.data
+            this.$forceUpdate()
+            console.log(this.$refs)
+            this.$refs.cloudControl.getOptionLists(index)
+          })
+        }
+      })
+      console.log('this.childOptionLists', this.childOptionLists)
+    },
     async getPtzPresetLists(id, index) {
       await ptzPresetLists({ channelExpansionId: id }).then((res) => {
         if (res.code === 0) {
           this.childOptionLists[index] = res.data
 
           this.channelExpansionId[index] = id
-
-          // console.log(1111, this.childOptionLists)
         }
       })
     },
@@ -693,36 +713,36 @@ export default {
         console.log('获取播放窗口宽高比~~~~~~~~~~~~~', rectRate)
 
         console.log('获取初始化播放窗口宽高比~~~~~~~~~~~~~', videoRate)
-        if (rectRate < videoRate) {
-          // 处理框选部分宽高比小于播放窗口宽高比的情况
-          this.rectInfo.rectWidth = this.rectInfo.rectHeight * videoRate
-          if (this.rectInfo.rectCenterOffsetX < this.rectInfo.rectWidth / 2) {
-            // 框选部分在播放窗口左侧边缘
-            this.rectInfo.rectCenterOffsetX = this.rectInfo.rectWidth / 2
-          }
-          if (
-            this.rectInfo.rectCenterOffsetX + this.rectInfo.rectWidth / 2 >
-            this.rectInfo.videoWidth
-          ) {
-            this.rectInfo.rectCenterOffsetX =
-              this.rectInfo.videoWidth - this.rectInfo.rectWidth / 2
-          }
-        } else if (rectRate > videoRate) {
-          // 处理框选部分宽高比大于播放窗口宽高比的情况
-          this.rectInfo.rectHeight = this.rectInfo.rectWidth / videoRate
-          if (this.rectInfo.rectCenterOffsetY < this.rectInfo.rectHeight / 2) {
-            // 处理框选部分在播放窗口顶部边
-            this.rectInfo.rectCenterOffsetY = this.rectInfo.rectHeight / 2
-          }
-          if (
-            this.rectInfo.rectCenterOffsetY + this.rectInfo.rectHeight / 2 >
-            this.rectInfo.videoHeight
-          ) {
-            //
-            this.rectInfo.rectCenterOffsetY =
-              this.rectInfo.videoHeight - this.rectInfo.rectHeight / 2
-          }
-        }
+        // if (rectRate < videoRate) {
+        //   // 处理框选部分宽高比小于播放窗口宽高比的情况
+        //   this.rectInfo.rectWidth = this.rectInfo.rectHeight * videoRate
+        //   if (this.rectInfo.rectCenterOffsetX < this.rectInfo.rectWidth / 2) {
+        //     // 框选部分在播放窗口左侧边缘
+        //     this.rectInfo.rectCenterOffsetX = this.rectInfo.rectWidth / 2
+        //   }
+        //   if (
+        //     this.rectInfo.rectCenterOffsetX + this.rectInfo.rectWidth / 2 >
+        //     this.rectInfo.videoWidth
+        //   ) {
+        //     this.rectInfo.rectCenterOffsetX =
+        //       this.rectInfo.videoWidth - this.rectInfo.rectWidth / 2
+        //   }
+        // } else if (rectRate > videoRate) {
+        //   // 处理框选部分宽高比大于播放窗口宽高比的情况
+        //   this.rectInfo.rectHeight = this.rectInfo.rectWidth / videoRate
+        //   if (this.rectInfo.rectCenterOffsetY < this.rectInfo.rectHeight / 2) {
+        //     // 处理框选部分在播放窗口顶部边
+        //     this.rectInfo.rectCenterOffsetY = this.rectInfo.rectHeight / 2
+        //   }
+        //   if (
+        //     this.rectInfo.rectCenterOffsetY + this.rectInfo.rectHeight / 2 >
+        //     this.rectInfo.videoHeight
+        //   ) {
+        //     //
+        //     this.rectInfo.rectCenterOffsetY =
+        //       this.rectInfo.videoHeight - this.rectInfo.rectHeight / 2
+        //   }
+        // }
         //  处理视频
         this.handleVideo()
       }
@@ -739,7 +759,7 @@ export default {
       let resMultiple = this.rectInfo.rectHeight / this.rectInfo.rectWidth
       let initMultiple = this.rectInfo.videoHeight / this.rectInfo.videoWidth
 
-      console.log(resMultiple, initMultiple)
+      console.log('视频放大显示', resMultiple, initMultiple)
 
       if (this.isClicked[this.rectAreaNum]) {
         console.log(111111, this.rectAreaNum)
@@ -750,26 +770,26 @@ export default {
         this.$refs.videoBox[this.rectAreaNum].style.height =
           (this.rectInfo.videoHeight * resMultiple) / initMultiple + 'px'
         // 移动放大后视频使框选区域显示在原播放窗口
-        this.$refs.videoBox[this.rectAreaNum].style.top =
-          parseInt(this.$refs.videoBox[this.rectAreaNum].style.top) -
-          this.rectInfo.rectHeight
-        this.$refs.videoBox[this.rectAreaNum].style.left =
-          parseInt(this.$refs.videoBox[this.rectAreaNum].style.left) -
-          this.rectInfo.rectWidth
+        // this.$refs.videoBox[this.rectAreaNum].style.top =
+        //   parseInt(this.$refs.videoBox[this.rectAreaNum].style.top) -
+        //   this.rectInfo.rectHeight
+        // this.$refs.videoBox[this.rectAreaNum].style.left =
+        //   parseInt(this.$refs.videoBox[this.rectAreaNum].style.left) -
+        //   this.rectInfo.rectWidth
       } else {
         console.log(22222, this.rectAreaNum)
         // 视频放大后大小
         this.$refs.videoBox[this.rectAreaNum].style.width =
           this.rectInfo.videoWidth * times + 'px'
         // 移动放大后视频使框选区域显示在原播放窗口
-        this.$refs.videoBox[this.rectAreaNum].style.top = -(
-          this.rectInfo.rectCenterOffsetY -
-          this.rectInfo.rectHeight / 2
-        )
-        this.$refs.videoBox[this.rectAreaNum].style.left = -(
-          this.rectInfo.rectCenterOffsetX -
-          this.rectInfo.rectWidth / 2
-        )
+        // this.$refs.videoBox[this.rectAreaNum].style.top = -(
+        //   this.rectInfo.rectCenterOffsetY -
+        //   this.rectInfo.rectHeight / 2
+        // )
+        // this.$refs.videoBox[this.rectAreaNum].style.left = -(
+        //   this.rectInfo.rectCenterOffsetX -
+        //   this.rectInfo.rectWidth / 2
+        // )
       }
     },
     //重置选择框
@@ -803,9 +823,10 @@ export default {
         videoZoomDom[val].style.display = 'block'
       } else {
         videoZoomDom[val].style.display = 'none'
+        this.$refs.videoBox[this.rectAreaNum].style.width = '100%'
+        this.$refs.videoBox[this.rectAreaNum].style.height = '100%'
       }
       this.rectZoomInit(val)
-      // console.log(this.isClicked)
     },
 
     changeHover(num, value) {
@@ -1121,9 +1142,6 @@ export default {
         this.$refs.menuRef.close(String(index))
       })
     },
-    close(a, b) {
-      console.log(a, b)
-    },
     closeVideo(i) {
       this.videoUrl.splice(i, 1, '')
       this.videoUrl = [...this.videoUrl]
@@ -1144,6 +1162,9 @@ export default {
               this.playerIdx++
             }
             this.setPlayUrl(res.data.wsFlv, idxTmp)
+            this.setStreamId(res.data.streamId, idxTmp)
+            this.setFlvCloudId(id, idxTmp)
+
             this.hasVideoUrl = true
           }
         })
@@ -1253,6 +1274,26 @@ export default {
         window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
       }, 100)
       this.showContent = true
+    },
+    setStreamId(id, idx) {
+      this.$set(this.flvStreamId, idx, id)
+
+      setTimeout(() => {
+        window.localStorage.setItem(
+          'flvStreamId',
+          JSON.stringify(this.flvStreamId)
+        )
+      }, 100)
+    },
+    setFlvCloudId(id, idx) {
+      this.$set(this.flvCloudId, idx, id)
+
+      setTimeout(() => {
+        window.localStorage.setItem(
+          'flvCloudId',
+          JSON.stringify(this.flvCloudId)
+        )
+      }, 100)
     },
     checkPlayByParam() {
       let { deviceId, channelId } = this.$route.query

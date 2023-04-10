@@ -16,7 +16,7 @@
       }}</span>
       <div class="head-right">
         <span>正在实时预览</span>
-        <i class="el-icon-close icon-close" @click="closeVideo"></i>
+        <i class="el-icon-close icon-close" @click.stop="closeVideo"></i>
       </div>
     </div>
     <DirectionControl :deviceData="deviceData" v-if="showControl" />
@@ -42,18 +42,18 @@
         style="width: 50%; float: left"
         loading
       >
-        <span>流 {{ index }}</span>
-        <div class="trankInfo" v-if="item.codec_type == 0">
-          <p>格式: {{ item.codec_id_name }}</p>
+        <!-- <span>流 {{ index }}</span> -->
+        <div class="trankInfo" v-if="item.codecType === 0">
+          <p>格式: {{ item.codecName }}</p>
           <p>类型: 视频</p>
           <p>分辨率: {{ item.width }} x {{ item.height }}</p>
           <p>帧率: {{ item.fps }}</p>
         </div>
-        <div class="trankInfo" v-if="item.codec_type == 1">
-          <p>格式: {{ item.codec_id_name }}</p>
+        <div class="trankInfo" v-if="item.codecType === 1">
+          <p>格式: {{ item.codecName }}</p>
           <p>类型: 音频</p>
-          <p>采样位数: {{ item.sample_bit }}</p>
-          <p>采样率: {{ item.sample_rate }}</p>
+          <p>采样位数: {{ item.sampleBit }}</p>
+          <p>采样率: {{ item.sampleRate }}</p>
         </div>
       </div>
     </div>
@@ -64,6 +64,8 @@
 import PlayerTool from './playerTool.vue'
 import flvjs from 'flv.js'
 import DirectionControl from './DirectionControl'
+import { getStreamInfo } from '@/api/method/live'
+import { Local } from '@/utils/storage'
 
 const IS_CONTROL_TYPES = [1, 4] //有云台功能的ptztype
 
@@ -109,7 +111,9 @@ export default {
       lastDecodedFrame: null,
       isShowStream: false,
       tracks: [],
-      resVideoUrl: ''
+      resVideoUrl: '',
+      resChannelId: '',
+      resPlayerIdx: 0
     }
   },
   props: [
@@ -120,10 +124,19 @@ export default {
     'idx',
     'deviceData',
     'index',
-    'stretch'
+    'stretch',
+    'playerIdx',
+    'channelExpansionId',
+    'flvStreamId'
   ],
   created() {
     this.resVideoUrl = this.$props.videoUrl
+    console.log('this.$props.flvStreamId', this.$props.flvStreamId)
+    console.log('this.$props.playerIdx', this.$props.playerIdx)
+
+    this.resChannelId = this.$props.flvStreamId
+
+    console.log(this.resChannelId)
     if (this.timerId) {
       clearInterval(this.timerId)
       this.timerId = null
@@ -160,45 +173,38 @@ export default {
         })
       },
       deep: true
-    }
+    },
+    playerIdx(val) {
+      console.log(val, 111)
+      this.resPlayerIdx = val
+      // this.resShowContent.map((item, index) => {
+      //   if (item && item !== '' && item.length > 0) {
+      //     if (index === this.resPlayerIdx) {
+      //       this.initType[this.resPlayerIdx] = true
+      //     } else {
+      //       this.initType[this.resPlayerIdx] = false
+      //     }
+      //   }
+      // })
+      this.$forceUpdate()
+    },
+    deep: true,
+    immediate: true
   },
   computed() {},
   methods: {
     //获取码流信息
-    getStreamInfo() {
-      const { mediaServerId, app, stream } = this.deviceData
-      if (mediaServerId && app && stream) {
-        const that = this
-        that.tracks = []
-        this.$axios({
-          method: 'get',
-          url:
-            '/zlm/' +
-            mediaServerId +
-            '/index/api/getMediaInfo?vhost=__defaultVhost__&schema=rtmp&app=' +
-            app +
-            '&stream=' +
-            stream
-        }).then(function (res) {
-          if (res.data.code == 0 && res.data.online) {
-            that.tracks = res.data.tracks
-            that.isShowStream = true
-          } else {
-            that.$message({
-              showClose: true,
-              message: '获取编码信息失败,',
-              type: 'warning'
-            })
-          }
-        })
-      } else {
-        this.isShowStream = false
-        this.$message({
-          showClose: true,
-          message: '获取编码信息失败,',
-          type: 'warning'
-        })
-      }
+    async getStreamInfo() {
+      this.tracks = []
+      await getStreamInfo({
+        channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
+        streamId: Local.get('flvStreamId')[this.resPlayerIdx]
+      }).then((res) => {
+        if (res.code === 0) {
+          this.tracks = res.data.tracks
+          this.isShowStream = true
+        }
+      })
     },
     handleShowStream() {
       if (!this.isShowStream) {
@@ -428,12 +434,12 @@ export default {
     width: 100%;
     height: 180px;
     text-align: left;
-    padding: 0 10%;
+    // padding: 0 10%;
     overflow: auto;
     position: absolute;
-    color: white;
+    color: red;
     font-size: 0.75rem;
-    bottom: 40px;
+    bottom: 20px;
     box-sizing: border-box;
   }
   .trankInfo {

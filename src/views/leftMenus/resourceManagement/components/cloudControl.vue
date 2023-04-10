@@ -32,7 +32,7 @@
             <div class="yuzhiwei-control-content">
               <el-tooltip effect="dark" content="预置位播放" placement="top">
                 <svg-icon
-                  @click="presetPosition(130, presetPos)"
+                  @click="ptzPlay"
                   :class="
                     initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
                   "
@@ -55,7 +55,7 @@
               >
                 <svg-icon
                   class="cloudBtn-right"
-                  @click="addPresetPosition()"
+                  @click="presetEdit()"
                   :class="
                     initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
                   "
@@ -95,14 +95,14 @@
           </div>
 
           <div class="preset-input-box" v-if="inputBoxDisplay">
-            <span class="preset-span">设置预置位</span>
+            <span class="preset-span">修改预置位名称</span>
             <el-input v-model="inputPresetName" placeholder="输入内容">
             </el-input>
             <el-button
               style="float: right; padding-top: 12px; padding-left: 12px"
               type="text"
               size="small"
-              @click="presetPosition(129, presetPos, inputPresetName)"
+              @click="presetPosition(inputPresetName)"
             >
               确定
             </el-button>
@@ -123,12 +123,7 @@
 
 <script>
 import DirectionControl from './DirectionControl'
-import {
-  ptzPresetLists,
-  ptzPresetDelete,
-  ptzPresetEdit,
-  ptzPreset
-} from '@/api/method/live'
+import { ptzPresetDelete, ptzPresetEdit, ptzPreset } from '@/api/method/live'
 export default {
   name: 'cloudControl',
   components: {
@@ -185,9 +180,17 @@ export default {
   watch: {
     showContent1(val) {
       this.resShowContent = val
+
+      this.resShowContent.map((item, index) => {
+        if (item && item.length > 0) {
+          this.initType[index] = true
+        } else {
+          this.initType[index] = false
+        }
+      })
+      this.$forceUpdate()
     },
     playerIdx1(val) {
-      // console.log(1111,val)
       this.optionLists = this.$props.childOptionLists[val]
       this.resChannelId = this.$props.channelExpansionId[val]
 
@@ -201,11 +204,24 @@ export default {
           }
         }
       })
+      this.$forceUpdate()
     },
     deep: true,
     immediate: true
   },
   methods: {
+    async ptzPlay() {
+      await ptzPreset({
+        channelExpansionId: this.resChannelId,
+        presetId: this.nowPreset
+      }).then((res) => {
+        if (res.code === 0) {
+        }
+      })
+    },
+    getOptionLists(index) {
+      this.optionLists = this.$props.childOptionLists[index]
+    },
     changeHover(num, value) {
       if (this.initType) {
         if (num === 1) {
@@ -245,7 +261,7 @@ export default {
       }
     },
 
-    presetPosition: function (cmdCode, presetPos, presetName) {
+    async presetPosition(presetName) {
       const reg = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,15}$/
       if (!reg.test(presetName)) {
         return this.$message({
@@ -253,8 +269,26 @@ export default {
           type: 'error'
         })
       }
-      const { deviceID, channelId } = this.deviceData
-      // console.log('预置位控制：' + this.presetPos + ' : 0x' + cmdCode.toString(16));
+      await ptzPresetEdit({
+        channelExpansionId: this.resChannelId,
+        presetId: this.nowPreset,
+        presetName
+      }).then((res) => {
+        if (res.code === 0) {
+          this.nowPreset = presetName
+          this.$message({
+            type: 'success',
+            message: '修改名称成功'
+          })
+          this.inputBoxDisplay = false
+          console.log('预置位修改', this.resChannelId, this.resPlayerIdx)
+          this.$emit(
+            'changeChildOptionLists',
+            this.resChannelId,
+            this.resPlayerIdx
+          )
+        }
+      })
     },
     async deletePreset() {
       await ptzPresetDelete({
@@ -263,6 +297,16 @@ export default {
       })
         .then((res) => {
           if (res.code === 0) {
+            this.optionLists = this.optionLists.filter((item) => {
+              return item.presetId !== this.nowPreset
+            })
+            this.nowPreset = []
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+
+            this.$emit('changeOptionLists', this.resPlayerIdx, this.nowPreset)
           }
         })
         .catch((error) => {
@@ -270,43 +314,14 @@ export default {
         })
     },
     // 设置预置位
-    addPresetPosition() {
+    presetEdit() {
       this.inputBoxDisplay = !this.inputBoxDisplay
-      this.presetPos = this.nowPreset.substring(0, this.nowPreset.indexOf('-'))
-      this.inputPresetName = this.nowPreset.substring(
-        this.nowPreset.indexOf('-') + 1
-      )
     },
     handleChange(val) {
-      this.presetPos = this.nowPreset.substring(0, this.nowPreset.indexOf('-'))
-      this.inputPresetName = this.nowPreset.substring(
-        this.nowPreset.indexOf('-') + 1
-      )
-      this.presetEnable =
-        this.presetList[
-          this.nowPreset.substring(0, this.nowPreset.indexOf('-')) - 1
-        ].enable
+      this.nowPreset = val
     },
     cancelPreset() {
       this.inputBoxDisplay = false
-    },
-    // 预置位查询
-    queryPreset(val) {
-      console.log('预置位查询')
-      this.presetList = []
-      const { deviceID, channelId } = val
-
-      //数据库中批量添加预置位
-      const batchPreset = { deviceID }.deviceID + { channelId }.channelId
-      // console.log(this.presetExistence,"已经批量新建的")
-      if (!this.presetExistence.includes(batchPreset)) {
-        this.presetExistence.push(batchPreset)
-      } else {
-        // console.log("数据库中已经存在")
-      }
-    },
-    changePos: function (params) {
-      this.presetPos = params.presetId
     }
   },
   destroyed() {}
