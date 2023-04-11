@@ -79,6 +79,11 @@ export function speedRecordView(data) {
 }
 
 export function getStreamInfo(data) {
-  // 录像倍速
+  // 码流信息
   return request.get(`${expansion}/play/streamId/info`, data)
+}
+
+export function ptz3dEnlarge(data) {
+  // 3d放大
+  return request.put(`${expansion}/ptz/3d/zoom`, data)
 }

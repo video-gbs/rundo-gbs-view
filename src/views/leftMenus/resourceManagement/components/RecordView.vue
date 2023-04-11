@@ -71,37 +71,31 @@
             </div>
             <div class="equipment-group-wrapper-bottom">
               <div class="date-select">
-                <!-- <el-select
-                  size="small"
-                  v-model="formData.type"
-                  placeholder="录像类型"
-                  style="margin-left: 16px !important"
+                <el-date-picker
+                  popper-class="form-date-picker-popper"
+                  v-model="formData.date"
+                  type="datetimerange"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  :picker-options="pickerOptions"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  align="right"
                 >
-                  <el-option value="device" label="设备录像" />
-                  <el-option value="cloud" label="云端录像" />
-                </el-select>-->
-
-                <!-- :disabled="!selData.isLeaf" -->
+                </el-date-picker>
                 <el-button
                   @click="handleSearch"
                   type="primary"
                   size="small"
                   :loading="formData.loading"
-                  style="float: right; margin: 16px 16px 0 0 !important"
+                  style="
+                    margin: 16px 16px 0 0 !important;
+                    width: 151px;
+                    height: 36px;
+                  "
                   >查询</el-button
                 >
-
-                <el-date-picker
-                  @focus="addEvent"
-                  popper-class="form-date-picker-popper"
-                  size="small"
-                  class="date"
-                  v-model="formData.date"
-                  type="date"
-                  :clearable="true"
-                  :picker-options="cloudDateOptions"
-                  placeholder="请选择日期"
-                />
               </div>
             </div>
           </div>
@@ -167,18 +161,6 @@
                   :dataSource="deviceVideoList"
                 />
               </template>
-              <!-- <template v-else>
-                <div class="player-option-box">
-                  <TimePlayer
-                    ref="TimePlayer"
-                    v-model="cloudPlayTime"
-                    :is-current-date="true"
-                    :onChange="handleChangeCloudPlayTime"
-                    :onChangeDate="handleChangePlayDate"
-                    :dataSource="cloudVideoList"
-                  />
-                </div>
-              </template> -->
             </div>
             <div class="player-toolbar">
               <div class="toolbar-left">
@@ -527,7 +509,7 @@ export default {
       tabsActiveName: this.$route.params.type || 'device',
       formData: {
         type: '',
-        date: new Date(),
+        date: [],
         loading: false
       },
       deviceId: this.$route.params.deviceId,
@@ -591,7 +573,69 @@ export default {
       ischannel: this.$route.params.SselectedNode
         ? this.$route.params.SselectedNode
         : 0,
-      ScurrentPage: this.$route.params.ScurrentPage
+      ScurrentPage: this.$route.params.ScurrentPage,
+      pickerOptions: {
+        onPick: ({ maxDate, minDate }) => {
+          // 把选择的第一个日期赋值给一个变量。
+          this.choiceDate = minDate.getTime()
+          // 如何你选择了两个日期了，就把那个变量置空
+          if (maxDate) this.choiceDate = ''
+        },
+        disabledDate: (time) => {
+          // 如何选择了一个日期
+          if (this.choiceDate) {
+            // 7天的时间戳
+            const one = 6 * 24 * 3600 * 1000
+            // 当前日期 - one = 7天之前
+            const minTime = this.choiceDate - one
+            // 当前日期 + one = 7天之后
+            const maxTime = this.choiceDate + one
+            return time.getTime() < minTime || time.getTime() > maxTime
+          } else {
+          }
+        },
+        shortcuts: [
+          {
+            text: '今天',
+            onClick(picker) {
+              const temp = new Date()
+              picker.$emit('pick', [
+                new Date(temp.setHours(0, 0, 0, 0)),
+                new Date(temp.setHours(23, 59, 59, 0))
+              ])
+            }
+          },
+          {
+            text: '昨天',
+            onClick(picker) {
+              const temp = new Date()
+              temp.setTime(temp.getTime() - 3600 * 1000 * 24)
+              picker.$emit('pick', [
+                new Date(temp.setHours(0, 0, 0, 0)),
+                new Date(temp.setHours(23, 59, 59, 0))
+              ])
+            }
+          },
+          {
+            text: '近3天',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 3)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
+          }
+        ]
+      }
     }
   },
 
@@ -704,17 +748,15 @@ export default {
     },
 
     async getPlaybackList(date, playStartTime = this.playTime) {
-      console.log(11111111, date, playStartTime, this.playTime)
+      console.log(11111111, date, this.deviceVideoList)
       this.videoUrl = ['']
       this.videoHistory.searchHistoryResult = []
-      let listData = this.deviceVideoList[date] || []
-      console.log('listData~~~~~~~~~~~~', this.deviceVideoList[date], listData)
-      // if (!listData.length) {
+      let listData = []
 
       await getPlaybackList({
         channelId: this.channelId,
-        startTime: `${date} 00:00:00`,
-        endTime: `${date} 23:59:59`
+        startTime: date[0],
+        endTime: date[1]
       })
         .then((res) => {
           if (res.code === 0) {
@@ -828,7 +870,6 @@ export default {
         })
     },
     async handleNodeClick(data, node, self) {
-      console.log(222222, data, !data.onlineState)
       this.resOnlineState = data.onlineState ? data.onlineState : ''
       if (!data.onlineState) {
         this.resArray = []
@@ -954,7 +995,7 @@ export default {
           return
         }
         if (
-          this.formData.date === '' ||
+          this.formData.date.length === 0 ||
           this.formData.date === null ||
           this.formData.date === undefined
         ) {
@@ -980,27 +1021,6 @@ export default {
       if (this.mediaServerId && this.app && this.streamId) {
         const that = this
         that.tracks = []
-        this.$axios({
-          method: 'get',
-          url:
-            '/zlm/' +
-            this.mediaServerId +
-            '/index/api/getMediaInfo?vhost=__defaultVhost__&schema=rtmp&app=' +
-            this.app +
-            '&stream=' +
-            this.streamId
-        }).then(function (res) {
-          if (res.data.code == 0 && res.data.online) {
-            that.tracks = res.data.tracks
-            that.isShowStream = true
-          } else {
-            that.$message({
-              showClose: true,
-              message: '获取编码信息失败,',
-              type: 'warning'
-            })
-          }
-        })
       } else {
         this.$message({
           showClose: true,
@@ -1294,7 +1314,7 @@ export default {
         this.videoHistory.date = date
         this.playTime = moment(val)
         // this.queryRecords(this.videoHistory.date)
-        this.getPlaybackList(this.videoHistory.date)
+        this.getPlaybackList(val)
       } else {
         this.cloudPlayTime = moment(val)
         this.getCloudRecordVideo(date)
@@ -1421,37 +1441,6 @@ export default {
           }
         })
       } else {
-        this.$axios({
-          method: 'get',
-          url:
-            '/api/gb_record/download/start/' +
-            this.deviceId +
-            '/' +
-            this.channelId +
-            '?startTime=' +
-            row.startTime +
-            '&endTime=' +
-            row.endTime +
-            '&downloadSpeed=4'
-        }).then(function (res) {
-          if (res.data.code == 0) {
-            let streamInfo = res.data.data
-            that.recordPlay = false
-            that.$refs.recordDownload.openDialog(
-              that.deviceId,
-              that.channelId,
-              streamInfo.app,
-              streamInfo.stream,
-              streamInfo.mediaServerId
-            )
-          } else {
-            that.$message({
-              showClose: true,
-              message: res.data.msg,
-              type: 'error'
-            })
-          }
-        })
       }
     },
 
@@ -1517,8 +1506,8 @@ export default {
           if (res.code === 0) {
             getPlayBackUrlLists({
               channelId: this.channelId,
-              startTime: row.startTime ? row.startTime : `${playTime} 00:00:00`,
-              endTime: row.endTime ? row.endTime : `${playTime} 23:59:59`
+              startTime: row.startTime ? row.startTime : playTime[0],
+              endTime: row.endTime ? row.endTime : playTime[1]
             })
               .then((res) => {
                 if (res.code === 0) {
@@ -1775,6 +1764,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-input__inner {
+  height: 36px;
+  width: 97%;
+  margin: 0 5px;
+}
+::v-deep .el-range-separator {
+  line-height: 28px;
+}
+::v-deep .el-picker-panel__sidebar {
+  width: 136px !important;
+}
+::v-deep .el-picker-panel__body {
+  margin-left: 136px !important;
+}
+
+::v-deep .el-picker-panel__shortcut {
+  width: 104px !important;
+  height: 31px !important;
+  background: #ffffff;
+  border-radius: 4px !important;
+  border: 1px solid #ecf0f3 !important;
+  margin-left: 10% !important;
+  padding-left: 27% !important;
+}
+
 ::v-deep .tree .el-tree-node__expand-icon.expanded {
   -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
@@ -1928,6 +1942,7 @@ export default {
     flex-direction: column;
     overflow: hidden;
     max-height: 50%;
+    text-align: center;
 
     .wrapper-bottom-content {
       flex: 1;
@@ -2022,11 +2037,6 @@ export default {
   .el-tabs__content {
     flex: 1;
   }
-  .el-tab-pane {
-    // height: 100%;
-    // display: flex;
-    // flex-direction: column;
-  }
 }
 .recordView .el-container {
   height: 100%;
@@ -2063,9 +2073,6 @@ export default {
   color: #fff;
 }
 .record-list .content {
-  // display: flex;
-  // justify-content: center;
-  // flex-direction: column;
   flex: 1;
   padding-bottom: 16px;
   text-align: left;
@@ -2135,8 +2142,6 @@ export default {
 .player-box {
   flex: 1;
   position: relative;
-  /* display: flex;
-    align-items: center; */
 }
 .player-box .player-header {
   position: absolute;

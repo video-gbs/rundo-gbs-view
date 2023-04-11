@@ -139,7 +139,12 @@
           </el-tooltip>
 
           <span class="cloudBtns-control-line"></span>
-          <el-tooltip effect="dark" content="3D放大" placement="top">
+          <el-tooltip
+            effect="dark"
+            content="3D放大"
+            placement="top"
+            v-if="!type3d[resPlayerIdx]"
+          >
             <svg-icon
               class="cloudBtn-right"
               :class="initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'"
@@ -150,8 +155,18 @@
                     : '3Dfangda'
                   : '3Dfangdahidden'
               "
+              @click.stop="
+                initType[resPlayerIdx] ? click3dBtn(1, resPlayerIdx) : ''
+              "
               @mouseenter="changeHover(2, '移入')"
               @mouseleave="changeHover(2, '移出')"
+            />
+          </el-tooltip>
+          <el-tooltip effect="dark" content="取消3D放大" placement="top" v-else>
+            <svg-icon
+              class="cloudBtn-right cloudBtn"
+              icon-class="3Dfangda-h"
+              @click.stop="click3dBtn(2, resPlayerIdx)"
             />
           </el-tooltip>
         </div>
@@ -173,7 +188,7 @@ export const DIRECTIONS_CLASS = [
   { className: 'bottom-right', command: 'downright' }
 ]
 
-import { ptzControl, ptzControl1 } from '@/api/method/live'
+import { ptzControl1, ptz3dEnlarge } from '@/api/method/live'
 import { Local } from '@/utils/storage'
 
 export default {
@@ -181,6 +196,13 @@ export default {
   props: ['deviceData', 'showContentList', 'playerIdx'],
   data() {
     return {
+      lengthX: 0,
+      lengthY: 0,
+      midPointX: 0,
+      midPointY: 0,
+      type3d: [],
+      width3d: 0,
+      height3d: 0,
       isHoverNum: 0,
       isCloudBtnsHover1: false,
       isJujiaoHover: false,
@@ -263,6 +285,7 @@ export default {
           }
         }
       })
+      this.$forceUpdate()
     },
     deep: true,
     immediate: true
@@ -274,6 +297,7 @@ export default {
     this.resPlayerIdx = this.$props.playerIdx
     this.initTopType = []
     this.initType = []
+
     for (let i = 0; i < this.$props.showContentList.length; i++) {
       this.initTopType[i] = false
       this.initType[i] = false
@@ -281,6 +305,54 @@ export default {
   },
   mounted() {},
   methods: {
+    click3dBtn(type, index) {
+      if (type === 1) {
+        this.type3d[index] = true
+        this.$listeners.rectZoomInit(index, this.type3d[index], '3d')
+      } else {
+        console.log(999999, this.lengthX, this.lengthY)
+        this.type3d[index] = false
+        if (this.lengthX > 0 && this.lengthX > 0) {
+          this.ptzEnlarge(
+            2,
+            this.lengthX,
+            this.lengthY,
+            this.midPointX,
+            this.midPointY
+          )
+        }
+      }
+      this.$forceUpdate()
+    },
+
+    async ptzEnlarge(dragType, lengthX, lengthY, midPointX, midPointY) {
+      const video = document.getElementsByClassName('play-box')
+
+      this.width3d = video[this.resPlayerIdx].clientWidth
+      this.height3d = video[this.resPlayerIdx].clientHeight
+      this.lengthX = lengthX
+      this.lengthY = lengthY
+      this.midPointX = midPointX
+      this.midPointY = midPointY
+
+      await ptz3dEnlarge({
+        channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
+        dragType,
+        length: this.height3d,
+        width: this.width3d,
+        lengthX,
+        lengthY,
+        midPointX,
+        midPointY
+      }).then((res) => {
+        if (res.code === 0 && dragType === 2) {
+          this.lengthX = 0
+          this.lengthY = 0
+          this.midPointX = 0
+          this.midPointY = 0
+        }
+      })
+    },
     handleLeftBtn(name) {
       switch (name) {
         case '缩小':
@@ -390,14 +462,15 @@ export default {
       }
     },
     changeType(i, splitNum) {
+      console.log('changeType', i, splitNum)
       if (splitNum === 1) {
         this.initTopType = []
         this.initType = []
         this.initTopType[i] = true
         this.initType[i] = true
       } else {
-        this.initTopType[i] = true
-        this.initType[i] = true
+        this.initTopType[i] = false
+        this.initType[i] = false
       }
       this.$forceUpdate()
     },
