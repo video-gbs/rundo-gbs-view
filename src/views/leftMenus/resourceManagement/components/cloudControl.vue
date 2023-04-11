@@ -306,7 +306,7 @@ export default {
               message: '删除成功'
             })
 
-            this.$emit('changeOptionLists', this.resPlayerIdx, this.nowPreset)
+            this.$emit('changeOptionLists', this.nowPreset, this.resPlayerIdx)
           }
         })
         .catch((error) => {

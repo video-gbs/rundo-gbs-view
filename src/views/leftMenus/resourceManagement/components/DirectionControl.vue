@@ -256,6 +256,8 @@ export default {
           this.initTopType[index] = false
           this.initType[index] = false
         }
+
+        this.type3d[index] = false
       })
       this.$forceUpdate()
     },
@@ -264,8 +266,6 @@ export default {
 
       this.resShowContent.map((item, index) => {
         if (item && item !== '' && item.length > 0) {
-          // this.topBtnLists.map((item, j) => {
-          // if (index === this.resPlayerIdx) {
           this.initTopType[index] = true
           this.initType[index] = true
         } else {
@@ -297,10 +297,11 @@ export default {
     this.resPlayerIdx = this.$props.playerIdx
     this.initTopType = []
     this.initType = []
-
+    this.type3d = []
     for (let i = 0; i < this.$props.showContentList.length; i++) {
       this.initTopType[i] = false
       this.initType[i] = false
+      this.type3d[i] = false
     }
   },
   mounted() {},
@@ -309,8 +310,9 @@ export default {
       if (type === 1) {
         this.type3d[index] = true
         this.$listeners.rectZoomInit(index, this.type3d[index], '3d')
+        console.log('this.type3d=====', this.type3d, index)
+        this.is3DHover = false
       } else {
-        console.log(999999, this.lengthX, this.lengthY)
         this.type3d[index] = false
         if (this.lengthX > 0 && this.lengthX > 0) {
           this.ptzEnlarge(
@@ -468,9 +470,6 @@ export default {
         this.initType = []
         this.initTopType[i] = true
         this.initType[i] = true
-      } else {
-        this.initTopType[i] = false
-        this.initType[i] = false
       }
       this.$forceUpdate()
     },
