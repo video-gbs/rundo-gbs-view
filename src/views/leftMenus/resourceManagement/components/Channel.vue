@@ -376,7 +376,6 @@ export default {
       this.getList()
     },
     handleSelectionChange(data) {
-      console.log(data, 'handleSelectionChange')
       const resName = []
       if (data && data.length > 0) {
         data.map((item) => {
@@ -386,11 +385,9 @@ export default {
         this.dialogForm.num = data.length
         this.dialogForm.dialogEquipmentName = resName.join(';')
       }
-      console.log(data, 'handleSelectionChange')
     },
     childClickHandle(data) {
       this.dialogVideoAreaId = data.id
-      console.log(data, 'childClickHandle')
     },
     dialogMove() {
       moveChannel({

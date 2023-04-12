@@ -412,7 +412,6 @@ export default {
     }
   },
   created() {
-    console.log('this.$route.query', this.$route.query)
     const {
       model,
       username,
@@ -555,9 +554,6 @@ export default {
       ]).then(() => {
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
-        console.log(1, this.form)
-        console.log(2, this.$route.query)
-        console.log(3, this.form1)
         editEncoder({
           deviceId:
             this.$route.query.back === '1'
