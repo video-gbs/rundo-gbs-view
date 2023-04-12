@@ -354,6 +354,12 @@ export default {
         rectCenterOffsetX: 0,
         rectCenterOffsetY: 0
       },
+      rectInfo1: {
+        rectWidth: 0,
+        rectHeight: 0,
+        rectCenterOffsetX: 0,
+        rectCenterOffsetY: 0
+      },
       hasVideoUrl: [],
       isClicked: [],
       isBoxSelection: false,
@@ -601,14 +607,24 @@ export default {
             this.is3d = false
           }
           this.rect = false
-          this.rectInfo.rectWidth = 0
-          this.rectInfo.rectHeight = 0
-          this.rectInfo.rectCenterOffsetX = 0
-          this.rectInfo.rectCenterOffsetY = 0
+          // this.rectInfo.rectWidth = 0
+          // this.rectInfo.rectHeight = 0
+          // this.rectInfo.rectCenterOffsetX = 0
+          // this.rectInfo.rectCenterOffsetY = 0
           this.$refs.videoBox[index].addEventListener('mousedown', this.down)
           this.$refs.videoBox[index].addEventListener('mousemove', this.move)
         } else {
           this.rect = true
+
+          if (this.rectInfo1.rectWidth > 0 && this.rectInfo1.rectHeight > 0) {
+            this.$refs.cloudControl.$refs.directionControl.ptzEnlarge(
+              2,
+              this.rectInfo1.rectWidth,
+              this.rectInfo1.rectHeight,
+              this.rectInfo1.rectCenterOffsetX,
+              this.rectInfo1.rectCenterOffsetY
+            )
+          }
         }
       })
     },
@@ -644,7 +660,7 @@ export default {
     },
     //  鼠标移动
     move($event) {
-      if (this.select) {
+      if (this.select && this.rect) {
         // 获取鼠标移动时的坐标位置
         this.mouseX = $event.clientX
         this.mouseY = $event.clientY
@@ -749,30 +765,32 @@ export default {
         //       this.rectInfo.videoHeight - this.rectInfo.rectHeight / 2
         //   }
         // }
-        if (this.is3d) {
-          console.log(
-            'this.rectInfo.rectCenterOffsetX',
-            this.rectInfo.rectCenterOffsetX
-          )
-          console.log(
-            'this.rectInfo.rectCenterOffsetY',
+        // if (this.is3d) {
+        console.log(
+          'this.rectInfo.rectCenterOffsetX',
+          this.rectInfo.rectCenterOffsetX
+        )
+        console.log(
+          'this.rectInfo.rectCenterOffsetY',
+          this.rectInfo.rectCenterOffsetY
+        )
+        if (this.rectInfo.rectWidth > 0 && this.rectInfo.rectHeight > 0) {
+          this.$refs.cloudControl.$refs.directionControl.ptzEnlarge(
+            1,
+            this.rectInfo.rectWidth,
+            this.rectInfo.rectHeight,
+            this.rectInfo.rectCenterOffsetX,
             this.rectInfo.rectCenterOffsetY
           )
-          if (
-            this.rectInfo.rectCenterOffsetX > 0 &&
-            this.rectInfo.rectCenterOffsetY > 0
-          ) {
-            this.$refs.cloudControl.$refs.directionControl.ptzEnlarge(
-              1,
-              this.rectInfo.rectWidth,
-              this.rectInfo.rectHeight,
-              this.rectInfo.rectCenterOffsetX,
-              this.rectInfo.rectCenterOffsetY
-            )
-          }
-        } else {
-          this.handleVideo()
         }
+        this.rectInfo1.rectWidth = this.rectInfo.rectWidth
+        this.rectInfo1.rectHeight = this.rectInfo.rectHeight
+
+        this.rectInfo1.rectCenterOffsetX = this.rectInfo.rectCenterOffsetX
+        this.rectInfo1.rectCenterOffsetY = this.rectInfo.rectCenterOffsetY
+        // } else {
+        //   this.handleVideo()
+        // }
       }
       //重置选择框
       this.resetRect()
