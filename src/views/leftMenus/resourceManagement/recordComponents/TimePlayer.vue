@@ -34,7 +34,6 @@
           <div class="time">
             {{ item }}
           </div>
-          <!-- <div id="playableTime"></div> -->
         </div>
       </div>
       <div
@@ -49,7 +48,6 @@
             {{ item }}
           </div>
         </div>
-        <!-- <div class="play-grid" v-for="(item, idx) in playableTimeList" :key="`idx4-${idx}`"  :style="`left:${item.position.left};width:${item.position.width}`"/> -->
       </div>
       <div
         :style="`background: ${isCurrentDate ? 'rgba(255,255,255,0.3)' : ''} ${
@@ -173,6 +171,7 @@ function generatorGridList(splitScope) {
       )}`
     )
   } while (count--)
+  console.log('list', list)
   return list
 }
 
@@ -227,7 +226,6 @@ export default {
       scope: SHOW_TIME_SCOPE.H24,
       moveX: 0, //移动位置
       lastMoveX: 0, //最后一次移动的距离
-      // playableTimeList: [],
       lastUpdateTime: this.value, //todo 临时解决方案 vm --> mv
       playableTimeImges: {},
       isDragging: false,
@@ -262,11 +260,15 @@ export default {
       //监听窗口大小变化，设置时间轴
       this.setMoveXByTime()
     },
-    //计算可播放的时间段（蓝条）样式,（通过canvas画出播放时间段，然后贴到播放条上让它自动拉伸）
+    //z计算可播放的时间段（蓝条）样式,（通过canvas画出播放时间段，然后贴到播放条上让它自动拉伸）
     computePlayableTimeList() {
       const curDate = moment(this.value).startOf('days')
       const preDate = moment(curDate).subtract(1, 'days')
       const nextDate = moment(curDate).add(1, 'days')
+
+      console.log('curDate~~~~~~~', curDate, this.value)
+      console.log('preDate~~~~~~~', preDate)
+      console.log('nextDate~~~~~~~', nextDate)
 
       const [preCanvas, curCanvas, nextCanvas] = Array(3)
         .fill(true)
@@ -590,7 +592,7 @@ export default {
       border: 6px solid transparent;
       position: absolute;
       border-top-color: white;
-      left: 0;
+      left: 2px;
     }
 
     &::after {
@@ -599,7 +601,7 @@ export default {
       position: absolute;
       bottom: 0;
       border-bottom-color: white;
-      left: 0;
+      left: 2px;
     }
 
     .current-line {

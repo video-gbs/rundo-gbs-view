@@ -98,7 +98,7 @@
                   class="date"
                   v-model="formData.date"
                   type="date"
-                  :clearable="false"
+                  :clearable="true"
                   :picker-options="cloudDateOptions"
                   placeholder="请选择日期"
                 />
@@ -110,81 +110,52 @@
             id="recordPlayerLayout"
           >
             <div
-              class="player-box playerBox"
-              @dblclick.capture.stop
-              @click="handleClickPlayer($event)"
-              @mousewheel="handleMouseWheel($event)"
-              :class="{
-                show: tabsActiveName === 'device',
-                'zoom-in': isZoom === ZOOM_TYPE.in,
-                'zoom-out': isZoom === ZOOM_TYPE.out
-              }"
+              ref="mainBox"
+              :class="`main-box grid${spilt}`"
+              style="height: 100%"
             >
-              <div v-loading="timeChangeLoading">
-                <cloud-player
-                  ref="devicesPlayer"
-                  v-if="videoUrl"
-                  :stretch="isFill ? true : false"
-                  :onChangePlayTime="handleChangeCurrentTime"
-                  :onPlayEnded="handleDevicesPlayEnded"
-                  :onError="handleDevicesPlayEnded"
-                  :onPlay="handleOnPlay"
-                  :onPause="handleOnPause"
-                  :videoStyle="`transform: translate(${zoomStyle.translateX}px , ${zoomStyle.translateY}px) scale(${zoomStyle.scale});`"
-                  :videoUrl="videoUrl"
-                  :playbackRate="speedArr[currentSpeed]"
-                  :autoplay="play"
-                  live
-                ></cloud-player>
-              </div>
               <div
-                class="not-player"
-                v-if="!videoHistory.searchHistoryResult.length && !videoUrl"
+                v-for="i in spilt"
+                :key="i"
+                class="play-box"
+                :class="{
+                  [`box${i}`]: true,
+                  redborder: playerIdx == i - 1,
+                  isFull: fullPlayerIdx !== -1
+                }"
+                @click="playerIdx = i - 1"
+                v-loading="playerData[i - 1] && !cloudPlayerUrl[i - 1]"
+                element-loading-text="拼命加载中"
+                element-loading-background="transparent"
               >
-                <img src="../../../../assets/imgs/player_error.png" />
-              </div>
-              <div class="player-header">
-                <span class="head-left">视频播放</span>
-                <div class="head-right">
-                  <i class="el-icon-close" @click="handleCloseVideo"></i>
+                <div
+                  @dblclick="toogleVideo(i)"
+                  class="dbl-box"
+                  :class="fullPlayerIdx === i ? 'full-play-box' : ''"
+                >
+                  <div v-if="!videoUrl[i - 1]" class="empty-player"></div>
+                  <div v-else class="player-box" ref="videoBox">
+                    <cloud-player
+                      :ref="'cloudPlayer' + i"
+                      :stretch="isFill"
+                      :onChangePlayTime="handleChangeCurrentTime"
+                      :onPlayEnded="handleDevicesPlayEnded"
+                      :onPlay="handleOnPlay"
+                      :muted="isMuted"
+                      :onPause="handleOnPause"
+                      @dblclick.capture.stop
+                      :videoUrl="videoUrl[i - 1]"
+                      :playbackRate="speedArr[currentSpeed]"
+                      :autoplay="play"
+                      live
+                    ></cloud-player>
+                  </div>
                 </div>
               </div>
             </div>
-            <!-- 云端录像 -->
-            <div
-              class="player-box playerBox"
-              @dblclick.capture.stop
-              @mousewheel="handleMouseWheel($event)"
-              @click="handleClickPlayer($event)"
-              :class="{
-                show: tabsActiveName === 'cloud',
-                'zoom-in': isZoom === ZOOM_TYPE.in,
-                'zoom-out': isZoom === ZOOM_TYPE.out
-              }"
-            >
-              <cloud-player
-                ref="cloudPlayer"
-                :stretch="isFill"
-                v-if="cloudPlayerUrl"
-                :onChangePlayTime="handleChangeCurrentTime"
-                :onPlayEnded="handleDevicesPlayEnded"
-                :onPlay="handleOnPlay"
-                :muted="isMuted"
-                :onPause="handleOnPause"
-                @dblclick.capture.stop
-                :videoStyle="`transform: translate(${zoomStyle.translateX}px , ${zoomStyle.translateY}px) scale(${zoomStyle.scale});`"
-                :videoUrl="cloudPlayerUrl"
-                :playbackRate="speedArr[currentSpeed]"
-                :autoplay="play"
-                live
-              ></cloud-player>
-              <div class="not-player" v-else>
-                <img src="../../../../assets/imgs/player_error.png" />
-              </div>
-            </div>
             <!-- 时间进度条 -->
+
             <div class="player-time">
-              <!-- 设备录像 -->
               <template v-if="tabsActiveName === 'device'">
                 <TimePlayer
                   ref="TimePlayer"
@@ -195,19 +166,6 @@
                   :onChangeDate="handleChangePlayDate"
                   :dataSource="deviceVideoList"
                 />
-              </template>
-              <!-- 云端录像 -->
-              <template v-else>
-                <div class="player-option-box">
-                  <TimePlayer
-                    ref="TimePlayer"
-                    v-model="cloudPlayTime"
-                    :is-current-date="true"
-                    :onChange="handleChangeCloudPlayTime"
-                    :onChangeDate="handleChangePlayDate"
-                    :dataSource="cloudVideoList"
-                  />
-                </div>
               </template>
             </div>
             <div class="player-toolbar">
@@ -237,7 +195,7 @@
                   />
                 </el-tooltip>
                 <el-tooltip effect="dark" content="截屏" placement="top">
-                  <i class="icon-jieping" @click="handleScreenShot()" />
+                  <i class="icon-jieping" />
                 </el-tooltip>
                 <el-tooltip effect="dark" content="下载" placement="top">
                   <i
@@ -260,7 +218,6 @@
               </div>
               <div class="tool-center">
                 <el-tooltip effect="dark" content="关闭视频" placement="top">
-                  <!-- <i class="close-video" @click="handleCloseVideo" /> -->
                   <svg-icon
                     class="iconfont white close-video"
                     icon-class="close-video"
@@ -292,18 +249,18 @@
                 <div class="speed-box">
                   <el-tooltip effect="dark" content="减速" placement="top">
                     <span
-                      @click="handleChangeSpeed('sub')"
+                      @click="hasStreamId ? handleChangeSpeed('sub') : ''"
                       :class="`speed-icon speed-down ${
-                        !currentSpeed ? 'disabled' : ''
+                        !hasStreamId ? 'disabled' : ''
                       }`"
                     />
                   </el-tooltip>
                   <span class="speed-text">{{ speedArr[currentSpeed] }}x</span>
                   <el-tooltip effect="dark" content="快进" placement="top">
                     <span
-                      @click="handleChangeSpeed('plus')"
+                      @click="hasStreamId ? handleChangeSpeed('plus') : ''"
                       :class="`speed-icon speed-up ${
-                        currentSpeed === speedArr.length - 1 ? 'disabled' : ''
+                        !hasStreamId ? 'disabled' : ''
                       }`"
                     />
                   </el-tooltip>
@@ -326,6 +283,52 @@
                     :class="`iconfont icon-zishiying ${isFill ? 'active' : ''}`"
                   ></i>
                 </el-tooltip>
+                <div class="split-box">
+                  <el-dropdown placement="top">
+                    <span class="split-text">
+                      <svg-icon
+                        class="iconfont white"
+                        :icon-class="splitArr[spiltIndex].class"
+                      />
+
+                      <i class="el-icon-arrow-down iconArrow" />
+                    </span>
+                    <el-dropdown-menu
+                      ref="dropdownMenu"
+                      slot="dropdown"
+                      class="dropmenu"
+                      :append-to-body="false"
+                    >
+                      <template v-for="(item, index) in splitArr">
+                        <el-dropdown-item :command="item" :key="item.num">
+                          <div
+                            @click="clickSpilt(item, index)"
+                            style="padding: 0 16px"
+                          >
+                            <svg-icon
+                              v-if="item.num === spilt"
+                              class="iconfont btn fenping"
+                              :icon-class="`${item.num}fenpinged`"
+                            />
+                            <svg-icon
+                              v-else
+                              class="iconfont btn fenping"
+                              @mouseenter="changeHover(1, item.num)"
+                              @mouseleave="changeHover(2, item.num)"
+                              :icon-class="
+                                !isMouseHover
+                                  ? `${item.num}fenping`
+                                  : index === isHoverNum
+                                  ? splitArr[isHoverNum].fenpinged
+                                  : `${item.num}fenping`
+                              "
+                            />
+                          </div>
+                        </el-dropdown-item>
+                      </template>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </div>
                 <el-tooltip
                   effect="dark"
                   :content="isFullScreen ? '退出全屏' : '全屏'"
@@ -341,7 +344,6 @@
                 </el-tooltip>
               </div>
             </div>
-
             <div class="trank" v-if="isShowStream">
               <p
                 v-if="tracksNotLoaded"
@@ -403,10 +405,13 @@ import { getPlaybackList } from '@/api/method/moduleManagement'
 import {
   getPlayBackUrlLists,
   getChannelPlayList,
-  playStop
+  playStop,
+  pauseRecordView,
+  resumeRecordView,
+  seekRecordView,
+  speedRecordView
 } from '@/api/method/live'
 
-// import flvJs from './flvJs'
 const ZOOM_TYPE = {
   in: 'in',
   out: 'out'
@@ -424,6 +429,51 @@ export default {
   },
   data() {
     return {
+      spilt: 4, //分屏
+      spiltIndex: 1,
+      playerIdx: 0, //激活播放器
+      playerData: [], //播放器数据
+      fullPlayerIdx: -1, //当前全屏的下标
+      isMouseHover: false,
+      hasStreamId: false,
+      splitArr: [
+        {
+          num: 1,
+          class: '1fenpingw',
+          fenpinged: '1fenpinged',
+          fenping: '1fenping'
+        },
+        {
+          num: 4,
+          class: '4fenpingw',
+          fenpinged: '4fenpinged',
+          fenping: '4fenping'
+        },
+        {
+          num: 6,
+          class: '6fenpingw',
+          fenpinged: '6fenpinged',
+          fenping: '6fenping'
+        },
+        {
+          num: 8,
+          class: '8fenpingw',
+          fenpinged: '8fenpinged',
+          fenping: '8fenping'
+        },
+        {
+          num: 9,
+          class: '9fenpingw',
+          fenpinged: '9fenpinged',
+          fenping: '9fenping'
+        },
+        {
+          num: 16,
+          class: '16fenpingw',
+          fenpinged: '16fenpinged',
+          fenping: '16fenping'
+        }
+      ],
       filterText: '',
       treeList: [],
       initDatas: [],
@@ -443,7 +493,7 @@ export default {
       cloudPlayTime: moment().startOf('days'),
       currentCloudList: '',
       isMuted: true, //音量
-      isFill: false, //是否拉伸视频
+      isFill: true, //是否拉伸视频
       isShowStream: false, //是否显示码流
       tracks: [],
       cloudPlay: false,
@@ -475,7 +525,8 @@ export default {
       // mediaServerObj: new MediaServer(),
       mediaServerObj: '',
       hasAudio: false,
-      videoUrl: '',
+      // videoUrl: '',
+      videoUrl: [''],
       detailFiles: [],
       mediaServerId: '',
       videoHistory: {
@@ -493,7 +544,7 @@ export default {
         stream: ''
       },
       mediaServerPath: '', // 录像path http + 域名+端口
-      cloudPlayerUrl: '',
+      cloudPlayerUrl: [''],
       cloudData: [],
       recordVideoData: [],
       timeChangeLoading: false,
@@ -512,7 +563,7 @@ export default {
         }
       },
       showBackBtn: false,
-
+      resOnlineState: '',
       //缓存通道管理页面的数据
       SchannelId: this.$route.params.SchannelId,
       SchannelName: this.$route.params.SchannelName,
@@ -540,6 +591,19 @@ export default {
       this.isFullScreen = !this.isFullScreen
     })
   },
+  computed: {
+    liveStyle() {
+      if (this.spilt == 1) {
+        return { width: '100%', height: '100%' }
+      } else if (this.spilt == 4) {
+        return { width: '50%', height: '50%' }
+      } else if (this.spilt == 9) {
+        return { width: (1 / 3) * 100 + '%', height: (1 / 3) * 100 + '%' }
+      } else if (this.spilt == 16) {
+        return { width: '25%', height: '25%' }
+      }
+    }
+  },
   methods: {
     async init() {
       await getVideoAraeTree()
@@ -553,6 +617,73 @@ export default {
           console.log(error)
         })
     },
+    // 放大缩小视频容器
+    toogleVideo(i) {
+      if (this.fullPlayerIdx === -1) {
+        this.fullPlayerIdx = i
+      } else {
+        this.fullPlayerIdx = -1
+      }
+    },
+    // 点击分屏
+    clickSpilt(item, i) {
+      this.fullPlayerIdx = -1
+      this.spilt = item.num
+      this.spiltIndex = i
+    },
+    changeHover(num, value) {
+      console.log(num, value)
+
+      if (num === 1) {
+        this.isMouseHover = true
+        switch (value) {
+          case 16:
+            this.isHoverNum = 5
+            break
+          case 9:
+            this.isHoverNum = 4
+            break
+          case 8:
+            this.isHoverNum = 3
+            break
+          case 6:
+            this.isHoverNum = 2
+            break
+          case 4:
+            this.isHoverNum = 1
+            break
+          case 1:
+            this.isHoverNum = 0
+            break
+          default:
+            break
+        }
+      } else {
+        this.isMouseHover = false
+        switch (value) {
+          case 16:
+            this.isHoverNum = 5
+            break
+          case 9:
+            this.isHoverNum = 4
+            break
+          case 8:
+            this.isHoverNum = 3
+            break
+          case 6:
+            this.isHoverNum = 2
+            break
+          case 4:
+            this.isHoverNum = 1
+            break
+          case 1:
+            this.isHoverNum = 0
+            break
+          default:
+            break
+        }
+      }
+    },
     filterNode(value, data) {
       console.log(11111111111, value, data)
       if (!value) return true
@@ -562,7 +693,7 @@ export default {
 
     async getPlaybackList(date, playStartTime = this.playTime) {
       console.log(11111111, date, playStartTime, this.playTime)
-      this.videoUrl = ''
+      this.videoUrl = ['']
       this.videoHistory.searchHistoryResult = []
       let listData = this.deviceVideoList[date] || []
       console.log('listData~~~~~~~~~~~~', this.deviceVideoList[date], listData)
@@ -685,54 +816,63 @@ export default {
         })
     },
     async handleNodeClick(data, node, self) {
-      console.log(data)
+      console.log(222222, data, !data.onlineState)
+      this.resOnlineState = data.onlineState ? data.onlineState : ''
       if (!data.onlineState) {
         this.resArray = []
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
         } else {
-          await getChannelPlayList(data.id)
-            .then((res) => {
-              if (res.code === 0) {
-                if (res.data && res.data.length > 0) {
-                  res.data.map((item) => {
-                    this.resArray.push({
-                      onlineState: item.onlineState,
-                      areaName: item.channelName,
-                      areaNames: item.channelName,
-                      areaPid: item.id,
-                      id: item.id,
-                      ptzType: item.ptzType,
-                      children: []
+          if (data.onlineState === 0) {
+            this.$message({
+              message: '设备已经离线',
+              type: 'warning'
+            })
+            return
+          } else {
+            await getChannelPlayList(data.id)
+              .then((res) => {
+                if (res.code === 0) {
+                  if (res.data && res.data.length > 0) {
+                    res.data.map((item) => {
+                      this.resArray.push({
+                        onlineState: item.onlineState,
+                        areaName: item.channelName,
+                        areaNames: item.channelName,
+                        areaPid: item.id,
+                        id: item.id,
+                        ptzType: item.ptzType,
+                        children: []
+                      })
                     })
-                  })
 
-                  this.detailsId.push(data.id)
-                  let arr = []
-                  if (data.id === '1') {
-                    arr = this.resArray.concat(this.initDatas[0].children)
-                  } else {
-                    arr = data.children
-                      ? this.resArray.concat(data.children)
-                      : this.resArray
+                    this.detailsId.push(data.id)
+                    let arr = []
+                    if (data.id === '1') {
+                      arr = this.resArray.concat(this.initDatas[0].children)
+                    } else {
+                      arr = data.children
+                        ? this.resArray.concat(data.children)
+                        : this.resArray
 
-                    const obj = {}
-                    arr = arr.reduce((item, next) => {
-                      obj[next.id]
-                        ? ''
-                        : (obj[next.id] = true && item.push(next))
-                      return item
-                    }, [])
+                      const obj = {}
+                      arr = arr.reduce((item, next) => {
+                        obj[next.id]
+                          ? ''
+                          : (obj[next.id] = true && item.push(next))
+                        return item
+                      }, [])
+                    }
+
+                    this.$refs.recordViewTree.updateKeyChildren(data.id, arr)
+                    this.defaultExpandedKeys = [data.id]
                   }
-
-                  this.$refs.recordViewTree.updateKeyChildren(data.id, arr)
-                  this.defaultExpandedKeys = [data.id]
                 }
-              }
-            })
-            .catch((error) => {
-              console.log(error)
-            })
+              })
+              .catch((error) => {
+                console.log(error)
+              })
+          }
         }
       } else {
         this.channelId = data.areaPid || data.id
@@ -763,7 +903,6 @@ export default {
       } else {
         const date = this.cloudPlayTime.format('YYYY-MM-DD')
         this.cloudPlayTime = moment(`${date} ${timeString}`)
-        // this.getCloudRecordVideo(date, this.cloudPlayTime);
       }
       this.handleDevicesPlayEnded()
       if (isPlay) this.handlePauseOrPlay()
@@ -778,13 +917,14 @@ export default {
     // 关闭视频
     handleCloseVideo() {
       this.cloudPlay = this.play = false
+      this.hasStreamId = false
       if (this.tabsActiveName === 'device') {
         this.stopPlayRecord()
-        this.videoUrl = ''
+        this.videoUrl = ['']
         this.currentList = ''
         this.currentSpeed = 2
       } else {
-        this.cloudPlayerUrl = ''
+        this.cloudPlayerUrl = ['']
       }
     },
     handleSelectTreeNode(data) {
@@ -792,60 +932,36 @@ export default {
     },
     // 查询视频
     handleSearch() {
-      console.log('this.channelId', this.channelId)
-      if (this.channelId === '' && this.channelId.length === 0) {
-        this.$message({
-          message: '请选择节点',
-          type: 'warning'
-        })
-        return
-      } else if (this.formData.date === '' && this.formData.date.length === 0) {
-        this.$message({
-          message: '请选择时间',
-          type: 'warning'
-        })
-        return
-      } else {
+      console.log('this.channelId', this.channelId, this.formData.date)
+      if (this.channelId && this.channelId.length > 0) {
+        if (this.resOnlineState === 0) {
+          this.$message({
+            message: '设备离线',
+            type: 'warning'
+          })
+          return
+        }
+        if (
+          this.formData.date === '' ||
+          this.formData.date === null ||
+          this.formData.date === undefined
+        ) {
+          this.$message({
+            message: '请选择时间',
+            type: 'warning'
+          })
+          return
+        }
         this.formData.loading = true
 
         this.dateChange(this.formData.date)
+      } else {
+        this.$message({
+          message: '请选择设备节点',
+          type: 'warning'
+        })
+        return
       }
-    },
-    // 设备滚动控制放大缩小
-    handleMouseWheel() {
-      if (!this.isZoom) return
-      this.isZoom = event.wheelDeltaY > 0 ? ZOOM_TYPE.in : ZOOM_TYPE.out
-      this.handleClickPlayer(event)
-    },
-    // 放大缩小事件
-    handleClickPlayer(event) {
-      if (this.isZoom) {
-        const scale =
-          this.isZoom === ZOOM_TYPE.in
-            ? this.zoomStyle.scale + 0.1
-            : this.zoomStyle.scale - 0.1
-        const dom = document.getElementById('recordPlayerLayout')
-        const centerX = dom.clientWidth / 2
-        const centerY = dom.clientHeight / 2
-
-        this.zoomStyle = {
-          scale,
-          translateX:
-            scale <= 1
-              ? 0
-              : this.zoomStyle.translateX +
-                (centerX - event.layerX) / (scale * 3),
-          translateY:
-            scale <= 1
-              ? 0
-              : this.zoomStyle.translateY +
-                (centerY - event.layerY) / (scale * 3)
-        }
-      }
-    },
-    // 控制放大缩小
-    handleZoom(type) {
-      this.isZoom = this.isZoom === type ? false : type
     },
     //获取码流信息
     getStreamInfo() {
@@ -893,24 +1009,6 @@ export default {
     handleChangeFill() {
       this.isFill = !this.isFill
     },
-    handleDownload() {
-      //下载视频
-      if (this.deviceId && this.channelId) {
-        this.downloadModalVisible = true
-
-        // const [startTime]= this.currentCloudList.split("_");
-        //   this.downMp4({
-        //     startTime,
-        //     recordUrl: this.cloudPlayerUrl
-        // })
-      }
-    },
-    handleScreenShot() {
-      //截屏
-      this.tabsActiveName === 'device'
-        ? this.$refs.devicesPlayer.handleScreenShot()
-        : this.$refs.cloudPlayer.handleScreenShot()
-    },
     handleSetVolume() {
       //设置声音
       this.isMuted = !this.isMuted
@@ -935,9 +1033,6 @@ export default {
       if (this.tabsActiveName === 'device') {
         console.log('播放设备视频')
         this.gbPlay()
-        if (this.currentSpeed != 2) {
-          this.gbScale(this.speedArr[this.currentSpeed])
-        }
       }
       this.play = true
     },
@@ -981,15 +1076,6 @@ export default {
         case isDragEnd: //拖拽后没有播放内容
           this.isDragging = false
           this.handleCloseVideo()
-          // const date = curTime.format("YYYY-MM-DD");
-          // if(this.cloudVideoList[date]){ //数据已经加载过了
-          //   if(this.play){
-          //     this.play = false;
-          //     this.$refs.cloudPlayer && this.$refs.cloudPlayer.pause();
-          //   }
-          // }else{
-          //   this.getCloudRecordVideo(date, curTime);
-          // }
           break
 
         case !isDragEnd: {
@@ -1091,7 +1177,6 @@ export default {
             this.playCloudVideo(minDateRecord)
           } else {
             this.cloudPlay = this.play = false
-            // this.getCloudRecordVideo(moment(this.cloudPlayTime).add(1, "days").format("YYYY-MM-DD"))
           }
         }
       }
@@ -1104,11 +1189,13 @@ export default {
         this.cloudPlay = this.play = false
         this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
         this.$refs.cloudPlayer && this.$refs.cloudPlayer.pause()
+        this.hasStreamId = false
       } else if (
         this.tabsActiveName === 'device' ? this.videoUrl : this.cloudPlayerUrl
       ) {
         //播放
         this.play = true
+        this.hasStreamId = true
         this.$refs.devicesPlayer && this.$refs.devicesPlayer.play()
         this.$refs.cloudPlayer && this.$refs.cloudPlayer.play()
       }
@@ -1176,7 +1263,7 @@ export default {
       this.cloudRecordStartTime = row.startTime
       this.play = this.cloudPlay
 
-      if (this.cloudPlayerUrl != row.recordUrl)
+      if (this.cloudPlayerUrl !== row.recordUrl)
         //播放不同时间段视频
         this.cloudPlayerUrl = row.recordUrl
 
@@ -1200,109 +1287,6 @@ export default {
         this.cloudPlayTime = moment(val)
         this.getCloudRecordVideo(date)
       }
-    },
-    /**
-     * 获取某日全部录像文件
-     * @param callback
-     */
-    getCloudRecordVideo: function (
-      date = this.cloudPlayTime.format('YYYY-MM-DD'),
-      playStartTime,
-      isGetData,
-      callback
-    ) {
-      let that = this
-
-      if (isGetData && playStartTime && this.cloudPlayTime !== playStartTime) {
-        this.cloudPlayTime = playStartTime
-      }
-      that
-        .$axios({
-          method: 'get',
-          url: `/api/record/info/device/data`,
-          params: {
-            startDate: date,
-            endDate: date,
-            deviceChannelId: this.id
-          }
-        })
-        .then((res) => {
-          let flag = false,
-            minStartTimeRecord = res.data.data[0] //是否找到播放的时间
-
-          if (res.data.data && res.data.data.length) {
-            that.cloudVideoList = {
-              // ...that.cloudVideoList,
-              [date]: res.data.data
-            }
-            if (isGetData) return //只是获取数据渲染时间轴
-
-            that.recordVideoData = res.data.data.map((item) => {
-              const startTime = item.startTime.split(' ')
-                ? item.startTime.split(' ')[1]
-                : item.startTime
-              const endTime = item.endTime.split(' ')
-                ? item.endTime.split(' ')[1]
-                : item.endTime
-
-              if (this.play && !playStartTime) {
-                //当前是播放状态
-                minStartTimeRecord =
-                  moment(minStartTimeRecord.startTime).diff(item.startTime) > 0
-                    ? item
-                    : minStartTimeRecord
-              } else if (
-                !flag &&
-                playStartTime &&
-                playStartTime.isBetween(
-                  item.startTime,
-                  item.endTime,
-                  null,
-                  '[]'
-                )
-              ) {
-                //找到指定要播放的记录
-                flag = true
-                this.playCloudVideo(
-                  item,
-                  playStartTime.diff(item.startTime),
-                  playStartTime
-                )
-              }
-
-              return {
-                ...item,
-                duration:
-                  (new Date(date + ' ' + endTime).getTime() -
-                    new Date(date + ' ' + startTime).getTime()) /
-                  1000 // ms
-              }
-            })
-          } else {
-            that.cloudVideoList[date] = []
-            that.recordVideoData = []
-          }
-
-          that.formData.loading = false
-
-          switch (true) {
-            case this.play && !playStartTime && !!minStartTimeRecord: //找到要播放的视频
-              this.playCloudVideo(minStartTimeRecord)
-              break
-            case this.play && !playStartTime:
-            case res.data.data.length === 0:
-            case !!flag:
-              this.play = false
-              break
-          }
-
-          if (callback) callback()
-        })
-        .catch(function (error) {
-          console.log(error)
-          that.formData.loading = false
-          that.loading = false
-        })
     },
     // 秒转换成时分秒
     formatSeconds(value) {
@@ -1337,241 +1321,15 @@ export default {
         this.$router.go(-1)
       }
     },
-    // 请求设备录像
-    getDevicesVideData(
-      date,
-      startTime = date + ' 00:00:00',
-      endTime = date + ' 23:59:59'
-    ) {
-      if (this.deviceVideoList[date]) return
-      this.deviceVideoList[date] = []
-      this.$axios({
-        method: 'get',
-        url:
-          '/api/gb_record/query/' +
-          this.deviceId +
-          '/' +
-          this.channelId +
-          '?startTime=' +
-          startTime +
-          '&endTime=' +
-          endTime
-      }).then((res) => {
-        if (res.data.data.recordList && res.data.data.recordList.length) {
-          this.deviceVideoList = {
-            ...this.deviceVideoList,
-            [date]: res.data.data.recordList.map((item) => {
-              const { startTime, endTime } = item
-              item.duration =
-                (new Date(endTime).getTime() - new Date(startTime).getTime()) /
-                1000 // ms
-              return item
-            })
-          }
-        } else {
-          this.deviceVideoList[date] = []
-        }
-      })
-    },
-
-    // 请求设备录像
-    queryRecords: async function (date, playStartTime = this.playTime) {
-      console.log(11111111, date, playStartTime, this.playTime)
-      this.videoUrl = ''
-      this.videoHistory.searchHistoryResult = []
-      let listData = this.deviceVideoList[date] || []
-      if (!listData.length) {
-        await this.$axios({
-          method: 'get',
-          url: `/api/gb_record/query/${this.deviceId}/${this.channelId}?startTime=${date} 00:00:00&endTime=${date} 23:59:59`
-        })
-          .then((response) => {
-            if (response.data.data && response.data.data.recordList) {
-              listData = response.data.data.recordList.map((item) => {
-                const { startTime, endTime } = item
-                item.duration =
-                  (new Date(endTime).getTime() -
-                    new Date(startTime).getTime()) /
-                  1000 // ms
-                return item
-              })
-
-              this.deviceVideoList = {
-                // ...this.deviceVideoList,
-                [date]: listData
-              }
-            }
-          })
-          .catch(() => {})
-      }
-      this.formData.loading = false
-
-      // 处理时间信息
-      this.videoHistory.searchHistoryResult = listData
-      if (!listData.length) return
-
-      if (playStartTime) {
-        //如果有播放开始时间
-        const record = listData.find((item) =>
-          playStartTime.isBetween(item.startTime, item.endTime, null, '[]')
-        )
-        if (record) this.playRecord(record, playStartTime)
-      } else if (this.play) {
-        //播放中,日期发生变化，找当天最早播放的
-        let minStartTimeRecord = listData[0]
-        for (const item of listData) {
-          minStartTimeRecord = moment(minStartTimeRecord.startTime).isBefore(
-            item.startTime
-          )
-            ? minStartTimeRecord
-            : item
-        }
-        if (minStartTimeRecord) {
-          this.playRecord(minStartTimeRecord)
-        } else {
-          this.play = false
-        }
-      }
-      if (!this.play) {
-        //没有自动播放
-        setTimeout(() => {}, 0)
-      }
-    },
     stopPlayRecord: function (callback) {
       if (!this.streamId) return
       this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
-      this.videoUrl = ''
-      return this.$axios({
-        method: 'get',
-        url:
-          '/api/playback/stop/' +
-          this.deviceId +
-          '/' +
-          this.channelId +
-          '/' +
-          this.streamId
-      }).then(function (res) {
-        return callback && callback()
-      })
+      this.videoUrl = ['']
     },
     // 点击tabs
     handleClick(e) {
       this.isShowStream = false
       this.play = false
-    },
-    // 下载mp4
-    downMp4(data) {
-      // const url = `${this.mediaServerPath}/${this.cloudDate}/${data}`;
-      const { recordUrl, startTime } = data
-      const url = recordUrl
-      // 实现下载功能
-      var filePath = url
-      var fileNewName = `${this.cloudPlayTime.format('YYYY-MM-DD')}_${
-        startTime.split(' ')[1]
-      }`
-      this.fileDownloadFun(filePath, fileNewName)
-      // this.downVideo(filePath, fileNewName);
-    },
-    downVideo(filePath, fileNewName) {
-      const this_ = this
-      const xhr = new XMLHttpRequest()
-      xhr.open('GET', filePath, true)
-      xhr.responseType = 'arraybuffer'
-      xhr.onload = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          let blob = this.response
-          let u = window.URL.createObjectURL(
-            new Blob([blob], { type: 'video/mp4' })
-          )
-          let a = document.createElement('a')
-          a.download = fileNewName
-          a.href = u
-          a.style.display = 'none'
-          document.body.appendChild(a)
-          a.click()
-          a.remove()
-          window.URL.revokeObjectURL(u)
-        }
-      }
-      xhr.onprogress = function (e) {
-        if (e.lengthComputable) {
-          // // 文件总体积
-          // console.log('totoal', e.total)
-          // // 已下载体积
-          // console.log('load', e.loaded)
-          const num = (e.loaded / e.total) * 100
-          Object.assign(this_.alarmList[index], { percentage: num })
-          if (e.total == e.loaded) {
-            this_.$message({
-              type: 'success',
-              message: '下载成功'
-            })
-            this_.percentage = 100
-            Object.assign(this_.alarmList[index], {
-              isDownLoad: false,
-              percentage: 0
-            })
-          }
-        }
-      }
-      xhr.onerror = function () {
-        console.log('失败')
-        this_.$message({
-          type: 'error',
-          message: '下载失败'
-        })
-        Object.assign(this_.alarmList[index], {
-          isDownLoad: false,
-          percentage: 0
-        })
-      }
-      xhr.send()
-    },
-    fileDownloadFun(fileUrl, fileName) {
-      if ('undefined' == typeof fileUrl || !fileUrl) {
-        alert('文件路径不能为空')
-        return false
-      }
-      let fileUrlArr = fileUrl.split('.')
-      // let fileFix = "undefined" != typeof fileUrlArr[1] && fileUrlArr[1] ? '.' + fileUrlArr[1] : '';
-      // fileName = fileName+fileFix;
-      // 发送http请求，将文件链接转换成文件流
-      fileAjaxFun(
-        fileUrl,
-        function (xhr) {
-          downloadFun(xhr.response, fileName)
-        },
-        {
-          responseType: 'blob'
-        }
-      )
-      // 发起请求
-      function fileAjaxFun(url, callback, options) {
-        let xhr = new XMLHttpRequest()
-        xhr.open('get', url, true)
-        if (options.responseType) {
-          xhr.responseType = options.responseType
-        }
-        xhr.onreadystatechange = function () {
-          if (xhr.readyState === 4 && xhr.status === 200) {
-            callback(xhr)
-          }
-        }
-        xhr.send()
-      }
-      // 进行下载
-      function downloadFun(content, filename) {
-        window.URL = window.URL || window.webkitURL
-        let a = document.createElement('a')
-        let blob = new Blob([content])
-        // 通过二进制文件创建url
-        let url = window.URL.createObjectURL(blob)
-        a.href = url
-        a.download = filename
-        a.click()
-        // 销毁创建的url
-        window.URL.revokeObjectURL(url)
-      }
     },
     // 组装视频url
     getUrlByStreamInfo(streamInfo) {
@@ -1632,34 +1390,6 @@ export default {
             videoUrl: lastVideoUrl
           } = lastQuery
           lastQuery = null
-          return this.$axios({
-            method: 'get',
-            url: `/api/playback/seek/${lastStreamId}/${parseInt(lastMs / 1000)}`
-          })
-            .then((res) => {
-              this.videoUrl = ''
-              this.timeChangeLoading = true
-              return new Promise((resolve) => {
-                setTimeout(() => {
-                  isWait = false
-                  if (lastQuery) {
-                    //如果在等待数据回来的时候有调用，就再次调用
-                    this.playTimeChange(lastQuery.ms, lastQuery.videoUrl)
-                  } else {
-                    this.videoUrl = lastVideoUrl
-                    this.timeChangeLoading = false
-                  }
-                  resolve()
-                }, 2000)
-              })
-            })
-            .catch(() => {
-              this.stopPlayRecord(() => {
-                isWait = false
-                this.streamId = ''
-                if (curRow) this.playRecord(curRow, playTime)
-              })
-            })
         }
       }
     })(),
@@ -1712,99 +1442,10 @@ export default {
         })
       }
     },
-    stopDownloadRecord: function (callback) {
-      this.$refs.videoPlayer && this.$refs.videoPlayer.pause()
-      this.videoUrl = ''
-      this.$axios({
-        method: 'get',
-        url:
-          '/api/gb_record/download/stop/' +
-          this.deviceId +
-          '/' +
-          this.channelId +
-          '/' +
-          this.streamId
-      }).then((res) => {
-        if (callback) callback(res)
-      })
-    },
-    ptzCamera: function (command) {
-      let that = this
-      this.$axios({
-        method: 'post',
-        url:
-          '/api/ptz/control/' +
-          this.deviceId +
-          '/' +
-          this.channelId +
-          '?command=' +
-          command +
-          '&horizonSpeed=' +
-          this.controSpeed +
-          '&verticalSpeed=' +
-          this.controSpeed +
-          '&zoomSpeed=' +
-          this.controSpeed
-      }).then(function (res) {})
-    },
 
     //////////////////////播放器事件处理//////////////////////////
     videoError: function (e) {},
-    presetPosition: function (cmdCode, presetPos) {
-      let that = this
-      this.$axios({
-        method: 'post',
-        url:
-          '/api/ptz/front_end_command/' +
-          this.deviceId +
-          '/' +
-          this.channelId +
-          '?cmdCode=' +
-          cmdCode +
-          '&parameter1=0&parameter2=' +
-          presetPos +
-          '&combindCode2=0'
-      }).then(function (res) {})
-    },
-    setSpeedOrTime: function (cmdCode, groupNum, parameter) {
-      let that = this
-      let parameter2 = parameter % 256
-      let combindCode2 = Math.floor(parameter / 256) * 16
-      this.$axios({
-        method: 'post',
-        url:
-          '/api/ptz/front_end_command/' +
-          this.deviceId +
-          '/' +
-          this.channelId +
-          '?cmdCode=' +
-          cmdCode +
-          '&parameter1=' +
-          groupNum +
-          '&parameter2=' +
-          parameter2 +
-          '&combindCode2=' +
-          combindCode2
-      }).then(function (res) {})
-    },
-    setCommand: function (cmdCode, groupNum, parameter) {
-      let that = this
-      this.$axios({
-        method: 'post',
-        url:
-          '/api/ptz/front_end_command/' +
-          this.deviceId +
-          '/' +
-          this.channelId +
-          '?cmdCode=' +
-          cmdCode +
-          '&parameter1=' +
-          groupNum +
-          '&parameter2=' +
-          parameter +
-          '&combindCode2=0'
-      }).then(function (res) {})
-    },
+
     formatTooltip: function (val) {
       var h = parseInt(val / 60)
       var hStr = h < 10 ? '0' + h : h
@@ -1869,7 +1510,14 @@ export default {
             })
               .then((res) => {
                 if (res.code === 0) {
-                  this.videoUrl = res.data.wsFlv
+                  let idxTmp = this.playerIdx
+                  if (this.spilt - 1 > this.playerIdx) {
+                    this.playerIdx++
+                  }
+                  this.setPlayUrl(res.data.wsFlv, idxTmp)
+                  this.streamId = res.data.streamId
+
+                  console.log('this.streamId', this.streamId)
                 }
               })
               .catch((error) => {
@@ -1879,29 +1527,33 @@ export default {
         })
       }
     })(),
-    gbPlay() {
+    setPlayUrl(url, idx) {
+      this.$set(this.videoUrl, idx, url)
+
+      setTimeout(() => {
+        window.localStorage.setItem(
+          'RecordViewVideoUrl',
+          JSON.stringify(this.videoUrl)
+        )
+      }, 100)
+    },
+    async gbPlay() {
       console.log('前端控制：播放')
-      this.$axios({
-        method: 'get',
-        url: '/api/playback/resume/' + this.streamId
-      }).then((res) => {
-        // this.$refs.videoPlayer.play(this.videoUrl);
-      })
     },
     gbPause() {
       console.log('前端控制：暂停')
-      this.$axios({
-        method: 'get',
-        url: '/api/playback/pause/' + this.streamId
-      }).then(function (res) {})
     },
-    gbScale(command) {
+    async gbScale(command) {
       console.log('前端控制：倍速 ' + command)
-      this.$axios({
-        method: 'get',
-        url: `/api/playback/speed/${this.streamId}/${command}`
-        // url: `/api/playback/speed/41AF368A/${command}`
-      }).then(function (res) {})
+
+      await speedRecordView({
+        channelId: this.channelId,
+        speed: command,
+        streamId: this.streamId
+      }).then((res) => {
+        if (res.code === 0) {
+        }
+      })
     },
     gbSeek(val) {
       console.log('前端控制：seek ')
@@ -1917,12 +1569,6 @@ export default {
         (minutes < 10 ? '0' + minutes : minutes) +
         ':' +
         (seconds < 10 ? '0' + seconds : seconds)
-      this.$axios({
-        method: 'get',
-        url:
-          `/api/playback/seek/${this.streamId}/` +
-          Math.floor((this.seekTime * val) / 100000)
-      }).then(function (res) {})
     },
     getMediaServerList: function () {
       let that = this
@@ -1966,28 +1612,7 @@ export default {
      * @param val 数组[年,月]
      * @param callback 回调函数
      */
-    getDateInMoth(val, callback) {
-      this.$axios({
-        method: 'get',
-        url: '/api/record/info/device/month',
-        params: {
-          year: val[0],
-          month: val[1],
-          deviceChannelId: this.selData.id
-        }
-      })
-        .then((res) => {
-          if (res.data.code === 0) {
-            if (res.data.data.length > 0) {
-              this.setHaveVideoDate(res.data.data)
-            }
-          }
-          if (callback) callback()
-        })
-        .catch(function (error) {
-          console.log(error)
-        })
-    },
+    getDateInMoth(val, callback) {},
     //设置当前有录像日期样式
     setHaveVideoDate(dates) {
       let yearAndMonth = []
@@ -2158,6 +1783,77 @@ export default {
     display: none;
   }
 }
+#recordPlayerLayout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: #fff;
+  position: relative;
+  height: 100%;
+  .grid1 {
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+  }
+  .grid4 {
+    grid-template-columns: repeat(2, 50%);
+    grid-template-rows: repeat(2, 50%);
+  }
+  .grid6 {
+    grid-template-areas:
+      'one one .'
+      'one one .'
+      '. . .';
+    grid-template-columns: repeat(3, 33.33%);
+    grid-template-rows: repeat(3, 33.33%);
+    .box1 {
+      grid-area: one;
+    }
+  }
+  .grid8 {
+    grid-template-areas:
+      'one one one .'
+      'one one one .'
+      'one one one .'
+      '. . . .';
+    grid-template-columns: repeat(4, 25%);
+    grid-template-rows: repeat(4, 25%);
+    .box1 {
+      grid-area: one;
+    }
+  }
+  .grid9 {
+    grid-template-columns: repeat(3, 33.33%);
+    grid-template-rows: repeat(3, 33.33%);
+  }
+
+  .grid16 {
+    grid-template-columns: repeat(4, 25%);
+    grid-template-rows: repeat(4, 25%);
+  }
+
+  .empty-player {
+    width: 200px;
+    height: 100px;
+    background: url('../../../../assets/imgs/player_logo.png') center/cover
+      no-repeat;
+  }
+}
+.dbl-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.full-play-box {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-color: #595959;
+}
 .monitoring-content-box {
   height: calc(100% - 0px);
   .left-tree {
@@ -2210,6 +1906,26 @@ export default {
       overflow-y: auto;
     }
   }
+}
+.main-box {
+  width: 100%;
+  height: calc(100vh - 258px);
+  display: grid;
+  flex-wrap: wrap;
+  background-color: #000000;
+  position: relative;
+}
+.redborder {
+  border: 2px solid #1890ff !important;
+}
+.play-box {
+  position: relative;
+  border: 2px solid #505050;
+  box-sizing: border-box;
+  user-select: none;
+}
+.play-box.isFull {
+  position: static;
 }
 .player-container-full {
   display: flex;
@@ -2356,8 +2072,7 @@ export default {
   height: 100%;
 
   width: 80%;
-  display: flex;
-  flex-direction: column;
+  display: grid;
   background-color: #545556;
   position: relative;
 
@@ -2411,12 +2126,6 @@ export default {
       padding-bottom: 0 !important;
       height: 100%;
     }
-
-    // position: absolute;
-    // left: 50%;
-    // top: 50%;
-    // width: 100%;
-    // -webkit-transform: translateX(-50%) translateY(-50%);
   }
 }
 .player-box .not-player {
@@ -2441,10 +2150,6 @@ export default {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.85);
 }
-.jPlayer-box {
-  /* position: absolute; */
-  /* -webkit-transform: translateX(0) translateY(-50%); */
-}
 .playerBox {
   display: none;
 
@@ -2466,9 +2171,6 @@ export default {
 }
 .player-time {
   height: 64px;
-  /* display: flex;
-    align-items: center;
-    justify-content: center; */
   background-color: #303031;
 }
 .player-time .playtime-slider {
@@ -2537,7 +2239,7 @@ export default {
       display: inline-block;
       position: relative;
       top: 7px;
-      left: 0px;
+      left: -1px;
 
       &.play {
         background: url('../../../../assets/imgs/player_pause.png') no-repeat;

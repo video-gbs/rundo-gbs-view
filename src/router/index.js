@@ -355,17 +355,17 @@ const getLastUrl = (str, yourStr) => str.slice(str.lastIndexOf(yourStr))
 
 // let isToken = true
 router.beforeEach(async (to, from, next) => {
-  console.log('进入路由守卫')
+  // console.log('进入路由守卫')
   const hasToken = Local.getToken()
   if (hasToken) {
     // 如果有 token 并且不是登录页的时候，进行权限获取
-    console.log('获取to.path的值', to.path)
+    // console.log('获取to.path的值', to.path)
     if (to.path !== '/login') {
       const lastUrl = getLastUrl(window.location.href, '/')
 
-      console.log('获取lastUrl的值', lastUrl)
-      console.log('获取init的值', store.state.user.init)
-      console.log('获取vuex的值', store.state.user.routerLists)
+      // console.log('获取lastUrl的值', lastUrl)
+      // console.log('获取init的值', store.state.user.init)
+      // console.log('获取vuex的值', store.state.user.routerLists)
 
       if (!store.state.user.init) {
         //从vuex中获取动态路由
@@ -373,7 +373,7 @@ router.beforeEach(async (to, from, next) => {
         let accessRouteses = []
         if (lastUrl !== '/workTable' && to.path !== '/workTable') {
           accessRouteses = JSON.parse(Local.get('dynamicRouters'))
-          console.log('刷新页面的时候动态路由获取', accessRouteses)
+          // console.log('刷新页面的时候动态路由获取', accessRouteses)
 
           const homeRouters = [
             {
@@ -391,7 +391,7 @@ router.beforeEach(async (to, from, next) => {
           let sideBarRouterList2 = []
           let sideBarRouterList3 = []
 
-          console.log('获取tree_type的值', Local.get('tree_type'))
+          // console.log('获取tree_type的值', Local.get('tree_type'))
 
           if (Local.get('tree_type') === 1) {
             const childComponent1 = []
@@ -418,7 +418,7 @@ router.beforeEach(async (to, from, next) => {
                   component: Layout,
                   children: childComponent1
                 }
-                console.log('获取temp1的值', temp1)
+                // console.log('获取temp1的值', temp1)
                 router.addRoute(temp1)
                 router.options.routes.push(temp1)
               }
@@ -471,7 +471,7 @@ router.beforeEach(async (to, from, next) => {
                   component: Layout,
                   children: childComponent4
                 }
-                console.log('获取temp4的值', temp4)
+                // console.log('获取temp4的值', temp4)
                 router.addRoute(temp4)
                 router.options.routes.push(temp4)
               }
@@ -514,16 +514,16 @@ router.beforeEach(async (to, from, next) => {
                       component: Layout,
                       children: childComponent2
                     }
-                    console.log('获取temp4的值', temp2)
+                    // console.log('获取temp4的值', temp2)
                     router.addRoute(temp2)
                     router.options.routes.push(temp2)
                     configTypeRouter = configTypeRouter.concat([temp2])
                   }
 
-                  console.log(
-                    'sideBarRouterList1~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
-                    sideBarRouterList1
-                  )
+                  // console.log(
+                  //   'sideBarRouterList1~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
+                  //   sideBarRouterList1
+                  // )
 
                   // store.dispatch('user/changeSidebarRouter', sideBarRouterList1)
                   store.dispatch(
@@ -557,16 +557,16 @@ router.beforeEach(async (to, from, next) => {
                       component: Layout,
                       children: childComponent3
                     }
-                    console.log('获取temp4的值', temp3)
+                    // console.log('获取temp4的值', temp3)
                     router.addRoute(temp3)
                     router.options.routes.push(temp3)
                     configTypeRouter = configTypeRouter.concat([temp3])
                   }
 
-                  console.log(
-                    'sideBarRouterList2~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
-                    sideBarRouterList2
-                  )
+                  // console.log(
+                  //   'sideBarRouterList2~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
+                  //   sideBarRouterList2
+                  // )
 
                   // store.dispatch('user/changeSidebarRouter', sideBarRouterList2)
                   store.dispatch(
@@ -606,10 +606,10 @@ router.beforeEach(async (to, from, next) => {
                     configTypeRouter = configTypeRouter.concat([temp4])
                   }
 
-                  console.log(
-                    'sideBarRouterList3~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
-                    sideBarRouterList3
-                  )
+                  // console.log(
+                  //   'sideBarRouterList3~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
+                  //   sideBarRouterList3
+                  // )
 
                   // store.dispatch('user/changeSidebarRouter', sideBarRouterList3)
 
@@ -626,7 +626,7 @@ router.beforeEach(async (to, from, next) => {
               }
             })
 
-            console.log('最终的路由值', configTypeRouter)
+            // console.log('最终的路由值', configTypeRouter)
             // store.dispatch(
             //   'user/changeTypeRouter',
             //   homeRouters.concat(configTypeRouter)
@@ -659,13 +659,13 @@ router.beforeEach(async (to, from, next) => {
               store.dispatch('user/changeSidebarRouter', sideBarRouterList2)
             }
           }
-          console.log('刷新后的最终路由', router)
+          // console.log('刷新后的最终路由', router)
 
           store.dispatch('user/changeInit', true)
         } else {
           accessRouteses = await store.state.user.routerLists
 
-          console.log('首页点击的时候动态路由获取', accessRouteses)
+          // console.log('首页点击的时候动态路由获取', accessRouteses)
 
           const childComponent = []
           accessRouteses.forEach((item) => {
@@ -705,23 +705,23 @@ router.beforeEach(async (to, from, next) => {
               router.options.routes.push(elseTemp)
             }
           })
-          console.log('首页点击后的最终路由', router)
+          // console.log('首页点击后的最终路由', router)
 
           store.dispatch('user/changeInit', true)
         }
         next({ ...to, replace: true })
       } else {
-        console.log(12345678)
+        // console.log(12345678)
       }
     } else {
       next('/workTable')
     }
   } else {
     if (to.path !== '/login') {
-      console.log('不在登录页跳转')
+      // console.log('不在登录页跳转')
       next('/login')
     } else {
-      console.log('在登录页跳转')
+      // console.log('在登录页跳转')
       next()
     }
   }

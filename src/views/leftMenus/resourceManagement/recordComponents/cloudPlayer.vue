@@ -25,7 +25,10 @@ export default {
     }
   },
   props: {
-    videoUrl: String,
+    videoUrl: {
+      type: String,
+      default: ''
+    },
     playbackRate: {
       type: Number,
       default: 1
@@ -74,7 +77,7 @@ export default {
     },
     stretch: {
       type: Boolean, //是否拉伸
-      default: false
+      default: true
     },
     videoStyle: {
       type: String,
@@ -83,6 +86,7 @@ export default {
   },
   mounted() {
     let paramUrl = decodeURIComponent(this.$route.params.url)
+    console.log('paramUrl', paramUrl)
     this.$nextTick(() => {
       this.init()
       // let dom = document.getElementById("webRtcPlayerBox");
@@ -91,7 +95,7 @@ export default {
       //   dom1.playbackRate = 4;
       // }, 3000);
       // dom && (dom.style.height = (9 / 16) * dom.clientWidth + "px");
-      if (typeof this.videoUrl == 'undefined') {
+      if (typeof this.videoUrl === 'undefined') {
         this.videoUrl = paramUrl
       }
       console.info('this.$refs.videoPlayer', this.$refs.videoPlayer)
@@ -156,7 +160,6 @@ export default {
       var dataURL = canvas.toDataURL('image/png') //将图片转成base64格式
       // document.getElementById("cutImage").appendChild(img);   //显示在页面中
       this.downFile(dataURL, '截图.jpg') //下载截图
-      // this.$refs.videoPlayer.snap()
     },
     //下载截图
     downFile(data, fileName) {
@@ -250,11 +253,17 @@ export default {
       this.$refs.videoPlayer.setMuted(newVal)
     },
     stretch(newVal) {
+      console.log(
+        'newVal!!!!!!!!!!!!!!!!!!!!',
+        this.$refs.videoPlayer.$el.querySelector('video')
+      )
       this.$refs.videoPlayer.$el.querySelector('video').style['object-fit'] =
-        newVal ? 'fill' : ''
+        !newVal ? 'fill' : ''
+      this.$forceUpdate()
     },
     videoStyle(newVal) {
       const videoDom = this.$refs.videoPlayer.$el.querySelector('video')
+      console.log('videoDom', videoDom)
       videoDom.style = newVal
       videoDom.style['object-fit'] = this.stretch ? 'fill' : ''
     }

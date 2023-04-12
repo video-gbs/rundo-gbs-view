@@ -38,6 +38,14 @@ const methods = {
       headers
     })
   },
+  delete1(url, data, headers) {
+    return request({
+      method: 'DELETE',
+      url,
+      data,
+      headers
+    })
+  },
   delete(url, params, headers) {
     let _params
     if (Object.is(params, undefined)) {

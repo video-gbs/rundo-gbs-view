@@ -1,12 +1,16 @@
 <template>
   <!-- 云台控制 -->
   <div class="cloud-control-container">
-    <DirectionControl :device-data="deviceData" />
-    <!-- <div class="control-operate-box">
+    <DirectionControl
+      ref="directionControl"
+      :device-data="deviceData"
+      v-bind="$attrs"
+      v-on="$listeners"
+    />
+    <div class="control-operate-box">
       <div class="preliminary-position">
-        <div class="position-title" style="margin-bottom: 0px">预置位</div>
-        <div class="position-control-panel">
-        </div>
+        <div class="position-title">预置位</div>
+        <div class="position-control-panel"></div>
         <div class="position-preset">
           <div class="position-preset-middle">
             <div>
@@ -16,51 +20,89 @@
                 @change="handleChange"
               >
                 <el-option
-                  v-for="item in presetList"
-                  :key="item.preset"
-                  :value="item.preset"
-                  style="height: 24px"
+                  v-for="item in optionLists"
+                  :key="item.presetId"
+                  :value="item.presetId"
+                  :label="item.presetName"
                 >
                 </el-option>
               </el-select>
             </div>
 
-            <el-button
-              type="primary"
-              size="small"
-              plain
-              @click="addPresetPosition()"
-              :disabled="nowPreset == ''"
-              >编辑</el-button
-            >
-            <el-button
-              :disabled="!presetEnable"
-              class="btn-call"
-              type="primary"
-              size="small"
-              plain
-              @click="presetPosition(130, presetPos)"
-              >调用</el-button
-            >
-            <el-button
-              :disabled="!presetEnable"
-              type="primary"
-              size="small"
-              plain
-              @click="presetPosition(131, presetPos)"
-              >删除</el-button
-            >
+            <div class="yuzhiwei-control-content">
+              <el-tooltip effect="dark" content="预置位播放" placement="top">
+                <svg-icon
+                  @click="ptzPlay"
+                  :class="
+                    initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
+                  "
+                  :icon-class="
+                    initType[resPlayerIdx]
+                      ? isBofangHover
+                        ? 'yuzhiweibofang-h'
+                        : 'yuzhiweibofang'
+                      : 'yuzhiweibofanghidden'
+                  "
+                  @mouseenter="changeHover(1, '移入')"
+                  @mouseleave="changeHover(1, '移出')"
+                />
+              </el-tooltip>
+
+              <el-tooltip
+                effect="dark"
+                content="预置位名称修改"
+                placement="top"
+              >
+                <svg-icon
+                  class="cloudBtn-right"
+                  @click="presetEdit()"
+                  :class="
+                    initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
+                  "
+                  :icon-class="
+                    initType[resPlayerIdx]
+                      ? isXiugaiHover
+                        ? 'yuzhiweixiugai-h'
+                        : 'yuzhiweixiugai'
+                      : 'yuzhiweixiugaihidden'
+                  "
+                  @mouseenter="changeHover(2, '移入')"
+                  @mouseleave="changeHover(2, '移出')"
+                />
+              </el-tooltip>
+
+              <el-tooltip effect="dark" content="预置位删除" placement="top">
+                <svg-icon
+                  class="cloudBtn-right"
+                  @click="
+                    initType[resPlayerIdx] ? deletePreset(131, presetPos) : ''
+                  "
+                  :class="
+                    initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
+                  "
+                  :icon-class="
+                    initType[resPlayerIdx]
+                      ? isShanchuHover
+                        ? 'yuzhiweishanchu-h'
+                        : 'yuzhiweishanchu'
+                      : 'yuzhiweishanchuhidden'
+                  "
+                  @mouseenter="changeHover(3, '移入')"
+                  @mouseleave="changeHover(3, '移出')"
+                />
+              </el-tooltip>
+            </div>
           </div>
 
           <div class="preset-input-box" v-if="inputBoxDisplay">
-            <span class="preset-span">设置预置位</span>
+            <span class="preset-span">修改预置位名称</span>
             <el-input v-model="inputPresetName" placeholder="输入内容">
             </el-input>
             <el-button
               style="float: right; padding-top: 12px; padding-left: 12px"
               type="text"
               size="small"
-              @click="presetPosition(129, presetPos, inputPresetName)"
+              @click="presetPosition(inputPresetName)"
             >
               确定
             </el-button>
@@ -75,12 +117,13 @@
           </div>
         </div>
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 
 <script>
 import DirectionControl from './DirectionControl'
+import { ptzPresetDelete, ptzPresetEdit, ptzPreset } from '@/api/method/live'
 export default {
   name: 'cloudControl',
   components: {
@@ -88,6 +131,17 @@ export default {
   },
   data() {
     return {
+      resChannelId: '',
+      optionLists: [],
+      resShowContent: [],
+      isBofangHover: false,
+      isXiugaiHover: false,
+      isShanchuHover: false,
+      resPlayerIdx: 0,
+      hoverNum: 0,
+      initType: [],
+      isCloudBtnsHover: false,
+      isHoverNum: null,
       videoUrl: '',
       controSpeed: 30, //云台控制速度
       presetPos: 0,
@@ -100,45 +154,114 @@ export default {
       presetEnable: false //是否禁用删除或调用
     }
   },
-  props: {
-    deviceData: Object
-  },
-  mounted() {
-    // setTimeout(() => {
-    //   this.queryPreset();
-    // }, 0);
-    // this.$bus.$on("ptzCamera", (type) => {
-    //   console.info("bus.type", type);
-    //   this.ptzCamera(type);
-    // });
-  },
-  watch: {
-    deviceData: {
-      deep: true,
-      handler(newVal, oldVal) {
-        if (newVal.deviceID) {
-          this.queryPreset(newVal)
-        }
-      }
+  props: [
+    'deviceData',
+    'showContent1',
+    'playerIdx1',
+    'childOptionLists',
+    'channelExpansionId'
+  ],
+  created() {
+    this.resShowContent = this.$props.showContent1
+
+    this.resPlayerIdx = this.$props.playerIdx1
+
+    this.optionLists = this.$props.childOptionLists[this.$props.playerIdx1]
+
+    this.resChannelId = this.$props.channelExpansionId[this.$props.playerIdx1]
+
+    console.log(111111, this.$props.playerIdx1, this.$props.showContent1)
+    this.initType = []
+    for (let i = 0; i < this.$props.showContent1.length; i++) {
+      this.initType[i] = false
     }
   },
-  methods: {
-    callPosition(deviceId, channelId) {
-      this.$axios({
-        method: 'post',
-        url: `/api/ptz/front_end_command/${deviceId}/${channelId}`
+  mounted() {},
+  watch: {
+    showContent1(val) {
+      this.resShowContent = val
+
+      this.resShowContent.map((item, index) => {
+        if (item && item.length > 0) {
+          this.initType[index] = true
+        } else {
+          this.initType[index] = false
+        }
       })
-        .then((res) => {
-          console.info('=====#####111', res)
-        })
-        .catch(() => {
-          that.$message({
-            message: '调用失败！',
-            type: 'error'
-          })
-        })
+      this.$forceUpdate()
     },
-    presetPosition: function (cmdCode, presetPos, presetName) {
+    playerIdx1(val) {
+      this.optionLists = this.$props.childOptionLists[val]
+      this.resChannelId = this.$props.channelExpansionId[val]
+
+      this.resPlayerIdx = val
+      this.resShowContent.map((item, index) => {
+        if (item && item !== '' && item.length > 0) {
+          if (index === this.resPlayerIdx) {
+            this.initType[this.resPlayerIdx] = true
+          } else {
+            this.initType[this.resPlayerIdx] = false
+          }
+        }
+      })
+      this.$forceUpdate()
+    },
+    deep: true,
+    immediate: true
+  },
+  methods: {
+    async ptzPlay() {
+      await ptzPreset({
+        channelExpansionId: this.resChannelId,
+        presetId: this.nowPreset
+      }).then((res) => {
+        if (res.code === 0) {
+        }
+      })
+    },
+    getOptionLists(index) {
+      this.optionLists = this.$props.childOptionLists[index]
+    },
+    changeHover(num, value) {
+      if (this.initType) {
+        if (num === 1) {
+          switch (value) {
+            case '移入':
+              this.isBofangHover = true
+              break
+            case '移出':
+              this.isBofangHover = false
+              break
+            default:
+              break
+          }
+        } else if (num === 2) {
+          switch (value) {
+            case '移入':
+              this.isXiugaiHover = true
+              break
+            case '移出':
+              this.isXiugaiHover = false
+              break
+            default:
+              break
+          }
+        } else {
+          switch (value) {
+            case '移入':
+              this.isShanchuHover = true
+              break
+            case '移出':
+              this.isShanchuHover = false
+              break
+            default:
+              break
+          }
+        }
+      }
+    },
+
+    async presetPosition(presetName) {
       const reg = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,15}$/
       if (!reg.test(presetName)) {
         return this.$message({
@@ -146,128 +269,59 @@ export default {
           type: 'error'
         })
       }
-      const { deviceID, channelId } = this.deviceData
-      // console.log(this.deviceData,"deviceData")
-      // console.log('预置位控制：' + this.presetPos + ' : 0x' + cmdCode.toString(16));
-      this.$axios({
-        method: 'post',
-        // url: '/api/ptz/front_end_command/' + deviceID + '/' + channelId + '?cmdCode=' + cmdCode + '&parameter1=0&parameter2=' + presetPos + '&combindCode2=0'
-        url: '/api/ptz/front_end_command',
-        params: {
-          deviceId: { deviceID }.deviceID,
-          channelId: { channelId }.channelId,
-          cmdCode: cmdCode,
-          parameter1: 0,
-          parameter2: presetPos,
-          combindCode2: 0,
-          presetName: presetName
-        }
+      await ptzPresetEdit({
+        channelExpansionId: this.resChannelId,
+        presetId: this.nowPreset,
+        presetName
       }).then((res) => {
-        this.inputBoxDisplay = false
-        this.queryPreset(this.deviceData)
+        if (res.code === 0) {
+          this.nowPreset = presetName
+          this.$message({
+            type: 'success',
+            message: '修改名称成功'
+          })
+          this.inputBoxDisplay = false
+          console.log('预置位修改', this.resChannelId, this.resPlayerIdx)
+          this.$emit(
+            'changeChildOptionLists',
+            this.resChannelId,
+            this.resPlayerIdx
+          )
+        }
       })
     },
-    // 设置预置位
-    addPresetPosition() {
-      this.inputBoxDisplay = !this.inputBoxDisplay
-      this.presetPos = this.nowPreset.substring(0, this.nowPreset.indexOf('-'))
-      this.inputPresetName = this.nowPreset.substring(
-        this.nowPreset.indexOf('-') + 1
-      )
+    async deletePreset() {
+      await ptzPresetDelete({
+        channelExpansionId: this.resChannelId,
+        presetId: this.nowPreset
+      })
+        .then((res) => {
+          if (res.code === 0) {
+            this.optionLists = this.optionLists.filter((item) => {
+              return item.presetId !== this.nowPreset
+            })
+            this.nowPreset = []
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+
+            this.$emit('changeOptionLists', this.nowPreset, this.resPlayerIdx)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
-    handleChange() {
-      this.presetPos = this.nowPreset.substring(0, this.nowPreset.indexOf('-'))
-      this.inputPresetName = this.nowPreset.substring(
-        this.nowPreset.indexOf('-') + 1
-      )
-      this.presetEnable =
-        this.presetList[
-          this.nowPreset.substring(0, this.nowPreset.indexOf('-')) - 1
-        ].enable
+    // 设置预置位
+    presetEdit() {
+      this.inputBoxDisplay = !this.inputBoxDisplay
+    },
+    handleChange(val) {
+      this.nowPreset = val
     },
     cancelPreset() {
       this.inputBoxDisplay = false
-    },
-    // 预置位查询
-    queryPreset(val) {
-      console.log('预置位查询')
-      this.presetList = []
-      const { deviceID, channelId } = val
-
-      //数据库中批量添加预置位
-      const batchPreset = { deviceID }.deviceID + { channelId }.channelId
-      // console.log(this.presetExistence,"已经批量新建的")
-      if (!this.presetExistence.includes(batchPreset)) {
-        this.presetExistence.push(batchPreset)
-        //往数据库批量添加
-        this.batchPresetPosition({ deviceID }.deviceID, { channelId }.channelId)
-        // console.log(this.presetExistence,"数据库中不存在")
-      } else {
-        // console.log("数据库中已经存在")
-      }
-      this.$axios({
-        method: 'get',
-        // url: `/api/ptz/preset/query/${deviceID}/${channelId}`
-        url: '/api/ptz/preset/query',
-        params: {
-          deviceId: { deviceID }.deviceID,
-          channelId: { channelId }.channelId
-        }
-      }).then((res) => {
-        // console.log(res,"预置位列表")
-        if (res.data.data && Array.isArray(res.data.data)) {
-          this.presetList = res.data.data
-          this.presetList.forEach((element) => {
-            const preset = element.presetId + '-' + element.presetName
-            element.preset = preset
-          })
-          const currentPreset =
-            this.presetList[
-              this.nowPreset.substring(0, this.nowPreset.indexOf('-')) - 1
-            ]
-          this.nowPreset = currentPreset.preset
-          this.presetEnable = currentPreset.enable
-          // console.log(this.presetEnable,"是否启动")
-        }
-        // console.log(this.presetList,"预置位列表")
-      })
-    },
-    //批量添加预置位（默认预置位）
-    batchPresetPosition(deviceId, channelId) {
-      this.$axios({
-        method: 'get',
-        url: '/api/ptz/preset/batchAdd',
-        params: {
-          deviceId: deviceId,
-          channelId: channelId,
-          count: this.count
-        }
-      }).then(() => {})
-    },
-    // 云台控制
-    ptzCamera: function (command) {
-      const { deviceID, channelId } = this.deviceData
-      console.log('云台控制数据：' + this.deviceData)
-      console.log('云台控制：' + command)
-      this.$axios({
-        method: 'post',
-        url:
-          '/api/ptz/control/' +
-          deviceID +
-          '/' +
-          channelId +
-          '?command=' +
-          command +
-          '&horizonSpeed=' +
-          this.controSpeed +
-          '&verticalSpeed=' +
-          this.controSpeed +
-          '&zoomSpeed=' +
-          this.controSpeed
-      }).then(function (res) {})
-    },
-    changePos: function (params) {
-      this.presetPos = params.presetId
     }
   },
   destroyed() {}
@@ -277,6 +331,11 @@ export default {
 <style lang="scss">
 .cloud-control-container {
   position: relative;
+  .position-title {
+    margin-bottom: 0px;
+    border-bottom: 1px solid #e8e8e8;
+    padding-bottom: 10px;
+  }
 
   .direction-control {
     .steering-wheel {
@@ -313,16 +372,15 @@ export default {
   padding-bottom: 20px;
 
   div {
-    width: 140px;
-    margin-right: 20px;
-    //  padding-top: 10px;
+    width: 178px;
+    height: 36px;
     .el-input--suffix .el-input__inner {
       padding-right: 30px;
       height: 32px;
       border-radius: 2px;
     }
     .el-select .el-input .el-select__caret {
-      display: none;
+      // display: none;
     }
   }
 }
@@ -334,11 +392,6 @@ export default {
     background: #fff !important;
   }
 }
-// .el-select-dropdown__item {
-//   line-height: 24px;
-//   font-family: PingFangSC-Regular, PingFang SC;
-//   overflow: hidden;
-// }
 .position-preset-middle .el-button--primary {
   height: 32px;
   font-size: 14px;
@@ -367,6 +420,28 @@ export default {
   .preset-span {
     float: left;
     padding-bottom: 8px;
+  }
+}
+.yuzhiwei-control-content {
+  width: 100%;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 20px;
+  .cloudBtn {
+    position: relative;
+    top: 5px;
+    left: 25px;
+    width: 24px;
+    height: 24px;
+  }
+  .cloudBtnDisable {
+    position: relative;
+    top: 5px;
+    left: 25px;
+    width: 24px;
+    height: 24px;
+    cursor: not-allowed;
   }
 }
 </style>

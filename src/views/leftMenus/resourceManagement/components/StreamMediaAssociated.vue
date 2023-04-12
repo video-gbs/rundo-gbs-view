@@ -397,7 +397,6 @@ export default {
         selectLeftList.map((item) => {
           gatewayIds.push(item.id)
         })
-        console.log('gatewayIds', gatewayIds)
         bindingNorthLists({
           gatewayIds,
           dispatchId: this.$router.currentRoute.query.key
@@ -446,7 +445,6 @@ export default {
         selectRightList.map((item) => {
           gatewayIds1.push(item.id)
         })
-        console.log('gatewayIds1', gatewayIds1)
 
         unbindingNorthLists({
           gatewayIds: gatewayIds1,

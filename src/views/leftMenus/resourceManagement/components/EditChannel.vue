@@ -300,7 +300,6 @@ export default {
     }
   },
   created() {
-    console.log('this.$route.query', this.$route.query)
     const {
       channelCode,
       channelName,

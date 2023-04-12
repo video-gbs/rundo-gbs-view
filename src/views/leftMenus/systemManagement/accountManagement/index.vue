@@ -66,16 +66,36 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/*表格表头全选*/
-// ::v-deep .disabledSelection .cell .el-checkbox__inner{
-//   margin-left: -30px;
-//   position:relative;
-// }
-// ::v-deep .disabledSelection .cell:before{
-//   content:"序号";
-//   position:absolute;
-//   right:11px;
-// }
+::v-deep .accountTree .el-tree-node__expand-icon.expanded {
+  -webkit-transform: rotate(0deg);
+  transform: rotate(0deg);
+}
+// 没有展开且有子节点
+::v-deep .accountTree .el-icon-caret-right:before {
+  background: url('~@/assets/imgs/treeOpen.png') no-repeat 0 0;
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  top: 1px;
+}
+// 已经展开且有子节点
+::v-deep
+  .accountTree
+  .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
+  background: url('~@/assets/imgs/treeClose.png') no-repeat 0 0;
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  top: 1px;
+}
+// 没有子节点
+::v-deep .accountTree .el-tree-node__expand-icon.is-leaf::before {
+  display: none;
+}
 ::v-deep .el-tabs__content {
   flex: 1;
 }
