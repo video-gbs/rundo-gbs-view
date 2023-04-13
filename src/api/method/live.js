@@ -25,7 +25,7 @@ export function ptzControl1(data) {
 // 预置位执行
 
 export function ptzPreset(data) {
-  return request.put(`${expansion}/ptz/preset/delete`, data)
+  return request.put(`${expansion}/ptz/preset/invoke`, data)
 }
 
 // 预置位编辑
