@@ -592,7 +592,7 @@ export default {
       border: 6px solid transparent;
       position: absolute;
       border-top-color: white;
-      left: 2px;
+      left: 1.5px;
     }
 
     &::after {
@@ -601,7 +601,7 @@ export default {
       position: absolute;
       bottom: 0;
       border-bottom-color: white;
-      left: 2px;
+      left: 1.5px;
     }
 
     .current-line {
