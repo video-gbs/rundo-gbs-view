@@ -147,7 +147,7 @@
                       :videoUrl="videoUrl[i - 1]"
                       :playbackRate="speedArr[currentSpeed]"
                       :autoplay="play"
-                      :playerIdx="playerIdx - 1"
+                      :playerIdx="playerIdx"
                       live
                     ></cloud-player>
                   </div>
@@ -638,8 +638,6 @@ export default {
       this.fullPlayerIdx = -1
       this.spilt = item.num
       this.spiltIndex = i
-
-      this.isFill
     },
     changeHover(num, value) {
       console.log(num, value)
@@ -1018,6 +1016,20 @@ export default {
     //缩放拉伸屏幕
     handleChangeFill() {
       this.isFill[this.playerIdx] = !this.isFill[this.playerIdx]
+
+      console.log('缩放拉伸屏幕', this.isFill)
+
+      const dom = document.getElementsByClassName('player-box')
+
+      console.log('缩放拉伸屏幕', dom)
+
+      // if (dom[this.playerIdx].style.height === '100%') {
+      //   this.stretch[this.playerIdx] = true
+      // }else{
+      //   this.stretch[this.playerIdx] = false
+      // }
+
+      this.$forceUpdate()
     },
     handleSetVolume() {
       //设置声音
@@ -1115,6 +1127,7 @@ export default {
     })(),
     //监听设备播放完毕,自动播放下一个视频
     handleDevicesPlayEnded(ref, event) {
+      console.log('监听设备播放完毕,自动播放下一个视频')
       let minDateRecord,
         maxDiff = -99999999999
       if (this.tabsActiveName === 'device') {
@@ -2015,6 +2028,7 @@ export default {
 .player-box {
   flex: 1;
   position: relative;
+  // height: 100%;
   /* display: flex;
     align-items: center; */
 }

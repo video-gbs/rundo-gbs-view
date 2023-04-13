@@ -2,10 +2,12 @@
   <LivePlayer
     ref="videoPlayer"
     class="live-player-container"
+    :aspect="stretch ? 'fullscreen' : '16:9'"
     id="livePlayerDevice"
     :videoUrl="videoUrl"
     :controls="controls"
     :autoplay="autoplay"
+    @fullscreen="changFullscreen"
     @snapOutside="screenShot"
     :live="live"
   >
@@ -91,6 +93,10 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.init()
+      const dom = document.getElementsByClassName('player-box')
+      dom[this.$props.playerIdx - 1].style.height = this.$props.stretch
+        ? '100%'
+        : ''
       console.info('this.$refs.videoPlayer', this.$refs.videoPlayer)
       console.log('q初始化时的地址为: ' + this.videoUrl)
     })
@@ -136,6 +142,9 @@ export default {
 
       //设置静音
       this.$refs.videoPlayer.setMuted(this.muted)
+    },
+    changFullscreen(val) {
+      console.log('changFullscreen', val)
     },
     handleScreenShot() {
       //触发快照
@@ -227,6 +236,7 @@ export default {
   },
   watch: {
     videoUrl(newVal) {
+      console.log(111111111)
       if (newVal)
         this.$nextTick(() => {
           this.init()
@@ -242,18 +252,15 @@ export default {
     muted(newVal) {
       this.$refs.videoPlayer.setMuted(newVal)
     },
+
     stretch(newVal) {
-      console.log(
-        'newVal!!!!!!!!!!!!!!!!!!!!',
-        this.$refs.videoPlayer.$el.querySelector('video')
-      )
-      this.$refs.videoPlayer.$el.querySelector('video').style['object-fit'] =
-        !newVal ? 'fill' : ''
+      document.getElementsByClassName('player-box')[
+        this.$props.playerIdx
+      ].style.height = newVal ? '100%' : ''
       this.$forceUpdate()
     },
     videoStyle(newVal) {
       const videoDom = this.$refs.videoPlayer.$el.querySelector('video')
-      console.log('videoDom', videoDom)
       videoDom.style = newVal
       videoDom.style['object-fit'] = this.stretch ? 'fill' : ''
     }
