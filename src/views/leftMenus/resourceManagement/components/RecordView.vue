@@ -123,7 +123,7 @@
                   redborder: playerIdx == i - 1,
                   isFull: fullPlayerIdx !== -1
                 }"
-                @click="playerIdx = i - 1"
+                @click.stop="videoClick(i)"
                 v-loading="playerData[i - 1] && !cloudPlayerUrl[i - 1]"
                 element-loading-text="拼命加载中"
                 element-loading-background="transparent"
@@ -136,8 +136,8 @@
                   <div v-if="!videoUrl[i - 1]" class="empty-player"></div>
                   <div v-else class="player-box" ref="videoBox">
                     <cloud-player
-                      :ref="'cloudPlayer' + i"
-                      :stretch="isFill"
+                      ref="cloudPlayer"
+                      :stretch="isFill[i - 1]"
                       :onChangePlayTime="handleChangeCurrentTime"
                       :onPlayEnded="handleDevicesPlayEnded"
                       :onPlay="handleOnPlay"
@@ -147,6 +147,7 @@
                       :videoUrl="videoUrl[i - 1]"
                       :playbackRate="speedArr[currentSpeed]"
                       :autoplay="play"
+                      :playerIdx="playerIdx - 1"
                       live
                     ></cloud-player>
                   </div>
@@ -275,12 +276,14 @@
                 </el-tooltip>
                 <el-tooltip
                   effect="dark"
-                  :content="isFill ? '拉伸' : '自适应'"
+                  :content="isFill[playerIdx] ? '拉伸' : '自适应'"
                   placement="top"
                 >
                   <i
                     @click="handleChangeFill"
-                    :class="`iconfont icon-zishiying ${isFill ? 'active' : ''}`"
+                    :class="`iconfont icon-zishiying ${
+                      isFill[playerIdx] ? 'active' : ''
+                    }`"
                   ></i>
                 </el-tooltip>
                 <div class="split-box">
@@ -493,7 +496,7 @@ export default {
       cloudPlayTime: moment().startOf('days'),
       currentCloudList: '',
       isMuted: true, //音量
-      isFill: true, //是否拉伸视频
+      isFill: [], //是否拉伸视频
       isShowStream: false, //是否显示码流
       tracks: [],
       cloudPlay: false,
@@ -579,7 +582,8 @@ export default {
       ischannel: this.$route.params.SselectedNode
         ? this.$route.params.SselectedNode
         : 0,
-      ScurrentPage: this.$route.params.ScurrentPage
+      ScurrentPage: this.$route.params.ScurrentPage,
+      isNext: true
     }
   },
 
@@ -590,6 +594,10 @@ export default {
       // 监听到屏幕变化，更改全屏状态，该页面不能存在多个全屏元素
       this.isFullScreen = !this.isFullScreen
     })
+    this.isFill = []
+    for (let i = 0; i < this.spilt; i++) {
+      this.isFill[i] = true
+    }
   },
   computed: {
     liveStyle() {
@@ -630,6 +638,8 @@ export default {
       this.fullPlayerIdx = -1
       this.spilt = item.num
       this.spiltIndex = i
+
+      this.isFill
     },
     changeHover(num, value) {
       console.log(num, value)
@@ -693,7 +703,7 @@ export default {
 
     async getPlaybackList(date, playStartTime = this.playTime) {
       console.log(11111111, date, playStartTime, this.playTime)
-      this.videoUrl = ['']
+      // this.videoUrl = ['']
       this.videoHistory.searchHistoryResult = []
       let listData = this.deviceVideoList[date] || []
       console.log('listData~~~~~~~~~~~~', this.deviceVideoList[date], listData)
@@ -1007,7 +1017,7 @@ export default {
     },
     //缩放拉伸屏幕
     handleChangeFill() {
-      this.isFill = !this.isFill
+      this.isFill[this.playerIdx] = !this.isFill[this.playerIdx]
     },
     handleSetVolume() {
       //设置声音
@@ -1036,41 +1046,16 @@ export default {
       }
       this.play = true
     },
-    //滚动时间轴事件
+
+    // 滚动时间轴事件
     handleChangePlayTime(curTime, isDragEnd, record) {
-      // console.log('curTime',curTime)
-      switch (true) {
-        case !!(isDragEnd && record): {
-          //拖拽完成,并且该时间有播放内容数据
-          console.log('拖拽结束')
-          this.playRecord(record)
-          this.isDragging = false
-          break
-        }
-        case isDragEnd: //拖拽后没有播放内容
-          console.log('拖拽结束--没数据')
-          this.isDragging = false
-          this.handleCloseVideo()
-
-          break
-
-        case !!(!isDragEnd && this.play): {
-          //拖拽中
-          console.log('拖拽中')
-          this.isDragging = true
-          this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
-          break
-        }
-      }
-    },
-    //云录像滚动时间轴事件
-    handleChangeCloudPlayTime(curTime, isDragEnd, record) {
       switch (true) {
         case !!(isDragEnd && record): {
           //拖拽完成,并且该时间有播放内容数据
           this.isDragging = false
+          this.isNext = false
           console.log('拖拽完成', record)
-          this.playCloudVideo(record, curTime.diff(record.startTime), curTime)
+          this.playRecord(record, curTime)
           break
         }
         case isDragEnd: //拖拽后没有播放内容
@@ -1080,11 +1065,10 @@ export default {
 
         case !isDragEnd: {
           //拖拽中
-          console.log('拖拽中')
+          console.log('拖拽中', this.$refs, this.playerIdx)
           this.isDragging = true
-          if (this.play) this.cloudPlay = this.play
-          this.play = false
-          this.$refs.cloudPlayer && this.$refs.cloudPlayer.pause()
+          this.$refs.cloudPlayer[this.playerIdx - 1] &&
+            this.$refs.cloudPlayer[this.playerIdx - 1].pause()
           break
         }
       }
@@ -1188,7 +1172,8 @@ export default {
         //暂停
         this.cloudPlay = this.play = false
         this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
-        this.$refs.cloudPlayer && this.$refs.cloudPlayer.pause()
+        this.$refs.cloudPlayer[this.playerIdx - 1] &&
+          this.$refs.cloudPlayer[this.playerIdx - 1].pause()
         this.hasStreamId = false
       } else if (
         this.tabsActiveName === 'device' ? this.videoUrl : this.cloudPlayerUrl
@@ -1197,7 +1182,8 @@ export default {
         this.play = true
         this.hasStreamId = true
         this.$refs.devicesPlayer && this.$refs.devicesPlayer.play()
-        this.$refs.cloudPlayer && this.$refs.cloudPlayer.play()
+        this.$refs.cloudPlayer[this.playerIdx - 1] &&
+          this.$refs.cloudPlayer[this.playerIdx - 1].play()
       }
     },
     //倍数按钮
@@ -1270,8 +1256,10 @@ export default {
       if (skipTime) {
         //快进的时间段
         this.$nextTick(() => {
-          this.$refs.cloudPlayer &&
-            this.$refs.cloudPlayer.setCurrentTime(parseInt(skipTime / 1000))
+          this.$refs.cloudPlayer[this.playerIdx - 1] &&
+            this.$refs.cloudPlayer[this.playerIdx - 1].setCurrentTime(
+              parseInt(skipTime / 1000)
+            )
         })
       }
     },
@@ -1288,39 +1276,6 @@ export default {
         this.getCloudRecordVideo(date)
       }
     },
-    // 秒转换成时分秒
-    formatSeconds(value) {
-      // 转换为式分秒
-      let h = parseInt((value / 60 / 60) % 24)
-      h = h < 10 ? '0' + h : h
-      let m = parseInt((value / 60) % 60)
-      m = m < 10 ? '0' + m : m
-      let s = parseInt(value % 60)
-      s = s < 10 ? '0' + s : s
-      // 作为返回值返回
-      return `${h}:${m}:${s}`
-    },
-    goBack() {
-      if (this.ischannel == 1) {
-        this.$router.push({
-          name: `ChannelManagement`,
-          params: {
-            SchannelId: this.SchannelId,
-            SchannelName: this.SchannelName,
-            // Scount : this.count,
-            SdeviceId: this.SdeviceId,
-            SdeviceName: this.SdeviceName,
-            SincludeEquipment: this.SincludeEquipment,
-            Sip: this.Sip,
-            Sstatus: this.Sstatus,
-            SselectedNode: this.SselectedNode,
-            ScurrentPage: this.ScurrentPage
-          }
-        })
-      } else {
-        this.$router.go(-1)
-      }
-    },
     stopPlayRecord: function (callback) {
       if (!this.streamId) return
       this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
@@ -1330,47 +1285,6 @@ export default {
     handleClick(e) {
       this.isShowStream = false
       this.play = false
-    },
-    // 组装视频url
-    getUrlByStreamInfo(streamInfo) {
-      console.log(streamInfo, 'streamInfo')
-      const urlType = 'FLV'
-      let videoUrl = [streamInfo.ws_flv, streamInfo.wss_flv] // [0]为http，[1]为https
-      // let videoUrl = [streamInfo.wss_flv, streamInfo.wss_flv]; // [0]为http，[1]为https
-      let baseZlmApi =
-        process.env.NODE_ENV === 'development'
-          ? `${location.host}/debug/zlm`
-          : `${location.host}/zlm`
-      // return `${baseZlmApi}/${streamInfo.app}/${streamInfo.streamId}.flv`;
-      // return `http://${baseZlmApi}/${streamInfo.app}/${streamInfo.streamId}.flv`;
-      // 2020/03/14
-      if (urlType === 'HLS') {
-        videoUrl = [streamInfo.hls, streamInfo.https_hls]
-      } else if (urlType === 'WEB-RTC') {
-        videoUrl = [streamInfo.rtc, streamInfo.rtc]
-      }
-
-      if (location.protocol === 'https:') {
-        if (streamInfo.wss_flv === null) {
-          console.error('媒体服务器未配置ssl端口, 使用http端口')
-          // this.$message({
-          //   showClose: true,
-          //   message: '媒体服务器未配置ssl端口, ',
-          //   type: 'error'
-          // });
-          return videoUrl[0]
-        } else {
-          return videoUrl[1]
-        }
-      } else {
-        return videoUrl[0]
-      }
-    },
-    playTimeFormat(val) {
-      let h = parseInt(val / 3600)
-      let m = parseInt((val - h * 3600) / 60)
-      let s = parseInt(val - h * 3600 - m * 60)
-      return h + ':' + m + ':' + s
     },
     // 切换播放进度
     playTimeChange: (function () {
@@ -1409,37 +1323,6 @@ export default {
           }
         })
       } else {
-        this.$axios({
-          method: 'get',
-          url:
-            '/api/gb_record/download/start/' +
-            this.deviceId +
-            '/' +
-            this.channelId +
-            '?startTime=' +
-            row.startTime +
-            '&endTime=' +
-            row.endTime +
-            '&downloadSpeed=4'
-        }).then(function (res) {
-          if (res.data.code == 0) {
-            let streamInfo = res.data.data
-            that.recordPlay = false
-            that.$refs.recordDownload.openDialog(
-              that.deviceId,
-              that.channelId,
-              streamInfo.app,
-              streamInfo.stream,
-              streamInfo.mediaServerId
-            )
-          } else {
-            that.$message({
-              showClose: true,
-              message: res.data.msg,
-              type: 'error'
-            })
-          }
-        })
       }
     },
 
@@ -1510,14 +1393,16 @@ export default {
             })
               .then((res) => {
                 if (res.code === 0) {
-                  let idxTmp = this.playerIdx
-                  if (this.spilt - 1 > this.playerIdx) {
-                    this.playerIdx++
+                  if (!this.isNext) {
+                    this.setPlayUrl(res.data.wsFlv, this.playerIdx - 1)
+                  } else {
+                    if (this.spilt > this.playerIdx) {
+                      this.playerIdx++
+                    }
+                    this.setPlayUrl(res.data.wsFlv, this.playerIdx - 1)
                   }
-                  this.setPlayUrl(res.data.wsFlv, idxTmp)
-                  this.streamId = res.data.streamId
 
-                  console.log('this.streamId', this.streamId)
+                  this.streamId = res.data.streamId
                 }
               })
               .catch((error) => {
@@ -1530,12 +1415,14 @@ export default {
     setPlayUrl(url, idx) {
       this.$set(this.videoUrl, idx, url)
 
+      console.log('!!!!!!!!!!!', this.videoUrl, idx)
       setTimeout(() => {
         window.localStorage.setItem(
           'RecordViewVideoUrl',
           JSON.stringify(this.videoUrl)
         )
       }, 100)
+      this.isNext = true
     },
     async gbPlay() {
       console.log('前端控制：播放')
@@ -1715,6 +1602,12 @@ export default {
         (endTime.getTime() - startTime.getTime()) /
         ((this.cloudSliderMax - this.cloudSliderMIn) * 1000)
       return result * 100
+    },
+    videoClick(i) {
+      // this.getPlaybackList(this.videoHistory.date)
+
+      console.log('this.deviceVideoList', this.deviceVideoList)
+      this.playerIdx = i - 1
     }
   },
   watch: {
@@ -1751,6 +1644,9 @@ export default {
     treeList(n) {
       console.log('nnnnnn')
       this.treeList = n
+    },
+    playerIdx(val) {
+      console.log('val!!!!!!!!!!!!!!!!!!!!!', val)
     }
   },
   beforeDestroy() {
@@ -1763,6 +1659,38 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .tree .el-tree-node__expand-icon.expanded {
+  -webkit-transform: rotate(0deg);
+  transform: rotate(0deg);
+}
+// 没有展开且有子节点
+::v-deep .tree .el-icon-caret-right:before {
+  background: url('~@/assets/imgs/treeOpen.png') no-repeat 0 0;
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  top: 1px;
+}
+// 已经展开且有子节点
+::v-deep .tree .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
+  background: url('~@/assets/imgs/treeClose.png') no-repeat 0 0;
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  top: 1px;
+}
+// 没有子节点
+::v-deep .tree .el-tree-node__expand-icon.is-leaf::before {
+  // background: url("~@/assets/imgs/tree+.png") no-repeat 0 3px;
+  content: '';
+  display: none;
+  width: 8px;
+  height: 8px;
+}
 ::v-deep .el-tabs__nav-scroll {
   &::after {
     display: none;
@@ -1982,11 +1910,6 @@ export default {
   .el-tabs__content {
     flex: 1;
   }
-  .el-tab-pane {
-    // height: 100%;
-    // display: flex;
-    // flex-direction: column;
-  }
 }
 .recordView .el-container {
   height: 100%;
@@ -2023,9 +1946,6 @@ export default {
   color: #fff;
 }
 .record-list .content {
-  // display: flex;
-  // justify-content: center;
-  // flex-direction: column;
   flex: 1;
   padding-bottom: 16px;
   text-align: left;

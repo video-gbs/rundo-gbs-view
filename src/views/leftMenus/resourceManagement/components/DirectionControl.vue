@@ -414,14 +414,14 @@ export default {
         case '缩小':
           ptzControl1({
             channelExpansionId: Local.get('cloudId'),
-            ptzOperationType: 64,
+            ptzOperationType: 0,
             operationValue: this.speed
           })
           break
         case '焦点拉进':
           ptzControl1({
             channelExpansionId: Local.get('cloudId'),
-            ptzOperationType: 64,
+            ptzOperationType: 0,
             operationValue: this.speed
           })
           break
@@ -441,14 +441,14 @@ export default {
         case '放大':
           ptzControl1({
             channelExpansionId: Local.get('cloudId'),
-            ptzOperationType: 64,
+            ptzOperationType: 0,
             operationValue: this.speed
           })
           break
         case '焦点拉远':
           ptzControl1({
             channelExpansionId: Local.get('cloudId'),
-            ptzOperationType: 64,
+            ptzOperationType: 0,
             operationValue: this.speed
           })
           break

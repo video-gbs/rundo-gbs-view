@@ -33,6 +33,10 @@ export default {
       type: Number,
       default: 1
     },
+    playerIdx: {
+      type: Number,
+      default: 0
+    },
     controls: {
       type: Boolean,
       default: false
@@ -85,24 +89,10 @@ export default {
     }
   },
   mounted() {
-    let paramUrl = decodeURIComponent(this.$route.params.url)
-    console.log('paramUrl', paramUrl)
     this.$nextTick(() => {
       this.init()
-      // let dom = document.getElementById("webRtcPlayerBox");
-      // setTimeout(() => {
-      //   let dom1 = document.getElementById("vjs_video_3_flvjs_api");
-      //   dom1.playbackRate = 4;
-      // }, 3000);
-      // dom && (dom.style.height = (9 / 16) * dom.clientWidth + "px");
-      if (typeof this.videoUrl === 'undefined') {
-        this.videoUrl = paramUrl
-      }
       console.info('this.$refs.videoPlayer', this.$refs.videoPlayer)
       console.log('q初始化时的地址为: ' + this.videoUrl)
-      // this.$refs.videoPlayer.playbackRates = new Array(0.25, 0.5, 1, 2, 4);
-      // dom1.playbackRates = new Array(0.25, 0.5, 1, 2, 4);
-      // this.play(this.videoUrl);1
     })
   },
   methods: {
