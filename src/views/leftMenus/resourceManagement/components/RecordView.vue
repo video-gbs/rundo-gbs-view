@@ -71,27 +71,33 @@
             </div>
             <div class="equipment-group-wrapper-bottom">
               <div class="date-select">
-                <!-- <el-select
-                  size="small"
-                  v-model="formData.type"
-                  placeholder="录像类型"
-                  style="margin-left: 16px !important"
+                <el-date-picker
+                  popper-class="form-date-picker-popper"
+                  v-model="formData.date"
+                  type="datetimerange"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  :picker-options="pickerOptions"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  align="right"
                 >
-                  <el-option value="device" label="设备录像" />
-                  <el-option value="cloud" label="云端录像" />
-                </el-select>-->
-
-                <!-- :disabled="!selData.isLeaf" -->
+                </el-date-picker>
                 <el-button
                   @click="handleSearch"
                   type="primary"
                   size="small"
                   :loading="formData.loading"
-                  style="float: right; margin: 16px 16px 0 0 !important"
+                  style="
+                    margin: 16px 16px 0 0 !important;
+                    width: 151px;
+                    height: 36px;
+                  "
                   >查询</el-button
                 >
 
-                <el-date-picker
+                <!-- <el-date-picker
                   @focus="addEvent"
                   popper-class="form-date-picker-popper"
                   size="small"
@@ -101,7 +107,7 @@
                   :clearable="true"
                   :picker-options="cloudDateOptions"
                   placeholder="请选择日期"
-                />
+                /> -->
               </div>
             </div>
           </div>
@@ -231,7 +237,6 @@
                   prefixIcon="data-picker-icon"
                   :clearable="false"
                   v-model="selectTime"
-                  :disabled="timePickerDisabled()"
                   @change="handleChangeTimePicker"
                 />
 
@@ -518,9 +523,72 @@ export default {
       tabsActiveName: this.$route.params.type || 'device',
       formData: {
         type: '',
-        date: new Date(),
+        date: [],
         loading: false
       },
+      pickerOptions: {
+        onPick: ({ maxDate, minDate }) => {
+          // 把选择的第一个日期赋值给一个变量。
+          this.choiceDate = minDate.getTime()
+          // 如何你选择了两个日期了，就把那个变量置空
+          if (maxDate) this.choiceDate = ''
+        },
+        disabledDate: (time) => {
+          // 如何选择了一个日期
+          if (this.choiceDate) {
+            // 7天的时间戳
+            const one = 6 * 24 * 3600 * 1000
+            // 当前日期 - one = 7天之前
+            const minTime = this.choiceDate - one
+            // 当前日期 + one = 7天之后
+            const maxTime = this.choiceDate + one
+            return time.getTime() < minTime || time.getTime() > maxTime
+          } else {
+          }
+        },
+        shortcuts: [
+          {
+            text: '今天',
+            onClick(picker) {
+              const temp = new Date()
+              picker.$emit('pick', [
+                new Date(temp.setHours(0, 0, 0, 0)),
+                new Date(temp.setHours(23, 59, 59, 0))
+              ])
+            }
+          },
+          {
+            text: '昨天',
+            onClick(picker) {
+              const temp = new Date()
+              temp.setTime(temp.getTime() - 3600 * 1000 * 24)
+              picker.$emit('pick', [
+                new Date(temp.setHours(0, 0, 0, 0)),
+                new Date(temp.setHours(23, 59, 59, 0))
+              ])
+            }
+          },
+          {
+            text: '近3天',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 3)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
+          }
+        ]
+      },
+
       deviceId: this.$route.params.deviceId,
       channelId: '',
       selData: {},
@@ -709,8 +777,8 @@ export default {
 
       await getPlaybackList({
         channelId: this.channelId,
-        startTime: `${date} 00:00:00`,
-        endTime: `${date} 23:59:59`
+        startTime: date[0],
+        endTime: date[1]
       })
         .then((res) => {
           if (res.code === 0) {
@@ -728,6 +796,11 @@ export default {
               this.deviceVideoList = {
                 [date]: listData
               }
+
+              console.log(
+                'this.deviceVideoList======================',
+                this.deviceVideoList
+              )
 
               this.playRecord(1, date)
             } else {
@@ -901,6 +974,7 @@ export default {
       }
     },
     handleChangeTimePicker(val) {
+      console.log('handleChangeTimePicker====================', val)
       const isPlay = this.play
       if (this.play) this.handlePauseOrPlay()
 
@@ -915,13 +989,13 @@ export default {
       this.handleDevicesPlayEnded()
       if (isPlay) this.handlePauseOrPlay()
     },
-    timePickerDisabled() {
-      const data =
-        this.tabsActiveName === 'device'
-          ? this.deviceVideoList[this.playTime.format('YYYY-MM-DD')]
-          : this.cloudVideoList[this.cloudPlayTime.format('YYYY-MM-DD')]
-      return !(data && data.length)
-    },
+    // timePickerDisabled() {
+    //   const data =
+    //     this.tabsActiveName === 'device'
+    //       ? this.deviceVideoList[this.playTime.format('YYYY-MM-DD')]
+    //       : this.cloudVideoList[this.cloudPlayTime.format('YYYY-MM-DD')]
+    //   return !(data && data.length)
+    // },
     // 关闭视频
     handleCloseVideo() {
       this.cloudPlay = this.play = false
@@ -951,6 +1025,7 @@ export default {
         }
         if (
           this.formData.date === '' ||
+          this.formData.date.length === 0 ||
           this.formData.date === null ||
           this.formData.date === undefined
         ) {
@@ -1023,10 +1098,10 @@ export default {
 
       console.log('缩放拉伸屏幕', dom)
 
-      // if (dom[this.playerIdx].style.height === '100%') {
-      //   this.stretch[this.playerIdx] = true
-      // }else{
+      // if (dom[this.playerIdx].style.height === '100%' && this.isFill[this.playerIdx]) {
       //   this.stretch[this.playerIdx] = false
+      // }else{
+      //   this.stretch[this.playerIdx] = true
       // }
 
       this.$forceUpdate()
@@ -1127,7 +1202,7 @@ export default {
     })(),
     //监听设备播放完毕,自动播放下一个视频
     handleDevicesPlayEnded(ref, event) {
-      console.log('监听设备播放完毕,自动播放下一个视频')
+      console.log('监听设备播放完毕,自动播放下一个视频', this.playTime)
       let minDateRecord,
         maxDiff = -99999999999
       if (this.tabsActiveName === 'device') {
@@ -1154,7 +1229,6 @@ export default {
           } else {
             //如果今天已经没数据了就到下一天看
             this.cloudPlay = this.play = false
-            // this.queryRecords(moment(this.playTime).add(1, "days").format("YYYY-MM-DD"));
           }
         }
       } else {
@@ -1281,11 +1355,11 @@ export default {
       const date = moment(val).format('YYYY-MM-DD')
       if (this.tabsActiveName === 'device') {
         this.videoHistory.date = date
-        this.playTime = moment(val)
+        this.playTime = val
         // this.queryRecords(this.videoHistory.date)
-        this.getPlaybackList(this.videoHistory.date)
+        this.getPlaybackList(val)
       } else {
-        this.cloudPlayTime = moment(val)
+        this.cloudPlayTime = val
         this.getCloudRecordVideo(date)
       }
     },
@@ -1401,8 +1475,8 @@ export default {
           if (res.code === 0) {
             getPlayBackUrlLists({
               channelId: this.channelId,
-              startTime: row.startTime ? row.startTime : `${playTime} 00:00:00`,
-              endTime: row.endTime ? row.endTime : `${playTime} 23:59:59`
+              startTime: row.startTime ? row.startTime : playTime[0],
+              endTime: row.endTime ? row.endTime : playTime[1]
             })
               .then((res) => {
                 if (res.code === 0) {
@@ -1625,15 +1699,15 @@ export default {
   },
   watch: {
     playTime(newVal, oldVal) {
-      this.datePickerPlayTime = newVal.toDate()
+      this.datePickerPlayTime = newVal
       let minDateRecord,
         maxDiff = -99999999999
       const endTime = this.currentList && this.currentList.split('_')[1]
-      const date = newVal.format('YYYY-MM-DD')
+      const date = newVal
       //如果当前播放时间超过但前菜单选中的时间久重新选择
-      if (endTime && newVal.isAfter(endTime) && this.deviceVideoList[date]) {
+      if (endTime && newVal[1].isAfter(endTime) && this.deviceVideoList[date]) {
         for (const item of this.deviceVideoList[date]) {
-          const diff = newVal.diff(item.startTime)
+          const diff = newVal[0].diff(item.startTime)
           if (diff <= 0 && maxDiff < diff) {
             //记录开始时间在当前时间之后,并且比之前的值更接近
             maxDiff = diff
@@ -1644,12 +1718,12 @@ export default {
           this.currentList = `${minDateRecord.startTime}_${minDateRecord.endTime}`
         }
       }
-      if (newVal.diff(oldVal, 'days')) {
-        this.videoHistory.searchHistoryResult = this.deviceVideoList[date] || []
-      }
+      // if (newVal.diff(oldVal, 'days')) {
+      //   this.videoHistory.searchHistoryResult = this.deviceVideoList[date] || []
+      // }
     },
     cloudPlayTime(newVal, oldVal) {
-      this.datePickerCloudPlayTime = newVal.toDate()
+      this.datePickerCloudPlayTime = newVal
     },
     filterText(val) {
       this.$refs.recordViewTree.filter(val)
@@ -1672,6 +1746,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-input__inner {
+  height: 36px;
+  width: 97%;
+  margin: 0 5px;
+}
+::v-deep .el-range-separator {
+  line-height: 28px;
+}
+::v-deep .el-picker-panel__sidebar {
+  width: 136px !important;
+}
+::v-deep .el-picker-panel__body {
+  margin-left: 136px !important;
+}
+
+::v-deep .el-picker-panel__shortcut {
+  width: 104px !important;
+  height: 31px !important;
+  background: #ffffff;
+  border-radius: 4px !important;
+  border: 1px solid #ecf0f3 !important;
+  margin-left: 10% !important;
+  padding-left: 27% !important;
+}
+
 ::v-deep .tree .el-tree-node__expand-icon.expanded {
   -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
@@ -1829,6 +1928,7 @@ export default {
     flex-direction: column;
     overflow: hidden;
     max-height: 50%;
+    text-align: center;
 
     .wrapper-bottom-content {
       flex: 1;

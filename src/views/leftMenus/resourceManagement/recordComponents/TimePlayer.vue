@@ -21,13 +21,7 @@
       </div>
       <div
         :style="`background: ${isCurrentDate ? 'rgba(255,255,255,0.3)' : ''} ${
-          isCurrentDate
-            ? ''
-            : 'url(' +
-              playableTimeImges[
-                toMoment(value).subtract(1, 'days').format('YYYY-MM-DD')
-              ] +
-              ')'
+          isCurrentDate ? '' : 'url(' + playableTimeImges[value] + ')'
         } 0px 38px/100% 24px no-repeat; image-rendering: pixelated;`"
       >
         <div class="time-grid" v-for="(item, idx) in grid" :key="`idx2-${idx}`">
@@ -39,9 +33,7 @@
       <div
         ref="middleTimeGrid"
         class="middle-time-grid-layout"
-        :style="`background: url(${
-          playableTimeImges[value.format('YYYY-MM-DD')]
-        })   0px 38px/100% 24px no-repeat; image-rendering: pixelated;`"
+        :style="`background: url(${playableTimeImges[value]})   0px 38px/100% 24px no-repeat; image-rendering: pixelated;`"
       >
         <div :key="`idx3-${idx}`" class="time-grid" v-for="(item, idx) in grid">
           <div class="time">
@@ -51,13 +43,7 @@
       </div>
       <div
         :style="`background: ${isCurrentDate ? 'rgba(255,255,255,0.3)' : ''} ${
-          isCurrentDate
-            ? ''
-            : 'url(' +
-              playableTimeImges[
-                toMoment(value).add(1, 'days').format('YYYY-MM-DD')
-              ] +
-              ')'
+          isCurrentDate ? '' : 'url(' + playableTimeImges[value] + ')'
         } 0px 38px/100% 24px no-repeat; image-rendering: pixelated;`"
       >
         <div :key="`idx5-${idx}`" class="time-grid" v-for="(item, idx) in grid">
@@ -592,7 +578,7 @@ export default {
       border: 6px solid transparent;
       position: absolute;
       border-top-color: white;
-      left: 1.5px;
+      left: 0;
     }
 
     &::after {
@@ -601,7 +587,7 @@ export default {
       position: absolute;
       bottom: 0;
       border-bottom-color: white;
-      left: 1.5px;
+      left: 0;
     }
 
     .current-line {
