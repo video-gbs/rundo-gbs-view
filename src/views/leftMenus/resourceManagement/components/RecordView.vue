@@ -164,7 +164,7 @@
 
             <div class="player-time">
               <template v-if="tabsActiveName === 'device'">
-                <TimePlayer
+                <!-- <TimePlayer
                   ref="TimePlayer"
                   v-model="playTime"
                   :onChange="handleChangePlayTime"
@@ -172,6 +172,12 @@
                   :is-current-date="true"
                   :onChangeDate="handleChangePlayDate"
                   :dataSource="deviceVideoList"
+                /> -->
+                <TimePlayer1
+                  ref="TimePlayer"
+                  :playerTimes="formData.date"
+                  @handleChangeTime="handleChangeTime"
+                  @onChange="handleChangePlayTime"
                 />
               </template>
             </div>
@@ -232,13 +238,17 @@
                   />
                 </el-tooltip>
 
-                <el-time-picker
+                <el-date-picker
+                  v-model="selectTime"
                   class="toolbar-date-picker"
                   prefixIcon="data-picker-icon"
-                  :clearable="false"
-                  v-model="selectTime"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  type="datetime"
+                  placeholder="选择日期时间"
                   @change="handleChangeTimePicker"
-                />
+                >
+                </el-date-picker>
 
                 <el-tooltip
                   effect="dark"
@@ -403,9 +413,12 @@
 
 <script>
 import moment from 'moment'
+import { Local } from '@/utils/storage'
+import dayjs from 'dayjs'
 import jPlayer from '../recordComponents/jessibuca.vue'
 import cloudPlayer from '../recordComponents/cloudPlayer.vue'
 import TimePlayer from '../recordComponents/TimePlayer.vue'
+import TimePlayer1 from '../recordComponents/TimePlayer1.vue'
 import MonitorEquipmentGroup from './monitorEquipmentGroup'
 import DownloadVideoModal from '../recordComponents/DownloadVideoModal'
 import { getVideoAraeTree } from '@/api/method/role'
@@ -431,6 +444,7 @@ export default {
     jPlayer,
     cloudPlayer,
     TimePlayer,
+    TimePlayer1,
     // flvJs,
     MonitorEquipmentGroup,
     DownloadVideoModal
@@ -512,7 +526,7 @@ export default {
         translateX: 0,
         translateY: 0
       },
-      selectTime: new Date().setHours(0, 0, 0, 0),
+      selectTime: Local.get('showTime'),
       isDragging: false, //拖拽中
       ZOOM_TYPE: ZOOM_TYPE,
       recordStartTime: null,
@@ -973,19 +987,19 @@ export default {
         this.handleSearch()
       }
     },
+    handleChangeTime(time) {
+      this.selectTime = Local.get('showTime')
+    },
     handleChangeTimePicker(val) {
       console.log('handleChangeTimePicker====================', val)
+      Local.set('showTime', val)
       const isPlay = this.play
       if (this.play) this.handlePauseOrPlay()
 
       const timeString = moment(val).format('HH:mm:ss')
-      if (this.tabsActiveName === 'device') {
-        const date = this.playTime.format('YYYY-MM-DD')
-        this.playTime = moment(`${date} ${timeString}`)
-      } else {
-        const date = this.cloudPlayTime.format('YYYY-MM-DD')
-        this.cloudPlayTime = moment(`${date} ${timeString}`)
-      }
+      const date = this.playTime.format('YYYY-MM-DD')
+      this.playTime = moment(`${date} ${timeString}`)
+
       this.handleDevicesPlayEnded()
       if (isPlay) this.handlePauseOrPlay()
     },
@@ -1038,6 +1052,10 @@ export default {
         this.formData.loading = true
 
         this.dateChange(this.formData.date)
+
+        console.log('is.$refs.TimePlayer.c', this.$refs, this.formData.date)
+
+        this.$refs.TimePlayer.changePlayerTimes(this.formData.date)
       } else {
         this.$message({
           message: '请选择设备节点',
@@ -1135,29 +1153,21 @@ export default {
     },
 
     // 滚动时间轴事件
-    handleChangePlayTime(curTime, isDragEnd, record) {
-      switch (true) {
-        case !!(isDragEnd && record): {
-          //拖拽完成,并且该时间有播放内容数据
-          this.isDragging = false
-          this.isNext = false
-          console.log('拖拽完成', record)
-          this.playRecord(record, curTime)
-          break
-        }
-        case isDragEnd: //拖拽后没有播放内容
-          this.isDragging = false
-          this.handleCloseVideo()
-          break
-
-        case !isDragEnd: {
-          //拖拽中
-          console.log('拖拽中', this.$refs, this.playerIdx)
-          this.isDragging = true
-          this.$refs.cloudPlayer[this.playerIdx - 1] &&
-            this.$refs.cloudPlayer[this.playerIdx - 1].pause()
-          break
-        }
+    handleChangePlayTime(curTime) {
+      const resEndTime = new Date(this.formData.date[1]).getTime()
+      const resStartTime = new Date(this.formData.date[0]).getTime()
+      this.isNext = false
+      if (resStartTime < curTime && curTime < resEndTime) {
+        this.playRecord({}, [
+          dayjs(curTime).format('YYYY-MM-DD HH:mm:ss'),
+          this.formData.date[1]
+        ])
+      } else {
+        this.$message({
+          message: '该时间段暂无录像',
+          type: 'warning'
+        })
+        this.handleCloseVideo()
       }
     },
     //事件轴上的日期发生变化
@@ -1490,6 +1500,8 @@ export default {
                   }
 
                   this.streamId = res.data.streamId
+
+                  this.play = true
                 }
               })
               .catch((error) => {
@@ -2247,7 +2259,7 @@ export default {
 
     .toolbar-date-picker {
       height: 100%;
-      width: 184px;
+      width: 201px;
       margin-top: 8px;
 
       input {

@@ -223,6 +223,11 @@ export default {
       this.$refs.videoPlayer.player.pause()
     },
     getCurrentTime() {
+      console.log(
+        '获取当前播放时间',
+        this.$refs,
+        this.$refs.videoPlayer.player.getCurrentTime()
+      )
       //获取当前播放时间
       this.$refs.videoPlayer.player.getCurrentTime()
     },

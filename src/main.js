@@ -28,6 +28,9 @@ import * as moment from 'moment'
 
 Vue.prototype.$moment = moment
 
+import VideoTimeline from '@wanglin1994/video-timeline'
+Vue.use(VideoTimeline)
+
 // 引入字典
 import _dict from '@/dict/index'
 
