@@ -16,6 +16,8 @@
 
 <script>
 import LivePlayer from '@liveqing/liveplayer'
+
+import { Local } from '@/utils/storage'
 export default {
   name: 'lqPlayer',
   components: {
@@ -252,6 +254,7 @@ export default {
       handler(newval) {
         let videoDom = this.$refs.videoPlayer.$el.querySelector('video')
         videoDom.playbackRate = newval
+        Local.set('playbackRate', newval)
       }
     },
     muted(newVal) {
