@@ -8,28 +8,13 @@
     <div class="time-grid-list" :style="`transform:translateX(${moveX}px)`">
       <!--      填充轴-->
       <div v-if="grid.length <= 12">
-        <div
-          class="time-grid"
-          v-for="(item, idx) in grid"
-          :key="`idx1-${idx}`"
-          :style="`background: ${isCurrentDate ? 'rgba(255,255,255,0.3)' : ''}`"
-        >
+        <div class="time-grid" v-for="(item, idx) in grid" :key="`idx1-${idx}`">
           <div class="time">
             {{ item }}
           </div>
         </div>
       </div>
-      <div
-        :style="`background: ${isCurrentDate ? 'rgba(255,255,255,0.3)' : ''} ${
-          isCurrentDate
-            ? ''
-            : 'url(' +
-              playableTimeImges[
-                toMoment(value).subtract(1, 'days').format('YYYY-MM-DD')
-              ] +
-              ')'
-        } 0px 38px/100% 24px no-repeat; image-rendering: pixelated;`"
-      >
+      <div>
         <div class="time-grid" v-for="(item, idx) in grid" :key="`idx2-${idx}`">
           <div class="time">
             {{ item }}
@@ -39,9 +24,7 @@
       <div
         ref="middleTimeGrid"
         class="middle-time-grid-layout"
-        :style="`background: url(${
-          playableTimeImges[value.format('YYYY-MM-DD')]
-        })   0px 38px/100% 24px no-repeat; image-rendering: pixelated;`"
+        :style="`background: url(${playableTimeImges[value]})   0px 38px/100% 24px no-repeat; image-rendering: pixelated;`"
       >
         <div :key="`idx3-${idx}`" class="time-grid" v-for="(item, idx) in grid">
           <div class="time">
@@ -51,13 +34,7 @@
       </div>
       <div
         :style="`background: ${isCurrentDate ? 'rgba(255,255,255,0.3)' : ''} ${
-          isCurrentDate
-            ? ''
-            : 'url(' +
-              playableTimeImges[
-                toMoment(value).add(1, 'days').format('YYYY-MM-DD')
-              ] +
-              ')'
+          isCurrentDate ? '' : 'url(' + playableTimeImges[value] + ')'
         } 0px 38px/100% 24px no-repeat; image-rendering: pixelated;`"
       >
         <div :key="`idx5-${idx}`" class="time-grid" v-for="(item, idx) in grid">
@@ -592,7 +569,7 @@ export default {
       border: 6px solid transparent;
       position: absolute;
       border-top-color: white;
-      left: 1.5px;
+      left: 0;
     }
 
     &::after {
@@ -601,7 +578,7 @@ export default {
       position: absolute;
       bottom: 0;
       border-bottom-color: white;
-      left: 1.5px;
+      left: 0;
     }
 
     .current-line {
@@ -609,6 +586,8 @@ export default {
       height: 100%;
       background-color: #fff;
       width: 1px;
+      position: relative;
+      left: -1px;
     }
   }
 

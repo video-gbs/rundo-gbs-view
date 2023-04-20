@@ -71,27 +71,33 @@
             </div>
             <div class="equipment-group-wrapper-bottom">
               <div class="date-select">
-                <!-- <el-select
-                  size="small"
-                  v-model="formData.type"
-                  placeholder="录像类型"
-                  style="margin-left: 16px !important"
+                <el-date-picker
+                  popper-class="form-date-picker-popper"
+                  v-model="formData.date"
+                  type="datetimerange"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  :picker-options="pickerOptions"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  align="right"
                 >
-                  <el-option value="device" label="设备录像" />
-                  <el-option value="cloud" label="云端录像" />
-                </el-select>-->
-
-                <!-- :disabled="!selData.isLeaf" -->
+                </el-date-picker>
                 <el-button
                   @click="handleSearch"
                   type="primary"
                   size="small"
                   :loading="formData.loading"
-                  style="float: right; margin: 16px 16px 0 0 !important"
+                  style="
+                    margin: 16px 16px 0 0 !important;
+                    width: 151px;
+                    height: 36px;
+                  "
                   >查询</el-button
                 >
 
-                <el-date-picker
+                <!-- <el-date-picker
                   @focus="addEvent"
                   popper-class="form-date-picker-popper"
                   size="small"
@@ -101,7 +107,7 @@
                   :clearable="true"
                   :picker-options="cloudDateOptions"
                   placeholder="请选择日期"
-                />
+                /> -->
               </div>
             </div>
           </div>
@@ -133,7 +139,11 @@
                   class="dbl-box"
                   :class="fullPlayerIdx === i ? 'full-play-box' : ''"
                 >
-                  <div v-if="!videoUrl[i - 1]" class="empty-player"></div>
+                  <div
+                    v-if="!videoUrl[i - 1]"
+                    ref="emptyPlayer"
+                    class="empty-player"
+                  ></div>
                   <div v-else class="player-box" ref="videoBox">
                     <cloud-player
                       ref="cloudPlayer"
@@ -147,7 +157,7 @@
                       :videoUrl="videoUrl[i - 1]"
                       :playbackRate="speedArr[currentSpeed]"
                       :autoplay="play"
-                      :playerIdx="playerIdx - 1"
+                      :playerIdx="playerIdx"
                       live
                     ></cloud-player>
                   </div>
@@ -158,7 +168,7 @@
 
             <div class="player-time">
               <template v-if="tabsActiveName === 'device'">
-                <TimePlayer
+                <!-- <TimePlayer
                   ref="TimePlayer"
                   v-model="playTime"
                   :onChange="handleChangePlayTime"
@@ -166,6 +176,15 @@
                   :is-current-date="true"
                   :onChangeDate="handleChangePlayDate"
                   :dataSource="deviceVideoList"
+                /> -->
+                <TimePlayer1
+                  ref="TimePlayer"
+                  :playerTimes="formData.date"
+                  @handleChangeTime="handleChangeTime"
+                  @onChange="handleChangePlayTime"
+                  :playerIdx="playerIdx"
+                  :timeSegments="timeSegments"
+                  @handleCloseVideo="handleCloseVideo"
                 />
               </template>
             </div>
@@ -226,14 +245,18 @@
                   />
                 </el-tooltip>
 
-                <el-time-picker
+                <el-date-picker
+                  v-model="selectTime"
                   class="toolbar-date-picker"
                   prefixIcon="data-picker-icon"
-                  :clearable="false"
-                  v-model="selectTime"
-                  :disabled="timePickerDisabled()"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  type="datetime"
+                  :disabled="isClickCx"
+                  placeholder="选择日期时间"
                   @change="handleChangeTimePicker"
-                />
+                >
+                </el-date-picker>
 
                 <el-tooltip
                   effect="dark"
@@ -398,9 +421,12 @@
 
 <script>
 import moment from 'moment'
+import { Local } from '@/utils/storage'
+import dayjs from 'dayjs'
 import jPlayer from '../recordComponents/jessibuca.vue'
 import cloudPlayer from '../recordComponents/cloudPlayer.vue'
 import TimePlayer from '../recordComponents/TimePlayer.vue'
+import TimePlayer1 from '../recordComponents/TimePlayer1.vue'
 import MonitorEquipmentGroup from './monitorEquipmentGroup'
 import DownloadVideoModal from '../recordComponents/DownloadVideoModal'
 import { getVideoAraeTree } from '@/api/method/role'
@@ -426,12 +452,14 @@ export default {
     jPlayer,
     cloudPlayer,
     TimePlayer,
+    TimePlayer1,
     // flvJs,
     MonitorEquipmentGroup,
     DownloadVideoModal
   },
   data() {
     return {
+      isClickCx: true,
       spilt: 4, //分屏
       spiltIndex: 1,
       playerIdx: 0, //激活播放器
@@ -507,7 +535,7 @@ export default {
         translateX: 0,
         translateY: 0
       },
-      selectTime: new Date().setHours(0, 0, 0, 0),
+      selectTime: new Date(),
       isDragging: false, //拖拽中
       ZOOM_TYPE: ZOOM_TYPE,
       recordStartTime: null,
@@ -518,9 +546,72 @@ export default {
       tabsActiveName: this.$route.params.type || 'device',
       formData: {
         type: '',
-        date: new Date(),
+        date: [],
         loading: false
       },
+      pickerOptions: {
+        onPick: ({ maxDate, minDate }) => {
+          // 把选择的第一个日期赋值给一个变量。
+          this.choiceDate = minDate.getTime()
+          // 如何你选择了两个日期了，就把那个变量置空
+          if (maxDate) this.choiceDate = ''
+        },
+        disabledDate: (time) => {
+          // 如何选择了一个日期
+          if (this.choiceDate) {
+            // 7天的时间戳
+            const one = 6 * 24 * 3600 * 1000
+            // 当前日期 - one = 7天之前
+            const minTime = this.choiceDate - one
+            // 当前日期 + one = 7天之后
+            const maxTime = this.choiceDate + one
+            return time.getTime() < minTime || time.getTime() > maxTime
+          } else {
+          }
+        },
+        shortcuts: [
+          {
+            text: '今天',
+            onClick(picker) {
+              const temp = new Date()
+              picker.$emit('pick', [
+                new Date(temp.setHours(0, 0, 0, 0)),
+                new Date(temp.setHours(23, 59, 59, 0))
+              ])
+            }
+          },
+          {
+            text: '昨天',
+            onClick(picker) {
+              const temp = new Date()
+              temp.setTime(temp.getTime() - 3600 * 1000 * 24)
+              picker.$emit('pick', [
+                new Date(temp.setHours(0, 0, 0, 0)),
+                new Date(temp.setHours(23, 59, 59, 0))
+              ])
+            }
+          },
+          {
+            text: '近3天',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 3)
+              picker.$emit('pick', [start, end])
+            }
+          },
+          {
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
+          }
+        ]
+      },
+
       deviceId: this.$route.params.deviceId,
       channelId: '',
       selData: {},
@@ -583,7 +674,17 @@ export default {
         ? this.$route.params.SselectedNode
         : 0,
       ScurrentPage: this.$route.params.ScurrentPage,
-      isNext: true
+      isNext: true,
+      timeSegments: [
+        {
+          name: '',
+          beginTime: 0,
+          endTime: 0,
+          color: '#4797FF',
+          startRatio: 0.65,
+          endRatio: 0.9
+        }
+      ]
     }
   },
 
@@ -597,7 +698,18 @@ export default {
     this.isFill = []
     for (let i = 0; i < this.spilt; i++) {
       this.isFill[i] = true
+      this.timeSegments[i] = {
+        name: '',
+        beginTime: 0,
+        endTime: 0,
+        color: '#4797FF',
+        startRatio: 0.65,
+        endRatio: 0.9
+      }
     }
+    console.log('this.timeSegments', this.timeSegments)
+
+    Local.set('playbackRate', 1)
   },
   computed: {
     liveStyle() {
@@ -638,8 +750,6 @@ export default {
       this.fullPlayerIdx = -1
       this.spilt = item.num
       this.spiltIndex = i
-
-      this.isFill
     },
     changeHover(num, value) {
       console.log(num, value)
@@ -706,17 +816,15 @@ export default {
       // this.videoUrl = ['']
       this.videoHistory.searchHistoryResult = []
       let listData = this.deviceVideoList[date] || []
-      console.log('listData~~~~~~~~~~~~', this.deviceVideoList[date], listData)
       // if (!listData.length) {
 
       await getPlaybackList({
         channelId: this.channelId,
-        startTime: `${date} 00:00:00`,
-        endTime: `${date} 23:59:59`
+        startTime: date[0],
+        endTime: date[1]
       })
         .then((res) => {
           if (res.code === 0) {
-            console.log('getPlaybackList', res.data)
             if (res.data && res.data.recordList.length > 0) {
               listData = res.data.recordList.map((item) => {
                 const { startTime, endTime } = item
@@ -730,6 +838,23 @@ export default {
               this.deviceVideoList = {
                 [date]: listData
               }
+
+              this.timeSegments[this.playerIdx] = {
+                name: '',
+                beginTime: date[0],
+                endTime: date[1],
+                color: '#4797FF',
+                startRatio: 0.65,
+                endRatio: 0.9
+              }
+
+              console.log(
+                '=========================',
+                this.timeSegments,
+                this.playerIdx
+              )
+
+              this.hasStreamId = true
 
               this.playRecord(1, date)
             } else {
@@ -826,7 +951,6 @@ export default {
         })
     },
     async handleNodeClick(data, node, self) {
-      console.log(222222, data, !data.onlineState)
       this.resOnlineState = data.onlineState ? data.onlineState : ''
       if (!data.onlineState) {
         this.resArray = []
@@ -902,27 +1026,31 @@ export default {
         this.handleSearch()
       }
     },
+    handleChangeTime() {
+      this.selectTime = Local.get('showTime')
+    },
     handleChangeTimePicker(val) {
+      console.log('val!!!!!!!', val)
+      Local.set('showTime', val)
       const isPlay = this.play
+
+      if (
+        new Date(this.formData.date[0]).getTime() < new Date(val).getTime() &&
+        new Date(val).getTime() < new Date(this.formData.date[1]).getTime()
+      ) {
+        this.playRecord({}, [val, this.formData.date[1]])
+      } else {
+        this.$message({
+          message: '该时间段暂无录像',
+          type: 'warning'
+        })
+        this.$refs.TimePlayer.stopTimeAutoPlay()
+        this.handleCloseVideo()
+      }
       if (this.play) this.handlePauseOrPlay()
 
-      const timeString = moment(val).format('HH:mm:ss')
-      if (this.tabsActiveName === 'device') {
-        const date = this.playTime.format('YYYY-MM-DD')
-        this.playTime = moment(`${date} ${timeString}`)
-      } else {
-        const date = this.cloudPlayTime.format('YYYY-MM-DD')
-        this.cloudPlayTime = moment(`${date} ${timeString}`)
-      }
       this.handleDevicesPlayEnded()
       if (isPlay) this.handlePauseOrPlay()
-    },
-    timePickerDisabled() {
-      const data =
-        this.tabsActiveName === 'device'
-          ? this.deviceVideoList[this.playTime.format('YYYY-MM-DD')]
-          : this.cloudVideoList[this.cloudPlayTime.format('YYYY-MM-DD')]
-      return !(data && data.length)
     },
     // 关闭视频
     handleCloseVideo() {
@@ -936,13 +1064,26 @@ export default {
       } else {
         this.cloudPlayerUrl = ['']
       }
+      this.$nextTick(() => {
+        let emptyPlayerDom = this.$refs.emptyPlayer
+        console.log('emptyPlayerDom', emptyPlayerDom)
+        // for (let i = 0; i <= emptyPlayerDom.length; i++) {
+        //   console.log(
+        //     'emptyPlayerDom[i]',
+        //     emptyPlayerDom[i],
+        //     emptyPlayerDom.length
+        //   )
+        emptyPlayerDom[emptyPlayerDom.length - 1].style.height = '100px'
+        // }
+      })
+
+      this.$refs.TimePlayer.handleCloseVideoChildTimeSegments()
     },
     handleSelectTreeNode(data) {
       this.selData = data
     },
     // 查询视频
     handleSearch() {
-      console.log('this.channelId', this.channelId, this.formData.date)
       if (this.channelId && this.channelId.length > 0) {
         if (this.resOnlineState === 0) {
           this.$message({
@@ -953,6 +1094,7 @@ export default {
         }
         if (
           this.formData.date === '' ||
+          this.formData.date.length === 0 ||
           this.formData.date === null ||
           this.formData.date === undefined
         ) {
@@ -965,6 +1107,8 @@ export default {
         this.formData.loading = true
 
         this.dateChange(this.formData.date)
+
+        this.$refs.TimePlayer.changePlayerTimes(this.formData.date)
       } else {
         this.$message({
           message: '请选择设备节点',
@@ -978,27 +1122,6 @@ export default {
       if (this.mediaServerId && this.app && this.streamId) {
         const that = this
         that.tracks = []
-        this.$axios({
-          method: 'get',
-          url:
-            '/zlm/' +
-            this.mediaServerId +
-            '/index/api/getMediaInfo?vhost=__defaultVhost__&schema=rtmp&app=' +
-            this.app +
-            '&stream=' +
-            this.streamId
-        }).then(function (res) {
-          if (res.data.code == 0 && res.data.online) {
-            that.tracks = res.data.tracks
-            that.isShowStream = true
-          } else {
-            that.$message({
-              showClose: true,
-              message: '获取编码信息失败,',
-              type: 'warning'
-            })
-          }
-        })
       } else {
         this.$message({
           showClose: true,
@@ -1018,6 +1141,16 @@ export default {
     //缩放拉伸屏幕
     handleChangeFill() {
       this.isFill[this.playerIdx] = !this.isFill[this.playerIdx]
+
+      const dom = document.getElementsByClassName('player-box')
+
+      // if (dom[this.playerIdx].style.height === '100%' && this.isFill[this.playerIdx]) {
+      //   this.stretch[this.playerIdx] = false
+      // }else{
+      //   this.stretch[this.playerIdx] = true
+      // }
+
+      this.$forceUpdate()
     },
     handleSetVolume() {
       //设置声音
@@ -1048,29 +1181,23 @@ export default {
     },
 
     // 滚动时间轴事件
-    handleChangePlayTime(curTime, isDragEnd, record) {
-      switch (true) {
-        case !!(isDragEnd && record): {
-          //拖拽完成,并且该时间有播放内容数据
-          this.isDragging = false
-          this.isNext = false
-          console.log('拖拽完成', record)
-          this.playRecord(record, curTime)
-          break
-        }
-        case isDragEnd: //拖拽后没有播放内容
-          this.isDragging = false
-          this.handleCloseVideo()
-          break
-
-        case !isDragEnd: {
-          //拖拽中
-          console.log('拖拽中', this.$refs, this.playerIdx)
-          this.isDragging = true
-          this.$refs.cloudPlayer[this.playerIdx - 1] &&
-            this.$refs.cloudPlayer[this.playerIdx - 1].pause()
-          break
-        }
+    handleChangePlayTime(curTime) {
+      console.log('curTime~~~~~~~~~~~~~~~~', curTime, this.formData.date)
+      const resEndTime = new Date(this.formData.date[1]).getTime()
+      const resStartTime = new Date(this.formData.date[0]).getTime()
+      this.isNext = false
+      if (resStartTime < curTime && curTime < resEndTime) {
+        this.playRecord({}, [
+          dayjs(curTime).format('YYYY-MM-DD HH:mm:ss'),
+          this.formData.date[1]
+        ])
+      } else {
+        this.$message({
+          message: '该时间段暂无录像',
+          type: 'warning'
+        })
+        this.$refs.TimePlayer.stopTimeAutoPlay()
+        this.handleCloseVideo()
       }
     },
     //事件轴上的日期发生变化
@@ -1115,6 +1242,7 @@ export default {
     })(),
     //监听设备播放完毕,自动播放下一个视频
     handleDevicesPlayEnded(ref, event) {
+      console.log('监听设备播放完毕,自动播放下一个视频', this.playTime)
       let minDateRecord,
         maxDiff = -99999999999
       if (this.tabsActiveName === 'device') {
@@ -1141,7 +1269,6 @@ export default {
           } else {
             //如果今天已经没数据了就到下一天看
             this.cloudPlay = this.play = false
-            // this.queryRecords(moment(this.playTime).add(1, "days").format("YYYY-MM-DD"));
           }
         }
       } else {
@@ -1268,11 +1395,11 @@ export default {
       const date = moment(val).format('YYYY-MM-DD')
       if (this.tabsActiveName === 'device') {
         this.videoHistory.date = date
-        this.playTime = moment(val)
+        this.playTime = val
         // this.queryRecords(this.videoHistory.date)
-        this.getPlaybackList(this.videoHistory.date)
+        this.getPlaybackList(val)
       } else {
-        this.cloudPlayTime = moment(val)
+        this.cloudPlayTime = val
         this.getCloudRecordVideo(date)
       }
     },
@@ -1388,8 +1515,8 @@ export default {
           if (res.code === 0) {
             getPlayBackUrlLists({
               channelId: this.channelId,
-              startTime: row.startTime ? row.startTime : `${playTime} 00:00:00`,
-              endTime: row.endTime ? row.endTime : `${playTime} 23:59:59`
+              startTime: row.startTime ? row.startTime : playTime[0],
+              endTime: row.endTime ? row.endTime : playTime[1]
             })
               .then((res) => {
                 if (res.code === 0) {
@@ -1403,6 +1530,8 @@ export default {
                   }
 
                   this.streamId = res.data.streamId
+
+                  this.play = true
                 }
               })
               .catch((error) => {
@@ -1426,19 +1555,42 @@ export default {
     },
     async gbPlay() {
       console.log('前端控制：播放')
+
+      await resumeRecordView({
+        channelId: this.channelId,
+        speed: this.speedArr[this.currentSpeed],
+        streamId: this.streamId
+      }).then((res) => {
+        if (res.code === 0) {
+          ;(this.isClickCx = true), this.$refs.TimePlayer.timeAutoPlay()
+        }
+      })
     },
-    gbPause() {
-      console.log('前端控制：暂停')
+    async gbPause() {
+      console.log('前端控制：暂停', this.$refs.TimePlayer)
+
+      await pauseRecordView({
+        channelId: this.channelId,
+        speed: this.speedArr[this.currentSpeed],
+        streamId: this.streamId
+      }).then((res) => {
+        if (res.code === 0) {
+          ;(this.isClickCx = false), this.$refs.TimePlayer.stopTimeAutoPlay()
+        }
+      })
     },
     async gbScale(command) {
       console.log('前端控制：倍速 ' + command)
-
+      this.$refs.TimePlayer.stopTimeAutoPlay()
       await speedRecordView({
         channelId: this.channelId,
         speed: command,
         streamId: this.streamId
       }).then((res) => {
         if (res.code === 0) {
+          Local.set('playbackRate', command)
+
+          this.$refs.TimePlayer.timeAutoPlay()
         }
       })
     },
@@ -1604,23 +1756,26 @@ export default {
       return result * 100
     },
     videoClick(i) {
-      // this.getPlaybackList(this.videoHistory.date)
+      Local.set('showTime', this.formData.date[0])
+      this.$refs.TimePlayer.stopTimeAutoPlay()
+      this.$refs.TimePlayer.timeAutoPlay()
 
-      console.log('this.deviceVideoList', this.deviceVideoList)
       this.playerIdx = i - 1
+
+      this.$refs.TimePlayer.changeChildTimeSegments(i - 1)
     }
   },
   watch: {
     playTime(newVal, oldVal) {
-      this.datePickerPlayTime = newVal.toDate()
+      this.datePickerPlayTime = newVal
       let minDateRecord,
         maxDiff = -99999999999
       const endTime = this.currentList && this.currentList.split('_')[1]
-      const date = newVal.format('YYYY-MM-DD')
+      const date = newVal
       //如果当前播放时间超过但前菜单选中的时间久重新选择
-      if (endTime && newVal.isAfter(endTime) && this.deviceVideoList[date]) {
+      if (endTime && newVal[1].isAfter(endTime) && this.deviceVideoList[date]) {
         for (const item of this.deviceVideoList[date]) {
-          const diff = newVal.diff(item.startTime)
+          const diff = newVal[0].diff(item.startTime)
           if (diff <= 0 && maxDiff < diff) {
             //记录开始时间在当前时间之后,并且比之前的值更接近
             maxDiff = diff
@@ -1631,22 +1786,46 @@ export default {
           this.currentList = `${minDateRecord.startTime}_${minDateRecord.endTime}`
         }
       }
-      if (newVal.diff(oldVal, 'days')) {
-        this.videoHistory.searchHistoryResult = this.deviceVideoList[date] || []
-      }
+      // if (newVal.diff(oldVal, 'days')) {
+      //   this.videoHistory.searchHistoryResult = this.deviceVideoList[date] || []
+      // }
     },
     cloudPlayTime(newVal, oldVal) {
-      this.datePickerCloudPlayTime = newVal.toDate()
+      this.datePickerCloudPlayTime = newVal
     },
     filterText(val) {
       this.$refs.recordViewTree.filter(val)
     },
     treeList(n) {
-      console.log('nnnnnn')
       this.treeList = n
     },
     playerIdx(val) {
-      console.log('val!!!!!!!!!!!!!!!!!!!!!', val)
+      // this.$refs.TimePlayer.changeChildTimeSegments(val)
+    },
+    spilt(newValue) {
+      console.log('切换画幅;' + newValue)
+      let resTimeSegments = []
+      // let that = this
+      if (newValue < this.videoUrl.length) {
+        this.timeSegments = this.timeSegments.slice(0, newValue)
+      } else if (newValue > this.videoUrl.length) {
+        for (let i = 0; i < newValue; i++) {
+          if (i >= this.videoUrl.length) {
+            resTimeSegments.push({
+              name: '',
+              beginTime: this.formData.date[0],
+              endTime: this.formData.date[1],
+              color: '#4797FF',
+              startRatio: 0.65,
+              endRatio: 0.9
+            })
+          }
+        }
+        this.timeSegments = this.timeSegments.concat(resTimeSegments)
+
+        console.log('切换画幅大于之前', this.timeSegments)
+      } else {
+      }
     }
   },
   beforeDestroy() {
@@ -1659,6 +1838,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-input__inner {
+  height: 36px;
+  width: 97%;
+  margin: 0 5px;
+}
+::v-deep .el-range-separator {
+  line-height: 28px;
+}
+::v-deep .el-picker-panel__sidebar {
+  width: 136px !important;
+}
+::v-deep .el-picker-panel__body {
+  margin-left: 136px !important;
+}
+
+::v-deep .el-picker-panel__shortcut {
+  width: 104px !important;
+  height: 31px !important;
+  background: #ffffff;
+  border-radius: 4px !important;
+  border: 1px solid #ecf0f3 !important;
+  margin-left: 10% !important;
+  padding-left: 27% !important;
+}
+
 ::v-deep .tree .el-tree-node__expand-icon.expanded {
   -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
@@ -1816,6 +2020,7 @@ export default {
     flex-direction: column;
     overflow: hidden;
     max-height: 50%;
+    text-align: center;
 
     .wrapper-bottom-content {
       flex: 1;
@@ -2015,6 +2220,7 @@ export default {
 .player-box {
   flex: 1;
   position: relative;
+  // height: 100%;
   /* display: flex;
     align-items: center; */
 }
@@ -2133,7 +2339,7 @@ export default {
 
     .toolbar-date-picker {
       height: 100%;
-      width: 184px;
+      width: 201px;
       margin-top: 8px;
 
       input {
