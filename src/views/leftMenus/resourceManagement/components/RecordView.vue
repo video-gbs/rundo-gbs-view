@@ -139,7 +139,11 @@
                   class="dbl-box"
                   :class="fullPlayerIdx === i ? 'full-play-box' : ''"
                 >
-                  <div v-if="!videoUrl[i - 1]" class="empty-player"></div>
+                  <div
+                    v-if="!videoUrl[i - 1]"
+                    ref="emptyPlayer"
+                    class="empty-player"
+                  ></div>
                   <div v-else class="player-box" ref="videoBox">
                     <cloud-player
                       ref="cloudPlayer"
@@ -180,6 +184,7 @@
                   @onChange="handleChangePlayTime"
                   :playerIdx="playerIdx"
                   :timeSegments="timeSegments"
+                  @handleCloseVideo="handleCloseVideo"
                 />
               </template>
             </div>
@@ -247,6 +252,7 @@
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
                   type="datetime"
+                  :disabled="isClickCx"
                   placeholder="选择日期时间"
                   @change="handleChangeTimePicker"
                 >
@@ -453,6 +459,7 @@ export default {
   },
   data() {
     return {
+      isClickCx: true,
       spilt: 4, //分屏
       spiltIndex: 1,
       playerIdx: 0, //激活播放器
@@ -1023,13 +1030,24 @@ export default {
       this.selectTime = Local.get('showTime')
     },
     handleChangeTimePicker(val) {
+      console.log('val!!!!!!!', val)
       Local.set('showTime', val)
       const isPlay = this.play
-      if (this.play) this.handlePauseOrPlay()
 
-      const timeString = moment(val).format('HH:mm:ss')
-      const date = this.playTime.format('YYYY-MM-DD')
-      this.playTime = moment(`${date} ${timeString}`)
+      if (
+        new Date(this.formData.date[0]).getTime() < new Date(val).getTime() &&
+        new Date(val).getTime() < new Date(this.formData.date[1]).getTime()
+      ) {
+        this.playRecord({}, [val, this.formData.date[1]])
+      } else {
+        this.$message({
+          message: '该时间段暂无录像',
+          type: 'warning'
+        })
+        this.$refs.TimePlayer.stopTimeAutoPlay()
+        this.handleCloseVideo()
+      }
+      if (this.play) this.handlePauseOrPlay()
 
       this.handleDevicesPlayEnded()
       if (isPlay) this.handlePauseOrPlay()
@@ -1046,6 +1064,20 @@ export default {
       } else {
         this.cloudPlayerUrl = ['']
       }
+      this.$nextTick(() => {
+        let emptyPlayerDom = this.$refs.emptyPlayer
+        console.log('emptyPlayerDom', emptyPlayerDom)
+        // for (let i = 0; i <= emptyPlayerDom.length; i++) {
+        //   console.log(
+        //     'emptyPlayerDom[i]',
+        //     emptyPlayerDom[i],
+        //     emptyPlayerDom.length
+        //   )
+        emptyPlayerDom[emptyPlayerDom.length - 1].style.height = '100px'
+        // }
+      })
+
+      this.$refs.TimePlayer.handleCloseVideoChildTimeSegments()
     },
     handleSelectTreeNode(data) {
       this.selData = data
@@ -1150,6 +1182,7 @@ export default {
 
     // 滚动时间轴事件
     handleChangePlayTime(curTime) {
+      console.log('curTime~~~~~~~~~~~~~~~~', curTime, this.formData.date)
       const resEndTime = new Date(this.formData.date[1]).getTime()
       const resStartTime = new Date(this.formData.date[0]).getTime()
       this.isNext = false
@@ -1163,6 +1196,7 @@ export default {
           message: '该时间段暂无录像',
           type: 'warning'
         })
+        this.$refs.TimePlayer.stopTimeAutoPlay()
         this.handleCloseVideo()
       }
     },
@@ -1521,11 +1555,29 @@ export default {
     },
     async gbPlay() {
       console.log('前端控制：播放')
-      this.$refs.TimePlayer.timeAutoPlay()
+
+      await resumeRecordView({
+        channelId: this.channelId,
+        speed: this.speedArr[this.currentSpeed],
+        streamId: this.streamId
+      }).then((res) => {
+        if (res.code === 0) {
+          ;(this.isClickCx = true), this.$refs.TimePlayer.timeAutoPlay()
+        }
+      })
     },
-    gbPause() {
+    async gbPause() {
       console.log('前端控制：暂停', this.$refs.TimePlayer)
-      this.$refs.TimePlayer.stopTimeAutoPlay()
+
+      await pauseRecordView({
+        channelId: this.channelId,
+        speed: this.speedArr[this.currentSpeed],
+        streamId: this.streamId
+      }).then((res) => {
+        if (res.code === 0) {
+          ;(this.isClickCx = false), this.$refs.TimePlayer.stopTimeAutoPlay()
+        }
+      })
     },
     async gbScale(command) {
       console.log('前端控制：倍速 ' + command)
@@ -1704,10 +1756,10 @@ export default {
       return result * 100
     },
     videoClick(i) {
+      Local.set('showTime', this.formData.date[0])
       this.$refs.TimePlayer.stopTimeAutoPlay()
-      // this.getPlaybackList(this.videoHistory.date)
+      this.$refs.TimePlayer.timeAutoPlay()
 
-      console.log('this.deviceVideoList', this.deviceVideoList)
       this.playerIdx = i - 1
 
       this.$refs.TimePlayer.changeChildTimeSegments(i - 1)

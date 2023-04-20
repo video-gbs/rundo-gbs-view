@@ -128,6 +128,7 @@ export default {
       this.$refs.videoPlayer.player.on('pause', (event) => {
         if (!this.isError) this.onPause(this.$refs.videoPlayer, event)
       })
+
       //自动播放
       this.autoplay && this.$refs.videoPlayer.player.play()
 
