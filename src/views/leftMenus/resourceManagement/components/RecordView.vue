@@ -148,6 +148,8 @@
                     <cloud-player
                       ref="cloudPlayer"
                       :stretch="isFill[i - 1]"
+                      :tracks="tracks"
+                      :isShowStream="isShowStream[i - 1]"
                       :onChangePlayTime="handleChangeCurrentTime"
                       :onPlayEnded="handleDevicesPlayEnded"
                       :onPlay="handleOnPlay"
@@ -164,6 +166,7 @@
                 </div>
               </div>
             </div>
+
             <!-- 时间进度条 -->
 
             <div class="player-time">
@@ -225,12 +228,14 @@
                 </el-tooltip>
                 <el-tooltip
                   effect="dark"
-                  :content="isShowStream ? '显示码流信息' : '隐藏码流信息'"
+                  :content="
+                    isShowStream[playerIdx] ? '显示码流信息' : '隐藏码流信息'
+                  "
                   placement="top"
                 >
                   <i
                     :class="`icon-xianshimaliuxinxi ${
-                      isShowStream ? 'active' : ''
+                      isShowStream[playerIdx] ? 'active' : ''
                     }`"
                     @click="handleShowStream()"
                   />
@@ -370,39 +375,11 @@
                 </el-tooltip>
               </div>
             </div>
-            <div class="trank" v-if="isShowStream">
-              <p
-                v-if="tracksNotLoaded"
-                style="text-align: center; padding-top: 3rem"
-              >
-                暂无数据
-              </p>
-              <div
-                :key="index"
-                v-for="(item, index) in tracks"
-                style="width: 50%; float: left"
-                loading
-              >
-                <span>流 {{ index }}</span>
-                <div class="trankInfo" v-if="item.codec_type == 0">
-                  <p>格式: {{ item.codec_id_name }}</p>
-                  <p>类型: 视频</p>
-                  <p>分辨率: {{ item.width }} x {{ item.height }}</p>
-                  <p>帧率: {{ item.fps }}</p>
-                </div>
-                <div class="trankInfo" v-if="item.codec_type == 1">
-                  <p>格式: {{ item.codec_id_name }}</p>
-                  <p>类型: 音频</p>
-                  <p>采样位数: {{ item.sample_bit }}</p>
-                  <p>采样率: {{ item.sample_rate }}</p>
-                </div>
-              </div>
-              <div></div>
-            </div>
           </div>
         </div>
       </el-main>
     </el-container>
+
     <DownloadVideoModal
       v-if="downloadModalVisible"
       :visible.sync="downloadModalVisible"
@@ -438,7 +415,8 @@ import {
   pauseRecordView,
   resumeRecordView,
   seekRecordView,
-  speedRecordView
+  speedRecordView,
+  getStreamInfo
 } from '@/api/method/live'
 
 const ZOOM_TYPE = {
@@ -525,7 +503,7 @@ export default {
       currentCloudList: '',
       isMuted: true, //音量
       isFill: [], //是否拉伸视频
-      isShowStream: false, //是否显示码流
+      isShowStream: [], //是否显示码流
       tracks: [],
       cloudPlay: false,
       isZoom: false, //放大缩小类型
@@ -658,6 +636,8 @@ export default {
       },
       showBackBtn: false,
       resOnlineState: '',
+      recordStreamId: [''],
+      recordCloudId: [''],
       //缓存通道管理页面的数据
       SchannelId: this.$route.params.SchannelId,
       SchannelName: this.$route.params.SchannelName,
@@ -696,8 +676,10 @@ export default {
       this.isFullScreen = !this.isFullScreen
     })
     this.isFill = []
+    this.isShowStream = []
     for (let i = 0; i < this.spilt; i++) {
       this.isFill[i] = true
+      this.isShowStream[i] = false
       this.timeSegments[i] = {
         name: '',
         beginTime: 0,
@@ -1066,18 +1048,19 @@ export default {
       }
       this.$nextTick(() => {
         let emptyPlayerDom = this.$refs.emptyPlayer
-        console.log('emptyPlayerDom', emptyPlayerDom)
-        // for (let i = 0; i <= emptyPlayerDom.length; i++) {
-        //   console.log(
-        //     'emptyPlayerDom[i]',
-        //     emptyPlayerDom[i],
-        //     emptyPlayerDom.length
-        //   )
-        emptyPlayerDom[emptyPlayerDom.length - 1].style.height = '100px'
-        // }
-      })
+        for (let i = 0; i < emptyPlayerDom.length; i++) {
+          //   console.log(
+          //     'emptyPlayerDom[i]',
+          //     emptyPlayerDom[i],
+          //     emptyPlayerDom.length
+          //   )
+          emptyPlayerDom[i].style.height = '100px'
+        }
 
-      this.$refs.TimePlayer.handleCloseVideoChildTimeSegments()
+        this.$refs.TimePlayer.handleCloseVideoChildTimeSegments()
+
+        this.$refs.TimePlayer.stopTimeAutoPlay()
+      })
     },
     handleSelectTreeNode(data) {
       this.selData = data
@@ -1117,26 +1100,49 @@ export default {
         return
       }
     },
+    setRecordStreamId(id, idx) {
+      this.$set(this.recordStreamId, idx, id)
+
+      setTimeout(() => {
+        window.localStorage.setItem(
+          'recordStreamId',
+          JSON.stringify(this.recordStreamId)
+        )
+      }, 100)
+    },
+    setRecordCloudId(id, idx) {
+      this.$set(this.recordCloudId, idx, id)
+
+      setTimeout(() => {
+        window.localStorage.setItem(
+          'recordCloudId',
+          JSON.stringify(this.recordCloudId)
+        )
+      }, 100)
+    },
+
     //获取码流信息
-    getStreamInfo() {
-      if (this.mediaServerId && this.app && this.streamId) {
-        const that = this
-        that.tracks = []
-      } else {
-        this.$message({
-          showClose: true,
-          message: '获取编码信息失败,',
-          type: 'warning'
-        })
-      }
+    async getStreamInfo() {
+      this.tracks = []
+      await getStreamInfo({
+        channelExpansionId: Local.get('recordCloudId')[this.playerIdx],
+        streamId: Local.get('recordStreamId')[this.playerIdx]
+      }).then((res) => {
+        if (res.code === 0) {
+          this.tracks = res.data.tracks
+        } else {
+          this.$message({
+            showClose: true,
+            message: '获取编码信息失败,',
+            type: 'warning'
+          })
+        }
+      })
     },
     //控制显示码流
     handleShowStream() {
-      if (!this.isShowStream) {
-        this.getStreamInfo()
-      } else {
-        this.isShowStream = !this.isShowStream
-      }
+      this.getStreamInfo()
+      this.isShowStream[this.playerIdx] = !this.isShowStream[this.playerIdx]
     },
     //缩放拉伸屏幕
     handleChangeFill() {
@@ -1410,7 +1416,7 @@ export default {
     },
     // 点击tabs
     handleClick(e) {
-      this.isShowStream = false
+      this.isShowStream[this.playerIdx] = false
       this.play = false
     },
     // 切换播放进度
@@ -1522,11 +1528,21 @@ export default {
                 if (res.code === 0) {
                   if (!this.isNext) {
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx - 1)
+                    this.setRecordStreamId(
+                      res.data.streamId,
+                      this.playerIdx - 1
+                    )
+                    this.setRecordCloudId(this.channelId, this.playerIdx - 1)
                   } else {
                     if (this.spilt > this.playerIdx) {
                       this.playerIdx++
                     }
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx - 1)
+                    this.setRecordStreamId(
+                      res.data.streamId,
+                      this.playerIdx - 1
+                    )
+                    this.setRecordCloudId(this.channelId, this.playerIdx - 1)
                   }
 
                   this.streamId = res.data.streamId
@@ -2178,19 +2194,21 @@ export default {
   background-color: #545556;
   position: relative;
   .trank {
-    width: 80%;
+    width: 380px;
     height: 180px;
     text-align: left;
-    padding: 0 10%;
     overflow: auto;
     position: absolute;
-    color: white;
-    font-size: 12px;
-    bottom: 112px;
+    color: red;
+    font-size: 0.75rem;
+    bottom: 20px;
+    left: 20px;
+    box-sizing: border-box;
   }
   .trankInfo {
-    width: 80%;
+    width: 100%;
     padding: 0 10%;
+    text-shadow: 1px 1px black;
   }
 }
 .player-container {
@@ -2202,19 +2220,22 @@ export default {
   position: relative;
 
   .trank {
-    width: 80%;
+    width: 380px;
     height: 180px;
     text-align: left;
-    padding: 0 10%;
+    // padding: 0 10%;
     overflow: auto;
     position: absolute;
-    color: white;
-    font-size: 12px;
-    bottom: 112px;
+    color: red;
+    font-size: 0.75rem;
+    bottom: 20px;
+    left: 20px;
+    box-sizing: border-box;
   }
   .trankInfo {
-    width: 80%;
+    width: 100%;
     padding: 0 10%;
+    text-shadow: 1px 1px black;
   }
 }
 .player-box {

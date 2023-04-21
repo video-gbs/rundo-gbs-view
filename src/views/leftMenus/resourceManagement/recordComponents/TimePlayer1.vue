@@ -170,8 +170,6 @@ export default {
         //   that.time2 += 1000
         // }
 
-        that.$refs.Timeline.setTime(that.time2)
-
         Local.set('showTime', dayjs(that.time2).format('YYYY-MM-DD HH:mm:ss'))
 
         that.$emit('handleChangeTime')
@@ -180,6 +178,11 @@ export default {
           that.stopTimeAutoPlay()
           that.$emit('handleCloseVideo')
         }
+        if (that.$refs.Timeline.setTime) {
+          that.$refs.Timeline.setTime(that.time2)
+        } else {
+          return
+        }
       }, 1000)
     },
     stopTimeAutoPlay() {
@@ -187,16 +190,10 @@ export default {
       clearInterval(that.timeAutoPlays)
     },
     handleCloseVideoChildTimeSegments() {
-      this.childTimeSegments = [
-        {
-          name: '',
-          beginTime: 0,
-          endTime: 0,
-          color: '#4797FF',
-          startRatio: 0.65,
-          endRatio: 0.9
-        }
-      ]
+      this.childTimeSegments.map((item) => {
+        item.beginTime = 0
+        item.endTime = 0
+      })
     },
     changeChildTimeSegments(index) {
       this.childTimeSegments[0].beginTime = new Date(
@@ -241,6 +238,7 @@ export default {
       this.timeAutoPlay()
     },
     changePlayerTimes(val) {
+      // this.time2 = val[0]
       this.childTimeSegments[0].beginTime = 0
       this.childTimeSegments[0].endTime = 0
       this.$nextTick(() => {

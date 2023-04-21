@@ -1,17 +1,42 @@
 <template>
-  <LivePlayer
-    ref="videoPlayer"
-    class="live-player-container"
-    :aspect="stretch ? 'fullscreen' : '16:9'"
-    id="livePlayerDevice"
-    :videoUrl="videoUrl"
-    :controls="controls"
-    :autoplay="autoplay"
-    @fullscreen="changFullscreen"
-    @snapOutside="screenShot"
-    :live="live"
-  >
-  </LivePlayer>
+  <div class="livePlayer">
+    <LivePlayer
+      ref="videoPlayer"
+      class="live-player-container"
+      :aspect="stretch ? 'fullscreen' : '16:9'"
+      id="livePlayerDevice"
+      :videoUrl="videoUrl"
+      :controls="controls"
+      :autoplay="autoplay"
+      @fullscreen="changFullscreen"
+      @snapOutside="screenShot"
+      :live="live"
+    >
+    </LivePlayer>
+
+    <div class="trank" v-if="isShowStream">
+      <div
+        :key="index"
+        v-for="(item, index) in tracks"
+        style="width: 50%; float: left"
+        loading
+      >
+        <div class="trankInfo" v-if="item.codecType === 0">
+          <p>格式: {{ item.codecName }}</p>
+          <p>类型: 视频</p>
+          <p>分辨率: {{ item.width }} x {{ item.height }}</p>
+          <p>帧率: {{ item.fps }}</p>
+        </div>
+        <div class="trankInfo" v-if="item.codecType === 1">
+          <p>格式: {{ item.codecName }}</p>
+          <p>类型: 音频</p>
+          <p>采样位数: {{ item.sampleBit }}</p>
+          <p>采样率: {{ item.sampleRate }}</p>
+        </div>
+      </div>
+      <div></div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -33,6 +58,17 @@ export default {
       type: String,
       default: ''
     },
+    isShowStream: {
+      type: Boolean,
+      default: false
+    },
+    tracks: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
+
     playbackRate: {
       type: Number,
       default: 1
@@ -287,5 +323,25 @@ export default {
     padding-bottom: 0 !important;
     height: 100%;
   }
+}
+.livePlayer {
+  // position: relative;
+}
+.trank {
+  width: 380px;
+  height: 180px;
+  text-align: left;
+  overflow: auto;
+  position: absolute;
+  color: red;
+  font-size: 0.75rem;
+  bottom: 20px;
+  left: 20px;
+  box-sizing: border-box;
+}
+.trankInfo {
+  width: 100%;
+  padding: 0 10%;
+  text-shadow: 1px 1px black;
 }
 </style>
