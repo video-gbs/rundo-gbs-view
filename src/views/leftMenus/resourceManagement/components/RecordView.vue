@@ -246,7 +246,7 @@
                   <svg-icon
                     class="iconfont white close-video"
                     icon-class="close-video"
-                    @click="handleCloseVideo"
+                    @click="handleCloseVideo('关闭视频')"
                   />
                 </el-tooltip>
 
@@ -1035,9 +1035,10 @@ export default {
       if (isPlay) this.handlePauseOrPlay()
     },
     // 关闭视频
-    handleCloseVideo() {
+    handleCloseVideo(name) {
       this.cloudPlay = this.play = false
       this.hasStreamId = false
+      this.$refs.TimePlayer.stopTimeAutoPlay()
       if (this.tabsActiveName === 'device') {
         this.stopPlayRecord()
         this.videoUrl = ['']
@@ -1056,10 +1057,9 @@ export default {
           //   )
           emptyPlayerDom[i].style.height = '100px'
         }
-
-        this.$refs.TimePlayer.handleCloseVideoChildTimeSegments()
-
-        this.$refs.TimePlayer.stopTimeAutoPlay()
+        if (name === '关闭视频') {
+          this.$refs.TimePlayer.handleCloseVideoChildTimeSegments()
+        }
       })
     },
     handleSelectTreeNode(data) {
@@ -1187,7 +1187,7 @@ export default {
     },
 
     // 滚动时间轴事件
-    handleChangePlayTime(curTime) {
+    handleChangePlayTime(curTime, name) {
       console.log('curTime~~~~~~~~~~~~~~~~', curTime, this.formData.date)
       const resEndTime = new Date(this.formData.date[1]).getTime()
       const resStartTime = new Date(this.formData.date[0]).getTime()
@@ -1203,7 +1203,7 @@ export default {
           type: 'warning'
         })
         this.$refs.TimePlayer.stopTimeAutoPlay()
-        this.handleCloseVideo()
+        this.handleCloseVideo(name)
       }
     },
     //事件轴上的日期发生变化

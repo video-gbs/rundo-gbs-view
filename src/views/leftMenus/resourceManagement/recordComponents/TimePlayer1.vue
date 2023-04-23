@@ -178,6 +178,10 @@ export default {
           that.stopTimeAutoPlay()
           that.$emit('handleCloseVideo')
         }
+        console.log(
+          'that.$refs.Timeline~~~~~~~~~~~~~~~~~~~',
+          that.$refs.Timeline
+        )
         if (that.$refs.Timeline.setTime) {
           that.$refs.Timeline.setTime(that.time2)
         } else {
@@ -230,12 +234,12 @@ export default {
       console.log('点击了：' + arr[0].name)
     },
     dragTimeChange(time) {
+      this.stopTimeAutoPlay()
       Local.set('showTime', dayjs(time).format('YYYY-MM-DD HH:mm:ss'))
       this.$emit('handleChangeTime', time)
 
-      this.$emit('onChange', time)
-      // clearInterval(this.timeAutoPlays)
-      this.timeAutoPlay()
+      this.$emit('onChange', time, '拖拽')
+      // this.timeAutoPlay()
     },
     changePlayerTimes(val) {
       // this.time2 = val[0]
