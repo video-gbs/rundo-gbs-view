@@ -275,12 +275,18 @@ export default {
         presetName
       }).then((res) => {
         if (res.code === 0) {
-          this.nowPreset = presetName
+          console.log('this.nowPreset=======', this.nowPreset)
+          if (this.nowPreset !== '') {
+            this.nowPreset = presetName
+          }
+
+          console.log('this.nowPreset~~~~~~~~~~~~~', this.nowPreset)
           this.$message({
             type: 'success',
             message: '修改名称成功'
           })
           this.inputBoxDisplay = false
+          this.inputPresetName = ''
           console.log('预置位修改', this.resChannelId, this.resPlayerIdx)
           this.$emit(
             'changeChildOptionLists',
@@ -291,6 +297,18 @@ export default {
       })
     },
     async deletePreset() {
+      console.log('deletePreset~~~~~~~~~~~~~', this.nowPreset)
+      if (
+        this.nowPreset === '' ||
+        this.nowPreset === null ||
+        this.nowPreset === undefined
+      ) {
+        this.$message({
+          message: '请选择预置位',
+          type: 'warning'
+        })
+        return
+      }
       await ptzPresetDelete({
         channelExpansionId: this.resChannelId,
         presetId: this.nowPreset
@@ -300,13 +318,14 @@ export default {
             this.optionLists = this.optionLists.filter((item) => {
               return item.presetId !== this.nowPreset
             })
-            this.nowPreset = []
+            this.nowPreset = ''
+
             this.$message({
               type: 'success',
               message: '删除成功'
             })
 
-            this.$emit('changeOptionLists', this.nowPreset, this.resPlayerIdx)
+            this.$emit('changeOptionLists', this.resPlayerIdx, this.nowPreset)
           }
         })
         .catch((error) => {
@@ -322,6 +341,7 @@ export default {
     },
     cancelPreset() {
       this.inputBoxDisplay = false
+      this.inputPresetName = ''
     }
   },
   destroyed() {}
