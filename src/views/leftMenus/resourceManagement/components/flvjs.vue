@@ -302,7 +302,10 @@ export default {
 
       that.flvPlayer.attachMediaElement(videoElement)
       that.flvPlayer.load()
-      that.flvPlayer.play()
+      setTimeout(function () {
+        that.flvPlayer.play()
+      }, 300)
+
       if (that.timerId !== null) {
         clearInterval(that.timerId)
       }
