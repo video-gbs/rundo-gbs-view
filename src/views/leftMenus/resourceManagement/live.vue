@@ -128,6 +128,7 @@
                       :videoUrl="videoUrl[i - 1]"
                       :flvStreamId="flvStreamId[i - 1]"
                       :flvCloudId="flvCloudId[i - 1]"
+                      :leftTopName="leftTopName[i - 1]"
                       :deviceData="playerData[i - 1] || {}"
                       fluent
                       autoplay
@@ -369,6 +370,7 @@ export default {
       videoUrl: [''],
       flvStreamId: [''],
       flvCloudId: [''],
+      leftTopName: [''],
       showContent: false, // 展示面板内容
       spilt: 4, //分屏
       spilt1: 4, //分屏
@@ -503,6 +505,7 @@ export default {
     },
     spilt(newValue) {
       console.log('切换画幅;' + newValue)
+      this.playerIdx = 0
       let resVideoUrl = []
       let resChildOptionLists = []
       let resChannelExpansionId = []
@@ -1010,6 +1013,7 @@ export default {
       return arr
     },
     async handleNodeClick(data, node, self) {
+      console.log(data, 111)
       if (!data.onlineState) {
         this.resArray = []
         if (this.detailsId.indexOf(data.id) !== -1) {
@@ -1069,7 +1073,7 @@ export default {
           }
         }
       } else {
-        this.getDeviceList(data.areaPid)
+        this.getDeviceList(data.areaPid, data.areaNames)
         this.getPtzPresetLists(data.areaPid, this.playerIdx)
       }
     },
@@ -1183,7 +1187,7 @@ export default {
       this.playerData = []
       this.childOptionLists = []
     },
-    async getDeviceList(id) {
+    async getDeviceList(id, name) {
       Local.set('cloudId', id)
       await getPlayLists({ channelId: id })
         .then((res) => {
@@ -1199,6 +1203,7 @@ export default {
             this.setPlayUrl(res.data.wsFlv, idxTmp)
             this.setStreamId(res.data.streamId, idxTmp)
             this.setFlvCloudId(id, idxTmp)
+            this.setLeftTopName(name, idxTmp)
 
             this.hasVideoUrl = true
           }
@@ -1260,6 +1265,16 @@ export default {
         window.localStorage.setItem(
           'flvCloudId',
           JSON.stringify(this.flvCloudId)
+        )
+      }, 100)
+    },
+    setLeftTopName(name, idx) {
+      this.$set(this.leftTopName, idx, name)
+
+      setTimeout(() => {
+        window.localStorage.setItem(
+          'leftTopName',
+          JSON.stringify(this.leftTopName)
         )
       }, 100)
     },
@@ -1647,7 +1662,7 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  max-height: 50%;
+  max-height: 60%;
 
   .wrapper-bottom-content {
     flex: 1;

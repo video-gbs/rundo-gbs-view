@@ -9,17 +9,24 @@
       height="100%"
     ></video>
     <div class="player-header">
-      <span class="head-left">{{
+      <!-- <span class="head-left">{{
         deviceData.sourceType
           ? deviceData.selfChannelName
           : deviceData.channelName
-      }}</span>
+      }}</span> -->
+      <span class="head-left">{{ leftTopName }}</span>
       <div class="head-right">
         <span>正在实时预览</span>
         <i class="el-icon-close icon-close" @click.stop="closeVideo"></i>
       </div>
     </div>
-    <DirectionControl :deviceData="deviceData" v-if="showControl" />
+    <DirectionControl
+      ref="playtoolDirect"
+      class="playtoolDirectionControl"
+      :showContentList="showContentList"
+      :formPlaytoolShowControl="showControl"
+      v-show="showControl"
+    />
     <playerTool
       ref="playerTool"
       :idx="idx"
@@ -113,11 +120,13 @@ export default {
       tracks: [],
       resVideoUrl: '',
       resChannelId: '',
-      resPlayerIdx: 0
+      resPlayerIdx: 0,
+      showContentList: []
     }
   },
   props: [
     'videoUrl',
+    'leftTopName',
     'error',
     'hasAudio',
     'height',
@@ -218,6 +227,7 @@ export default {
     },
     handleOpenControl() {
       this.showControl = !this.showControl
+      this.showContentList = Local.get('videoUrl')
     },
     createVideo() {
       this.reconnectIng = true
@@ -231,6 +241,7 @@ export default {
         clearInterval(that.timerId)
       }
       const videoElement = document.getElementById(that.idx)
+      flvjs.closePlay()
       if (flvjs.isSupported()) {
         that.flvPlayer = flvjs.createPlayer(
           {
@@ -301,9 +312,11 @@ export default {
       })
 
       that.flvPlayer.attachMediaElement(videoElement)
-      that.flvPlayer.load()
       setTimeout(function () {
-        that.flvPlayer.play()
+        if (that.resVideoUrl !== '' && that.resVideoUrl !== null) {
+          that.flvPlayer.load()
+          that.flvPlayer.play()
+        }
       }, 300)
 
       if (that.timerId !== null) {
@@ -350,7 +363,7 @@ export default {
         clearInterval(that.timerId1)
       }
       that.timerId1 = setInterval(() => {
-        if (this.reconnectCount > 10) {
+        if (that.reconnectCount > 10) {
           console.info('重连大于10次，不再重连')
           clearTimeout(that.timerId1)
           that.timerId1 = null
@@ -360,9 +373,9 @@ export default {
         if (videoElement.buffered.length > 0) {
           const end = videoElement.buffered.end(0) // 视频结尾时间
 
-          if (end === this.prevEnd) {
-            this.reconnectCount++
-            console.info('重连', this.reconnectCount)
+          if (end === that.prevEnd) {
+            that.reconnectCount++
+            console.info('重连', that.reconnectCount)
             if (that.flvPlayer) {
               that.flvPlayer.pause()
               that.flvPlayer.unload()
@@ -378,7 +391,7 @@ export default {
             // that.flvPlayer.play()
           }
 
-          this.prevEnd = end
+          that.prevEnd = end
         }
       }, 10000)
     },
@@ -424,6 +437,12 @@ export default {
   overflow: hidden;
   display: none;
 }
+.playtoolDirectionControl {
+  z-index: 999999;
+}
+::v-deep .playtoolDirectionControl > .speed-control {
+  margin: 5px auto !important;
+}
 .video-box-container {
   position: relative;
   width: 100%;
@@ -442,7 +461,7 @@ export default {
     position: absolute;
     color: red;
     font-size: 0.75rem;
-    bottom: 20px;
+    bottom: 30px;
     box-sizing: border-box;
   }
   .trankInfo {
