@@ -37,8 +37,7 @@
         :max="255"
         @change="$emit('change-speed')"
         :show-tooltip="false"
-      >
-      </el-slider>
+      ></el-slider>
       <span class="text width25">{{ speed }}</span>
     </div>
 
@@ -54,8 +53,7 @@
         disabled
         @change="$emit('change-speed')"
         :show-tooltip="false"
-      >
-      </el-slider>
+      ></el-slider>
       <span class="text width25">{{ speed }}</span>
     </div>
 
@@ -193,7 +191,12 @@ import { Local } from '@/utils/storage'
 
 export default {
   name: 'DirectionControl',
-  props: ['deviceData', 'showContentList', 'playerIdx'],
+  props: [
+    'deviceData',
+    'showContentList',
+    'playerIdx',
+    'formPlaytoolShowControl'
+  ],
   data() {
     return {
       lengthX: 0,
@@ -261,6 +264,14 @@ export default {
       })
       this.$forceUpdate()
     },
+    formPlaytoolShowControl(val) {
+      this.resPlayerIdx = 0
+      this.initTopType = []
+      this.initType = []
+      this.initTopType[0] = true
+      this.initType[0] = true
+      this.$forceUpdate()
+    },
     playerIdx(val) {
       this.resPlayerIdx = val
 
@@ -277,14 +288,14 @@ export default {
             this.resShowContent.length - 1 === val &&
             this.resShowContent[this.resShowContent.length - 1] !== ''
           ) {
-            // this.$nextTick(() => {
             this.initTopType[this.resShowContent.length - 1] = true
             this.initType[this.resShowContent.length - 1] = true
-
-            // })
           }
         }
       })
+
+      console.log(222, this.initTopType)
+      console.log(22, this.initType)
       this.$forceUpdate()
     },
     deep: true,
@@ -298,6 +309,7 @@ export default {
     this.initTopType = []
     this.initType = []
     this.type3d = []
+
     for (let i = 0; i < this.$props.showContentList.length; i++) {
       this.initTopType[i] = false
       this.initType[i] = false
@@ -359,21 +371,21 @@ export default {
       switch (name) {
         case '缩小':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 16,
             operationValue: this.speed
           })
           break
         case '焦点拉进':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 66,
             operationValue: this.speed
           })
           break
         case '光圈缩小':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 72,
             operationValue: this.speed
           })
@@ -386,21 +398,21 @@ export default {
       switch (name) {
         case '放大':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 32,
             operationValue: this.speed
           })
           break
         case '焦点拉远':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 65,
             operationValue: this.speed
           })
           break
         case '光圈放大':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 68,
             operationValue: this.speed
           })
@@ -413,21 +425,21 @@ export default {
       switch (name) {
         case '缩小':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 0,
             operationValue: this.speed
           })
           break
         case '焦点拉进':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 0,
             operationValue: this.speed
           })
           break
         case '光圈缩小':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 64,
             operationValue: this.speed
           })
@@ -440,21 +452,21 @@ export default {
       switch (name) {
         case '放大':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 0,
             operationValue: this.speed
           })
           break
         case '焦点拉远':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 0,
             operationValue: this.speed
           })
           break
         case '光圈放大':
           ptzControl1({
-            channelExpansionId: Local.get('cloudId'),
+            channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
             ptzOperationType: 64,
             operationValue: this.speed
           })
@@ -464,8 +476,11 @@ export default {
       }
     },
     changeType(i, splitNum) {
-      console.log('changeType', i, splitNum)
-      if (splitNum === 1) {
+      if (
+        splitNum === 1 &&
+        this.resShowContent !== '' &&
+        this.resShowContent[i].length > 0
+      ) {
         this.initTopType = []
         this.initType = []
         this.initTopType[i] = true
@@ -758,16 +773,16 @@ export default {
     ptzCamera(cmdCode) {
       // const { channelId } = this.deviceData
 
-      // console.log('cmdCode~~~~~~~', cmdCode, Local.get('cloudId'))
+      // console.log('cmdCode~~~~~~~', cmdCode, Local.get('flvCloudId')[this.resPlayerIdx])
       ptzControl1({
-        channelExpansionId: Local.get('cloudId'),
+        channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
         ptzOperationType: this.status[cmdCode],
         operationValue: this.speed
       })
     },
     ptzCameraStop(cmdCode) {
       ptzControl1({
-        channelExpansionId: Local.get('cloudId'),
+        channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
         ptzOperationType: 0,
         operationValue: this.speed
       })
@@ -833,16 +848,21 @@ export default {
   .speed-control-else {
     width: 214px;
     height: 46px;
-    // margin-left: -7px;
     margin: 24px auto 2px;
-    // background: rgba(16, 85, 189, 0.3);
     border-radius: 8px 8px 8px 8px;
     opacity: 1;
     margin-top: 16px;
     padding: 12px 24px;
+    -webkit-box-sizing: border-box;
     box-sizing: border-box;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
     justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
 
     .el-slider-component {
@@ -1026,7 +1046,7 @@ export default {
     height: 200px;
     overflow: hidden;
     position: relative;
-
+    margin: 24px auto 2px;
     &::before {
       content: ' ';
       display: block;
