@@ -170,8 +170,6 @@ export default {
         //   that.time2 += 1000
         // }
 
-        that.$refs.Timeline.setTime(that.time2)
-
         Local.set('showTime', dayjs(that.time2).format('YYYY-MM-DD HH:mm:ss'))
 
         that.$emit('handleChangeTime')
@@ -180,6 +178,15 @@ export default {
           that.stopTimeAutoPlay()
           that.$emit('handleCloseVideo')
         }
+        console.log(
+          'that.$refs.Timeline~~~~~~~~~~~~~~~~~~~',
+          that.$refs.Timeline
+        )
+        if (that.$refs.Timeline.setTime) {
+          that.$refs.Timeline.setTime(that.time2)
+        } else {
+          return
+        }
       }, 1000)
     },
     stopTimeAutoPlay() {
@@ -187,16 +194,10 @@ export default {
       clearInterval(that.timeAutoPlays)
     },
     handleCloseVideoChildTimeSegments() {
-      this.childTimeSegments = [
-        {
-          name: '',
-          beginTime: 0,
-          endTime: 0,
-          color: '#4797FF',
-          startRatio: 0.65,
-          endRatio: 0.9
-        }
-      ]
+      this.childTimeSegments.map((item) => {
+        item.beginTime = 0
+        item.endTime = 0
+      })
     },
     changeChildTimeSegments(index) {
       this.childTimeSegments[0].beginTime = new Date(
@@ -233,14 +234,15 @@ export default {
       console.log('点击了：' + arr[0].name)
     },
     dragTimeChange(time) {
+      this.stopTimeAutoPlay()
       Local.set('showTime', dayjs(time).format('YYYY-MM-DD HH:mm:ss'))
       this.$emit('handleChangeTime', time)
 
-      this.$emit('onChange', time)
-      // clearInterval(this.timeAutoPlays)
-      this.timeAutoPlay()
+      this.$emit('onChange', time, '拖拽')
+      // this.timeAutoPlay()
     },
     changePlayerTimes(val) {
+      // this.time2 = val[0]
       this.childTimeSegments[0].beginTime = 0
       this.childTimeSegments[0].endTime = 0
       this.$nextTick(() => {

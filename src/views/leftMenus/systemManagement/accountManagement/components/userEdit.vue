@@ -592,11 +592,11 @@ export default {
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
-      // this.getLists()
+      this.getLists()
     },
     currentChange(proCount) {
       this.params.proCount = proCount
-      // this.getLists()
+      this.getLists()
     },
     nodeClickHandle(data) {
       this.form.orgId = data.orgName

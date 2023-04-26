@@ -17,6 +17,7 @@
               <el-select
                 v-model="nowPreset"
                 placeholder="请选择预置位"
+                clearable
                 @change="handleChange"
               >
                 <el-option
@@ -99,7 +100,13 @@
             <el-input v-model="inputPresetName" placeholder="输入内容">
             </el-input>
             <el-button
-              style="float: right; padding-top: 12px; padding-left: 12px"
+              style="
+                float: right;
+                padding-top: 12px;
+                padding-left: 12px;
+                position: relative;
+                top: -4px;
+              "
               type="text"
               size="small"
               @click="presetPosition(inputPresetName)"
@@ -107,7 +114,13 @@
               确定
             </el-button>
             <el-button
-              style="float: right; padding-top: 12px; color: #ff4b49"
+              style="
+                float: right;
+                padding-top: 12px;
+                color: #ff4b49;
+                position: relative;
+                top: -4px;
+              "
               type="text"
               size="small"
               @click="cancelPreset()"
@@ -204,6 +217,14 @@ export default {
           }
         }
       })
+
+      console.log(' this.optionLists', this.optionLists)
+      this.nowPreset =
+        this.optionLists !== undefined &&
+        this.optionLists.length > 0 &&
+        this.optionLists[0].presetId
+          ? this.optionLists[0].presetId
+          : ''
       this.$forceUpdate()
     },
     deep: true,
@@ -269,18 +290,37 @@ export default {
           type: 'error'
         })
       }
+      console.log('this.nowPreset', this.nowPreset)
       await ptzPresetEdit({
         channelExpansionId: this.resChannelId,
         presetId: this.nowPreset,
         presetName
       }).then((res) => {
         if (res.code === 0) {
-          this.nowPreset = presetName
-          this.$message({
-            type: 'success',
-            message: '修改名称成功'
-          })
+          console.log('this.nowPreset=======', this.nowPreset)
+          if (this.nowPreset !== '') {
+            this.nowPreset = presetName
+          }
+
+          console.log('this.nowPreset~~~~~~~~~~~~~', this.nowPreset)
+          if (
+            this.nowPreset === '' ||
+            this.nowPreset === null ||
+            this.nowPreset === undefined
+          ) {
+            this.$message({
+              message: '新增预置位成功',
+              type: 'success'
+            })
+          } else {
+            this.$message({
+              type: 'success',
+              message: '修改名称成功'
+            })
+          }
+
           this.inputBoxDisplay = false
+          this.inputPresetName = ''
           console.log('预置位修改', this.resChannelId, this.resPlayerIdx)
           this.$emit(
             'changeChildOptionLists',
@@ -291,6 +331,18 @@ export default {
       })
     },
     async deletePreset() {
+      console.log('deletePreset~~~~~~~~~~~~~', this.nowPreset)
+      if (
+        this.nowPreset === '' ||
+        this.nowPreset === null ||
+        this.nowPreset === undefined
+      ) {
+        this.$message({
+          message: '请选择预置位',
+          type: 'warning'
+        })
+        return
+      }
       await ptzPresetDelete({
         channelExpansionId: this.resChannelId,
         presetId: this.nowPreset
@@ -300,13 +352,14 @@ export default {
             this.optionLists = this.optionLists.filter((item) => {
               return item.presetId !== this.nowPreset
             })
-            this.nowPreset = []
+            this.nowPreset = ''
+
             this.$message({
               type: 'success',
               message: '删除成功'
             })
 
-            this.$emit('changeOptionLists', this.nowPreset, this.resPlayerIdx)
+            this.$emit('changeOptionLists', this.resPlayerIdx, this.nowPreset)
           }
         })
         .catch((error) => {
@@ -322,6 +375,7 @@ export default {
     },
     cancelPreset() {
       this.inputBoxDisplay = false
+      this.inputPresetName = ''
     }
   },
   destroyed() {}
