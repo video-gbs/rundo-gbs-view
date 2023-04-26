@@ -201,6 +201,7 @@ export default {
           this.initType[index] = false
         }
       })
+
       this.$forceUpdate()
     },
     playerIdx1(val) {
@@ -208,12 +209,30 @@ export default {
       this.resChannelId = this.$props.channelExpansionId[val]
 
       this.resPlayerIdx = val
+      // this.resShowContent.map((item, index) => {
+      //   if (item && item !== '' && item.length > 0) {
+      //     if (index === this.resPlayerIdx) {
+      //       this.initType[this.resPlayerIdx] = true
+      //     } else {
+      //       this.initType[this.resPlayerIdx] = false
+      //     }
+      //   }
+      // })
       this.resShowContent.map((item, index) => {
         if (item && item !== '' && item.length > 0) {
-          if (index === this.resPlayerIdx) {
-            this.initType[this.resPlayerIdx] = true
-          } else {
-            this.initType[this.resPlayerIdx] = false
+          // this.initTopType[index] = true
+          this.initType[index] = true
+        } else {
+          // this.initTopType[index] = false
+          this.initType[index] = false
+
+          if (
+            this.resShowContent.length > 1 &&
+            this.resShowContent.length - 1 === val &&
+            this.resShowContent[this.resShowContent.length - 1] !== ''
+          ) {
+            // this.initTopType[this.resShowContent.length - 1] = true
+            this.initType[this.resShowContent.length - 1] = true
           }
         }
       })
