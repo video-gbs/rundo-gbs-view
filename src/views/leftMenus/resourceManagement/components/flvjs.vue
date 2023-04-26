@@ -332,6 +332,18 @@ export default {
           const diffSpeedUp = 2 // 这里设置了超过1秒以上则进行视频加速播放
           const maxPlaybackRate = 4 // 自定义设置允许的最大播放速度
           let playbackRate = 1.0 // 播放速度
+          // 延迟过大，通过跳帧的方式更新视频
+          if (diff > 10 || diff < 0) {
+            that.flvPlayer.currentTime = this.flvPlayer.buffered.end(0) - 1
+            return
+          }
+
+          // 追帧
+          if (diff > 1) {
+            videoElement.playbackRate = 1.1
+          } else {
+            videoElement.playbackRate = 1
+          }
 
           if (diff > diffSpeedUp) {
             videoElement.currentTime = end - 0.2
