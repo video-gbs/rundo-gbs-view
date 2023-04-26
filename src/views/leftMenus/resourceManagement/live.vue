@@ -75,7 +75,11 @@
                   </transition>
                 </div>
                 <transition name="el-fade-in-linear">
-                  <div class="wrapper-bottom-content" v-show="showContent">
+                  <div
+                    class="wrapper-bottom-content"
+                    v-show="showContent"
+                    ref="wrapperBottomContent"
+                  >
                     <cloud-control
                       ref="cloudControl"
                       :deviceData="playerData[playerIdx]"
@@ -89,6 +93,7 @@
                       @changeOptionLists="changeOptionLists"
                       @changeChildOptionLists="changeChildOptionLists"
                       @rectZoomInit="rectZoomInit"
+                      @wrapperBottomContentScroll="wrapperBottomContentScroll"
                     />
                   </div>
                 </transition>
@@ -577,6 +582,12 @@ export default {
           return item.presetId !== this.id
         }
       )
+    },
+
+    wrapperBottomContentScroll() {
+      this.$nextTick(() => {
+        this.$refs.wrapperBottomContent.scrollTop = 80
+      })
     },
     async changeChildOptionLists(id, index) {
       await ptzPresetLists({ channelExpansionId: id }).then((res) => {

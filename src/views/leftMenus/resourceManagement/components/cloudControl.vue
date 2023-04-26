@@ -388,6 +388,7 @@ export default {
     // 设置预置位
     presetEdit() {
       this.inputBoxDisplay = !this.inputBoxDisplay
+      this.$emit('wrapperBottomContentScroll')
     },
     handleChange(val) {
       this.nowPreset = val
