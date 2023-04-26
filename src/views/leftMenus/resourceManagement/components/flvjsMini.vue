@@ -1,5 +1,5 @@
 <template>
-  <div class="video-box-container">
+  <div class="video-box-container" v-if="videoUrl">
     <video
       class="video-player"
       autoplay

@@ -372,7 +372,7 @@ export default {
         case '缩小':
           ptzControl1({
             channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
-            ptzOperationType: 16,
+            ptzOperationType: 32,
             operationValue: this.speed
           })
           break
@@ -399,7 +399,7 @@ export default {
         case '放大':
           ptzControl1({
             channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
-            ptzOperationType: 32,
+            ptzOperationType: 16,
             operationValue: this.speed
           })
           break
