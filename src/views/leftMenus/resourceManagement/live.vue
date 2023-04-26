@@ -147,10 +147,10 @@
                     ></player>
                     <div ref="rectArea" class="rect"></div>
 
-                    <div
+                    <!-- <div
                       ref="videoZoom"
                       class="video-zoom"
-                      v-show="isClicked[i]"
+                      v-if="isClicked[i]"
                     >
                       <div class="player-box-mini">
                         <playerMini
@@ -169,7 +169,7 @@
                           :hasAudio="hasAudio"
                         ></playerMini>
                       </div>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
@@ -372,7 +372,7 @@ export default {
       flvCloudId: [''],
       leftTopName: [''],
       showContent: false, // 展示面板内容
-      spilt: 4, //分屏
+      spilt: 16, //分屏
       spilt1: 4, //分屏
       spiltIndex: 1,
       isFill: true, //是否拉伸视频
@@ -861,18 +861,24 @@ export default {
     },
 
     showPlayerBoxMini(val, showValue) {
-      this.isClicked[val] = showValue
-      const videoZoomDom = document.getElementsByClassName('video-zoom')
-      if (showValue) {
-        videoZoomDom[val].style.display = 'block'
-      } else {
-        videoZoomDom[val].style.display = 'none'
-        this.$refs.videoBox[this.rectAreaNum].style.width = '100%'
-        this.$refs.videoBox[this.rectAreaNum].style.height = '100%'
-      }
-      this.is3d = showValue
-      this.select = showValue
-      this.rectZoomInit(val, showValue, '小视频')
+      this.$nextTick(() => {
+        // setTimeout(() => {
+        this.isClicked[val] = showValue
+        // const videoZoomDom = document.getElementsByClassName('video-zoom')
+
+        // console.log(videoZoomDom, val, showValue)
+        // if (showValue) {
+        //   videoZoomDom[val].style.display = 'block'
+        // } else {
+        //   videoZoomDom[val].style.display = 'none'
+        //   this.$refs.videoBox[this.rectAreaNum].style.width = '100%'
+        //   this.$refs.videoBox[this.rectAreaNum].style.height = '100%'
+        // }
+        this.is3d = showValue
+        this.select = showValue
+        this.rectZoomInit(val, showValue, '小视频')
+        // }, 3000)
+      })
     },
 
     changeHover(num, value) {

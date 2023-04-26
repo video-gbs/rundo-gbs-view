@@ -5,6 +5,7 @@
       autoplay
       :style="stretch ? 'object-fit: fill' : ''"
       :id="idx"
+      muted="muted"
       width="100%"
       height="100%"
     ></video>
@@ -241,18 +242,18 @@ export default {
         clearInterval(that.timerId)
       }
       const videoElement = document.getElementById(that.idx)
-      flvjs.closePlay()
       if (flvjs.isSupported()) {
         that.flvPlayer = flvjs.createPlayer(
           {
             type: 'flv',
             url: that.resVideoUrl,
-            // url:"ws://192.168.0.73:80/rtp/LIVE_23.live.flv",
             isLive: true
           },
+
           {
             cors: true, // 是否跨域
             // enableWorker: true, // 是否多线程工作
+            // fixAudioTimestampGap: false,
             enableStashBuffer: false, // 是否启用缓存
             stashInitialSize: 128, // 缓存大小(kb)  默认384kb
             autoCleanupSourceBuffer: true // 是否自动清理缓存
@@ -327,34 +328,15 @@ export default {
           const end = videoElement.buffered.end(0) // 视频结尾时间
           const current = videoElement.currentTime //  视频当前时间
           const diff = end - current // 相差时间
-          // console.log(diff);
           const diffCritical = 4 // 这里设定了超过4秒以上就进行跳转
           const diffSpeedUp = 2 // 这里设置了超过1秒以上则进行视频加速播放
           const maxPlaybackRate = 4 // 自定义设置允许的最大播放速度
           let playbackRate = 1.0 // 播放速度
 
-          // if (diff > diffCritical) {
-          //   console.log("相差超过4秒，进行跳转");
-          //   // videoElement.currentTime = end - 1.5;
-          //   videoElement.currentTime = end - 0.5;
-          //   playbackRate = Math.max(1, Math.min(diffCritical, 16));
-          // }
-          // else if (diff > diffSpeedUp) {
-          //   console.log("相差超过3秒，进行加速");
-          //   videoElement.currentTime = end - 0.5;
-          //   playbackRate = Math.max(1, Math.min(diff, maxPlaybackRate, 16))
-          // }
-
           if (diff > diffSpeedUp) {
-            // console.log("相差超过" + diffSpeedUp + "秒，进行追帧");
             videoElement.currentTime = end - 0.2
-            // playbackRate = Math.max(1, Math.min(diff, maxPlaybackRate, 16))
           }
-
-          // videoElement.playbackRate = playbackRate;
           if (videoElement.paused) {
-            // console.info("重新播放")
-            // that.flvPlayer.play()
           }
         }
       }, 1000)
@@ -396,22 +378,16 @@ export default {
       }, 10000)
     },
     setsrc() {
-      // if(this.url){
-      // this.src =this.url;
       console.info('开始播放')
       this.createVideo()
 
       if (this.isShowStream) this.getStreamInfo()
-      // }
     },
     // 关闭视频
     closeVideo() {
       console.info('关闭视频', this.index)
       this.player && this.player.close()
       this.$emit('close', this.index)
-      // console.info("this.$parent.playerIdx", this.$parent.$parent.playerIdx);
-      // this.$parent.videoUrl[this.$parent.playerIdx] = "";
-      // this.$parent.playerIdx = 0;
     }
   },
   destroyed() {
