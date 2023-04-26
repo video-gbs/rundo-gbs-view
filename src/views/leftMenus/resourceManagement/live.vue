@@ -147,14 +147,15 @@
                     ></player>
                     <div ref="rectArea" class="rect"></div>
 
-                    <!-- <div
+                    <div
                       ref="videoZoom"
                       class="video-zoom"
-                      v-if="isClicked[i]"
+                      v-show="isClicked[i]"
                     >
                       <div class="player-box-mini">
                         <playerMini
                           :ref="'player1' + i"
+                          v-if="isClicked[i]"
                           :videoUrl="videoUrl[i - 1]"
                           :deviceData="playerData[i - 1] || {}"
                           fluent
@@ -169,7 +170,7 @@
                           :hasAudio="hasAudio"
                         ></playerMini>
                       </div>
-                    </div> -->
+                    </div>
                   </div>
                 </div>
               </div>
@@ -372,7 +373,7 @@ export default {
       flvCloudId: [''],
       leftTopName: [''],
       showContent: false, // 展示面板内容
-      spilt: 16, //分屏
+      spilt: 4, //分屏
       spilt1: 4, //分屏
       spiltIndex: 1,
       isFill: true, //是否拉伸视频
@@ -472,6 +473,7 @@ export default {
       this.channelExpansionId[i] = []
     }
   },
+  updated() {},
   created() {
     window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
   },
@@ -864,16 +866,16 @@ export default {
       this.$nextTick(() => {
         // setTimeout(() => {
         this.isClicked[val] = showValue
-        // const videoZoomDom = document.getElementsByClassName('video-zoom')
+        const videoZoomDom = document.getElementsByClassName('video-zoom')
 
-        // console.log(videoZoomDom, val, showValue)
-        // if (showValue) {
-        //   videoZoomDom[val].style.display = 'block'
-        // } else {
-        //   videoZoomDom[val].style.display = 'none'
-        //   this.$refs.videoBox[this.rectAreaNum].style.width = '100%'
-        //   this.$refs.videoBox[this.rectAreaNum].style.height = '100%'
-        // }
+        console.log(videoZoomDom, val, showValue)
+        if (showValue) {
+          videoZoomDom[val].style.display = 'block'
+        } else {
+          videoZoomDom[val].style.display = 'none'
+          this.$refs.videoBox[this.rectAreaNum].style.width = '100%'
+          this.$refs.videoBox[this.rectAreaNum].style.height = '100%'
+        }
         this.is3d = showValue
         this.select = showValue
         this.rectZoomInit(val, showValue, '小视频')
@@ -1471,6 +1473,9 @@ export default {
 
 ::v-deep .el-tabs__content {
   overflow-y: auto;
+}
+.focusing {
+  display: none;
 }
 .video-zoom {
   position: relative;
