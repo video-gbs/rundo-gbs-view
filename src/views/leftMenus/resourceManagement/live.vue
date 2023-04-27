@@ -595,7 +595,6 @@ export default {
           this.$nextTick(() => {
             this.childOptionLists[index] = res.data
             this.$forceUpdate()
-            console.log(this.$refs)
             this.$refs.cloudControl.getOptionLists(index)
           })
         }

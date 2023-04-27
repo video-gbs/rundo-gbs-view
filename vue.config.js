@@ -2,6 +2,7 @@
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 // const px2rem = require('postcss-px2rem')
 // // 配置基本大小
 // const postcss = px2rem({
@@ -15,6 +16,23 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 // 生产环境
 // const proEnv = require('')
 
+const assetsCDN = {
+  // webpack build externals
+  externals: {
+    vue: 'Vue',
+    'vue-router': 'VueRouter',
+    vuex: 'Vuex',
+    axios: 'axios'
+  },
+  css: [],
+  // https://unpkg.com/browse/vue@2.6.10/
+  js: [
+    '//cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js',
+    '//cdn.jsdelivr.net/npm/vue-router@3.1.3/dist/vue-router.min.js',
+    '//cdn.jsdelivr.net/npm/vuex@3.1.1/dist/vuex.min.js',
+    '//cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js'
+  ]
+}
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
@@ -115,6 +133,15 @@ module.exports = {
     }
   },
   chainWebpack(config) {
+    if (process.env.NODE_ENV === 'production') {
+      config
+        .plugin('html')
+        .use(HtmlWebpackPlugin)
+        .tap((args) => {
+          args[0].cdn = assetsCDN.assets
+          return args
+        })
+    }
     // it can improve the speed of the first screen, it is recommended to turn on preload
     config.plugin('preload').tap(() => [
       {
@@ -125,6 +152,20 @@ module.exports = {
         include: 'initial'
       }
     ])
+    // config.plugin("preload-index").tap(() => [
+    //   {
+    //     rel: "preload",
+    //     fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
+    //     include: "initial",
+    //   },
+    // ]);
+    // config.plugin("preload-qr").tap(() => [
+    //   {
+    //     rel: "preload",
+    //     fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
+    //     include: "initial",
+    //   },
+    // ])
 
     // when there are many pages, it will cause too many meaningless requests
     config.plugins.delete('prefetch')
@@ -189,7 +230,10 @@ module.exports = {
         }
       })
       // https:// webpack.js.org/configuration/optimization/#optimizationruntimechunk
-      config.optimization.runtimeChunk('single')
+      config.optimization.runtimeChunk = {
+        name: (entrypoint) => `runtime~${entrypoint.name}`
+      }
+      // config.optimization.runtimeChunk('single')
     })
   },
   css: {
