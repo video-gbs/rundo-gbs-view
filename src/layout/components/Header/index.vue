@@ -157,7 +157,6 @@ export default {
   watch: {
     changeTypeRouter(newValue, oldValue) {
       // this.isShowSidebar = newValue
-      // console.log(newValue, oldValue, this.isShowSidebar ,98989898)
     }
   },
   created() {

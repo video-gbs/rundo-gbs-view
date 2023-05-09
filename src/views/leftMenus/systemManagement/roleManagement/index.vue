@@ -205,6 +205,7 @@ export default {
   mounted() {
     this.getList()
     // this.init()
+    console.log('this.$router~~~~~~~~~~~~~~', this.$router)
   },
   methods: {
     changeSwitch(row) {

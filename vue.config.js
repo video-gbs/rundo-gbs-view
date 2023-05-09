@@ -58,7 +58,12 @@ const urls = [
     target: 'http://124.71.20.118:8080',
     proxy: '/api'
   }
+  // {
+  //   target: 'http://xard-gbs-dev.runjian.com:8080',
+  //   proxy: '/api'
+  // }
 ]
+
 
 /**
  * 遍历转发数组，生成转发json，在vue.config.js中调用
