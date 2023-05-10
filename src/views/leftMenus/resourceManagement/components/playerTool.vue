@@ -199,12 +199,6 @@ export default {
     // 点击放大
     onBoxSelection(value) {
       this.isBoxSelection = !this.isBoxSelection
-      console.log(
-        'this.$props.rectAreaNum',
-        this.$props.boxSelectionNum,
-        this.$listeners,
-        value
-      )
       if (value === 1) {
         this.$listeners.showPlayerBoxMini(this.$props.boxSelectionNum, true)
       } else {

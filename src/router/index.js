@@ -321,6 +321,24 @@ Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch((err) => err)
 }
 
+function recursion(accessRouteses, childComponent) {
+  if (!accessRouteses.children) {
+    accessRouteses.children.forEach((child) => {
+      // 组装路由配置
+      const childTemp = {
+        name: child.name,
+        path: child.path,
+        meta: child.meta,
+        hidden: child.hidden === 1 ? true : false,
+        component: (resolve) => require([`@/views${child.component}`], resolve)
+      }
+      childComponent.push(childTemp)
+    })
+  } else {
+    accessRouteses.children.forEach((item) => recursion(item, arr))
+  }
+}
+
 // export default new Router({
 //   mode: 'history',
 //   scrollBehavior: () => ({ y: 0 }),
@@ -557,16 +575,16 @@ router.beforeEach(async (to, from, next) => {
                       component: Layout,
                       children: childComponent3
                     }
-                    // console.log('获取temp4的值', temp3)
+                    console.log('获取temp4的值', temp3)
                     router.addRoute(temp3)
                     router.options.routes.push(temp3)
                     configTypeRouter = configTypeRouter.concat([temp3])
                   }
 
-                  // console.log(
-                  //   'sideBarRouterList2~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
-                  //   sideBarRouterList2
-                  // )
+                  console.log(
+                    'sideBarRouterList2~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
+                    sideBarRouterList2
+                  )
 
                   // store.dispatch('user/changeSidebarRouter', sideBarRouterList2)
                   store.dispatch(
@@ -626,7 +644,7 @@ router.beforeEach(async (to, from, next) => {
               }
             })
 
-            // console.log('最终的路由值', configTypeRouter)
+            console.log('最终的路由值', configTypeRouter)
             // store.dispatch(
             //   'user/changeTypeRouter',
             //   homeRouters.concat(configTypeRouter)
@@ -665,12 +683,27 @@ router.beforeEach(async (to, from, next) => {
         } else {
           accessRouteses = await store.state.user.routerLists
 
-          // console.log('首页点击的时候动态路由获取', accessRouteses)
+          console.log('首页点击的时候动态路由获取', accessRouteses)
 
           const childComponent = []
+          const sunChildComponent = []
           accessRouteses.forEach((item) => {
             if (item.children && item.children.length > 0) {
               item.children.forEach((child) => {
+                //   if (child.children && child.children.length > 0) {
+                //     child.children.forEach((sun) => {
+                //     // 组装路由配置
+                //     const sunChildTemp = {
+                //       name: sun.name,
+                //       path: sun.path,
+                //       meta: sun.meta,
+                //       hidden: sun.hidden === 1 ? true : false,
+                //       component: (resolve) =>
+                //         require([`@/views${sun.component}`], resolve)
+                //     }
+                //     sunChildComponent.push(sunChildTemp)
+                //   })
+                // }
                 // 组装路由配置
                 const childTemp = {
                   name: child.name,
@@ -679,6 +712,7 @@ router.beforeEach(async (to, from, next) => {
                   hidden: child.hidden === 1 ? true : false,
                   component: (resolve) =>
                     require([`@/views${child.component}`], resolve)
+                  // children: sunChildComponent
                 }
                 childComponent.push(childTemp)
               })
@@ -690,6 +724,7 @@ router.beforeEach(async (to, from, next) => {
                 component: Layout,
                 children: childComponent
               }
+
               router.addRoute(temp)
               router.options.routes.push(temp)
             } else {
@@ -705,7 +740,7 @@ router.beforeEach(async (to, from, next) => {
               router.options.routes.push(elseTemp)
             }
           })
-          // console.log('首页点击后的最终路由', router)
+          console.log('首页点击后的最终路由', router)
 
           store.dispatch('user/changeInit', true)
         }
