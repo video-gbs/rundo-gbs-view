@@ -82,6 +82,7 @@
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
                   align="right"
+                  :default-time="['00:00:00', '23:59:59']"
                 >
                 </el-date-picker>
                 <el-button
@@ -188,6 +189,7 @@
                   :playerIdx="playerIdx"
                   :timeSegments="timeSegments"
                   @handleCloseVideo="handleCloseVideo"
+                  @gbPlay="gbPlay"
                 />
               </template>
             </div>
@@ -535,6 +537,7 @@ export default {
           if (maxDate) this.choiceDate = ''
         },
         disabledDate: (time) => {
+          return time.getTime() > Date.now()
           // 如何选择了一个日期
           if (this.choiceDate) {
             // 7天的时间戳
@@ -1087,6 +1090,7 @@ export default {
           })
           return
         }
+        // this.selectTime=this.formData.date[0]
         this.formData.loading = true
 
         this.dateChange(this.formData.date)
@@ -1578,7 +1582,8 @@ export default {
         streamId: this.streamId
       }).then((res) => {
         if (res.code === 0) {
-          ;(this.isClickCx = true), this.$refs.TimePlayer.timeAutoPlay()
+          this.$refs.TimePlayer.timeAutoPlay()
+          this.isClickCx = true
         }
       })
     },
@@ -1591,7 +1596,8 @@ export default {
         streamId: this.streamId
       }).then((res) => {
         if (res.code === 0) {
-          ;(this.isClickCx = false), this.$refs.TimePlayer.stopTimeAutoPlay()
+          this.$refs.TimePlayer.stopTimeAutoPlay()
+          this.isClickCx = false
         }
       })
     },

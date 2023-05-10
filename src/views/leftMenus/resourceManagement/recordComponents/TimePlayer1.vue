@@ -134,7 +134,7 @@ export default {
   watch: {
     playerIdx(newVal) {},
     playerTimes(val) {
-      // this.time2 = val[0] ? new Date(val[0]).getTime() : 0
+      this.time2 = val[0] ? new Date(val[0]).getTime() : 0
       // this.$forceUpdate()
     },
     childTimeSegments(val) {
@@ -164,11 +164,7 @@ export default {
     timeAutoPlay() {
       const that = this
       that.timeAutoPlays = setInterval(() => {
-        // if (Local.get('playbackRate') !== 1) {
         that.time2 += Local.get('playbackRate') * 1000
-        // } else {
-        //   that.time2 += 1000
-        // }
 
         Local.set('showTime', dayjs(that.time2).format('YYYY-MM-DD HH:mm:ss'))
 
@@ -178,10 +174,6 @@ export default {
           that.stopTimeAutoPlay()
           that.$emit('handleCloseVideo')
         }
-        console.log(
-          'that.$refs.Timeline~~~~~~~~~~~~~~~~~~~',
-          that.$refs.Timeline
-        )
         if (that.$refs.Timeline.setTime) {
           that.$refs.Timeline.setTime(that.time2)
         } else {
@@ -239,6 +231,7 @@ export default {
       this.$emit('handleChangeTime', time)
 
       this.$emit('onChange', time, '拖拽')
+      this.$emit('gbPlay')
       // this.timeAutoPlay()
     },
     changePlayerTimes(val) {
