@@ -1,5 +1,5 @@
 <template>
-  <div class="direction-control">
+  <div class="direction-control" @dblclick.stop>
     <!--    方向盘-->
     <div
       :class="`steering-wheel ${hoverClass}`"

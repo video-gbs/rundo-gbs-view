@@ -183,7 +183,6 @@
             <div :class="`player-toolbar ${splitFullscreen ? 'full' : ''}`">
               <div class="tool-left">
                 <el-tooltip
-                  effect="dark"
                   :content="isShowMenu ? '收起' : '展开'"
                   placement="top"
                 >
@@ -196,7 +195,6 @@
                   ></i>
                 </el-tooltip>
                 <el-tooltip
-                  effect="dark"
                   :content="hasAudio ? '开启全部声音' : '关闭全部声音'"
                   placement="top"
                 >
@@ -207,7 +205,7 @@
                     @click="handleSetVoice"
                   ></i>
                 </el-tooltip>
-                <el-tooltip effect="dark" content="截屏" placement="top">
+                <el-tooltip content="截屏" placement="top">
                   <i
                     class="iconfont icon-jieping"
                     @click="handleScreenShot"
@@ -218,7 +216,7 @@
               <div class="tool-center"></div>
               <div class="tool-right">
                 <el-tooltip
-                  effect="dark"
+                  id="stretch"
                   :content="isFill ? '拉伸' : '自适应'"
                   placement="top"
                 >
@@ -228,7 +226,7 @@
                   ></i>
                 </el-tooltip>
 
-                <el-tooltip effect="dark" content="关闭全部" placement="top">
+                <el-tooltip content="关闭全部" placement="top">
                   <i
                     @click="handleCloseAll()"
                     class="iconfont icon-guanbiquanbu"
@@ -282,7 +280,6 @@
                   </el-dropdown>
                 </div>
                 <el-tooltip
-                  effect="dark"
                   :content="splitFullscreen ? '退出全屏' : '全屏'"
                   placement="top"
                 >
@@ -338,6 +335,7 @@ export default {
       videoShow: true,
       videoZoomFlag: false,
       player: {},
+      // hasClickAll: false,
       // 视频播放窗口起始点位置
       top: 0,
       left: 0,
@@ -595,7 +593,6 @@ export default {
           this.$nextTick(() => {
             this.childOptionLists[index] = res.data
             this.$forceUpdate()
-            console.log(this.$refs)
             this.$refs.cloudControl.getOptionLists(index)
           })
         }
@@ -1181,6 +1178,11 @@ export default {
     },
     //关闭全部
     handleCloseAll() {
+      // this.hasClickAll = true
+      // setTimeout(function () {
+      //   this.hasClickAll = false
+      // }, 1500)
+
       this.$on('closeAll')
       this.videoUrl = ['']
       this.playerData = []
@@ -1216,10 +1218,13 @@ export default {
             let idxTmp = this.playerIdx
 
             this.rectAreaNum = idxTmp
+
             if (this.spilt - 1 > this.playerIdx) {
               this.playerIdx++
             }
+
             this.setPlayUrl(res.data.wsFlv, idxTmp)
+
             this.setStreamId(res.data.streamId, idxTmp)
             this.setFlvCloudId(id, idxTmp)
             this.setLeftTopName(name, idxTmp)
@@ -1260,12 +1265,20 @@ export default {
     },
 
     setPlayUrl(url, idx) {
-      this.$set(this.videoUrl, idx, url)
+      if (this.videoUrl.indexOf(url) > -1 && idx >= 1) {
+        this.$message({
+          message: '请选择不同的设备',
+          type: 'warning'
+        })
+        this.playerIdx = idx
+      } else {
+        this.$set(this.videoUrl, idx, url)
 
-      setTimeout(() => {
-        window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
-      }, 100)
-      this.showContent = true
+        setTimeout(() => {
+          window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
+        }, 100)
+        this.showContent = true
+      }
     },
     setStreamId(id, idx) {
       this.$set(this.flvStreamId, idx, id)

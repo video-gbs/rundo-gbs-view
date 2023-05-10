@@ -59,7 +59,7 @@
         border
         row-key="id"
         class="menuManagement-table"
-        :tree-props="{ children: 'children' }"
+        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
         :header-cell-style="{
           background: 'rgba(0, 75, 173, 0.06)',
           fontSize: '14px',
@@ -68,7 +68,7 @@
           color: '#333333'
         }"
       >
-        <el-table-column prop="icon" width="50" align="center" label="图标">
+        <!-- <el-table-column prop="icon" width="50" align="center" label="图标">
           <template slot-scope="scope">
             <svg-icon
               slot="suffix"
@@ -76,8 +76,12 @@
               class="menus-icon"
             />
           </template>
+        </el-table-column> -->
+        <el-table-column prop="title" label="菜单名称">
+          <template slot-scope="scope">
+            <span>{{ scope.row.title }}</span>
+          </template>
         </el-table-column>
-        <el-table-column prop="title" label="菜单名称" />
         <el-table-column prop="path" label="跳转URL" width="180" />
         <el-table-column prop="menuSort" label="排序" width="80" />
         <el-table-column prop="component" label="前端组件Import路径" />
@@ -162,7 +166,7 @@
               disabled
               id="selectTree"
             >
-              <el-option :value="List">
+              <el-option :value="dialogForm.params.menuPid">
                 <el-tree
                   ref="tree"
                   class="unit-tree"
@@ -187,7 +191,7 @@
               class="selectTree"
               id="selectTree"
             >
-              <el-option :value="List">
+              <el-option :value="dialogForm.params.menuPid">
                 <el-tree
                   ref="tree"
                   class="unit-tree"
@@ -298,6 +302,7 @@ export default {
       List: '',
       Ids: [],
       Id: '',
+      resName: '',
       defaultProps: {
         children: 'children',
         label: 'title'
@@ -308,6 +313,20 @@ export default {
     this.getList()
   },
   methods: {
+    getTreeName(arr, id) {
+      console.log(111, arr)
+      arr.map((item) => {
+        if (item.id === id) {
+          this.resName = item.areaName
+          this.Id = id
+          return
+        } else {
+          if (item.children && item.children.length > 0) {
+            this.getTreeName(item.children, id)
+          }
+        }
+      })
+    },
     cxData() {
       this.getList()
     },
@@ -378,6 +397,7 @@ export default {
       })
     },
     dialogShow(type, row) {
+      console.log(row)
       this.applicationOption = []
       this.isDisabled = true
       getApplicationList().then((res) => {
@@ -400,7 +420,8 @@ export default {
           title,
           icon,
           appId,
-          menuPid
+          menuPid,
+          parentName
         } = row
         this.dialogForm.params.icon = icon
         this.dialogForm.params.title = title
@@ -410,8 +431,12 @@ export default {
         this.dialogForm.params.path = path
         this.dialogForm.params.component = component
         this.dialogForm.params.appId = appId
-        this.dialogForm.params.menuPid = menuPid
-
+        this.dialogForm.params.menuPid =
+          parentName !== '' ? parentName : menuPid
+        //  this.$nextTick(() => {
+        //         this.getTreeName(this.treeList, this.dialogForm.params.menuPid)
+        //         this.dialogForm.params.menuPid = this.resName
+        //  })
         this.editId = row.id
       } else {
         this.dialogForm.params = {
@@ -458,9 +483,9 @@ export default {
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          this.dialogForm.params.menuPid = this.Id
           switch (this.dialogForm.title1) {
             case '新建':
-              this.dialogForm.params.menuPid = this.Id
               addMenuInfo(this.dialogForm.params).then((res) => {
                 if (res.code === 0) {
                   this.$message({
@@ -568,9 +593,9 @@ export default {
   display: none !important;
 }
 
-::v-deep .el-table__expand-icon {
+::v-deep .el-icon-arrow-right {
   position: relative;
-  top: 5px;
+  top: 0px;
   width: 16px;
   height: 16px;
 }
