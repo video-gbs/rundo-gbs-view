@@ -72,6 +72,7 @@
             <div class="equipment-group-wrapper-bottom">
               <div class="date-select">
                 <el-date-picker
+                  ref="datetimerange1"
                   popper-class="form-date-picker-popper"
                   v-model="formData.date"
                   type="datetimerange"
@@ -263,6 +264,7 @@
                   value-format="yyyy-MM-dd HH:mm:ss"
                   type="datetime"
                   :disabled="isClickCx"
+                  key="datetime1"
                   placeholder="选择日期时间"
                   @change="handleChangeTimePicker"
                 >
@@ -669,8 +671,11 @@ export default {
       ]
     }
   },
+  created() {},
 
   mounted() {
+    // console.log('this.$refs.datetimerange1',this.$refs.datetimerange1)
+    this.$refs.datetimerange1.placement = 'top'
     this.init()
 
     document.addEventListener('fullscreenchange', (e) => {
