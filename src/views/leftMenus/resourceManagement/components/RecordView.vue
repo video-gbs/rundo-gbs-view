@@ -82,6 +82,7 @@
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
                   align="right"
+                  key="datetimerange1"
                   :default-time="['00:00:00', '23:59:59']"
                 >
                 </el-date-picker>
@@ -239,7 +240,9 @@
                     :class="`icon-xianshimaliuxinxi ${
                       isShowStream[playerIdx] ? 'active' : ''
                     }`"
-                    @click="handleShowStream()"
+                    @click="
+                      videoUrl[playerIdx] !== '' ? handleShowStream() : ''
+                    "
                   />
                 </el-tooltip>
               </div>
@@ -440,7 +443,7 @@ export default {
   data() {
     return {
       isClickCx: true,
-      spilt: 4, //分屏
+      spilt: 1, //分屏
       spiltIndex: 1,
       playerIdx: 0, //激活播放器
       playerData: [], //播放器数据
@@ -828,12 +831,6 @@ export default {
                 startRatio: 0.65,
                 endRatio: 0.9
               }
-
-              console.log(
-                '=========================',
-                this.timeSegments,
-                this.playerIdx
-              )
 
               this.hasStreamId = true
 
@@ -1534,9 +1531,9 @@ export default {
                     )
                     this.setRecordCloudId(this.channelId, this.playerIdx - 1)
                   } else {
-                    if (this.spilt > this.playerIdx) {
-                      this.playerIdx++
-                    }
+                    // if (this.spilt > this.playerIdx) {
+                    //   this.playerIdx++
+                    // }
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx - 1)
                     this.setRecordStreamId(
                       res.data.streamId,
