@@ -1304,13 +1304,13 @@ export default {
     },
     //点击暂停播放按钮
     handlePauseOrPlay() {
-      console.log('点击了播放', this.play)
+      console.log('点击了播放', this.play, this.playerIdx)
       if (this.play) {
         //暂停
         this.cloudPlay = this.play = false
         this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
-        this.$refs.cloudPlayer[this.playerIdx - 1] &&
-          this.$refs.cloudPlayer[this.playerIdx - 1].pause()
+        this.$refs.cloudPlayer[this.playerIdx] &&
+          this.$refs.cloudPlayer[this.playerIdx].pause()
         this.hasStreamId = false
       } else if (
         this.tabsActiveName === 'device' ? this.videoUrl : this.cloudPlayerUrl
@@ -1319,8 +1319,8 @@ export default {
         this.play = true
         this.hasStreamId = true
         this.$refs.devicesPlayer && this.$refs.devicesPlayer.play()
-        this.$refs.cloudPlayer[this.playerIdx - 1] &&
-          this.$refs.cloudPlayer[this.playerIdx - 1].play()
+        this.$refs.cloudPlayer[this.playerIdx] &&
+          this.$refs.cloudPlayer[this.playerIdx].play()
       }
     },
     //倍数按钮
