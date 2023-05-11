@@ -75,7 +75,7 @@
                   label="用户名称"
                   :show-overflow-tooltip="true"
                 />
-                <el-table-column prop="orgName;" label="所属部门" width="240" />
+                <el-table-column prop="orgName" label="所属部门" width="240" />
                 <el-table-column width="80" label="操作" align="center">
                   <template slot-scope="scope">
                     <el-button
@@ -176,7 +176,7 @@
                   label="用户名称"
                   :show-overflow-tooltip="true"
                 />
-                <el-table-column prop="orgName;" label="所属部门" width="240" />
+                <el-table-column prop="orgName" label="所属部门" width="240" />
               </el-table>
 
               <pagination
@@ -298,11 +298,11 @@
           </el-form-item>
           <el-form-item label="安防区域">
             <el-input
-              v-model="dialog.params.phone"
+              v-model="dialog.params.areaName"
               placeholder="请输入"
               style="width: 436px"
             />
-            <span>{{ dialog.params.areaName }}</span>
+            <!-- <span>{{ dialog.params.areaName }}</span> -->
           </el-form-item>
           <el-form-item label="描述">
             <el-input
