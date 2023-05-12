@@ -45,6 +45,9 @@
                 ref="tableLeft"
                 class="table-content-bottom"
                 :data="tableData"
+                row-key="id"
+                @selection-change="handleSelectChange"
+                @select="handleSelect"
                 border
                 :header-cell-style="{
                   background: 'rgba(0, 75, 173, 0.06)',
@@ -87,80 +90,6 @@
               />
             </div>
           </div>
-          <!-- 中间按钮 -->
-          <!-- <div class="vertical center3 centrebtn">
-            <svg-icon icon-class="right" class="right_svg" @click="Right" />
-            <svg-icon
-              icon-class="left"
-              class="left_svg"
-              @click="Left"
-            />
-          </div> -->
-          <!-- 右边框框 -->
-          <!-- <div class="transferbox">
-            <div class="topbox">
-              <LineFont
-                :line-title="lineTitle1"
-                :text-style="textStyle"
-                :line-blue-style="lineBlueStyle"
-              />
-            </div>
-            <div class="level searchbox">
-              <el-input
-                placeholder="请输入搜索关键字"
-                suffix-icon="el-icon-search"
-                class="search-input"
-              ></el-input>
-            </div>
-
-            <div style="padding: 10px" class="contont">
-              <el-table
-                ref="tableRight"
-                class="table-content-bottom"
-                :data="selectedStaffList"
-                @selection-change="handleSelectedStaffChange"
-                border
-                :header-cell-style="{
-                  background: 'rgba(0, 75, 173, 0.06)',
-                  fontSize: '14px',
-                  fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
-                  fontWeight: 'bold',
-                  color: '#333333'
-                }"
-              >
-                <el-table-column type="selection" width="80" align="center">
-                </el-table-column>
-                <el-table-column
-                  type="index"
-                  width="50"
-                  align="center"
-                  label="序号"
-                >
-                </el-table-column>
-                <el-table-column
-                  prop="channelName"
-                  label="通道名称"
-                  :show-overflow-tooltip="true"
-                />
-                <el-table-column
-                  prop="channelCode"
-                  label="通道编号"
-                  :show-overflow-tooltip="true"
-                />
-                <el-table-column
-                  prop="deviceExpansionName"
-                  label="所属设备"
-                  width="240"
-                />
-              </el-table>
-
-              <pagination
-                :pages-data="params"
-                @size-change="sizeChange"
-                @current-change="currentChange"
-              />
-            </div>
-          </div> -->
         </div>
         <div class="dialog-footer">
           <el-button @click="goback()"
@@ -176,10 +105,6 @@
 </template>
 
 <script>
-const defaultListQuery = {
-  SkipCount: 0,
-  MaxResultCount: 20
-}
 import LineFont from '@/components/LineFont'
 import pagination from '@/components/Pagination/index.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
@@ -199,6 +124,8 @@ export default {
         pageSize: 10,
         total: 0
       },
+      selectedObj: {},
+      selectedData: [],
       leftSearchName: '',
       areaNames: 'areaNames',
       selectedList: [],
@@ -260,6 +187,42 @@ export default {
         })
     },
 
+    handleSelectChange(selection) {
+      // 全选取消，删除当前页所有数据
+      if (selection.length === 0) {
+        this.tableData.forEach((item) => {
+          delete this.selectedObj[item.channelId]
+        })
+      }
+      // 勾选数据 添加
+      selection.forEach((item) => {
+        this.selectedObj[item.channelId] = item
+      })
+      // 获取所有分页勾选的数据
+      this.selectedData = []
+      for (const key in this.selectedObj) {
+        this.selectedData.push(this.selectedObj[key])
+      }
+    },
+
+    handleSelect(selection, row) {
+      // 取消单个勾选时，删除对应属性
+      if (!selection.some((item) => item.channelId === row.channelId)) {
+        delete this.selectedObj[row.channelId]
+      }
+    },
+
+    // 处理当前列表选中状态
+    handleRowSelection(data) {
+      data.forEach((item) => {
+        if (this.selectedObj[item.channelId]) {
+          this.$nextTick(() => {
+            this.$refs.tableLeft.toggleRowSelection(item)
+          })
+        }
+      })
+    },
+
     search() {
       this.init()
     },
@@ -276,6 +239,7 @@ export default {
         .then((res) => {
           if (res.code === 0) {
             this.tableData = res.data.records
+            this.handleRowSelection(this.tableData)
             this.params.total = res.data.total
             this.params.pages = res.data.pages
             this.params.current = res.data.current
@@ -317,17 +281,19 @@ export default {
           return
         }
         // 复制数组对象
-        let selectList = JSON.parse(
-          JSON.stringify(this.$refs.tableLeft.selection)
-        )
-        selectList.forEach((item) => {
-          let index = this.tableData.findIndex((_item) => _item.id === item.id)
-          if (index !== undefined) {
-            this.tableData.splice(index, 1)
-          }
-        })
+        // let selectList = JSON.parse(
+        //   JSON.stringify(this.$refs.tableLeft.selection)
+        // )
+
+        // selectList.forEach((item) => {
+        //   let index = this.tableData.findIndex((_item) => _item.channelId === item.channelId)
+        //   if (index !== undefined) {
+        //     this.tableData.splice(index, 1)
+        //   }
+        // })
+
         let channelList = []
-        selectList.map((item) => {
+        this.selectedData.map((item) => {
           channelList.push({
             channelCode: item.channelCode,
             channelName: item.channelName,
@@ -336,6 +302,7 @@ export default {
             onlineState: item.onlineState
           })
         })
+        console.log('channelList', channelList, this.channelId)
         addChannel({ channelList, videoAreaId: this.channelId }).then((res) => {
           if (res.code === 0) {
             this.$message({

@@ -132,7 +132,7 @@ export default {
     this.$nextTick(() => {
       this.init()
       const dom = document.getElementsByClassName('player-box')
-      dom[this.$props.playerIdx - 1].style.height = this.$props.stretch
+      dom[this.$props.playerIdx].style.height = this.$props.stretch
         ? '100%'
         : ''
       console.info('this.$refs.videoPlayer', this.$refs.videoPlayer)
