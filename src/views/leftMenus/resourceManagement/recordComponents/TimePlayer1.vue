@@ -174,7 +174,7 @@ export default {
           that.stopTimeAutoPlay()
           that.$emit('handleCloseVideo')
         }
-        if (that.$refs.Timeline.setTime) {
+        if (that.$refs.Timeline) {
           that.$refs.Timeline.setTime(that.time2)
         } else {
           return
