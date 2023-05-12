@@ -1183,6 +1183,8 @@ export default {
       //   this.hasClickAll = false
       // }, 1500)
 
+      this.playerIdx = 0
+
       this.$on('closeAll')
       this.videoUrl = ['']
       this.playerData = []
