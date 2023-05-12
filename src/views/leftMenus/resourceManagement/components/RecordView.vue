@@ -242,7 +242,11 @@
                       isShowStream[playerIdx] ? 'active' : ''
                     }`"
                     @click="
-                      videoUrl[playerIdx] !== '' ? handleShowStream() : ''
+                      videoUrl[playerIdx] &&
+                      videoUrl[playerIdx] !== '' &&
+                      videoUrl[playerIdx].length > 0
+                        ? handleShowStream()
+                        : ''
                     "
                   />
                 </el-tooltip>
@@ -276,9 +280,13 @@
                   placement="top"
                 >
                   <div
-                    @click="handlePauseOrPlay()"
+                    @click="
+                      videoUrl[playerIdx] !== '' ? handlePauseOrPlay() : ''
+                    "
                     :class="`play-btn ${play ? 'pause' : 'play'} ${
-                      !cloudPlayerUrl && !videoUrl ? 'disabled' : ''
+                      !cloudPlayerUrl && !videoUrl[playerIdx] !== ''
+                        ? 'disabled'
+                        : ''
                     }`"
                   />
                 </el-tooltip>
@@ -794,14 +802,12 @@ export default {
       }
     },
     filterNode(value, data) {
-      console.log(11111111111, value, data)
       if (!value) return true
       return data.areaNames && data.areaNames.indexOf(value) !== -1
       // }
     },
 
     async getPlaybackList(date, playStartTime = this.playTime) {
-      console.log(11111111, date, playStartTime, this.playTime)
       // this.videoUrl = ['']
       this.videoHistory.searchHistoryResult = []
       let listData = this.deviceVideoList[date] || []
@@ -925,7 +931,6 @@ export default {
       await getPlayLists({ channelId: id })
         .then((res) => {
           if (res.code === 0) {
-            console.log(111111, res)
           }
         })
         .catch(function (error) {
@@ -1142,6 +1147,7 @@ export default {
     },
     //控制显示码流
     handleShowStream() {
+      console.log('videoUrl[playerIdx]', this.videoUrl, this.playerIdx)
       this.getStreamInfo()
       this.isShowStream[this.playerIdx] = !this.isShowStream[this.playerIdx]
     },
