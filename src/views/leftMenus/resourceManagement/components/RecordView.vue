@@ -192,6 +192,7 @@
                   :timeSegments="timeSegments"
                   @handleCloseVideo="handleCloseVideo"
                   @gbPlay="gbPlay"
+                  @changeChannelId="changeChannelId"
                 />
               </template>
             </div>
@@ -523,6 +524,7 @@ export default {
       cloudPlay: false,
       isZoom: false, //放大缩小类型
       id: null,
+      isSetRecordCloudId: false,
       zoomStyle: {
         scale: 1,
         translateX: 0,
@@ -1518,9 +1520,15 @@ export default {
     onTimeChange: function (video) {
       // this.queryRecords()
     },
+    changeChannelId(val) {
+      this.isSetRecordCloudId = val
+      console.log(Local.get('recordCloudId'), this.playerIdx)
+      this.streamId = Local.get('recordStreamId')[this.playerIdx]
+      this.channelId = Local.get('recordCloudId')[this.playerIdx]
+    },
     playRecord: (function () {
+      // Local.get('recordCloudId')
       return async function (row, playTime) {
-        console.log(2222222222222, row, playTime)
         await playStop({
           streamId: this.channelId
         }).then((res) => {
@@ -1534,18 +1542,23 @@ export default {
                 if (res.code === 0) {
                   if (!this.isNext) {
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx - 1)
-                    this.setRecordStreamId(
-                      res.data.streamId,
-                      this.playerIdx - 1
-                    )
-                    this.setRecordCloudId(this.channelId, this.playerIdx - 1)
+
+                    if (!this.isSetRecordCloudId) {
+                      this.setRecordStreamId(
+                        res.data.streamId,
+                        this.playerIdx - 1
+                      )
+                      this.setRecordCloudId(this.channelId, this.playerIdx - 1)
+                    }
                   } else {
                     // if (this.spilt > this.playerIdx) {
                     //   this.playerIdx++
                     // }
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx)
-                    this.setRecordStreamId(res.data.streamId, this.playerIdx)
-                    this.setRecordCloudId(this.channelId, this.playerIdx)
+                    if (!this.isSetRecordCloudId) {
+                      this.setRecordStreamId(res.data.streamId, this.playerIdx)
+                      this.setRecordCloudId(this.channelId, this.playerIdx)
+                    }
                   }
 
                   this.streamId = res.data.streamId
@@ -1563,7 +1576,6 @@ export default {
     setPlayUrl(url, idx) {
       this.$set(this.videoUrl, idx, url)
 
-      console.log('!!!!!!!!!!!', this.videoUrl, idx)
       setTimeout(() => {
         window.localStorage.setItem(
           'RecordViewVideoUrl',

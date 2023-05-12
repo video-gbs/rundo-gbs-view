@@ -26,6 +26,7 @@ import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { leftTree, Encoder },
+
   data() {
     return {
       treeData: [],
