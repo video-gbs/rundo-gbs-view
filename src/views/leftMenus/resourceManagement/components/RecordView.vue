@@ -446,7 +446,7 @@ export default {
     return {
       isClickCx: true,
       spilt: 1, //分屏
-      spiltIndex: 1,
+      spiltIndex: 0,
       playerIdx: 0, //激活播放器
       playerData: [], //播放器数据
       fullPlayerIdx: -1, //当前全屏的下标
@@ -1013,7 +1013,6 @@ export default {
       this.selectTime = Local.get('showTime')
     },
     handleChangeTimePicker(val) {
-      console.log('val!!!!!!!', val)
       Local.set('showTime', val)
       const isPlay = this.play
 
@@ -1190,7 +1189,6 @@ export default {
 
     // 滚动时间轴事件
     handleChangePlayTime(curTime, name) {
-      console.log('curTime~~~~~~~~~~~~~~~~', curTime, this.formData.date)
       const resEndTime = new Date(this.formData.date[1]).getTime()
       const resStartTime = new Date(this.formData.date[0]).getTime()
       this.isNext = false
@@ -1539,12 +1537,9 @@ export default {
                     // if (this.spilt > this.playerIdx) {
                     //   this.playerIdx++
                     // }
-                    this.setPlayUrl(res.data.wsFlv, this.playerIdx - 1)
-                    this.setRecordStreamId(
-                      res.data.streamId,
-                      this.playerIdx - 1
-                    )
-                    this.setRecordCloudId(this.channelId, this.playerIdx - 1)
+                    this.setPlayUrl(res.data.wsFlv, this.playerIdx)
+                    this.setRecordStreamId(res.data.streamId, this.playerIdx)
+                    this.setRecordCloudId(this.channelId, this.playerIdx)
                   }
 
                   this.streamId = res.data.streamId
