@@ -229,10 +229,13 @@ export default {
       this.stopTimeAutoPlay()
       Local.set('showTime', dayjs(time).format('YYYY-MM-DD HH:mm:ss'))
       this.$emit('handleChangeTime', time)
-      this.$emit('changeChannelId', true)
+      // this.$emit('changeChannelId', true)
 
       this.$emit('onChange', time, '拖拽')
+      // setTimeout(()=>{
+
       this.$emit('gbPlay')
+      // },3500)
       // this.timeAutoPlay()
     },
     changePlayerTimes(val) {
