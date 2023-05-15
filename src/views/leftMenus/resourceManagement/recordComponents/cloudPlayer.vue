@@ -132,6 +132,7 @@ export default {
     this.$nextTick(() => {
       this.init()
       const dom = document.getElementsByClassName('player-box')
+      console.log('this.$props.playerIdx1212', this.$props.playerIdx)
       dom[this.$props.playerIdx].style.height = this.$props.stretch
         ? '100%'
         : ''
@@ -299,6 +300,7 @@ export default {
     },
 
     stretch(newVal) {
+      console.log(1111, this.$props.playerIdx)
       document.getElementsByClassName('player-box')[
         this.$props.playerIdx
       ].style.height = newVal ? '100%' : ''
