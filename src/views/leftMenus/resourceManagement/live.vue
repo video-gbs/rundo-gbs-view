@@ -117,7 +117,7 @@
                   isFull: fullPlayerIdx !== -1
                 }"
                 @click.stop="videoClick(i)"
-                v-loading="playerData[i - 1] && !videoUrl[i - 1]"
+                v-loading="isLoading[i - 1]"
                 element-loading-text="拼命加载中"
                 element-loading-background="transparent"
               >
@@ -335,6 +335,7 @@ export default {
       videoShow: true,
       videoZoomFlag: false,
       player: {},
+      isLoading: [],
       // hasClickAll: false,
       // 视频播放窗口起始点位置
       top: 0,
@@ -371,7 +372,7 @@ export default {
       activeTab: 'security',
       showVideoDialog: true,
       hasAudio: false, //设置默认是否静音
-      videoUrl: [''],
+      videoUrl: [],
       flvStreamId: [''],
       flvCloudId: [''],
       leftTopName: [''],
@@ -472,8 +473,11 @@ export default {
     for (let i = 0; i < this.spilt; i++) {
       this.isClicked[i] = false
       this.videoUrl[i] = ''
+
       this.childOptionLists[i] = []
       this.channelExpansionId[i] = []
+
+      this.isLoading[i] = false
     }
   },
   updated() {},
@@ -538,8 +542,10 @@ export default {
         console.log('切换画幅等于之前', this.videoUrl)
       }
       this.isClicked = []
+      this.isLoading = []
       for (let i = 0; i < newValue; i++) {
         this.isClicked[i] = false
+        this.isLoading[i] = false
       }
       for (let i = 1; i <= newValue; i++) {
         if (!this.$refs['player' + i]) {
@@ -1089,6 +1095,8 @@ export default {
           }
         }
       } else {
+        this.$set(this.isLoading, this.playerIdx, true)
+        // this.isLoading = []
         this.getDeviceList(data.areaPid, data.areaNames)
         this.getPtzPresetLists(data.areaPid, this.playerIdx)
       }
@@ -1186,7 +1194,7 @@ export default {
       this.playerIdx = 0
 
       this.$on('closeAll')
-      this.videoUrl = ['']
+      this.videoUrl = []
       this.playerData = []
       this.childOptionLists = []
     },
@@ -1274,7 +1282,9 @@ export default {
         })
         this.playerIdx = idx
       } else {
+        console.log(11111111, idx)
         this.$set(this.videoUrl, idx, url)
+        this.isLoading[idx] = false
 
         setTimeout(() => {
           window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))

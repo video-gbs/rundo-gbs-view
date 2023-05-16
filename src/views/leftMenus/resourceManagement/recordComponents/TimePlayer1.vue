@@ -120,6 +120,12 @@ export default {
         return []
       }
     },
+    timeLists: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
     playerIdx: {
       type: Number,
       default: 0
@@ -132,14 +138,18 @@ export default {
     }
   },
   watch: {
-    playerIdx(newVal) {},
+    playerIdx(newVal) {
+      console.log('newVal', newVal, this.$props.playerTimes)
+      // this.stopTimeAutoPlay()
+      // this.time2 = this.$props.timeLists[newVal]
+      // ? new Date(this.$props.timeLists[newVal]).getTime()
+      // : 0
+    },
     playerTimes(val) {
+      console.log('playerTimes~~~~~~~~~~', val)
       this.time2 = val[0] ? new Date(val[0]).getTime() : 0
-      // this.$forceUpdate()
     },
-    childTimeSegments(val) {
-      // this.$set(this.childTimeSegments, 0, val)
-    },
+    childTimeSegments(val) {},
     immediate: true,
     deep: true
   },

@@ -106,7 +106,7 @@ export default {
       recSecond: 0,
       title: '视频播放',
       testSrc: '',
-      // flvPlayer: null,
+      flvPlayer: null,
 
       reconnectIng: false, //是否正在重连中
 

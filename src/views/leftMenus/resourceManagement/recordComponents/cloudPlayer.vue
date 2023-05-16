@@ -133,9 +133,13 @@ export default {
       this.init()
       const dom = document.getElementsByClassName('player-box')
       console.log('this.$props.playerIdx1212', this.$props.playerIdx)
-      dom[this.$props.playerIdx].style.height = this.$props.stretch
-        ? '100%'
-        : ''
+      if (dom.length > 1) {
+        dom[this.$props.playerIdx].style.height = this.$props.stretch
+          ? '100%'
+          : ''
+      } else {
+        dom[0].style.height = this.$props.stretch ? '100%' : ''
+      }
       console.info('this.$refs.videoPlayer', this.$refs.videoPlayer)
       console.log('q初始化时的地址为: ' + this.videoUrl)
     })
