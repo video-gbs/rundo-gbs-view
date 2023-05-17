@@ -187,6 +187,7 @@ export default {
     playerIdx(val) {
       console.log(val, 111)
       this.resPlayerIdx = val
+      Local.set('resPlayerIdx', val)
       // this.resShowContent.map((item, index) => {
       //   if (item && item !== '' && item.length > 0) {
       //     if (index === this.resPlayerIdx) {

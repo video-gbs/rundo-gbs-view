@@ -1186,17 +1186,14 @@ export default {
     },
     //关闭全部
     handleCloseAll() {
-      // this.hasClickAll = true
-      // setTimeout(function () {
-      //   this.hasClickAll = false
-      // }, 1500)
-
       this.playerIdx = 0
-
+      this.$refs.cloudControl.$refs.directionControl.clearType()
       this.$on('closeAll')
       this.videoUrl = []
+      this.videoUrl = [...this.videoUrl]
       this.playerData = []
       this.childOptionLists = []
+      window.localStorage.setItem('flvCloudId', JSON.stringify([]))
     },
     destroy(idx) {
       this.clear(idx.substring(idx.length - 1))
@@ -1240,10 +1237,13 @@ export default {
             this.setLeftTopName(name, idxTmp)
 
             this.hasVideoUrl = true
+
+            this.$set(this.isLoading, this.playerIdx, false)
           }
         })
         .catch(function (error) {
           console.log(error)
+          this.$set(this.isLoading, this.playerIdx, false)
         })
     },
     // 切换播放器全屏
