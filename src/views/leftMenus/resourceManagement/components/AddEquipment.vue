@@ -335,7 +335,6 @@ export default {
       Ids: [],
       Id: '',
       resAreaName: '',
-      resLabel: '',
       defaultProps: {
         children: 'children',
         label: 'areaName'
@@ -476,10 +475,10 @@ export default {
         this.$refs.form.validate(),
         this.$refs.form1.validate()
       ]).then(() => {
+        const resGatewayId = this.form.gatewayId
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
         this.form.gatewayId = this.form.gatewayId.value
-        this.resLabel = this.form.gatewayId.label
         addEncoder({ ...this.form, ...this.form1 })
           .then((res) => {
             if (res.code === 0) {
@@ -492,8 +491,9 @@ export default {
           })
           .catch((error) => {
             this.form.deviceType = String(this.form.deviceType)
+            this.form.gatewayId = resGatewayId.label || resGatewayId
             this.form.videoAreaId = this.resAreaName
-            console.log(error)
+            console.log(111111, error, this.form, resGatewayId)
           })
       })
     },

@@ -99,18 +99,6 @@
                   "
                   >查询</el-button
                 >
-
-                <!-- <el-date-picker
-                  @focus="addEvent"
-                  popper-class="form-date-picker-popper"
-                  size="small"
-                  class="date"
-                  v-model="formData.date"
-                  type="date"
-                  :clearable="true"
-                  :picker-options="cloudDateOptions"
-                  placeholder="请选择日期"
-                /> -->
               </div>
             </div>
           </div>
@@ -165,6 +153,15 @@
                       :playerIdx="playerIdx"
                       live
                     ></cloud-player>
+
+                    <div class="player-header">
+                      <span class="head-left">{{
+                        recordLeftTopName[playerIdx]
+                      }}</span>
+                      <div class="head-right">
+                        <i class="el-icon-close" @click="closeVideo(i - 1)"></i>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -174,18 +171,10 @@
 
             <div class="player-time">
               <template v-if="tabsActiveName === 'device'">
-                <!-- <TimePlayer
-                  ref="TimePlayer"
-                  v-model="playTime"
-                  :onChange="handleChangePlayTime"
-                  :delay="500"
-                  :is-current-date="true"
-                  :onChangeDate="handleChangePlayDate"
-                  :dataSource="deviceVideoList"
-                /> -->
                 <TimePlayer1
                   ref="TimePlayer"
                   :playerTimes="formData.date"
+                  :timeLists="timeLists"
                   @handleChangeTime="handleChangeTime"
                   @onChange="handleChangePlayTime"
                   :playerIdx="playerIdx"
@@ -252,13 +241,13 @@
                 </el-tooltip>
               </div>
               <div class="tool-center">
-                <el-tooltip effect="dark" content="关闭视频" placement="top">
+                <!-- <el-tooltip effect="dark" content="关闭视频" placement="top">
                   <svg-icon
                     class="iconfont white close-video"
                     icon-class="close-video"
                     @click="handleCloseVideo('关闭视频')"
                   />
-                </el-tooltip>
+                </el-tooltip> -->
 
                 <el-date-picker
                   v-model="selectTime"
@@ -454,6 +443,7 @@ export default {
     return {
       isClickCx: true,
       spilt: 1, //分屏
+      recordLeftTopName: [''],
       spiltIndex: 0,
       playerIdx: 0, //激活播放器
       playerData: [], //播放器数据
@@ -473,18 +463,18 @@ export default {
           fenpinged: '4fenpinged',
           fenping: '4fenping'
         },
-        {
-          num: 6,
-          class: '6fenpingw',
-          fenpinged: '6fenpinged',
-          fenping: '6fenping'
-        },
-        {
-          num: 8,
-          class: '8fenpingw',
-          fenpinged: '8fenpinged',
-          fenping: '8fenping'
-        },
+        // {
+        //   num: 6,
+        //   class: '6fenpingw',
+        //   fenpinged: '6fenpinged',
+        //   fenping: '6fenping'
+        // },
+        // {
+        //   num: 8,
+        //   class: '8fenpingw',
+        //   fenpinged: '8fenpinged',
+        //   fenping: '8fenping'
+        // },
         {
           num: 9,
           class: '9fenpingw',
@@ -605,8 +595,7 @@ export default {
       deviceId: this.$route.params.deviceId,
       channelId: '',
       selData: {},
-      // recordsLoading: false,
-      // mediaServerObj: new MediaServer(),
+      timeLists: [],
       mediaServerObj: '',
       hasAudio: false,
       // videoUrl: '',
@@ -760,12 +749,12 @@ export default {
           case 9:
             this.isHoverNum = 4
             break
-          case 8:
-            this.isHoverNum = 3
-            break
-          case 6:
-            this.isHoverNum = 2
-            break
+          // case 8:
+          //   this.isHoverNum = 3
+          //   break
+          // case 6:
+          //   this.isHoverNum = 2
+          //   break
           case 4:
             this.isHoverNum = 1
             break
@@ -784,12 +773,12 @@ export default {
           case 9:
             this.isHoverNum = 4
             break
-          case 8:
-            this.isHoverNum = 3
-            break
-          case 6:
-            this.isHoverNum = 2
-            break
+          // case 8:
+          //   this.isHoverNum = 3
+          //   break
+          // case 6:
+          //   this.isHoverNum = 2
+          //   break
           case 4:
             this.isHoverNum = 1
             break
@@ -997,7 +986,9 @@ export default {
           }
         }
       } else {
+        // console.log('data~~~~~~~',data)
         this.channelId = data.areaPid || data.id
+        this.setLeftTopName(data.areaNames, this.playerIdx)
       }
     },
     initData() {
@@ -1039,6 +1030,19 @@ export default {
       this.handleDevicesPlayEnded()
       if (isPlay) this.handlePauseOrPlay()
     },
+    closeVideo(i) {
+      this.videoUrl.splice(i, 1, '')
+      this.timeLists.splice(i, 1, [])
+      this.videoUrl = [...this.videoUrl]
+      this.timeLists = [...this.timeLists]
+      this.$nextTick(() => {
+        let emptyPlayerDom = this.$refs.emptyPlayer
+        for (let i = 0; i < emptyPlayerDom.length; i++) {
+          emptyPlayerDom[i].style.height = '100px'
+        }
+        this.$refs.TimePlayer.handleCloseVideoChildTimeSegments()
+      })
+    },
     // 关闭视频
     handleCloseVideo(name) {
       this.cloudPlay = this.play = false
@@ -1055,15 +1059,7 @@ export default {
       this.$nextTick(() => {
         let emptyPlayerDom = this.$refs.emptyPlayer
         for (let i = 0; i < emptyPlayerDom.length; i++) {
-          //   console.log(
-          //     'emptyPlayerDom[i]',
-          //     emptyPlayerDom[i],
-          //     emptyPlayerDom.length
-          //   )
           emptyPlayerDom[i].style.height = '100px'
-        }
-        if (name === '关闭视频') {
-          this.$refs.TimePlayer.handleCloseVideoChildTimeSegments()
         }
       })
     },
@@ -1092,7 +1088,8 @@ export default {
           })
           return
         }
-        // this.selectTime=this.formData.date[0]
+        this.$refs.TimePlayer.stopTimeAutoPlay()
+
         this.formData.loading = true
 
         this.dateChange(this.formData.date)
@@ -1105,6 +1102,24 @@ export default {
         })
         return
       }
+    },
+    setTimeLists(date, idx) {
+      // console.log('setTimeLists~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',date)
+      this.$set(this.timeLists, idx, date)
+
+      setTimeout(() => {
+        window.localStorage.setItem('timeLists', JSON.stringify(this.timeLists))
+      }, 100)
+    },
+    setLeftTopName(name, idx) {
+      this.$set(this.recordLeftTopName, idx, name)
+
+      setTimeout(() => {
+        window.localStorage.setItem(
+          'recordLeftTopName',
+          JSON.stringify(this.recordLeftTopName)
+        )
+      }, 100)
     },
     setRecordStreamId(id, idx) {
       this.$set(this.recordStreamId, idx, id)
@@ -1530,7 +1545,11 @@ export default {
                   if (!this.isNext) {
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx)
                     this.setRecordStreamId(res.data.streamId, this.playerIdx)
+
+                    // this.setLeftTopName(name, idxTmp)
                     this.setRecordCloudId(this.channelId, this.playerIdx)
+
+                    this.setTimeLists(playTime, this.playerIdx)
                   } else {
                     // if (this.spilt > this.playerIdx) {
                     //   this.playerIdx++
@@ -1541,7 +1560,11 @@ export default {
                     )
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx)
                     this.setRecordStreamId(res.data.streamId, this.playerIdx)
+
+                    // this.setLeftTopName(name, this.playerIdx)
                     this.setRecordCloudId(this.channelId, this.playerIdx)
+
+                    this.setTimeLists(playTime, this.playerIdx)
                   }
 
                   this.streamId = res.data.streamId

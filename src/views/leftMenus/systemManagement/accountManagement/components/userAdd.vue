@@ -239,7 +239,7 @@
             />
             <el-table-column
               prop="createdBy"
-              label="创建"
+              label="创建人"
               :show-overflow-tooltip="true"
             />
           </el-table>
