@@ -1040,7 +1040,17 @@ export default {
         for (let i = 0; i < emptyPlayerDom.length; i++) {
           emptyPlayerDom[i].style.height = '100px'
         }
-        this.$refs.TimePlayer.handleCloseVideoChildTimeSegments()
+
+        this.$refs.TimePlayer.stopTimeAutoPlay()
+        Local.set('showTime', '')
+        this.timeSegments[i] = {
+          name: '',
+          beginTime: '',
+          endTime: '',
+          color: '#4797FF',
+          startRatio: 0.65,
+          endRatio: 0.9
+        }
       })
     },
     // 关闭视频
@@ -1093,8 +1103,6 @@ export default {
         this.formData.loading = true
 
         this.dateChange(this.formData.date)
-
-        this.$refs.TimePlayer.changePlayerTimes(this.formData.date)
       } else {
         this.$message({
           message: '请选择设备节点',
@@ -1542,6 +1550,9 @@ export default {
               .then((res) => {
                 if (res.code === 0) {
                   console.log('this.isNext', this.isNext)
+
+                  this.$refs.TimePlayer.changePlayerTimes(playTime)
+
                   if (!this.isNext) {
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx)
                     this.setRecordStreamId(res.data.streamId, this.playerIdx)

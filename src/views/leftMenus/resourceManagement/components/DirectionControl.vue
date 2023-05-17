@@ -271,13 +271,6 @@ export default {
         this.initType = []
         this.initTopType[this.resPlayerIdx] = true
         this.initType[this.resPlayerIdx] = true
-
-        console.log(
-          'formPlaytoolShowControl',
-          this.initType,
-          this.initTopType,
-          this.resPlayerIdx
-        )
         this.$forceUpdate()
       })
     },
@@ -302,11 +295,6 @@ export default {
           }
         }
       })
-
-      console.log(222, this.initTopType)
-      console.log(22, this.initType)
-
-      console.log('playerIdx', this.resPlayerIdx)
       this.$forceUpdate()
     },
     deep: true,
@@ -775,7 +763,6 @@ export default {
     },
     // 鼠标在方向按键上
     handleHoverWheel(direction) {
-      // console.log('direction~~~~~~~', direction)
       this.hoverClass = direction
     },
     // 鼠标已开方向键
@@ -784,11 +771,6 @@ export default {
     },
     // 云台控制
     ptzCamera(cmdCode) {
-      console.log(
-        'cmdCode~~~~~~~',
-        Local.get('flvCloudId'),
-        Local.get('resPlayerIdx')
-      )
       ptzControl1({
         channelExpansionId: Local.get('flvCloudId')[Local.get('resPlayerIdx')],
         ptzOperationType: this.status[cmdCode],
