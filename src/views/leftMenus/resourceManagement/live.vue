@@ -1210,6 +1210,7 @@ export default {
       }
     },
     closeVideo(i) {
+      console.log('i=======================', i)
       this.videoUrl.splice(i, 1, '')
       this.videoUrl = [...this.videoUrl]
       this.playerData = []
