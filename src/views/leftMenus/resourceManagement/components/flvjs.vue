@@ -267,6 +267,9 @@ export default {
           console.log('errorType:', errorType)
           console.log('errorDetail:', errorDetail)
           console.log('errorInfo:', errorInfo)
+
+          that.player && that.player.close()
+          that.$emit('close', that.index)
           // this.loadStatus=true
           // this.statusMsg="正在重连。。。"
           //视频出错后销毁重新创建

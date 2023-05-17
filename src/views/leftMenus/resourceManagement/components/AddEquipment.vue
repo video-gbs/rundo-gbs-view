@@ -456,11 +456,13 @@ export default {
       })
     },
     changeRequired(val) {
+      console.log('changeRequired', val)
       if (val.protocol === 'GB28181') {
         this.isRequired = false
       } else {
         this.isRequired = true
       }
+      //  this.form.gatewayId = val.value
     },
     // 点击节点选中
     nodeClickHandle(data) {
@@ -475,6 +477,8 @@ export default {
         this.$refs.form.validate(),
         this.$refs.form1.validate()
       ]).then(() => {
+        console.log('this.form', this.form)
+        console.log('this.form1', this.form1)
         const resGatewayId = this.form.gatewayId
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
@@ -491,7 +495,7 @@ export default {
           })
           .catch((error) => {
             this.form.deviceType = String(this.form.deviceType)
-            this.form.gatewayId = resGatewayId.label || resGatewayId
+            this.form.gatewayId = resGatewayId
             this.form.videoAreaId = this.resAreaName
             console.log(111111, error, this.form, resGatewayId)
           })
