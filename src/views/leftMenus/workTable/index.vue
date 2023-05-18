@@ -443,8 +443,8 @@ export default {
                 this.sideBarRouterList1
               )
 
-              // console.log(1, this.sideBarRouterList1)
-              this.$router.push({ path: this.sideBarRouterList1[0].path })
+              console.log(1, this.sideBarRouterList1, data)
+              this.$router.push({ path: data[0].redirect })
               break
             case '/systemManagement':
               data.map((item2) => {

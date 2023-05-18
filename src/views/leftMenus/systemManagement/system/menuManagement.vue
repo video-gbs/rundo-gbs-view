@@ -212,6 +212,21 @@
           <el-form-item label="菜单图标：" prop="icon">
             <el-input v-model="dialogForm.params.icon" style="width: 436px" />
           </el-form-item>
+
+          <el-form-item prop="menuType" label="菜单类型：">
+            <el-select
+              v-model="dialogForm.params.menuType"
+              placeholder="请选择"
+              style="width: 436px"
+            >
+              <el-option
+                v-for="o in menuTypeeOptions"
+                :label="o.label"
+                :value="o.value"
+                :key="o.value"
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item label="排序：" prop="menuSort">
             <el-input
               v-model="dialogForm.params.menuSort"
@@ -262,6 +277,7 @@ import {
   changeMenusHidden
 } from '@/api/method/menus'
 import pagination from '@/components/Pagination/index.vue'
+import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 export default {
   name: '',
   components: { pagination },
@@ -281,7 +297,8 @@ export default {
           title: '',
           icon: '',
           appId: '',
-          menuPid: ''
+          menuPid: '',
+          menuType: ''
         }
       },
       searchParams: {
@@ -302,6 +319,7 @@ export default {
       List: '',
       Ids: [],
       Id: '',
+      menuTypeeOptions: [],
       resName: '',
       defaultProps: {
         children: 'children',
@@ -311,6 +329,7 @@ export default {
   },
   mounted() {
     this.getList()
+    this.getManufacturerDictionaryList()
   },
   methods: {
     getTreeName(arr, id) {
@@ -324,6 +343,19 @@ export default {
           if (item.children && item.children.length > 0) {
             this.getTreeName(item.children, id)
           }
+        }
+      })
+    },
+
+    async getManufacturerDictionaryList() {
+      await getManufacturerDictionaryList('MenuType').then((res) => {
+        if (res.code === 0) {
+          res.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.menuTypeeOptions.push(obj)
+          })
         }
       })
     },
@@ -421,7 +453,8 @@ export default {
           icon,
           appId,
           menuPid,
-          parentName
+          parentName,
+          menuType
         } = row
         this.dialogForm.params.icon = icon
         this.dialogForm.params.title = title
@@ -431,6 +464,7 @@ export default {
         this.dialogForm.params.path = path
         this.dialogForm.params.component = component
         this.dialogForm.params.appId = appId
+        this.dialogForm.params.menuType = menuType
         this.dialogForm.params.menuPid =
           parentName !== '' ? parentName : menuPid
         //  this.$nextTick(() => {
@@ -448,7 +482,8 @@ export default {
           title: '',
           icon: '',
           appId: '',
-          menuPid: ''
+          menuPid: '',
+          menuType: ''
         }
       }
       this.dialogForm.title1 = type === 1 ? '新建' : '编辑'
