@@ -96,7 +96,7 @@
               style="width: 436px"
               class="selectTree"
             >
-              <el-option :value="List">
+              <el-option :value="dialog.params.areaPid">
                 <el-tree
                   class="securityArea-tree"
                   :data="treeList"
@@ -241,7 +241,8 @@ export default {
       List: '',
       Ids: [],
       Id: '',
-      fatherId: '',
+      fatherId: '1',
+      fatherName: '根节点',
       defaultProps: {
         children: 'children',
         label: 'areaName'
@@ -268,11 +269,9 @@ export default {
       this.$refs.selectTree.blur()
     },
 
-    childClickHandle(data, node, self) {
-      console.log('data', data)
-      console.log('node', node)
-      console.log('self', self)
+    childClickHandle(data) {
       this.fatherId = data.id
+      this.fatherName = data.areaName
       if (data.children && data.children.length > 0) {
         this.isMore = true
         this.treeMsg = data.areaName
@@ -323,6 +322,8 @@ export default {
       this.editShow = true
 
       this.dialog.show = !this.dialog.show
+
+      this.dialog.params.areaPid = this.fatherName
     },
     dialogMoveShow() {
       this.$refs.moveTree.changeMoveTreeShow()
@@ -336,7 +337,10 @@ export default {
                 type: 'success',
                 message: '编辑成功'
               })
+              this.fatherName = this.form.areaName
+
               this.$refs.securityAreaTree.chooseId(this.detailsId)
+
               this.init(this.detailsId)
             }
           })
@@ -398,7 +402,7 @@ export default {
         if (valid) {
           switch (this.dialog.title) {
             case '新建部门':
-              this.dialog.params.areaPid = this.Id
+              this.dialog.params.areaPid = this.Id ? this.Id : this.fatherId
               this.isLoading = true
               unitAdd(this.dialog.params).then((res) => {
                 if (res.code === 0) {
@@ -411,7 +415,9 @@ export default {
                   this.detailsId = res.data.id
                   this.init(this.detailsId)
 
-                  this.$refs.securityAreaTree.chooseId(this.Id)
+                  this.$refs.securityAreaTree.chooseId(
+                    this.Id ? this.Id : this.fatherId
+                  )
                 }
               })
               break

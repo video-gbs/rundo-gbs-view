@@ -20,9 +20,11 @@
           </el-button>
         </div>
         <leftTree
-          :treeData="treeList"
-          @childClickHandle="childClickHandle"
+          ref="unitTree"
           class="unitTree"
+          :treeData="treeList"
+          :currentKey="currentKey"
+          @childClickHandle="childClickHandle"
         />
       </div>
       <el-card class="right-box-card">
@@ -271,6 +273,7 @@ export default {
         }
       },
       editShow: false,
+      currentKey: '1',
       form: {
         orgName: '',
         description: '',
@@ -341,7 +344,8 @@ export default {
       List: '',
       Ids: [],
       Id: '',
-      fatherId: '',
+      fatherId: '1',
+      fatherName: '根节点',
       defaultProps: {
         children: 'children',
         label: 'orgName'
@@ -369,6 +373,7 @@ export default {
 
     childClickHandle(data) {
       this.fatherId = data.id
+      this.fatherName = data.orgName
       if (data.children && data.children.length > 0) {
         this.isMore = true
         this.treeMsg = data.orgName
@@ -383,9 +388,6 @@ export default {
     getUnitDetailsData() {
       getUnitDetails(this.detailsId).then((res) => {
         if (res.code === 0) {
-          // Object.keys(res.data).forEach((key) => {
-          //   this.form[key] = res.data[key] || this.form[key]
-          // })
           this.form.orgName = res.data.orgName
           this.form.description = res.data.description
           this.form.phone = res.data.phone
@@ -411,14 +413,17 @@ export default {
     },
     dialogShow() {
       this.editShow = true
-      ;(this.dialog.params = {
+      this.dialog.params = {
         orgPid: '',
         description: '',
         orgLeader: '',
         orgName: '',
         phone: ''
-      }),
-        (this.dialog.show = !this.dialog.show)
+      }
+
+      console.log('this.orgPid', this.fatherName)
+      this.dialog.params.orgPid = this.fatherName
+      this.dialog.show = !this.dialog.show
     },
     dialogMoveShow() {
       this.$refs.moveTree.changeMoveTreeShow()
@@ -432,6 +437,9 @@ export default {
                 type: 'success',
                 message: '编辑成功'
               })
+
+              this.fatherName = this.form.orgName
+              this.$refs.unitTree.chooseId(this.detailsId)
               this.init(this.detailsId)
             }
           })
@@ -479,18 +487,16 @@ export default {
         if (valid) {
           switch (this.dialog.title) {
             case '新建部门':
-              this.dialog.params.orgPid = this.Id
+              this.dialog.params.orgPid = this.Id ? this.Id : this.fatherId
               unitAdd(this.dialog.params).then((res) => {
                 if (res.code === 0) {
                   this.$message({
                     type: 'success',
                     message: '新建成功'
                   })
-
                   this.dialog.show = false
                   this.detailsId = res.data.id
                   this.init(this.detailsId)
-                  // this.getUnitDetailsData()
                 }
               })
               break
@@ -499,6 +505,7 @@ export default {
                 (res) => {
                   if (res.code === 0) {
                     this.$message.success('编辑成功')
+                    this.$refs.unitTree.chooseId(this.dialog.params.orgPid)
                     this.dialog.show = false
                     this.getList()
                   }
