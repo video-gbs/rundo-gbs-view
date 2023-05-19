@@ -661,16 +661,7 @@ export default {
         : 0,
       ScurrentPage: this.$route.params.ScurrentPage,
       isNext: true,
-      timeSegments: [
-        {
-          name: '',
-          beginTime: 0,
-          endTime: 0,
-          color: '#4797FF',
-          startRatio: 0.65,
-          endRatio: 0.9
-        }
-      ]
+      timeSegments: []
     }
   },
   created() {},
@@ -686,7 +677,9 @@ export default {
     })
     this.isFill = []
     this.isShowStream = []
+    this.videoUrl = []
     for (let i = 0; i < this.spilt; i++) {
+      this.videoUrl[i] = ''
       this.isFill[i] = true
       this.isShowStream[i] = false
       this.timeSegments[i] = {
@@ -698,7 +691,6 @@ export default {
         endRatio: 0.9
       }
     }
-    console.log('this.timeSegments', this.timeSegments)
 
     Local.set('playbackRate', 1)
   },
@@ -1503,7 +1495,6 @@ export default {
     },
 
     videoClick(i) {
-      console.log('videoClick-------------', i)
       // Local.set(`showTime${i}`, this.formData.date[0])
 
       this.playerIdx = i - 1
@@ -1546,22 +1537,27 @@ export default {
     playerIdx(val) {},
     spilt(newValue) {
       let resTimeSegments = []
-      // let that = this
+      let resVideoUrl = []
+
       if (newValue < this.videoUrl.length) {
+        this.videoUrl = this.videoUrl.slice(0, newValue)
         this.timeSegments = this.timeSegments.slice(0, newValue)
       } else if (newValue > this.videoUrl.length) {
         for (let i = 0; i < newValue; i++) {
           if (i >= this.videoUrl.length) {
+            resVideoUrl.push('')
             resTimeSegments.push({
               name: '',
-              beginTime: this.formData.date[0],
-              endTime: this.formData.date[1],
+              beginTime: 0,
+              endTime: 0,
               color: '#4797FF',
               startRatio: 0.65,
               endRatio: 0.9
             })
           }
         }
+        this.videoUrl = this.videoUrl.concat(resVideoUrl)
+
         this.timeSegments = this.timeSegments.concat(resTimeSegments)
       } else {
       }
