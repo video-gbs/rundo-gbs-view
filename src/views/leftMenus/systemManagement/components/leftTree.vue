@@ -74,9 +74,9 @@ export default {
     // this.init()
   },
   methods: {
-    handleNodeClick(data) {
+    handleNodeClick(data, node, self) {
       // data.icon = 'tree1'
-      this.$emit('childClickHandle', data)
+      this.$emit('childClickHandle', data, node, self)
     },
     handleNodeClose(data) {
       // data.icon = 'tree2'
