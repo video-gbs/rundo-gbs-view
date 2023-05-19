@@ -89,7 +89,7 @@ export default {
   data() {
     return {
       scope: SHOW_TIME_SCOPE.H24,
-      time2: Date.now(),
+      time2: 0,
       resTime2: [],
       zoom: 5,
       zoomList: [
@@ -177,7 +177,9 @@ export default {
         ? new Date(this.$props.timeSegments[newVal].endTime).getTime()
         : 0
 
-      // this.changeTime2(this.$props.timeSegments[newVal].beginTime, newVal)
+      console.log('this.resTime2', this.resTime2)
+
+      // this.time2 = this.resTime2[newVal]
     },
     playerTimes(val) {},
     timeSegments(val) {
@@ -185,7 +187,6 @@ export default {
       val.map((item, index) => {
         this.resTime2[index] = item.beginTime
       })
-      console.log('this.resTime2 ---------------------', this.resTime2)
     },
     initTimeLists(val) {},
     childTimeSegments(val) {},
@@ -196,21 +197,11 @@ export default {
     immediate: true,
     deep: true
   },
-  // computed: {
-  //   showTime() {
-  //     Local.set('showTime', dayjs(this.time2).format('YYYY-MM-DD HH:mm:ss'))
-
-  //     return dayjs(this.time2).format('YYYY-MM-DD HH:mm:ss')
-  //   }
-  // },
-  created() {
-    // this.childTimeSegments = this.$props.timeSegments[this.$props.playerIdx]
-    console.log('created', this.childTimeSegments)
-  },
+  created() {},
   mounted() {},
   methods: {
     changeTime2(val, index) {
-      console.log(val, index, 99)
+      console.log(val, index)
       this.time2 = val
     },
     timeAutoPlay(i) {
@@ -243,7 +234,7 @@ export default {
       }
     },
     closeChangeTime(i) {
-      this.time2[i] = 0
+      this.time2 = 0
       // Local.set(`showTime${i}`, dayjs(this.time2).format('YYYY-MM-DD HH:mm:ss'))
     },
     stopTimeAutoPlay(index) {
