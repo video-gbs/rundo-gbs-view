@@ -15,8 +15,9 @@
         :props="{ children: 'children', label: this.defaultPropsName }"
         default-expand-all
         :default-expanded-keys="['根节点']"
+        :current-node-key="resCurrentKey"
         :expand-on-click-node="false"
-        highlight-current
+        :highlight-current="true"
         node-key="id"
         @node-click="handleNodeClick"
         :filter-node-method="filterNode"
@@ -28,15 +29,7 @@
               icon-class="tree1"
               class="tree1"
             />
-            <!-- <svg-icon
-              v-else-if="
-                data.level === 2 || data.level === 3 || data.level === 4
-              "
-              icon-class="tree2"
-              class="tree2"
-            /> -->
             <svg-icon v-else icon-class="tree2" class="tree2" />
-            <!-- <svg-icon v-else icon-class="tree3" class="tree3" /> -->
             {{ data.orgName || data.areaName }}
           </span>
         </span>
@@ -50,7 +43,8 @@ export default {
   data() {
     return {
       data: [],
-      filterText: ''
+      filterText: '',
+      resCurrentKey: '1'
     }
   },
   props: {
@@ -68,6 +62,9 @@ export default {
   watch: {
     filterText(val) {
       this.$refs.tree.filter(val)
+    },
+    resCurrentKey(val) {
+      this.resCurrentKey = val
     }
   },
   mounted() {
@@ -82,9 +79,14 @@ export default {
       // data.icon = 'tree2'
     },
     chooseId(id) {
-      this.$nextTick(() => {
-        this.$refs.tree.setCurrentKey(id)
-      })
+      console.log('id', typeof id, this.$refs)
+      setTimeout(() => {
+        this.$nextTick(() => {
+          this.$refs.tree.setCurrentKey(id)
+          this.resCurrentKey = id
+          this.$forceUpdate()
+        })
+      }, 500)
     },
     filterNode(value, data) {
       if (!value) return true

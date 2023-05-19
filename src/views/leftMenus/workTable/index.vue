@@ -417,6 +417,7 @@ export default {
           switch (name) {
             case '/resourceManagement':
               data.map((item1) => {
+                console.log('item1', item1)
                 if (
                   item1.children &&
                   item1.children.length > 0 &&
@@ -436,6 +437,9 @@ export default {
                     this.sideBarRouterList1.push(resourceManagement)
                   })
                 }
+                if (item1.title === '资源管理') {
+                  this.$router.push({ path: item1.redirect })
+                }
               })
 
               store.dispatch(
@@ -443,8 +447,7 @@ export default {
                 this.sideBarRouterList1
               )
 
-              console.log(1, this.sideBarRouterList1, data)
-              this.$router.push({ path: data[0].redirect })
+              // console.log(1, this.sideBarRouterList1, data)
               break
             case '/systemManagement':
               data.map((item2) => {
@@ -467,6 +470,10 @@ export default {
                     this.sideBarRouterList2.push(systemManagement)
                   })
                 }
+                if (item2.title === '组织管理') {
+                  this.$router.push({ path: item2.redirect })
+                }
+                // this.$router.push({ path: item2.redirect })
               })
 
               store.dispatch(
@@ -475,7 +482,7 @@ export default {
               )
               // console.log(2, this.sideBarRouterList2)
               // this.$router.push({ path: this.sideBarRouterList2[0].path })
-              this.$router.push({ path: data[1].redirect })
+              // this.$router.push({ path: data[1].redirect })
               break
             case '/moduleManageMent':
               data.map((item3) => {
@@ -498,6 +505,10 @@ export default {
                     this.sideBarRouterList3.push(moduleManageMent)
                   })
                 }
+                if (item3.title === '服务管理') {
+                  this.$router.push({ path: item3.redirect })
+                }
+                // this.$router.push({ path: item3.redirect })
               })
 
               store.dispatch(
@@ -507,7 +518,7 @@ export default {
 
               // console.log(3, this.sideBarRouterList3)
               // this.$router.push({ path: this.sideBarRouterList3[0].path })
-              this.$router.push({ path: data[2].redirect })
+              // this.$router.push({ path: data[2].redirect })
               break
             default:
               break
