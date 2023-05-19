@@ -348,8 +348,7 @@ export default {
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList3)
           // this.$router.push({ path: this.sideBarRouterList3[1].path })
           this.$router.push({ path: resArray[2].redirect })
-
-          // console.log(3, this.sideBarRouterList3)
+          console.log('resArray', resArray)
           break
         default:
           break
