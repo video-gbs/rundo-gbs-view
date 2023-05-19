@@ -287,10 +287,13 @@ export default {
                 this.sideBarRouterList1.push(resourceManagement)
               })
             }
+            if (item.title === '资源管理') {
+              this.$router.push({ path: item.redirect })
+            }
           })
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList1)
-          this.$router.push({ path: resArray[0].redirect })
+          // this.$router.push({ path: resArray[0].redirect })
 
           // console.log(1, this.sideBarRouterList1)
           break
@@ -315,11 +318,14 @@ export default {
                 this.sideBarRouterList2.push(systemManagement)
               })
             }
+            if (item.title === '组织管理') {
+              this.$router.push({ path: item.redirect })
+            }
           })
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList2)
           // this.$router.push({ path: this.sideBarRouterList2[0].path })
-          this.$router.push({ path: resArray[1].redirect })
+          // this.$router.push({ path: resArray[1].redirect })
           // console.log(2, this.sideBarRouterList2)
           break
         case '/moduleManageMent':
@@ -343,12 +349,14 @@ export default {
                 this.sideBarRouterList3.push(moduleManageMent)
               })
             }
+            if (item.title === '服务管理') {
+              this.$router.push({ path: item.redirect })
+            }
           })
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList3)
           // this.$router.push({ path: this.sideBarRouterList3[1].path })
-          this.$router.push({ path: resArray[2].redirect })
-          console.log('resArray', resArray)
+          // this.$router.push({ path: resArray[2].redirect })
           break
         default:
           break
