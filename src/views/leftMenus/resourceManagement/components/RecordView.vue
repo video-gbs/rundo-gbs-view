@@ -99,18 +99,6 @@
                   "
                   >查询</el-button
                 >
-
-                <!-- <el-date-picker
-                  @focus="addEvent"
-                  popper-class="form-date-picker-popper"
-                  size="small"
-                  class="date"
-                  v-model="formData.date"
-                  type="date"
-                  :clearable="true"
-                  :picker-options="cloudDateOptions"
-                  placeholder="请选择日期"
-                /> -->
               </div>
             </div>
           </div>
@@ -165,6 +153,18 @@
                       :playerIdx="playerIdx"
                       live
                     ></cloud-player>
+
+                    <div class="player-header">
+                      <span class="head-left">{{
+                        recordLeftTopName[playerIdx]
+                      }}</span>
+                      <div class="head-right">
+                        <i
+                          class="el-icon-close"
+                          @click.stop="closeVideo(i - 1)"
+                        ></i>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -174,18 +174,11 @@
 
             <div class="player-time">
               <template v-if="tabsActiveName === 'device'">
-                <!-- <TimePlayer
-                  ref="TimePlayer"
-                  v-model="playTime"
-                  :onChange="handleChangePlayTime"
-                  :delay="500"
-                  :is-current-date="true"
-                  :onChangeDate="handleChangePlayDate"
-                  :dataSource="deviceVideoList"
-                /> -->
                 <TimePlayer1
                   ref="TimePlayer"
+                  :initTimeLists="initTimeLists"
                   :playerTimes="formData.date"
+                  :timeLists="timeLists"
                   @handleChangeTime="handleChangeTime"
                   @onChange="handleChangePlayTime"
                   :playerIdx="playerIdx"
@@ -252,13 +245,13 @@
                 </el-tooltip>
               </div>
               <div class="tool-center">
-                <el-tooltip effect="dark" content="关闭视频" placement="top">
+                <!-- <el-tooltip effect="dark" content="关闭视频" placement="top">
                   <svg-icon
                     class="iconfont white close-video"
                     icon-class="close-video"
                     @click="handleCloseVideo('关闭视频')"
                   />
-                </el-tooltip>
+                </el-tooltip> -->
 
                 <el-date-picker
                   v-model="selectTime"
@@ -454,6 +447,7 @@ export default {
     return {
       isClickCx: true,
       spilt: 1, //分屏
+      recordLeftTopName: [''],
       spiltIndex: 0,
       playerIdx: 0, //激活播放器
       playerData: [], //播放器数据
@@ -473,18 +467,18 @@ export default {
           fenpinged: '4fenpinged',
           fenping: '4fenping'
         },
-        {
-          num: 6,
-          class: '6fenpingw',
-          fenpinged: '6fenpinged',
-          fenping: '6fenping'
-        },
-        {
-          num: 8,
-          class: '8fenpingw',
-          fenpinged: '8fenpinged',
-          fenping: '8fenping'
-        },
+        // {
+        //   num: 6,
+        //   class: '6fenpingw',
+        //   fenpinged: '6fenpinged',
+        //   fenping: '6fenping'
+        // },
+        // {
+        //   num: 8,
+        //   class: '8fenpingw',
+        //   fenpinged: '8fenpinged',
+        //   fenping: '8fenping'
+        // },
         {
           num: 9,
           class: '9fenpingw',
@@ -500,6 +494,7 @@ export default {
       ],
       filterText: '',
       treeList: [],
+      initTimeLists: [],
       initDatas: [],
       activeTab: 'equipmentGroup',
       detailsId: [],
@@ -605,8 +600,7 @@ export default {
       deviceId: this.$route.params.deviceId,
       channelId: '',
       selData: {},
-      // recordsLoading: false,
-      // mediaServerObj: new MediaServer(),
+      timeLists: [],
       mediaServerObj: '',
       hasAudio: false,
       // videoUrl: '',
@@ -667,16 +661,7 @@ export default {
         : 0,
       ScurrentPage: this.$route.params.ScurrentPage,
       isNext: true,
-      timeSegments: [
-        {
-          name: '',
-          beginTime: 0,
-          endTime: 0,
-          color: '#4797FF',
-          startRatio: 0.65,
-          endRatio: 0.9
-        }
-      ]
+      timeSegments: []
     }
   },
   created() {},
@@ -692,7 +677,9 @@ export default {
     })
     this.isFill = []
     this.isShowStream = []
+    this.videoUrl = []
     for (let i = 0; i < this.spilt; i++) {
+      this.videoUrl[i] = ''
       this.isFill[i] = true
       this.isShowStream[i] = false
       this.timeSegments[i] = {
@@ -704,7 +691,6 @@ export default {
         endRatio: 0.9
       }
     }
-    console.log('this.timeSegments', this.timeSegments)
 
     Local.set('playbackRate', 1)
   },
@@ -749,8 +735,6 @@ export default {
       this.spiltIndex = i
     },
     changeHover(num, value) {
-      console.log(num, value)
-
       if (num === 1) {
         this.isMouseHover = true
         switch (value) {
@@ -760,12 +744,12 @@ export default {
           case 9:
             this.isHoverNum = 4
             break
-          case 8:
-            this.isHoverNum = 3
-            break
-          case 6:
-            this.isHoverNum = 2
-            break
+          // case 8:
+          //   this.isHoverNum = 3
+          //   break
+          // case 6:
+          //   this.isHoverNum = 2
+          //   break
           case 4:
             this.isHoverNum = 1
             break
@@ -784,12 +768,12 @@ export default {
           case 9:
             this.isHoverNum = 4
             break
-          case 8:
-            this.isHoverNum = 3
-            break
-          case 6:
-            this.isHoverNum = 2
-            break
+          // case 8:
+          //   this.isHoverNum = 3
+          //   break
+          // case 6:
+          //   this.isHoverNum = 2
+          //   break
           case 4:
             this.isHoverNum = 1
             break
@@ -997,25 +981,14 @@ export default {
           }
         }
       } else {
+        // console.log('data~~~~~~~',data)
         this.channelId = data.areaPid || data.id
+        this.setLeftTopName(data.areaNames, this.playerIdx)
       }
     },
-    initData() {
-      //如果是其他地方跳转过来
-      if (this.$route.query.channelId) {
-        this.selData = {
-          isLeaf: true,
-          deviceId: this.$route.query.deviceId,
-          channelId: this.$route.query.channelId,
-          id: this.$route.query.id
-        }
-        this.formData.type = this.$route.query.type
-        this.showBackBtn = true
-        this.handleSearch()
-      }
-    },
-    handleChangeTime() {
-      this.selectTime = Local.get('showTime')
+
+    handleChangeTime(index) {
+      this.selectTime = Local.get(`showTime${index}`)
     },
     handleChangeTimePicker(val) {
       Local.set('showTime', val)
@@ -1031,19 +1004,45 @@ export default {
           message: '该时间段暂无录像',
           type: 'warning'
         })
-        this.$refs.TimePlayer.stopTimeAutoPlay()
-        this.handleCloseVideo()
+        this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+        this.handleCloseVideo(this.playerIdx)
       }
       if (this.play) this.handlePauseOrPlay()
 
       this.handleDevicesPlayEnded()
       if (isPlay) this.handlePauseOrPlay()
     },
+    closeVideo(i) {
+      this.videoUrl.splice(i, 1, '')
+      this.timeLists.splice(i, 1, [])
+      this.videoUrl = [...this.videoUrl]
+      this.timeLists = [...this.timeLists]
+      this.cloudPlay = this.play = false
+      this.$nextTick(() => {
+        let emptyPlayerDom = this.$refs.emptyPlayer
+        for (let j = 0; j < emptyPlayerDom.length; j++) {
+          emptyPlayerDom[j].style.height = '100px'
+        }
+        Local.set(`showTime${i}`, '')
+        this.timeSegments[i] = {
+          name: '',
+          beginTime: 0,
+          endTime: 0,
+          color: '#4797FF',
+          startRatio: 0.65,
+          endRatio: 0.9
+        }
+        this.$refs.TimePlayer.changeChildTimeSegments(i)
+
+        this.$refs.TimePlayer.stopTimeAutoPlay(i)
+        this.stopPlayRecord()
+      })
+    },
     // 关闭视频
-    handleCloseVideo(name) {
+    handleCloseVideo(num) {
       this.cloudPlay = this.play = false
       this.hasStreamId = false
-      this.$refs.TimePlayer.stopTimeAutoPlay()
+      this.$refs.TimePlayer.stopTimeAutoPlay(num)
       if (this.tabsActiveName === 'device') {
         this.stopPlayRecord()
         this.videoUrl = ['']
@@ -1055,20 +1054,9 @@ export default {
       this.$nextTick(() => {
         let emptyPlayerDom = this.$refs.emptyPlayer
         for (let i = 0; i < emptyPlayerDom.length; i++) {
-          //   console.log(
-          //     'emptyPlayerDom[i]',
-          //     emptyPlayerDom[i],
-          //     emptyPlayerDom.length
-          //   )
           emptyPlayerDom[i].style.height = '100px'
         }
-        if (name === '关闭视频') {
-          this.$refs.TimePlayer.handleCloseVideoChildTimeSegments()
-        }
       })
-    },
-    handleSelectTreeNode(data) {
-      this.selData = data
     },
     // 查询视频
     handleSearch() {
@@ -1092,12 +1080,10 @@ export default {
           })
           return
         }
-        // this.selectTime=this.formData.date[0]
+
         this.formData.loading = true
 
         this.dateChange(this.formData.date)
-
-        this.$refs.TimePlayer.changePlayerTimes(this.formData.date)
       } else {
         this.$message({
           message: '请选择设备节点',
@@ -1105,6 +1091,28 @@ export default {
         })
         return
       }
+    },
+
+    setTimeLists(date, idx) {
+      this.$set(this.timeLists, idx, date)
+
+      this.$refs.TimePlayer.changePlayerTimes(this.timeLists[idx], idx)
+
+      this.$set(this.initTimeLists, idx, date[0])
+
+      setTimeout(() => {
+        window.localStorage.setItem('timeLists', JSON.stringify(this.timeLists))
+      }, 100)
+    },
+    setLeftTopName(name, idx) {
+      this.$set(this.recordLeftTopName, idx, name)
+
+      setTimeout(() => {
+        window.localStorage.setItem(
+          'recordLeftTopName',
+          JSON.stringify(this.recordLeftTopName)
+        )
+      }, 100)
     },
     setRecordStreamId(id, idx) {
       this.$set(this.recordStreamId, idx, id)
@@ -1147,7 +1155,6 @@ export default {
     },
     //控制显示码流
     handleShowStream() {
-      console.log('videoUrl[playerIdx]', this.videoUrl, this.playerIdx)
       this.getStreamInfo()
       this.isShowStream[this.playerIdx] = !this.isShowStream[this.playerIdx]
     },
@@ -1156,12 +1163,6 @@ export default {
       this.isFill[this.playerIdx] = !this.isFill[this.playerIdx]
 
       const dom = document.getElementsByClassName('player-box')
-
-      // if (dom[this.playerIdx].style.height === '100%' && this.isFill[this.playerIdx]) {
-      //   this.stretch[this.playerIdx] = false
-      // }else{
-      //   this.stretch[this.playerIdx] = true
-      // }
 
       this.$forceUpdate()
     },
@@ -1208,26 +1209,11 @@ export default {
           message: '该时间段暂无录像',
           type: 'warning'
         })
-        this.$refs.TimePlayer.stopTimeAutoPlay()
-        this.handleCloseVideo(name)
+        this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+        this.handleCloseVideo(this.playerIdx)
       }
     },
-    //事件轴上的日期发生变化
-    handleChangePlayDate(currentDate, ...preAndNextDate) {
-      if (this.tabsActiveName === 'device') {
-        //设备列表
-        this.queryRecords(currentDate.format('YYYY-MM-DD'))
-        preAndNextDate.forEach((date) => {
-          this.getDevicesVideData(date.format('YYYY-MM-DD'))
-        })
-      } else {
-        //云播
-        this.getCloudRecordVideo(currentDate.format('YYYY-MM-DD'))
-        preAndNextDate.forEach((date) => {
-          this.getCloudRecordVideo(date.format('YYYY-MM-DD'), null, true)
-        })
-      }
-    },
+
     //监听播放中的时间变化消息时间
     handleChangeCurrentTime: (function () {
       let lastPlayTime
@@ -1339,16 +1325,6 @@ export default {
           this.gbScale(this.speedArr[this.currentSpeed])
       }
     },
-
-    // 切换倍速
-    switchSpeed(val) {
-      let newVal = val.toString()
-      this.currentSpeed = this.speedArr.indexOf(val)
-      if (newVal.indexOf('.') === -1) {
-        newVal = val.toFixed(1)
-      }
-      this.gbScale(newVal)
-    },
     toogleFullScreen() {
       const playerMain = document.getElementById('recordPlayerLayout')
 
@@ -1408,7 +1384,7 @@ export default {
       if (this.tabsActiveName === 'device') {
         this.videoHistory.date = date
         this.playTime = val
-        // this.queryRecords(this.videoHistory.date)
+
         this.getPlaybackList(val)
       } else {
         this.cloudPlayTime = val
@@ -1420,104 +1396,7 @@ export default {
       this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
       this.videoUrl = ['']
     },
-    // 点击tabs
-    handleClick(e) {
-      this.isShowStream[this.playerIdx] = false
-      this.play = false
-    },
-    // 切换播放进度
-    playTimeChange: (function () {
-      //采用队列形式请求，防止等待响应过程中又发起一次请求
-      let lastQuery = null,
-        isWait = false //请求队列
-      return function (ms, videoUrl = this.videoUrl, curRow, playTime) {
-        if (!this.streamId || !ms) return (this.videoUrl = videoUrl)
-        lastQuery = { ms, videoUrl, streamId: this.streamId }
-        this.skipTime = ms
 
-        if (!isWait && lastQuery) {
-          isWait = true
-          const {
-            ms: lastMs,
-            streamId: lastStreamId,
-            videoUrl: lastVideoUrl
-          } = lastQuery
-          lastQuery = null
-        }
-      }
-    })(),
-    downloadRecord: function (row) {
-      let that = this
-      if (that.streamId != '') {
-        that.stopDownloadRecord(function (res) {
-          if (res.code == 0) {
-            that.streamId = ''
-            that.downloadRecord(row)
-          } else {
-            this.$message({
-              showClose: true,
-              message: res.data.msg,
-              type: 'error'
-            })
-          }
-        })
-      } else {
-      }
-    },
-
-    //////////////////////播放器事件处理//////////////////////////
-    videoError: function (e) {},
-
-    formatTooltip: function (val) {
-      var h = parseInt(val / 60)
-      var hStr = h < 10 ? '0' + h : h
-      var s = val % 60
-      var sStr = s < 10 ? '0' + s : s
-      return h + ':' + sStr
-    },
-    timeFormatter: function (row, column, cellValue, index) {
-      return cellValue.split(' ')[1]
-    },
-    mergeTime: function (timeArray) {
-      var resultArray = []
-      for (let i = 0; i < timeArray.length; i++) {
-        var startTime = new Date(timeArray[i].startTime)
-        var endTime = new Date(timeArray[i].endTime)
-        if (i == 0) {
-          resultArray[0] = {
-            startTime: startTime,
-            endTime: endTime
-          }
-        }
-        for (let j = 0; j < resultArray.length; j++) {
-          if (startTime > resultArray[j].endTime) {
-            // 合并
-            if (startTime - resultArray[j].endTime <= 1000) {
-              resultArray[j].endTime = endTime
-            } else {
-              resultArray[resultArray.length] = {
-                startTime: startTime,
-                endTime: endTime
-              }
-            }
-          } else if (resultArray[j].startTime > endTime) {
-            // 合并
-            if (resultArray[j].startTime - endTime <= 1000) {
-              resultArray[j].startTime = startTime
-            } else {
-              resultArray[resultArray.length] = {
-                startTime: startTime,
-                endTime: endTime
-              }
-            }
-          }
-        }
-      }
-      return resultArray
-    },
-    onTimeChange: function (video) {
-      // this.queryRecords()
-    },
     playRecord: (function () {
       return async function (row, playTime) {
         console.log(2222222222222, row, playTime)
@@ -1533,19 +1412,19 @@ export default {
               .then((res) => {
                 if (res.code === 0) {
                   if (!this.isNext) {
-                    this.setPlayUrl(res.data.wsFlv, this.playerIdx - 1)
-                    this.setRecordStreamId(
-                      res.data.streamId,
-                      this.playerIdx - 1
-                    )
-                    this.setRecordCloudId(this.channelId, this.playerIdx - 1)
-                  } else {
-                    // if (this.spilt > this.playerIdx) {
-                    //   this.playerIdx++
-                    // }
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx)
                     this.setRecordStreamId(res.data.streamId, this.playerIdx)
+
                     this.setRecordCloudId(this.channelId, this.playerIdx)
+
+                    this.setTimeLists(playTime, this.playerIdx)
+                  } else {
+                    this.setPlayUrl(res.data.wsFlv, this.playerIdx)
+                    this.setRecordStreamId(res.data.streamId, this.playerIdx)
+
+                    this.setRecordCloudId(this.channelId, this.playerIdx)
+
+                    this.setTimeLists(playTime, this.playerIdx)
                   }
 
                   this.streamId = res.data.streamId
@@ -1563,7 +1442,6 @@ export default {
     setPlayUrl(url, idx) {
       this.$set(this.videoUrl, idx, url)
 
-      console.log('!!!!!!!!!!!', this.videoUrl, idx)
       setTimeout(() => {
         window.localStorage.setItem(
           'RecordViewVideoUrl',
@@ -1581,7 +1459,7 @@ export default {
         streamId: this.streamId
       }).then((res) => {
         if (res.code === 0) {
-          this.$refs.TimePlayer.timeAutoPlay()
+          this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
           this.isClickCx = true
         }
       })
@@ -1595,14 +1473,14 @@ export default {
         streamId: this.streamId
       }).then((res) => {
         if (res.code === 0) {
-          this.$refs.TimePlayer.stopTimeAutoPlay()
+          this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
           this.isClickCx = false
         }
       })
     },
     async gbScale(command) {
       console.log('前端控制：倍速 ' + command)
-      this.$refs.TimePlayer.stopTimeAutoPlay()
+      this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
       await speedRecordView({
         channelId: this.channelId,
         speed: command,
@@ -1611,179 +1489,15 @@ export default {
         if (res.code === 0) {
           Local.set('playbackRate', command)
 
-          this.$refs.TimePlayer.timeAutoPlay()
+          this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
         }
       })
     },
-    gbSeek(val) {
-      console.log('前端控制：seek ')
-      let showTime = new Date(
-        new Date(this.recordStartTime).getTime() + (this.seekTime * val) / 100
-      )
-      let hour = showTime.getHours()
-      let minutes = showTime.getMinutes()
-      let seconds = showTime.getSeconds()
-      this.showTimeText =
-        (hour < 10 ? '0' + hour : hour) +
-        ':' +
-        (minutes < 10 ? '0' + minutes : minutes) +
-        ':' +
-        (seconds < 10 ? '0' + seconds : seconds)
-    },
-    getMediaServerList: function () {
-      let that = this
-      that.mediaServerObj.getOnlineMediaServerList((data) => {
-        console.info(data, 'data')
-        const mediaServerList = data.data
-        if (mediaServerList.length > 0) {
-          // mediaServerId = mediaServerList[0].id;
-          let port = mediaServerList[0].httpPort
-          //   if (
-          //     location.protocol === "https:" &&
-          //     that.mediaServerList[0].httpSSlPort
-          //   ) {
-          //     port = that.mediaServerList[0].httpSSlPort;
-          //   }
-          if (
-            location.protocol === 'https:' &&
-            mediaServerList[0].httpSSlPort
-          ) {
-            port = mediaServerList[0].httpSSlPort
-          } else {
-            port = mediaServerList[0].httpPlayPort
-          }
-          that.mediaServerPath =
-            location.protocol +
-            '//' +
-            mediaServerList[0].streamIp +
-            ':' +
-            port +
-            '/record/' +
-            that.recordFile.app +
-            '/' +
-            that.recordFile.stream
-          console.info('录像path', that.mediaServerPath)
-          // that.getRecordList();
-        }
-      })
-    },
-    /**
-     * 用年月获取存在数据的日子
-     * @param val 数组[年,月]
-     * @param callback 回调函数
-     */
-    getDateInMoth(val, callback) {},
-    //设置当前有录像日期样式
-    setHaveVideoDate(dates) {
-      let yearAndMonth = []
-      document
-        .querySelectorAll(
-          '.form-date-picker-popper .el-date-picker__header-label'
-        )
-        .forEach((item) => {
-          let dateData = item.innerText.split(' ')[0]
-          if (dateData < 10) {
-            yearAndMonth.push('0' + dateData)
-          } else {
-            yearAndMonth.push(dateData)
-          }
-        })
-      const yearAndMonthStr = yearAndMonth.join('-')
-      document
-        .querySelectorAll(
-          '.form-date-picker-popper .el-picker-panel__content .el-date-table .available'
-        )
-        .forEach((item) => {
-          if (
-            dates.includes(
-              yearAndMonthStr + '-' + item.innerText.padStart(2, '0')
-            )
-          ) {
-            item.className = item.className + ' data-picker-true'
-          }
-        })
-    },
-    /**
-     * 为日期选择添加监听事件，用于获取变化的月份
-     * @returns {Promise<void>}
-     */
-    async addEvent() {
-      await this.$nextTick()
-      this.monthChange()
-      if (this.setClick) return
-      document
-        .querySelector('.form-date-picker-popper .el-month-table')
-        .addEventListener('click', () => {
-          this.monthChange()
-        })
-      document
-        .querySelectorAll(
-          ".form-date-picker-popper [aria-label='下个月'],[aria-label='上个月'],[aria-label='后一年'],[aria-label='前一年']"
-        )
-        .forEach((item) =>
-          item.addEventListener('click', () => {
-            this.monthChange()
-          })
-        )
-      this.setClick = true
-    },
-    /**
-     * 月份改变
-     */
-    monthChange() {
-      //只能查询云端视频日期数据
-      document
-        .querySelectorAll(
-          '.form-date-picker-popper .el-picker-panel__content .el-date-table .data-picker-true'
-        )
-        .forEach((item) => {
-          item.className = item.className.replace(
-            'data-picker-true',
-            'data-picker-false'
-          )
-        })
 
-      if (!this.selData.isLeaf || this.formData.type !== 'cloud') return
-
-      this.$nextTick(() => {
-        let yearAndMonth = []
-        document
-          .querySelectorAll(
-            '.form-date-picker-popper .el-date-picker__header-label'
-          )
-          .forEach((item) => {
-            let dateData = item.innerText.split(' ')[0]
-            if (dateData < 10) {
-              yearAndMonth.push('0' + dateData)
-            } else {
-              yearAndMonth.push(dateData)
-            }
-          })
-
-        this.getDateInMoth(yearAndMonth)
-      })
-    },
-    /**
-     * 获取播放时长
-     * @param item
-     * @returns {number}
-     */
-    getDataWidth(item) {
-      let endTime = new Date(item.endTime)
-      let startTime = new Date(item.startTime)
-      let result =
-        (endTime.getTime() - startTime.getTime()) /
-        ((this.cloudSliderMax - this.cloudSliderMIn) * 1000)
-      return result * 100
-    },
     videoClick(i) {
-      Local.set('showTime', this.formData.date[0])
-      this.$refs.TimePlayer.stopTimeAutoPlay()
-      this.$refs.TimePlayer.timeAutoPlay()
+      // Local.set(`showTime${i}`, this.formData.date[0])
 
       this.playerIdx = i - 1
-
-      this.$refs.TimePlayer.changeChildTimeSegments(i - 1)
     }
   },
   watch: {
@@ -1820,37 +1534,36 @@ export default {
     treeList(n) {
       this.treeList = n
     },
-    playerIdx(val) {
-      // this.$refs.TimePlayer.changeChildTimeSegments(val)
-    },
+    playerIdx(val) {},
     spilt(newValue) {
-      console.log('切换画幅;' + newValue)
       let resTimeSegments = []
-      // let that = this
+      let resVideoUrl = []
+
       if (newValue < this.videoUrl.length) {
+        this.videoUrl = this.videoUrl.slice(0, newValue)
         this.timeSegments = this.timeSegments.slice(0, newValue)
       } else if (newValue > this.videoUrl.length) {
         for (let i = 0; i < newValue; i++) {
           if (i >= this.videoUrl.length) {
+            resVideoUrl.push('')
             resTimeSegments.push({
               name: '',
-              beginTime: this.formData.date[0],
-              endTime: this.formData.date[1],
+              beginTime: 0,
+              endTime: 0,
               color: '#4797FF',
               startRatio: 0.65,
               endRatio: 0.9
             })
           }
         }
-        this.timeSegments = this.timeSegments.concat(resTimeSegments)
+        this.videoUrl = this.videoUrl.concat(resVideoUrl)
 
-        console.log('切换画幅大于之前', this.timeSegments)
+        this.timeSegments = this.timeSegments.concat(resTimeSegments)
       } else {
       }
     }
   },
   beforeDestroy() {
-    console.log('beforeDestroy')
     if (this.streamId) {
       this.stopPlayRecord()
     }
@@ -2265,6 +1978,9 @@ export default {
   font-size: 14px;
   color: #fff;
   box-sizing: border-box;
+  .head-right {
+    cursor: pointer;
+  }
 }
 .player-box:hover .player-header {
   opacity: 1;

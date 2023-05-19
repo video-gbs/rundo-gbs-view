@@ -183,7 +183,6 @@ export default {
 
     this.resChannelId = this.$props.channelExpansionId[this.$props.playerIdx1]
 
-    console.log(111111, this.$props.playerIdx1, this.$props.showContent1)
     this.initType = []
     for (let i = 0; i < this.$props.showContent1.length; i++) {
       this.initType[i] = false
@@ -236,8 +235,6 @@ export default {
           }
         }
       })
-
-      console.log(' this.optionLists', this.optionLists)
       this.nowPreset =
         this.optionLists !== undefined &&
         this.optionLists.length > 0 &&
@@ -309,19 +306,16 @@ export default {
           type: 'error'
         })
       }
-      console.log('this.nowPreset', this.nowPreset)
       await ptzPresetEdit({
         channelExpansionId: this.resChannelId,
         presetId: this.nowPreset,
         presetName
       }).then((res) => {
         if (res.code === 0) {
-          console.log('this.nowPreset=======', this.nowPreset)
           if (this.nowPreset !== '') {
             this.nowPreset = presetName
           }
 
-          console.log('this.nowPreset~~~~~~~~~~~~~', this.nowPreset)
           if (
             this.nowPreset === '' ||
             this.nowPreset === null ||
@@ -340,7 +334,6 @@ export default {
 
           this.inputBoxDisplay = false
           this.inputPresetName = ''
-          console.log('预置位修改', this.resChannelId, this.resPlayerIdx)
           this.$emit(
             'changeChildOptionLists',
             this.resChannelId,
@@ -350,7 +343,6 @@ export default {
       })
     },
     async deletePreset() {
-      console.log('deletePreset~~~~~~~~~~~~~', this.nowPreset)
       if (
         this.nowPreset === '' ||
         this.nowPreset === null ||

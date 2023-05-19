@@ -132,11 +132,13 @@ export default {
     this.$nextTick(() => {
       this.init()
       const dom = document.getElementsByClassName('player-box')
-      dom[this.$props.playerIdx].style.height = this.$props.stretch
-        ? '100%'
-        : ''
-      console.info('this.$refs.videoPlayer', this.$refs.videoPlayer)
-      console.log('q初始化时的地址为: ' + this.videoUrl)
+      if (dom.length > 1) {
+        dom[this.$props.playerIdx].style.height = this.$props.stretch
+          ? '100%'
+          : ''
+      } else {
+        dom[0].style.height = this.$props.stretch ? '100%' : ''
+      }
     })
   },
   methods: {
@@ -262,11 +264,6 @@ export default {
       this.$refs.videoPlayer.player.pause()
     },
     getCurrentTime() {
-      console.log(
-        '获取当前播放时间',
-        this.$refs,
-        this.$refs.videoPlayer.player.getCurrentTime()
-      )
       //获取当前播放时间
       this.$refs.videoPlayer.player.getCurrentTime()
     },
@@ -280,7 +277,6 @@ export default {
   },
   watch: {
     videoUrl(newVal) {
-      console.log(111111111)
       if (newVal)
         this.$nextTick(() => {
           this.init()

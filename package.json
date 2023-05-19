@@ -18,8 +18,6 @@
     "@ffmpeg/core": "^0.11.0",
     "@ffmpeg/ffmpeg": "^0.11.6",
     "@liveqing/liveplayer": "^2.6.4",
-    "@wangeditor/editor": "5.0.1",
-    "@wangeditor/editor-for-vue": "1.0.1",
     "@wanglin1994/video-timeline": "^0.1.10",
     "axios": "0.18.1",
     "core-js": "3.6.5",

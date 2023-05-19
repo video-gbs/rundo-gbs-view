@@ -443,8 +443,8 @@ export default {
                 this.sideBarRouterList1
               )
 
-              // console.log(1, this.sideBarRouterList1)
-              this.$router.push({ path: this.sideBarRouterList1[0].path })
+              // console.log(1, this.sideBarRouterList1, data)
+              this.$router.push({ path: data[0].redirect })
               break
             case '/systemManagement':
               data.map((item2) => {
@@ -474,7 +474,8 @@ export default {
                 this.sideBarRouterList2
               )
               // console.log(2, this.sideBarRouterList2)
-              this.$router.push({ path: this.sideBarRouterList2[0].path })
+              // this.$router.push({ path: this.sideBarRouterList2[0].path })
+              this.$router.push({ path: data[1].redirect })
               break
             case '/moduleManageMent':
               data.map((item3) => {
@@ -505,7 +506,8 @@ export default {
               )
 
               // console.log(3, this.sideBarRouterList3)
-              this.$router.push({ path: this.sideBarRouterList3[0].path })
+              // this.$router.push({ path: this.sideBarRouterList3[0].path })
+              this.$router.push({ path: data[2].redirect })
               break
             default:
               break

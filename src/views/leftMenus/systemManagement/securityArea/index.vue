@@ -268,7 +268,10 @@ export default {
       this.$refs.selectTree.blur()
     },
 
-    childClickHandle(data) {
+    childClickHandle(data, node, self) {
+      console.log('data', data)
+      console.log('node', node)
+      console.log('self', self)
       this.fatherId = data.id
       if (data.children && data.children.length > 0) {
         this.isMore = true

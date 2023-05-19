@@ -240,8 +240,8 @@
               :show-overflow-tooltip="true"
             />
             <el-table-column
-              prop="createdBy"
-              label="创建"
+              prop="userAccount"
+              label="创建人"
               :show-overflow-tooltip="true"
             />
           </el-table>

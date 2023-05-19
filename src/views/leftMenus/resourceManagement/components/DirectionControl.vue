@@ -265,12 +265,14 @@ export default {
       this.$forceUpdate()
     },
     formPlaytoolShowControl(val) {
-      this.resPlayerIdx = 0
-      this.initTopType = []
-      this.initType = []
-      this.initTopType[0] = true
-      this.initType[0] = true
-      this.$forceUpdate()
+      this.$nextTick(() => {
+        this.resPlayerIdx = 0
+        this.initTopType = []
+        this.initType = []
+        this.initTopType[this.resPlayerIdx] = true
+        this.initType[this.resPlayerIdx] = true
+        this.$forceUpdate()
+      })
     },
     playerIdx(val) {
       this.resPlayerIdx = val
@@ -293,9 +295,6 @@ export default {
           }
         }
       })
-
-      console.log(222, this.initTopType)
-      console.log(22, this.initType)
       this.$forceUpdate()
     },
     deep: true,
@@ -322,7 +321,6 @@ export default {
       if (type === 1) {
         this.type3d[index] = true
         this.$listeners.rectZoomInit(index, this.type3d[index], '3d')
-        console.log('this.type3d=====', this.type3d, index)
         this.is3DHover = false
       } else {
         this.type3d[index] = false
@@ -338,7 +336,10 @@ export default {
       }
       this.$forceUpdate()
     },
-
+    clearType() {
+      this.initTopType = []
+      this.initType = []
+    },
     async ptzEnlarge(dragType, lengthX, lengthY, midPointX, midPointY) {
       const video = document.getElementsByClassName('play-box')
 
@@ -762,7 +763,6 @@ export default {
     },
     // 鼠标在方向按键上
     handleHoverWheel(direction) {
-      // console.log('direction~~~~~~~', direction)
       this.hoverClass = direction
     },
     // 鼠标已开方向键
@@ -771,18 +771,15 @@ export default {
     },
     // 云台控制
     ptzCamera(cmdCode) {
-      // const { channelId } = this.deviceData
-
-      // console.log('cmdCode~~~~~~~', cmdCode, Local.get('flvCloudId')[this.resPlayerIdx])
       ptzControl1({
-        channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
+        channelExpansionId: Local.get('flvCloudId')[Local.get('resPlayerIdx')],
         ptzOperationType: this.status[cmdCode],
         operationValue: this.speed
       })
     },
     ptzCameraStop(cmdCode) {
       ptzControl1({
-        channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
+        channelExpansionId: Local.get('flvCloudId')[Local.get('resPlayerIdx')],
         ptzOperationType: 0,
         operationValue: this.speed
       })

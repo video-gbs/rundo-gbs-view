@@ -302,7 +302,6 @@ export default {
             onlineState: item.onlineState
           })
         })
-        console.log('channelList', channelList, this.channelId)
         addChannel({ channelList, videoAreaId: this.channelId }).then((res) => {
           if (res.code === 0) {
             this.$message({

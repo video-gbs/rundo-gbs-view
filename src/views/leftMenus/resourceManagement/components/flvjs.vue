@@ -106,7 +106,7 @@ export default {
       recSecond: 0,
       title: '视频播放',
       testSrc: '',
-      // flvPlayer: null,
+      flvPlayer: null,
 
       reconnectIng: false, //是否正在重连中
 
@@ -141,12 +141,9 @@ export default {
   ],
   created() {
     this.resVideoUrl = this.$props.videoUrl
-    console.log('this.$props.flvStreamId', this.$props.flvStreamId)
-    console.log('this.$props.playerIdx', this.$props.playerIdx)
 
     this.resChannelId = this.$props.flvStreamId
 
-    console.log(this.resChannelId)
     if (this.timerId) {
       clearInterval(this.timerId)
       this.timerId = null
@@ -185,8 +182,8 @@ export default {
       deep: true
     },
     playerIdx(val) {
-      console.log(val, 111)
       this.resPlayerIdx = val
+      Local.set('resPlayerIdx', val)
       // this.resShowContent.map((item, index) => {
       //   if (item && item !== '' && item.length > 0) {
       //     if (index === this.resPlayerIdx) {
@@ -266,8 +263,10 @@ export default {
           console.log('errorType:', errorType)
           console.log('errorDetail:', errorDetail)
           console.log('errorInfo:', errorInfo)
-          // this.loadStatus=true
-          // this.statusMsg="正在重连。。。"
+
+          // that.player && that.player.close()
+          // that.$emit('close', that.index)
+
           //视频出错后销毁重新创建
           if (that.flvPlayer) {
             that.flvPlayer.pause()
@@ -288,27 +287,7 @@ export default {
           that.reconnectIng = false
           that.lastDecodedFrame = res.decodedFrames
         } else {
-          // const end = videoElement.buffered.end(0);
-          // console.info("进来了-----------", that.lastDecodedFrame, res.decodedFrames, end)
-          // this._timeout && clearTimeout(this._timeout);
-          // this._timeout = setTimeout(() => {
-          //   const endNew = videoElement.buffered.end(0);
-          //   if (endNew === end) {
-          //     console.info("断线重连--------------")
-          //   }
-          //   console.info("res.decodedFrames", videoElement.buffered.end(0));
-          // }, 5000);
-          // that.$nextTick(() => {
-          // });
           that.lastDecodedFrame = 0
-          // if (that.flvPlayer) {
-          //   that.flvPlayer.pause();
-          //   that.flvPlayer.unload();
-          //   that.flvPlayer.detachMediaElement();
-          //   that.flvPlayer.destroy();
-          //   that.flvPlayer = null;
-          //   that.createVideo();
-          // }
         }
       })
 
@@ -357,10 +336,12 @@ export default {
         clearInterval(that.timerId1)
       }
       that.timerId1 = setInterval(() => {
-        if (that.reconnectCount > 10) {
+        if (that.reconnectCount > 3) {
           console.info('重连大于10次，不再重连')
           clearTimeout(that.timerId1)
           that.timerId1 = null
+          that.player && that.player.close()
+          that.$emit('close', that.index)
           return
         }
 
