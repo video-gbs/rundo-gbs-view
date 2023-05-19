@@ -1241,10 +1241,11 @@ export default {
 
             this.$set(this.isLoading, this.playerIdx, false)
           }
-        })
-        .catch(function (error) {
-          console.log(error)
           this.$set(this.isLoading, this.playerIdx, false)
+        })
+        .catch((error) => {
+          this.$set(this.isLoading, this.playerIdx, false)
+          console.log(error)
         })
     },
     // 切换播放器全屏
