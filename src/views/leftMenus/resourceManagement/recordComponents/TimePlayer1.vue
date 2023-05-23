@@ -117,7 +117,7 @@ export default {
           endRatio: 0.9
         }
       ],
-      timeAutoPlays: null,
+      timeAutoPlays: [],
       setIntervalNum: 0
     }
   },
@@ -161,9 +161,9 @@ export default {
       if (
         this.$props.timeLists[newVal] &&
         newVal < this.$props.timeLists.length &&
-        this.timeAutoPlays
+        this.timeAutoPlays[newVal]
       ) {
-        console.log('点击的画面有视频')
+        console.log('点击的画面有视频~~~~~~~~~~~~~~~~~~~~~~~~')
         this.time2[newVal] = new Date(Local.get(`showTime${newVal}`)).getTime()
         // this.$set(
         //   this.time2,
@@ -171,13 +171,13 @@ export default {
         //   new Date(Local.get(`showTime${newVal}`)).getTime()
         // )
       } else {
-        console.log('点击的画面没有视频')
-        // this.time2.map((item) => {
-        this.time2 = 0
-        // })
-        // this.$set(this.time2, newVal, 0)
+        console.log('点击的画面没有视频!!!!!!!!!!!!!!!!!!!!!')
+        this.time2.forEach((item) => {
+          item = new Date()
+        })
+        // this.timeAutoPlay(newVal)
 
-        this.$emit('handleChangeTime', newVal)
+        // this.$emit('handleChangeTime', newVal)
       }
       this.$nextTick(() => {
         this.childTimeSegments[0].beginTime = this.$props.timeSegments[newVal]
@@ -206,7 +206,7 @@ export default {
     },
     initTimeLists(val) {},
     setIntervalNum(val) {
-      console.log('setIntervalNum,=====', val)
+      // console.log('setIntervalNum,=====', val)
     },
     childTimeSegments(val) {},
     time2(val) {
@@ -220,48 +220,38 @@ export default {
   mounted() {},
   methods: {
     timeAutoPlay(i) {
+      this.$emit('handleChangeTime', i)
       this.setIntervalNum = i
-      if (this.timeAutoPlays) {
-        return
+      if (this.timeAutoPlays[this.setIntervalNum]) {
+        clearInterval(this.timeAutoPlays[this.setIntervalNum])
       }
-      this.timeAutoPlays = setInterval(() => {
-        this.$props.timeSegments.forEach((item, index) => {
-          if (
-            item.beginTime &&
-            item.beginTime !== 0 &&
-            item.beginTime.length > 0
-          ) {
-            this.time2[index] += Local.get('playbackRate') * 1000
+      this.timeAutoPlays[i] = setInterval(() => {
+        this.time2[i] += Local.get('playbackRate') * 1000
 
-            Local.set(
-              `showTime${index}`,
-              dayjs(this.time2[index]).format('YYYY-MM-DD HH:mm:ss')
-            )
-            this.$emit('handleChangeTime', i)
-
-            // if (
-            //   this.time2[index] >=
-            //   new Date(this.$props.timeLists[index][1]).getTime()
-            // ) {
-            //   this.stopTimeAutoPlay(index)
-            //   this.$emit('handleCloseVideo', index)
-            // }
-            if (this.$refs.Timeline) {
-              this.$refs.Timeline.setTime(this.time2[index])
-            } else {
-              return
-            }
-          }
-        })
+        Local.set(
+          `showTime${i}`,
+          dayjs(this.time2[i]).format('YYYY-MM-DD HH:mm:ss')
+        )
+        if (
+          i === this.$props.playerIdx &&
+          this.$props.timeLists[i] &&
+          i < this.$props.timeLists.length &&
+          this.timeAutoPlays[i]
+        )
+          this.$emit('handleChangeTime', i)
+        // if (this.$refs.Timeline) {
+        //   this.$refs.Timeline.setTime(this.time2[i])
+        // } else {
+        //   return
+        // }
       }, 1000)
-
-      console.log('i==================================', i, this.timeAutoPlays)
     },
     changeTime() {},
+
     stopTimeAutoPlay(index) {
       console.log('关闭视频进来停止定时器')
-      clearInterval(this.timeAutoPlays)
-      this.timeAutoPlays = null
+      clearInterval(this.timeAutoPlays[index])
+      this.timeAutoPlays[index] = null
     },
 
     changeChildTimeSegments() {
@@ -275,11 +265,12 @@ export default {
     },
     // 显示时间段
     timeChange(t) {
-      this.time2[this.setIntervalNum] = t
-      Local.set(
-        `showTime${this.setIntervalNum}`,
-        dayjs(this.time2[this.setIntervalNum]).format('YYYY-MM-DD HH:mm:ss')
-      )
+      // console.log('显示时间段',this.time2,this.setIntervalNum,t)
+      // this.time2[this.setIntervalNum] = t
+      // Local.set(
+      //   `showTime${this.setIntervalNum}`,
+      //   dayjs(this.time2[this.setIntervalNum]).format('YYYY-MM-DD HH:mm:ss')
+      // )
     },
 
     handleControlScope(i) {
@@ -334,7 +325,9 @@ export default {
     }
   },
   destroyed() {
-    clearInterval(this.timeAutoPlays)
+    this.timeAutoPlays.forEach((item) => {
+      clearInterval(item)
+    })
     Local.set('playbackRate', 1)
   }
 }
