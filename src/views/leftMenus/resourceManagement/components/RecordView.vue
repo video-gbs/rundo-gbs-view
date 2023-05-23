@@ -180,6 +180,7 @@
                   :playerTimes="formData.date"
                   :timeLists="timeLists"
                   @handleChangeTime="handleChangeTime"
+                  @initSelectTime="initSelectTime"
                   @onChange="handleChangePlayTime"
                   :playerIdx="playerIdx"
                   :timeSegments="timeSegments"
@@ -191,7 +192,6 @@
             <div class="player-toolbar">
               <div class="toolbar-left">
                 <el-tooltip
-                  effect="dark"
                   :content="isShowMenu ? '收起' : '展开'"
                   placement="top"
                 >
@@ -205,7 +205,6 @@
                 </el-tooltip>
                 <span class="parting-line" />
                 <el-tooltip
-                  effect="dark"
                   :content="isMuted ? '关闭声音' : '开启声音'"
                   placement="top"
                 >
@@ -214,17 +213,16 @@
                     @click="handleSetVolume()"
                   />
                 </el-tooltip>
-                <el-tooltip effect="dark" content="截屏" placement="top">
+                <el-tooltip content="截屏" placement="top">
                   <i class="icon-jieping" />
                 </el-tooltip>
-                <el-tooltip effect="dark" content="下载" placement="top">
+                <el-tooltip content="下载" placement="top">
                   <i
                     :class="`icon-xiazai ${channelId ? '' : 'disabled'}`"
                     @click="handleDownload()"
                   />
                 </el-tooltip>
                 <el-tooltip
-                  effect="dark"
                   :content="
                     isShowStream[playerIdx] ? '显示码流信息' : '隐藏码流信息'
                   "
@@ -245,14 +243,6 @@
                 </el-tooltip>
               </div>
               <div class="tool-center">
-                <!-- <el-tooltip effect="dark" content="关闭视频" placement="top">
-                  <svg-icon
-                    class="iconfont white close-video"
-                    icon-class="close-video"
-                    @click="handleCloseVideo('关闭视频')"
-                  />
-                </el-tooltip> -->
-
                 <el-date-picker
                   v-model="selectTime"
                   class="toolbar-date-picker"
@@ -267,11 +257,7 @@
                 >
                 </el-date-picker>
 
-                <el-tooltip
-                  effect="dark"
-                  :content="play ? '暂停' : '播放'"
-                  placement="top"
-                >
+                <el-tooltip :content="play ? '暂停' : '播放'" placement="top">
                   <div
                     @click="
                       videoUrl[playerIdx] !== '' ? handlePauseOrPlay() : ''
@@ -284,7 +270,7 @@
                   />
                 </el-tooltip>
                 <div class="speed-box">
-                  <el-tooltip effect="dark" content="减速" placement="top">
+                  <el-tooltip content="减速" placement="top">
                     <span
                       @click="hasStreamId ? handleChangeSpeed('sub') : ''"
                       :class="`speed-icon speed-down ${
@@ -293,7 +279,7 @@
                     />
                   </el-tooltip>
                   <span class="speed-text">{{ speedArr[currentSpeed] }}x</span>
-                  <el-tooltip effect="dark" content="快进" placement="top">
+                  <el-tooltip content="快进" placement="top">
                     <span
                       @click="hasStreamId ? handleChangeSpeed('plus') : ''"
                       :class="`speed-icon speed-up ${
@@ -304,14 +290,19 @@
                 </div>
               </div>
               <div class="tool-right">
-                <el-tooltip effect="dark" content="放大/缩小" placement="top">
+                <el-tooltip content="关闭全部" placement="top">
+                  <i
+                    @click="handleCloseVideo()"
+                    class="iconfont icon-guanbiquanbu"
+                  />
+                </el-tooltip>
+
+                <el-tooltip content="放大/缩小" placement="top">
                   <i
                     :class="`iconfont icon-fangda ${isZoom ? 'active' : ''}`"
-                    @click="handleZoom(ZOOM_TYPE.in)"
                   />
                 </el-tooltip>
                 <el-tooltip
-                  effect="dark"
                   :content="isFill[playerIdx] ? '拉伸' : '自适应'"
                   placement="top"
                 >
@@ -369,7 +360,6 @@
                   </el-dropdown>
                 </div>
                 <el-tooltip
-                  effect="dark"
                   :content="isFullScreen ? '退出全屏' : '全屏'"
                   placement="top"
                 >
@@ -810,7 +800,7 @@ export default {
                 item.duration =
                   (new Date(endTime).getTime() -
                     new Date(startTime).getTime()) /
-                  1000 // ms
+                  1000
                 return item
               })
 
@@ -849,11 +839,7 @@ export default {
     },
     getIconType(data) {
       if (data.level) {
-        // if (data.level === 2) {
-        //   return 'tree2'
-        // } else {
         return 'tree2'
-        // }
       } else {
         switch (data.ptzType) {
           case 1:
@@ -919,7 +905,6 @@ export default {
         })
         .catch(function (error) {
           console.log(error)
-          // this.getDeviceListLoading = false
         })
     },
     async handleNodeClick(data, node, self) {
@@ -987,11 +972,18 @@ export default {
       }
     },
 
+    initSelectTime(i) {
+      this.selectTime = new Date()
+
+      // console.log('this.selectTime----------', i,this.selectTime)
+    },
+
     handleChangeTime(index) {
       this.selectTime = Local.get(`showTime${index}`)
+      // console.log('selectTime=========', index,this.selectTime)
     },
     handleChangeTimePicker(val) {
-      Local.set('showTime', val)
+      // Local.set('showTime', val)
       const isPlay = this.play
 
       if (
@@ -1023,7 +1015,12 @@ export default {
         for (let j = 0; j < emptyPlayerDom.length; j++) {
           emptyPlayerDom[j].style.height = '100px'
         }
-        Local.set(`showTime${i}`, '')
+
+        Local.set(
+          `showTime${i}`,
+          dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
+        )
+
         this.timeSegments[i] = {
           name: '',
           beginTime: 0,
@@ -1032,9 +1029,11 @@ export default {
           startRatio: 0.65,
           endRatio: 0.9
         }
+
         this.$refs.TimePlayer.changeChildTimeSegments(i)
 
         this.$refs.TimePlayer.stopTimeAutoPlay(i)
+
         this.stopPlayRecord()
       })
     },
@@ -1042,10 +1041,12 @@ export default {
     handleCloseVideo(num) {
       this.cloudPlay = this.play = false
       this.hasStreamId = false
-      this.$refs.TimePlayer.stopTimeAutoPlay(num)
       if (this.tabsActiveName === 'device') {
         this.stopPlayRecord()
         this.videoUrl = ['']
+        this.videoUrl = [...this.videoUrl]
+        this.timeLists = ['']
+        this.timeLists = [...this.timeLists]
         this.currentList = ''
         this.currentSpeed = 2
       } else {
@@ -1055,6 +1056,21 @@ export default {
         let emptyPlayerDom = this.$refs.emptyPlayer
         for (let i = 0; i < emptyPlayerDom.length; i++) {
           emptyPlayerDom[i].style.height = '100px'
+
+          this.$refs.TimePlayer.stopTimeAutoPlay(i)
+          this.timeSegments[i] = {
+            name: '',
+            beginTime: 0,
+            endTime: 0,
+            color: '#4797FF',
+            startRatio: 0.65,
+            endRatio: 0.9
+          }
+          Local.set(
+            `showTime${i}`,
+            dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
+          )
+          this.$refs.TimePlayer.changeChildTimeSegments(i)
         }
       })
     },
@@ -1188,7 +1204,6 @@ export default {
     //监听播放视频事件
     handleOnPlay() {
       if (this.tabsActiveName === 'device') {
-        console.log('播放设备视频')
         this.gbPlay()
       }
       this.play = true
@@ -1249,6 +1264,7 @@ export default {
           '播放结束或者报错停止设备播放' +
             this.playTime.format('YYYY-MM-DD HH:mm:ss')
         )
+        this.closeVideo(this.playerIdx)
         const [startTime, endTime] = this.currentList.split('_')
         if (this.playTime.isBetween(startTime, endTime)) {
           //如果当前没有播完，就停了继续播
@@ -1399,7 +1415,6 @@ export default {
 
     playRecord: (function () {
       return async function (row, playTime) {
-        console.log(2222222222222, row, playTime)
         await playStop({
           streamId: this.channelId
         }).then((res) => {
@@ -1464,6 +1479,7 @@ export default {
         }
       })
     },
+
     async gbPause() {
       console.log('前端控制：暂停', this.$refs.TimePlayer)
 
@@ -1478,6 +1494,7 @@ export default {
         }
       })
     },
+
     async gbScale(command) {
       console.log('前端控制：倍速 ' + command)
       this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
@@ -1495,8 +1512,6 @@ export default {
     },
 
     videoClick(i) {
-      // Local.set(`showTime${i}`, this.formData.date[0])
-
       this.playerIdx = i - 1
     }
   },
@@ -1559,6 +1574,11 @@ export default {
         this.videoUrl = this.videoUrl.concat(resVideoUrl)
 
         this.timeSegments = this.timeSegments.concat(resTimeSegments)
+        console.log('this.$refs', this.$refs)
+        this.$refs.TimePlayer.spiltChangePlayerTimes(
+          [this.timeSegments[this.playerIdx]],
+          this.playerIdx
+        )
       } else {
       }
     }
@@ -2081,7 +2101,7 @@ export default {
 
     .toolbar-date-picker {
       height: 100%;
-      width: 201px;
+      width: 210px;
       margin-top: 8px;
 
       input {

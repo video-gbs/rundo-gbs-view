@@ -104,6 +104,7 @@
                 <el-date-picker
                   v-model="form.expiryDateEnd"
                   type="datetime"
+                  @change="changeExpiryDateEnd"
                   clearable
                   placeholder="结束日期"
                   format="yyyy-MM-dd HH:mm:ss"
@@ -113,7 +114,6 @@
                 </el-date-picker>
               </el-form-item>
             </el-col>
-            <!-- <el-col :span="12"></el-col> -->
           </el-row>
         </el-form>
       </div>
@@ -472,6 +472,13 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    changeExpiryDateEnd(val) {
+      if (val === null) {
+        this.form.expiryDateEnd = ''
+      } else {
+        this.form.expiryDateEnd = val
+      }
     },
     search() {
       this.getLists()
