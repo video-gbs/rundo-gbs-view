@@ -978,10 +978,6 @@ export default {
     },
 
     handleChangeTime(index) {
-      console.log(
-        'Local.get(`showTime${index}`)=========',
-        Local.get(`showTime${index}`)
-      )
       if (
         Local.get(`showTime${index}`) === 'Invalid Date' ||
         !Local.get(`showTime${index}`)
@@ -1016,8 +1012,6 @@ export default {
       if (isPlay) this.handlePauseOrPlay()
     },
     closeVideo(i) {
-      debugger
-      console.log('closeVideo~~~~~~~~~~~~~~', i)
       this.videoUrl.splice(i, 1, '')
       this.timeLists.splice(i, 1, [])
       // this.videoUrl = [...this.videoUrl]
@@ -1279,7 +1273,7 @@ export default {
           '播放结束或者报错停止设备播放' +
             this.playTime.format('YYYY-MM-DD HH:mm:ss')
         )
-        this.closeVideo(this.playerIdx)
+        // this.closeVideo(this.playerIdx)
         const [startTime, endTime] = this.currentList.split('_')
         if (this.playTime.isBetween(startTime, endTime)) {
           //如果当前没有播完，就停了继续播
@@ -1331,6 +1325,8 @@ export default {
         this.$refs.cloudPlayer[this.playerIdx] &&
           this.$refs.cloudPlayer[this.playerIdx].pause()
         this.hasStreamId = false
+
+        this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
       } else if (
         this.tabsActiveName === 'device' ? this.videoUrl : this.cloudPlayerUrl
       ) {

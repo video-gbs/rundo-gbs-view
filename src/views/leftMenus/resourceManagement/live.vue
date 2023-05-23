@@ -182,56 +182,68 @@
             </div>
             <div :class="`player-toolbar ${splitFullscreen ? 'full' : ''}`">
               <div class="tool-left">
-                <el-tooltip
-                  :content="isShowMenu ? '收起' : '展开'"
-                  placement="top"
-                >
-                  <i
-                    :class="
-                      'hidden-menu-icon ' +
-                      (isShowMenu ? 'el-icon-s-fold' : 'el-icon-s-unfold')
-                    "
-                    @click="handleHiddenMenu()"
-                  ></i>
-                </el-tooltip>
-                <el-tooltip
-                  :content="hasAudio ? '开启全部声音' : '关闭全部声音'"
-                  placement="top"
-                >
-                  <i
-                    :class="`iconfont ${
-                      hasAudio ? 'icon-yinliang' : 'icon-wuyinliang'
-                    }`"
-                    @click="handleSetVoice"
-                  ></i>
-                </el-tooltip>
-                <el-tooltip content="截屏" placement="top">
-                  <i
-                    class="iconfont icon-jieping"
-                    @click="handleScreenShot"
-                  ></i>
-                </el-tooltip>
+                <div class="test-div">
+                  <el-tooltip
+                    :content="isShowMenu ? '收起' : '展开'"
+                    placement="top"
+                  >
+                    <i
+                      :class="
+                        'hidden-menu-icon ' +
+                        (isShowMenu ? 'el-icon-s-fold' : 'el-icon-s-unfold')
+                      "
+                      @click.stop="handleHiddenMenu()"
+                    ></i>
+                  </el-tooltip>
+                </div>
+                <div class="test-div">
+                  <el-tooltip
+                    :content="hasAudio ? '开启全部声音' : '关闭全部声音'"
+                    placement="top"
+                  >
+                    <i
+                      :class="`iconfont ${
+                        hasAudio ? 'icon-yinliang' : 'icon-wuyinliang'
+                      }`"
+                      @click.stop="handleSetVoice()"
+                    ></i>
+                  </el-tooltip>
+                </div>
+                <div class="test-div">
+                  <el-tooltip content="截屏" placement="top">
+                    <i
+                      class="iconfont icon-jieping"
+                      @click.stop="handleScreenShot()"
+                    ></i>
+                  </el-tooltip>
+                </div>
               </div>
 
               <div class="tool-center"></div>
               <div class="tool-right">
-                <el-tooltip
-                  id="stretch"
-                  :content="isFill ? '拉伸' : '自适应'"
-                  placement="top"
-                >
-                  <i
-                    @click="handleChangeFill"
-                    :class="`iconfont icon-zishiying ${isFill ? 'active' : ''}`"
-                  ></i>
-                </el-tooltip>
+                <div class="test-div">
+                  <el-tooltip
+                    id="stretch"
+                    :content="isFill ? '拉伸' : '自适应'"
+                    placement="top"
+                  >
+                    <i
+                      @click.stop="handleChangeFill()"
+                      :class="`iconfont icon-zishiying ${
+                        isFill ? 'active' : ''
+                      }`"
+                    ></i>
+                  </el-tooltip>
+                </div>
 
-                <el-tooltip content="关闭全部" placement="top">
-                  <i
-                    @click="handleCloseAll()"
-                    class="iconfont icon-guanbiquanbu"
-                  />
-                </el-tooltip>
+                <div class="test-div1">
+                  <el-tooltip content="关闭全部" placement="top">
+                    <i
+                      @click.stop="handleCloseAll()"
+                      class="iconfont icon-guanbiquanbu"
+                    />
+                  </el-tooltip>
+                </div>
                 <div class="split-box">
                   <el-dropdown @command="switchSplit" placement="top">
                     <span class="split-text">
@@ -1407,6 +1419,20 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.test-div {
+  width: 16px;
+  height: 18px;
+  margin-left: 16px;
+}
+.test-div1 {
+  width: 16px;
+  height: 18px;
+  margin: 0 16px;
+}
+
+// ::v-deep .el-tooltip{
+//   width: 18px;
+// }
 ::v-deep .tree .el-tree-node__expand-icon.expanded {
   -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
@@ -1733,6 +1759,9 @@ export default {
   user-select: none;
 
   .tool-left {
+    display: flex;
+    align-items: center;
+    margin-left: -20px;
     i {
       cursor: pointer;
       margin-right: 16px;
@@ -1756,10 +1785,10 @@ export default {
     display: flex;
     align-items: center;
   }
-  .tool-right > * {
-    margin-left: 12px;
-  }
-  .tool-right > i {
+  // .tool-right > .test-div > * {
+  //   margin-left: 12px;
+  // }
+  i {
     cursor: pointer;
     font-size: 18px;
   }
