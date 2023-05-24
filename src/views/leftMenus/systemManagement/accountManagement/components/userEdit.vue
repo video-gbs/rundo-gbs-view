@@ -211,6 +211,9 @@
             ref="userTable"
             class="table-content-bottom"
             :data="tableData"
+            row-key="id"
+            @selection-change="handleSelectChange"
+            @select="handleSelect"
             border
             :header-cell-style="{
               background: 'rgba(0, 75, 173, 0.06)',
@@ -356,6 +359,9 @@ export default {
         total: 0
       },
       treeList: [],
+      selectedObj: {},
+      selectedData: [],
+
       List: '',
       Ids: [],
       Id: '',
@@ -483,6 +489,42 @@ export default {
     search() {
       this.getLists()
     },
+    handleSelectChange(selection) {
+      // 全选取消，删除当前页所有数据
+      if (selection.length === 0) {
+        this.tableData.forEach((item) => {
+          delete this.selectedObj[item.id]
+        })
+      }
+      // 勾选数据 添加
+      selection.forEach((item) => {
+        this.selectedObj[item.id] = item
+      })
+      // 获取所有分页勾选的数据
+      this.selectedData = []
+      for (const key in this.selectedObj) {
+        this.selectedData.push(this.selectedObj[key])
+      }
+    },
+
+    handleSelect(selection, row) {
+      // 取消单个勾选时，删除对应属性
+      if (!selection.some((item) => item.id === row.id)) {
+        delete this.selectedObj[row.id]
+      }
+    },
+
+    // 处理当前列表选中状态
+    handleRowSelection(data) {
+      data.forEach((item) => {
+        if (this.selectedObj[item.id]) {
+          this.$nextTick(() => {
+            this.$refs.userTable.toggleRowSelection(item)
+          })
+        }
+      })
+    },
+
     async getLists(id) {
       await getUserInfoList({
         current: this.params.pageNum,
@@ -526,21 +568,22 @@ export default {
 
                 let arr = res.data.records
                 this.tableData = arr
+                this.handleRowSelection(this.tableData)
                 this.params.total = res.data.total
                 this.params.pages = res.data.pages
                 this.params.current = res.data.current
-                arr.forEach((item) => {
-                  for (let j in this.form.roleIds) {
-                    //console.log(arr[j])
-                    if (item.id == this.form.roleIds[j]) {
-                      //把对应的数据回显的时候，勾选上
-                      this.$nextTick(() => {
-                        this.$refs.userTable.toggleRowSelection(item, true)
-                      })
-                      break
-                    }
-                  }
-                })
+                // arr.forEach((item) => {
+                //   for (let j in this.form.roleIds) {
+                //     //console.log(arr[j])
+                //     if (item.id == this.form.roleIds[j]) {
+                //       //把对应的数据回显的时候，勾选上
+                //       this.$nextTick(() => {
+                //         this.$refs.userTable.toggleRowSelection(item, true)
+                //       })
+                //       break
+                //     }
+                //   }
+                // })
               }
             })
           }
@@ -578,8 +621,7 @@ export default {
         // }
         this.form.orgId = this.Id
         const roleIds = []
-
-        this.$refs.userTable.selection.map((item) => {
+        this.selectedData.map((item) => {
           roleIds.push(item.id)
         })
         editUser({ ...this.form, ...this.form1, roleIds }).then((res) => {
