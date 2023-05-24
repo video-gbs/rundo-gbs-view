@@ -149,6 +149,7 @@
                       :channelExpansionId="channelExpansionId"
                       :playerIdx="playerIdx"
                       @showPlayerBoxMini="showPlayerBoxMini"
+                      @videoClick="videoClick"
                     ></player>
                     <div ref="rectArea" class="rect"></div>
 
