@@ -10,7 +10,7 @@
           :class="`iconfont icon-xianshimaliuxinxi ${
             isShowStream ? 'active' : ''
           }`"
-          @click.stop="onShowStream"
+          @click="showStream($event)"
         />
       </el-tooltip>
     </div>
@@ -92,7 +92,6 @@ export default {
     'deviceData',
     'onOpenControl',
     'showControl',
-    'onShowStream',
     'isShowStream',
     'hasAudio',
     'boxSelectionNum'
@@ -113,6 +112,13 @@ export default {
     }
   },
   methods: {
+    showStream(event) {
+      // console.log('showStream',event.target.__vue__.$parent.boxSelectionNum)
+      this.$emit(
+        'handleShowStream',
+        event.target.__vue__.$parent.boxSelectionNum
+      )
+    },
     // 截图
     jieping() {
       this.getNowDate()
