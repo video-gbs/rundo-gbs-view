@@ -1327,6 +1327,7 @@ export default {
         this.hasStreamId = false
 
         this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+        this.isClickCx = false
       } else if (
         this.tabsActiveName === 'device' ? this.videoUrl : this.cloudPlayerUrl
       ) {

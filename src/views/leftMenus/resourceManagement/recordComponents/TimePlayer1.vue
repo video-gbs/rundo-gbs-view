@@ -239,11 +239,11 @@ export default {
           this.timeAutoPlays[i]
         )
           this.$emit('handleChangeTime', i)
-        // if (this.$refs.Timeline) {
-        //   this.$refs.Timeline.setTime(this.time2[i])
-        // } else {
-        //   return
-        // }
+        if (this.$refs.Timeline) {
+          this.$refs.Timeline.setTime(this.time2[i])
+        } else {
+          return
+        }
       }, 1000)
     },
     changeTime() {},
