@@ -412,7 +412,6 @@ import {
   playStop,
   pauseRecordView,
   resumeRecordView,
-  seekRecordView,
   speedRecordView,
   getStreamInfo
 } from '@/api/method/live'
@@ -979,7 +978,15 @@ export default {
     },
 
     handleChangeTime(index) {
-      this.selectTime = Local.get(`showTime${index}`)
+      if (
+        Local.get(`showTime${index}`) === 'Invalid Date' ||
+        !Local.get(`showTime${index}`)
+      ) {
+        this.selectTime = new Date()
+      } else {
+        this.selectTime = Local.get(`showTime${index}`)
+      }
+      // this.selectTime = Local.get(`showTime${index}`) || new Date();
       // console.log('selectTime=========', index,this.selectTime)
     },
     handleChangeTimePicker(val) {
@@ -1007,14 +1014,16 @@ export default {
     closeVideo(i) {
       this.videoUrl.splice(i, 1, '')
       this.timeLists.splice(i, 1, [])
-      this.videoUrl = [...this.videoUrl]
-      this.timeLists = [...this.timeLists]
+      // this.videoUrl = [...this.videoUrl]
+      // this.timeLists = [...this.timeLists]
+
+      console.log('this.videoUrl~~~~~~~~~~~~~~', this.videoUrl)
       this.cloudPlay = this.play = false
       this.$nextTick(() => {
         let emptyPlayerDom = this.$refs.emptyPlayer
-        for (let j = 0; j < emptyPlayerDom.length; j++) {
-          emptyPlayerDom[j].style.height = '100px'
-        }
+        // for (let j = 0; j < emptyPlayerDom.length; j++) {
+        //   emptyPlayerDom[j].style.height = '100px'
+        // }
 
         Local.set(
           `showTime${i}`,
@@ -1034,11 +1043,11 @@ export default {
 
         this.$refs.TimePlayer.stopTimeAutoPlay(i)
 
-        this.stopPlayRecord()
+        this.stopPlayRecord(i)
       })
     },
     // 关闭视频
-    handleCloseVideo(num) {
+    handleCloseVideo() {
       this.cloudPlay = this.play = false
       this.hasStreamId = false
       if (this.tabsActiveName === 'device') {
@@ -1055,7 +1064,7 @@ export default {
       this.$nextTick(() => {
         let emptyPlayerDom = this.$refs.emptyPlayer
         for (let i = 0; i < emptyPlayerDom.length; i++) {
-          emptyPlayerDom[i].style.height = '100px'
+          // emptyPlayerDom[i].style.height = '100px'
 
           this.$refs.TimePlayer.stopTimeAutoPlay(i)
           this.timeSegments[i] = {
@@ -1196,10 +1205,10 @@ export default {
     //视频暂停监听时件
     handleOnPause() {
       // this.play = false;
-      console.log('暂停播放设备视频')
-      if (this.tabsActiveName === 'device') {
-        this.gbPause()
-      }
+      // console.log('暂停播放设备视频')
+      // if (this.tabsActiveName === 'device') {
+      //   this.gbPause()
+      // }
     },
     //监听播放视频事件
     handleOnPlay() {
@@ -1210,7 +1219,7 @@ export default {
     },
 
     // 滚动时间轴事件
-    handleChangePlayTime(curTime, name) {
+    handleChangePlayTime(curTime) {
       const resEndTime = new Date(this.formData.date[1]).getTime()
       const resStartTime = new Date(this.formData.date[0]).getTime()
       this.isNext = false
@@ -1264,7 +1273,7 @@ export default {
           '播放结束或者报错停止设备播放' +
             this.playTime.format('YYYY-MM-DD HH:mm:ss')
         )
-        this.closeVideo(this.playerIdx)
+        // this.closeVideo(this.playerIdx)
         const [startTime, endTime] = this.currentList.split('_')
         if (this.playTime.isBetween(startTime, endTime)) {
           //如果当前没有播完，就停了继续播
@@ -1316,6 +1325,8 @@ export default {
         this.$refs.cloudPlayer[this.playerIdx] &&
           this.$refs.cloudPlayer[this.playerIdx].pause()
         this.hasStreamId = false
+
+        this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
       } else if (
         this.tabsActiveName === 'device' ? this.videoUrl : this.cloudPlayerUrl
       ) {
@@ -1407,10 +1418,10 @@ export default {
         this.getCloudRecordVideo(date)
       }
     },
-    stopPlayRecord: function (callback) {
+    stopPlayRecord: function (i) {
       if (!this.streamId) return
       this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
-      this.videoUrl = ['']
+      // this.videoUrl = ['']
     },
 
     playRecord: (function () {
@@ -1513,6 +1524,7 @@ export default {
 
     videoClick(i) {
       this.playerIdx = i - 1
+      this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
     }
   },
   watch: {
@@ -1719,7 +1731,7 @@ export default {
 
   .empty-player {
     width: 200px;
-    height: 100px;
+    height: 100px !important;
     background: url('../../../../assets/imgs/player_logo.png') center/cover
       no-repeat;
   }
