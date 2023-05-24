@@ -1501,7 +1501,7 @@ export default {
         streamId: this.streamId
       }).then((res) => {
         if (res.code === 0) {
-          this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+          // this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
           this.isClickCx = false
         }
       })
