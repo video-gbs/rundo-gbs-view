@@ -156,7 +156,7 @@
 
                     <div class="player-header">
                       <span class="head-left">{{
-                        recordLeftTopName[playerIdx]
+                        recordLeftTopName[i - 1]
                       }}</span>
                       <div class="head-right">
                         <i
@@ -436,7 +436,7 @@ export default {
     return {
       isClickCx: true,
       spilt: 1, //分屏
-      recordLeftTopName: [''],
+      recordLeftTopName: [],
       spiltIndex: 0,
       playerIdx: 0, //激活播放器
       playerData: [], //播放器数据
@@ -1204,11 +1204,11 @@ export default {
     },
     //视频暂停监听时件
     handleOnPause() {
-      // this.play = false;
-      // console.log('暂停播放设备视频')
-      // if (this.tabsActiveName === 'device') {
-      //   this.gbPause()
-      // }
+      this.play = false
+      console.log('暂停播放设备视频')
+      if (this.tabsActiveName === 'device') {
+        this.gbPause()
+      }
     },
     //监听播放视频事件
     handleOnPlay() {
