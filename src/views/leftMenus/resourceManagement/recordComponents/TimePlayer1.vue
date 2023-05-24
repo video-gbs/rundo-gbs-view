@@ -2,7 +2,7 @@
   <div class="container">
     <div class="timeLine">
       <TimeLine
-        ref="Timeline"
+        :ref="'Timeline' + setIntervalNum"
         :initTime="time2[setIntervalNum]"
         @timeChange="timeChange"
         :timeSegments="childTimeSegments"
@@ -192,7 +192,6 @@ export default {
     },
     playerTimes(val) {},
     timeSegments(val) {
-      console.log('timeSegments==========', val)
       this.childTimeSegments = [
         {
           name: '',
@@ -239,8 +238,10 @@ export default {
           this.timeAutoPlays[i]
         )
           this.$emit('handleChangeTime', i)
-        if (this.$refs.Timeline) {
-          this.$refs.Timeline.setTime(this.time2[i])
+
+        // console.log('this.$refs',this.$refs)
+        if (this.$refs['Timeline' + i]) {
+          this.$refs['Timeline' + i].setTime(this.time2[i])
         } else {
           return
         }
@@ -279,7 +280,7 @@ export default {
         this.scope = Object.values(SHOW_TIME_SCOPE)[this.scope.index + i]
 
         this.$nextTick(() => {
-          this.$refs.Timeline.setZoom(this.scope.value)
+          this.$refs['Timeline' + this.setIntervalNum].setZoom(this.scope.value)
         })
       }
     },
@@ -291,12 +292,6 @@ export default {
       this.$emit('gbPlay')
     },
     changePlayerTimes(val, index) {
-      console.log(
-        'changePlayerTimes-----------------',
-        val,
-        index,
-        this.childTimeSegments
-      )
       this.$nextTick(() => {
         this.time2[index] = val ? new Date(val[0]).getTime() : 0
         this.childTimeSegments[0].beginTime = new Date(
