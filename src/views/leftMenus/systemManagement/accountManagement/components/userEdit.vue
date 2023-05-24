@@ -369,6 +369,8 @@ export default {
         children: 'children',
         label: 'orgName'
       },
+      // isCheckedId: '',
+      isChecked: false,
       form: {
         userAccount: '',
         password: '',
@@ -508,6 +510,14 @@ export default {
     },
 
     handleSelect(selection, row) {
+      if (selection.length === 0) {
+        // this.isCheckedId = row.id
+
+        this.isChecked = true
+      } else {
+        this.isChecked = false
+      }
+
       // 取消单个勾选时，删除对应属性
       if (!selection.some((item) => item.id === row.id)) {
         delete this.selectedObj[row.id]
@@ -562,6 +572,9 @@ export default {
                 this.form1.phone = phone
                 this.form.rePassword = rePassword
                 this.form.roleIds = roleIds
+
+                this.selectedData = roleIds
+
                 this.form.userAccount = userAccount
                 this.form.userName = userName
                 this.Id = orgId
@@ -575,7 +588,7 @@ export default {
                 // arr.forEach((item) => {
                 //   for (let j in this.form.roleIds) {
                 //     //console.log(arr[j])
-                //     if (item.id == this.form.roleIds[j]) {
+                //     if (item.id === this.form.roleIds[j]) {
                 //       //把对应的数据回显的时候，勾选上
                 //       this.$nextTick(() => {
                 //         this.$refs.userTable.toggleRowSelection(item, true)
@@ -584,6 +597,16 @@ export default {
                 //     }
                 //   }
                 // })
+
+                if (!this.isChecked) {
+                  arr.forEach((item) => {
+                    if (this.selectedData.includes(item.id)) {
+                      this.$nextTick(() => {
+                        this.$refs.userTable.toggleRowSelection(item, true)
+                      })
+                    }
+                  })
+                }
               }
             })
           }
@@ -630,6 +653,7 @@ export default {
               type: 'success',
               message: '编辑成功'
             })
+            this.isChecked = false
             this.goback()
           }
         })
