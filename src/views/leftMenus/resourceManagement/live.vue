@@ -1620,7 +1620,7 @@ export default {
 
   .empty-player {
     width: 200px;
-    height: 100px;
+    height: 100px !important;
     background: url('../../../assets/imgs/player_logo.png') center/cover
       no-repeat;
   }

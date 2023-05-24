@@ -144,6 +144,10 @@ export default {
       type: Number,
       default: 0
     },
+    clickedPbPause: {
+      type: Boolean,
+      default: false
+    },
     timeSegments: {
       type: Array,
       default: function () {
@@ -175,6 +179,8 @@ export default {
         this.time2.forEach((item) => {
           item = new Date()
         })
+        this.changeChildTimeSegments()
+
         // this.timeAutoPlay(newVal)
 
         // this.$emit('handleChangeTime', newVal)
@@ -188,10 +194,15 @@ export default {
           : 0
         this.$forceUpdate()
       })
-      // console.log()
+
+      console.log(
+        'this.childTimeSegments!!!!!!!!!!!!!!!!!!!!!',
+        this.childTimeSegments
+      )
     },
     playerTimes(val) {},
     timeSegments(val) {
+      console.log('timeSegments==========', val)
       this.childTimeSegments = [
         {
           name: '',
@@ -208,17 +219,23 @@ export default {
       // console.log('setIntervalNum,=====', val)
     },
     childTimeSegments(val) {},
-    time2(val) {
-      console.log('time2,', val)
+    clickedPbPause(val) {
+      this.resClickedPbPause = val
     },
 
     immediate: true,
     deep: true
   },
   created() {},
-  mounted() {},
+  mounted() {
+    console.log('mounted!!!!!!!!!!!!!!!!!!!!!', this.childTimeSegments)
+    this.resClickedPbPause = this.$props.clickedPbPause
+  },
   methods: {
     timeAutoPlay(i) {
+      // if (this.resClickedPbPause) {
+      //   return
+      // }
       this.$emit('handleChangeTime', i)
       this.setIntervalNum = i
       if (this.timeAutoPlays[this.setIntervalNum]) {
@@ -280,6 +297,10 @@ export default {
         this.scope = Object.values(SHOW_TIME_SCOPE)[this.scope.index + i]
 
         this.$nextTick(() => {
+          console.log(
+            'this.$refs',
+            this.$refs['Timeline' + this.setIntervalNum]
+          )
           this.$refs['Timeline' + this.setIntervalNum].setZoom(this.scope.value)
         })
       }
@@ -292,6 +313,12 @@ export default {
       this.$emit('gbPlay')
     },
     changePlayerTimes(val, index) {
+      console.log(
+        'changePlayerTimes-----------------',
+        val,
+        index,
+        this.childTimeSegments
+      )
       this.$nextTick(() => {
         this.time2[index] = val ? new Date(val[0]).getTime() : 0
         this.childTimeSegments[0].beginTime = new Date(

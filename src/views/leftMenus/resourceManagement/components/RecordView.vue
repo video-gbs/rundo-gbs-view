@@ -183,6 +183,7 @@
                   @initSelectTime="initSelectTime"
                   @onChange="handleChangePlayTime"
                   :playerIdx="playerIdx"
+                  :clickedPbPause="clickedPbPause"
                   :timeSegments="timeSegments"
                   @handleCloseVideo="handleCloseVideo"
                   @gbPlay="gbPlay"
@@ -650,7 +651,8 @@ export default {
         : 0,
       ScurrentPage: this.$route.params.ScurrentPage,
       isNext: true,
-      timeSegments: []
+      timeSegments: [],
+      clickedPbPause: false
     }
   },
   created() {},
@@ -1486,6 +1488,7 @@ export default {
         streamId: this.streamId
       }).then((res) => {
         if (res.code === 0) {
+          this.clickedPbPause = false
           this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
           this.isClickCx = true
         }
@@ -1501,7 +1504,8 @@ export default {
         streamId: this.streamId
       }).then((res) => {
         if (res.code === 0) {
-          // this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+          this.clickedPbPause = true
+          this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
           this.isClickCx = false
         }
       })
@@ -1525,7 +1529,12 @@ export default {
 
     videoClick(i) {
       this.playerIdx = i - 1
-      this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
+      if (!this.clickedPbPause) {
+        this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
+        // this.play = true
+      } else {
+        // this.play = false
+      }
     }
   },
   watch: {
