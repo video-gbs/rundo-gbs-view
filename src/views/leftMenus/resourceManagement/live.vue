@@ -639,10 +639,6 @@ export default {
             this.is3d = false
           }
           this.rect = false
-          // this.rectInfo.rectWidth = 0
-          // this.rectInfo.rectHeight = 0
-          // this.rectInfo.rectCenterOffsetX = 0
-          // this.rectInfo.rectCenterOffsetY = 0
           this.$refs.videoBox[index].addEventListener('mousedown', this.down)
           this.$refs.videoBox[index].addEventListener('mousemove', this.move)
         } else {
@@ -662,7 +658,8 @@ export default {
     },
     // 鼠标按下
     down($event) {
-      if (!this.rect) {
+      console.log('鼠标按下', $event, this.rect)
+      if (!this.rect && this.rect !== null) {
         // 获取鼠标按下时的坐标位置
         this.downX = $event.clientX
         this.downY = $event.clientY
@@ -1204,6 +1201,8 @@ export default {
       this.$on('closeAll')
       this.videoUrl = []
       this.videoUrl = [...this.videoUrl]
+      this.rect = null
+      this.is3d = false
       this.playerData = []
       this.childOptionLists = []
       window.localStorage.setItem('flvCloudId', JSON.stringify([]))
@@ -1223,11 +1222,12 @@ export default {
       }
     },
     closeVideo(i) {
-      console.log('i=======================', i)
       this.videoUrl.splice(i, 1, '')
       this.videoUrl = [...this.videoUrl]
       this.playerData = []
       this.childOptionLists = []
+      this.rect = null
+      this.is3d = false
     },
     async getDeviceList(id, name) {
       Local.set('cloudId', id)

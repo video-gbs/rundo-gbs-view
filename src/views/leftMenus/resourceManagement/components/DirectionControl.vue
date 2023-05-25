@@ -318,13 +318,19 @@ export default {
   mounted() {},
   methods: {
     click3dBtn(type, index) {
+      console.log(this.lengthX, this.lengthY)
       if (type === 1) {
         this.type3d[index] = true
         this.$listeners.rectZoomInit(index, this.type3d[index], '3d')
         this.is3DHover = false
       } else {
         this.type3d[index] = false
-        if (this.lengthX > 0 && this.lengthX > 0) {
+        if (
+          this.lengthX > 0 &&
+          this.lengthY > 0 &&
+          this.midPointX &&
+          this.midPointY
+        ) {
           this.ptzEnlarge(
             2,
             this.lengthX,
