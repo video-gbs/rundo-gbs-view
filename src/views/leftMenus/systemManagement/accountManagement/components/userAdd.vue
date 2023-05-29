@@ -207,6 +207,9 @@
             ref="userTable"
             class="table-content-bottom"
             :data="tableData"
+            row-key="id"
+            @selection-change="handleSelectChange"
+            @select="handleSelect"
             border
             :header-cell-style="{
               background: 'rgba(0, 75, 173, 0.06)',
@@ -341,6 +344,8 @@ export default {
     }
     return {
       tableData: [],
+      selectedObj: {},
+      selectedData: [],
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -495,6 +500,7 @@ export default {
         .then((res) => {
           if (res.code === 0) {
             this.tableData = res.data.records
+            this.handleRowSelection(this.tableData)
             this.params.total = res.data.total
             this.params.pages = res.data.pages
             this.params.current = res.data.current
@@ -504,16 +510,40 @@ export default {
           console.log(error)
         })
     },
-    // handleSelectionChange(val) {
-    //   if (val.length > 1) {
-    //     val.map((item) => {
-    //       this.roleIds.push(item.id)
-    //     })
+    handleSelectChange(selection) {
+      // 全选取消，删除当前页所有数据
+      if (selection.length === 0) {
+        this.tableData.forEach((item) => {
+          delete this.selectedObj[item.id]
+        })
+      }
+      // 勾选数据 添加
+      selection.forEach((item) => {
+        this.selectedObj[item.id] = item
+      })
+      // 获取所有分页勾选的数据
+      this.selectedData = []
+      for (const key in this.selectedObj) {
+        this.selectedData.push(this.selectedObj[key])
+      }
+    },
 
-    //     this.roleIds = [...new Set(this.roleIds)]
-    //     console.log('this.roleIds', this.roleIds)
-    //   }
-    // },
+    handleSelect(selection, row) {
+      // 取消单个勾选时，删除对应属性
+      if (!selection.some((item) => item.id === row.id)) {
+        delete this.selectedObj[row.id]
+      }
+    },
+    // 处理当前列表选中状态
+    handleRowSelection(data) {
+      data.forEach((item) => {
+        if (this.selectedObj[item.id]) {
+          this.$nextTick(() => {
+            this.$refs.userTable.toggleRowSelection(item)
+          })
+        }
+      })
+    },
 
     handlePasswordCheck(password, rePassword) {
       if (!password) {
@@ -542,7 +572,7 @@ export default {
         }
         this.form.orgId = this.Id
         const roleIds = []
-        this.$refs.userTable.selection.map((item) => {
+        this.selectedData.map((item) => {
           roleIds.push(item.id)
         })
         addUser({ roleIds, ...this.form, ...this.form1 }).then((res) => {

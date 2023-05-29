@@ -90,6 +90,7 @@
                           class="addRoleTree"
                           show-checkbox
                           node-key="id"
+                          :check-strictly="true"
                           :props="getDefaultProps(index)"
                           :default-expand-all="true"
                           highlight-current

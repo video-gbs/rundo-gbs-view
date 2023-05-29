@@ -2,8 +2,8 @@
   <div class="container">
     <div class="timeLine">
       <TimeLine
-        ref="Timeline"
-        :initTime="time2"
+        :ref="'Timeline' + setIntervalNum"
+        :initTime="time2[setIntervalNum]"
         @timeChange="timeChange"
         :timeSegments="childTimeSegments"
         @dragTimeChange="dragTimeChange"
@@ -89,8 +89,7 @@ export default {
   data() {
     return {
       scope: SHOW_TIME_SCOPE.H24,
-      time2: 0,
-      resTime2: [],
+      time2: [],
       zoom: 5,
       zoomList: [
         '半小时',
@@ -145,6 +144,10 @@ export default {
       type: Number,
       default: 0
     },
+    clickedPbPause: {
+      type: Boolean,
+      default: false
+    },
     timeSegments: {
       type: Array,
       default: function () {
@@ -152,100 +155,127 @@ export default {
       }
     }
   },
+  computed: {},
   watch: {
     playerIdx(newVal) {
-      console.log('playerIdx===========', newVal, this.$props.timeSegments)
-      // if (
-      //   this.$props.timeLists[newVal] &&
-      //   newVal < this.$props.timeLists.length
-      // ) {
-      //   console.log('进来')
-      //   // this.changePlayerTimes(this.$props.timeLists[newVal], newVal)
-      //   // this.time2[newVal] = new Date(Local.get(`showTime${newVal}`)).getTime()
-      // } else {
-      //   console.log(
-      //     'this.childTimeSegments---------------------',
-      //     this.childTimeSegments,
-      //     this.$props.timeSegments
-      //   )
-      // }
+      this.setIntervalNum = newVal
 
-      this.childTimeSegments[0].beginTime = this.$props.timeSegments[newVal]
-        ? new Date(this.$props.timeSegments[newVal].beginTime).getTime()
-        : 0
-      this.childTimeSegments[0].endTime = this.$props.timeSegments[newVal]
-        ? new Date(this.$props.timeSegments[newVal].endTime).getTime()
-        : 0
+      console.log('playerIdx===========', newVal, this.timeAutoPlays)
+      //
+      if (
+        this.$props.timeLists[newVal] &&
+        newVal < this.$props.timeLists.length &&
+        this.timeAutoPlays[newVal]
+      ) {
+        console.log('点击的画面有视频~~~~~~~~~~~~~~~~~~~~~~~~')
+        this.time2[newVal] = new Date(Local.get(`showTime${newVal}`)).getTime()
+        // this.$set(
+        //   this.time2,
+        //   newVal,
+        //   new Date(Local.get(`showTime${newVal}`)).getTime()
+        // )
+      } else {
+        console.log('点击的画面没有视频!!!!!!!!!!!!!!!!!!!!!')
+        this.time2.forEach((item) => {
+          item = new Date()
+        })
+        this.changeChildTimeSegments()
 
-      console.log('this.resTime2', this.resTime2)
+        // this.timeAutoPlay(newVal)
 
-      // this.time2 = this.resTime2[newVal]
+        // this.$emit('handleChangeTime', newVal)
+      }
+      this.$nextTick(() => {
+        this.childTimeSegments[0].beginTime = this.$props.timeSegments[newVal]
+          ? new Date(this.$props.timeSegments[newVal].beginTime).getTime()
+          : 0
+        this.childTimeSegments[0].endTime = this.$props.timeSegments[newVal]
+          ? new Date(this.$props.timeSegments[newVal].endTime).getTime()
+          : 0
+        this.$forceUpdate()
+      })
+
+      console.log(
+        'this.childTimeSegments!!!!!!!!!!!!!!!!!!!!!',
+        this.childTimeSegments
+      )
     },
     playerTimes(val) {},
     timeSegments(val) {
-      this.resTime2 = []
-      val.map((item, index) => {
-        this.resTime2[index] = item.beginTime
-      })
+      console.log('timeSegments==========', val)
+      this.childTimeSegments = [
+        {
+          name: '',
+          beginTime: 0,
+          endTime: 0,
+          color: '#4797FF',
+          startRatio: 0.65,
+          endRatio: 0.9
+        }
+      ]
     },
     initTimeLists(val) {},
+    setIntervalNum(val) {
+      // console.log('setIntervalNum,=====', val)
+    },
     childTimeSegments(val) {},
-    time2(val) {
-      // console.log('time2,', val)
+    clickedPbPause(val) {
+      this.resClickedPbPause = val
     },
 
     immediate: true,
     deep: true
   },
   created() {},
-  mounted() {},
+  mounted() {
+    console.log('mounted!!!!!!!!!!!!!!!!!!!!!', this.childTimeSegments)
+    this.resClickedPbPause = this.$props.clickedPbPause
+  },
   methods: {
-    changeTime2(val, index) {
-      console.log(val, index)
-      this.time2 = val
-    },
     timeAutoPlay(i) {
+      // if (this.resClickedPbPause) {
+      //   return
+      // }
+      this.$emit('handleChangeTime', i)
       this.setIntervalNum = i
-      this.timeAutoPlays[i] = setInterval(this.changeTime, 1000)
-    },
-    changeTime() {
-      this.time2 += Local.get('playbackRate') * 1000
-
-      // console.log('this.time2~~~~~~~~~~~', this.time2)
-
-      // Local.set(
-      //   `showTime${this.setIntervalNum}`,
-      //   dayjs(this.time2).format('YYYY-MM-DD HH:mm:ss')
-      // )
-
-      this.$emit('handleChangeTime', this.setIntervalNum)
-
-      if (
-        this.time2 >=
-        new Date(this.$props.timeLists[this.setIntervalNum][1]).getTime()
-      ) {
-        // this.stopTimeAutoPlay(this.setIntervalNum)
-        this.$emit('handleCloseVideo', this.setIntervalNum)
+      if (this.timeAutoPlays[this.setIntervalNum]) {
+        clearInterval(this.timeAutoPlays[this.setIntervalNum])
       }
-      if (this.$refs.Timeline) {
-        this.$refs.Timeline.setTime(this.time2)
-      } else {
-        return
-      }
+      this.timeAutoPlays[i] = setInterval(() => {
+        this.time2[i] += Local.get('playbackRate') * 1000
+
+        Local.set(
+          `showTime${i}`,
+          dayjs(this.time2[i]).format('YYYY-MM-DD HH:mm:ss')
+        )
+        if (
+          i === this.$props.playerIdx &&
+          this.$props.timeLists[i] &&
+          i < this.$props.timeLists.length &&
+          this.timeAutoPlays[i]
+        )
+          this.$emit('handleChangeTime', i)
+
+        // console.log('this.$refs',this.$refs)
+        if (this.$refs['Timeline' + i]) {
+          this.$refs['Timeline' + i].setTime(this.time2[i])
+        } else {
+          return
+        }
+      }, 1000)
     },
-    closeChangeTime(i) {
-      this.time2 = 0
-      // Local.set(`showTime${i}`, dayjs(this.time2).format('YYYY-MM-DD HH:mm:ss'))
-    },
+    changeTime() {},
+
     stopTimeAutoPlay(index) {
       console.log('关闭视频进来停止定时器')
       clearInterval(this.timeAutoPlays[index])
       this.timeAutoPlays[index] = null
     },
-    changeChildTimeSegments(index) {
-      this.childTimeSegments[index].beginTime = 0
 
-      this.childTimeSegments[index].endTime = 0
+    changeChildTimeSegments() {
+      this.childTimeSegments[0].beginTime = 0
+
+      this.childTimeSegments[0].endTime = 0
 
       console.log('this.childTimeSegments---------', this.childTimeSegments)
 
@@ -253,8 +283,12 @@ export default {
     },
     // 显示时间段
     timeChange(t) {
-      // this.time2 = t
-      // Local.set('showTime', dayjs(this.time2).format('YYYY-MM-DD HH:mm:ss'))
+      // console.log('显示时间段',this.time2,this.setIntervalNum,t)
+      // this.time2[this.setIntervalNum] = t
+      // Local.set(
+      //   `showTime${this.setIntervalNum}`,
+      //   dayjs(this.time2[this.setIntervalNum]).format('YYYY-MM-DD HH:mm:ss')
+      // )
     },
 
     handleControlScope(i) {
@@ -263,13 +297,15 @@ export default {
         this.scope = Object.values(SHOW_TIME_SCOPE)[this.scope.index + i]
 
         this.$nextTick(() => {
-          this.$refs.Timeline.setZoom(this.scope.value)
+          console.log(
+            'this.$refs',
+            this.$refs['Timeline' + this.setIntervalNum]
+          )
+          this.$refs['Timeline' + this.setIntervalNum].setZoom(this.scope.value)
         })
       }
     },
     dragTimeChange(time) {
-      this.stopTimeAutoPlay()
-      Local.set('showTime', dayjs(time).format('YYYY-MM-DD HH:mm:ss'))
       this.$emit('handleChangeTime', this.$props.playerIdx)
 
       this.$emit('onChange', time, '拖拽')
@@ -284,16 +320,36 @@ export default {
         this.childTimeSegments
       )
       this.$nextTick(() => {
-        this.time2 = val ? new Date(val[0]).getTime() : 0
-        this.childTimeSegments[0].beginTime = new Date(val[0]).getTime()
-        this.childTimeSegments[0].endTime = new Date(val[1]).getTime()
+        this.time2[index] = val ? new Date(val[0]).getTime() : 0
+        this.childTimeSegments[0].beginTime = new Date(
+          this.$props.timeSegments[index].beginTime
+        ).getTime()
+        this.childTimeSegments[0].endTime = new Date(
+          this.$props.timeSegments[index].endTime
+        ).getTime()
+
+        this.$forceUpdate()
+      })
+    },
+
+    spiltChangePlayerTimes(val, index) {
+      this.$nextTick(() => {
+        this.time2[index] = val ? new Date(val[0].beginTime).getTime() : 0
+        this.childTimeSegments[0].beginTime = new Date(
+          this.$props.timeSegments[index].beginTime
+        ).getTime()
+        this.childTimeSegments[0].endTime = new Date(
+          this.$props.timeSegments[index].endTime
+        ).getTime()
 
         this.$forceUpdate()
       })
     }
   },
   destroyed() {
-    clearInterval(this.timeAutoPlays)
+    this.timeAutoPlays.forEach((item) => {
+      clearInterval(item)
+    })
     Local.set('playbackRate', 1)
   }
 }

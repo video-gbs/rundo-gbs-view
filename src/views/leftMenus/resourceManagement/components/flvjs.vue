@@ -36,7 +36,7 @@
       :onOpenControl="handleOpenControl"
       :showControl="showControl"
       :isShowStream="isShowStream"
-      :onShowStream="handleShowStream"
+      @handleShowStream="handleShowStream"
       :onBoxSelection="handBoxSelection"
       :hasAudio="hasAudio"
       v-bind="$attrs"
@@ -184,6 +184,7 @@ export default {
     playerIdx(val) {
       this.resPlayerIdx = val
       Local.set('resPlayerIdx', val)
+      console.log('playerIdx~~~~~~~~~~~', val, this.resPlayerIdx)
       // this.resShowContent.map((item, index) => {
       //   if (item && item !== '' && item.length > 0) {
       //     if (index === this.resPlayerIdx) {
@@ -213,9 +214,12 @@ export default {
         }
       })
     },
-    handleShowStream() {
+    handleShowStream(i) {
       if (!this.isShowStream) {
-        this.getStreamInfo()
+        this.$emit('videoClick', i + 1)
+        this.$nextTick(() => {
+          this.getStreamInfo()
+        })
       } else {
         this.isShowStream = !this.isShowStream
       }
