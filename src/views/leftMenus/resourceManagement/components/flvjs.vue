@@ -1,6 +1,7 @@
 <template>
   <div class="video-box-container">
     <video
+      ref="testVideo"
       class="video-player"
       autoplay
       :style="stretch ? 'object-fit: fill' : ''"
@@ -74,6 +75,7 @@ import flvjs from 'flv.js'
 import DirectionControl from './DirectionControl'
 import { getStreamInfo } from '@/api/method/live'
 import { Local } from '@/utils/storage'
+import moment from 'moment'
 
 const IS_CONTROL_TYPES = [1, 4] //有云台功能的ptztype
 
@@ -162,6 +164,23 @@ export default {
     this.$nextTick(async () => {
       this.setsrc()
     })
+
+    // const video = this.$refs.testVideo
+
+    // video.addEventListener('play', (e) => {
+    //   console.log('play===========', e)
+    // })
+    // video.addEventListener('timeupdate', (e) => {
+    //   // const duration = moment.duration(video.currentTime, 'seconds')
+    //   // const formattedTime = moment
+    //   //   .utc(duration.as('milliseconds'))
+    //   //   .format('HH:mm:ss')
+    //     // console.log('timeupdate===========', e,moment(Math.floor(video.currentTime * 1000)).format('YYYY-MM-DD HH:mm:ss'))
+    //   // console.log('timeupdate===========',formattedTime)
+    // })
+    // video.addEventListener('seeked', (e) => {
+    //   console.log('seeked===========', e)
+    // })
   },
   watch: {
     '$props.videoUrl': {
@@ -201,6 +220,16 @@ export default {
   },
   computed() {},
   methods: {
+    // getFrameRate() {
+    //   const video = this.$refs.testVideo
+    //   const time = video.currentTime
+    //   const totalFrames = Math.round(video.duration * video.fps)
+    //   const currentFrame = Math.round(time * video.fps)
+
+    //   console.log(
+    //     `当前时间：${time}，视频总帧数：${totalFrames}，当前帧数：${currentFrame}`
+    //   )
+    // },
     //获取码流信息
     async getStreamInfo() {
       this.tracks = []
@@ -273,6 +302,7 @@ export default {
 
           //视频出错后销毁重新创建
           if (that.flvPlayer) {
+            console.log('that.flvPlayer~~~~~~~~~~~~~~~~~~', that.flvPlayer)
             that.flvPlayer.pause()
             that.flvPlayer.unload()
             that.flvPlayer.detachMediaElement()
@@ -366,8 +396,8 @@ export default {
           }
 
           if (videoElement.paused) {
-            // console.info("重新播放")
-            // that.flvPlayer.play()
+            console.info('重新播放')
+            that.flvPlayer.play()
           }
 
           that.prevEnd = end
