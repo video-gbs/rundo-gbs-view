@@ -1,5 +1,11 @@
 <template>
   <div id="devicePosition" style="height: 100%; width: 100%">
+    <!-- <div id="mydiv">
+      <div id="mydiv1"></div>
+    </div> -->
+    <!-- <div class="box-container" ref="container" @mousedown="onMouseDown">
+    <div class="box" :style="boxStyles"></div>
+  </div> -->
     <el-container style="height: 100%">
       <el-main
         style="display: flex; flex-direction: column"
@@ -342,6 +348,12 @@ export default {
   },
   data() {
     return {
+      // startPoint:'',
+      // dragRect:'',
+      // startX: 0, // 鼠标按下时的横坐标
+      // startY: 0, // 鼠标按下时的纵坐标
+      // endX: 0,   // 鼠标松开时的横坐标
+      // endY: 0,   // 鼠标松开时的纵坐标
       is3d: false,
       channelExpansionId: [],
       videoZoomShow: false,
@@ -476,6 +488,17 @@ export default {
   },
   mounted() {
     this.init()
+    // document.addEventListener('mousedown', (event) => {
+    //   if (event.button !== 0) return // 只响应左键操作
+
+    //   this.startPoint = { x: event.clientX, y: event.clientY }
+
+    //   console.log('this.startPoint',this.startPoint)
+    //   this.dragRect = null
+
+    //   document.addEventListener('mousemove', this.onMouseMove)
+    //   document.addEventListener('mouseup', this.onMouseUp)
+    // })
 
     document.addEventListener('fullscreenchange', (e) => {
       // 监听到屏幕变化，更改全屏状态，该页面不能存在多个全屏元素
@@ -510,6 +533,14 @@ export default {
         return { width: '25%', height: '25%' }
       }
     }
+    // boxStyles() {
+    //   return {
+    //     top: `${Math.min(this.startY, this.endY)}px`,
+    //     left: `${Math.min(this.startX, this.endX)}px`,
+    //     width: `${Math.abs(this.endX - this.startX)}px`,
+    //     height: `${Math.abs(this.endY - this.startY)}px`
+    //   }
+    // }
   },
   watch: {
     filterText(val) {
@@ -580,6 +611,54 @@ export default {
     document.removeEventListener('fullscreenchange', () => {})
   },
   methods: {
+    // onMouseDown(event) {
+    //   // 只在左键按下时响应事件
+    //   if (event.button === 0) {
+    //     this.startX = event.pageX;
+    //     this.startY = event.pageY;
+    //     document.addEventListener('mousemove', this.onMouseMove);
+    //     document.addEventListener('mouseup', this.onMouseUp);
+    //   }
+    // },
+    // onMouseMove(event) {
+    //   this.endX = event.pageX;
+    //   this.endY = event.pageY;
+    // },
+    // onMouseUp(event) {
+    //   document.removeEventListener('mousemove', this.onMouseMove);
+    //   document.removeEventListener('mouseup', this.onMouseUp);
+    // },
+    // onMouseMove(event) {
+
+    //     const testDom = document.getElementById('mydiv1')
+
+    //     const rect = testDom.getBoundingClientRect()
+    //   if (!this.startPoint) return
+
+    //   if (!this.dragRect) {
+    //     // 创建拖拽矩形
+    //     this.dragRect = {
+    //       left: Math.min(this.startPoint.x, event.clientX) - rect.left,
+    //       top: Math.min(this.startPoint.y, event.clientY) - rect.top,
+    //       width: 0,
+    //       height: 0,
+    //       background: 'red'
+    //     }
+    //   }
+    //   // 更新拖拽矩形的大小
+    //   this.dragRect.width = Math.abs(event.clientX - this.startPoint.x)
+    //   this.dragRect.height = Math.abs(event.clientY - this.startPoint.y)
+
+    //   // 更新样式
+    //   testDom.style.clipPath = `inset(${this.dragRect.top}px ${
+    //     rect.width - this.dragRect.left - this.dragRect.width
+    //   }px ${rect.height - this.dragRect.top - this.dragRect.height}px ${this.dragRect.left}px)`
+    // },
+
+    // onMouseUp() {
+    //   document.removeEventListener('mousemove', this.onMouseMove)
+    //   document.removeEventListener('mouseup', this.onMouseUp)
+    // },
     async init() {
       await getVideoAraeTree()
         .then((res) => {
@@ -1420,6 +1499,27 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+// #mydiv {
+//   width: 800px;
+//   height: 600px;
+//   background: #000;
+
+// }
+// #mydiv1 {
+//   width: 100%;
+//   height: 100%;
+//   background: #fff;
+
+// }
+// .box-container {
+//   position: relative;
+//   width: 600px;
+//   height: 400px;
+// }
+// .box {
+//   position: absolute;
+//   border: 1px dashed #000;
+// }
 .test-div {
   width: 16px;
   height: 18px;
