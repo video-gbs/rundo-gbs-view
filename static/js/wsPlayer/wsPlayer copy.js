@@ -17,7 +17,7 @@ wsPlayer.prototype.startRecord = function () {
 
     this.isRecord = true;
     this.recordArr.push(this.fristBuffer);
-    
+
     // const blobUrl = window.URL.createObjectURL(new Blob(new Uint8Array(this.recordArr)), {'type': 'application/octet-stream'});
 }
 
@@ -49,6 +49,7 @@ wsPlayer.prototype.endRecord = function () {
 }
 
 wsPlayer.prototype.open = function () {
+  debugger
     let sourcebuffer = null;
 
     this.isRecord = false;
@@ -61,7 +62,7 @@ wsPlayer.prototype.open = function () {
     let firstMessage = true;
 
     let messageIndex = 0;
-    
+
     let demux_moov = function (info) {
         let codecs = [];
         for (let i = 0; i < info.tracks.length; i++) {
@@ -73,7 +74,7 @@ wsPlayer.prototype.open = function () {
         let mediasource = new MediaSource();
         video.src = URL.createObjectURL(mediasource);
         this.videoSrc = video.src;
-        
+
         let pre_pos = 0;
         mediasource.onsourceopen = function() {
             sourcebuffer = mediasource.addSourceBuffer('video/mp4; codecs="' + codecs.join(', ') + '"');
@@ -132,7 +133,7 @@ wsPlayer.prototype.open = function () {
     this.ws.onmessage = function(e) {
 
         messageIndex++;
-        
+
         // if (messageIndex > 1 && messageIndex < 3) {
         //     this.fristBuffer = e.data;
         //     this.recordArr.push(this.fristBuffer);
