@@ -181,7 +181,7 @@
                   :timeLists="timeLists"
                   @handleChangeTime="handleChangeTime"
                   @initSelectTime="initSelectTime"
-                  @onChange="handleChangePlayTime"
+                  @handleChangePlayTime="handleChangePlayTime"
                   :playerIdx="playerIdx"
                   :clickedPbPause="clickedPbPause"
                   :timeSegments="timeSegments"
@@ -518,9 +518,6 @@ export default {
       ZOOM_TYPE: ZOOM_TYPE,
       recordStartTime: null,
       cloudRecordStartTime: null,
-      toolDateTime: new Date(),
-      dateValue: new Date(),
-      // cloundDateValue: new Date(),
       tabsActiveName: this.$route.params.type || 'device',
       formData: {
         type: '',
@@ -589,48 +586,16 @@ export default {
 
       deviceId: this.$route.params.deviceId,
       channelId: '',
-      selData: {},
       timeLists: [],
-      mediaServerObj: '',
-      hasAudio: false,
-      // videoUrl: '',
       videoUrl: [''],
-      detailFiles: [],
-      mediaServerId: '',
       videoHistory: {
         date: '',
         searchHistoryResult: [] //媒体流历史记录搜索结果
       },
-      cloudSliderMIn: 0,
-      cloudSliderMax: 86400,
-      playTimeHasRecords: [],
       speedArr: [0.25, 0.5, 1.0, 2.0, 4.0],
       currentSpeed: 2,
       isFullScreen: false,
-      recordFile: {
-        app: '',
-        stream: ''
-      },
-      mediaServerPath: '', // 录像path http + 域名+端口
       cloudPlayerUrl: [''],
-      cloudData: [],
-      recordVideoData: [],
-      timeChangeLoading: false,
-      cloudDateOptions: {
-        // 云端录像日期选择器格式
-        disabledDate(time) {
-          return time.getTime() > Date.now() - 8.64e6
-        }
-      },
-      dateFilesObj: {},
-      filerData: {
-        pickerOptions: {
-          disabledDate(time) {
-            return time.getTime() > Date.now() - 8.64e6
-          }
-        }
-      },
-      showBackBtn: false,
       resOnlineState: '',
       recordStreamId: [''],
       recordCloudId: [''],
@@ -652,13 +617,14 @@ export default {
       ScurrentPage: this.$route.params.ScurrentPage,
       isNext: true,
       timeSegments: [],
-      clickedPbPause: false
+      clickedPbPause: false,
+      // 时间聚合
+      resTimeLists: []
     }
   },
   created() {},
 
   mounted() {
-    // console.log('this.$refs.datetimerange1',this.$refs.datetimerange1)
     this.$refs.datetimerange1.placement = 'top'
     this.init()
 
@@ -699,6 +665,47 @@ export default {
     }
   },
   methods: {
+    mergeDatetimeRanges(datetimeRanges) {
+      if (!Array.isArray(datetimeRanges)) return []
+
+      // 转化为 Unix 时间戳并按照开始时间排序
+      const sortedRanges = datetimeRanges
+        .map((range) => ({
+          startTime: Date.parse(range.startTime),
+          endTime: Date.parse(range.endTime)
+        }))
+        .sort((a, b) => a.startTime - b.startTime)
+
+      const merged = [sortedRanges[0]]
+
+      for (let i = 1; i < sortedRanges.length; i++) {
+        const prev = merged[merged.length - 1]
+        const curr = sortedRanges[i]
+
+        if (curr.startTime <= prev.endTime) {
+          // 发生重叠
+          prev.endTime =
+            curr.endTime > prev.endTime ? curr.endTime : prev.endTime
+        } else {
+          // 无重叠，添加到结果中
+          merged.push(curr)
+        }
+      }
+
+      // 转化为日期时间格式
+      const dateFormat = 'YYYY-MM-DD HH:mm:ss'
+      console.log(
+        '最终时间',
+        merged.map((range) => ({
+          startTime: dayjs(range.startTime).format(dateFormat),
+          endTime: dayjs(range.endTime).format(dateFormat)
+        }))
+      )
+      return merged.map((range) => ({
+        startTime: dayjs(range.startTime).format(dateFormat),
+        endTime: dayjs(range.endTime).format(dateFormat)
+      }))
+    },
     async init() {
       await getVideoAraeTree()
         .then((res) => {
@@ -805,22 +812,59 @@ export default {
                 return item
               })
 
+              // 处理时间聚合
+              // const testTime = [
+              //   {
+              //     startTime: '2023-06-06 00:00:00',
+              //     endTime: '2023-06-06 00:30:00'
+              //   },
+              //   {
+              //     startTime: '2023-06-06 01:00:00',
+              //     endTime: '2023-06-06 01:30:00'
+              //   },
+              //   {
+              //     startTime: '2023-06-06 01:00:00',
+              //     endTime: '2023-06-06 02:30:00'
+              //   },
+              //   {
+              //     startTime: '2023-06-06 04:00:00',
+              //     endTime: '2023-06-06 05:30:00'
+              //   }
+              // ]
+              this.resTimeLists = this.mergeDatetimeRanges(listData)
+
               this.deviceVideoList = {
                 [date]: listData
               }
 
-              this.timeSegments[this.playerIdx] = {
-                name: '',
-                beginTime: date[0],
-                endTime: date[1],
-                color: '#4797FF',
-                startRatio: 0.65,
-                endRatio: 0.9
-              }
+              let array1 = []
 
+              let params = {}
+
+              this.resTimeLists.forEach((item, index) => {
+                params = {
+                  name: '',
+                  beginTime: new Date(item.startTime).getTime(),
+                  endTime: new Date(item.endTime).getTime(),
+                  color: '#4797FF',
+                  startRatio: 0.65,
+                  endRatio: 0.9
+                }
+                array1.push(params)
+              })
+
+              this.timeSegments[this.playerIdx] = array1
+
+              console.log(
+                ' this.timeSegments~~~~~~~~~~~~~~~~~~~',
+                this.timeSegments
+              )
               this.hasStreamId = true
 
-              this.playRecord(1, date)
+              this.playRecord(1, date, [
+                this.resTimeLists[0].startTime,
+                this.resTimeLists[this.resTimeLists.length - 1].endTime
+              ])
             } else {
               this.$message({
                 message: '设备没有录像数据',
@@ -988,8 +1032,6 @@ export default {
       } else {
         this.selectTime = Local.get(`showTime${index}`)
       }
-      // this.selectTime = Local.get(`showTime${index}`) || new Date();
-      // console.log('selectTime=========', index,this.selectTime)
     },
     handleChangeTimePicker(val) {
       // Local.set('showTime', val)
@@ -1016,17 +1058,10 @@ export default {
     closeVideo(i) {
       this.videoUrl.splice(i, 1, '')
       this.timeLists.splice(i, 1, [])
-      // this.videoUrl = [...this.videoUrl]
-      // this.timeLists = [...this.timeLists]
 
       console.log('this.videoUrl~~~~~~~~~~~~~~', this.videoUrl)
       this.cloudPlay = this.play = false
       this.$nextTick(() => {
-        let emptyPlayerDom = this.$refs.emptyPlayer
-        // for (let j = 0; j < emptyPlayerDom.length; j++) {
-        //   emptyPlayerDom[j].style.height = '100px'
-        // }
-
         Local.set(
           `showTime${i}`,
           dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
@@ -1066,8 +1101,6 @@ export default {
       this.$nextTick(() => {
         let emptyPlayerDom = this.$refs.emptyPlayer
         for (let i = 0; i < emptyPlayerDom.length; i++) {
-          // emptyPlayerDom[i].style.height = '100px'
-
           this.$refs.TimePlayer.stopTimeAutoPlay(i)
           this.timeSegments[i] = {
             name: '',
@@ -1122,6 +1155,8 @@ export default {
 
     setTimeLists(date, idx) {
       this.$set(this.timeLists, idx, date)
+
+      console.log('this.timeLists------------------', this.timeLists)
 
       this.$refs.TimePlayer.changePlayerTimes(this.timeLists[idx], idx)
 
@@ -1222,21 +1257,78 @@ export default {
 
     // 滚动时间轴事件
     handleChangePlayTime(curTime) {
-      const resEndTime = new Date(this.formData.date[1]).getTime()
-      const resStartTime = new Date(this.formData.date[0]).getTime()
+      // console.log('拖拽时间轴事件==========', curTime)
+      // console.log('拖拽时间轴事件==========', this.resTimeLists)
+      const resStartTime = new Date(this.resTimeLists[0].startTime).getTime()
+      const resEndTime = new Date(
+        this.resTimeLists[this.resTimeLists.length - 1].endTime
+      ).getTime()
       this.isNext = false
-      if (resStartTime < curTime && curTime < resEndTime) {
-        this.playRecord({}, [
-          dayjs(curTime).format('YYYY-MM-DD HH:mm:ss'),
-          this.formData.date[1]
-        ])
+      if (this.resTimeLists.length > 1) {
+        for (let i = 0; i < this.resTimeLists.length; i++) {
+          const range = this.resTimeLists[i]
+          const start = new Date(range.startTime).getTime() // 转换时间段开始时间
+          const end = new Date(range.endTime).getTime() // 转换时间段结束时间
+          if (curTime > start && curTime < end) {
+            // 当前时间属于某个时间段，返回当前时间
+            this.playRecord(
+              {},
+              [
+                dayjs(curTime).format('YYYY-MM-DD HH:mm:ss'),
+                this.resTimeLists[this.resTimeLists.length - 1].endTime
+              ],
+              [
+                dayjs(curTime).format('YYYY-MM-DD HH:mm:ss'),
+                this.resTimeLists[this.resTimeLists.length - 1].endTime
+              ]
+            )
+            // console.log('时间有多段,拖拽的时间属于多段的第一段', i)
+            return
+          } else {
+            if (
+              curTime >= new Date(range.endTime).getTime() &&
+              curTime <= new Date(this.resTimeLists[i + 1].startTime).getTime()
+            ) {
+              // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
+              this.playRecord(
+                {},
+                [
+                  this.resTimeLists[i + 1].startTime,
+                  this.resTimeLists[this.resTimeLists.length - 1].endTime
+                ],
+                [
+                  this.resTimeLists[i + 1].startTime,
+                  this.resTimeLists[this.resTimeLists.length - 1].endTime
+                ]
+              )
+              // console.log(
+              //   '时间有多段,拖拽的时间属于多段的第i段',
+              //   i,
+              //   this.resTimeLists[i + 1].startTime
+              // )
+              return
+            }
+          }
+        }
       } else {
-        this.$message({
-          message: '该时间段暂无录像',
-          type: 'warning'
-        })
-        this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
-        this.handleCloseVideo(this.playerIdx)
+        if (curTime >= resStartTime && curTime <= resEndTime) {
+          // 当前时间属于某个时间段，返回当前时间
+          this.playRecord({}, this.formData.date, [
+            dayjs(curTime).format('YYYY-MM-DD HH:mm:ss'),
+            this.resTimeLists[this.resTimeLists.length - 1].endTime
+          ])
+          return
+          // console.log('时间只有一段,拖拽的时间在中间')
+        } else {
+          // console.log('时间只有一段,拖拽的时间不在中间')
+          this.$message({
+            message: '该时间段暂无录像',
+            type: 'warning'
+          })
+          this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+          this.handleCloseVideo(this.playerIdx)
+          return
+        }
       }
     },
 
@@ -1428,7 +1520,7 @@ export default {
     },
 
     playRecord: (function () {
-      return async function (row, playTime) {
+      return async function (row, playTime, videoTime) {
         await playStop({
           streamId: this.channelId
         }).then((res) => {
@@ -1440,20 +1532,21 @@ export default {
             })
               .then((res) => {
                 if (res.code === 0) {
+                  // console.log(res.data.wsFlv.slice(5))
                   if (!this.isNext) {
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx)
                     this.setRecordStreamId(res.data.streamId, this.playerIdx)
 
                     this.setRecordCloudId(this.channelId, this.playerIdx)
 
-                    this.setTimeLists(playTime, this.playerIdx)
+                    this.setTimeLists(videoTime, this.playerIdx)
                   } else {
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx)
                     this.setRecordStreamId(res.data.streamId, this.playerIdx)
 
                     this.setRecordCloudId(this.channelId, this.playerIdx)
 
-                    this.setTimeLists(playTime, this.playerIdx)
+                    this.setTimeLists(videoTime, this.playerIdx)
                   }
 
                   this.streamId = res.data.streamId
@@ -1538,28 +1631,70 @@ export default {
     }
   },
   watch: {
-    playTime(newVal, oldVal) {
-      this.datePickerPlayTime = newVal
-      let minDateRecord,
-        maxDiff = -99999999999
-      const endTime = this.currentList && this.currentList.split('_')[1]
-      const date = newVal
-      //如果当前播放时间超过但前菜单选中的时间久重新选择
-      if (endTime && newVal[1].isAfter(endTime) && this.deviceVideoList[date]) {
-        for (const item of this.deviceVideoList[date]) {
-          const diff = newVal[0].diff(item.startTime)
-          if (diff <= 0 && maxDiff < diff) {
-            //记录开始时间在当前时间之后,并且比之前的值更接近
-            maxDiff = diff
-            minDateRecord = item
-          }
-        }
-        if (minDateRecord) {
-          this.currentList = `${minDateRecord.startTime}_${minDateRecord.endTime}`
-        }
-      }
-      // if (newVal.diff(oldVal, 'days')) {
-      //   this.videoHistory.searchHistoryResult = this.deviceVideoList[date] || []
+    selectTime(newVal, oldVal) {
+      const selectNowTime = new Date(newVal).getTime()
+      const selectStartTime = new Date(this.resTimeLists[0].startTime).getTime()
+      const selectEndTime = new Date(
+        this.resTimeLists[this.resTimeLists.length - 1].endTime
+      ).getTime()
+
+      // if (this.resTimeLists.length > 1) {
+      //   for (let i = 0; i < this.resTimeLists.length; i++) {
+      //     const range1 = this.resTimeLists[i]
+      //     const start1 = new Date(range1.startTime).getTime() // 转换时间段开始时间
+      //     const end1 = new Date(range1.endTime).getTime() // 转换时间段结束时间
+      //     if (selectNowTime > start1 && selectNowTime < end1) {
+      //       // 当前时间属于某个时间段，返回当前时间
+      //       this.playRecord(
+      //         {},
+      //         [
+      //           newVal,
+      //           this.resTimeLists[this.resTimeLists.length - 1].endTime
+      //         ],
+      //         [
+      //           newVal,
+      //           this.resTimeLists[this.resTimeLists.length - 1].endTime
+      //         ]
+      //       )
+      //       return
+      //     } else {
+      //       if (
+      //         selectNowTime >= new Date(range1.endTime).getTime() &&
+      //         selectNowTime <= new Date(this.resTimeLists[i + 1].startTime).getTime()
+      //       ) {
+      //         // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
+      //         this.playRecord(
+      //           {},
+      //           [
+      //             this.resTimeLists[i + 1].startTime,
+      //             this.resTimeLists[this.resTimeLists.length - 1].endTime
+      //           ],
+      //           [
+      //             this.resTimeLists[i + 1].startTime,
+      //             this.resTimeLists[this.resTimeLists.length - 1].endTime
+      //           ]
+      //         )
+      //         return
+      //       }
+      //     }
+      //   }
+      // } else {
+      //   if (selectNowTime >= selectStartTime && selectNowTime <= selectEndTime) {
+      //     // 当前时间属于某个时间段，返回当前时间
+      //     this.playRecord({}, this.formData.date, [
+      //       newVal,
+      //       this.resTimeLists[this.resTimeLists.length - 1].endTime
+      //     ])
+      //     return
+      //   } else {
+      //     this.$message({
+      //       message: '该时间段暂无录像',
+      //       type: 'warning'
+      //     })
+      //     this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+      //     this.handleCloseVideo(this.playerIdx)
+      //     return
+      //   }
       // }
     },
     cloudPlayTime(newVal, oldVal) {

@@ -164,23 +164,6 @@ export default {
     this.$nextTick(async () => {
       this.setsrc()
     })
-
-    // const video = this.$refs.testVideo
-
-    // video.addEventListener('play', (e) => {
-    //   console.log('play===========', e)
-    // })
-    // video.addEventListener('timeupdate', (e) => {
-    //   // const duration = moment.duration(video.currentTime, 'seconds')
-    //   // const formattedTime = moment
-    //   //   .utc(duration.as('milliseconds'))
-    //   //   .format('HH:mm:ss')
-    //     // console.log('timeupdate===========', e,moment(Math.floor(video.currentTime * 1000)).format('YYYY-MM-DD HH:mm:ss'))
-    //   // console.log('timeupdate===========',formattedTime)
-    // })
-    // video.addEventListener('seeked', (e) => {
-    //   console.log('seeked===========', e)
-    // })
   },
   watch: {
     '$props.videoUrl': {
@@ -272,6 +255,7 @@ export default {
         clearInterval(that.timerId)
       }
       const videoElement = document.getElementById(that.idx)
+
       if (flvjs.isSupported()) {
         that.flvPlayer = flvjs.createPlayer(
           {

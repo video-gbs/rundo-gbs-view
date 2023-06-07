@@ -35,7 +35,7 @@ wsPlayer.prototype.startRecord = function () {
 
     this.isRecord = true;
     this.recordArr.push(this.fristBuffer);
-    
+
     // const blobUrl = window.URL.createObjectURL(new Blob(new Uint8Array(this.recordArr)), {'type': 'application/octet-stream'});
 }
 
@@ -95,7 +95,7 @@ wsPlayer.prototype.open = function () {
             player.open();
         }
     }, 5000);
-    
+
     let demux_moov = function (info) {
         let codecs = [];
         for (let i = 0; i < info.tracks.length; i++) {
@@ -169,7 +169,7 @@ wsPlayer.prototype.open = function () {
             mp4Box.appendBuffer(moov);
             this.fristBuffer = moov;
             this.recordArr.push(this.fristBuffer);
-            
+
             this.openInterval && clearInterval(this.openInterval);
             this.interval && clearInterval(this.interval);
             this.interval = setInterval(() => {
@@ -180,7 +180,7 @@ wsPlayer.prototype.open = function () {
                     this.openInterval && clearInterval(this.openInterval);
                     return;
                 }
-                
+
                 const currentTime = new Date().getTime();
                 if (currentTime - this.timeout > 5000) {
                     this.reconnectNum++;
