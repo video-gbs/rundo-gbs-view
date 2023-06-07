@@ -180,17 +180,10 @@ export default {
           item = new Date()
         })
         this.changeChildTimeSegments()
-
-        // this.timeAutoPlay(newVal)
-
-        // this.$emit('handleChangeTime', newVal)
       }
       this.$nextTick(() => {
-        this.childTimeSegments[0].beginTime = this.$props.timeSegments[newVal]
-          ? new Date(this.$props.timeSegments[newVal].beginTime).getTime()
-          : 0
-        this.childTimeSegments[0].endTime = this.$props.timeSegments[newVal]
-          ? new Date(this.$props.timeSegments[newVal].endTime).getTime()
+        this.childTimeSegments = this.$props.timeSegments[newVal]
+          ? this.$props.timeSegments[newVal]
           : 0
         this.$forceUpdate()
       })
@@ -273,11 +266,14 @@ export default {
     },
 
     changeChildTimeSegments() {
-      this.childTimeSegments[0].beginTime = 0
+      // this.childTimeSegments[0].beginTime = 0
 
-      this.childTimeSegments[0].endTime = 0
+      // this.childTimeSegments[0].endTime = 0
 
-      console.log('this.childTimeSegments---------', this.childTimeSegments)
+      this.childTimeSegments.map((item) => {
+        item.beginTime = 0
+        item.endTime = 0
+      })
 
       this.$forceUpdate()
     },
@@ -297,10 +293,6 @@ export default {
         this.scope = Object.values(SHOW_TIME_SCOPE)[this.scope.index + i]
 
         this.$nextTick(() => {
-          console.log(
-            'this.$refs',
-            this.$refs['Timeline' + this.setIntervalNum]
-          )
           this.$refs['Timeline' + this.setIntervalNum].setZoom(this.scope.value)
         })
       }
@@ -308,7 +300,7 @@ export default {
     dragTimeChange(time) {
       this.$emit('handleChangeTime', this.$props.playerIdx)
 
-      this.$emit('onChange', time, '拖拽')
+      this.$emit('handleChangePlayTime', time, '拖拽')
 
       this.$emit('gbPlay')
     },
@@ -321,12 +313,8 @@ export default {
       )
       this.$nextTick(() => {
         this.time2[index] = val ? new Date(val[0]).getTime() : 0
-        this.childTimeSegments[0].beginTime = new Date(
-          this.$props.timeSegments[index].beginTime
-        ).getTime()
-        this.childTimeSegments[0].endTime = new Date(
-          this.$props.timeSegments[index].endTime
-        ).getTime()
+
+        this.childTimeSegments = this.$props.timeSegments[index]
 
         this.$forceUpdate()
       })
@@ -335,12 +323,7 @@ export default {
     spiltChangePlayerTimes(val, index) {
       this.$nextTick(() => {
         this.time2[index] = val ? new Date(val[0].beginTime).getTime() : 0
-        this.childTimeSegments[0].beginTime = new Date(
-          this.$props.timeSegments[index].beginTime
-        ).getTime()
-        this.childTimeSegments[0].endTime = new Date(
-          this.$props.timeSegments[index].endTime
-        ).getTime()
+        this.childTimeSegments = this.$props.timeSegments[index]
 
         this.$forceUpdate()
       })

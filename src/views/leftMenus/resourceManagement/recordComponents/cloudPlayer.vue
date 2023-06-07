@@ -149,6 +149,8 @@ export default {
           event,
           this.$refs.videoPlayer
         )
+
+        // console.log('this.$refs===========',new Date(), this.$refs.videoPlayer.getCurrentTime())
       })
       this.$refs.videoPlayer.player.on('ended', (event) => {
         this.onPlayEnded(this.$refs.videoPlayer, event)
