@@ -90,7 +90,7 @@
                           class="addRoleTree"
                           show-checkbox
                           node-key="id"
-                          :check-strictly="true"
+                          :check-strictly="ischeckStrictly[index]"
                           :props="getDefaultProps(index)"
                           :default-expand-all="true"
                           highlight-current
@@ -352,6 +352,7 @@ export default {
         }
       },
       activeName: '系统权限',
+      ischeckStrictly: [false, false, false, true, true],
       // params: {
       //   pageNum: 1,
       //   pageSize: 10,
@@ -553,6 +554,7 @@ export default {
           this.checkedList[num] = resIds
           break
         case 3:
+          console.log(2222)
           let res3 = this.$refs.addRoleTree3[0].getCheckedNodes()
           res3.forEach((item) => {
             resIds.push(item.id)
@@ -562,6 +564,7 @@ export default {
           this.checkedList[num] = resIds
           break
         case 4:
+          console.log(11111)
           let res4 = this.$refs.addRoleTree4[0].getCheckedNodes()
           res4.forEach((item) => {
             resIds.push(item.id)

@@ -1638,64 +1638,64 @@ export default {
         this.resTimeLists[this.resTimeLists.length - 1].endTime
       ).getTime()
 
-      // if (this.resTimeLists.length > 1) {
-      //   for (let i = 0; i < this.resTimeLists.length; i++) {
-      //     const range1 = this.resTimeLists[i]
-      //     const start1 = new Date(range1.startTime).getTime() // 转换时间段开始时间
-      //     const end1 = new Date(range1.endTime).getTime() // 转换时间段结束时间
-      //     if (selectNowTime > start1 && selectNowTime < end1) {
-      //       // 当前时间属于某个时间段，返回当前时间
-      //       this.playRecord(
-      //         {},
-      //         [
-      //           newVal,
-      //           this.resTimeLists[this.resTimeLists.length - 1].endTime
-      //         ],
-      //         [
-      //           newVal,
-      //           this.resTimeLists[this.resTimeLists.length - 1].endTime
-      //         ]
-      //       )
-      //       return
-      //     } else {
-      //       if (
-      //         selectNowTime >= new Date(range1.endTime).getTime() &&
-      //         selectNowTime <= new Date(this.resTimeLists[i + 1].startTime).getTime()
-      //       ) {
-      //         // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
-      //         this.playRecord(
-      //           {},
-      //           [
-      //             this.resTimeLists[i + 1].startTime,
-      //             this.resTimeLists[this.resTimeLists.length - 1].endTime
-      //           ],
-      //           [
-      //             this.resTimeLists[i + 1].startTime,
-      //             this.resTimeLists[this.resTimeLists.length - 1].endTime
-      //           ]
-      //         )
-      //         return
-      //       }
-      //     }
-      //   }
-      // } else {
-      //   if (selectNowTime >= selectStartTime && selectNowTime <= selectEndTime) {
-      //     // 当前时间属于某个时间段，返回当前时间
-      //     this.playRecord({}, this.formData.date, [
-      //       newVal,
-      //       this.resTimeLists[this.resTimeLists.length - 1].endTime
-      //     ])
-      //     return
-      //   } else {
-      //     this.$message({
-      //       message: '该时间段暂无录像',
-      //       type: 'warning'
-      //     })
-      //     this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
-      //     this.handleCloseVideo(this.playerIdx)
-      //     return
-      //   }
-      // }
+      if (this.resTimeLists.length > 1) {
+        for (let i = 0; i < this.resTimeLists.length; i++) {
+          const range1 = this.resTimeLists[i]
+          const start1 = new Date(range1.startTime).getTime() // 转换时间段开始时间
+          const end1 = new Date(range1.endTime).getTime() // 转换时间段结束时间
+          if (selectNowTime > start1 && selectNowTime < end1) {
+            // 当前时间属于某个时间段，返回当前时间
+            // this.playRecord(
+            //   {},
+            //   [
+            //     newVal,
+            //     this.resTimeLists[this.resTimeLists.length - 1].endTime
+            //   ],
+            //   [
+            //     newVal,
+            //     this.resTimeLists[this.resTimeLists.length - 1].endTime
+            //   ]
+            // )
+            // return
+          } else {
+            if (selectNowTime === new Date(range1.endTime).getTime()) {
+              // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
+              this.playRecord(
+                {},
+                [
+                  this.resTimeLists[i + 1].startTime,
+                  this.resTimeLists[this.resTimeLists.length - 1].endTime
+                ],
+                [
+                  this.resTimeLists[i + 1].startTime,
+                  this.resTimeLists[this.resTimeLists.length - 1].endTime
+                ]
+              )
+              return
+            }
+          }
+        }
+      } else {
+        if (
+          selectNowTime >= selectStartTime &&
+          selectNowTime <= selectEndTime
+        ) {
+          // 当前时间属于某个时间段，返回当前时间
+          // this.playRecord({}, this.formData.date, [
+          //   newVal,
+          //   this.resTimeLists[this.resTimeLists.length - 1].endTime
+          // ])
+          // return
+        } else {
+          this.$message({
+            message: '该时间段暂无录像',
+            type: 'warning'
+          })
+          this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+          this.handleCloseVideo(this.playerIdx)
+          return
+        }
+      }
     },
     cloudPlayTime(newVal, oldVal) {
       this.datePickerCloudPlayTime = newVal
