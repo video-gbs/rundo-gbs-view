@@ -108,14 +108,14 @@ export default {
         }
       }),
       childTimeSegments: [
-        {
-          name: '',
-          beginTime: 0,
-          endTime: 0,
-          color: '#4797FF',
-          startRatio: 0.65,
-          endRatio: 0.9
-        }
+        // {
+        //   name: '',
+        //   beginTime: 0,
+        //   endTime: 0,
+        //   color: '#4797FF',
+        //   startRatio: 0.65,
+        //   endRatio: 0.9
+        // }
       ],
       timeAutoPlays: [],
       setIntervalNum: 0
@@ -194,19 +194,7 @@ export default {
       )
     },
     playerTimes(val) {},
-    timeSegments(val) {
-      console.log('timeSegments==========', val)
-      this.childTimeSegments = [
-        {
-          name: '',
-          beginTime: 0,
-          endTime: 0,
-          color: '#4797FF',
-          startRatio: 0.65,
-          endRatio: 0.9
-        }
-      ]
-    },
+    timeSegments(val) {},
     initTimeLists(val) {},
     setIntervalNum(val) {
       // console.log('setIntervalNum,=====', val)
@@ -323,7 +311,7 @@ export default {
     spiltChangePlayerTimes(val, index) {
       this.$nextTick(() => {
         this.time2[index] = val ? new Date(val[0].beginTime).getTime() : 0
-        this.childTimeSegments = this.$props.timeSegments[index]
+        this.childTimeSegments = this.$props.timeSegments
 
         this.$forceUpdate()
       })
