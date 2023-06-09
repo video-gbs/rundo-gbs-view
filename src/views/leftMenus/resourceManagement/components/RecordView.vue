@@ -1527,8 +1527,8 @@ export default {
           if (res.code === 0) {
             getPlayBackUrlLists({
               channelId: this.channelId,
-              startTime: row.startTime ? row.startTime : playTime[0],
-              endTime: row.endTime ? row.endTime : playTime[1]
+              startTime: row.startTime ? row.startTime : videoTime[0],
+              endTime: row.endTime ? row.endTime : videoTime[1]
             })
               .then((res) => {
                 if (res.code === 0) {
