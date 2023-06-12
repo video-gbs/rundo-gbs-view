@@ -180,7 +180,6 @@
                   :playerTimes="formData.date"
                   :timeLists="timeLists"
                   @handleChangeTime="handleChangeTime"
-                  @initSelectTime="initSelectTime"
                   @handleChangePlayTime="handleChangePlayTime"
                   :playerIdx="playerIdx"
                   :clickedPbPause="clickedPbPause"
@@ -513,7 +512,7 @@ export default {
         translateX: 0,
         translateY: 0
       },
-      selectTime: new Date(),
+      selectTime: new Date(new Date().setHours(0, 0, 0, 0)),
       isDragging: false, //拖拽中
       ZOOM_TYPE: ZOOM_TYPE,
       recordStartTime: null,
@@ -1017,23 +1016,18 @@ export default {
       }
     },
 
-    initSelectTime(i) {
-      this.selectTime = new Date()
-
-      // console.log('this.selectTime----------', i,this.selectTime)
-    },
-
     handleChangeTime(index) {
       if (
         Local.get(`showTime${index}`) === 'Invalid Date' ||
         !Local.get(`showTime${index}`)
       ) {
-        this.selectTime = new Date()
+        this.selectTime = new Date(new Date().setHours(0, 0, 0, 0))
       } else {
         this.selectTime = Local.get(`showTime${index}`)
       }
     },
     handleChangeTimePicker(val) {
+      console.log('handleChangeTimePicker', val)
       // Local.set('showTime', val)
       const isPlay = this.play
 
@@ -1632,6 +1626,9 @@ export default {
   },
   watch: {
     selectTime(newVal, oldVal) {
+      if (!this.videoUrl[this.playerIdx]) {
+        return
+      }
       const selectNowTime = new Date(newVal).getTime()
       const selectStartTime = new Date(this.resTimeLists[0].startTime).getTime()
       const selectEndTime = new Date(
@@ -1644,19 +1641,6 @@ export default {
           const start1 = new Date(range1.startTime).getTime() // 转换时间段开始时间
           const end1 = new Date(range1.endTime).getTime() // 转换时间段结束时间
           if (selectNowTime > start1 && selectNowTime < end1) {
-            // 当前时间属于某个时间段，返回当前时间
-            // this.playRecord(
-            //   {},
-            //   [
-            //     newVal,
-            //     this.resTimeLists[this.resTimeLists.length - 1].endTime
-            //   ],
-            //   [
-            //     newVal,
-            //     this.resTimeLists[this.resTimeLists.length - 1].endTime
-            //   ]
-            // )
-            // return
           } else {
             if (selectNowTime === new Date(range1.endTime).getTime()) {
               // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
@@ -1680,13 +1664,8 @@ export default {
           selectNowTime >= selectStartTime &&
           selectNowTime <= selectEndTime
         ) {
-          // 当前时间属于某个时间段，返回当前时间
-          // this.playRecord({}, this.formData.date, [
-          //   newVal,
-          //   this.resTimeLists[this.resTimeLists.length - 1].endTime
-          // ])
-          // return
         } else {
+          console.log('1111111111')
           this.$message({
             message: '该时间段暂无录像',
             type: 'warning'
