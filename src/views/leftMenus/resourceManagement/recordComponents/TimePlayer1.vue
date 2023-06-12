@@ -292,7 +292,7 @@ export default {
 
       this.$emit('handleChangePlayTime', time, '拖拽')
 
-      this.$emit('gbPlay')
+      // this.$emit('gbPlay')
     },
     changePlayerTimes(val, index) {
       console.log(
