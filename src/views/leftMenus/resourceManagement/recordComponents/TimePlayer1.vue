@@ -179,11 +179,11 @@ export default {
         this.time2.forEach((item) => {
           item = new Date()
         })
-        this.changeChildTimeSegments()
+        this.changeChildTimeSegments(newVal)
       }
       this.$nextTick(() => {
         this.childTimeSegments = this.$props.timeSegments[newVal]
-          ? this.$props.timeSegments[newVal]
+          ? [this.$props.timeSegments[newVal]]
           : 0
         this.$forceUpdate()
       })
@@ -253,10 +253,12 @@ export default {
       this.timeAutoPlays[index] = null
     },
 
-    changeChildTimeSegments() {
+    changeChildTimeSegments(index) {
+      // debugger
       // this.childTimeSegments[0].beginTime = 0
 
       // this.childTimeSegments[0].endTime = 0
+      this.childTimeSegments = [this.$props.timeSegments[index]]
 
       this.childTimeSegments.map((item) => {
         item.beginTime = 0
