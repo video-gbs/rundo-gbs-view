@@ -169,22 +169,33 @@ export default {
       ) {
         console.log('点击的画面有视频~~~~~~~~~~~~~~~~~~~~~~~~')
         this.time2[newVal] = new Date(Local.get(`showTime${newVal}`)).getTime()
-        // this.$set(
-        //   this.time2,
-        //   newVal,
-        //   new Date(Local.get(`showTime${newVal}`)).getTime()
-        // )
       } else {
-        console.log('点击的画面没有视频!!!!!!!!!!!!!!!!!!!!!')
-        this.time2.forEach((item) => {
-          item = new Date()
-        })
-        this.changeChildTimeSegments(newVal)
+        console.log(
+          '点击的画面没有视频!!!!!!!!!!!!!!!!!!!!!',
+          this.$props.timeSegments
+        )
+        this.time2[newVal] = new Date(new Date().setHours(0, 0, 0, 0)).getTime()
+        // this.time2.forEach((item) => {
+        //   item = new Date(new Date().setHours(0, 0, 0, 0))
+        // })
       }
       this.$nextTick(() => {
         this.childTimeSegments = this.$props.timeSegments[newVal]
-          ? [this.$props.timeSegments[newVal]]
-          : 0
+          ? this.$props.timeSegments[newVal]
+          : [
+              {
+                name: '',
+                beginTime: 0,
+                endTime: 0,
+                color: '#4797FF',
+                startRatio: 0.65,
+                endRatio: 0.9
+              }
+            ]
+
+        setTimeout(() => {
+          this.$emit('handleChangeTime', newVal)
+        }, 1000)
         this.$forceUpdate()
       })
 
@@ -209,7 +220,6 @@ export default {
   },
   created() {},
   mounted() {
-    console.log('mounted!!!!!!!!!!!!!!!!!!!!!', this.childTimeSegments)
     this.resClickedPbPause = this.$props.clickedPbPause
   },
   methods: {
@@ -258,12 +268,12 @@ export default {
       // this.childTimeSegments[0].beginTime = 0
 
       // this.childTimeSegments[0].endTime = 0
-      this.childTimeSegments = [this.$props.timeSegments[index]]
+      this.childTimeSegments = this.$props.timeSegments[index]
 
-      this.childTimeSegments.map((item) => {
-        item.beginTime = 0
-        item.endTime = 0
-      })
+      // this.childTimeSegments.map((item) => {
+      //   item.beginTime = 0
+      //   item.endTime = 0
+      // })
 
       this.$forceUpdate()
     },
@@ -308,16 +318,16 @@ export default {
 
         this.$forceUpdate()
       })
-    },
-
-    spiltChangePlayerTimes(val, index) {
-      this.$nextTick(() => {
-        this.time2[index] = val ? new Date(val[0].beginTime).getTime() : 0
-        this.childTimeSegments = this.$props.timeSegments
-
-        this.$forceUpdate()
-      })
     }
+
+    // spiltChangePlayerTimes(val, index) {
+    //   this.$nextTick(() => {
+    //     this.time2[index] = val ? new Date(val[0].beginTime).getTime() : 0
+    //     this.childTimeSegments = this.$props.timeSegments[index]
+
+    //     this.$forceUpdate()
+    //   })
+    // }
   },
   destroyed() {
     this.timeAutoPlays.forEach((item) => {

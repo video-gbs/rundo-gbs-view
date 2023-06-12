@@ -434,6 +434,7 @@ export default {
   },
   data() {
     return {
+      // isChildChange:false,
       isClickCx: true,
       spilt: 1, //分屏
       recordLeftTopName: [],
@@ -638,14 +639,16 @@ export default {
       this.videoUrl[i] = ''
       this.isFill[i] = true
       this.isShowStream[i] = false
-      this.timeSegments[i] = {
-        name: '',
-        beginTime: 0,
-        endTime: 0,
-        color: '#4797FF',
-        startRatio: 0.65,
-        endRatio: 0.9
-      }
+      this.timeSegments[i] = [
+        {
+          name: '',
+          beginTime: 0,
+          endTime: 0,
+          color: '#4797FF',
+          startRatio: 0.65,
+          endRatio: 0.9
+        }
+      ]
     }
 
     Local.set('playbackRate', 1)
@@ -830,12 +833,21 @@ export default {
               //     endTime: '2023-06-06 05:30:00'
               //   }
               // ]
-              this.resTimeLists = this.mergeDatetimeRanges(listData)
+              // this.resTimeLists = []
+              this.resTimeLists[this.playerIdx] =
+                this.mergeDatetimeRanges(listData)
+
+              console.log(
+                'this.resTimeListsthis.resTimeLists',
+                this.resTimeLists
+              )
               // 查询初始化时间
               Local.set(
                 `showTime${this.playerIdx}`,
                 dayjs(
-                  new Date(this.resTimeLists[0].startTime).getTime()
+                  new Date(
+                    this.resTimeLists[this.playerIdx][0].startTime
+                  ).getTime()
                 ).format('YYYY-MM-DD HH:mm:ss')
               )
 
@@ -847,7 +859,7 @@ export default {
 
               let params = {}
 
-              this.resTimeLists.forEach((item, index) => {
+              this.resTimeLists[this.playerIdx].forEach((item, index) => {
                 params = {
                   name: '',
                   beginTime: new Date(item.startTime).getTime(),
@@ -868,8 +880,10 @@ export default {
               this.hasStreamId = true
 
               this.playRecord(1, date, [
-                this.resTimeLists[0].startTime,
-                this.resTimeLists[this.resTimeLists.length - 1].endTime
+                this.resTimeLists[this.playerIdx][0].startTime,
+                this.resTimeLists[this.playerIdx][
+                  this.resTimeLists[this.playerIdx].length - 1
+                ].endTime
               ])
             } else {
               this.$message({
@@ -1029,10 +1043,11 @@ export default {
         !Local.get(`showTime${index}`)
       ) {
         this.selectTime =
-          this.resTimeLists[0].startTime ||
+          this.resTimeLists[this.playerIdx][0].startTime ||
           new Date(new Date().setHours(0, 0, 0, 0))
       } else {
         this.selectTime = Local.get(`showTime${index}`)
+        // this.isChildChange=true
       }
     },
     handleChangeTimePicker(val) {
@@ -1078,7 +1093,7 @@ export default {
       }
       if (this.play) this.handlePauseOrPlay()
 
-      this.handleDevicesPlayEnded()
+      // this.handleDevicesPlayEnded()
       if (isPlay) this.handlePauseOrPlay()
     },
     closeVideo(i) {
@@ -1088,14 +1103,16 @@ export default {
       console.log('this.videoUrl~~~~~~~~~~~~~~', this.videoUrl)
       this.cloudPlay = this.play = false
       this.$nextTick(() => {
-        this.timeSegments[i] = {
-          name: '',
-          beginTime: 0,
-          endTime: 0,
-          color: '#4797FF',
-          startRatio: 0.65,
-          endRatio: 0.9
-        }
+        this.timeSegments[i] = [
+          {
+            name: '',
+            beginTime: 0,
+            endTime: 0,
+            color: '#4797FF',
+            startRatio: 0.65,
+            endRatio: 0.9
+          }
+        ]
 
         this.$refs.TimePlayer.changeChildTimeSegments(i)
 
@@ -1129,14 +1146,16 @@ export default {
         let emptyPlayerDom = this.$refs.emptyPlayer
         for (let i = 0; i < emptyPlayerDom.length; i++) {
           this.$refs.TimePlayer.stopTimeAutoPlay(i)
-          this.timeSegments[i] = {
-            name: '',
-            beginTime: 0,
-            endTime: 0,
-            color: '#4797FF',
-            startRatio: 0.65,
-            endRatio: 0.9
-          }
+          this.timeSegments[i] = [
+            {
+              name: '',
+              beginTime: 0,
+              endTime: 0,
+              color: '#4797FF',
+              startRatio: 0.65,
+              endRatio: 0.9
+            }
+          ]
           Local.set(
             `showTime${i}`,
             dayjs(new Date(new Date().setHours(0, 0, 0, 0)).getTime()).format(
@@ -1288,14 +1307,18 @@ export default {
     handleChangePlayTime(curTime) {
       // console.log('拖拽时间轴事件==========', curTime)
       // console.log('拖拽时间轴事件==========', this.resTimeLists)
-      const resStartTime = new Date(this.resTimeLists[0].startTime).getTime()
+      const resStartTime = new Date(
+        this.resTimeLists[this.playerIdx][0].startTime
+      ).getTime()
       const resEndTime = new Date(
-        this.resTimeLists[this.resTimeLists.length - 1].endTime
+        this.resTimeLists[this.playerIdx][
+          this.resTimeLists[this.playerIdx].length - 1
+        ].endTime
       ).getTime()
       this.isNext = false
-      if (this.resTimeLists.length > 1) {
-        for (let i = 0; i < this.resTimeLists.length; i++) {
-          const range = this.resTimeLists[i]
+      if (this.resTimeLists[this.playerIdx].length > 1) {
+        for (let i = 0; i < this.resTimeLists[this.playerIdx].length; i++) {
+          const range = this.resTimeLists[this.playerIdx][i]
           const start = new Date(range.startTime).getTime() // 转换时间段开始时间
           const end = new Date(range.endTime).getTime() // 转换时间段结束时间
           if (curTime > start && curTime < end) {
@@ -1304,11 +1327,15 @@ export default {
               {},
               [
                 dayjs(curTime).format('YYYY-MM-DD HH:mm:ss'),
-                this.resTimeLists[this.resTimeLists.length - 1].endTime
+                this.resTimeLists[this.playerIdx][
+                  this.resTimeLists[this.playerIdx].length - 1
+                ].endTime
               ],
               [
                 dayjs(curTime).format('YYYY-MM-DD HH:mm:ss'),
-                this.resTimeLists[this.resTimeLists.length - 1].endTime
+                this.resTimeLists[this.playerIdx][
+                  this.resTimeLists[this.playerIdx].length - 1
+                ].endTime
               ]
             )
             // console.log('时间有多段,拖拽的时间属于多段的第一段', i)
@@ -1322,12 +1349,16 @@ export default {
               this.playRecord(
                 {},
                 [
-                  this.resTimeLists[i + 1].startTime,
-                  this.resTimeLists[this.resTimeLists.length - 1].endTime
+                  this.resTimeLists[this.playerIdx][i + 1].startTime,
+                  this.resTimeLists[this.playerIdx][
+                    this.resTimeLists[this.playerIdx].length - 1
+                  ].endTime
                 ],
                 [
-                  this.resTimeLists[i + 1].startTime,
-                  this.resTimeLists[this.resTimeLists.length - 1].endTime
+                  this.resTimeLists[this.playerIdx][i + 1].startTime,
+                  this.resTimeLists[this.playerIdx][
+                    this.resTimeLists[this.playerIdx].length - 1
+                  ].endTime
                 ]
               )
               // console.log(
@@ -1344,7 +1375,9 @@ export default {
           // 当前时间属于某个时间段，返回当前时间
           this.playRecord({}, this.formData.date, [
             dayjs(curTime).format('YYYY-MM-DD HH:mm:ss'),
-            this.resTimeLists[this.resTimeLists.length - 1].endTime
+            this.resTimeLists[this.playerIdx][
+              this.resTimeLists[this.playerIdx].length - 1
+            ].endTime
           ])
           return
           // console.log('时间只有一段,拖拽的时间在中间')
@@ -1671,18 +1704,27 @@ export default {
   },
   watch: {
     selectTime(newVal, oldVal) {
+      console.log('谁先进来', this.playerIdx, this.resTimeLists)
       if (!this.videoUrl[this.playerIdx]) {
         return
       }
-      const selectNowTime = new Date(newVal).getTime()
-      const selectStartTime = new Date(this.resTimeLists[0].startTime).getTime()
+      let selectNowTime = this.resTimeLists[this.playerIdx]
+        ? new Date(this.resTimeLists[this.playerIdx].startTime).getTime()
+        : new Date(new Date().setHours(0, 0, 0, 0))
+      selectNowTime = new Date(newVal).getTime()
+      const selectOldTime = new Date(oldVal).getTime()
+      const selectStartTime = new Date(
+        this.resTimeLists[this.playerIdx][0].startTime
+      ).getTime()
       const selectEndTime = new Date(
-        this.resTimeLists[this.resTimeLists.length - 1].endTime
+        this.resTimeLists[this.playerIdx][
+          this.resTimeLists[this.playerIdx].length - 1
+        ].endTime
       ).getTime()
 
-      if (this.resTimeLists.length > 1) {
-        for (let i = 0; i < this.resTimeLists.length; i++) {
-          const range1 = this.resTimeLists[i]
+      if (this.resTimeLists[this.playerIdx].length > 1) {
+        for (let i = 0; i < this.resTimeLists[this.playerIdx].length; i++) {
+          const range1 = this.resTimeLists[this.playerIdx][i]
           const start1 = new Date(range1.startTime).getTime() // 转换时间段开始时间
           const end1 = new Date(range1.endTime).getTime() // 转换时间段结束时间
           if (selectNowTime > start1 && selectNowTime < end1) {
@@ -1692,12 +1734,16 @@ export default {
               this.playRecord(
                 {},
                 [
-                  this.resTimeLists[i + 1].startTime,
-                  this.resTimeLists[this.resTimeLists.length - 1].endTime
+                  this.resTimeLists[this.playerIdx][i + 1].startTime,
+                  this.resTimeLists[this.playerIdx][
+                    this.resTimeLists[this.playerIdx].length - 1
+                  ].endTime
                 ],
                 [
-                  this.resTimeLists[i + 1].startTime,
-                  this.resTimeLists[this.resTimeLists.length - 1].endTime
+                  this.resTimeLists[this.playerIdx][i + 1].startTime,
+                  this.resTimeLists[this.playerIdx][
+                    this.resTimeLists[this.playerIdx].length - 1
+                  ].endTime
                 ]
               )
               return
@@ -1750,24 +1796,26 @@ export default {
         for (let i = 0; i < newValue; i++) {
           if (i >= this.videoUrl.length) {
             resVideoUrl.push('')
-            resTimeSegments.push({
-              name: '',
-              beginTime: 0,
-              endTime: 0,
-              color: '#4797FF',
-              startRatio: 0.65,
-              endRatio: 0.9
-            })
+            resTimeSegments.push([
+              {
+                name: '',
+                beginTime: 0,
+                endTime: 0,
+                color: '#4797FF',
+                startRatio: 0.65,
+                endRatio: 0.9
+              }
+            ])
           }
         }
         this.videoUrl = this.videoUrl.concat(resVideoUrl)
 
         this.timeSegments = this.timeSegments.concat(resTimeSegments)
         console.log('this.$refs', this.$refs)
-        this.$refs.TimePlayer.spiltChangePlayerTimes(
-          [this.timeSegments[this.playerIdx]],
-          this.playerIdx
-        )
+        // this.$refs.TimePlayer.spiltChangePlayerTimes(
+        //   [this.timeSegments[this.playerIdx]],
+        //   this.playerIdx
+        // )
       } else {
       }
     }
