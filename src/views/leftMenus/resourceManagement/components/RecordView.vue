@@ -831,6 +831,13 @@ export default {
               //   }
               // ]
               this.resTimeLists = this.mergeDatetimeRanges(listData)
+              // 查询初始化时间
+              Local.set(
+                `showTime${this.playerIdx}`,
+                dayjs(
+                  new Date(this.resTimeLists[0].startTime).getTime()
+                ).format('YYYY-MM-DD HH:mm:ss')
+              )
 
               this.deviceVideoList = {
                 [date]: listData
@@ -1021,7 +1028,9 @@ export default {
         Local.get(`showTime${index}`) === 'Invalid Date' ||
         !Local.get(`showTime${index}`)
       ) {
-        this.selectTime = new Date(new Date().setHours(0, 0, 0, 0))
+        this.selectTime =
+          this.resTimeLists[0].startTime ||
+          new Date(new Date().setHours(0, 0, 0, 0))
       } else {
         this.selectTime = Local.get(`showTime${index}`)
       }
@@ -1042,7 +1051,30 @@ export default {
           type: 'warning'
         })
         this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
-        this.handleCloseVideo(this.playerIdx)
+        // this.handleCloseVideo(this.playerIdx)
+        this.cloudPlay = this.play = false
+        this.hasStreamId = false
+        this.stopPlayRecord()
+        this.videoUrl = ['']
+        // this.$nextTick(() => {
+        //   let emptyPlayerDom = this.$refs.emptyPlayer
+        //   for (let i = 0; i < emptyPlayerDom.length; i++) {
+        //     this.$refs.TimePlayer.stopTimeAutoPlay(i)
+        //     this.timeSegments[i] = {
+        //       name: '',
+        //       beginTime: 0,
+        //       endTime: 0,
+        //       color: '#4797FF',
+        //       startRatio: 0.65,
+        //       endRatio: 0.9
+        //     }
+        //     // Local.set(
+        //     //   `showTime${i}`,
+        //     //   dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
+        //     // )
+        //     this.$refs.TimePlayer.changeChildTimeSegments(i)
+        //   }
+        // })
       }
       if (this.play) this.handlePauseOrPlay()
 
@@ -1056,11 +1088,6 @@ export default {
       console.log('this.videoUrl~~~~~~~~~~~~~~', this.videoUrl)
       this.cloudPlay = this.play = false
       this.$nextTick(() => {
-        Local.set(
-          `showTime${i}`,
-          dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
-        )
-
         this.timeSegments[i] = {
           name: '',
           beginTime: 0,
@@ -1073,6 +1100,12 @@ export default {
         this.$refs.TimePlayer.changeChildTimeSegments(i)
 
         this.$refs.TimePlayer.stopTimeAutoPlay(i)
+        Local.set(
+          `showTime${i}`,
+          dayjs(new Date(new Date().setHours(0, 0, 0, 0)).getTime()).format(
+            'YYYY-MM-DD HH:mm:ss'
+          )
+        )
 
         this.stopPlayRecord(i)
       })
@@ -1106,7 +1139,9 @@ export default {
           }
           Local.set(
             `showTime${i}`,
-            dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
+            dayjs(new Date(new Date().setHours(0, 0, 0, 0)).getTime()).format(
+              'YYYY-MM-DD HH:mm:ss'
+            )
           )
           this.$refs.TimePlayer.changeChildTimeSegments(i)
         }
@@ -1314,13 +1349,23 @@ export default {
           return
           // console.log('时间只有一段,拖拽的时间在中间')
         } else {
-          // console.log('时间只有一段,拖拽的时间不在中间')
+          console.log('时间只有一段,拖拽的时间不在中间')
           this.$message({
             message: '该时间段暂无录像',
             type: 'warning'
           })
+
           this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
-          this.handleCloseVideo(this.playerIdx)
+          Local.set(
+            `showTime${this.playerIdx}`,
+            dayjs(curTime).format('YYYY-MM-DD HH:mm:ss')
+          )
+          this.selectTime = dayjs(curTime).format('YYYY-MM-DD HH:mm:ss')
+          // this.handleCloseVideo(this.playerIdx)
+          this.cloudPlay = this.play = false
+          this.hasStreamId = false
+          this.stopPlayRecord()
+          this.videoUrl = ['']
           return
         }
       }
@@ -1671,7 +1716,15 @@ export default {
             type: 'warning'
           })
           this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
-          this.handleCloseVideo(this.playerIdx)
+
+          // Local.set(
+          //   `showTime${this.playerIdx}`,
+          //   dayjs(selectNowTime.format('YYYY-MM-DD HH:mm:ss'))
+          // )
+          this.cloudPlay = this.play = false
+          this.hasStreamId = false
+          this.stopPlayRecord()
+          this.videoUrl = ['']
           return
         }
       }
