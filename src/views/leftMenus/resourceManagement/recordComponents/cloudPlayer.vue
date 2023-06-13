@@ -3,7 +3,7 @@
     <LivePlayer
       ref="videoPlayer"
       class="live-player-container"
-      :aspect="stretch ? 'fullscreen' : '16:9'"
+      :aspect="stretch ? 'fullscreen' : ''"
       id="livePlayerDevice"
       :videoUrl="videoUrl"
       :controls="controls"
@@ -297,9 +297,18 @@ export default {
     },
 
     stretch(newVal) {
-      document.getElementsByClassName('player-box')[
-        this.$props.playerIdx
-      ].style.height = newVal ? '100%' : ''
+      const dom = document.getElementsByClassName('player-box')
+      dom.forEach((item) => {
+        item.style.height = newVal ? '100%' : ''
+      })
+      // if (dom.length > 1) {
+
+      // } else {
+      //   dom[0].style.height = ''
+      // }
+      // document.getElementsByClassName('player-box')[
+      //   this.$props.playerIdx
+      // ].style.height = newVal ? '100%' : ''
       this.$forceUpdate()
     },
     videoStyle(newVal) {
