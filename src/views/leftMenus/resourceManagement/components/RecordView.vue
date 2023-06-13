@@ -138,7 +138,7 @@
                   <div v-else class="player-box" ref="videoBox">
                     <cloud-player
                       ref="cloudPlayer"
-                      :stretch="isFill[i - 1]"
+                      :stretch="isFill"
                       :tracks="tracks"
                       :isShowStream="isShowStream[i - 1]"
                       :onChangePlayTime="handleChangeCurrentTime"
@@ -303,14 +303,12 @@
                   />
                 </el-tooltip>
                 <el-tooltip
-                  :content="isFill[playerIdx] ? '拉伸' : '自适应'"
+                  :content="isFill ? '拉伸' : '自适应'"
                   placement="top"
                 >
                   <i
                     @click="handleChangeFill"
-                    :class="`iconfont icon-zishiying ${
-                      isFill[playerIdx] ? 'active' : ''
-                    }`"
+                    :class="`iconfont icon-zishiying ${isFill ? 'active' : ''}`"
                   ></i>
                 </el-tooltip>
                 <div class="split-box">
@@ -502,7 +500,7 @@ export default {
       cloudPlayTime: moment().startOf('days'),
       currentCloudList: '',
       isMuted: true, //音量
-      isFill: [], //是否拉伸视频
+      isFill: true, //是否拉伸视频
       isShowStream: [], //是否显示码流
       tracks: [],
       cloudPlay: false,
@@ -632,12 +630,12 @@ export default {
       // 监听到屏幕变化，更改全屏状态，该页面不能存在多个全屏元素
       this.isFullScreen = !this.isFullScreen
     })
-    this.isFill = []
+    // this.isFill = []
     this.isShowStream = []
     this.videoUrl = []
     for (let i = 0; i < this.spilt; i++) {
       this.videoUrl[i] = ''
-      this.isFill[i] = true
+      // this.isFill[i] = true
       this.isShowStream[i] = false
       this.timeSegments[i] = [
         {
@@ -1270,7 +1268,7 @@ export default {
     },
     //缩放拉伸屏幕
     handleChangeFill() {
-      this.isFill[this.playerIdx] = !this.isFill[this.playerIdx]
+      this.isFill = !this.isFill
 
       const dom = document.getElementsByClassName('player-box')
 

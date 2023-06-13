@@ -269,6 +269,8 @@ export default {
             // enableWorker: true, // 是否多线程工作
             // fixAudioTimestampGap: false,
             enableStashBuffer: false, // 是否启用缓存
+            // autoCleanupMaxBackwardDuration: 12, //    当向后缓冲区持续时间超过此值（以秒为单位）时，请对SourceBuffer进行自动清理
+            // autoCleanupMinBackwardDuration: 60, //指示进行自动清除时为反向缓冲区保留的持续时间（以秒为单位）。
             stashInitialSize: 128, // 缓存大小(kb)  默认384kb
             autoCleanupSourceBuffer: true // 是否自动清理缓存
           }
