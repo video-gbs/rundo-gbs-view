@@ -298,8 +298,13 @@ export default {
 
     stretch(newVal) {
       const dom = document.getElementsByClassName('player-box')
-      dom.forEach((item) => {
-        item.style.height = newVal ? '100%' : ''
+      // dom.forEach((item) => {
+      //   item.style.height = newVal ? '100%' : ''
+      // })
+      const videoDom = document.getElementsByClassName('vjs-tech')
+      // console.log('videoDom', videoDom)
+      videoDom.forEach((item1) => {
+        item1.style['object-fit'] = newVal ? 'fill' : ''
       })
       // if (dom.length > 1) {
 
@@ -313,6 +318,7 @@ export default {
     },
     videoStyle(newVal) {
       const videoDom = this.$refs.videoPlayer.$el.querySelector('video')
+      console.log('videoStyle', videoStyle)
       videoDom.style = newVal
       videoDom.style['object-fit'] = this.stretch ? 'fill' : ''
     }
@@ -321,6 +327,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .video-wrapper {
+  position: static !important;
+  padding-bottom: 0 !important;
+  height: 100%;
+}
 .live-player-container {
   width: 100%;
   height: 100%;
