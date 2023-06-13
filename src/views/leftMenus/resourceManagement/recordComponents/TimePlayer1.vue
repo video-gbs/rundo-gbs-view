@@ -161,6 +161,8 @@ export default {
       this.setIntervalNum = newVal
 
       console.log('playerIdx===========', newVal, this.timeAutoPlays)
+
+      this.$emit('handleChangeTime', newVal)
       //
       if (
         this.$props.timeLists[newVal] &&
@@ -192,10 +194,6 @@ export default {
                 endRatio: 0.9
               }
             ]
-
-        setTimeout(() => {
-          this.$emit('handleChangeTime', newVal)
-        }, 1000)
         this.$forceUpdate()
       })
 

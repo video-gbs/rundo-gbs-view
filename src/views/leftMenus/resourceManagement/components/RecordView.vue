@@ -1042,9 +1042,9 @@ export default {
         Local.get(`showTime${index}`) === 'Invalid Date' ||
         !Local.get(`showTime${index}`)
       ) {
-        this.selectTime =
-          this.resTimeLists[this.playerIdx][0].startTime ||
-          new Date(new Date().setHours(0, 0, 0, 0))
+        this.selectTime = this.resTimeLists[this.playerIdx][0]
+          ? this.resTimeLists[this.playerIdx][0].startTime
+          : new Date(new Date().setHours(0, 0, 0, 0))
       } else {
         this.selectTime = Local.get(`showTime${index}`)
         // this.isChildChange=true
@@ -1606,19 +1606,17 @@ export default {
                 if (res.code === 0) {
                   // console.log(res.data.wsFlv.slice(5))
                   if (!this.isNext) {
+                    this.setTimeLists(videoTime, this.playerIdx)
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx)
                     this.setRecordStreamId(res.data.streamId, this.playerIdx)
 
                     this.setRecordCloudId(this.channelId, this.playerIdx)
-
-                    this.setTimeLists(videoTime, this.playerIdx)
                   } else {
+                    this.setTimeLists(videoTime, this.playerIdx)
                     this.setPlayUrl(res.data.wsFlv, this.playerIdx)
                     this.setRecordStreamId(res.data.streamId, this.playerIdx)
 
                     this.setRecordCloudId(this.channelId, this.playerIdx)
-
-                    this.setTimeLists(videoTime, this.playerIdx)
                   }
 
                   this.streamId = res.data.streamId
@@ -1704,7 +1702,6 @@ export default {
   },
   watch: {
     selectTime(newVal, oldVal) {
-      console.log('谁先进来', this.playerIdx, this.resTimeLists)
       if (!this.videoUrl[this.playerIdx]) {
         return
       }
@@ -1755,23 +1752,21 @@ export default {
           selectNowTime >= selectStartTime &&
           selectNowTime <= selectEndTime
         ) {
+          console.log('有录像')
         } else {
-          console.log('1111111111')
-          this.$message({
-            message: '该时间段暂无录像',
-            type: 'warning'
+          this.$nextTick(() => {
+            console.log('1111111111', newVal, this.resTimeLists, this.playerIdx)
+            this.$message({
+              message: '该时间段暂无录像',
+              type: 'warning'
+            })
+            this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+            this.cloudPlay = this.play = false
+            this.hasStreamId = false
+            this.stopPlayRecord()
+            this.videoUrl = ['']
+            return
           })
-          this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
-
-          // Local.set(
-          //   `showTime${this.playerIdx}`,
-          //   dayjs(selectNowTime.format('YYYY-MM-DD HH:mm:ss'))
-          // )
-          this.cloudPlay = this.play = false
-          this.hasStreamId = false
-          this.stopPlayRecord()
-          this.videoUrl = ['']
-          return
         }
       }
     },
