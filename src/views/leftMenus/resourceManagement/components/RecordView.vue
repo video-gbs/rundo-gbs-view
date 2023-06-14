@@ -1302,8 +1302,8 @@ export default {
     },
 
     // 滚动时间轴事件
-    handleChangePlayTime(curTime) {
-      // console.log('拖拽时间轴事件==========', curTime)
+    handleChangePlayTime(curTime, name, index) {
+      this.channelId = Local.get('recordCloudId')[index]
       // console.log('拖拽时间轴事件==========', this.resTimeLists)
       const resStartTime = new Date(
         this.resTimeLists[this.playerIdx][0].startTime
