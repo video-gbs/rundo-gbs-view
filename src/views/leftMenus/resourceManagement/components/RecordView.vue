@@ -137,7 +137,7 @@
                   ></div>
                   <div v-else class="player-box" ref="videoBox">
                     <cloud-player
-                      ref="cloudPlayer"
+                      :ref="'cloudPlayer' + [i - 1]"
                       :stretch="isFill"
                       :tracks="tracks"
                       :isShowStream="isShowStream[i - 1]"
@@ -1481,26 +1481,67 @@ export default {
     },
     //点击暂停播放按钮
     handlePauseOrPlay() {
-      console.log('点击了播放', this.play, this.playerIdx)
+      // console.log('初始化', this.$refs)
+      // const cloudPlayerDom = this.$refs['cloudPlayer' + this.playerIdx]
+      // console.log('98', cloudPlayerDom.length)
+      // let videoUrLength = 0
+      // this.videoUrl.forEach((item) => {
+      //   if (item !== '' && item.length) {
+      //     videoUrLength += 1
+      //   }
+      // })
+
+      // console.log('videoUrLength', videoUrLength)
       if (this.play) {
         //暂停
+
+        console.log('点击暂停', this.$refs)
         this.cloudPlay = this.play = false
         this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
-        this.$refs.cloudPlayer[this.playerIdx] &&
-          this.$refs.cloudPlayer[this.playerIdx].pause()
-        this.hasStreamId = false
+        this.$refs['cloudPlayer' + this.playerIdx] &&
+          this.$refs['cloudPlayer' + this.playerIdx][0].pause()
 
         this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+        // if (cloudPlayerDom.length === 1) {
+        //   this.$refs['cloudPlayer' + this.playerIdx][0].pause()
+        // } else {
+        //   if (cloudPlayerDom.length === videoUrLength) {
+        //     this.$refs['cloudPlayer' + this.playerIdx][this.playerIdx].pause()
+        //     // this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+        //   } else {
+        //     this.videoUrl.forEach((item1, index) => {
+        //       if (item1 !== '' && item1.length && this.playerIdx === index) {
+        //         this.$refs['cloudPlayer' + this.playerIdx][index].pause()
+        //         // this.$refs.TimePlayer.stopTimeAutoPlay(index)
+        //       }
+        //     })
+        //   }
+        // }
+        this.hasStreamId = false
         this.isClickCx = false
       } else if (
         this.tabsActiveName === 'device' ? this.videoUrl : this.cloudPlayerUrl
       ) {
         //播放
+        console.log('点击播放按钮', this.$refs)
         this.play = true
         this.hasStreamId = true
         this.$refs.devicesPlayer && this.$refs.devicesPlayer.play()
-        this.$refs.cloudPlayer[this.playerIdx] &&
-          this.$refs.cloudPlayer[this.playerIdx].play()
+        this.$refs['cloudPlayer' + this.playerIdx] &&
+          this.$refs['cloudPlayer' + this.playerIdx][0].play()
+        // if (cloudPlayerDom.length === 1) {
+        //   this.$refs['cloudPlayer' + this.playerIdx][0].play()
+        // } else {
+        //   if (cloudPlayerDom.length === videoUrLength) {
+        //     this.$refs['cloudPlayer' + this.playerIdx][this.playerIdx].play()
+        //   } else {
+        //     this.videoUrl.forEach((item1, index) => {
+        //       if (item1 !== '' && item1.length && this.playerIdx === index) {
+        //         this.$refs['cloudPlayer' + this.playerIdx][index].play()
+        //       }
+        //     })
+        //   }
+        // }
       }
     },
     //倍数按钮
@@ -1750,7 +1791,6 @@ export default {
           selectNowTime >= selectStartTime &&
           selectNowTime <= selectEndTime
         ) {
-          console.log('有录像')
         } else {
           this.$nextTick(() => {
             console.log('1111111111', newVal, this.resTimeLists, this.playerIdx)
