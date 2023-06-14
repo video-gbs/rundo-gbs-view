@@ -146,7 +146,7 @@
                       :muted="isMuted"
                       @dblclick.capture.stop
                       :videoUrl="videoUrl[i - 1]"
-                      :playbackRate="speedArr[currentSpeed]"
+                      :playbackRate="speedArr[currentSpeed[i - 1]]"
                       :autoplay="play[i - 1]"
                       :playerIdx="playerIdx"
                       live
@@ -279,7 +279,9 @@
                       }`"
                     />
                   </el-tooltip>
-                  <span class="speed-text">{{ speedArr[currentSpeed] }}x</span>
+                  <span class="speed-text"
+                    >{{ speedArr[currentSpeed[playerIdx]] }}x</span
+                  >
                   <el-tooltip content="快进" placement="top">
                     <span
                       @click="hasStreamId ? handleChangeSpeed('plus') : ''"
@@ -592,7 +594,7 @@ export default {
         searchHistoryResult: [] //媒体流历史记录搜索结果
       },
       speedArr: [0.25, 0.5, 1.0, 2.0, 4.0],
-      currentSpeed: 2,
+      currentSpeed: [2],
       isFullScreen: false,
       cloudPlayerUrl: [''],
       resOnlineState: '',
@@ -634,9 +636,11 @@ export default {
     this.play = []
     this.isShowStream = []
     this.videoUrl = []
+    this.currentSpeed = [2]
     for (let i = 0; i < this.spilt; i++) {
       this.videoUrl[i] = ''
       this.play[i] = false
+      this.currentSpeed[i] = 2
       this.isShowStream[i] = false
       this.timeSegments[i] = [
         {
@@ -1113,7 +1117,7 @@ export default {
         this.timeLists = ['']
         this.timeLists = [...this.timeLists]
         this.currentList = ''
-        this.currentSpeed = 2
+        this.currentSpeed = [2]
       } else {
         this.cloudPlayerUrl = ['']
       }
@@ -1524,16 +1528,19 @@ export default {
     },
     //倍数按钮
     handleChangeSpeed(type) {
-      if (type === 'plus' && this.currentSpeed != this.speedArr.length - 1) {
+      if (
+        type === 'plus' &&
+        this.currentSpeed[this.playerIdx] != this.speedArr.length - 1
+      ) {
         //加速
-        this.currentSpeed++
+        this.currentSpeed[this.playerIdx]++
         if (this.tabsActiveName === 'device')
-          this.gbScale(this.speedArr[this.currentSpeed])
-      } else if (type === 'sub' && this.currentSpeed) {
+          this.gbScale(this.speedArr[this.currentSpeed[this.playerIdx]])
+      } else if (type === 'sub' && this.currentSpeed[this.playerIdx]) {
         //减速
-        this.currentSpeed--
+        this.currentSpeed[this.playerIdx]--
         if (this.tabsActiveName === 'device')
-          this.gbScale(this.speedArr[this.currentSpeed])
+          this.gbScale(this.speedArr[this.currentSpeed[this.playerIdx]])
       }
     },
     toogleFullScreen() {
@@ -1561,11 +1568,6 @@ export default {
           playerMain.msRequestFullscreen()
         }
       }
-    },
-    // 点击设备录像列表
-    clickRecordList(row) {
-      this.currentSpeed = 2
-      this.playRecord(row)
     },
     // 点击云端录像列表
     playCloudVideo(row, skipTime = 0, curTime) {
@@ -1665,7 +1667,7 @@ export default {
 
       await resumeRecordView({
         channelId: this.channelId,
-        speed: this.speedArr[this.currentSpeed],
+        speed: this.speedArr[this.currentSpeed[this.playerIdx]],
         streamId: this.streamId
       }).then((res) => {
         if (res.code === 0) {
@@ -1681,7 +1683,7 @@ export default {
 
       await pauseRecordView({
         channelId: this.channelId,
-        speed: this.speedArr[this.currentSpeed],
+        speed: this.speedArr[this.currentSpeed[this.playerIdx]],
         streamId: this.streamId
       }).then((res) => {
         if (res.code === 0) {
@@ -1800,13 +1802,16 @@ export default {
     spilt(newValue) {
       let resTimeSegments = []
       let resVideoUrl = []
+      let resCurrentSpeed = []
 
       if (newValue < this.videoUrl.length) {
         this.videoUrl = this.videoUrl.slice(0, newValue)
         this.timeSegments = this.timeSegments.slice(0, newValue)
+        this.currentSpeed = this.currentSpeed.slice(0, newValue)
       } else if (newValue > this.videoUrl.length) {
         for (let i = 0; i < newValue; i++) {
           if (i >= this.videoUrl.length) {
+            resCurrentSpeed.push(2)
             resVideoUrl.push('')
             resTimeSegments.push([
               {
@@ -1820,6 +1825,7 @@ export default {
             ])
           }
         }
+        this.currentSpeed = this.currentSpeed.concat(resCurrentSpeed)
         this.videoUrl = this.videoUrl.concat(resVideoUrl)
 
         this.timeSegments = this.timeSegments.concat(resTimeSegments)
