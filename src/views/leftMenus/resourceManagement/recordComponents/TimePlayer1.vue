@@ -163,14 +163,17 @@ export default {
       console.log('playerIdx===========', newVal, this.timeAutoPlays)
 
       this.$emit('handleChangeTime', newVal)
-      //
+      //&&
       if (
         this.$props.timeLists[newVal] &&
-        newVal < this.$props.timeLists.length &&
-        this.timeAutoPlays[newVal]
+        newVal < this.$props.timeLists.length
       ) {
         console.log('点击的画面有视频~~~~~~~~~~~~~~~~~~~~~~~~')
-        this.time2[newVal] = new Date(Local.get(`showTime${newVal}`)).getTime()
+        if (this.timeAutoPlays[newVal]) {
+          this.time2[newVal] = new Date(
+            Local.get(`showTime${newVal}`)
+          ).getTime()
+        }
       } else {
         console.log(
           '点击的画面没有视频!!!!!!!!!!!!!!!!!!!!!',
