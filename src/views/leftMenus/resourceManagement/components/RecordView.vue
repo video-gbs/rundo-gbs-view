@@ -143,13 +143,11 @@
                       :isShowStream="isShowStream[i - 1]"
                       :onChangePlayTime="handleChangeCurrentTime"
                       :onPlayEnded="handleDevicesPlayEnded"
-                      :onPlay="handleOnPlay"
                       :muted="isMuted"
-                      :onPause="handleOnPause"
                       @dblclick.capture.stop
                       :videoUrl="videoUrl[i - 1]"
                       :playbackRate="speedArr[currentSpeed]"
-                      :autoplay="play"
+                      :autoplay="play[i - 1]"
                       :playerIdx="playerIdx"
                       live
                     ></cloud-player>
@@ -257,12 +255,15 @@
                 >
                 </el-date-picker>
 
-                <el-tooltip :content="play ? '暂停' : '播放'" placement="top">
+                <el-tooltip
+                  :content="play[playerIdx] ? '暂停' : '播放'"
+                  placement="top"
+                >
                   <div
                     @click="
                       videoUrl[playerIdx] !== '' ? handlePauseOrPlay() : ''
                     "
-                    :class="`play-btn ${play ? 'pause' : 'play'} ${
+                    :class="`play-btn ${play[playerIdx] ? 'pause' : 'play'} ${
                       !cloudPlayerUrl && !videoUrl[playerIdx] !== ''
                         ? 'disabled'
                         : ''
@@ -491,7 +492,7 @@ export default {
       downloadModalVisible: false,
       playTime: moment().startOf('days'),
       deviceVideoList: {}, //录像视频
-      play: false,
+      play: [],
       currentList: '',
       skipTime: 0, //拖拽时间
       streamId: '',
@@ -503,7 +504,7 @@ export default {
       isFill: true, //是否拉伸视频
       isShowStream: [], //是否显示码流
       tracks: [],
-      cloudPlay: false,
+      // cloudPlay: false,
       isZoom: false, //放大缩小类型
       id: null,
       zoomStyle: {
@@ -630,12 +631,12 @@ export default {
       // 监听到屏幕变化，更改全屏状态，该页面不能存在多个全屏元素
       this.isFullScreen = !this.isFullScreen
     })
-    // this.isFill = []
+    this.play = []
     this.isShowStream = []
     this.videoUrl = []
     for (let i = 0; i < this.spilt; i++) {
       this.videoUrl[i] = ''
-      // this.isFill[i] = true
+      this.play[i] = false
       this.isShowStream[i] = false
       this.timeSegments[i] = [
         {
@@ -1040,7 +1041,7 @@ export default {
         Local.get(`showTime${index}`) === 'Invalid Date' ||
         !Local.get(`showTime${index}`)
       ) {
-        this.selectTime = this.resTimeLists[this.playerIdx][0]
+        this.selectTime = this.resTimeLists[this.playerIdx]
           ? this.resTimeLists[this.playerIdx][0].startTime
           : new Date(new Date().setHours(0, 0, 0, 0))
       } else {
@@ -1050,8 +1051,6 @@ export default {
     },
     handleChangeTimePicker(val) {
       console.log('handleChangeTimePicker', val)
-      // Local.set('showTime', val)
-      const isPlay = this.play
 
       if (
         new Date(this.formData.date[0]).getTime() < new Date(val).getTime() &&
@@ -1065,41 +1064,19 @@ export default {
         })
         this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
         // this.handleCloseVideo(this.playerIdx)
-        this.cloudPlay = this.play = false
+        this.play[this.playerIdx] = false
         this.hasStreamId = false
         this.stopPlayRecord()
         this.videoUrl = ['']
-        // this.$nextTick(() => {
-        //   let emptyPlayerDom = this.$refs.emptyPlayer
-        //   for (let i = 0; i < emptyPlayerDom.length; i++) {
-        //     this.$refs.TimePlayer.stopTimeAutoPlay(i)
-        //     this.timeSegments[i] = {
-        //       name: '',
-        //       beginTime: 0,
-        //       endTime: 0,
-        //       color: '#4797FF',
-        //       startRatio: 0.65,
-        //       endRatio: 0.9
-        //     }
-        //     // Local.set(
-        //     //   `showTime${i}`,
-        //     //   dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
-        //     // )
-        //     this.$refs.TimePlayer.changeChildTimeSegments(i)
-        //   }
-        // })
       }
-      if (this.play) this.handlePauseOrPlay()
-
-      // this.handleDevicesPlayEnded()
-      if (isPlay) this.handlePauseOrPlay()
+      if (this.play[this.playerIdx]) this.handlePauseOrPlay()
     },
     closeVideo(i) {
       this.videoUrl.splice(i, 1, '')
       this.timeLists.splice(i, 1, [])
 
       console.log('this.videoUrl~~~~~~~~~~~~~~', this.videoUrl)
-      this.cloudPlay = this.play = false
+      this.play[i] = false
       this.$nextTick(() => {
         this.timeSegments[i] = [
           {
@@ -1127,7 +1104,7 @@ export default {
     },
     // 关闭视频
     handleCloseVideo() {
-      this.cloudPlay = this.play = false
+      this.play = []
       this.hasStreamId = false
       if (this.tabsActiveName === 'device') {
         this.stopPlayRecord()
@@ -1286,20 +1263,20 @@ export default {
       })
     },
     //视频暂停监听时件
-    handleOnPause() {
-      this.play = false
-      console.log('暂停播放设备视频')
-      if (this.tabsActiveName === 'device') {
-        this.gbPause()
-      }
-    },
-    //监听播放视频事件
-    handleOnPlay() {
-      if (this.tabsActiveName === 'device') {
-        this.gbPlay()
-      }
-      this.play = true
-    },
+    // handleOnPause() {
+    //   this.play[this.playerIdx] = false
+    //   console.log('暂停播放设备视频')
+    //   if (this.tabsActiveName === 'device') {
+    //     this.gbPause()
+    //   }
+    // },
+    // //监听播放视频事件
+    // handleOnPlay() {
+    //   if (this.tabsActiveName === 'device') {
+    //     this.gbPlay()
+    //   }
+    //   this.play[this.playerIdx] = true
+    // },
 
     // 滚动时间轴事件
     handleChangePlayTime(curTime, name, index) {
@@ -1393,7 +1370,7 @@ export default {
           )
           this.selectTime = dayjs(curTime).format('YYYY-MM-DD HH:mm:ss')
           // this.handleCloseVideo(this.playerIdx)
-          this.cloudPlay = this.play = false
+          this.play[index] = false
           this.hasStreamId = false
           this.stopPlayRecord()
           this.videoUrl = ['']
@@ -1406,7 +1383,7 @@ export default {
     handleChangeCurrentTime: (function () {
       let lastPlayTime
       return function (currentTime) {
-        if (this.play && !this.isDragging) {
+        if (this.play[this.playerIdx] && !this.isDragging) {
           if (this.tabsActiveName === 'device') {
             this.playTime = moment(this.recordStartTime).add(
               currentTime * 1000 + this.skipTime,
@@ -1455,11 +1432,11 @@ export default {
             this.playRecord(minDateRecord)
           } else {
             //如果今天已经没数据了就到下一天看
-            this.cloudPlay = this.play = false
+            this.play[this.playerIdx] = false
           }
         }
       } else {
-        if (this.play) this.cloudPlay = this.play
+        // if (this.play[this.playerIdx])
         const date = this.cloudPlayTime.format('YYYY-MM-DD')
         if (this.cloudVideoList[date]) {
           for (const item of this.cloudVideoList[date]) {
@@ -1474,7 +1451,7 @@ export default {
           if (minDateRecord) {
             this.playCloudVideo(minDateRecord)
           } else {
-            this.cloudPlay = this.play = false
+            this.play[this.playerIdx] = false
           }
         }
       }
@@ -1492,12 +1469,12 @@ export default {
       // })
 
       // console.log('videoUrLength', videoUrLength)
-      if (this.play) {
+      if (this.play[this.playerIdx]) {
         //暂停
 
         console.log('点击暂停', this.$refs)
-        this.cloudPlay = this.play = false
-        this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
+        this.play[this.playerIdx] = false
+        // this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
         this.$refs['cloudPlayer' + this.playerIdx] &&
           this.$refs['cloudPlayer' + this.playerIdx][0].pause()
 
@@ -1524,9 +1501,10 @@ export default {
       ) {
         //播放
         console.log('点击播放按钮', this.$refs)
-        this.play = true
+        this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
+        this.play[this.playerIdx] = true
         this.hasStreamId = true
-        this.$refs.devicesPlayer && this.$refs.devicesPlayer.play()
+        // this.$refs.devicesPlayer && this.$refs.devicesPlayer.play()
         this.$refs['cloudPlayer' + this.playerIdx] &&
           this.$refs['cloudPlayer' + this.playerIdx][0].play()
         // if (cloudPlayerDom.length === 1) {
@@ -1595,7 +1573,6 @@ export default {
 
       this.cloudPlayTime = curTime || moment(row.startTime)
       this.cloudRecordStartTime = row.startTime
-      this.play = this.cloudPlay
 
       if (this.cloudPlayerUrl !== row.recordUrl)
         //播放不同时间段视频
@@ -1660,7 +1637,9 @@ export default {
 
                   this.streamId = res.data.streamId
 
-                  this.play = true
+                  this.play[this.playerIdx] = true
+
+                  this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
                 }
               })
               .catch((error) => {
@@ -1731,12 +1710,12 @@ export default {
 
     videoClick(i) {
       this.playerIdx = i - 1
-      if (!this.clickedPbPause) {
-        this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
-        // this.play = true
-      } else {
-        // this.play = false
-      }
+      // if (!this.clickedPbPause) {
+      //   this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
+      //   // this.play = true
+      // } else {
+      //   // this.play = false
+      // }
     }
   },
   watch: {
@@ -1799,7 +1778,7 @@ export default {
               type: 'warning'
             })
             this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
-            this.cloudPlay = this.play = false
+            this.play[this.playerIdx] = false
             this.hasStreamId = false
             this.stopPlayRecord()
             this.videoUrl = ['']
