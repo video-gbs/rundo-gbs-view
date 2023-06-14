@@ -298,7 +298,7 @@ export default {
     dragTimeChange(time) {
       this.$emit('handleChangeTime', this.$props.playerIdx)
 
-      this.$emit('handleChangePlayTime', time, '拖拽')
+      this.$emit('handleChangePlayTime', time, '拖拽', this.$props.playerIdx)
 
       // this.$emit('gbPlay')
     },
