@@ -273,9 +273,11 @@
                 <div class="speed-box">
                   <el-tooltip content="减速" placement="top">
                     <span
-                      @click="hasStreamId ? handleChangeSpeed('sub') : ''"
+                      @click="
+                        hasStreamId[playerIdx] ? handleChangeSpeed('sub') : ''
+                      "
                       :class="`speed-icon speed-down ${
-                        !hasStreamId ? 'disabled' : ''
+                        !hasStreamId[playerIdx] ? 'disabled' : ''
                       }`"
                     />
                   </el-tooltip>
@@ -284,9 +286,11 @@
                   >
                   <el-tooltip content="快进" placement="top">
                     <span
-                      @click="hasStreamId ? handleChangeSpeed('plus') : ''"
+                      @click="
+                        hasStreamId[playerIdx] ? handleChangeSpeed('plus') : ''
+                      "
                       :class="`speed-icon speed-up ${
-                        !hasStreamId ? 'disabled' : ''
+                        !hasStreamId[playerIdx] ? 'disabled' : ''
                       }`"
                     />
                   </el-tooltip>
@@ -444,7 +448,7 @@ export default {
       playerData: [], //播放器数据
       fullPlayerIdx: -1, //当前全屏的下标
       isMouseHover: false,
-      hasStreamId: false,
+      hasStreamId: [],
       splitArr: [
         {
           num: 1,
@@ -637,10 +641,12 @@ export default {
     this.isShowStream = []
     this.videoUrl = []
     this.currentSpeed = [2]
+    this.hasStreamId = []
     for (let i = 0; i < this.spilt; i++) {
       this.videoUrl[i] = ''
       this.play[i] = false
       this.currentSpeed[i] = 2
+      this.hasStreamId[i] = false
       this.isShowStream[i] = false
       this.timeSegments[i] = [
         {
@@ -880,7 +886,7 @@ export default {
                 ' this.timeSegments~~~~~~~~~~~~~~~~~~~',
                 this.timeSegments
               )
-              this.hasStreamId = true
+              this.hasStreamId[this.playerIdx] = true
 
               this.playRecord(1, date, [
                 this.resTimeLists[this.playerIdx][0].startTime,
@@ -1069,7 +1075,7 @@ export default {
         this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
         // this.handleCloseVideo(this.playerIdx)
         this.play[this.playerIdx] = false
-        this.hasStreamId = false
+        this.hasStreamId[this.playerIdx] = false
         this.stopPlayRecord()
         this.videoUrl = ['']
       }
@@ -1109,7 +1115,7 @@ export default {
     // 关闭视频
     handleCloseVideo() {
       this.play = []
-      this.hasStreamId = false
+      this.hasStreamId = []
       if (this.tabsActiveName === 'device') {
         this.stopPlayRecord()
         this.videoUrl = ['']
@@ -1285,6 +1291,7 @@ export default {
     // 滚动时间轴事件
     handleChangePlayTime(curTime, name, index) {
       this.channelId = Local.get('recordCloudId')[index]
+      this.streamId = Local.get('recordStreamId')[index]
       // console.log('拖拽时间轴事件==========', this.resTimeLists)
       const resStartTime = new Date(
         this.resTimeLists[this.playerIdx][0].startTime
@@ -1375,7 +1382,7 @@ export default {
           this.selectTime = dayjs(curTime).format('YYYY-MM-DD HH:mm:ss')
           // this.handleCloseVideo(this.playerIdx)
           this.play[index] = false
-          this.hasStreamId = false
+          this.hasStreamId[index] = false
           this.stopPlayRecord()
           this.videoUrl = ['']
           return
@@ -1498,7 +1505,7 @@ export default {
         //     })
         //   }
         // }
-        this.hasStreamId = false
+        this.hasStreamId[this.playerIdx] = false
         this.isClickCx = false
       } else if (
         this.tabsActiveName === 'device' ? this.videoUrl : this.cloudPlayerUrl
@@ -1507,7 +1514,7 @@ export default {
         console.log('点击播放按钮', this.$refs)
         this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
         this.play[this.playerIdx] = true
-        this.hasStreamId = true
+        this.hasStreamId[this.playerIdx] = true
         // this.$refs.devicesPlayer && this.$refs.devicesPlayer.play()
         this.$refs['cloudPlayer' + this.playerIdx] &&
           this.$refs['cloudPlayer' + this.playerIdx][0].play()
@@ -1712,6 +1719,8 @@ export default {
 
     videoClick(i) {
       this.playerIdx = i - 1
+      this.channelId = Local.get('recordCloudId')[this.playerIdx]
+      this.streamId = Local.get('recordStreamId')[this.playerIdx]
       // if (!this.clickedPbPause) {
       //   this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
       //   // this.play = true
@@ -1781,7 +1790,7 @@ export default {
             })
             this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
             this.play[this.playerIdx] = false
-            this.hasStreamId = false
+            this.hasStreamId[this.playerIdx] = false
             this.stopPlayRecord()
             this.videoUrl = ['']
             return
@@ -1803,15 +1812,18 @@ export default {
       let resTimeSegments = []
       let resVideoUrl = []
       let resCurrentSpeed = []
+      let resHasStreamId = []
 
       if (newValue < this.videoUrl.length) {
         this.videoUrl = this.videoUrl.slice(0, newValue)
         this.timeSegments = this.timeSegments.slice(0, newValue)
         this.currentSpeed = this.currentSpeed.slice(0, newValue)
+        this.hasStreamId = this.hasStreamId.slice(0, newValue)
       } else if (newValue > this.videoUrl.length) {
         for (let i = 0; i < newValue; i++) {
           if (i >= this.videoUrl.length) {
             resCurrentSpeed.push(2)
+            resHasStreamId.push(false)
             resVideoUrl.push('')
             resTimeSegments.push([
               {
@@ -1827,6 +1839,7 @@ export default {
         }
         this.currentSpeed = this.currentSpeed.concat(resCurrentSpeed)
         this.videoUrl = this.videoUrl.concat(resVideoUrl)
+        this.hasStreamId = this.hasStreamId.concat(resHasStreamId)
 
         this.timeSegments = this.timeSegments.concat(resTimeSegments)
         console.log('this.$refs', this.$refs)
