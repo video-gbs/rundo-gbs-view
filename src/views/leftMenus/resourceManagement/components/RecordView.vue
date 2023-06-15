@@ -146,7 +146,7 @@
                       :muted="isMuted"
                       @dblclick.capture.stop
                       :videoUrl="videoUrl[i - 1]"
-                      :playbackRate="speedArr[currentSpeed[i - 1]]"
+                      :playbackRate="speedArr[currentSpeed[playerIdx]]"
                       :autoplay="play[i - 1]"
                       :playerIdx="playerIdx"
                       live
