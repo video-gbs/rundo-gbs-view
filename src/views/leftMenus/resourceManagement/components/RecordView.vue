@@ -1123,7 +1123,9 @@ export default {
         this.timeLists = ['']
         this.timeLists = [...this.timeLists]
         this.currentList = ''
-        this.currentSpeed = [2]
+        for (let i = 0; i < this.spilt; i++) {
+          this.currentSpeed[i] = [2]
+        }
       } else {
         this.cloudPlayerUrl = ['']
       }

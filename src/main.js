@@ -31,6 +31,8 @@ Vue.prototype.$moment = moment
 import VideoTimeline from '@wanglin1994/video-timeline'
 Vue.use(VideoTimeline)
 
+// import { Base64 } from 'js-base64'
+// Vue.use(Base64)
 // 引入字典
 import _dict from '@/dict/index'
 

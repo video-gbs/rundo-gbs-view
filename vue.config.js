@@ -49,11 +49,11 @@ const port = process.env.port || process.env.npm_config_port || 8080 // dev port
 // 转发配置数组
 const urls = [
   // test 测试
-  {
-    target: 'http://xard-gbs-test.runjian.com:8080',
-    proxy: '/api'
+  // {
+  //   target: 'http://xard-gbs-test.runjian.com:8080',
+  //   proxy: '/api'
 
-  },
+  // },
   // dev  本地
   // {
   //   target: 'http://xard-gbs-dev.runjian.com:8080',
@@ -63,6 +63,11 @@ const urls = [
   //   target: 'http://xard-gbs-dev.runjian.com:8080',
   //   proxy: '/api'
   // }
+  // 测试新接口
+    {
+    target: 'http://192.192.192.92:9090',
+    proxy: '/rbac'
+  }
 ]
 
 

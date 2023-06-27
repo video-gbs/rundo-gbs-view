@@ -20,9 +20,9 @@
             style="width: 240px"
           ></el-input>
         </el-form-item>
-        <el-form-item label="字典值:">
+        <el-form-item label="分组名称:">
           <el-input
-            v-model="searchParams.itemValue"
+            v-model="searchParams.groupName"
             placeholder="请输入"
             clearable
             style="width: 240px"
@@ -73,7 +73,7 @@
         <el-table-column prop="groupCode" label="分组编码" />
         <el-table-column prop="itemName" label="字典项名称" />
         <el-table-column prop="itemValue" label="字典值Value" />
-        <el-table-column prop="itemDesc" label="字典值描述" />
+        <el-table-column prop="description" label="字典值描述" />
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
             <el-button type="text" @click="dialogShow(0, scope.row)"
@@ -138,7 +138,7 @@
           </el-form-item>
           <el-form-item label="字典项描述">
             <el-input
-              v-model="dialog.params.itemDesc"
+              v-model="dialog.params.description"
               type="textarea"
               :rows="2"
               :maxlength="50"
@@ -223,12 +223,12 @@
 
 <script>
 import {
-  getDictionaryList,
-  addDictionary,
-  getDictionaryById,
-  deleteDictionary,
-  editDictionary
-} from '@/api/method/user'
+  getDictLists,
+  getGroupDictLists,
+  addDict,
+  updateDict,
+  deleteDict
+} from '@/api/method/dictionary'
 import pagination from '@/components/Pagination/index.vue'
 export default {
   name: '',
@@ -254,7 +254,7 @@ export default {
         params: {
           itemValue: '',
           itemName: '',
-          itemDesc: '',
+          description: '',
           groupName: '',
           groupCode: ''
         }
@@ -365,11 +365,18 @@ export default {
       })
     },
     dialogShow(act, data) {
+      this.dialog.params = {
+        itemValue: '',
+        itemName: '',
+        description: '',
+        groupName: '',
+        groupCode: ''
+      }
       if (act === 0) {
-        const { groupName, groupCode, itemDesc, itemName, itemValue } = data
+        const { groupName, groupCode, description, itemName, itemValue } = data
         this.dialog.params.groupCode = groupCode
         this.dialog.params.groupName = groupName
-        this.dialog.params.itemDesc = itemDesc
+        this.dialog.params.description = description
         this.dialog.params.itemName = itemName
         this.dialog.params.itemValue = itemValue
         this.editId = data.id
@@ -404,7 +411,7 @@ export default {
       this.permissionDialog.show = !this.permissionDialog.show
       this.roleId = id
       permissionTree(id).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.permissionTableData = res.data
         }
       })
@@ -423,12 +430,12 @@ export default {
       this.buttonLoading = true
       // this.checkList = []
       this.buildTree('get')
-      editDictionary({
+      updateDict({
         roleId: this.roleId,
         permissionIds: this.checkList
       }).then((res) => {
         this.buttonLoading = false
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.$message({
             message: '保存成功！',
             type: 'success'
@@ -439,16 +446,16 @@ export default {
       })
     },
     getList() {
-      getDictionaryList({
-        current: this.params.pageNum,
-        pageSize: this.params.pageSize,
+      getDictLists({
+        num: this.params.pageSize,
+        page: this.params.pageNum,
         ...this.searchParams
       }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data.records
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
+        if (res.data.code === 0) {
+          this.tableData = res.data.data.list
+          this.params.total = res.data.data.total
+          this.params.pages = res.data.data.pages
+          this.params.current = res.data.data.pageSize
         }
       })
     },
@@ -458,8 +465,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteDictionary(row.id).then((res) => {
-          if (res.code === 0) {
+        deleteDict(row.id).then((res) => {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -475,8 +482,8 @@ export default {
         if (valid) {
           switch (this.dialog.title) {
             case '新建':
-              addDictionary(this.dialog.params).then((res) => {
-                if (res.code === 0) {
+              addDict(this.dialog.params).then((res) => {
+                if (res.data.code === 0) {
                   this.$message({
                     type: 'success',
                     message: '新建成功'
@@ -487,9 +494,9 @@ export default {
               })
               break
             case '编辑':
-              editDictionary({ id: this.editId, ...this.dialog.params }).then(
+              updateDict({ dictId: this.editId, ...this.dialog.params }).then(
                 (res) => {
-                  if (res.code === 0) {
+                  if (res.data.code === 0) {
                     this.$message.success('编辑成功')
                     this.dialog.show = false
                     this.getList()

@@ -1,6 +1,8 @@
 import request from '@/api/fetch'
 
 const rundoAuthServer = '/auth'
+const newRundoAuthServer = '/oauth2'
+const rbac = '/rbac'
 
 export function login(data) {
   return request.post(`${rundoAuthServer}/user/login`, data)
@@ -109,4 +111,24 @@ export function getEditRolesDetail(id) {
 // 用户状态切换
 export function changeUserStatus(params) {
   return request.post(`${rundoAuthServer}/sysUserInfo/status/change`, params)
+}
+
+// 测试新登录
+export function newLogin(params) {
+  return request.post(`${newRundoAuthServer}/token`, params)
+}
+
+// 获取用户信息
+export function getUseInfoLists(params) {
+  return request.get(`${rbac}/auth/user/user`, params)
+}
+
+// 获取菜单信息
+export function getMenuLists(params) {
+  return request.get(`${rbac}/auth/user/menu`, params)
+}
+
+// 退出
+export function newLogout(params) {
+  return request.delete(`${rbac}/auth/user/logout`, params)
 }

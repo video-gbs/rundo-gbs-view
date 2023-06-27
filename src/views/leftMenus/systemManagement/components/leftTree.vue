@@ -12,7 +12,7 @@
         ref="tree"
         :data="treeData"
         class="tree"
-        :props="{ children: 'children', label: this.defaultPropsName }"
+        :props="{ children: 'childList', label: this.defaultPropsName }"
         default-expand-all
         :default-expanded-keys="['根节点']"
         :current-node-key="resCurrentKey"
@@ -30,7 +30,7 @@
               class="tree1"
             />
             <svg-icon v-else icon-class="tree2" class="tree2" />
-            {{ data.orgName || data.areaName }}
+            {{ data.name || data.sectionName }}
           </span>
         </span>
       </el-tree>
@@ -44,7 +44,7 @@ export default {
     return {
       data: [],
       filterText: '',
-      resCurrentKey: '1'
+      resCurrentKey: '0'
     }
   },
   props: {
@@ -56,7 +56,7 @@ export default {
     },
     defaultPropsName: {
       type: String,
-      default: 'orgName'
+      default: 'name'
     }
   },
   watch: {
@@ -90,10 +90,10 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true
-      if (this.$props.defaultPropsName === 'orgName') {
-        return data.orgName && data.orgName.indexOf(value) !== -1
+      if (this.$props.defaultPropsName === 'name') {
+        return data.name && data.name.indexOf(value) !== -1
       } else {
-        return data.areaNames && data.areaNames.indexOf(value) !== -1
+        return data.sectionName && data.sectionName.indexOf(value) !== -1
       }
     }
   }

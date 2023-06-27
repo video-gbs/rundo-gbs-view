@@ -108,7 +108,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { Local } from '@/utils/storage'
-import { logout } from '@/api/method/user'
+import { logout, newLogout } from '@/api/method/user'
 import store from '@/store/index'
 export default {
   components: {
@@ -230,14 +230,14 @@ export default {
      * 退出登录
      */
     logout() {
-      logout()
+      newLogout()
         .then((res) => {})
         .catch(() => {})
         .finally(() => {
           Local.setToken('')
-          Local.remove('rj_token')
+          Local.remove('access_token')
           Local.remove('rj_deptType')
-          Local.remove('rj_userName')
+          // Local.remove('rj_userName')
           // Local.remove('rj__deptName')
           this.$router.push({ path: '/login' })
         })

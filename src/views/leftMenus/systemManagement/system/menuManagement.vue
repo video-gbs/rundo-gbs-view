@@ -14,7 +14,7 @@
       >
         <el-form-item label="菜单名称:">
           <el-input
-            v-model="searchParams.menuName"
+            v-model="searchParams.name"
             placeholder="请输入"
             clearable
             style="width: 240px"
@@ -22,7 +22,7 @@
         </el-form-item>
         <el-form-item label="跳转URL:">
           <el-input
-            v-model="searchParams.url"
+            v-model="searchParams.path"
             placeholder="请输入"
             clearable
             style="width: 240px"
@@ -55,11 +55,12 @@
         </div>
       </div>
       <el-table
+        ref="menuTable"
         :data="tableData"
         border
         row-key="id"
         class="menuManagement-table"
-        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+        :tree-props="{ children: 'childList', hasChildren: 'hasChildren' }"
         :header-cell-style="{
           background: 'rgba(0, 75, 173, 0.06)',
           fontSize: '14px',
@@ -68,27 +69,18 @@
           color: '#333333'
         }"
       >
-        <!-- <el-table-column prop="icon" width="50" align="center" label="图标">
+        <el-table-column prop="name" label="菜单名称">
           <template slot-scope="scope">
-            <svg-icon
-              slot="suffix"
-              :icon-class="scope.row.icon"
-              class="menus-icon"
-            />
-          </template>
-        </el-table-column> -->
-        <el-table-column prop="title" label="菜单名称">
-          <template slot-scope="scope">
-            <span>{{ scope.row.title }}</span>
+            <span>{{ scope.row.name }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="path" label="跳转URL" width="180" />
         <el-table-column prop="menuSort" label="排序" width="80" />
         <el-table-column prop="component" label="前端组件Import路径" />
-        <el-table-column prop="status" label="是否禁用" width="100">
+        <el-table-column prop="disabled" label="是否禁用" width="100">
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.status"
+              v-model="scope.row.disabled"
               active-color="#13ce66"
               inactive-color="#ff4949"
               :active-value="0"
@@ -140,48 +132,7 @@
           :model="dialogForm.params"
           @keyup.enter="submit('roleForm')"
         >
-          <el-form-item label="所属应用：" prop="appId">
-            <el-select
-              v-model="dialogForm.params.appId"
-              placeholder="请选择"
-              style="width: 436px"
-              @change="changeApplication"
-            >
-              <el-option
-                v-for="o in applicationOption"
-                :label="o.label"
-                :value="o.value"
-                :key="o.value"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="上级菜单：" v-if="isDisabled" prop="menuPid">
-            <el-select
-              ref="selectTree"
-              v-model="dialogForm.params.menuPid"
-              placeholder="请选择"
-              :popper-append-to-body="false"
-              style="width: 436px"
-              class="selectTree"
-              disabled
-              id="selectTree"
-            >
-              <el-option :value="dialogForm.params.menuPid">
-                <el-tree
-                  ref="tree"
-                  class="unit-tree"
-                  :data="treeList"
-                  node-key="id"
-                  :props="defaultProps"
-                  :default-expanded-keys="Ids"
-                  highlight-current
-                  :expand-on-click-node="false"
-                  @node-click="nodeClickHandle"
-                ></el-tree>
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="上级菜单：" v-else prop="menuPid">
+          <el-form-item label="上级菜单：" prop="menuPid">
             <el-select
               ref="selectTree"
               v-model="dialogForm.params.menuPid"
@@ -206,8 +157,8 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="菜单名称：" prop="title">
-            <el-input v-model="dialogForm.params.title" style="width: 436px" />
+          <el-form-item label="菜单名称：" prop="name">
+            <el-input v-model="dialogForm.params.name" style="width: 436px" />
           </el-form-item>
           <el-form-item label="菜单图标：" prop="icon">
             <el-input v-model="dialogForm.params.icon" style="width: 436px" />
@@ -244,7 +195,7 @@
             />
           </el-form-item>
           <el-form-item label="是否禁用：">
-            <el-radio-group v-model="dialogForm.params.status">
+            <el-radio-group v-model="dialogForm.params.disabled">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="0">否</el-radio>
             </el-radio-group>
@@ -259,7 +210,9 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogForm.show = false">取 消</el-button>
-        <el-button type="primary" @click="submit('roleForm')">确 定</el-button>
+        <el-button type="primary" :loading="isClick" @click="submit('roleForm')"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
   </div>
@@ -267,14 +220,12 @@
 
 <script>
 import {
-  addMenuInfo,
-  editMenuInfo,
-  getMenuInfoLists,
-  deleteMenuInfo,
-  getApplicationList,
-  getApplicationTree,
-  changeMenusStatus,
-  changeMenusHidden
+  getMenuTree,
+  menuAdd,
+  menuUpdate,
+  menuDelete,
+  menuDisabled,
+  menuHidden
 } from '@/api/method/menus'
 import pagination from '@/components/Pagination/index.vue'
 import { getManufacturerDictionaryList } from '@/api/method/dictionary'
@@ -284,26 +235,26 @@ export default {
   data() {
     return {
       tableData: [],
-      isDisabled: true,
+      isClick: false,
       dialogForm: {
         show: false,
         title1: '新建',
         params: {
-          component: '',
-          path: '',
-          status: '',
-          hidden: '',
-          menuSort: '',
-          title: '',
-          icon: '',
-          appId: '',
+          menuSort: null,
           menuPid: '',
-          menuType: ''
+          menuType: '',
+          path: '',
+          component: '',
+          name: '',
+          icon: '',
+          description: '',
+          hidden: 1,
+          disabled: 1
         }
       },
       searchParams: {
-        menuName: '',
-        url: ''
+        name: '',
+        path: ''
       },
       rules: {
         menuPid: [{ required: true, message: '请选择', trigger: 'change' }],
@@ -319,30 +270,56 @@ export default {
       List: '',
       Ids: [],
       Id: '',
-      menuTypeeOptions: [],
+      menuTypeeOptions: [{ label: '页面', value: 2 }],
       resName: '',
       defaultProps: {
-        children: 'children',
-        label: 'title'
+        children: 'childList',
+        label: 'name'
       }
     }
   },
   mounted() {
-    this.getList()
-    this.getManufacturerDictionaryList()
+    this.initGetMenuTree()
+    // this.getManufacturerDictionaryList()
   },
   methods: {
+    async initGetMenuTree() {
+      await getMenuTree({
+        ...this.searchParams
+      }).then((res) => {
+        if (res.data.code === 0) {
+          this.tableData = [res.data.data]
+
+          this.treeList = [res.data.data]
+        }
+      })
+    },
+
+    // 回显树名字
     getTreeName(arr, id) {
-      console.log(111, arr)
       arr.map((item) => {
         if (item.id === id) {
-          this.resName = item.areaName
+          this.resName = item.name
           this.Id = id
           return
         } else {
-          if (item.children && item.children.length > 0) {
-            this.getTreeName(item.children, id)
+          if (item.childList && item.childList.length > 0) {
+            this.getTreeName(item.childList, id)
           }
+        }
+      })
+    },
+
+    tableExpand(data, flag) {
+      data.forEach((item) => {
+        //用ref获取table表格，进行展开结构
+        this.$refs.menuTable.toggleRowExpansion(item, flag)
+        //如果存在children 并且长度大于0
+        if (item.childList && item.childList.length > 0) {
+          //递归进行展开结构
+          this.tableExpand(item.childList, flag)
+        } else {
+          return
         }
       })
     },
@@ -360,12 +337,13 @@ export default {
       })
     },
     cxData() {
-      this.getList()
+      this.initGetMenuTree()
+      this.tableExpand(this.tableData, true)
     },
     resetData(e) {
       this.searchParams = {
-        menuName: '',
-        url: ''
+        name: '',
+        path: ''
       }
       let target = e.target
       if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
@@ -377,42 +355,42 @@ export default {
       }
       target.blur()
       this.params.pageNum = 1
-      this.getList()
+      this.initGetMenuTree()
     },
     nodeClickHandle(data) {
-      this.dialogForm.params.menuPid = data.title
+      this.dialogForm.params.menuPid = data.name
       this.Id = data.id
       this.$refs.selectTree.blur()
     },
     changeSwitch(row) {
-      let text = row.status === 0 ? '启用' : '停用'
+      let text = row.disabled === 0 ? '启用' : '停用'
 
-      this.$confirm('确认要"' + text + '""' + row.title + '"吗?', '警告', {
+      this.$confirm('确认要"' + text + '""' + row.name + '"吗?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          changeMenusStatus({
-            id: row.id,
-            status: row.status
+          menuDisabled({
+            menuId: row.id,
+            disabled: row.disabled
           }).then((res) => {})
         })
         .catch(() => {
-          row.status = row.status === 0 ? 1 : 0
+          row.disabled = row.disabled === 0 ? 1 : 0
         })
     },
     changeSwitchHidden(row) {
       let text = row.hidden === 0 ? '显示' : '隐藏'
 
-      this.$confirm('确认要"' + text + '""' + row.title + '"吗?', '警告', {
+      this.$confirm('确认要"' + text + '""' + row.name + '"吗?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          changeMenusHidden({
-            id: row.id,
+          menuHidden({
+            menuId: row.id,
             hidden: row.hidden
           }).then((res) => {})
         })
@@ -420,83 +398,54 @@ export default {
           row.hidden = row.hidden === 0 ? 1 : 0
         })
     },
-    changeApplication(val) {
-      this.isDisabled = false
-      getApplicationTree({ appId: val }).then((res) => {
-        if (res.code === 0) {
-          this.treeList = res.data
-        }
-      })
-    },
     dialogShow(type, row) {
-      console.log(row)
-      this.applicationOption = []
-      this.isDisabled = true
-      getApplicationList().then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
-            let obj = {}
-            obj.label = item.appName
-            obj.value = item.id
-            this.applicationOption.push(obj)
-          })
-        }
-      })
       if (type === 0) {
         const {
           component,
           path,
           status,
           hidden,
-          menuSort,
+          sort,
           title,
           icon,
           appId,
           menuPid,
-          parentName,
+          name,
           menuType
         } = row
         this.dialogForm.params.icon = icon
         this.dialogForm.params.title = title
         this.dialogForm.params.hidden = hidden
         this.dialogForm.params.status = status
-        this.dialogForm.params.menuSort = menuSort
+        this.dialogForm.params.menuSort = sort
         this.dialogForm.params.path = path
         this.dialogForm.params.component = component
         this.dialogForm.params.appId = appId
         this.dialogForm.params.menuType = menuType
-        this.dialogForm.params.menuPid =
-          parentName !== '' ? parentName : menuPid
-        //  this.$nextTick(() => {
-        //         this.getTreeName(this.treeList, this.dialogForm.params.menuPid)
-        //         this.dialogForm.params.menuPid = this.resName
-        //  })
+        // this.dialogForm.params.menuPid = menuPid
+        this.dialogForm.params.name = name
         this.editId = row.id
+
+        // this.$nextTick(() => {
+        this.getTreeName(this.treeList, menuPid)
+        this.dialogForm.params.menuPid = this.resName
+        // })
       } else {
         this.dialogForm.params = {
-          component: '',
-          path: '',
-          status: '',
-          hidden: '',
-          menuSort: '',
-          title: '',
-          icon: '',
-          appId: '',
+          menuSort: null,
           menuPid: '',
-          menuType: ''
+          menuType: '',
+          path: '',
+          component: '',
+          name: '',
+          icon: '',
+          description: '',
+          hidden: 1,
+          disabled: 1
         }
       }
       this.dialogForm.title1 = type === 1 ? '新建' : '编辑'
       this.dialogForm.show = !this.dialogForm.show
-    },
-    async getList() {
-      await getMenuInfoLists({
-        ...this.searchParams
-      }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data
-        }
-      })
     },
     deleteRole(row) {
       this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
@@ -504,44 +453,52 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteMenuInfo(row.id).then((res) => {
-          if (res.code === 0) {
+        menuDelete(row.id).then((res) => {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
             })
-            this.getList()
+            this.initGetMenuTree()
           }
         })
       })
     },
     submit(formName) {
+      this.isClick = true
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.dialogForm.params.menuPid = this.Id
           switch (this.dialogForm.title1) {
             case '新建':
-              addMenuInfo(this.dialogForm.params).then((res) => {
-                if (res.code === 0) {
-                  this.$message({
-                    type: 'success',
-                    message: '新建成功'
-                  })
-                  this.dialogForm.show = false
-                  this.getList()
-                }
-              })
+              menuAdd(this.dialogForm.params)
+                .then((res) => {
+                  if (res.data.code === 0) {
+                    this.$message({
+                      type: 'success',
+                      message: '新建成功'
+                    })
+                    this.isClick = false
+                    this.dialogForm.show = false
+                    this.initGetMenuTree()
+                  }
+                })
+                .catch(() => {
+                  this.isClick = false
+                })
               break
             case '编辑':
-              editMenuInfo({ id: this.editId, ...this.dialogForm.params }).then(
-                (res) => {
-                  if (res.code === 0) {
+              menuUpdate({ id: this.editId, ...this.dialogForm.params })
+                .then((res) => {
+                  if (res.data.code === 0) {
                     this.$message.success('编辑成功')
                     this.dialogForm.show = false
-                    this.getList()
+                    this.initGetMenuTree()
                   }
-                }
-              )
+                })
+                .catch(() => {
+                  this.isClick = false
+                })
               break
 
             default:
@@ -555,6 +512,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid #eaeaea;
 }

@@ -1,146 +1,226 @@
-import Vue from 'vue'
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
-import store from '@/store'
+import { Message } from 'element-ui'
 import router from '@/router'
 import { Local } from '@/utils/storage'
+import { logout } from '@/api/method/user'
 
 const requestTimeOut = 20 * 100000
-// const baseURL = window.ipConfig.baseURL
-const noToken = ['/politics/sys/login', '/politics/v1/file/batchUploadImg']
-// create an axios instance
-// console.log('process.env.VUE_APP_BASE_API',process.env)
-// axios.defaults.transformResponse = jb
+
 console.log('process.env.NODE_ENV', process.env.NODE_ENV)
 const service = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? 'api/' : 'api/', // url = base url + request url
-  // withCredentials: true, // send cookies when cross-domain requests
-  timeout: requestTimeOut // request timeout
+  baseURL: process.env.NODE_ENV === 'production' ? 'api/' : '',
+  timeout: requestTimeOut
 })
 
-// request interceptor
+//判空
+const isEmpty = function (obj) {
+  return (
+    obj == null ||
+    obj == 'undefined' ||
+    obj == 'null' ||
+    new String(obj).trim() == ''
+  )
+}
+
+const init = {
+  // 记录时间戳
+  timer: null,
+  // 是否调过refresh_token函数
+  isRefresh: false,
+  openMessage: function (msg) {
+    Message({
+      message: msg,
+      type: 'error',
+      showClose: true
+    })
+  },
+  updataTokenAPI: function () {
+    let that = this
+    axios({
+      method: 'post',
+      url: `http://192.192.192.92:9090/oauth2/token?grant_type=refresh_token&refresh_token=${Local.get(
+        'refresh_token'
+      )}`,
+      headers: {
+        Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+      }
+    })
+      .then(function (res) {
+        console.log('res', res)
+        if (res.data.data.access_token) {
+          // 防止重复调refresh_token接口
+          that.isRefresh = false
+          let result = res.data
+          let millisecond = new Date().getTime()
+          let expiresTime = result.expires_in * 1000
+          let utilTime = millisecond + expiresTime
+          Local.set('access_token', result.access_token, {
+            expires: expiresTime
+          })
+          Local.set('utilTime', utilTime)
+          Local.set('refresh_token', result.refresh_token)
+          Local.set('expires_in', result.expires_in)
+        } else {
+          //刷新token失败只能跳转到登录页重新登录
+          Local.clear()
+          Local.remove('access_token')
+          Local.remove('utilTime')
+          Local.remove('expires_in')
+          Local.remove('refresh_token')
+          router.replace({
+            path: '/login',
+            query: { redirect: router.currentRoute.fullPath }
+          })
+        }
+      })
+      .catch(function (err) {
+        //刷新token失败只能跳转到登录页重新登录
+
+        console.log(err)
+        logout()
+          .then((res) => {})
+          .catch(() => {})
+          .finally(() => {
+            Local.clear()
+            Local.remove('access_token')
+            Local.remove('utilTime')
+            Local.remove('expires_in')
+            Local.remove('refresh_token')
+            that.openMessage('登录失效')
+            router.replace({
+              path: '/login',
+              query: { redirect: router.currentRoute.fullPath }
+            })
+          })
+      })
+  }
+}
+
+//http request 拦截器
 service.interceptors.request.use(
   (config) => {
-    config.headers = { ...config.headers, ...{} } // 不知为何 这里的headers是undefined,所以需要设置成{}
-    const token = Local.getToken()
-    // config.headers.Authorization= token;
-    if (noToken.indexOf(config.url) !== -1) {
-      // 图片上传不传token
-      delete config.headers.Authorization
-      return config
-    }
-    if (token) {
-      config.headers.Authorization = token
-      return config
+    console.log('config', config)
+    config.data = JSON.stringify(config.data)
+    init.timer = new Date().getTime()
+    if (Local.get('access_token')) {
+      if (
+        (parseInt(Local.get('utilTime')) - init.timer) / (1000 * 60 * 60) <
+        0
+      ) {
+        Local.remove('access_token')
+        Local.remove('utilTime')
+        Local.remove('expires_in')
+        Local.remove('refresh_token')
+        logout()
+          .then((res) => {})
+          .catch(() => {})
+          .finally(() => {
+            Local.clear()
+            router.replace({
+              path: '/login',
+              query: { redirect: router.currentRoute.fullPath }
+            })
+          })
+      }
+      config.headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${Local.get('access_token')}`
+      }
+    } else {
+      config.headers = {
+        'Content-Type': 'application/json'
+      }
     }
     return config
   },
   (error) => {
-    // do something with request error
-    console.log(error) // for debug
+    Message.error({
+      message: '加载超时'
+    })
     return Promise.reject(error)
   }
 )
 
-const ls = ['MANAGE_USER_TOKEN', 'rj_token', 'rj_deptType']
-
-const logoutFn = () => {
-  ls.forEach((i) => {
-    Local.remove(i)
-  })
-  router.push('/login')
-}
-
-// response interceptor
+//响应拦截器即异常处理
 service.interceptors.response.use(
-  /**
-   * If you want to get http information such as headers or status
-   * Please return  response => response
-   */
-
-  /**
-   * Determine the request status by custom code
-   * Here is just an example
-   * You can also judge the status by HTTP Status Code
-   */
   (response) => {
-    const res = response.data
-
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 200 && res.code !== 0) {
-      // Message({
-      //   message: res.message || 'Error',
-      //   type: 'error',
-      //   duration: 5 * 1000
-      // })
-
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-        // to re-login
-        MessageBox.confirm('发生错误，退出重新登录', '错误', {
-          confirmButtonText: '退出',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          logoutFn()
-        })
-      } else if (res.code === 50000) {
-        Message({
-          message: res.message || '系统连接异常',
-          type: 'error',
-          duration: 5 * 1000
-        })
-      } else if (res.code === 401) {
-        Message({
-          message: res.message || '登录过期,请重新登录',
-          type: 'error',
-          duration: 5 * 1000
-        })
-        logoutFn()
-      } else {
-        Message({
-          message: res.msg || res.message || '发生错误',
-          type: 'error',
-          duration: 5 * 1000
-        })
+    console.log(999, response)
+    if (Local.get('utilTime')) {
+      if (!init.isRefresh) {
+        // 是否是到期前30分钟
+        if (
+          (parseInt(Local.get('utilTime')) - init.timer) / (1000 * 60 * 60) <
+          0.5
+        ) {
+          init.isRefresh = true
+          init.updataTokenAPI()
+        }
       }
-      return Promise.reject(new Error(res.message || 'Error'))
-    } else {
-      return res
     }
+    return response
   },
-  (error) => {
-    let msg = '系统连接异常'
-    if ((error + '').indexOf('401') > -1) {
-      logoutFn()
-      msg = '账户信息已过期,请重新登录。'
+  (err) => {
+    // debugger
+    if (err && err.response) {
+      switch (err.response.status) {
+        case 400:
+          console.log('错误请求')
+          break
+        case 401:
+          //刷新token失败只能跳转到登录页重新登录
+          logout()
+            .then((res) => {})
+            .catch(() => {})
+            .finally(() => {
+              Local.clear()
+              Local.remove('access_token')
+              Local.remove('expires_in')
+              Local.remove('utilTime')
+              Local.remove('refresh_token')
+              init.openMessage('登录失效')
+              router.replace({
+                path: '/login',
+                query: { redirect: router.currentRoute.fullPath }
+              })
+            })
+          break
+        case 403:
+          init.openMessage('拒绝访问')
+          break
+        case 404:
+          init.openMessage('请求错误,未找到该资源')
+          break
+        case 405:
+          init.openMessage('请求方法未允许')
+          break
+        case 408:
+          init.openMessage('请求超时')
+          break
+        case 500:
+          init.openMessage('服务器端出错')
+          break
+        case 501:
+          init.openMessage('网络未实现')
+          break
+        case 502:
+          init.openMessage('网络错误')
+          break
+        case 503:
+          init.openMessage('服务不可用')
+          break
+        case 504:
+          init.openMessage('网络超时')
+          break
+        case 505:
+          init.openMessage('http版本不支持该请求')
+          break
+        default:
+          init.openMessage(`连接错误${err.response.status}`)
+      }
+    } else {
+      init.openMessage('连接服务器失败')
     }
-
-    if ((error + '').indexOf('403') > -1) {
-      msg = '您的账号无访问权限。'
-    }
-    if ((error + '').indexOf('405') > -1) {
-      msg = '数据请求异常'
-    }
-    if ((error + '').indexOf('500') > -1) {
-      msg = '系统连接异常'
-    }
-    if ((error + '').indexOf('502') > -1) {
-      msg = '服务器连接超时'
-    }
-    console.log('err info:' + error) // for debug
-    if (
-      document &&
-      document.getElementsByClassName('el-message').length === 0
-    ) {
-      Message({
-        message: msg,
-        type: 'error',
-        duration: 5 * 1000
-      })
-    }
-
-    return Promise.reject(error)
+    return Promise.resolve(err.response)
   }
 )
 

@@ -14,6 +14,10 @@
             <svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
+          <el-button @click="dialogMoveShow">
+            <svg-icon class="svg-btn" icon-class="move" />
+            <span class="btn-span">排序</span>
+          </el-button>
           <el-button @click="deleteAccount($event)">
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">删除</span>
@@ -41,15 +45,19 @@
           label-width="100px"
           class="area-form"
         >
-          <el-form-item label="部门信息" prop="orgName">
-            <div class="f fd-c mr30">
-              <el-input v-model="form.orgName" placeholder="请输入" clearable />
-            </div>
-          </el-form-item>
-          <el-form-item label="部门负责人" prop="orgLeader">
+          <el-form-item label="部门信息" prop="sectionName">
             <div class="f fd-c mr30">
               <el-input
-                v-model="form.orgLeader"
+                v-model="form.sectionName"
+                placeholder="请输入"
+                clearable
+              />
+            </div>
+          </el-form-item>
+          <el-form-item label="部门负责人" prop="leaderName">
+            <div class="f fd-c mr30">
+              <el-input
+                v-model="form.leaderName"
                 placeholder="请输入"
                 clearable
               />
@@ -70,7 +78,11 @@
         </el-form>
 
         <div class="dialog-footer">
-          <el-button type="primary" @click="save('unitManagementForm')">
+          <el-button
+            type="primary"
+            :disabled="fatherName === '根节点'"
+            @click="save('unitManagementForm')"
+          >
             <svg-icon class="svg-btn" icon-class="save" />保 存
           </el-button>
         </div>
@@ -100,16 +112,16 @@
           :rules="dialogRules"
           @keyup.enter="submit('accountForm')"
         >
-          <el-form-item label="上级部门" prop="orgPid">
+          <el-form-item label="上级部门" prop="sectionPid">
             <el-select
               ref="selectTree"
-              v-model="dialog.params.orgPid"
+              v-model="dialog.params.sectionPid"
               placeholder="请选择"
               :popper-append-to-body="false"
               style="width: 436px"
               class="selectTree"
             >
-              <el-option :value="List">
+              <el-option :value="dialog.params.sectionPid">
                 <el-tree
                   class="unit-tree"
                   :data="treeList"
@@ -125,18 +137,18 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="部门名称" prop="orgName">
+          <el-form-item label="部门名称" prop="sectionName">
             <el-input
-              v-model="dialog.params.orgName"
+              v-model="dialog.params.sectionName"
               placeholder="请输入"
               clearable
               style="width: 436px"
             />
           </el-form-item>
 
-          <el-form-item label="部门负责人" prop="orgLeader">
+          <el-form-item label="部门负责人" prop="leaderName">
             <el-input
-              v-model="dialog.params.orgLeader"
+              v-model="dialog.params.leaderName"
               placeholder="请输入"
               clearable
               style="width: 436px"
@@ -163,7 +175,10 @@
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="submit('accountForm')"
+        <el-button
+          type="primary"
+          :loading="isClick"
+          @click="submit('accountForm')"
           >确 定</el-button
         >
       </div>
@@ -181,11 +196,12 @@
 <script>
 import moveTree from './components/MoveTree'
 import {
+  getUnitList,
+  moveUnitFz,
+  moveUnitXd,
   unitAdd,
-  unitEdit,
-  unitList,
-  unitDelete,
-  getUnitDetails
+  unitUpdate,
+  unitDelete
 } from '@/api/method/unitManagement'
 import { Local } from '@/utils/storage'
 import leftTree from '../components/leftTree'
@@ -233,7 +249,7 @@ export default {
     }
     const checkPhone = (rule, value, cb) => {
       const regPhone = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
-      if (value.length === 0) {
+      if (value === '' || value === null || value.length === 0) {
         return cb()
       }
       setTimeout(() => {
@@ -265,23 +281,24 @@ export default {
         show: false,
         title: '新建部门',
         params: {
-          orgPid: '',
+          sectionPid: '',
           description: '',
-          orgLeader: '',
-          orgName: '',
+          leaderName: '',
+          sectionName: '',
           phone: ''
         }
       },
+      isClick: false,
       editShow: false,
-      currentKey: '1',
+      currentKey: '0',
       form: {
-        orgName: '',
+        sectionName: '',
         description: '',
         phone: '',
-        orgLeader: ''
+        leaderName: ''
       },
       rules: {
-        orgName: [
+        sectionName: [
           {
             validator: checkOrgName,
             max: 32,
@@ -289,7 +306,7 @@ export default {
             trigger: 'blur'
           }
         ],
-        orgLeader: [
+        leaderName: [
           {
             validator: checkOrgName1,
             trigger: 'blur'
@@ -309,14 +326,14 @@ export default {
         }
       },
       dialogRules: {
-        orgName: [
+        sectionName: [
           {
             validator: checkOrgName,
             required: true,
             trigger: 'blur'
           }
         ],
-        orgLeader: [
+        leaderName: [
           {
             validator: checkOrgName1,
             trigger: 'blur'
@@ -333,7 +350,7 @@ export default {
           trigger: 'blur',
           max: 128
         },
-        orgPid: {
+        sectionPid: {
           required: true,
           message: '此为必填项。',
           trigger: 'change'
@@ -347,8 +364,8 @@ export default {
       fatherId: '1',
       fatherName: '根节点',
       defaultProps: {
-        children: 'children',
-        label: 'orgName'
+        children: 'childList',
+        label: 'sectionName'
       },
       detailsId: '',
       treeMsg: '',
@@ -361,47 +378,69 @@ export default {
     }
   },
   mounted() {
-    this.init()
+    this.init(this.detailsId)
   },
   methods: {
     // 点击节点选中
     nodeClickHandle(data) {
-      this.dialog.params.orgPid = data.orgName
+      this.dialog.params.sectionPid = data.sectionName
       this.Id = data.id
       this.$refs.selectTree.blur()
     },
 
     childClickHandle(data) {
+      console.log(data)
       this.fatherId = data.id
-      this.fatherName = data.orgName
-      if (data.children && data.children.length > 0) {
+      this.fatherName = data.sectionName
+      if (data.childList && data.childList.length > 0) {
         this.isMore = true
-        this.treeMsg = data.orgName
+        this.treeMsg = data.sectionName
       } else {
         this.isMore = false
-        this.treeMsg = data.orgName
+        this.treeMsg = data.sectionName
       }
       this.detailsId = data.id
-      this.$refs['unitManagementForm'].resetFields()
-      this.getUnitDetailsData()
+      // this.$refs['unitManagementForm'].resetFields()
+      this.getUnitDetailsData(data)
     },
-    getUnitDetailsData() {
-      getUnitDetails(this.detailsId).then((res) => {
-        if (res.code === 0) {
-          this.form.orgName = res.data.orgName
-          this.form.description = res.data.description
-          this.form.phone = res.data.phone
-          this.form.orgLeader = res.data.orgLeader
+    getUnitDetailsData(res) {
+      // getUnitList(this.detailsId).then((res) => {
+      //   if (res.data.code === 0) {
+      this.form.sectionName = res.sectionName
+      this.form.description = res.description
+      this.form.phone = res.phone
+      this.form.leaderName = res.leaderName
+      //   }
+      // })
+    },
+
+    getDetailsLists(arr, id) {
+      arr.map((item) => {
+        if (item.id === id) {
+          return item
+        } else {
+          if (item.childList && item.childList.length > 0) {
+            this.getDetailsLists(item.childList, id)
+          }
         }
       })
     },
+
     async init(id) {
-      await getDepartmentTree()
+      console.log(111, id)
+      await getUnitList()
         .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
-            this.detailsId = id ? id : res.data[0].id
-            this.getUnitDetailsData()
+          if (res.data.code === 0) {
+            this.treeList = [res.data.data]
+            let resData = {}
+            if (id && id !== undefined && id !== '') {
+              this.detailsId = id
+              resData = this.getDetailsLists(this.treeList, id)
+            } else {
+              this.detailsId = res.data.data.id
+              resData = res.data.data
+            }
+            this.getUnitDetailsData(resData)
           }
         })
         .catch((error) => {
@@ -414,31 +453,31 @@ export default {
     dialogShow() {
       this.editShow = true
       this.dialog.params = {
-        orgPid: '',
+        sectionPid: '',
         description: '',
-        orgLeader: '',
-        orgName: '',
+        leaderName: '',
+        sectionName: '',
         phone: ''
       }
 
-      console.log('this.orgPid', this.fatherName)
-      this.dialog.params.orgPid = this.fatherName
+      console.log('this.sectionPid', this.fatherName)
+      this.dialog.params.sectionPid = this.fatherName
       this.dialog.show = !this.dialog.show
     },
     dialogMoveShow() {
       this.$refs.moveTree.changeMoveTreeShow()
     },
     save(formName) {
+      console.log('formName', formName, this.$refs[formName])
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
-            if (res.code === 0) {
+          unitUpdate({ id: this.detailsId, ...this.form }).then((res) => {
+            if (res.data.code === 0) {
               this.$message({
                 type: 'success',
                 message: '编辑成功'
               })
-
-              this.fatherName = this.form.orgName
+              this.fatherName = this.form.sectionName
               this.$refs.unitTree.chooseId(this.detailsId)
               this.init(this.detailsId)
             }
@@ -469,48 +508,64 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        unitDelete(this.detailsId).then((res) => {
-          if (res.code === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            })
-            this.init()
-            this.detailsId = this.treeList[0].id
-            this.getUnitDetailsData()
-          }
-        })
+        unitDelete(this.detailsId)
+          .then((res) => {
+            if (res.data.code === 0) {
+              this.$message({
+                type: 'success',
+                message: '删除成功'
+              })
+              this.init()
+            } else {
+              this.$message({
+                type: 'warning',
+                message: res.data.data
+              })
+            }
+          })
+          .catch((error) => {
+            console.log(11111, error)
+          })
       })
     },
     submit(formName) {
+      this.isClick = true
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
             case '新建部门':
-              this.dialog.params.orgPid = this.Id ? this.Id : this.fatherId
-              unitAdd(this.dialog.params).then((res) => {
-                if (res.code === 0) {
-                  this.$message({
-                    type: 'success',
-                    message: '新建成功'
-                  })
-                  this.dialog.show = false
-                  this.detailsId = res.data.id
-                  this.init(this.detailsId)
-                }
-              })
+              this.dialog.params.sectionPid = this.Id ? this.Id : this.fatherId
+              unitAdd(this.dialog.params)
+                .then((res) => {
+                  if (res.data.code === 0) {
+                    this.$message({
+                      type: 'success',
+                      message: '新建成功'
+                    })
+                    this.dialog.show = false
+                    this.isClick = false
+                    this.detailsId = res.data.id
+                    this.init(this.detailsId)
+                  }
+                })
+                .catch((error) => {
+                  this.isClick = false
+                })
               break
             case '编辑':
-              editApplication({ id: this.editId, ...this.dialog.params }).then(
-                (res) => {
-                  if (res.code === 0) {
+              editApplication({ id: this.editId, ...this.dialog.params })
+                .then((res) => {
+                  if (res.data.code === 0) {
+                    this.isClick = false
                     this.$message.success('编辑成功')
-                    this.$refs.unitTree.chooseId(this.dialog.params.orgPid)
+                    this.$refs.unitTree.chooseId(this.dialog.params.sectionPid)
                     this.dialog.show = false
                     this.getList()
                   }
-                }
-              )
+                })
+                .catch((error) => {
+                  this.isClick = false
+                })
               break
 
             default:
@@ -524,6 +579,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .btn-lists > .el-button {
+  margin-left: 0 !important;
+}
 ::v-deep .unitTree .el-tree-node__expand-icon.expanded {
   -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
@@ -631,7 +689,7 @@ export default {
           left: -6px;
         }
         .el-button {
-          width: 80px;
+          width: 70px;
           height: 32px;
         }
       }

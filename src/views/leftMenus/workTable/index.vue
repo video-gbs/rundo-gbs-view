@@ -118,6 +118,9 @@
 import { Header } from '@/layout/components'
 import LineFont from '@/components/LineFont'
 import { getHomeLists, getTypeTreeMenus } from '@/api/method/home'
+
+import { getUseInfoLists, getMenuLists } from '@/api/method/user'
+
 import store from '@/store/index'
 import router from '../../../router/index'
 import { Local } from '@/utils/storage'
@@ -300,7 +303,9 @@ export default {
   },
   created() {},
   mounted() {
-    this.init()
+    // this.init()
+    this.initUseInfoLists()
+    this.initMenuLists()
     this.windowWidth = document.documentElement.clientWidth
     window.onresize = this.throttle(this.setScale, 500, 500)
   },
@@ -308,7 +313,7 @@ export default {
     async init() {
       await getHomeLists()
         .then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             const { appList, configList, devOpsList } = res.data
             this.devOpsList = devOpsList
             this.appList = appList
@@ -319,6 +324,28 @@ export default {
           console.log(error)
         })
     },
+    async initUseInfoLists() {
+      await getUseInfoLists()
+        .then((res) => {
+          console.log(111, res)
+          if (res.data.code === 0) {
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    async initMenuLists() {
+      await getMenuLists({ levelNumStart: 1, levelNumEnd: 2 })
+        .then((res) => {
+          if (res.data.code === 0) {
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
     throttle(method, delay, duration) {
       var timer = null
       var begin = new Date()
