@@ -1,10 +1,25 @@
 <template>
   <div class="department_main">
     <div class="panel-header-box f jc-sb ai-c fw-w">
-      <div>部门管理</div>
+      <div>资源接口</div>
     </div>
     <div class="main-content">
       <div class="securityArea_container">
+        <div class="btn-lists-top">
+          <el-select
+            v-model="resourceType"
+            placeholder="请选择资源类型："
+            style="width: 100%"
+            @change="changeResourceType"
+          >
+            <el-option
+              v-for="o in resourceKeyOptions"
+              :label="o.label"
+              :value="o.value"
+              :key="o.value"
+            />
+          </el-select>
+        </div>
         <div class="btn-lists">
           <el-button type="primary" @click="dialogShow">
             <svg-icon class="svg-btn" icon-class="add" />
@@ -27,6 +42,7 @@
           ref="unitTree"
           class="unitTree"
           :treeData="treeList"
+          :defaultPropsName="resourceName1"
           :currentKey="currentKey"
           @childClickHandle="childClickHandle"
         />
@@ -34,7 +50,7 @@
       <el-card class="right-box-card">
         <div slot="header" class="clearfix">
           <svg-icon icon-class="zzgl" class="tzgg_svg" />
-          <span>部门信息</span>
+          <span>资源接口信息</span>
         </div>
 
         <el-form
@@ -45,34 +61,21 @@
           label-width="100px"
           class="area-form"
         >
-          <el-form-item label="部门信息" prop="sectionName">
+          <el-form-item label="资源名称" prop="resourceName">
             <div class="f fd-c mr30">
               <el-input
-                v-model="form.sectionName"
+                v-model="form.resourceName"
                 placeholder="请输入"
                 clearable
               />
             </div>
           </el-form-item>
-          <el-form-item label="部门负责人" prop="leaderName">
-            <div class="f fd-c mr30">
-              <el-input
-                v-model="form.leaderName"
-                placeholder="请输入"
-                clearable
-              />
-            </div>
-          </el-form-item>
-          <el-form-item label="手机号码" prop="phone">
-            <div class="f fd-c mr30">
-              <el-input v-model="form.phone" placeholder="请输入" clearable />
-            </div>
-          </el-form-item>
-          <el-form-item label="描述" prop="description">
+
+          <el-form-item label="资源value" prop="resourceValue">
             <el-input
-              v-model="form.description"
-              type="textarea"
-              placeholder="多行输入"
+              v-model="form.resourceValue"
+              placeholder="请输入"
+              clearable
             />
           </el-form-item>
         </el-form>
@@ -112,23 +115,23 @@
           :rules="dialogRules"
           @keyup.enter="submit('accountForm')"
         >
-          <el-form-item label="上级部门" prop="sectionPid">
+          <el-form-item label="父节点名称" prop="resourcePid">
             <el-select
               ref="selectTree"
-              v-model="dialog.params.sectionPid"
+              v-model="dialog.params.resourcePid"
               placeholder="请选择"
               :popper-append-to-body="false"
-              style="width: 436px"
+              style="width: 386px"
               class="selectTree"
             >
-              <el-option :value="dialog.params.sectionPid">
+              <el-option :value="dialog.params.resourcePid">
                 <el-tree
+                  ref="dialogTree"
                   class="unit-tree"
                   :data="treeList"
                   node-key="id"
                   :props="defaultProps"
                   :default-expanded-keys="Ids"
-                  ref="tree"
                   highlight-current
                   :expand-on-click-node="false"
                   @node-click="nodeClickHandle"
@@ -137,40 +140,91 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="部门名称" prop="sectionName">
+          <el-form-item label="资源类型" prop="resourceType">
+            <el-select
+              v-model="dialog.params.resourceType"
+              placeholder="请选择资源类型"
+              style="width: 386px"
+              @change="changeDialogResourceType"
+            >
+              <el-option
+                v-for="o in resourceKeyOptions"
+                :label="o.label"
+                :value="o.value"
+                :key="o.value"
+              />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="资源组名称" prop="groupName">
             <el-input
-              v-model="dialog.params.sectionName"
+              v-model="dialog.params.groupName"
               placeholder="请输入"
               clearable
-              style="width: 436px"
+              style="width: 386px"
             />
           </el-form-item>
 
-          <el-form-item label="部门负责人" prop="leaderName">
+          <el-form-item label="资源key" prop="resourceKey">
             <el-input
-              v-model="dialog.params.leaderName"
+              v-model="dialog.params.resourceKey"
               placeholder="请输入"
               clearable
-              style="width: 436px"
+              style="width: 386px"
             />
           </el-form-item>
 
-          <el-form-item label="手机号码" prop="phone">
-            <el-input
-              v-model="dialog.params.phone"
-              placeholder="请输入"
-              clearable
-              style="width: 436px"
-            />
-          </el-form-item>
+          <el-button
+            class="add_resource"
+            icon="el-icon-circle-plus"
+            @click="addProduct()"
+            >新增多个资源组</el-button
+          >
 
-          <el-form-item label="描述" prop="description">
-            <el-input
-              v-model="dialog.params.description"
-              type="textarea"
-              placeholder="多行输入"
-            />
-          </el-form-item>
+          <div
+            v-for="(item, index) in groupNameLists"
+            :key="index"
+            class="group_name_lists"
+          >
+            <div>
+              <el-form-item label="资源名称" prop="resourceName">
+                <el-input
+                  v-model="dialog.params.resourceName[index]"
+                  placeholder="请输入"
+                  clearable
+                  style="width: 386px"
+                  @change="
+                    (val) => {
+                      changeGroupNameLists(val, 'resourceName', index)
+                    }
+                  "
+                />
+              </el-form-item>
+
+              <el-form-item label="资源value" prop="resourceValue">
+                <el-input
+                  v-model="dialog.params.resourceValue[index]"
+                  placeholder="请输入"
+                  style="width: 386px"
+                  @change="
+                    (val) => {
+                      changeGroupNameLists(val, 'resourceValue', index)
+                    }
+                  "
+                  clearable
+                />
+              </el-form-item>
+            </div>
+
+            <el-button
+              v-if="index >= 1"
+              style="float: right; color: red"
+              type="text"
+              @click="deleteDate(index)"
+            >
+              删除
+            </el-button>
+          </div>
         </el-form>
       </div>
       <div slot="footer" class="dialog-footer">
@@ -187,6 +241,7 @@
     <moveTree
       ref="moveTree"
       :treeData="treeList"
+      :resourceType="resourceType"
       @init="init"
       :fatherId="fatherId"
     />
@@ -196,13 +251,13 @@
 <script>
 import moveTree from './components/MoveTree'
 import {
-  getUnitList,
-  moveUnitFz,
-  moveUnitXd,
-  unitAdd,
-  unitUpdate,
-  unitDelete
-} from '@/api/method/unitManagement'
+  getResourceList,
+  moveResourceFz,
+  moveResourceXd,
+  resourceAdd,
+  resourceUpdate,
+  resourceDelete
+} from '@/api/method/resourceInterface'
 import { Local } from '@/utils/storage'
 import leftTree from '../components/leftTree'
 import LineFont from '@/components/LineFont'
@@ -262,8 +317,9 @@ export default {
     }
 
     return {
+      resourceName1: 'resourceName',
       lineTitle: {
-        title: '新建部门',
+        title: '新建资源',
         notShowSmallTitle: false
       },
       textStyle: {
@@ -277,80 +333,94 @@ export default {
         width: '3px',
         height: '18px'
       },
+      resourceKeyOptions: [
+        {
+          label: '测试1',
+          value: 'chanel'
+        },
+        {
+          label: '资源类型',
+          value: 1
+        },
+        {
+          label: '目录',
+          value: 2
+        }
+      ],
+      resourceType: 'chanel',
+      dialogResourceName: [],
+      dialogResourceValue: [],
       dialog: {
         show: false,
-        title: '新建部门',
+        title: '新建资源',
         params: {
-          sectionPid: '',
-          description: '',
-          leaderName: '',
-          sectionName: '',
-          phone: ''
+          resourcePid: '',
+          resourceName: [],
+          resourceType: '',
+          resourceKey: '',
+          groupName: '',
+          resourceValue: [],
+          resourceMap: {}
         }
       },
       isClick: false,
       editShow: false,
+      groupNameLists: [0],
+      i: 0,
       currentKey: '0',
       form: {
-        sectionName: '',
-        description: '',
-        phone: '',
-        leaderName: ''
+        resourceName: '',
+        resourceValue: ''
       },
       rules: {
-        sectionName: [
+        resourceName: [
           {
-            validator: checkOrgName,
-            max: 32,
+            validator: checkOrgName1,
             required: true,
             trigger: 'blur'
           }
         ],
-        leaderName: [
-          {
-            validator: checkOrgName1,
-            trigger: 'blur'
-          }
-        ],
-        phone: [
-          {
-            max: 11,
-            validator: checkPhone,
-            trigger: 'blur'
-          }
-        ],
-        description: {
-          message: '支持最大长度128个字符。',
-          trigger: 'blur',
-          max: 128
+        resourceValue: {
+          validator: checkOrgName1,
+          required: true,
+          trigger: 'blur'
         }
       },
       dialogRules: {
-        sectionName: [
+        resourceType: [
           {
-            validator: checkOrgName,
+            message: '此为必填项。',
+            required: true,
+            trigger: 'change'
+          }
+        ],
+        groupName: [
+          {
+            message: '此为必填项。',
             required: true,
             trigger: 'blur'
           }
         ],
-        leaderName: [
+        resourceName: [
           {
-            validator: checkOrgName1,
+            message: '此为必填项。',
+            required: true,
             trigger: 'blur'
           }
         ],
-        phone: [
+        resourceKey: [
           {
-            validator: checkPhone,
+            message: '此为必填项。',
+            required: true,
             trigger: 'blur'
           }
         ],
-        description: {
-          message: '支持最大长度128个字符。',
-          trigger: 'blur',
-          max: 128
+        resourceValue: {
+          message: '此为必填项。',
+          required: true,
+          trigger: 'blur'
         },
-        sectionPid: {
+        resourcePid: {
           required: true,
           message: '此为必填项。',
           trigger: 'change'
@@ -361,11 +431,11 @@ export default {
       List: '',
       Ids: [],
       Id: '',
-      fatherId: '1',
+      fatherId: '0',
       fatherName: '根节点',
       defaultProps: {
         children: 'childList',
-        label: 'sectionName'
+        label: 'resourceName'
       },
       detailsId: '',
       treeMsg: '',
@@ -378,40 +448,75 @@ export default {
     }
   },
   mounted() {
-    this.init(this.detailsId)
+    this.init(this.detailsId, this.resourceType)
   },
   methods: {
     // 点击节点选中
     nodeClickHandle(data) {
-      this.dialog.params.sectionPid = data.sectionName
+      this.dialog.params.resourcePid = data.id
       this.Id = data.id
       this.$refs.selectTree.blur()
+    },
+    changeGroupNameLists(val, name, index) {
+      if (name === 'resourceName') {
+        this.dialog.params.resourceName[index] = val
+      } else {
+        this.dialog.params.resourceValue[index] = val
+      }
+    },
+    addProduct: function () {
+      this.i++
+      this.groupNameLists.push(this.i)
+    },
+    deleteDate: function (val) {
+      //当弹框只剩一个时不可删除
+      if (this.groupNameLists.length === 1) {
+        this.$message({ type: 'warning', message: '唯一不可删除!' })
+        return
+      } else {
+        this.$confirm('确认删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(() => {
+            this.groupNameLists.splice(val, 1)
+            this.$message({ type: 'success', message: '删除成功!' })
+          })
+          .catch(() => {
+            this.$message({ type: 'info', message: '已取消删除' })
+          })
+      }
+    },
+
+    changeResourceType(val) {
+      this.resourceType = val
+      this.init(this.detailsId, val)
+    },
+    changeDialogResourceType(val) {
+      this.resourceType = val
+      this.init(this.detailsId, val)
     },
 
     childClickHandle(data) {
       console.log(data)
       this.fatherId = data.id
-      this.fatherName = data.sectionName
+      this.fatherName = data.resourceType
       if (data.childList && data.childList.length > 0) {
         this.isMore = true
-        this.treeMsg = data.sectionName
+        this.treeMsg = data.resourceType
       } else {
         this.isMore = false
-        this.treeMsg = data.sectionName
+        this.treeMsg = data.resourceType
       }
       this.detailsId = data.id
       // this.$refs['unitManagementForm'].resetFields()
       this.getUnitDetailsData(data)
     },
     getUnitDetailsData(res) {
-      // getUnitList(this.detailsId).then((res) => {
-      //   if (res.data.code === 0) {
-      this.form.sectionName = res.sectionName
-      this.form.description = res.description
-      this.form.phone = res.phone
-      this.form.leaderName = res.leaderName
-      //   }
-      // })
+      console.log(res)
+      this.form.resourceValue = res ? res.resourceValue : ''
+      this.form.resourceName = res ? res.resourceName : ''
     },
 
     getDetailsLists(arr, id) {
@@ -426,9 +531,12 @@ export default {
       })
     },
 
-    async init(id) {
-      console.log(111, id)
-      await getUnitList()
+    async init(id, resourceType) {
+      console.log(111, resourceType)
+      await getResourceList({
+        resourceKey: resourceType,
+        isIncludeResource: true
+      })
         .then((res) => {
           if (res.data.code === 0) {
             this.treeList = [res.data.data]
@@ -453,35 +561,36 @@ export default {
     dialogShow() {
       this.editShow = true
       this.dialog.params = {
-        sectionPid: '',
-        description: '',
-        leaderName: '',
-        sectionName: '',
-        phone: ''
+        resourcePid: '',
+        resourceMap: {},
+        groupName: '',
+        resourceName: [],
+        resourceType: '',
+        resourceKey: '',
+        resourceValue: []
       }
 
-      console.log('this.sectionPid', this.fatherName)
-      this.dialog.params.sectionPid = this.fatherName
+      this.dialog.params.resourcePid = this.fatherName
       this.dialog.show = !this.dialog.show
     },
     dialogMoveShow() {
       this.$refs.moveTree.changeMoveTreeShow()
     },
     save(formName) {
-      console.log('formName', formName, this.$refs[formName])
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          unitUpdate({ id: this.detailsId, ...this.form }).then((res) => {
-            if (res.data.code === 0) {
-              this.$message({
-                type: 'success',
-                message: '编辑成功'
-              })
-              this.fatherName = this.form.sectionName
-              this.$refs.unitTree.chooseId(this.detailsId)
-              this.init(this.detailsId)
+          resourceUpdate({ resourceId: this.detailsId, ...this.form }).then(
+            (res) => {
+              if (res.data.code === 0) {
+                this.$message({
+                  type: 'success',
+                  message: '编辑成功'
+                })
+                this.$refs.unitTree.chooseId(this.detailsId)
+                this.init(this.detailsId, this.resourceType)
+              }
             }
-          })
+          )
         }
       })
     },
@@ -508,18 +617,18 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        unitDelete(this.detailsId)
+        resourceDelete([this.detailsId])
           .then((res) => {
             if (res.data.code === 0) {
               this.$message({
                 type: 'success',
                 message: '删除成功'
               })
-              this.init()
+              this.init(this.detailsId, this.resourceType)
             } else {
               this.$message({
                 type: 'warning',
-                message: res.data.data
+                message: res.data.msg
               })
             }
           })
@@ -529,13 +638,37 @@ export default {
       })
     },
     submit(formName) {
-      this.isClick = true
+      // this.isClick = true
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
-            case '新建部门':
-              this.dialog.params.sectionPid = this.Id ? this.Id : this.fatherId
-              unitAdd(this.dialog.params)
+            case '新建资源':
+              this.dialog.params.resourcePid = this.Id ? this.Id : this.fatherId
+
+              let resData1 = this.dialog.params.resourceValue
+                ? this.dialog.params.resourceValue
+                : []
+              let resData2 = this.dialog.params.resourceName
+                ? this.dialog.params.resourceName
+                : []
+
+              let resParamsArray = []
+              let resParams = {}
+              resData1.forEach((item, index) => {
+                resParamsArray.push({ [item]: resData2[index] })
+              })
+              for (let i = 0; i < resParamsArray.length; i++) {
+                const key = Object.keys(resParamsArray[i])
+                resParams[key] = resParamsArray[i][key]
+              }
+              let lastParams = {
+                resourceMap: resParams,
+                resourcePid: this.dialog.params.resourcePid,
+                resourceType: this.dialog.params.resourceType,
+                groupName: this.dialog.params.groupName,
+                resourceKey: this.dialog.params.resourceKey
+              }
+              resourceAdd(lastParams)
                 .then((res) => {
                   if (res.data.code === 0) {
                     this.$message({
@@ -543,9 +676,10 @@ export default {
                       message: '新建成功'
                     })
                     this.dialog.show = false
+                    this.i = 1
                     this.isClick = false
                     this.detailsId = res.data.id
-                    this.init(this.detailsId)
+                    this.init(this.detailsId, this.resourceType)
                   }
                 })
                 .catch((error) => {
@@ -553,12 +687,12 @@ export default {
                 })
               break
             case '编辑':
-              editApplication({ id: this.editId, ...this.dialog.params })
+              resourceUpdate({ id: this.editId, ...this.dialog.params })
                 .then((res) => {
                   if (res.data.code === 0) {
                     this.isClick = false
                     this.$message.success('编辑成功')
-                    this.$refs.unitTree.chooseId(this.dialog.params.sectionPid)
+                    this.$refs.unitTree.chooseId(this.dialog.params.resourcePid)
                     this.dialog.show = false
                     this.getList()
                   }
@@ -626,6 +760,13 @@ export default {
 ::v-deep .unit-tree > .el-tree-node::before {
   border-left: none;
 }
+.add_resource {
+  margin: 20px;
+}
+.group_name_lists {
+  display: flex;
+  justify-content: space-between;
+}
 .selectTree {
   .el-select-dropdown__item {
     height: 200px !important;
@@ -672,6 +813,9 @@ export default {
       margin: 20px;
       background: #ffffff;
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+      .btn-lists-top {
+        padding: 10px 10px 0 10px;
+      }
       .btn-lists {
         display: flex;
         justify-content: space-between;
@@ -721,7 +865,7 @@ export default {
 }
 .area-form {
   .el-input {
-    width: 436px;
+    width: 386px;
   }
 }
 .dialog-footer {

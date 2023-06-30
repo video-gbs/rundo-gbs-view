@@ -22,7 +22,7 @@
         </el-form-item>
         <el-form-item label="创建者:">
           <el-input
-            v-model="searchParams.userAccount"
+            v-model="searchParams.createBy"
             placeholder="请输入"
             clearable
             style="width: 240px"
@@ -95,7 +95,7 @@
           label="角色名称"
           :show-overflow-tooltip="true"
         />
-        <el-table-column prop="userAccount" label="创建者" />
+        <el-table-column prop="createBy" label="创建者" />
         <el-table-column prop="createdTime" label="创建时间" />
         <el-table-column prop="updatedTime" label="更新时间" />
         <el-table-column
@@ -141,15 +141,13 @@
 
 <script>
 import {
-  addRoles,
-  editRoles,
-  deleteRoles,
-  deleteAllRoles,
-  changeRolesStatus,
-  permissionTree,
   getRoleLists,
-  setAppAuth,
-  getSysOrgTree
+  roleSearch,
+  roleDisable,
+  roleAdd,
+  roleUpdate,
+  roleDelete,
+  roleAssociate
 } from '@/api/method/role'
 import pagination from '@/components/Pagination/index.vue'
 import { Local } from '@/utils/storage'
@@ -177,7 +175,7 @@ export default {
       tableData: [],
       permissionTableData: [],
       searchParams: {
-        userAccount: '',
+        createBy: '',
         roleName: '',
         time: ''
       },
@@ -217,7 +215,7 @@ export default {
         type: 'warning'
       })
         .then(function () {
-          changeRolesStatus({
+          roleDisable({
             id: row.id,
             status: row.status
           }).then((res) => {})
@@ -236,7 +234,7 @@ export default {
     },
     resetData(e) {
       this.searchParams = {
-        userAccount: '',
+        createBy: '',
         roleName: '',
         time: ''
       }
@@ -325,7 +323,7 @@ export default {
       this.buttonLoading = true
       // this.checkList = []
       this.buildTree('get')
-      setAppAuth({
+      roleAssociate({
         roleId: this.roleId,
         permissionIds: this.checkList
       }).then((res) => {
@@ -348,21 +346,20 @@ export default {
         ? this.searchParams.time[0]
         : ''
       const roleName = this.searchParams.roleName
-      const userAccount = this.searchParams.userAccount
+      const createBy = this.searchParams.createBy
       getRoleLists({
-        current: this.params.pageNum,
-        pageSize: this.params.pageSize,
+        page: this.params.pageNum,
+        num: this.params.pageSize,
         roleName,
         createdTimeStart,
         createdTimeEnd,
-        userAccount
-        // ...this.searchParams
+        createBy
       }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data.records
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
+        if (res.data.code === 0) {
+          this.tableData = res.data.data.list
+          this.params.total = res.data.data.total
+          this.params.pages = res.data.data.pages
+          this.params.current = res.data.data.current
         }
       })
     },
@@ -402,7 +399,7 @@ export default {
         this.$refs.roleTable.selection.map((item) => {
           roleIds.push(item.id)
         })
-        deleteAllRoles(roleIds).then((res) => {
+        roleDelete(roleIds).then((res) => {
           if (res.code === 0) {
             this.$message({
               type: 'success',
@@ -421,7 +418,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteRoles(row.id).then((res) => {
+        roleDelete(row.id).then((res) => {
           if (res.code === 0) {
             this.$message({
               type: 'success',
@@ -433,40 +430,6 @@ export default {
         })
       })
     }
-    // submit(formName) {
-    //   this.$refs[formName].validate((valid) => {
-    //     if (valid) {
-    //       switch (this.dialog.title) {
-    //         case '添加角色':
-    //           addRoles(this.dialog.params).then((res) => {
-    //             if (res.code === 10000) {
-    //               this.$message({
-    //                 type: 'success',
-    //                 message: '添加角色成功'
-    //               })
-    //               this.dialog.show = false
-    //               this.getList()
-    //             }
-    //           })
-    //           break
-    //         case '编辑角色':
-    //           editRoles({ id: this.editId, ...this.dialog.params }).then(
-    //             (res) => {
-    //               if (res.code === 10000) {
-    //                 this.$message.success('编辑成功')
-    //                 this.dialog.show = false
-    //                 this.getList()
-    //               }
-    //             }
-    //           )
-    //           break
-
-    //         default:
-    //           break
-    //       }
-    //     }
-    //   })
-    // }
   }
 }
 </script>

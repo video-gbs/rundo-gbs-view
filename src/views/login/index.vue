@@ -305,16 +305,11 @@ export default {
 
           console.log(accessToken, refreshToken, expiresIn, tokenType)
 
-          const millisecond = new Date().getTime()
-          const expiresTime = expiresIn * 1000
-          const utilTime = millisecond + expiresTime
-
           Local.set('rj_deptType', 0)
           Local.set('access_token', accessToken)
           Local.set('refresh_token', refreshToken)
           Local.set('expires_in', expiresIn)
           Local.set('token_type', tokenType)
-          Local.set('utilTime', utilTime)
 
           this.$router.push({ path: '/workTable' })
 

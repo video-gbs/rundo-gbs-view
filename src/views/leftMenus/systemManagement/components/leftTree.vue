@@ -30,7 +30,7 @@
               class="tree1"
             />
             <svg-icon v-else icon-class="tree2" class="tree2" />
-            {{ data.name || data.sectionName }}
+            {{ data.name || data.sectionName || data.resourceName }}
           </span>
         </span>
       </el-tree>
@@ -92,6 +92,8 @@ export default {
       if (!value) return true
       if (this.$props.defaultPropsName === 'name') {
         return data.name && data.name.indexOf(value) !== -1
+      } else if (this.$props.defaultPropsName === 'resourceName') {
+        return data.resourceName && data.resourceName.indexOf(value) !== -1
       } else {
         return data.sectionName && data.sectionName.indexOf(value) !== -1
       }

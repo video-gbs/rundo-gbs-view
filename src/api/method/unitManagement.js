@@ -1,4 +1,3 @@
-// 单位管理
 import request from '@/api/fetch'
 
 const rundoAuthServer = '/auth'

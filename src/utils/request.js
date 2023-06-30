@@ -5,6 +5,7 @@ import { Local } from '@/utils/storage'
 import { logout } from '@/api/method/user'
 
 const requestTimeOut = 20 * 100000
+window.isReresh = false
 
 console.log('process.env.NODE_ENV', process.env.NODE_ENV)
 const service = axios.create({
@@ -22,6 +23,14 @@ const isEmpty = function (obj) {
   )
 }
 
+const isRefreshTokenExpired = function (timestamp) {
+  clearInterval(window.interval)
+  window.interval = setInterval(() => {
+    timestamp = timestamp - 1
+    Local.set('expires_in', timestamp)
+  }, 1000)
+}
+
 const init = {
   // 记录时间戳
   timer: null,
@@ -34,33 +43,28 @@ const init = {
       showClose: true
     })
   },
-  updataTokenAPI: function () {
+  updataTokenAPI: function (refreshToken) {
     let that = this
     axios({
       method: 'post',
-      url: `http://192.192.192.92:9090/oauth2/token?grant_type=refresh_token&refresh_token=${Local.get(
-        'refresh_token'
-      )}`,
+      url: `http://192.192.192.92:9090/oauth2/token?grant_type=refresh_token&refresh_token=${refreshToken}`,
       headers: {
         Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
       }
     })
       .then(function (res) {
         console.log('res', res)
-        if (res.data.data.access_token) {
+        if (res.data.code === 0) {
           // 防止重复调refresh_token接口
           that.isRefresh = false
-          let result = res.data
-          let millisecond = new Date().getTime()
-          let expiresTime = result.expires_in * 1000
-          let utilTime = millisecond + expiresTime
-          Local.set('access_token', result.access_token, {
-            expires: expiresTime
-          })
-          Local.set('utilTime', utilTime)
-          Local.set('refresh_token', result.refresh_token)
-          Local.set('expires_in', result.expires_in)
+          let result = res.data.data
+          console.log('result~~~~~~', result)
+          Local.set('access_token', result.accessToken)
+          Local.set('refresh_token', result.refreshToken)
+          isRefreshTokenExpired(result.expiresIn)
+          Local.set('expires_in', result.expiresIn)
         } else {
+          console.log(2, 'else')
           //刷新token失败只能跳转到登录页重新登录
           Local.clear()
           Local.remove('access_token')
@@ -76,7 +80,7 @@ const init = {
       .catch(function (err) {
         //刷新token失败只能跳转到登录页重新登录
 
-        console.log(err)
+        console.log(3, err)
         logout()
           .then((res) => {})
           .catch(() => {})
@@ -99,44 +103,17 @@ const init = {
 //http request 拦截器
 service.interceptors.request.use(
   (config) => {
-    console.log('config', config)
-    config.data = JSON.stringify(config.data)
     init.timer = new Date().getTime()
     if (Local.get('access_token')) {
-      if (
-        (parseInt(Local.get('utilTime')) - init.timer) / (1000 * 60 * 60) <
-        0
-      ) {
-        Local.remove('access_token')
-        Local.remove('utilTime')
-        Local.remove('expires_in')
-        Local.remove('refresh_token')
-        logout()
-          .then((res) => {})
-          .catch(() => {})
-          .finally(() => {
-            Local.clear()
-            router.replace({
-              path: '/login',
-              query: { redirect: router.currentRoute.fullPath }
-            })
-          })
-      }
       config.headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${Local.get('access_token')}`
-      }
-    } else {
-      config.headers = {
-        'Content-Type': 'application/json'
       }
     }
     return config
   },
   (error) => {
-    Message.error({
-      message: '加载超时'
-    })
+    console.log('拦截器', Local.get('access_token'))
     return Promise.reject(error)
   }
 )
@@ -145,21 +122,21 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     console.log(999, response)
-    if (Local.get('utilTime')) {
-      if (!init.isRefresh) {
-        // 是否是到期前30分钟
-        if (
-          (parseInt(Local.get('utilTime')) - init.timer) / (1000 * 60 * 60) <
-          0.5
-        ) {
-          init.isRefresh = true
-          init.updataTokenAPI()
+    let resetTime = Local.get('expires_in')
+    if (Local.get('access_token')) {
+      //有没有token
+      isRefreshTokenExpired(resetTime)
+      if (resetTime < 120) {
+        if (!window.isReresh) {
+          window.isReresh = true
+          let refresh_token = Local.get('refresh_token')
+          init.updataTokenAPI(refresh_token)
         }
-      }
+      } else window.isReresh = false
     }
     return response
   },
-  (err) => {
+  async (err) => {
     // debugger
     if (err && err.response) {
       switch (err.response.status) {
@@ -167,7 +144,6 @@ service.interceptors.response.use(
           console.log('错误请求')
           break
         case 401:
-          //刷新token失败只能跳转到登录页重新登录
           logout()
             .then((res) => {})
             .catch(() => {})
@@ -183,10 +159,24 @@ service.interceptors.response.use(
                 query: { redirect: router.currentRoute.fullPath }
               })
             })
-          break
+          return
         case 403:
-          init.openMessage('拒绝访问')
-          break
+          logout()
+            .then((res) => {})
+            .catch(() => {})
+            .finally(() => {
+              Local.clear()
+              Local.remove('access_token')
+              Local.remove('expires_in')
+              Local.remove('utilTime')
+              Local.remove('refresh_token')
+              init.openMessage('登录失效')
+              router.replace({
+                path: '/login',
+                query: { redirect: router.currentRoute.fullPath }
+              })
+            })
+          return
         case 404:
           init.openMessage('请求错误,未找到该资源')
           break

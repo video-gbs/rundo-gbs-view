@@ -173,6 +173,14 @@ export const staticRouters = [
         meta: { title: '角色管理', icon: '' }
       },
       {
+        path: '/resourceInterface',
+        name: 'resourceInterface',
+        component: () =>
+          import('@/views/leftMenus/systemManagement/resourceInterface/index'),
+        meta: { title: '资源接口', icon: '' }
+      },
+
+      {
         path: '/unitManagement',
         name: 'unitManagement',
 
@@ -181,14 +189,13 @@ export const staticRouters = [
         meta: { title: '部门管理', icon: '' }
       },
       {
-        path: '/creatingRole/:type',
+        // path: '/creatingRole/:type',
+        path: '/creatingRole',
         name: '/creatingRole',
         component: () =>
           import(
             '@/views/leftMenus/resourceManagement/components/CreatingRole.vue'
           ),
-
-        hidden: true,
         meta: { title: '新建角色', icon: '' }
       },
       {
