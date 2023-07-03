@@ -11,10 +11,18 @@
           @childClickHandle="childClickHandle"
         />
       </div>
-      <div class="right-table p10">
+      <div class="right-table p10" v-if="!isClickedResourceBtn">
         <FeatureApiTable
           ref="featureApiTable"
           :featureApiTableTreeData="treeData"
+          @changeIsClickedResourceBtn="changeIsClickedResourceBtn"
+        />
+      </div>
+      <div class="right-table p10" v-else>
+        <FeatureRrsourceTable
+          ref="featureRrsourceTable"
+          :funcId="funcId"
+          @changeIsClickedResourceBtn="changeIsClickedResourceBtn"
         />
       </div>
     </div>
@@ -24,15 +32,18 @@
 <script>
 import leftTree from '@/views/leftMenus/systemManagement/components/leftTree'
 import FeatureApiTable from './components/FeatureApiTable.vue'
+import FeatureRrsourceTable from './components/FeatureRrsourceTable.vue'
 import { getMenuTree } from '@/api/method/menus'
 import { Local } from '@/utils/storage'
 export default {
   name: '',
-  components: { leftTree, FeatureApiTable },
+  components: { leftTree, FeatureApiTable, FeatureRrsourceTable },
 
   data() {
     return {
       treeData: [],
+      funcId: '',
+      isClickedResourceBtn: false,
       defaultProps: {
         children: 'childList',
         label: 'name'
@@ -41,6 +52,11 @@ export default {
   },
   mounted() {
     this.init()
+  },
+  watch: {
+    funcId(newVal) {
+      this.funcId = newVal
+    }
   },
   methods: {
     handleClick(val, event) {},
@@ -58,6 +74,18 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    changeIsClickedResourceBtn(val, id) {
+      if (val === 1) {
+        this.isClickedResourceBtn = true
+        console.log('this.$refs', this.$refs)
+        this.funcId = id
+        this.$nextTick(() => {
+          this.$refs.featureRrsourceTable.initFeatureResourceList(id)
+        })
+      } else {
+        this.isClickedResourceBtn = false
+      }
     },
     childClickHandle(data) {
       this.$refs.featureApiTable.saveId(data.id)

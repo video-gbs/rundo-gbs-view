@@ -133,7 +133,7 @@ export function getRoleLists(data) {
   // 分页查询角色
   return request.get(`${rbac}/role/page`, data)
 }
-export function roleSearch(data) {
+export function userSearchRole(data) {
   // 用户页面的角色查询
   return request.get(`${rbac}/role/page/user`, data)
 }

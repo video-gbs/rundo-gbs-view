@@ -9,6 +9,11 @@ export function getFeatureList(params) {
   return request.get(`${rbac}/func/page`, params)
 }
 
+export function getFeatureResourceList(params) {
+  // 查询功能列表
+  return request.get(`${rbac}/func/resource/list`, params)
+}
+
 export function featureUpdateDisabled(params) {
   // 修改功能禁用状态
   return request.put(`${rbac}/func/update/disabled`, params)
@@ -26,7 +31,7 @@ export function featureResourceUpdate(params) {
 
 export function featureAssociate(params) {
   // 功能关联资源
-  return request.get(`${rbac}/func/resource/associate`, params)
+  return request.post(`${rbac}/func/resource/associate`, params)
 }
 
 export function featureAdd(params) {
@@ -41,12 +46,10 @@ export function featureUpdate(params) {
 
 export function featureDelete(id) {
   // 删除功能接口
-  return request.delete(`${rbac}/func/delete/batch?id=${id}`)
+  return request.delete(`${rbac}/func/delete?id=${id}`)
 }
 
 export function featureResourceDelete(id) {
   // 删除资源
-  return request.delete(
-    `${rbac}/func/resource/delete/batch?funcResourceId=${id}`
-  )
+  return request.delete(`${rbac}/func/resource/delete?funcResourceId=${id}`)
 }

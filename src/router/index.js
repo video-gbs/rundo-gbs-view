@@ -167,7 +167,7 @@ export const staticRouters = [
       //   meta: { title: '编辑功能接口', icon: '' }
       // },
       {
-        path: '/user/:type',
+        path: '/user',
         name: 'user',
         component: () =>
           import(
@@ -178,7 +178,7 @@ export const staticRouters = [
         meta: { title: '新增用户', icon: '' }
       },
       {
-        path: '/editUser/:type',
+        path: '/editUser',
         name: 'editUser',
         component: () =>
           import(

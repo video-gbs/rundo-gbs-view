@@ -1,52 +1,18 @@
 <template>
-  <div class="featureApiTable-content">
+  <div class="featureRrsourceTable-content">
     <div class="search">
-      <el-form
-        ref="query"
-        class="search-form"
-        :inline="true"
-        :model="searchParams"
-        label-width="100px"
-      >
-        <el-form-item label="服务名称:">
-          <el-input
-            v-model="searchParams.serviceName"
-            clearable
-            :maxlength="15"
-          />
-        </el-form-item>
-        <el-form-item label="功能名称:">
-          <el-input v-model="searchParams.funcName" clearable :maxlength="15" />
-        </el-form-item>
-        <el-form-item
-          style="float: right; margin-right: 20px"
-          class="form-btn-list"
-        >
-          <el-button @click="resetData($event)"
-            ><svg-icon class="svg-btn" icon-class="cz" />
-            <span class="btn-span">重置</span></el-button
-          >
-          <el-button type="primary" @click="cxData"
-            ><svg-icon class="svg-btn" icon-class="cx" />
-            <span class="btn-span">查询</span></el-button
-          >
-        </el-form-item>
-      </el-form>
+      <div class="search-form">
+        <div class="title-css">功能资源信息</div>
+        <!-- <el-button size="mini" @click="goBack(2)">返回</el-button> -->
+        <el-button @click="goback(2)">
+          <svg-icon class="svg-btn" icon-class="back-svg" />返回
+        </el-button>
+      </div>
     </div>
 
     <div class="table-content">
       <div class="table-content-top">
-        <el-checkbox
-          v-model="isInclude"
-          class="table-content-top-check"
-          @change="changeAccountChecked"
-          >包含下级组织</el-checkbox
-        >
         <div class="btn-lists">
-          <!-- <el-button @click="deteleAll($event)" style="width: 100px" plain
-            ><svg-icon class="svg-btn" icon-class="del" />
-            <span class="btn-span">批量删除</span></el-button
-          > -->
           <el-button type="primary" @click="dialogShow(1)"
             ><svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span></el-button
@@ -54,9 +20,9 @@
         </div>
       </div>
       <el-table
-        ref="featureApiTable"
+        ref="featureRrsourceTable"
         class="table-content-bottom"
-        :data="featureApiTableData"
+        :data="featureRrsourceTable"
         border
         :header-cell-style="{
           background: 'rgba(0, 75, 173, 0.06)',
@@ -66,32 +32,19 @@
           color: '#333333'
         }"
       >
-        <!-- <el-table-column type="selection" width="80" align="center">
-        </el-table-column> -->
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
         <el-table-column
-          prop="serviceName"
-          label="服务名称"
+          prop="resourceKey"
+          label="资源组"
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          prop="funcName"
-          label="功能名称"
+          prop="validateParam"
+          label="需要校验的参数"
           :show-overflow-tooltip="true"
         />
-        <el-table-column
-          prop="path"
-          label="资源路径"
-          :show-overflow-tooltip="true"
-        />
-        <el-table-column prop="method" label="请求方法">
-          <template slot-scope="scope">
-            <span v-for="item in methodOptions" :key="item.value">{{
-              item.value === scope.row.method ? item.label : ''
-            }}</span>
-          </template>
-        </el-table-column>
+
         <el-table-column prop="disabled" label="是否禁用" width="120">
           <template slot-scope="scope">
             <el-switch
@@ -105,11 +58,8 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column width="160" label="操作" align="center">
+        <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="goResourceDetail(1, scope.row.id)"
-              >资源详情
-            </el-button>
             <el-button type="text" @click="dialogShow(0, scope.row)"
               >编辑
             </el-button>
@@ -119,11 +69,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <pagination
-        :pages-data="params"
-        @size-change="sizeChange"
-        @current-change="currentChange"
-      />
     </div>
 
     <el-dialog
@@ -134,74 +79,26 @@
     >
       <div>
         <el-form
-          ref="featureApiRoleForm"
+          ref="featureResourceRoleForm"
           class="params-form"
           size="mini"
-          label-width="120px"
+          label-width="140px"
           :rules="rules"
           label-position="right"
           :model="dialogForm.params"
-          @keyup.enter="submit('featureApiRoleForm')"
+          @keyup.enter="submit('featureResourceRoleForm')"
         >
-          <el-form-item label="菜单Id：" prop="menuId">
-            <el-select
-              ref="selectTree"
-              v-model="dialogForm.params.menuId"
-              placeholder="请选择"
-              :popper-append-to-body="false"
-              style="width: 436px"
-              class="selectTree"
-              id="selectTree"
-            >
-              <el-option :value="dialogForm.params.menuId">
-                <el-tree
-                  ref="tree"
-                  class="unit-tree"
-                  :data="featureApiTableTreeData"
-                  node-key="id"
-                  :props="defaultProps"
-                  :default-expanded-keys="Ids"
-                  highlight-current
-                  :expand-on-click-node="false"
-                  @node-click="nodeClickHandle"
-                ></el-tree>
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="服务名称：" prop="serviceName">
+          <el-form-item label="资源组：" prop="resourceKey">
             <el-input
-              v-model="dialogForm.params.serviceName"
+              v-model="dialogForm.params.resourceKey"
               style="width: 436px"
             />
           </el-form-item>
-          <el-form-item label="功能名称：" prop="funcName">
+          <el-form-item label="需要校验的参数：" prop="validateParam">
             <el-input
-              v-model="dialogForm.params.funcName"
+              v-model="dialogForm.params.validateParam"
               style="width: 436px"
             />
-          </el-form-item>
-
-          <el-form-item label="范围：" prop="scope">
-            <el-input v-model="dialogForm.params.scope" style="width: 436px" />
-          </el-form-item>
-
-          <el-form-item prop="method" label="请求方法：">
-            <el-select
-              v-model="dialogForm.params.method"
-              placeholder="请选择"
-              style="width: 436px"
-            >
-              <el-option
-                v-for="o in methodOptions"
-                :label="o.label"
-                :value="o.value"
-                :key="o.value"
-              />
-            </el-select>
-          </el-form-item>
-
-          <el-form-item label="访问地址：" prop="path">
-            <el-input v-model="dialogForm.params.path" style="width: 436px" />
           </el-form-item>
         </el-form>
       </div>
@@ -210,7 +107,7 @@
         <el-button
           type="primary"
           :loading="isClick"
-          @click="submit('featureApiRoleForm')"
+          @click="submit('featureResourceRoleForm')"
           >确 定</el-button
         >
       </span>
@@ -222,14 +119,10 @@
 import pagination from '@/components/Pagination/index.vue'
 
 import {
-  getFeatureList,
-  featureUpdateDisabled,
+  getFeatureResourceList,
   featureResourceUpdateDisabled,
   featureResourceUpdate,
   featureAssociate,
-  featureAdd,
-  featureUpdate,
-  featureDelete,
   featureResourceDelete
 } from '@/api/method/featureApi'
 
@@ -240,14 +133,9 @@ export default {
   components: { pagination },
   data() {
     return {
-      params: {
-        pageNum: 1,
-        pageSize: 10,
-        total: 0
-      },
       searchParams: {
-        funcName: '',
-        serviceName: ''
+        validateParam: '',
+        resourceKey: ''
       },
       isClick: false,
       defaultProps: {
@@ -265,97 +153,60 @@ export default {
         show: false,
         title1: '新建',
         params: {
-          menuId: '',
-          serviceName: '',
-          scope: '',
-          funcName: '',
-          path: '',
-          method: ''
+          resourceKey: '',
+          validateParam: ''
         }
       },
       rules: {
-        menuId: [{ required: true, message: '请选择', trigger: 'change' }],
-        serviceName: [{ required: true, message: '请选择', trigger: 'blur' }],
-        scope: [{ required: true, message: '请填写范围', trigger: 'blur' }],
-        funcName: [
+        resourceKey: [{ required: true, message: '请选择', trigger: 'blur' }],
+        validateParam: [
           { required: true, message: '请填写功能名称', trigger: 'blur' }
-        ],
-        path: [{ required: true, message: '请填写请求方法', trigger: 'blur' }],
-        method: [{ required: true, message: '请选择', trigger: 'change' }]
+        ]
       },
       Id: '',
       editId: '',
       Ids: [],
       checked: false,
       isInclude: true,
-      featureApiTableData: [],
-      featureApiId: '0'
+      featureRrsourceTable: [],
+      resFuncId: ''
     }
   },
-  props: {
-    featureApiTableTreeData: {
-      type: Array,
-      default: function () {
-        return []
-      }
-    }
-  },
+  props: ['funcId'],
   created() {
-    this.params.pageNum = Local.get('featureApiTablePageNum')
-    Local.remove('featureApiTablePageNum')
+    this.resFuncId = this.$props.funcId
+    console.log('this.resFuncId', this.$props.funcId)
   },
-  mounted() {
-    this.getList()
+  watch: {
+    funcId(newVal) {
+      this.resFuncId = newVal
+    }
   },
   methods: {
-    async getList(id) {
-      await getFeatureList({
-        page: this.params.pageNum,
-        num: this.params.pageSize,
-        menuId: id ? id : this.featureApiId,
-        isInclude: this.isInclude,
-        ...this.searchParams
+    async initFeatureResourceList(id) {
+      await getFeatureResourceList({
+        funcId: id
       }).then((res) => {
         if (res.data.code === 0) {
-          this.featureApiTableData = res.data.data.list
-          this.params.total = res.data.data.total
-          this.params.pages = res.data.data.pageNum
-          this.params.current = res.data.data.pageSize
+          this.featureRrsourceTable = res.data.data
         } else {
           this.$message({
             type: 'warning',
             message: res.data.data
           })
-          this.featureApiTableData = []
+          this.featureRrsourceTable = []
         }
       })
     },
-    nodeClickHandle(data) {
-      this.dialogForm.params.menuId = data.name
-      this.Id = data.id
-      this.$refs.selectTree.blur()
+
+    goBack(val) {
+      this.$emit('changeIsClickedResourceBtn', val)
     },
-    changeAccountChecked(val) {
-      this.getList()
-    },
-    // 回显树名字
-    getTreeName(arr, id) {
-      arr.map((item) => {
-        if (item.id === id) {
-          this.resName = item.name
-          this.Id = id
-          return
-        } else {
-          if (item.childList && item.childList.length > 0) {
-            this.getTreeName(item.childList, id)
-          }
-        }
-      })
-    },
+
     resetData(e) {
       this.searchParams = {
-        funcName: '',
-        serviceName: ''
+        validateParam: '',
+        resourceKey: ''
       }
       let target = e.target
       if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
@@ -366,57 +217,33 @@ export default {
         target = e.target
       }
       target.blur()
-      this.params.pageNum = 1
-      this.getList()
+      this.initFeatureResourceList(this.resFuncId)
     },
-    saveId(id) {
-      this.featureApiId = id
-    },
+
     deleteUser(row) {
-      this.$confirm(`确定删除功能${row.funcName}？`, '提示', {
+      this.$confirm(`确定删除功能${row.validateParam}？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        featureDelete(row.id).then((res) => {
+        featureResourceDelete(row.id).then((res) => {
           if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
             })
-            this.params.pageNum = 1
-            this.getList(this.featureApiId)
+            this.initFeatureResourceList(this.resFuncId)
           }
         })
       })
     },
-    sizeChange(pageSize) {
-      this.params.pageSize = pageSize
-      this.getList()
-    },
-    currentChange(proCount) {
-      this.params.proCount = proCount
-      this.getList()
-    },
-    cxData() {
-      this.getList()
-    },
-    goResourceDetail(val, id) {
-      this.$emit('changeIsClickedResourceBtn', val, id)
-    },
 
     dialogShow(type, row) {
       if (type === 0) {
-        const { menuId, serviceName, scope, funcName, path, method } = row
-        this.dialogForm.params.serviceName = serviceName
-        this.dialogForm.params.scope = scope
-        this.dialogForm.params.funcName = funcName
-        this.dialogForm.params.path = path
-        this.dialogForm.params.method = method
+        const { resourceKey, validateParam } = row
+        this.dialogForm.params.resourceKey = resourceKey
+        this.dialogForm.params.validateParam = validateParam
         this.editId = row.id
-
-        this.getTreeName(this.featureApiTableTreeData, menuId)
-        this.dialogForm.params.menuId = this.resName
       }
       this.dialogForm.title1 = type === 1 ? '新建' : '编辑'
       this.dialogForm.show = !this.dialogForm.show
@@ -426,10 +253,12 @@ export default {
       this.isClick = true
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogForm.params.menuId = this.Id
           switch (this.dialogForm.title1) {
             case '新建':
-              featureAdd(this.dialogForm.params)
+              featureAssociate({
+                funcId: this.resFuncId,
+                ...this.dialogForm.params
+              })
                 .then((res) => {
                   if (res.data.code === 0) {
                     this.$message({
@@ -438,14 +267,10 @@ export default {
                     })
                     this.isClick = false
                     this.dialogForm.show = false
-                    this.getList('0')
+                    this.initFeatureResourceList(this.resFuncId)
                     this.dialogForm.params = {
-                      menuId: '',
-                      serviceName: '',
-                      scope: '',
-                      funcName: '',
-                      path: '',
-                      method: ''
+                      resourceKey: '',
+                      validateParam: ''
                     }
                   } else {
                     this.isClick = false
@@ -456,13 +281,16 @@ export default {
                 })
               break
             case '编辑':
-              featureUpdate({ id: this.editId, ...this.dialogForm.params })
+              featureResourceUpdate({
+                funcResourceId: this.editId,
+                ...this.dialogForm.params
+              })
                 .then((res) => {
                   if (res.data.code === 0) {
                     this.$message.success('编辑成功')
                     this.isClick = false
                     this.dialogForm.show = false
-                    this.getList(this.featureApiId)
+                    this.initFeatureResourceList(this.resFuncId)
                   } else {
                     this.isClick = false
                   }
@@ -482,14 +310,18 @@ export default {
     changeSwitch(row) {
       let text = row.disabled === 0 ? '启用' : '停用'
 
-      this.$confirm('确认要"' + text + '""' + row.funcName + '"吗?', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
+      this.$confirm(
+        '确认要"' + text + '""' + row.validateParam + '"吗?',
+        '警告',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      )
         .then(function () {
-          featureUpdateDisabled({
-            id: row.id,
+          featureResourceUpdateDisabled({
+            funcResourceId: row.id,
             disabled: row.disabled
           }).then((res) => {})
         })
@@ -566,7 +398,7 @@ export default {
   }
 }
 
-.featureApiTable-content {
+.featureRrsourceTable-content {
   height: 100%;
   .search {
     width: 100%;
@@ -577,7 +409,10 @@ export default {
     border-radius: 2px;
     .search-form {
       position: relative;
-      top: 60%;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      top: 50%;
       transform: translate(0%, -50%);
     }
   }
@@ -595,12 +430,9 @@ export default {
     border-radius: 2px;
     padding: 18px;
     .table-content-top {
-      .table-content-top-check {
-        float: left;
-        margin-bottom: 30px;
-      }
       .btn-lists {
         float: right;
+        margin-bottom: 10px;
         .btn-span {
           position: relative;
           top: -2px;
