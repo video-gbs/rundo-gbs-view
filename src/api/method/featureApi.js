@@ -5,7 +5,7 @@ const rbac = '/rbac'
 // 新功能接口权限
 
 export function getFeatureList(params) {
-  // 功能接口权限树
+  // 查询功能列表
   return request.get(`${rbac}/func/page`, params)
 }
 

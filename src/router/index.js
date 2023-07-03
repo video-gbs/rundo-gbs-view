@@ -143,6 +143,30 @@ export const staticRouters = [
         meta: { title: '用户管理', icon: '' }
       },
       {
+        path: '/featureApi',
+        name: 'featureApi',
+
+        component: () =>
+          import('@/views/leftMenus/systemManagement/FeatureApi/index'),
+        meta: { title: '功能接口', icon: '' }
+      },
+      // {
+      //   path: '/featureApiTableAdd',
+      //   name: 'featureApiTableAdd',
+
+      //   component: () =>
+      //     import('@/views/leftMenus/systemManagement/FeatureApi/components/FeatureApiTableAdd.vue'),
+      //   meta: { title: '新增功能接口', icon: '' }
+      // },
+      // {
+      //   path: '/featureApiTableUpdate',
+      //   name: 'featureApiTableUpdate',
+
+      //   component: () =>
+      //     import('@/views/leftMenus/systemManagement/FeatureApi/components/FeatureApiTableUpdate.vue'),
+      //   meta: { title: '编辑功能接口', icon: '' }
+      // },
+      {
         path: '/user/:type',
         name: 'user',
         component: () =>
