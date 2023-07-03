@@ -1630,15 +1630,19 @@ export default {
               .then((res) => {
                 if (res.code === 0) {
                   // console.log(res.data.wsFlv.slice(5))
+                  var url = res.data.wsFlv
+                  if (res.data.playProtocalType == 1) {
+                    url = res.data.httpFlv
+                  }
                   if (!this.isNext) {
                     this.setTimeLists(videoTime, this.playerIdx)
-                    this.setPlayUrl(res.data.wsFlv, this.playerIdx)
+                    this.setPlayUrl(url, this.playerIdx)
                     this.setRecordStreamId(res.data.streamId, this.playerIdx)
 
                     this.setRecordCloudId(this.channelId, this.playerIdx)
                   } else {
                     this.setTimeLists(videoTime, this.playerIdx)
-                    this.setPlayUrl(res.data.wsFlv, this.playerIdx)
+                    this.setPlayUrl(url, this.playerIdx)
                     this.setRecordStreamId(res.data.streamId, this.playerIdx)
 
                     this.setRecordCloudId(this.channelId, this.playerIdx)

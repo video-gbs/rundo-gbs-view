@@ -1323,7 +1323,11 @@ export default {
               this.playerIdx++
             }
 
-            this.setPlayUrl(res.data.wsFlv, idxTmp)
+            var url = res.data.wsFlv
+            if (res.data.playProtocalType == 1) {
+              url = res.data.httpFlv
+            }
+            this.setPlayUrl(url, idxTmp)
 
             this.setStreamId(res.data.streamId, idxTmp)
             this.setFlvCloudId(id, idxTmp)
