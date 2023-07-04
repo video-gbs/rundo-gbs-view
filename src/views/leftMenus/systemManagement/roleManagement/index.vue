@@ -96,8 +96,8 @@
           :show-overflow-tooltip="true"
         />
         <el-table-column prop="createBy" label="创建者" />
-        <el-table-column prop="createdTime" label="创建时间" />
-        <el-table-column prop="updatedTime" label="更新时间" />
+        <el-table-column prop="createTime" label="创建时间" />
+        <el-table-column prop="updateTime" label="更新时间" />
         <el-table-column
           prop="roleDesc"
           label="描述"
@@ -202,12 +202,10 @@ export default {
   },
   mounted() {
     this.getList()
-    // this.init()
-    console.log('this.$router~~~~~~~~~~~~~~', this.$router)
   },
   methods: {
     changeSwitch(row) {
-      let text = row.status === 0 ? '启用' : '停用'
+      let text = row.disabled === 0 ? '启用' : '停用'
 
       this.$confirm('确认要"' + text + '""' + row.roleName + '"吗?', '警告', {
         confirmButtonText: '确定',
@@ -216,12 +214,12 @@ export default {
       })
         .then(function () {
           roleDisable({
-            id: row.id,
-            status: row.status
+            roleId: row.id,
+            disabled: row.disabled
           }).then((res) => {})
         })
         .catch(function () {
-          row.status = row.status === 0 ? 1 : 0
+          row.disabled = row.disabled === 0 ? 1 : 0
         })
     },
     sizeChange(pageSize) {
@@ -338,7 +336,7 @@ export default {
         }
       })
     },
-    getList() {
+    async getList() {
       const createdTimeEnd = this.searchParams.time
         ? this.searchParams.time[1]
         : ''
@@ -347,7 +345,7 @@ export default {
         : ''
       const roleName = this.searchParams.roleName
       const createBy = this.searchParams.createBy
-      getRoleLists({
+      await getRoleLists({
         page: this.params.pageNum,
         num: this.params.pageSize,
         roleName,

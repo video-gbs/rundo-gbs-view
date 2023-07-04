@@ -44,7 +44,7 @@ export default {
     return {
       data: [],
       filterText: '',
-      resCurrentKey: '0'
+      resCurrentKey: ''
     }
   },
   props: {

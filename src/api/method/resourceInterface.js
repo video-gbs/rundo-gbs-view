@@ -24,6 +24,16 @@ export function resourceAdd(params) {
   return request.post(`${rbac}/resource/batch/add`, params)
 }
 
+export function resourceRootAdd(params) {
+  // 添加资源根节点接口
+  return request.post(`${rbac}/resource/root/add`, params)
+}
+
+export function getRootList(params) {
+  // 获取根节点资源
+  return request.get(`${rbac}/resource/root`, params)
+}
+
 export function resourceUpdate(params) {
   // 修改资源接口
   return request.put(`${rbac}/resource/update`, params)
@@ -31,5 +41,5 @@ export function resourceUpdate(params) {
 
 export function resourceDelete(id) {
   // 删除资源接口
-  return request.delete(`${rbac}/resource/delete/batch?resourceIds=${id}`)
+  return request.delete(`${rbac}/resource/delete?resourceId=${id}`)
 }

@@ -8,17 +8,22 @@
         <div class="btn-lists-top">
           <el-select
             v-model="resourceType"
+            class="btn-lists-top-select"
             placeholder="请选择资源类型："
-            style="width: 100%"
+            style="width: 436px; margin-right: 10px"
             @change="changeResourceType"
           >
             <el-option
               v-for="o in resourceKeyOptions"
-              :label="o.label"
-              :value="o.value"
-              :key="o.value"
+              :label="o.resourceName"
+              :value="o.resourceKey"
+              :key="o.resourceValue"
             />
           </el-select>
+          <el-button type="primary" @click="dialogRootShow">
+            <svg-icon class="svg-btn" icon-class="add" />
+            <span class="btn-span">新增根节点</span>
+          </el-button>
         </div>
         <div class="btn-lists">
           <el-button type="primary" @click="dialogShow">
@@ -91,6 +96,70 @@
         </div>
       </el-card>
     </div>
+
+    <el-dialog
+      v-if="editRootShow"
+      :title="dialogRoot.title"
+      :visible.sync="dialogRoot.show"
+      width="600px"
+      :before-close="handleCloseRoot"
+    >
+      <div slot="title" class="dialog-title">
+        <LineFont
+          :line-title="lineTitleRoot"
+          :text-style="textStyle"
+          :line-blue-style="lineBlueStyle"
+        />
+      </div>
+      <div>
+        <el-form
+          ref="accountRootForm"
+          class="params-form"
+          label-position="right"
+          label-width="auto"
+          :model="dialogRoot.params"
+          :rules="dialogRootRules"
+          @keyup.enter="submitRoot('accountRootForm')"
+        >
+          <el-form-item label="资源名称" prop="resourceName">
+            <el-input
+              v-model="dialogRoot.params.resourceName"
+              placeholder="请输入"
+              clearable
+              style="width: 386px"
+            />
+          </el-form-item>
+
+          <el-form-item label="资源key" prop="resourceKey">
+            <el-input
+              v-model="dialogRoot.params.resourceKey"
+              placeholder="请输入"
+              clearable
+              style="width: 386px"
+            />
+          </el-form-item>
+
+          <el-form-item label="资源value" prop="resourceValue">
+            <el-input
+              v-model="dialogRoot.params.resourceValue"
+              placeholder="请输入"
+              clearable
+              style="width: 386px"
+            />
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogRoot.show = false">取 消</el-button>
+        <el-button
+          type="primary"
+          :loading="isClickRoot"
+          @click="submitRoot('accountRootForm')"
+          >确 定</el-button
+        >
+      </div>
+    </el-dialog>
+
     <el-dialog
       v-if="editShow"
       :title="dialog.title"
@@ -252,9 +321,11 @@
 import moveTree from './components/MoveTree'
 import {
   getResourceList,
+  getRootList,
   moveResourceFz,
   moveResourceXd,
   resourceAdd,
+  resourceRootAdd,
   resourceUpdate,
   resourceDelete
 } from '@/api/method/resourceInterface'
@@ -322,6 +393,10 @@ export default {
         title: '新建资源',
         notShowSmallTitle: false
       },
+      lineTitleRoot: {
+        title: '新建根节点资源',
+        notShowSmallTitle: false
+      },
       textStyle: {
         fontSize: '18px',
         fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
@@ -333,21 +408,8 @@ export default {
         width: '3px',
         height: '18px'
       },
-      resourceKeyOptions: [
-        {
-          label: '测试1',
-          value: 'chanel'
-        },
-        {
-          label: '资源类型',
-          value: 1
-        },
-        {
-          label: '目录',
-          value: 2
-        }
-      ],
-      resourceType: 'chanel',
+      resourceKeyOptions: [],
+      resourceType: '',
       dialogResourceName: [],
       dialogResourceValue: [],
       dialog: {
@@ -363,11 +425,22 @@ export default {
           resourceMap: {}
         }
       },
+      dialogRoot: {
+        show: false,
+        title: '新建根节点资源',
+        params: {
+          resourceName: '',
+          resourceKey: '',
+          resourceValue: ''
+        }
+      },
       isClick: false,
+      isClickRoot: false,
       editShow: false,
+      editRootShow: false,
       groupNameLists: [0],
       i: 0,
-      currentKey: '0',
+      currentKey: '',
       form: {
         resourceName: '',
         resourceValue: ''
@@ -382,6 +455,28 @@ export default {
         ],
         resourceValue: {
           validator: checkOrgName1,
+          required: true,
+          trigger: 'blur'
+        }
+      },
+
+      dialogRootRules: {
+        resourceName: [
+          {
+            message: '此为必填项。',
+            required: true,
+            trigger: 'blur'
+          }
+        ],
+        resourceKey: [
+          {
+            message: '此为必填项。',
+            required: true,
+            trigger: 'blur'
+          }
+        ],
+        resourceValue: {
+          message: '此为必填项。',
           required: true,
           trigger: 'blur'
         }
@@ -447,10 +542,23 @@ export default {
       //  this.form=val
     }
   },
-  mounted() {
-    this.init(this.detailsId, this.resourceType)
+  created() {
+    this.getRootList()
   },
   methods: {
+    async getRootList() {
+      await getRootList()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.resourceKeyOptions = res.data.data
+            this.resourceType = res.data.data[0].resourceName
+            this.init(null, res.data.data[0].resourceKey)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     // 点击节点选中
     nodeClickHandle(data) {
       this.dialog.params.resourcePid = data.id
@@ -540,8 +648,10 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.treeList = [res.data.data]
+            this.currentKey = res.data.data.id
+            this.$refs.unitTree.chooseId(res.data.data.id)
             let resData = {}
-            if (id && id !== undefined && id !== '') {
+            if (id && id !== undefined && id !== '0') {
               this.detailsId = id
               resData = this.getDetailsLists(this.treeList, id)
             } else {
@@ -558,6 +668,10 @@ export default {
     handleClose(done) {
       done()
     },
+    handleCloseRoot(done) {
+      done()
+    },
+
     dialogShow() {
       this.editShow = true
       this.dialog.params = {
@@ -572,6 +686,15 @@ export default {
 
       this.dialog.params.resourcePid = this.fatherName
       this.dialog.show = !this.dialog.show
+    },
+    dialogRootShow() {
+      this.editRootShow = true
+      this.dialogRoot.params = {
+        resourceName: '',
+        resourceKey: '',
+        resourceValue: ''
+      }
+      this.dialogRoot.show = !this.dialogRoot.show
     },
     dialogMoveShow() {
       this.$refs.moveTree.changeMoveTreeShow()
@@ -637,8 +760,40 @@ export default {
           })
       })
     },
+
+    submitRoot(formName) {
+      this.isClickRoot = true
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          switch (this.dialogRoot.title) {
+            case '新建根节点资源':
+              resourceRootAdd(this.dialogRoot.params)
+                .then((res) => {
+                  if (res.data.code === 0) {
+                    this.$message({
+                      type: 'success',
+                      message: '新建成功'
+                    })
+                    this.dialogRoot.show = false
+                    this.i = 1
+                    this.isClickRoot = false
+                    this.detailsId = res.data.id
+                    this.init(this.detailsId, this.resourceType)
+                  }
+                })
+                .catch((error) => {
+                  this.isClickRoot = false
+                })
+              break
+
+            default:
+              break
+          }
+        }
+      })
+    },
     submit(formName) {
-      // this.isClick = true
+      this.isClick = true
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
@@ -815,6 +970,22 @@ export default {
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
       .btn-lists-top {
         padding: 10px 10px 0 10px;
+        display: flex;
+        .btn-span {
+          position: relative;
+          top: -2px;
+          font-size: 14px;
+          font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+          font-weight: 400;
+        }
+        .svg-btn {
+          position: relative;
+          top: -1px;
+          left: -6px;
+        }
+        .el-button {
+          height: 32px;
+        }
       }
       .btn-lists {
         display: flex;
