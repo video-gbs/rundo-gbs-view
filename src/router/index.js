@@ -280,18 +280,18 @@ export const staticRouters = [
             '@/views/leftMenus/systemManagement/system/dataDictionary.vue'
           ),
         meta: { title: '数据字典', icon: '' }
+      },
+      {
+        path: '/userDiscovery',
+        name: 'userDiscovery',
+        component: () =>
+          import(
+            '@/views/leftMenus/resourceManagement/components/UserDiscovery.vue'
+          ),
+
+        hidden: true,
+        meta: { title: '关联角色', icon: '' }
       }
-      // {
-      //   path: '/creatingRole/:type',
-      //   name: 'creatingRole',
-      //   component: () =>
-      //     import(
-      //       '@/views/leftMenus/resourceManagement/components/CreatingRole.vue'
-      //     ),
-      //
-      //   hidden: true,
-      //   meta: { title: '新建角色', icon: '' }
-      // },
       // {
       //   path: '/otherUnitManagement',
       //   name: 'OtherUnitManagement',

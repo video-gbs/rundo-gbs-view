@@ -140,6 +140,11 @@ export default {
             type: 'success',
             message: '移动成功'
           })
+        } else {
+          this.$message({
+            type: 'warning',
+            message: res.data.data
+          })
         }
         this.$emit('init', '', this.$props.resourceType)
         this.isLoading = false

@@ -133,6 +133,7 @@ export function getRoleLists(data) {
   // 分页查询角色
   return request.get(`${rbac}/role/page`, data)
 }
+
 export function userSearchRole(data) {
   // 用户页面的角色查询
   return request.get(`${rbac}/role/page/user`, data)
@@ -151,7 +152,7 @@ export function roleUpdate(data) {
 }
 export function roleDelete(ids) {
   // 删除角色
-  return request.delete(`${rbac}/role/page?roleIds=${ids}`)
+  return request.delete(`${rbac}/role/delete/batch?roleIds=${ids}`)
 }
 export function roleAssociate(data) {
   // 角色关联用户

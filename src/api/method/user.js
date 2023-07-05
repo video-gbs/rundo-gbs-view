@@ -30,6 +30,12 @@ export function getUserList(params) {
   // 根据部门层级查询用户
   return request.get(`${rbac}/user/page`, params)
 }
+
+export function getRolePageLists(data) {
+  // 分页查询角色
+  return request.get(`${rbac}/user/page/role`, data)
+}
+
 export function userAdd(params) {
   // 新增用户
   return request.post(`${rbac}/user/add`, params)

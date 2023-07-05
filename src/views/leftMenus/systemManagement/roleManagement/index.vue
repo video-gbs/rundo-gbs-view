@@ -398,7 +398,7 @@ export default {
           roleIds.push(item.id)
         })
         roleDelete(roleIds).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -417,7 +417,7 @@ export default {
         type: 'warning'
       }).then(() => {
         roleDelete(row.id).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'

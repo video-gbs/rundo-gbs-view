@@ -121,7 +121,6 @@ service.interceptors.request.use(
 //响应拦截器即异常处理
 service.interceptors.response.use(
   (response) => {
-    console.log(999, response)
     let resetTime = Local.get('expires_in')
     if (Local.get('access_token')) {
       //有没有token

@@ -79,7 +79,6 @@ export default {
       // data.icon = 'tree2'
     },
     chooseId(id) {
-      console.log('id', typeof id, this.$refs)
       setTimeout(() => {
         this.$nextTick(() => {
           this.$refs.tree.setCurrentKey(id)

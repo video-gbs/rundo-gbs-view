@@ -66,7 +66,7 @@
                 >
                 </el-table-column>
                 <el-table-column
-                  prop="userAccount"
+                  prop="username"
                   label="用户账号"
                   :show-overflow-tooltip="true"
                 />
@@ -167,7 +167,7 @@
                 >
                 </el-table-column>
                 <el-table-column
-                  prop="userAccount"
+                  prop="username"
                   label="用户账号"
                   :show-overflow-tooltip="true"
                 />
@@ -218,11 +218,11 @@
         >
           <el-form-item label="用户账号">
             <el-input
-              v-model="dialog.params.userAccount"
+              v-model="dialog.params.username"
               placeholder="请输入"
               style="width: 436px"
             />
-            <!-- <span>{{ dialog.params.userAccount }}</span> -->
+            <!-- <span>{{ dialog.params.username }}</span> -->
           </el-form-item>
           <el-form-item label="用户姓名">
             <el-input
@@ -328,12 +328,13 @@ import LineFont from '@/components/LineFont'
 import pagination from '@/components/Pagination/index.vue'
 
 import {
-  getRelationSysUserInfoList,
   getRelationSysUserInfo,
-  getRelationUserByRole,
   addRelationLists,
-  removeRelationLists
+  removeRelationLists,
+  roleAssociate
 } from '@/api/method/role'
+import { getRolePageLists } from '@/api/method/user'
+
 export default {
   name: '',
   components: { LineFont, pagination },
@@ -413,17 +414,19 @@ export default {
       }
     },
     async leftInit() {
-      await getRelationSysUserInfoList({
-        current: this.params.pageNum,
-        pageSize: this.params.pageSize,
-        userAccount: this.leftSearchName
+      await getRolePageLists({
+        page: this.params.pageNum,
+        num: this.params.pageSize,
+        isBinding: false,
+        roleId: this.$router.currentRoute.query.key,
+        username: this.leftSearchName
       })
         .then((res) => {
-          if (res.code === 0) {
-            this.leftTableData = res.data.records
-            this.params.total = res.data.total
-            this.params.pages = res.data.pages
-            this.params.current = res.data.current
+          if (res.data.code === 0) {
+            this.leftTableData = res.data.data.list
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pageNum
+            this.params.current = res.data.data.pageSize
           }
         })
         .catch((error) => {
@@ -431,18 +434,19 @@ export default {
         })
     },
     async rightInit() {
-      await getRelationUserByRole({
-        current: this.params1.pageNum,
-        pageSize: this.params1.pageSize,
-        userAccount: this.rightSearchName,
+      await getRolePageLists({
+        page: this.params1.pageNum,
+        num: this.params1.pageSize,
+        isBinding: true,
+        username: this.rightSearchName,
         roleId: this.$router.currentRoute.query.key
       })
         .then((res) => {
-          if (res.code === 0) {
-            this.rightTableData = res.data.records
-            this.params1.total = res.data.total
-            this.params1.pages = res.data.pages
-            this.params1.current = res.data.current
+          if (res.data.code === 0) {
+            this.rightTableData = res.data.data.list
+            this.params1.total = res.data.data.total
+            this.params1.pages = res.data.data.pageNum
+            this.params1.current = res.data.data.pageSize
           }
         })
         .catch((error) => {
@@ -479,7 +483,7 @@ export default {
               phone,
               roleName,
               userName,
-              userAccount,
+              username,
               jobNo,
               expiryDateEnd,
               expiryDateStart
@@ -492,7 +496,7 @@ export default {
             this.dialog.params.phone = phone
             this.dialog.params.roleName = roleName
             this.dialog.params.userName = userName
-            this.dialog.params.userAccount = userAccount
+            this.dialog.params.username = username
             this.dialog.params.jobNo = jobNo
             this.dialog.params.expiryDateStart = expiryDateStart
             this.dialog.params.expiryDateEnd = expiryDateEnd
@@ -579,11 +583,12 @@ export default {
           userIdList.push(item.id)
         })
 
-        addRelationLists({
-          userIdList,
+        roleAssociate({
+          userIds: userIdList,
+          isAdd: true,
           roleId: this.$router.currentRoute.query.key
         }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '关联成功'
@@ -627,11 +632,12 @@ export default {
           userIdList1.push(item.id)
         })
 
-        removeRelationLists({
-          userIdList: userIdList1,
+        roleAssociate({
+          userIds: userIdList1,
+          isAdd: false,
           roleId: this.$router.currentRoute.query.key
         }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '解除管理用户成功'
@@ -649,6 +655,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 ::v-deep .el-dialog__footer {
   padding: 0;
 }

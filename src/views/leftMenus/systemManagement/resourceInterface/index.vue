@@ -7,7 +7,7 @@
       <div class="securityArea_container">
         <div class="btn-lists-top">
           <el-select
-            v-model="resourceType"
+            v-model="searchResourceType"
             class="btn-lists-top-select"
             placeholder="请选择资源类型："
             style="width: 436px; margin-right: 10px"
@@ -48,7 +48,6 @@
           class="unitTree"
           :treeData="treeList"
           :defaultPropsName="resourceName1"
-          :currentKey="currentKey"
           @childClickHandle="childClickHandle"
         />
       </div>
@@ -86,11 +85,7 @@
         </el-form>
 
         <div class="dialog-footer">
-          <el-button
-            type="primary"
-            :disabled="fatherName === '根节点'"
-            @click="save('unitManagementForm')"
-          >
+          <el-button type="primary" @click="save('unitManagementForm')">
             <svg-icon class="svg-btn" icon-class="save" />保 存
           </el-button>
         </div>
@@ -197,7 +192,7 @@
                 <el-tree
                   ref="dialogTree"
                   class="unit-tree"
-                  :data="treeList"
+                  :data="treeList1"
                   node-key="id"
                   :props="defaultProps"
                   :default-expanded-keys="Ids"
@@ -209,6 +204,16 @@
             </el-select>
           </el-form-item>
 
+          <!-- <el-form-item label="资源key" prop="resourceKey">
+            <el-input
+              v-model="dialog.params.resourceKey"
+              :disabled="true"
+              placeholder="请输入"
+              clearable
+              style="width: 386px"
+            />
+          </el-form-item> -->
+
           <el-form-item label="资源类型" prop="resourceType">
             <el-select
               v-model="dialog.params.resourceType"
@@ -217,7 +222,7 @@
               @change="changeDialogResourceType"
             >
               <el-option
-                v-for="o in resourceKeyOptions"
+                v-for="o in dialogResourceKeyOptions"
                 :label="o.label"
                 :value="o.value"
                 :key="o.value"
@@ -225,23 +230,14 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="资源组名称" prop="groupName">
+          <!-- <el-form-item label="资源组名称" prop="groupName">
             <el-input
               v-model="dialog.params.groupName"
               placeholder="请输入"
               clearable
               style="width: 386px"
             />
-          </el-form-item>
-
-          <el-form-item label="资源key" prop="resourceKey">
-            <el-input
-              v-model="dialog.params.resourceKey"
-              placeholder="请输入"
-              clearable
-              style="width: 386px"
-            />
-          </el-form-item>
+          </el-form-item> -->
 
           <el-button
             class="add_resource"
@@ -310,7 +306,7 @@
     <moveTree
       ref="moveTree"
       :treeData="treeList"
-      :resourceType="resourceType"
+      :resourceType="searchResourceType"
       @init="init"
       :fatherId="fatherId"
     />
@@ -409,7 +405,17 @@ export default {
         height: '18px'
       },
       resourceKeyOptions: [],
-      resourceType: '',
+      dialogResourceKeyOptions: [
+        {
+          label: '目录',
+          value: 1
+        },
+        {
+          label: '资源',
+          value: 2
+        }
+      ],
+      searchResourceType: '',
       dialogResourceName: [],
       dialogResourceValue: [],
       dialog: {
@@ -420,7 +426,7 @@ export default {
           resourceName: [],
           resourceType: '',
           resourceKey: '',
-          groupName: '',
+          // groupName: '',
           resourceValue: [],
           resourceMap: {}
         }
@@ -440,7 +446,6 @@ export default {
       editRootShow: false,
       groupNameLists: [0],
       i: 0,
-      currentKey: '',
       form: {
         resourceName: '',
         resourceValue: ''
@@ -523,11 +528,13 @@ export default {
       },
       treeData: [],
       treeList: [],
+      treeList1: [],
       List: '',
       Ids: [],
       Id: '',
-      fatherId: '0',
-      fatherName: '根节点',
+      fatherId: '',
+      fatherName: '',
+      dialogParamsResourceKey: '',
       defaultProps: {
         children: 'childList',
         label: 'resourceName'
@@ -551,8 +558,9 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.resourceKeyOptions = res.data.data
-            this.resourceType = res.data.data[0].resourceName
+            this.searchResourceType = res.data.data[0].resourceKey
             this.init(null, res.data.data[0].resourceKey)
+            this.initTreeList(res.data.data[0].resourceKey)
           }
         })
         .catch((error) => {
@@ -561,7 +569,9 @@ export default {
     },
     // 点击节点选中
     nodeClickHandle(data) {
+      console.log(data, 111111)
       this.dialog.params.resourcePid = data.id
+      // this.dialog.params.resourceKey = data.resourceKey
       this.Id = data.id
       this.$refs.selectTree.blur()
     },
@@ -598,24 +608,24 @@ export default {
     },
 
     changeResourceType(val) {
-      this.resourceType = val
-      this.init(this.detailsId, val)
+      this.searchResourceType = val
+      this.init(null, val)
+      this.initTreeList(val)
     },
     changeDialogResourceType(val) {
-      this.resourceType = val
-      this.init(this.detailsId, val)
+      this.dialog.params.resourceType = val
     },
 
     childClickHandle(data) {
       console.log(data)
       this.fatherId = data.id
-      this.fatherName = data.resourceType
+      this.fatherName = data.resourceName
       if (data.childList && data.childList.length > 0) {
         this.isMore = true
-        this.treeMsg = data.resourceType
+        this.treeMsg = data.resourceName
       } else {
         this.isMore = false
-        this.treeMsg = data.resourceType
+        this.treeMsg = data.resourceName
       }
       this.detailsId = data.id
       // this.$refs['unitManagementForm'].resetFields()
@@ -639,8 +649,26 @@ export default {
       })
     },
 
+    async initTreeList(resourceType) {
+      await getResourceList({
+        resourceKey: resourceType,
+        isIncludeResource: false
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.treeList1 = [res.data.data]
+
+            // 弹框赋值
+            this.dialogParamsResourceKey = res.data.data.resourceKey
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
     async init(id, resourceType) {
-      console.log(111, resourceType)
+      console.log(111, id, resourceType)
       await getResourceList({
         resourceKey: resourceType,
         isIncludeResource: true
@@ -648,16 +676,21 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.treeList = [res.data.data]
-            this.currentKey = res.data.data.id
-            this.$refs.unitTree.chooseId(res.data.data.id)
+            this.fatherId = res.data.data.id
+            this.fatherName = res.data.data.resourceName
             let resData = {}
-            if (id && id !== undefined && id !== '0') {
+            if (id !== '' && id !== undefined && id !== null) {
               this.detailsId = id
               resData = this.getDetailsLists(this.treeList, id)
+              this.$refs.unitTree.chooseId(id)
+              console.log(resData, 1111)
             } else {
               this.detailsId = res.data.data.id
               resData = res.data.data
+              this.$refs.unitTree.chooseId(res.data.data.id)
+              console.log(resData, 2222)
             }
+
             this.getUnitDetailsData(resData)
           }
         })
@@ -677,14 +710,15 @@ export default {
       this.dialog.params = {
         resourcePid: '',
         resourceMap: {},
-        groupName: '',
+        // groupName: '',
         resourceName: [],
         resourceType: '',
-        resourceKey: '',
+        // resourceKey: '',
         resourceValue: []
       }
 
       this.dialog.params.resourcePid = this.fatherName
+      // this.dialog.params.resourceKey = this.dialogParamsResourceKey
       this.dialog.show = !this.dialog.show
     },
     dialogRootShow() {
@@ -710,7 +744,8 @@ export default {
                   message: '编辑成功'
                 })
                 this.$refs.unitTree.chooseId(this.detailsId)
-                this.init(this.detailsId, this.resourceType)
+                this.getRootList()
+                // this.init(this.detailsId, this.searchResourceType)
               }
             }
           )
@@ -747,7 +782,8 @@ export default {
                 type: 'success',
                 message: '删除成功'
               })
-              this.init(this.detailsId, this.resourceType)
+              this.init(this.detailsId, this.searchResourceType)
+              this.initTreeList(this.searchResourceType)
             } else {
               this.$message({
                 type: 'warning',
@@ -775,10 +811,10 @@ export default {
                       message: '新建成功'
                     })
                     this.dialogRoot.show = false
+                    this.editRootShow = false
                     this.i = 1
                     this.isClickRoot = false
-                    this.detailsId = res.data.id
-                    this.init(this.detailsId, this.resourceType)
+                    this.getRootList()
                   }
                 })
                 .catch((error) => {
@@ -819,9 +855,9 @@ export default {
               let lastParams = {
                 resourceMap: resParams,
                 resourcePid: this.dialog.params.resourcePid,
-                resourceType: this.dialog.params.resourceType,
-                groupName: this.dialog.params.groupName,
-                resourceKey: this.dialog.params.resourceKey
+                resourceType: this.dialog.params.resourceType
+                // groupName: this.dialog.params.groupName,
+                // resourceKey: this.dialog.params.resourceKey
               }
               resourceAdd(lastParams)
                 .then((res) => {
@@ -831,25 +867,10 @@ export default {
                       message: '新建成功'
                     })
                     this.dialog.show = false
+                    this.editShow = false
                     this.i = 1
                     this.isClick = false
-                    this.detailsId = res.data.id
-                    this.init(this.detailsId, this.resourceType)
-                  }
-                })
-                .catch((error) => {
-                  this.isClick = false
-                })
-              break
-            case '编辑':
-              resourceUpdate({ id: this.editId, ...this.dialog.params })
-                .then((res) => {
-                  if (res.data.code === 0) {
-                    this.isClick = false
-                    this.$message.success('编辑成功')
-                    this.$refs.unitTree.chooseId(this.dialog.params.resourcePid)
-                    this.dialog.show = false
-                    this.getList()
+                    this.init(null, this.searchResourceType)
                   }
                 })
                 .catch((error) => {

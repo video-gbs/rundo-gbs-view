@@ -61,9 +61,9 @@
             >
               <el-option
                 v-for="o in resourceKeyOptions"
-                :label="o.label"
-                :value="o.value"
-                :key="o.value"
+                :label="o.resourceName"
+                :value="o.resourceKey"
+                :key="o.resourceValue"
               />
             </el-select>
           </div>
@@ -188,8 +188,8 @@
                     >
                       <div class="left-lists-table-tree">
                         <el-tree
-                          ref="addRoleTree2"
-                          :data="treeData2"
+                          :ref="'addRoleTree2' + resourceKey"
+                          :data="treeData2[resourceKey]"
                           class="addRoleTree"
                           show-checkbox
                           node-key="id"
@@ -199,8 +199,8 @@
                           :default-expand-all="true"
                           highlight-current
                           @check-change="handleCheckChange"
-                          :default-expanded-keys="expandedList2"
-                          :default-checked-keys="checkedList2"
+                          :default-expanded-keys="expandedList2[resourceKey]"
+                          :default-checked-keys="checkedList2[resourceKey]"
                         >
                           <span
                             slot-scope="{ node, data }"
@@ -242,6 +242,8 @@ import {
   editRoles,
   roleAdd
 } from '@/api/method/role'
+
+import { getRootList } from '@/api/method/resourceInterface'
 
 import { getMenuTree } from '@/api/method/menus'
 import { getResourceList } from '@/api/method/resourceInterface'
@@ -285,27 +287,18 @@ export default {
       },
       featureApiTableData: [],
       isLeftChecked: true,
-      resourceKey: 1,
-      resourceKeyOptions: [
-        {
-          label: '资源类型',
-          value: 1
-        },
-        {
-          label: '目录',
-          value: 2
-        }
-      ],
+      resourceKey: '',
+      resourceKeyOptions: [],
       activeName: '系统权限',
       ischeckStrictly: [false, false, false, true, true],
       activeIndex: '应用菜单权限',
       expandedList1: [],
       checkedList1: [],
-      expandedList2: [],
-      checkedList2: [],
+      expandedList2: {},
+      checkedList2: {},
       checked: false,
       treeData1: [],
-      treeData2: [],
+      treeData2: {},
       methodOptions: [
         { label: 'post', value: 2 },
         { label: 'get', value: 1 },
@@ -336,9 +329,7 @@ export default {
       Id: '',
       selectedObj: {},
       selectedData: [],
-      selectedObj1: {},
-      selectedData1: [],
-      resLists: [],
+      resLists: {},
       // 菜单数组
       menuIds: [],
       // 功能数组
@@ -360,14 +351,28 @@ export default {
     if (this.$route.query.key !== 'add') {
       this.getRoleDetail()
     }
+    this.getRootList()
   },
   mounted() {
     this.initGetMenuTree()
-    this.initGetResourceList(this.resourceKey)
   },
   methods: {
+    async getRootList() {
+      await getRootList()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.resourceKeyOptions = res.data.data
+            this.resourceKey = res.data.data[0].resourceKey
+
+            this.initGetResourceList(this.resourceKey)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     handleClick(tab, event) {
-      if (tab.name === '1') {
+      if (tab.name === '应用菜单权限') {
         return this.defaultProps
       } else {
         return this.defaultProp1
@@ -434,8 +439,16 @@ export default {
       })
         .then((res) => {
           if (res.data.code === 0) {
-            this.treeData2 = [res.data.data]
-            // this.handleRowSelection1(this.treeData2)
+            this.$nextTick(() => {
+              this.treeData2[resourceKey] = [res.data.data] || []
+
+              console.log(
+                'this.treeData2[resourceKey]',
+                this.treeData2[resourceKey]
+              )
+              // this.handleRowSelection1(this.treeData2[resourceKey])
+              this.$forceUpdate()
+            })
           }
         })
         .catch((error) => {
@@ -454,14 +467,32 @@ export default {
       })
     },
 
-    handleRowSelection1(data) {
-      data.forEach((item) => {
-        if (this.selectedObj1[item.id]) {
-          this.$nextTick(() => {
-            this.$refs.addRoleTree2.setCheckedNodes(item)
-          })
+    setCheckedLists(arr) {
+      arr.map((item) => {
+        if (item.id === this.resLists[this.resourceKey][0].id) {
+          return item
+        } else {
+          if (item.childList && item.childList.length > 0) {
+            this.setCheckedLists(item.childList)
+          }
         }
       })
+    },
+
+    handleRowSelection1(data) {
+      console.log(this.resLists[this.resourceKey])
+      if (this.resLists[this.resourceKey]) {
+        const resNodes = this.setCheckedLists(data)
+        console.log('resNodes~~~~~~~~~~~~~~', resNodes)
+        this.$nextTick(() => {
+          this.$refs['addRoleTree2' + this.resourceKey].setCheckedNodes(
+            resNodes
+          )
+          this.$refs['addRoleTree2' + this.resourceKey].setCheckedNodes([
+            resNodes
+          ])
+        })
+      }
     },
 
     handleSelectChange(selection) {
@@ -486,32 +517,6 @@ export default {
       // 取消单个勾选时，删除对应属性
       if (!selection.some((item) => item.id === row.id)) {
         delete this.selectedObj[row.id]
-      }
-    },
-
-    handleSelectChange1(selection) {
-      console.log('selection', selection)
-
-      // 勾选数据 添加
-      selection.forEach((item) => {
-        this.selectedObj1[item.id] = item
-      })
-
-      console.log('this.selectedObj1', this.selectedObj1)
-
-      // 获取所有分页勾选的数据
-      this.selectedData1 = []
-      for (const key in this.selectedObj1) {
-        this.selectedData1.push(this.selectedObj1[key])
-      }
-      console.log(this.selectedData1, 2111111)
-    },
-
-    handleSelect1(selection, row) {
-      console.log('selection', selection, row)
-      // 取消单个勾选时，删除对应属性
-      if (!selection.some((item) => item.id === row.id)) {
-        delete this.selectedObj1[row.id]
       }
     },
 
@@ -610,31 +615,45 @@ export default {
           this.checkedList1 = resIds
           break
         case '资源功能权限':
+          console.log('this.$refs', this.$refs)
           if (checked === false) {
             if (data.childList) {
               data.childList.map((item2) => {
-                this.$refs.addRoleTree2.setChecked(item2.id, false)
+                this.$refs['addRoleTree2' + this.resourceKey].setChecked(
+                  item2.id,
+                  false
+                )
               })
             }
           } else {
             if (data.resourcePid) {
-              this.$refs.addRoleTree2.setChecked(data.resourcePid, true)
+              this.$refs['addRoleTree2' + this.resourceKey].setChecked(
+                data.resourcePid,
+                true
+              )
             }
           }
-          this.resLists = this.$refs.addRoleTree2.getCheckedNodes()
+          this.resLists[this.resourceKey] =
+            this.$refs['addRoleTree2' + this.resourceKey].getCheckedNodes()
 
-          if (checked === false) {
-            this.handleSelect1(this.resLists, data)
-          } else {
-            this.handleSelectChange1(this.resLists)
-          }
-
-          this.resLists.forEach((item) => {
+          this.resLists[this.resourceKey].forEach((item) => {
             resIds.push(item.id)
           })
-          this.resourceIds = resIds
-          this.expandedList2 = resIds
-          this.checkedList2 = resIds
+          let resIdLists = []
+          this.resourceIds = []
+          for (const key in this.resLists) {
+            resIdLists.push(this.resLists[key])
+          }
+
+          resIdLists.forEach((item1) => {
+            item1.map((child) => {
+              this.resourceIds.push(child.id)
+            })
+          })
+          // console.log('this.resourceIds', this.resourceIds)
+          // return
+          this.expandedList2[this.resourceKey] = resIds
+          this.checkedList2[this.resourceKey] = resIds
           break
         default:
           break
