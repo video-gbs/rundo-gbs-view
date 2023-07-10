@@ -14,10 +14,14 @@
             <svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
-          <el-button @click="dialogMoveShow">
+          <div v-if="isClickTreeSort" @click="treeSort(1)" class="sort_div">
+            <svg-icon class="svg-btn" icon-class="sort-b" />
+            <span class="btn-span">排序</span>
+          </div>
+          <div v-else @click="treeSort(2)" class="clicked-button sort_div">
             <svg-icon class="svg-btn" icon-class="sort" />
             <span class="btn-span">排序</span>
-          </el-button>
+          </div>
           <el-button @click="deleteAccount($event)">
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">删除</span>
@@ -28,7 +32,9 @@
           class="unitTree"
           :treeData="treeList"
           :currentKey="currentKey"
+          :isClickTreeSort="isClickTreeSort"
           @childClickHandle="childClickHandle"
+          @changeSort="changeSort"
         />
       </div>
       <el-card class="right-box-card">
@@ -288,6 +294,7 @@ export default {
           phone: ''
         }
       },
+      isClickTreeSort: true,
       isClick: false,
       editShow: false,
       currentKey: '0',
@@ -424,6 +431,52 @@ export default {
           }
         }
       })
+    },
+    treeSort(val) {
+      if (val === 1) {
+        this.isClickTreeSort = false
+      } else {
+        this.isClickTreeSort = true
+      }
+    },
+    changeSort(val, id) {
+      if (val === 0) {
+        moveUnitXd({
+          id,
+          moveOp: val
+        }).then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '移动成功'
+            })
+          } else {
+            this.$message({
+              type: 'warning',
+              message: res.data.data
+            })
+          }
+          this.init(this.detailsId)
+        })
+      } else {
+        moveUnitXd({
+          id,
+          moveOp: val
+        }).then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '移动成功'
+            })
+          } else {
+            this.$message({
+              type: 'warning',
+              message: res.data.data
+            })
+          }
+          this.init(this.detailsId)
+        })
+      }
     },
 
     async init(id) {
@@ -691,6 +744,37 @@ export default {
         .el-button {
           width: 70px;
           height: 32px;
+        }
+        .sort_div {
+          display: inline-block;
+          line-height: 32px;
+          white-space: nowrap;
+          text-align: center;
+          cursor: pointer;
+          background: #ffffff;
+          border: 1px solid #dcdfe6;
+          border-radius: 4px;
+          width: 70px;
+          height: 32px;
+          .btn-span {
+            position: relative;
+            top: -2px;
+            font-size: 14px;
+            color: #606266;
+            font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+            font-weight: 400;
+          }
+          .svg-btn {
+            position: relative;
+            top: 1px;
+            left: -6px;
+          }
+        }
+        .clicked-button {
+          border: 1px solid #0270ff !important;
+          .btn-span {
+            color: #0270ff !important;
+          }
         }
       }
     }

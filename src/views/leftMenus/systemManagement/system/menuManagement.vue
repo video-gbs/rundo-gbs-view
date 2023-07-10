@@ -75,11 +75,12 @@
           </template>
         </el-table-column>
         <el-table-column prop="path" label="跳转URL" width="180" />
-        <el-table-column prop="menuSort" label="排序" width="80" />
+        <el-table-column prop="sort" label="排序" width="80" />
         <el-table-column prop="component" label="前端组件Import路径" />
         <el-table-column prop="disabled" label="是否禁用" width="100">
           <template slot-scope="scope">
             <el-switch
+              v-if="scope.row.id !== '0'"
               v-model="scope.row.disabled"
               active-color="#13ce66"
               inactive-color="#ff4949"
@@ -93,6 +94,7 @@
         <el-table-column prop="hidden" label="是否隐藏" width="100">
           <template slot-scope="scope">
             <el-switch
+              v-if="scope.row.id !== '0'"
               v-model="scope.row.hidden"
               active-color="#13ce66"
               inactive-color="#ff4949"
@@ -105,10 +107,16 @@
         </el-table-column>
         <el-table-column width="100" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" @click="dialogShow(0, scope.row)"
+            <el-button
+              v-if="scope.row.id !== '0'"
+              type="text"
+              @click="dialogShow(0, scope.row)"
               >编辑</el-button
             >
-            <el-button type="text" @click="deleteRole(scope.row)"
+            <el-button
+              v-if="scope.row.id !== '0'"
+              type="text"
+              @click="deleteRole(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -117,6 +125,7 @@
     </div>
 
     <el-dialog
+      v-if="dialogForm.show"
       :title="dialogForm.title1"
       :visible.sync="dialogForm.show"
       width="650px"
@@ -145,7 +154,7 @@
               <el-option :value="dialogForm.params.menuPid">
                 <el-tree
                   ref="tree"
-                  class="unit-tree"
+                  class="menu-tree tree"
                   :data="treeList"
                   node-key="id"
                   :props="defaultProps"
@@ -160,7 +169,7 @@
           <el-form-item label="菜单名称：" prop="name">
             <el-input v-model="dialogForm.params.name" style="width: 436px" />
           </el-form-item>
-          <el-form-item label="菜单图标：" prop="icon">
+          <el-form-item label="菜单图标：">
             <el-input v-model="dialogForm.params.icon" style="width: 436px" />
           </el-form-item>
 
@@ -246,7 +255,7 @@ export default {
           path: '',
           component: '',
           name: '',
-          icon: '',
+          icon: null,
           description: '',
           hidden: 1,
           disabled: 1
@@ -260,7 +269,7 @@ export default {
         menuPid: [{ required: true, message: '请选择', trigger: 'change' }],
         appId: [{ required: true, message: '请选择', trigger: 'change' }],
         ip: [{ required: true, message: '请填写ip', trigger: 'change' }],
-        icon: [{ required: true, message: '请填写图标', trigger: 'change' }],
+        // icon: [{ required: true, message: '请填写图标', trigger: 'change' }],
         title: [{ required: true, message: '请填写名称', trigger: 'change' }]
       },
       treeData: [],
@@ -270,7 +279,11 @@ export default {
       List: '',
       Ids: [],
       Id: '',
-      menuTypeeOptions: [{ label: '页面', value: 2 }],
+      menuTypeeOptions: [
+        { label: '虚拟目录', value: 0 },
+        { label: '目录', value: 1 },
+        { label: '页面', value: 2 }
+      ],
       resName: '',
       defaultProps: {
         children: 'childList',
@@ -438,7 +451,7 @@ export default {
           path: '',
           component: '',
           name: '',
-          icon: '',
+          icon: null,
           description: '',
           hidden: 1,
           disabled: 1
@@ -492,6 +505,7 @@ export default {
                 .then((res) => {
                   if (res.data.code === 0) {
                     this.$message.success('编辑成功')
+                    this.isClick = false
                     this.dialogForm.show = false
                     this.initGetMenuTree()
                   }
@@ -586,6 +600,22 @@ export default {
 // 去除滚动条上方多余显示
 ::v-deep .el-table__header .has-gutter th.gutter {
   display: none !important;
+}
+
+::v-deep .el-card__header {
+  padding: 0 16px;
+  height: 62px;
+}
+::v-deep .el-card__body {
+  padding-bottom: 0;
+}
+
+// 去掉顶部线条
+::v-deep .menu-tree > .el-tree-node::after {
+  border-top: none !important;
+}
+::v-deep .menu-tree > .el-tree-node::before {
+  border-left: none;
 }
 
 ::v-deep .el-icon-arrow-right {
@@ -806,5 +836,91 @@ export default {
 }
 ::v-deep .el-table::before {
   height: 0;
+}
+
+::v-deep .tree .el-tree-node__expand-icon.expanded {
+  -webkit-transform: rotate(90deg) !important;
+  transform: rotate(90deg) !important;
+}
+
+// 没有子节点
+::v-deep .tree .el-tree-node__expand-icon.is-leaf::before {
+  // background: url("~@/assets/imgs/tree+.png") no-repeat 0 3px;
+  content: '';
+  display: none;
+  width: 8px;
+  height: 8px;
+}
+::v-deep .operation_box {
+  height: 100%;
+}
+::v-deep .tree {
+  margin-left: 0px;
+}
+/* 树形结构节点添加连线 */
+::v-deep .el-tree-node {
+  position: relative;
+  padding-left: 8px;
+}
+::v-deep .el-tree-node__content {
+  height: 32px;
+  padding-left: 0px !important;
+}
+
+::v-deep .el-tree-node__children {
+  padding-left: 14px;
+}
+
+::v-deep .el-tree-node :last-child:before {
+  height: 38px;
+}
+
+::v-deep .el-tree > .el-tree-node:before {
+  border-left: none;
+}
+::v-deep .tree-container .el-tree > .el-tree-node:after {
+  border-top: none;
+}
+
+::v-deep .el-tree-node__children .el-tree-node:before {
+  content: '';
+  left: -4px;
+  position: absolute;
+  right: auto;
+  border-width: 1px;
+}
+
+::v-deep .el-tree-node:after {
+  content: '';
+  left: -4px;
+  position: absolute;
+  right: auto;
+  border-width: 1px;
+}
+::v-deep .el-tree-node__expand-icon.is-leaf {
+  // display: none;
+  padding-left: 4px;
+}
+
+::v-deep .el-tree-node:before {
+  content: '';
+  height: 100%;
+  width: 1px;
+  position: absolute;
+  left: -3px;
+  top: -22px;
+  border-width: 1px;
+  border-left: 1px solid #dddddd;
+}
+
+::v-deep .el-tree-node:after {
+  content: '';
+  width: 24px;
+  height: 20px;
+  position: absolute;
+  left: -4px;
+  top: 16px;
+  border-width: 1px;
+  border-top: 1px solid #dddddd;
 }
 </style>

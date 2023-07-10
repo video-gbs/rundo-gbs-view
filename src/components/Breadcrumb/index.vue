@@ -2,10 +2,6 @@
   <el-breadcrumb class="app-breadcrumb" separator="/">
     <transition-group name="breadcrumb">
       <el-breadcrumb-item v-for="item in levelList" :key="item.path">
-        <!-- <span v-if="item.redirect === 'noRedirect'" class="no-redirect">{{
-          item.meta.title
-        }}</span> -->
-        <!--  -->
         <a @click.prevent="handleLink(item)">{{ item.meta.title }}</a>
       </el-breadcrumb-item>
     </transition-group>

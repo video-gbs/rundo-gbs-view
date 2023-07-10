@@ -158,3 +158,21 @@ export function roleAssociate(data) {
   // 角色关联用户
   return request.post(`${rbac}/role/associate`, data)
 }
+
+// 编辑角色调用接口
+export function getRoleMenuList(data) {
+  // 获取角色菜单信息
+  return request.get(`${rbac}/role/role/menu`, data)
+}
+export function getRoleResourceList(data) {
+  // 获取角色资源信息
+  return request.get(`${rbac}/role/role/resource`, data)
+}
+export function getRoleFuncMenuList(data) {
+  // 获取角色某菜单下的功能信息
+  return request.get(`${rbac}/role/role/func/menu`, data)
+}
+export function getRoleFuncList(data) {
+  // 获取角色全部功能信息
+  return request.get(`${rbac}/role/role/func`, data)
+}

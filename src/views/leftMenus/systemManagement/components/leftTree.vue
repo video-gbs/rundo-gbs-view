@@ -12,7 +12,7 @@
         ref="tree"
         :data="treeData"
         class="tree"
-        :props="{ children: 'childList', label: this.defaultPropsName }"
+        :props="{ children: 'childList', label: defaultPropsName }"
         default-expand-all
         :default-expanded-keys="['根节点']"
         :current-node-key="resCurrentKey"
@@ -31,6 +31,22 @@
             />
             <svg-icon v-else icon-class="tree2" class="tree2" />
             {{ data.name || data.sectionName || data.resourceName }}
+
+            <div
+              v-if="!isClickTreeSort && data.level !== '0'"
+              class="sort_btns"
+            >
+              <svg-icon
+                icon-class="sortDown"
+                class="sort_down sort_btn"
+                @click="invokeSort(0, data.id)"
+              />
+              <svg-icon
+                icon-class="sortUp"
+                class="sort_up sort_btn"
+                @click="invokeSort(1, data.id)"
+              />
+            </div>
           </span>
         </span>
       </el-tree>
@@ -44,7 +60,7 @@ export default {
     return {
       data: [],
       filterText: '',
-      resCurrentKey: ''
+      resCurrentKey: '0'
     }
   },
   props: {
@@ -52,6 +68,12 @@ export default {
       type: Array,
       default: function () {
         return []
+      }
+    },
+    isClickTreeSort: {
+      type: Boolean,
+      default: function () {
+        return true
       }
     },
     defaultPropsName: {
@@ -74,6 +96,9 @@ export default {
     handleNodeClick(data) {
       // data.icon = 'tree1'
       this.$emit('childClickHandle', data)
+    },
+    invokeSort(val, id) {
+      this.$emit('changeSort', val, id)
     },
     handleNodeClose(data) {
       // data.icon = 'tree2'
@@ -208,6 +233,18 @@ export default {
 }
 .tree .custom-tree-node {
   // padding-left: 10px;
+}
+.sort_btns {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  .sort_btn {
+    width: 20px;
+    height: 20px;
+  }
+  .sort_down {
+    margin-right: 10px;
+  }
 }
 // 去掉顶部线条
 .tree {

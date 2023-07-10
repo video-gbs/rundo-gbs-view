@@ -71,16 +71,18 @@
                   :show-overflow-tooltip="true"
                 />
                 <el-table-column
-                  prop="userName"
+                  prop="workName"
                   label="用户名称"
                   :show-overflow-tooltip="true"
                 />
-                <el-table-column prop="orgName" label="所属部门" width="240" />
+                <el-table-column
+                  prop="sectionName"
+                  label="所属部门"
+                  width="240"
+                />
                 <el-table-column width="80" label="操作" align="center">
                   <template slot-scope="scope">
-                    <el-button
-                      type="text"
-                      @click="viewRolesDetails(scope.row.id)"
+                    <el-button type="text" @click="viewRolesDetails(scope.row)"
                       ><span class="delete-button">查看</span></el-button
                     >
                   </template>
@@ -172,11 +174,15 @@
                   :show-overflow-tooltip="true"
                 />
                 <el-table-column
-                  prop="userName"
+                  prop="username"
                   label="用户名称"
                   :show-overflow-tooltip="true"
                 />
-                <el-table-column prop="orgName" label="所属部门" width="240" />
+                <el-table-column
+                  prop="sectionName"
+                  label="所属部门"
+                  width="240"
+                />
               </el-table>
 
               <pagination
@@ -189,14 +195,6 @@
         </div>
       </div>
     </div>
-    <!-- <div class="dialog-footer">
-      <el-button @click="goback()"
-        ><svg-icon class="svg-btn" icon-class="back-svg" />返回</el-button
-      >
-      <el-button type="primary" @click="save()"
-        ><svg-icon class="svg-btn" icon-class="save" />保存</el-button
-      >
-    </div> -->
 
     <el-dialog :title="dialog.title" :visible.sync="dialog.show" width="600px">
       <div slot="title" class="dialog-title">
@@ -222,30 +220,22 @@
               placeholder="请输入"
               style="width: 436px"
             />
-            <!-- <span>{{ dialog.params.username }}</span> -->
           </el-form-item>
           <el-form-item label="用户姓名">
             <el-input
-              v-model="dialog.params.userName"
+              v-model="dialog.params.workName"
               placeholder="请输入"
               style="width: 436px"
             />
-            <!-- <span>{{ dialog.params.userName }}</span> -->
           </el-form-item>
           <el-form-item label="所属部门">
             <el-input
-              v-model="dialog.params.orgName"
+              v-model="dialog.params.sectionName"
               placeholder="请输入"
               style="width: 436px"
             />
-            <!-- <span>{{ dialog.params.orgName }}</span> -->
           </el-form-item>
           <el-form-item label="有效日期">
-            <!-- <el-input
-              v-model="dialog.params.expiryDateStart"
-              placeholder="请输入"
-
-            /> -->
             <span
               style="
                 display: inline-block;
@@ -259,18 +249,31 @@
                 font-weight: 400;
                 color: #333333;
               "
-              >{{ dialog.params.expiryDateStart }}~{{
-                dialog.params.expiryDateEnd
+              >{{ dialog.params.expiryStartTime }}~{{
+                dialog.params.expiryEndTime
               }}</span
             >
           </el-form-item>
           <el-form-item label="用户工号">
             <el-input
-              v-model="dialog.params.jobNo"
+              v-model="dialog.params.workNum"
               placeholder="请输入"
               style="width: 436px"
             />
-            <!-- <span>{{ dialog.params.jobNo }}</span> -->
+          </el-form-item>
+          <el-form-item label="创建人">
+            <el-input
+              v-model="dialog.params.createBy"
+              placeholder="请输入"
+              style="width: 436px"
+            />
+          </el-form-item>
+          <el-form-item label="邮箱">
+            <el-input
+              v-model="dialog.params.email"
+              placeholder="请输入"
+              style="width: 436px"
+            />
           </el-form-item>
           <el-form-item label="手机号码">
             <el-input
@@ -278,7 +281,6 @@
               placeholder="请输入"
               style="width: 436px"
             />
-            <!-- <span>{{ dialog.params.phone }}</span> -->
           </el-form-item>
           <el-form-item label="地址">
             <el-input
@@ -286,7 +288,6 @@
               placeholder="请输入"
               style="width: 436px"
             />
-            <!-- <span>{{ dialog.params.address }}</span> -->
           </el-form-item>
           <el-form-item label="功能角色">
             <el-input
@@ -294,15 +295,6 @@
               placeholder="请输入"
               style="width: 436px"
             />
-            <!-- <span>{{ dialog.params.roleName }}</span> -->
-          </el-form-item>
-          <el-form-item label="安防区域">
-            <el-input
-              v-model="dialog.params.areaName"
-              placeholder="请输入"
-              style="width: 436px"
-            />
-            <!-- <span>{{ dialog.params.areaName }}</span> -->
           </el-form-item>
           <el-form-item label="描述">
             <el-input
@@ -311,7 +303,6 @@
               placeholder="多行输入"
               style="width: 436px"
             />
-            <!-- <span>{{ dialog.params.description }}</span> -->
           </el-form-item>
         </el-form>
       </div>
@@ -328,7 +319,6 @@ import LineFont from '@/components/LineFont'
 import pagination from '@/components/Pagination/index.vue'
 
 import {
-  getRelationSysUserInfo,
   addRelationLists,
   removeRelationLists,
   roleAssociate
@@ -359,16 +349,20 @@ export default {
       leftSearchName: '',
       dialog: {
         show: false,
-        title: '查看',
+        title: '查看用户详情',
         params: {
+          sectionName: '',
+          createBy: '',
           address: '',
-          areaName: '',
+          email: '',
           description: '',
           email: '',
-          orgName: '',
           phone: '',
-          roleName: '',
-          userName: ''
+          username: '',
+          workName: '',
+          workNum: '',
+          expiryStartTime: '',
+          expiryEndTime: ''
         }
       },
       checked: false,
@@ -383,7 +377,7 @@ export default {
         notShowSmallTitle: false
       },
       lineTitle3: {
-        title: '查看',
+        title: '查看用户详情',
         notShowSmallTitle: false
       },
       textStyle: {
@@ -469,42 +463,33 @@ export default {
       this.params1.proCount = proCount
       this.rightInit()
     },
-    viewRolesDetails(id) {
+    viewRolesDetails(row) {
       this.dialog.show = true
-      getRelationSysUserInfo(id)
-        .then((res) => {
-          if (res.code === 0) {
-            const {
-              address,
-              areaName,
-              description,
-              email,
-              orgName,
-              phone,
-              roleName,
-              userName,
-              username,
-              jobNo,
-              expiryDateEnd,
-              expiryDateStart
-            } = res.data
-            this.dialog.params.address = address
-            this.dialog.params.areaName = areaName
-            this.dialog.params.description = description
-            this.dialog.params.email = email
-            this.dialog.params.orgName = orgName
-            this.dialog.params.phone = phone
-            this.dialog.params.roleName = roleName
-            this.dialog.params.userName = userName
-            this.dialog.params.username = username
-            this.dialog.params.jobNo = jobNo
-            this.dialog.params.expiryDateStart = expiryDateStart
-            this.dialog.params.expiryDateEnd = expiryDateEnd
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
+      const {
+        createBy,
+        address,
+        email,
+        description,
+        phone,
+        username,
+        workName,
+        workNum,
+        sectionName,
+        expiryStartTime,
+        expiryEndTime
+      } = row
+      this.dialog.params.address = address
+      this.dialog.params.sectionName = sectionName
+      this.dialog.params.username = username
+      this.dialog.params.description = description
+      this.dialog.params.email = email
+      this.dialog.params.workName = workName
+      this.dialog.params.phone = phone
+      this.dialog.params.createBy = createBy
+      this.dialog.params.workName = workName
+      this.dialog.params.workNum = workNum
+      this.dialog.params.expiryStartTime = expiryStartTime
+      this.dialog.params.expiryEndTime = expiryEndTime
     },
     goback() {
       this.$router.push({ path: '/roleManagement' })
@@ -640,7 +625,7 @@ export default {
           if (res.data.code === 0) {
             this.$message({
               type: 'success',
-              message: '解除管理用户成功'
+              message: '解除关联用户成功'
             })
             this.isLeftClicked = false
             this.tableRightSelectionLength = 0

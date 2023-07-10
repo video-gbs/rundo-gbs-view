@@ -1,7 +1,5 @@
 import { login, logout } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import Router, { staticRouters } from '@/router'
-import Layout from '@/layout'
 import { Local } from '@/utils/storage'
 const getDefaultState = () => {
   return {
@@ -18,9 +16,10 @@ const getDefaultState = () => {
     // 类型路由
     typeRouter: [],
     // 运维系统类型路由
-    sidebarRouter: []
+    sidebarRouter: [],
     // 配置类型路由
     // configTypeRouter: []
+    permission: []
   }
 }
 
@@ -72,6 +71,9 @@ const mutations = {
   },
   SET_INIT: (state, init) => {
     state.init = init
+  },
+  SET_PERMISSION: (state, permission) => {
+    state.permission = permission
   }
 }
 
@@ -155,10 +157,6 @@ const actions = {
   // changeSystemTypeRouter({ commit }, val) {
   //   commit('SET_SHOWSIDEBAR', val)
   // },
-  // // 配置类型路由
-  // changeConfigTypeRouter({ commit }, val) {
-  //   commit('SET_SHOWSIDEBAR', val)
-  // },
 
   // user logout
   logout({ commit, state }) {
@@ -183,6 +181,10 @@ const actions = {
       commit('RESET_STATE')
       resolve()
     })
+  },
+  // 配置按钮权限路由
+  changePermission({ commit }, val) {
+    commit('SET_PERMISSION', val)
   }
 }
 

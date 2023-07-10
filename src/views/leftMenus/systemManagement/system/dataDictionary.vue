@@ -229,7 +229,10 @@ import {
   updateDict,
   deleteDict
 } from '@/api/method/dictionary'
+import { getHomeFunc } from '@/api/method/home'
 import pagination from '@/components/Pagination/index.vue'
+import store from '@/store/index'
+import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { pagination },
@@ -316,15 +319,17 @@ export default {
       treeData: []
     }
   },
+  created() {},
   mounted() {
     this.getList()
-    // this.init()
+
+    this.getHomeFunc()
   },
   methods: {
-    init() {
-      getSysOrgTree({ id: 1 }).then((res) => {
-        if (res.code === 0) {
-          this.treeData = res.data
+    async getHomeFunc() {
+      await getHomeFunc({ menuId: Local.get('funcId') }).then((res) => {
+        if (res.data.code === 0) {
+          store.dispatch('user/changePermission', res.data)
         }
       })
     },
@@ -445,8 +450,8 @@ export default {
         }
       })
     },
-    getList() {
-      getDictLists({
+    async getList() {
+      await getDictLists({
         num: this.params.pageSize,
         page: this.params.pageNum,
         ...this.searchParams

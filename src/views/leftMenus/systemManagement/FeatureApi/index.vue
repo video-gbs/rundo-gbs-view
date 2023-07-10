@@ -65,6 +65,7 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.treeData = [res.data.data]
+            this.$refs.featureApiTable.changeName(res.data.data)
             const resId = Local.get('featureApiId')
               ? Local.get('featureApiId')
               : res.data.data.id
@@ -93,6 +94,8 @@ export default {
       Local.set('featureApiId', data.id)
 
       this.$refs.featureApiTable.getList(data.id)
+
+      this.$refs.featureApiTable.changeName(data)
     }
   },
   destroyed() {

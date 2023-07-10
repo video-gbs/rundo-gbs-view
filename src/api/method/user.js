@@ -9,11 +9,6 @@ export function newLogin(params) {
   return request.post(`${newRundoAuthServer}/token`, params)
 }
 
-// 获取用户信息
-export function getUseInfoLists(params) {
-  return request.get(`${rbac}/auth/user/user`, params)
-}
-
 // 获取菜单信息
 export function getMenuLists(params) {
   return request.get(`${rbac}/auth/user/menu`, params)

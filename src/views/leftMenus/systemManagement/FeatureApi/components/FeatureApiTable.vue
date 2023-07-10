@@ -289,7 +289,8 @@ export default {
       checked: false,
       isInclude: true,
       featureApiTableData: [],
-      featureApiId: '0'
+      featureApiId: '0',
+      fatherName: ''
     }
   },
   props: {
@@ -305,7 +306,7 @@ export default {
     Local.remove('featureApiTablePageNum')
   },
   mounted() {
-    this.getList()
+    // this.getList()
   },
   methods: {
     async getList(id) {
@@ -330,8 +331,13 @@ export default {
         }
       })
     },
+    changeName(data) {
+      this.fatherName = data.name
+      this.Id = data.id
+    },
     nodeClickHandle(data) {
       this.dialogForm.params.menuId = data.name
+      this.fatherName = data.name
       this.Id = data.id
       this.$refs.selectTree.blur()
     },
@@ -419,6 +425,8 @@ export default {
         this.dialogForm.params.menuId = this.resName
       }
       this.dialogForm.title1 = type === 1 ? '新建' : '编辑'
+
+      this.dialogForm.params.menuId = this.fatherName
       this.dialogForm.show = !this.dialogForm.show
     },
 

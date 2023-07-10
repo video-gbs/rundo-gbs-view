@@ -39,39 +39,6 @@
             <svg-icon icon-class="user3" class="user" />
             <span class="fs14 mr10">系统操作指南</span>
             <span class="user-line" />
-            <!-- <el-dropdown class trigger="click">
-              <div class="user-info">
-                <svg-icon icon-class="management" class="management" />
-
-                <span class="user-line" />
-              </div>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item divided @click.native="logout">
-                  <span style="display: block"
-                    ><svg-icon
-                      icon-class="peizhi"
-                      class="management1"
-                    />配置管理</span
-                  >
-                </el-dropdown-item>
-                <el-dropdown-item divided @click.native="logout">
-                  <span style="display: block"
-                    ><svg-icon
-                      icon-class="yunwei"
-                      class="management1"
-                    />运维管理</span
-                  >
-                </el-dropdown-item>
-                <el-dropdown-item divided @click.native="logout">
-                  <span style="display: block"
-                    ><svg-icon
-                      icon-class="zhinan"
-                      class="management1"
-                    />系统操作指南</span
-                  >
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown> -->
           </div>
           <el-dropdown class trigger="click">
             <div class="user-info">
@@ -111,27 +78,11 @@ import { Local } from '@/utils/storage'
 import { logout, newLogout } from '@/api/method/user'
 import store from '@/store/index'
 export default {
-  components: {
-    // Message,
-    // NotTips,
-  },
   props: {
     isShowTopMenus: {
       type: Boolean,
       default: false
     }
-    // ,
-    // secondLevelRouters: {
-    //   type: Array,
-    //   default: [
-    //     { path: '/workTable', title: '首页', type: 1 },
-    //     { path: '/equipment', title: '应用1', type: 2 },
-    //     { path: '/test2', title: '菜单1', type: 3 },
-    //     { path: '/test3', title: '运维1', type: 1 },
-    //     { path: '/permission', title: '应用2', type: 2 },
-    //     { path: '/permission', title: '菜单2', type: 3 }
-    //   ]
-    // }
   },
   data() {
     return {
@@ -155,74 +106,13 @@ export default {
     }
   },
   watch: {
-    changeTypeRouter(newValue, oldValue) {
-      // this.isShowSidebar = newValue
-    }
+    changeTypeRouter(newValue, oldValue) {}
   },
   created() {
-    // const homeRouters = [
-    //   {
-    //     path: '/workTable',
-    //     name: 'workTable',
-    //     component: () => import('@/views/leftMenus/workTable/index'),
-    //     meta: { title: '首页', icon: 'sy' }
-    //   }
-    // ]
     this.userInfo.userName = localStorage.getItem('rj_userName') || '佚名用户'
     this.userInfo.userName = this.userInfo.userName
       .replace('"', '')
       .replace('"', '')
-    // if (this.routerLists && this.routerLists.length > 0) {
-    //   if (Local.get('tree_type') === 1) {
-    //     this.routerLists.map((item) => {
-    //       if (item.children && item.children.length > 0) {
-    //         item.children.forEach((child) => {
-    //           let params = {}
-    //           params = {
-    //             path: child.path,
-    //             meta: child.meta,
-    //             name: child.name,
-    //             component: (resolve) =>
-    //               require([`@/views${child.component}`], resolve)
-    //           }
-    //           this.resRouterLists.push(params)
-    //         })
-    //       }
-    //     })
-    //     this.resRouterLists = homeRouters.concat(this.resRouterLists)
-    //     this.activeIndex = this.resRouterLists[1].path
-    //     console.log('this.resRouterLists', this.resRouterLists)
-    //   } else {
-    //     this.routerLists.map((item) => {
-    //       let params1 = {}
-    //       params1 = {
-    //         path: item.path,
-    //         meta: item.meta,
-    //         name: item.name,
-    //         component: (resolve) =>
-    //           require([`@/views${item.component}`], resolve)
-    //       }
-    //       this.resRouterLists.push(params1)
-    //       // 侧边栏路由
-    //       if (item.children && item.children.length > 0) {
-    //         item.children.forEach((child) => {
-    //           let params2 = {}
-    //           params2 = {
-    //             path: child.path,
-    //             meta: child.meta,
-    //             name: child.name,
-    //             component: (resolve) =>
-    //               require([`@/views${child.component}`], resolve)
-    //           }
-    //           this.sideBarRouterList.push(params2)
-    //         })
-    //       }
-    //     })
-    //     this.resRouterLists = homeRouters.concat(this.resRouterLists)
-    //     this.activeIndex = this.resRouterLists[1].path
-    //     console.log('this.resRouterLists~~~~~~~~~', this.resRouterLists)
-    //   }
-    // }
   },
   mounted() {},
   methods: {
@@ -237,8 +127,6 @@ export default {
           Local.setToken('')
           Local.remove('access_token')
           Local.remove('rj_deptType')
-          // Local.remove('rj_userName')
-          // Local.remove('rj__deptName')
           this.$router.push({ path: '/login' })
         })
     },
@@ -252,7 +140,6 @@ export default {
       // }
     },
     clickRouter(data) {
-      // console.log('data~~~~~~~~~~~~~~~~~~~~~~~~', data, this.routerLists)
       this.sideBarRouterList1 = []
       this.sideBarRouterList2 = []
       this.sideBarRouterList3 = []
@@ -260,24 +147,19 @@ export default {
         this.routerLists && this.routerLists.length > 0
           ? this.routerLists
           : JSON.parse(Local.get('dynamicRouters'))
-      // console.log(
-      //   '~~~~~~~~~~~~~~~~~~~~~~~~',
-      //   JSON.parse(Local.get('dynamicRouters'))
-      // )
-      // console.log('resArray~~~~~~~~~~~~~~~~~~~~~~~~', resArray)
       switch (data.path) {
         case '/resourceManagement':
           resArray.map((item) => {
             if (
-              item.children &&
-              item.children.length > 0 &&
+              item.childList &&
+              item.childList.length > 0 &&
               data.path === item.path
             ) {
-              item.children.forEach((child) => {
+              item.childList.forEach((child) => {
                 let resourceManagement = {}
                 resourceManagement = {
                   path: child.path,
-                  meta: child.meta,
+                  meta: { icon: child.icon, title: child.name },
                   name: child.name,
                   hidden: child.hidden === 1 ? true : false,
                   component: (resolve) =>
@@ -287,28 +169,28 @@ export default {
                 this.sideBarRouterList1.push(resourceManagement)
               })
             }
-            if (item.title === '资源管理') {
+            if (item.name === '资源管理') {
               this.$router.push({ path: item.redirect })
             }
           })
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList1)
-          // this.$router.push({ path: resArray[0].redirect })
+          this.$router.push({ path: this.sideBarRouterList1[0].path })
 
           // console.log(1, this.sideBarRouterList1)
           break
-        case '/systemManagement':
+        case '/organizationManagement':
           resArray.map((item) => {
             if (
-              item.children &&
-              item.children.length > 0 &&
+              item.childList &&
+              item.childList.length > 0 &&
               data.path === item.path
             ) {
-              item.children.forEach((child) => {
+              item.childList.forEach((child) => {
                 let systemManagement = {}
                 systemManagement = {
                   path: child.path,
-                  meta: child.meta,
+                  meta: { icon: child.icon, title: child.name },
                   name: child.name,
                   hidden: child.hidden === 1 ? true : false,
                   component: (resolve) =>
@@ -318,28 +200,26 @@ export default {
                 this.sideBarRouterList2.push(systemManagement)
               })
             }
-            if (item.title === '组织管理') {
+            if (item.name === '组织管理') {
               this.$router.push({ path: item.redirect })
             }
           })
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList2)
-          // this.$router.push({ path: this.sideBarRouterList2[0].path })
-          // this.$router.push({ path: resArray[1].redirect })
-          // console.log(2, this.sideBarRouterList2)
+          this.$router.push({ path: this.sideBarRouterList2[0].path })
           break
         case '/moduleManageMent':
           resArray.map((item) => {
             if (
-              item.children &&
-              item.children.length > 0 &&
+              item.childList &&
+              item.childList.length > 0 &&
               data.path === item.path
             ) {
-              item.children.forEach((child) => {
+              item.childList.forEach((child) => {
                 let moduleManageMent = {}
                 moduleManageMent = {
                   path: child.path,
-                  meta: child.meta,
+                  meta: { icon: child.icon, title: child.name },
                   name: child.name,
                   hidden: child.hidden === 1 ? true : false,
                   component: (resolve) =>
@@ -349,13 +229,13 @@ export default {
                 this.sideBarRouterList3.push(moduleManageMent)
               })
             }
-            if (item.title === '服务管理') {
+            if (item.name === '服务管理') {
               this.$router.push({ path: item.redirect })
             }
           })
 
           store.dispatch('user/changeSidebarRouter', this.sideBarRouterList3)
-          // this.$router.push({ path: this.sideBarRouterList3[1].path })
+          this.$router.push({ path: this.sideBarRouterList3[0].path })
           // this.$router.push({ path: resArray[2].redirect })
           break
         default:

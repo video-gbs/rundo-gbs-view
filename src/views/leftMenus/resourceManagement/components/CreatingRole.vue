@@ -238,15 +238,17 @@ import {
   getVideoAraeTree,
   getAppMenuApiTree,
   getDepartmentTree,
-  getRoleDetail,
-  editRoles,
-  roleAdd
+  roleUpdate,
+  roleAdd,
+  getRoleMenuList,
+  getRoleResourceList,
+  getRoleFuncMenuList,
+  getRoleFuncList
 } from '@/api/method/role'
 
-import { getRootList } from '@/api/method/resourceInterface'
+import { getRootList, getResourceList } from '@/api/method/resourceInterface'
 
 import { getMenuTree } from '@/api/method/menus'
-import { getResourceList } from '@/api/method/resourceInterface'
 
 import { getFeatureList } from '@/api/method/featureApi'
 
@@ -336,7 +338,11 @@ export default {
       funcIds: [],
       // 资源数组
       resourceIds: [],
-      type: 1
+      type: 1,
+      allRoleFuncList: [],
+      updateRoleResourceList: [],
+      updateIdsList: [],
+      updateRoleFuncMenuIds: []
     }
   },
   watch: {
@@ -349,7 +355,15 @@ export default {
   },
   created() {
     if (this.$route.query.key !== 'add') {
-      this.getRoleDetail()
+      const { roleDesc, roleName } = this.$router.currentRoute.query.row
+      this.form.params.roleDesc = roleDesc
+      this.form.params.roleName = roleName
+
+      this.getRoleFuncList()
+
+      this.getRoleMenuList()
+
+      this.getRoleResourceList()
     }
     this.getRootList()
   },
@@ -364,7 +378,7 @@ export default {
             this.resourceKeyOptions = res.data.data
             this.resourceKey = res.data.data[0].resourceKey
 
-            this.initGetResourceList(this.resourceKey)
+            this.initGetResourceList(this.resourceKey, false)
           }
         })
         .catch((error) => {
@@ -379,38 +393,61 @@ export default {
       }
     },
 
-    async getRoleDetail() {
-      await getRoleDetail()
+    // 获取全部的回显应用菜单权限树
+    async getRoleFuncList() {
+      await getRoleFuncList({ roleId: this.$router.currentRoute.query.row.id })
         .then((res) => {
           if (res.data.code === 0) {
-            const {
-              roleDesc,
-              roleName,
-              appIds,
-              areaIds,
-              configIds,
-              devopsIds,
-              orgIds
-            } = res.data.data
-            this.form.params.roleDesc = roleDesc
-            this.form.params.roleName = roleName
-            this.appIds = appIds
-            this.areaIds = areaIds
-            this.configIds = configIds
-            this.devopsIds = devopsIds
-            this.orgIds = orgIds
-            let res1 = []
-            let res2 = []
-            appIds.map((item1) => {
-              res1.push(item1.slice(2))
-            })
-            configIds.map((item2) => {
-              res2.push(item2.slice(2))
-            })
-            this.expandedList[0] = res1
-            this.expandedList[1] = res2
-            this.checkedList[0] = res1
-            this.checkedList[1] = res2
+            this.allRoleFuncList = res.data.data
+            // this.funcIds = res.data.data
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    // 回显应用菜单权限树
+    async getRoleMenuList() {
+      await getRoleMenuList({ roleId: this.$router.currentRoute.query.row.id })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.expandedList1 = res.data.data
+            this.checkedList1 = res.data.data
+            this.menuIds = res.data.data
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
+    // 回显角色某菜单下的功能信息
+    async getRoleFuncMenuList(id) {
+      await getRoleFuncMenuList({
+        roleId: this.$router.currentRoute.query.row.id,
+        menuId: id
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.updateRoleFuncMenuIds = res.data.data
+            this.getList(id)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
+    // 回显资源功能树
+    async getRoleResourceList() {
+      await getRoleResourceList({
+        roleId: this.$router.currentRoute.query.row.id
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.updateRoleResourceList = []
+            this.updateRoleResourceList = res.data.data
+            this.resourceIds = res.data.data
           }
         })
         .catch((error) => {
@@ -432,7 +469,7 @@ export default {
     },
 
     // 资源功能树
-    async initGetResourceList(resourceKey) {
+    async initGetResourceList(resourceKey, value) {
       await getResourceList({
         resourceKey,
         isIncludeResource: true
@@ -442,11 +479,12 @@ export default {
             this.$nextTick(() => {
               this.treeData2[resourceKey] = [res.data.data] || []
 
-              console.log(
-                'this.treeData2[resourceKey]',
-                this.treeData2[resourceKey]
-              )
-              // this.handleRowSelection1(this.treeData2[resourceKey])
+              if (this.$route.query.key !== 'add') {
+                this.handleRowSelection1(
+                  this.treeData2[resourceKey],
+                  resourceKey
+                )
+              }
               this.$forceUpdate()
             })
           }
@@ -458,10 +496,12 @@ export default {
 
     // 处理当前列表选中状态
     handleRowSelection(data) {
+      console.log('处理当前列表选中状态', data, this.selectedObj)
       data.forEach((item) => {
         if (this.selectedObj[item.id]) {
           this.$nextTick(() => {
             this.$refs.featureApiTable.toggleRowSelection(item)
+            this.$forceUpdate()
           })
         }
       })
@@ -479,20 +519,30 @@ export default {
       })
     },
 
-    handleRowSelection1(data) {
-      console.log(this.resLists[this.resourceKey])
-      if (this.resLists[this.resourceKey]) {
-        const resNodes = this.setCheckedLists(data)
-        console.log('resNodes~~~~~~~~~~~~~~', resNodes)
-        this.$nextTick(() => {
-          this.$refs['addRoleTree2' + this.resourceKey].setCheckedNodes(
-            resNodes
-          )
-          this.$refs['addRoleTree2' + this.resourceKey].setCheckedNodes([
-            resNodes
-          ])
-        })
-      }
+    // setCheckedLists1(arr, resourceKey) {
+    //   arr.map((item) => {
+    //     this.updateRoleResourceList.forEach((item1) => {
+    //       if (item.id === item1) {
+    //         this.updateIdsList.push(item.id)
+    //       } else {
+    //         if (item.childList && item.childList.length > 0) {
+    //           this.setCheckedLists1(item.childList)
+    //         }
+    //       }
+    //     })
+    //   })
+    // },
+
+    handleRowSelection1(data, resourceKey) {
+      // this.setCheckedLists1(data, resourceKey)
+      // console.log('this.updateIdsList', this.updateIdsList)
+      this.$nextTick(() => {
+        this.expandedList2[resourceKey] = this.updateRoleResourceList
+        this.checkedList2[resourceKey] = this.updateRoleResourceList
+        this.$refs['addRoleTree2' + resourceKey].setCheckedNodes(
+          this.updateRoleResourceList
+        )
+      })
     },
 
     handleSelectChange(selection) {
@@ -518,6 +568,19 @@ export default {
       if (!selection.some((item) => item.id === row.id)) {
         delete this.selectedObj[row.id]
       }
+
+      console.log('selection', selection, this.selectedObj)
+      if (this.$route.query.key !== 'add') {
+        let resData = []
+        selection.map((item1) => {
+          resData.push(item1.id)
+        })
+        this.allRoleFuncList = resData
+
+        console.log('resData', resData)
+
+        console.log('this.allRoleFuncList````````', this.allRoleFuncList)
+      }
     },
 
     sizeChange(pageSize) {
@@ -531,7 +594,11 @@ export default {
 
     changeResourceType(val) {
       this.resourceKey = val
-      this.initGetResourceList(val)
+      if (this.$route.query.key !== 'add') {
+        this.initGetResourceList(val, true)
+      } else {
+        this.initGetResourceList(val, false)
+      }
     },
 
     async getList(id) {
@@ -543,6 +610,20 @@ export default {
       }).then((res) => {
         if (res.data.code === 0) {
           this.featureApiTableData = res.data.data.list
+
+          if (this.$route.query.key !== 'add') {
+            // this.allRoleFuncList = Array.from(
+            //   new Set(this.allRoleFuncList.concat(checkedIds))
+            // )
+            res.data.data.list.map((item) => {
+              this.allRoleFuncList.forEach((item1) => {
+                if (item.id === item1) {
+                  this.selectedObj[item1] = item
+                }
+              })
+            })
+          }
+
           this.handleRowSelection(this.featureApiTableData)
           this.params.total = res.data.data.total
           this.params.pages = res.data.data.pageNum
@@ -558,7 +639,11 @@ export default {
     },
 
     nodeClickHandle(data) {
-      this.getList(data.id)
+      if (this.$route.query.key !== 'add') {
+        this.getRoleFuncMenuList(data.id)
+      } else {
+        this.getList(data.id)
+      }
       this.Id = data.id
     },
 
@@ -610,12 +695,12 @@ export default {
           res1.forEach((item) => {
             resIds.push(item.id)
           })
+
           this.menuIds = resIds
           this.expandedList1 = resIds
           this.checkedList1 = resIds
           break
         case '资源功能权限':
-          console.log('this.$refs', this.$refs)
           if (checked === false) {
             if (data.childList) {
               data.childList.map((item2) => {
@@ -650,7 +735,9 @@ export default {
               this.resourceIds.push(child.id)
             })
           })
-          // console.log('this.resourceIds', this.resourceIds)
+
+          this.updateRoleResourceList = []
+          this.updateRoleResourceList = this.resourceIds
           // return
           this.expandedList2[this.resourceKey] = resIds
           this.checkedList2[this.resourceKey] = resIds
@@ -666,13 +753,12 @@ export default {
     save(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          this.funcIds = []
+          this.selectedData.map((item) => {
+            this.funcIds.push(item.id)
+          })
           switch (this.$route.query.key) {
             case 'add':
-              this.funcIds = []
-              this.selectedData.map((item) => {
-                this.funcIds.push(item.id)
-              })
-
               const params = {
                 funcIds: this.funcIds,
                 menuIds: this.menuIds,
@@ -694,17 +780,15 @@ export default {
               break
             case 'edit':
               const params1 = {
-                appIds: this.appIds,
-                areaIds: this.areaIds,
-                configIds: this.configIds,
-                devopsIds: this.devopsIds,
-                orgIds: this.orgIds,
-                roleDesc: this.form.params.roleDesc,
-                roleName: this.form.params.roleName
+                funcIds: this.funcIds,
+                menuIds: this.menuIds,
+                resourceIds: this.resourceIds,
+                ...this.form.params
               }
-              editRoles({ id: this.$route.query.row, ...params1 }).then(
+              console.log('params1', params1)
+              roleUpdate({ roleId: this.$route.query.row.id, ...params1 }).then(
                 (res) => {
-                  if (res.code === 0) {
+                  if (res.data.code === 0) {
                     this.$message({
                       type: 'success',
                       message: '修改角色成功'

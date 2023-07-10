@@ -122,6 +122,7 @@ import Code from '@/views/leftMenus/systemManagement//components/Code'
 
 import { validUsername } from '@/utils/validate'
 import { login, newLogin } from '@/api/method/user'
+import { getHomeUser } from '@/api/method/home'
 import { Local } from '@/utils/storage'
 import store from '@/store/index'
 
@@ -216,6 +217,17 @@ export default {
     this.initMap()
   },
   methods: {
+    async getHomeUser() {
+      await getHomeUser()
+        .then((res) => {
+          if (res.data.code === 0) {
+            Local.set('rj_userName', res.data.data.username)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     initMap() {
       AMapLoader.load({
         key: '60e29aaeb21c23592a0396a255db259e', // 申请好的Web端开发者Key，首次调用 load 时必填
@@ -304,6 +316,8 @@ export default {
             res.data.data
 
           console.log(accessToken, refreshToken, expiresIn, tokenType)
+
+          this.getHomeUser()
 
           Local.set('rj_deptType', 0)
           Local.set('access_token', accessToken)

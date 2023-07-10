@@ -2,7 +2,7 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 import router from '@/router'
 import { Local } from '@/utils/storage'
-import { logout } from '@/api/method/user'
+import { newLogout } from '@/api/method/user'
 
 const requestTimeOut = 20 * 100000
 window.isReresh = false
@@ -81,7 +81,7 @@ const init = {
         //刷新token失败只能跳转到登录页重新登录
 
         console.log(3, err)
-        logout()
+        newLogout()
           .then((res) => {})
           .catch(() => {})
           .finally(() => {
@@ -137,44 +137,35 @@ service.interceptors.response.use(
   },
   async (err) => {
     // debugger
+    console.log(err.response.status)
     if (err && err.response) {
       switch (err.response.status) {
         case 400:
           console.log('错误请求')
           break
         case 401:
-          logout()
-            .then((res) => {})
-            .catch(() => {})
-            .finally(() => {
-              Local.clear()
-              Local.remove('access_token')
-              Local.remove('expires_in')
-              Local.remove('utilTime')
-              Local.remove('refresh_token')
-              init.openMessage('登录失效')
-              router.replace({
-                path: '/login',
-                query: { redirect: router.currentRoute.fullPath }
-              })
-            })
+          Local.clear()
+          Local.remove('access_token')
+          Local.remove('expires_in')
+          Local.remove('utilTime')
+          Local.remove('refresh_token')
+          init.openMessage('登录失效')
+          router.replace({
+            path: '/login',
+            query: { redirect: router.currentRoute.fullPath }
+          })
           return
         case 403:
-          logout()
-            .then((res) => {})
-            .catch(() => {})
-            .finally(() => {
-              Local.clear()
-              Local.remove('access_token')
-              Local.remove('expires_in')
-              Local.remove('utilTime')
-              Local.remove('refresh_token')
-              init.openMessage('登录失效')
-              router.replace({
-                path: '/login',
-                query: { redirect: router.currentRoute.fullPath }
-              })
-            })
+          Local.clear()
+          Local.remove('access_token')
+          Local.remove('expires_in')
+          Local.remove('utilTime')
+          Local.remove('refresh_token')
+          init.openMessage('登录失效')
+          router.replace({
+            path: '/login',
+            query: { redirect: router.currentRoute.fullPath }
+          })
           return
         case 404:
           init.openMessage('请求错误,未找到该资源')

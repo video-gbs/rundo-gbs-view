@@ -304,7 +304,7 @@ export default {
       Local.set('rolePageNum', this.params.pageNum)
       this.$router.push({
         path: '/creatingRole',
-        query: { key: 'edit', row: row.id }
+        query: { key: 'edit', row: row }
       })
     },
     checkMenu(list) {
