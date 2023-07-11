@@ -91,7 +91,7 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column prop="hidden" label="是否隐藏" width="100">
+        <!-- <el-table-column prop="hidden" label="是否隐藏" width="100">
           <template slot-scope="scope">
             <el-switch
               v-if="scope.row.id !== '0'"
@@ -104,7 +104,7 @@
             >
             </el-switch>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column width="100" label="操作">
           <template slot-scope="scope">
             <el-button
@@ -209,12 +209,12 @@
               <el-radio :label="0">否</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="是否隐藏：">
+          <!-- <el-form-item label="是否隐藏：">
             <el-radio-group v-model="dialogForm.params.hidden">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="0">否</el-radio>
             </el-radio-group>
-          </el-form-item>
+          </el-form-item> -->
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -257,7 +257,7 @@ export default {
           name: '',
           icon: null,
           description: '',
-          hidden: 1,
+          // hidden: 1,
           disabled: 1
         }
       },
@@ -393,31 +393,31 @@ export default {
           row.disabled = row.disabled === 0 ? 1 : 0
         })
     },
-    changeSwitchHidden(row) {
-      let text = row.hidden === 0 ? '显示' : '隐藏'
+    // changeSwitchHidden(row) {
+    //   let text = row.hidden === 0 ? '显示' : '隐藏'
 
-      this.$confirm('确认要"' + text + '""' + row.name + '"吗?', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          menuHidden({
-            menuId: row.id,
-            hidden: row.hidden
-          }).then((res) => {})
-        })
-        .catch(() => {
-          row.hidden = row.hidden === 0 ? 1 : 0
-        })
-    },
+    //   this.$confirm('确认要"' + text + '""' + row.name + '"吗?', '警告', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     type: 'warning'
+    //   })
+    //     .then(() => {
+    //       menuHidden({
+    //         menuId: row.id,
+    //         hidden: row.hidden
+    //       }).then((res) => {})
+    //     })
+    //     .catch(() => {
+    //       row.hidden = row.hidden === 0 ? 1 : 0
+    //     })
+    // },
     dialogShow(type, row) {
       if (type === 0) {
         const {
           component,
           path,
           status,
-          hidden,
+          // hidden,
           sort,
           title,
           icon,
@@ -428,7 +428,7 @@ export default {
         } = row
         this.dialogForm.params.icon = icon
         this.dialogForm.params.title = title
-        this.dialogForm.params.hidden = hidden
+        // this.dialogForm.params.hidden = hidden
         this.dialogForm.params.status = status
         this.dialogForm.params.menuSort = sort
         this.dialogForm.params.path = path
@@ -453,7 +453,7 @@ export default {
           name: '',
           icon: null,
           description: '',
-          hidden: 1,
+          // hidden: 1,
           disabled: 1
         }
       }

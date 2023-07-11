@@ -7,7 +7,6 @@ import { newLogout } from '@/api/method/user'
 const requestTimeOut = 20 * 100000
 window.isReresh = false
 
-console.log('process.env.NODE_ENV', process.env.NODE_ENV)
 const service = axios.create({
   baseURL: process.env.NODE_ENV === 'production' ? 'api/' : '',
   timeout: requestTimeOut

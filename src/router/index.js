@@ -304,10 +304,10 @@ router.afterEach((to, from) => {
 // 取到浏览器出现网址的最后"/"出现的后边的字符
 const getLastUrl = (str, yourStr) => str.slice(str.lastIndexOf(yourStr))
 
-let resRouterChildren = []
-let childTemp = {}
-const routerChildren = (accessRouteses) => {
-  accessRouteses.forEach((item) => {
+const routerChildren = (data) => {
+  let resRouterChildren = []
+  let childTemp = {}
+  data.forEach((item) => {
     // 组装路由配置
     childTemp = {
       name: item.name,
@@ -321,10 +321,7 @@ const routerChildren = (accessRouteses) => {
       item.children = routerChildren(child.childList)
     }
   })
-  console.log(
-    'resRouterChildren~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
-    resRouterChildren
-  )
+  return resRouterChildren
 }
 
 // let isToken = true
@@ -333,13 +330,13 @@ router.beforeEach(async (to, from, next) => {
   const hasToken = Local.get('access_token')
   if (hasToken) {
     // 如果有 token 并且不是登录页的时候，进行权限获取
-    console.log('获取to.path的值', to.path)
+    // console.log('获取to.path的值', to.path)
     if (to.path !== '/login') {
       const lastUrl = getLastUrl(window.location.href, '/')
 
-      console.log('获取lastUrl的值', lastUrl)
-      console.log('获取init的值', store.state.user.init)
-      console.log('获取vuex的值', store.state.user.routerLists)
+      // console.log('获取lastUrl的值', lastUrl)
+      // console.log('获取init的值', store.state.user.init)
+      // console.log('获取vuex的值', store.state.user.routerLists)
 
       if (!store.state.user.init) {
         //从vuex中获取动态路由
@@ -347,11 +344,11 @@ router.beforeEach(async (to, from, next) => {
         let accessRouteses = []
         if (lastUrl !== '/workTable' && to.path !== '/workTable') {
           accessRouteses = JSON.parse(Local.get('dynamicRouters'))
-          console.log(
-            '刷新页面的时候动态路由获取',
-            accessRouteses,
-            Local.get('dynamicRouters')
-          )
+          // console.log(
+          //   '刷新页面的时候动态路由获取',
+          //   accessRouteses,
+          //   Local.get('dynamicRouters')
+          // )
 
           const homeRouters = [
             {
@@ -369,7 +366,7 @@ router.beforeEach(async (to, from, next) => {
           let sideBarRouterList2 = []
           let sideBarRouterList3 = []
 
-          console.log('获取tree_type的值', Local.get('tree_type'))
+          // console.log('获取tree_type的值', Local.get('tree_type'))
 
           if (Local.get('tree_type') === 1) {
             accessRouteses.map((item1) => {
@@ -447,7 +444,14 @@ router.beforeEach(async (to, from, next) => {
 
             const childComponent3 = []
 
+            const childComponentLast3 = []
+
             const childComponent4 = []
+            console.log(
+              'accessRouteses!!!!!!!!!!!!!!!!!!!!!',
+              accessRouteses,
+              router
+            )
             accessRouteses.map((item2) => {
               switch (item2.path) {
                 case '/resourceManagement':
@@ -504,23 +508,33 @@ router.beforeEach(async (to, from, next) => {
                         hidden: child2.hidden,
                         component: (resolve) =>
                           require([`@/views${child2.component}`], resolve)
-                        // children: []
                       }
-                      // if (child2.childList && child2.childList.length > 0) {
-                      //   child2.childList.forEach((childLast1) => {
-                      //     let organizationManagementLast1 = {}
-                      //     organizationManagementLast1 = {
-                      //       path: childLast1.path,
-                      //       meta: { icon: childLast1.icon, title: childLast1.name },
-                      //       name: childLast1.name,
-                      //       hidden: childLast1.hidden,
-                      //       component: (resolve) =>
-                      //         require([`@/views${childLast1.component}`], resolve)
-                      //     }
+                      if (child2.childList && child2.childList.length > 0) {
+                        child2.childList.forEach((childLast1) => {
+                          let organizationManagementLast1 = {}
+                          organizationManagementLast1 = {
+                            path: childLast1.path,
+                            meta: {
+                              icon: childLast1.icon,
+                              title: childLast1.name
+                            },
+                            name: childLast1.name,
+                            hidden: childLast1.hidden,
+                            component: (resolve) =>
+                              require([
+                                `@/views${childLast1.component}`
+                              ], resolve)
+                          }
 
-                      //     organizationManagement.children.push(organizationManagementLast1)
-                      //   })
-                      // }
+                          childComponentLast3.push(organizationManagementLast1)
+                        })
+                        organizationManagement.children = childComponentLast3
+
+                        console.log(
+                          'organizationManagement-----------------------',
+                          organizationManagement
+                        )
+                      }
 
                       sideBarRouterList2.push(organizationManagement)
                       childComponent3.push(organizationManagement)
@@ -529,7 +543,6 @@ router.beforeEach(async (to, from, next) => {
                       name: item2.name,
                       path: item2.path,
                       meta: { icon: item2.icon, title: item2.name },
-                      redirect: item2.redirect,
                       component: Layout,
                       children: childComponent3
                     }
@@ -539,10 +552,10 @@ router.beforeEach(async (to, from, next) => {
                     configTypeRouter = configTypeRouter.concat([temp3])
                   }
 
-                  console.log(
-                    'sideBarRouterList2~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
-                    sideBarRouterList2
-                  )
+                  // console.log(
+                  //   'sideBarRouterList2~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
+                  //   sideBarRouterList2
+                  // )
 
                   // store.dispatch('user/changeSidebarRouter', sideBarRouterList2)
                   store.dispatch(
@@ -576,7 +589,7 @@ router.beforeEach(async (to, from, next) => {
                       component: Layout,
                       children: childComponent4
                     }
-                    console.log('获取temp3的值', temp4)
+                    // console.log('获取temp3的值', temp4)
                     router.addRoute(temp4)
                     router.options.routes.push(temp4)
                     configTypeRouter = configTypeRouter.concat([temp4])
@@ -602,7 +615,7 @@ router.beforeEach(async (to, from, next) => {
               }
             })
 
-            console.log('最终的路由值', configTypeRouter)
+            // console.log('最终的路由值', configTypeRouter)
             // store.dispatch(
             //   'user/changeTypeRouter',
             //   homeRouters.concat(configTypeRouter)
@@ -641,45 +654,16 @@ router.beforeEach(async (to, from, next) => {
         } else {
           accessRouteses = await store.state.user.routerLists
 
-          console.log('首页点击的时候动态路由获取', accessRouteses)
+          console.log('accessRouteses', accessRouteses)
 
-          const childComponent = []
           accessRouteses.forEach((item) => {
-            console.log('首页点击的时候动态路由获取item', item)
-            if (item.childList && item.childList.length > 0) {
-              item.childList.forEach((child) => {
-                // 组装路由配置
-                const childTemp = {
-                  name: child.name,
-                  path: child.path,
-                  meta: { icon: child.icon, title: child.name },
-                  hidden: child.hidden === 1 ? true : false,
-                  component: (resolve) =>
-                    require([`@/views${child.component}`], resolve)
-                }
-                childComponent.push(childTemp)
-              })
-              const temp = {
-                name: item.name,
-                path: item.path,
-                meta: { icon: item.icon, title: item.name },
-                component: Layout,
-                children: childComponent
-              }
+            // if (item.children && item.children.length > 0) {
 
-              router.addRoute(temp)
-              router.options.routes.push(temp)
-            } else {
-              const elseTemp = {
-                name: item.name,
-                path: item.path,
-                meta: { icon: item.icon, title: item.name },
-                component: (resolve) =>
-                  require([`@/views${item.component}`], resolve)
-              }
-              router.addRoute(elseTemp)
-              router.options.routes.push(elseTemp)
-            }
+            router.addRoute(item)
+
+            router.options.routes.push(item)
+
+            // }
           })
           console.log('首页点击后的最终路由', router)
 

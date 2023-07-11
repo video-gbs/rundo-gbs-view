@@ -77,6 +77,7 @@ export default {
   },
 
   mounted() {
+    console.log('this.sidebarRouter~~~~~~~~~~~~~~~`', this.sidebarRouter)
     this.select(this.$route.path)
     this.myRouter = Object.assign([], this.sidebarRouter)
 

@@ -446,7 +446,7 @@ export default {
                     })
                     this.isClick = false
                     this.dialogForm.show = false
-                    this.getList('0')
+                    this.getList(this.Id)
                     this.dialogForm.params = {
                       menuId: '',
                       serviceName: '',

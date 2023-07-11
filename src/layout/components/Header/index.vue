@@ -16,21 +16,22 @@
           @select="handleSelect"
           class="top-menus"
         >
-          <el-menu-item
-            v-for="(item, index) in typeRouter"
-            :index="item.path"
-            :key="index"
-            class="top-menus-item"
-          >
-            <div class="top-menus-div" @click="clickRouter(item)">
-              <span slot="title" class="top-menus-span"
-                ><svg-icon
-                  class="top-menu-svg"
-                  :icon-class="item.meta.icon"
-                />{{ item.meta.title }}</span
-              >
-            </div>
-          </el-menu-item>
+          <template v-for="(item, index) in typeRouter">
+            <el-menu-item
+              :index="item.path"
+              :key="index"
+              class="top-menus-item"
+            >
+              <div class="top-menus-div" @click="clickRouter(item)">
+                <span slot="title" class="top-menus-span"
+                  ><svg-icon
+                    class="top-menu-svg"
+                    :icon-class="item.meta.icon"
+                  />{{ item.meta.title }}</span
+                >
+              </div>
+            </el-menu-item>
+          </template>
         </el-menu>
       </div>
       <div class="header-menu">
@@ -114,7 +115,9 @@ export default {
       .replace('"', '')
       .replace('"', '')
   },
-  mounted() {},
+  mounted() {
+    console.log('this.typeRouter', this.typeRouter)
+  },
   methods: {
     /**
      * 退出登录
