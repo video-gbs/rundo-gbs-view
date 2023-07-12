@@ -6,6 +6,7 @@
     <div class="main-content">
       <div class="featureApi_container">
         <leftTree
+          ref="featureApiTree"
           class="featureApiTree"
           :treeData="treeData"
           @childClickHandle="childClickHandle"
@@ -86,6 +87,10 @@ export default {
         })
       } else {
         this.isClickedResourceBtn = false
+        this.$nextTick(() => {
+          this.$refs.featureApiTree.chooseId(Local.get('featureApiId'))
+          this.init()
+        })
       }
     },
     childClickHandle(data) {

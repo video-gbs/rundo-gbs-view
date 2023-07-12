@@ -42,7 +42,7 @@
               class="top-li"
               @click="
                 !isGoContentListClicked
-                  ? goContentList(item.isFullScreen, child)
+                  ? goContentList(item.isFullScreen, item.childList, child)
                   : ''
               "
             >
@@ -240,14 +240,24 @@ export default {
      * 格式化树形结构数据   生成 vue-router 层级路由表
      */
 
-    async saveComponents(data) {
+    saveComponents(data, resName) {
+      const homeRouters = [
+        {
+          path: '/workTable',
+          name: 'workTable',
+          component: () => import('@/views/leftMenus/workTable/index'),
+          meta: { title: '首页', icon: 'sy' }
+        }
+      ]
+
       if (data && data.length > 0) {
-        // this.routerLists = []
         let typeRouter = []
+        let resData = []
 
         data.map((item) => {
           let params = {}
           let params1 = {}
+          let params2 = {}
           params = {
             path: item.path,
             meta: { icon: item.icon, title: item.name },
@@ -260,31 +270,48 @@ export default {
             meta: { icon: item.icon, title: item.name },
             name: item.name
           }
+          params2 = {
+            path: item.path,
+            meta: { icon: item.icon, title: item.name },
+            name: item.name,
+            icon: item.icon,
+            component: item.component,
+            children: item.childList
+          }
           typeRouter.push(params1)
           this.routerLists.push(params)
+          resData.push(params2)
         })
 
-        await store.dispatch('user/dynamicRouters', this.routerLists)
-
         console.log(
-          'this.routerLists~~~~~~~~~~~~~~~~~~',
+          'this.routerLists~~~~~~',
           typeRouter,
-          this.routerLists[0].children
+          this.routerLists,
+          resData
         )
 
-        await store.dispatch(
-          'user/changeSidebarRouter',
-          this.routerLists[0].children
-        )
+        store.dispatch('user/dynamicRouters', resData)
 
-        await store.dispatch('user/changeTypeRouter', typeRouter)
+        store.dispatch('user/changeDynamicRouters', resData)
+
+        this.routerLists.map((item1) => {
+          if (item1.name === resName) {
+            store.dispatch('user/changeSidebarRouter', item1.children)
+          }
+        })
+
+        store.dispatch('user/changeTypeRouter', homeRouters.concat(typeRouter))
       }
     },
-    goContentList: antiShake(function (val, data) {
-      console.log(111111, val, data)
+    goContentList: antiShake(function (val, data, child) {
+      console.log(111111, val, data, child)
+
+      Local.set('resRouterName', child.name)
+      Local.set('isShowSideRouter', val)
+
       this.isGoContentListClicked = true
 
-      store.dispatch('user/changeInit', false)
+      // store.dispatch('user/changeInit', false)
 
       if (val === 0) {
         console.log('显示侧边，顶部')
@@ -296,77 +323,12 @@ export default {
         store.dispatch('user/changeShowSidebar', false)
       }
 
-      store.dispatch('user/changeActiveIndex', data.childList[0].path)
+      store.dispatch('user/changeActiveIndex', child.path)
 
-      this.saveComponents([data])
+      this.saveComponents(data, child.name)
 
-      Local.set('funcId', data.childList[0].id)
-      this.$router.push({ path: data.childList[0].path })
-      // switch (name) {
-      //   case '应用':
-      //     Local.set('tree_type', 1)
-
-      //     console.log('this.appList', this.appList)
-
-      //     store.dispatch('user/dynamicRouters', [])
-
-      //     store.dispatch('user/dynamicRouters', this.appList)
-      //     store.dispatch('user/changeInit', false)
-      //     store.dispatch('user/changeRightWidth', false)
-      //     store.dispatch('user/changeShowSidebar', false)
-
-      //     this.saveComponents(1, this.appList)
-      //     store.dispatch('user/changeTypeRouter', this.appTypeRouter)
-
-      //     store.dispatch('user/changeActiveIndex', data.path)
-      //     this.$router.push({ path: data.path })
-      //     break
-      //   case '运维':
-      //     Local.set('tree_type', 3)
-      //     getMenuLists({ levelNumStart: 1, levelNumEnd: 4 }).then((res2) => {
-      //       if (res2.data.code === 0) {
-      //         const resData = res2.data.data[1].childList
-
-      //         store.dispatch('user/changeInit', false)
-
-      //         store.dispatch('user/dynamicRouters', [])
-      //         store.dispatch('user/dynamicRouters', resData)
-      //         store.dispatch('user/changeRightWidth', true)
-      //         store.dispatch('user/changeShowSidebar', true)
-
-      //         this.saveComponents(3, resData)
-      //         store.dispatch('user/changeTypeRouter', this.systemTypeRouter)
-
-      //         this.$router.push({ path: resData[0].childList[0].path })
-
-      //         Local.set('funcId', resData[0].childList[0].id)
-      //       }
-      //     })
-      //     break
-      //   case '配置':
-      //     Local.set('tree_type', 2)
-      //     getMenuLists({ levelNumStart: 1, levelNumEnd: 4 }).then((res3) => {
-      //       if (res3.data.code === 0) {
-      //         const resRouter3 = res3.data.data[2].childList
-
-      //         store.dispatch('user/dynamicRouters', [])
-
-      //         store.dispatch('user/dynamicRouters', resRouter3)
-      //         store.dispatch('user/changeInit', false)
-      //         store.dispatch('user/changeRightWidth', true)
-      //         store.dispatch('user/changeShowSidebar', true)
-
-      //         store.dispatch('user/changeActiveIndex', data.path)
-
-      //         this.saveComponents(2, resRouter3, data.path)
-
-      //         store.dispatch('user/changeTypeRouter', this.configTypeRouter)
-      //       }
-      //     })
-      //     break
-      //   default:
-      //     break
-      // }
+      Local.set('funcId', child.childList[0].id)
+      this.$router.push({ path: child.childList[0].path })
       setTimeout(() => {
         this.isGoContentListClicked = false
       }, 10000)
@@ -438,12 +400,14 @@ export default {
     width: 100%;
     height: 184px;
     border-radius: 12px;
-    margin: 24px 24px 0 24px;
     display: flex;
     // justify-content: space-between;
     justify-content: flex-start;
+    flex-wrap: wrap;
     .container-middle-contnet {
-      width: 50%;
+      width: 45%;
+
+      margin: 12px;
     }
     .line-font {
       margin: 10px 0 0 35px;

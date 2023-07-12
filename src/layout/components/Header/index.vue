@@ -13,7 +13,6 @@
           text-color="#000000"
           active-text-color="#3989fa"
           :default-active="activeIndex"
-          @select="handleSelect"
           class="top-menus"
         >
           <template v-for="(item, index) in typeRouter">
@@ -78,6 +77,8 @@ import { mapGetters } from 'vuex'
 import { Local } from '@/utils/storage'
 import { logout, newLogout } from '@/api/method/user'
 import store from '@/store/index'
+
+// import { resetRouter } from '@/router/index'
 export default {
   props: {
     isShowTopMenus: {
@@ -89,10 +90,6 @@ export default {
     return {
       activeIndex: store.state.user.activeIndex,
       showDrawer: false,
-      messageData: {},
-      messageCount: 0,
-      lastCount: 0,
-      show: false,
       userInfo: {},
       sideBarRouterList: [],
       sideBarRouterList1: [],
@@ -104,10 +101,17 @@ export default {
     ...mapGetters(['routerLists', 'typeRouter']),
     changeTypeRouter() {
       return this.typeRouter
+    },
+    changeRouterLists() {
+      return this.routerLists
     }
   },
   watch: {
-    changeTypeRouter(newValue, oldValue) {}
+    changeTypeRouter(newValue, oldValue) {},
+    changeRouterLists(newValue, oldValue) {
+      console.log(11111, newValue)
+      // store.dispatch('user/dynamicRouters', newValue)
+    }
   },
   created() {
     this.userInfo.userName = localStorage.getItem('rj_userName') || '佚名用户'
@@ -116,7 +120,7 @@ export default {
       .replace('"', '')
   },
   mounted() {
-    console.log('this.typeRouter', this.typeRouter)
+    console.log('this.typeRouter~~~~~~~', this.typeRouter, this.routerLists)
   },
   methods: {
     /**
@@ -133,131 +137,28 @@ export default {
           this.$router.push({ path: '/login' })
         })
     },
-    handleSelect(key, keyPath) {
-      // if (key === '/resourceManagement') {
-      //   this.$emit('changeSidebarLists', this.sideBarRouterList[0])
-      // } else if (key === '/management') {
-      //   this.$emit('changeSidebarLists', this.sideBarRouterList)
-      // } else {
-      //   this.$emit('changeSidebarLists', this.sideBarRouterList[1])
-      // }
-    },
     clickRouter(data) {
-      this.sideBarRouterList1 = []
-      this.sideBarRouterList2 = []
-      this.sideBarRouterList3 = []
+      console.log('routerLists~~~~~~', this.routerLists)
+      Local.set('resRouterName', data.name)
       const resArray =
         this.routerLists && this.routerLists.length > 0
           ? this.routerLists
           : JSON.parse(Local.get('dynamicRouters'))
-      switch (data.path) {
-        case '/resourceManagement':
-          resArray.map((item) => {
-            if (
-              item.childList &&
-              item.childList.length > 0 &&
-              data.path === item.path
-            ) {
-              item.childList.forEach((child) => {
-                let resourceManagement = {}
-                resourceManagement = {
-                  path: child.path,
-                  meta: { icon: child.icon, title: child.name },
-                  name: child.name,
-                  hidden: child.hidden === 1 ? true : false,
-                  component: (resolve) =>
-                    require([`@/views${child.component}`], resolve)
-                }
-
-                this.sideBarRouterList1.push(resourceManagement)
-              })
-            }
-            if (item.name === '资源管理') {
-              this.$router.push({ path: item.redirect })
-            }
-          })
-
-          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList1)
-          this.$router.push({ path: this.sideBarRouterList1[0].path })
-
-          // console.log(1, this.sideBarRouterList1)
-          break
-        case '/organizationManagement':
-          resArray.map((item) => {
-            if (
-              item.childList &&
-              item.childList.length > 0 &&
-              data.path === item.path
-            ) {
-              item.childList.forEach((child) => {
-                let systemManagement = {}
-                systemManagement = {
-                  path: child.path,
-                  meta: { icon: child.icon, title: child.name },
-                  name: child.name,
-                  hidden: child.hidden === 1 ? true : false,
-                  component: (resolve) =>
-                    require([`@/views${child.component}`], resolve)
-                }
-
-                this.sideBarRouterList2.push(systemManagement)
-              })
-            }
-            if (item.name === '组织管理') {
-              this.$router.push({ path: item.redirect })
-            }
-          })
-
-          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList2)
-          this.$router.push({ path: this.sideBarRouterList2[0].path })
-          break
-        case '/moduleManageMent':
-          resArray.map((item) => {
-            if (
-              item.childList &&
-              item.childList.length > 0 &&
-              data.path === item.path
-            ) {
-              item.childList.forEach((child) => {
-                let moduleManageMent = {}
-                moduleManageMent = {
-                  path: child.path,
-                  meta: { icon: child.icon, title: child.name },
-                  name: child.name,
-                  hidden: child.hidden === 1 ? true : false,
-                  component: (resolve) =>
-                    require([`@/views${child.component}`], resolve)
-                }
-
-                this.sideBarRouterList3.push(moduleManageMent)
-              })
-            }
-            if (item.name === '服务管理') {
-              this.$router.push({ path: item.redirect })
-            }
-          })
-
-          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList3)
-          this.$router.push({ path: this.sideBarRouterList3[0].path })
-          // this.$router.push({ path: resArray[2].redirect })
-          break
-        default:
-          break
-      }
-      if (Local.get('tree_type') === 2 || Local.get('tree_type') === 3) {
-        if (data.path === '/workTable') {
-          this.$router.push({ path: data.path })
-          store.dispatch('user/changeRightWidth', false)
-          store.dispatch('user/changeShowSidebar', false)
-        } else {
-          store.dispatch('user/changeShowSidebar', true)
-        }
-      } else {
-        // if (item.path === '/workTable') {
+      if (data.path === '/workTable') {
         this.$router.push({ path: data.path })
-        // }
+        // resetRouter()
+        store.dispatch('user/changeRightWidth', false)
         store.dispatch('user/changeShowSidebar', false)
+      } else {
+        store.dispatch('user/changeShowSidebar', true)
       }
+
+      resArray.map((item) => {
+        if (item.name === data.name) {
+          store.dispatch('user/changeSidebarRouter', item.children)
+          this.$router.push({ path: item.children[0].path })
+        }
+      })
     }
   }
 }

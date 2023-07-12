@@ -135,7 +135,7 @@
           ref="roleForm"
           class="params-form"
           size="mini"
-          label-width="120px"
+          label-width="130px"
           :rules="rules"
           label-position="right"
           :model="dialogForm.params"
@@ -203,18 +203,19 @@
               style="width: 436px"
             />
           </el-form-item>
+
           <el-form-item label="是否禁用：">
             <el-radio-group v-model="dialogForm.params.disabled">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="0">否</el-radio>
             </el-radio-group>
           </el-form-item>
-          <!-- <el-form-item label="是否隐藏：">
-            <el-radio-group v-model="dialogForm.params.hidden">
-              <el-radio :label="1">是</el-radio>
-              <el-radio :label="0">否</el-radio>
+          <el-form-item label="是否显示侧边栏：">
+            <el-radio-group v-model="dialogForm.params.isFullScreen">
+              <el-radio :label="0">是</el-radio>
+              <el-radio :label="1">否</el-radio>
             </el-radio-group>
-          </el-form-item> -->
+          </el-form-item>
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -257,7 +258,7 @@ export default {
           name: '',
           icon: null,
           description: '',
-          // hidden: 1,
+          isFullScreen: 1,
           disabled: 1
         }
       },
@@ -417,7 +418,7 @@ export default {
           component,
           path,
           status,
-          // hidden,
+          isFullScreen,
           sort,
           title,
           icon,
@@ -428,7 +429,7 @@ export default {
         } = row
         this.dialogForm.params.icon = icon
         this.dialogForm.params.title = title
-        // this.dialogForm.params.hidden = hidden
+        this.dialogForm.params.isFullScreen = isFullScreen
         this.dialogForm.params.status = status
         this.dialogForm.params.menuSort = sort
         this.dialogForm.params.path = path
@@ -453,7 +454,7 @@ export default {
           name: '',
           icon: null,
           description: '',
-          // hidden: 1,
+          isFullScreen: 1,
           disabled: 1
         }
       }

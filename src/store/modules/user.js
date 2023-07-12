@@ -1,6 +1,8 @@
 import { login, logout } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { Local } from '@/utils/storage'
+import router from '../../router'
+import Layout from '@/layout/index'
 const getDefaultState = () => {
   return {
     token: getToken(),
@@ -22,7 +24,32 @@ const getDefaultState = () => {
     permission: []
   }
 }
+const loadView = (viewPath) => {
+  return (resolve) => require([`@/views${viewPath}`], resolve)
+  // return () => import('@/views' + viewPath)
+}
 
+const filterRouter = (routers) => {
+  console.log('filterRouter~~~~~~~~~', routers)
+  return routers.filter((router) => {
+    // 区分布局与视图文件，因为加载方式不同
+    router.meta = { icon: router.icon, title: router.name }
+    if (router.component === 'Layout') {
+      router.component = Layout
+    } else {
+      router.component = loadView(router.component)
+      // router.component = require([`@/views${routers.component}`])
+    }
+    // 判断是否存在子路由，并递归调用自己
+    if (
+      (router.children && router.children.length) ||
+      (router.childList && router.childList.length)
+    ) {
+      router.children = filterRouter(router.children || router.childList)
+    }
+    return true
+  })
+}
 const state = getDefaultState()
 
 const mutations = {
@@ -45,15 +72,8 @@ const mutations = {
     state.rightWidth = rightWidth
   },
   SET_SHOWSIDEBAR: (state, showSidebar) => {
-    state.showSidebar = []
     state.showSidebar = showSidebar
   },
-  // SET_APPTYPEROUTER: (state, showSidebar) => {
-  //   state.showSidebar = showSidebar
-  // },
-  // SET_SYSTEMTYPEROUTER: (state, showSidebar) => {
-  //   state.showSidebar = showSidebar
-  // },
   SET_TYPEROUTER: (state, typeRouter) => {
     state.typeRouter = []
     state.typeRouter = typeRouter
@@ -64,9 +84,54 @@ const mutations = {
     state.sidebarRouter = sidebarRouter
   },
 
+  SET_DYNAMICROUTERSMAP(state, routers) {
+    const homeRouters = [
+      {
+        path: '/workTable',
+        name: 'workTable',
+        component: () => import('@/views/leftMenus/workTable/index'),
+        meta: { title: '首页', icon: 'sy' }
+      }
+    ]
+    const restypeRouter = []
+    state.init = true
+    let routerMaps = filterRouter(routers)
+    state.routerLists = routerMaps
+    console.log(
+      'routerMapsrouterMapsrouterMapsrouterMapsrouterMapsrouterMaps',
+      routerMaps
+    )
+    routerMaps.map((item) => {
+      if (item.name === Local.get('resRouterName')) {
+        state.sidebarRouter = item.children
+        state.activeIndex = item.path
+      }
+      restypeRouter.push(item)
+    })
+    state.typeRouter = homeRouters.concat(restypeRouter)
+    if (Local.get('isShowSideRouter') === 0) {
+      state.rightWidth = true
+      state.showSidebar = true
+    } else {
+      state.rightWidth = false
+      state.showSidebar = false
+    }
+
+    // 最后追加404路由
+    routerMaps.push({
+      path: '*',
+      component: () => import('@/views/404.vue')
+    })
+    // 追加路由
+    // 这块是重点，如果直接使用addRoute是无效的
+    routerMaps.forEach((item) => {
+      router.addRoute(item)
+    })
+  },
+
   SET_ROUTERLISTS: (state, dynamicRouters) => {
-    state.routerLists = []
     state.routerLists = dynamicRouters
+
     Local.set('dynamicRouters', JSON.stringify(dynamicRouters))
   },
   SET_INIT: (state, init) => {
@@ -95,34 +160,6 @@ const actions = {
     })
   },
 
-  // get user info
-  // getInfo({ commit, state }) {
-  //   return new Promise((resolve, reject) => {
-  //     getInfo(state.token).then(response => {
-  //       const { data } = response
-  //       if (!data) {
-  //         reject('Token验证失败,请重新登录.')
-  //       } else {
-  //         const { userName, avatar, roles, mobile } = data
-  //         if (!userName) {
-  //           commit('SET_NAME', mobile)
-  //         } else {
-  //           commit('SET_NAME', userName)
-  //         }
-  //         const avatarStr = avatar || './avatar.png'
-  //         // commit('SET_NAME', mobile)
-  //         commit('SET_AVATAR', avatarStr)
-  //         // commit('SET_AVATAR', avatar)
-  //         commit('SET_ROLES', roles)
-  //         session.set(data)
-  //         resolve(data)
-  //       }
-  //     }).catch(error => {
-  //       reject(error)
-  //     })
-  //   })
-  // },
-
   // 动态设置路由 此为设置设置途径
   dynamicRouters({ commit }, dynamicRouters) {
     commit('SET_ROUTERLISTS', dynamicRouters) // 进行路由拼接并存储
@@ -142,6 +179,11 @@ const actions = {
 
   changeShowSidebar({ commit }, val) {
     commit('SET_SHOWSIDEBAR', val)
+  },
+
+  // 更新类型路由
+  changeDynamicRouters({ commit }, val) {
+    commit('SET_DYNAMICROUTERSMAP', val)
   },
 
   // 类型路由

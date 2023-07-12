@@ -4,7 +4,7 @@
       <div class="search-form">
         <div class="title-css">功能资源信息</div>
         <!-- <el-button size="mini" @click="goBack(2)">返回</el-button> -->
-        <el-button @click="goback(2)">
+        <el-button @click="goBack(2)">
           <svg-icon class="svg-btn" icon-class="back-svg" />返回
         </el-button>
       </div>
