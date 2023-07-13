@@ -1,11 +1,14 @@
 <template>
   <div id="app">
-    <router-view />
+    <router-view :key="$route.path" />
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  mounted() {
+    console.log(this.$route)
+  }
 }
 </script>

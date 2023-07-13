@@ -1,25 +1,42 @@
 import Vue from 'vue'
-import store from '@/store/index'
+import { Local } from '@/utils/storage'
+
+// 检测传入的元素key是否可以显示
+function checkKey(currentTag, resMethod) {
+  // 获取权限数组
+  let permissionData = Local.get('permissionData')
+    ? Local.get('permissionData')
+    : []
+
+  //如果传入的元素key不在权限数组里，则不可显示
+  const result = permissionData.findIndex((v) => {
+    return v.method === resMethod && v.path === currentTag
+  })
+  if (result !== -1) {
+    return true
+  } else {
+    return false
+  }
+}
 //自定义指令，用来控制按钮权限
-Vue.directive('permission', {
+export const buttonPermissions = Vue.directive('permission', {
   inserted(el, binding) {
-    // 当前按钮传递的值( v-permission="'add'" 中的值)
-    const currentTag = binding.value.action
-    const effect = binding.value.effect
-    // 获取到存放在 store 中的权限数据
-    const currentRight = store.state.user.permission
-    // 判断是否存在对应的按钮权限
-    let item = currentRight.filter((item) => {
-      return item === currentTag
-    })
-    //不具备权限则删除（隐藏）或者禁用该按钮 (el.parentNode 获取当前节点的父节点),根据在芫荽绑定的值去决定
-    if (item.length === 0) {
-      if (effect === 'disabled') {
+    console.log(el)
+    const currentTag = binding.value[0]
+    const resMethod = binding.value[1]
+
+    if ((currentTag, resMethod)) {
+      let key = checkKey(currentTag, resMethod)
+
+      if (!key) {
+        //没有权限
         el.disabled = true
         el.classList.add('is-disabled')
-      } else {
-        el.parentNode.removeChild(el)
       }
+    } else {
+      throw new Error('缺少唯一指令')
     }
   }
 })
+
+// export default permission

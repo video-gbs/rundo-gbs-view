@@ -102,7 +102,6 @@ export default {
     this.initTabList()
   },
   mounted() {
-    console.log('nowRouter', this.$route, this.showSidebar)
     this.windowWidth = document.documentElement.clientWidth
     window.onresize = this.throttle(this.setScale, 500, 500)
   },

@@ -215,6 +215,8 @@ export default {
     this.windowWidth = document.documentElement.clientWidth
     window.onresize = this.throttle(this.setScale, 500, 500)
     this.initMap()
+    Local.set('permissionData', [])
+    Local.set('permissionDataUrl', [])
   },
   methods: {
     async getHomeUser() {

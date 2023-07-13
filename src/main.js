@@ -14,12 +14,12 @@ import router from './router'
 import { Local } from './utils/storage'
 
 import '@/icons'
-import '@/permission'
 import '@/utils/extends'
-// import '@/utils/flexible'
 import '@/plugin'
 import * as echarts from 'echarts'
 Vue.prototype.$echarts = echarts
+
+import {} from './permission'
 
 import API from '@/api'
 Vue.prototype.$api = API

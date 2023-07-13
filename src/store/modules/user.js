@@ -41,11 +41,8 @@ const filterRouter = (routers) => {
       // router.component = require([`@/views${routers.component}`])
     }
     // 判断是否存在子路由，并递归调用自己
-    if (
-      (router.children && router.children.length) ||
-      (router.childList && router.childList.length)
-    ) {
-      router.children = filterRouter(router.children || router.childList)
+    if (router.children && router.children.length) {
+      router.children = filterRouter(router.children)
     }
     return true
   })

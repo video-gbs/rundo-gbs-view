@@ -80,19 +80,16 @@ export default {
     console.log('this.sidebarRouter~~~~~~~~~~~~~~~`', this.sidebarRouter)
     this.select(this.$route.path)
     this.myRouter = Object.assign([], this.sidebarRouter)
-
-    const ut = localStorage.getItem('rj_deptType') || 9999
-    this.setHide(this.myRouter, ut * 1)
+    this.setHide(this.myRouter)
   },
   methods: {
-    setHide(v, ut) {
+    setHide(v) {
+      console.log(1111111, v)
       v.forEach((i) => {
-        if (i.author !== null && i.author !== undefined) {
-          this.$set(i, 'authorHidden', false)
-          !i.author.includes(ut) && this.$set(i, 'authorHidden', true)
-        }
-        if (i.childList && i.childList.length) {
-          this.setHide(i.childList, ut)
+        if (i.children && i.children.length) {
+          i.children.forEach((child) => {
+            child.hidden = true
+          })
         }
       })
     },
@@ -104,7 +101,6 @@ export default {
         )
       ) {
         this.$store.state.tabs.tabList.push(this.$route)
-        // this.$store.commit("tabList", this.$store.state.tabs.tabList);
       }
     }
   }

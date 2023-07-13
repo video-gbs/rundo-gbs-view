@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!item.hidden && !item.authorHidden">
+  <div v-if="!item.hidden" @click="routerClick(item)">
     <template
       v-if="
         hasOneShowingChild(item.children, item) &&
@@ -33,6 +33,7 @@
           :title="item.meta.title"
         />
       </template>
+
       <sidebar-item
         v-for="child in item.children"
         :key="child.path"
@@ -51,6 +52,7 @@ import { isExternal } from '@/utils/validate'
 import Item from './Item'
 import AppLink from './Link'
 import FixiOSBug from './FixiOSBug'
+import { Local } from '@/utils/storage'
 
 export default {
   name: 'SidebarItem',
@@ -75,9 +77,15 @@ export default {
     this.onlyOneChild = null
     return {}
   },
-  mounted() {},
+  mounted() {
+    console.log('', this.$props.item)
+  },
   methods: {
+    routerClick(item) {
+      Local.set('funcId', item.id)
+    },
     hasOneShowingChild(children = [], parent) {
+      console.log('children~~~~~~~~', children, parent)
       const showingChildren = children.filter((item) => {
         if (item.hidden) {
           return false

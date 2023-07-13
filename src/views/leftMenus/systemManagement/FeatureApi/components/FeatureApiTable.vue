@@ -43,11 +43,10 @@
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <!-- <el-button @click="deteleAll($event)" style="width: 100px" plain
-            ><svg-icon class="svg-btn" icon-class="del" />
-            <span class="btn-span">批量删除</span></el-button
-          > -->
-          <el-button type="primary" @click="dialogShow(1)"
+          <el-button
+            v-permission="['/rbac/func/add', 2]"
+            type="primary"
+            @click="dialogShow(1)"
             ><svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span></el-button
           >
@@ -95,6 +94,7 @@
         <el-table-column prop="disabled" label="是否禁用" width="120">
           <template slot-scope="scope">
             <el-switch
+              v-permission="['/rbac/func/update/disabled', 3]"
               v-model="scope.row.disabled"
               active-color="#13ce66"
               inactive-color="#ff4949"
@@ -107,13 +107,22 @@
         </el-table-column>
         <el-table-column width="160" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="goResourceDetail(1, scope.row.id)"
+            <el-button
+              v-permission="['/rbac/func/resource/associate', 2]"
+              type="text"
+              @click="goResourceDetail(1, scope.row.id)"
               >资源详情
             </el-button>
-            <el-button type="text" @click="dialogShow(0, scope.row)"
+            <el-button
+              v-permission="['/rbac/func/update', 3]"
+              type="text"
+              @click="dialogShow(0, scope.row)"
               >编辑
             </el-button>
-            <el-button type="text" @click="deleteUser(scope.row)"
+            <el-button
+              v-permission="['/rbac/func/delete', 4]"
+              type="text"
+              @click="deleteUser(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -423,6 +432,15 @@ export default {
 
         this.getTreeName(this.featureApiTableTreeData, menuId)
         this.dialogForm.params.menuId = this.resName
+      } else {
+        this.dialogForm.params = {
+          menuId: '',
+          serviceName: '',
+          scope: '',
+          funcName: '',
+          path: '',
+          method: ''
+        }
       }
       this.dialogForm.title1 = type === 1 ? '新建' : '编辑'
 

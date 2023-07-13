@@ -3,11 +3,11 @@
     <div style="height: 100%" class="app-main-c f1 f">
       <transition name="fade-transform1" mode="out-in">
         <keep-alive>
-          <router-view v-if="$route.meta.keepAlive" :key="key" />
+          <router-view v-if="$route.path" :key="key" />
         </keep-alive>
       </transition>
       <transition name="fade-transform2" mode="out-in">
-        <router-view v-if="!$route.meta.keepAlive" :key="key" />
+        <router-view v-if="!$route.path" :key="key" />
       </transition>
     </div>
     <h2 v-if="showSidebar" class="company-title f jc-c ai-c">
@@ -28,6 +28,7 @@ export default {
   watch: {
     $route: {
       handler: function (val, oldVal) {
+        console.log(1111111, val, oldVal)
         if (val.path === '/workTable') {
           this.changeRouter = false
         } else {

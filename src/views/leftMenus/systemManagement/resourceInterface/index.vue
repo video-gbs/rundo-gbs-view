@@ -22,7 +22,7 @@
           </el-select>
           <el-button type="primary" @click="dialogRootShow">
             <svg-icon class="svg-btn" icon-class="add" />
-            <span class="btn-span">新增根节点</span>
+            <span class="btn-span">新增资源组</span>
           </el-button>
         </div>
         <div class="btn-lists">
@@ -330,6 +330,7 @@ import {
   resourceUpdate,
   resourceDelete
 } from '@/api/method/resourceInterface'
+import { getHomeFunc } from '@/api/method/home'
 import { Local } from '@/utils/storage'
 import leftTree from '../components/leftTree'
 import LineFont from '@/components/LineFont'

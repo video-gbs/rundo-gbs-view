@@ -1,5 +1,5 @@
 <template>
-  <div class="menuManagement_container">
+  <div class="menuManagement_container" v-if="isShow">
     <div class="panel-header-box">
       <div class="panel-header-box-border">菜单管理</div>
     </div>
@@ -47,7 +47,10 @@
     <div class="table-list">
       <div class="securityArea_container">
         <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow(1)"
+          <el-button
+            v-permission="['/rbac/menu/add', 2]"
+            type="primary"
+            @click="dialogShow(1)"
             ><svg-icon class="svg-btn" icon-class="add" /><span class="btn-span"
               >新建</span
             ></el-button
@@ -80,6 +83,7 @@
         <el-table-column prop="disabled" label="是否禁用" width="100">
           <template slot-scope="scope">
             <el-switch
+              v-permission="['/rbac/menu/update/disabled', 3]"
               v-if="scope.row.id !== '0'"
               v-model="scope.row.disabled"
               active-color="#13ce66"
@@ -91,22 +95,9 @@
             </el-switch>
           </template>
         </el-table-column>
-        <!-- <el-table-column prop="hidden" label="是否隐藏" width="100">
-          <template slot-scope="scope">
-            <el-switch
-              v-if="scope.row.id !== '0'"
-              v-model="scope.row.hidden"
-              active-color="#13ce66"
-              inactive-color="#ff4949"
-              :active-value="0"
-              :inactive-value="1"
-              @change="changeSwitchHidden(scope.row)"
-            >
-            </el-switch>
-          </template>
-        </el-table-column> -->
         <el-table-column width="100" label="操作">
           <template slot-scope="scope">
+            <!-- v-permission="['/rbac/menu/update', 3]" -->
             <el-button
               v-if="scope.row.id !== '0'"
               type="text"
@@ -114,6 +105,7 @@
               >编辑</el-button
             >
             <el-button
+              v-permission="['/rbac/delete', 4]"
               v-if="scope.row.id !== '0'"
               type="text"
               @click="deleteRole(scope.row)"
@@ -238,12 +230,15 @@ import {
   menuHidden
 } from '@/api/method/menus'
 import pagination from '@/components/Pagination/index.vue'
+import { getHomeFunc } from '@/api/method/home'
 import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { pagination },
   data() {
     return {
+      isShow: false,
       tableData: [],
       isClick: false,
       dialogForm: {
@@ -292,11 +287,22 @@ export default {
       }
     }
   },
-  mounted() {
-    this.initGetMenuTree()
-    // this.getManufacturerDictionaryList()
+  created() {
+    Local.set('permissionDataUrl', [])
+    this.getHomeFunc()
   },
+  mounted() {},
   methods: {
+    async getHomeFunc() {
+      await getHomeFunc({ menuId: Local.get('funcId') }).then((res) => {
+        if (res.data.code === 0) {
+          Local.set('permissionData', res.data.data)
+          Local.set('permissionDataUrl', res.data.data)
+          this.isShow = true
+          this.initGetMenuTree()
+        }
+      })
+    },
     async initGetMenuTree() {
       await getMenuTree({
         ...this.searchParams

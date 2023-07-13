@@ -1,5 +1,5 @@
 <template>
-  <div class="dataDictionary_container">
+  <div class="dataDictionary_container" v-if="isShow">
     <div class="panel-header-box">
       <div class="panel-header-box-border">字典管理</div>
     </div>
@@ -47,7 +47,10 @@
     <div class="table-list">
       <div class="securityArea_container">
         <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow(1)"
+          <el-button
+            v-permission="['/rbac/dict/add', 2]"
+            type="primary"
+            @click="dialogShow(1)"
             ><svg-icon class="svg-btn" icon-class="add" /><span class="btn-span"
               >新建</span
             ></el-button
@@ -76,10 +79,16 @@
         <el-table-column prop="description" label="字典值描述" />
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" @click="dialogShow(0, scope.row)"
+            <el-button
+              v-permission="['/rbac/dict/update', 3]"
+              type="text"
+              @click="dialogShow(0, scope.row)"
               >编辑</el-button
             >
-            <el-button type="text" @click="deleteRole(scope.row)"
+            <el-button
+              v-permission="['/rbac/dict/delete', 4]"
+              type="text"
+              @click="deleteRole(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -238,6 +247,7 @@ export default {
   components: { pagination },
   data() {
     return {
+      isShow: false,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -319,17 +329,21 @@ export default {
       treeData: []
     }
   },
-  created() {},
-  mounted() {
-    this.getList()
-
+  created() {
     this.getHomeFunc()
+  },
+  mounted() {
+    Local.set('permissionDataUrl', [])
   },
   methods: {
     async getHomeFunc() {
       await getHomeFunc({ menuId: Local.get('funcId') }).then((res) => {
         if (res.data.code === 0) {
-          store.dispatch('user/changePermission', res.data)
+          Local.set('permissionData', res.data.data)
+          Local.set('permissionDataUrl', res.data.data)
+          this.isShow = true
+
+          this.getList()
         }
       })
     },
@@ -455,14 +469,16 @@ export default {
         num: this.params.pageSize,
         page: this.params.pageNum,
         ...this.searchParams
-      }).then((res) => {
-        if (res.data.code === 0) {
-          this.tableData = res.data.data.list
-          this.params.total = res.data.data.total
-          this.params.pages = res.data.data.pages
-          this.params.current = res.data.data.pageSize
-        }
       })
+        .then((res) => {
+          if (res && res.data.code === 0) {
+            this.tableData = res.data.data.list
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.pageSize
+          }
+        })
+        .catch((error) => console.log(error))
     },
     deleteRole(row) {
       this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
@@ -521,6 +537,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid #eaeaea;
 }

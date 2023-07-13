@@ -169,6 +169,7 @@ export default {
     this.params.pageNum = Local.get('accountManagementPageNum')
     Local.remove('accountManagementPageNum')
   },
+
   mounted() {},
   methods: {
     async getList(id) {
@@ -315,6 +316,7 @@ export default {
       this.getList(this.newUserId)
     },
     addEquipment() {
+      this.$emit('changeIsShow', false)
       this.$router.push(`/user`)
     },
     editEquipment(row) {

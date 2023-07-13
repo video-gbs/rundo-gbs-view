@@ -12,7 +12,7 @@
         />
       </div>
       <div class="right-table p10">
-        <Encoder ref="encoder" />
+        <Encoder ref="encoder" @changeIsShow="changeIsShow" />
       </div>
     </div>
   </div>
@@ -29,6 +29,7 @@ export default {
 
   data() {
     return {
+      isShow: false,
       treeData: [],
       defaultProps: {
         children: 'childList',
@@ -40,6 +41,9 @@ export default {
     this.init()
   },
   methods: {
+    changeIsShow(val) {
+      this.isShow = val
+    },
     handleClick(val, event) {},
     async init() {
       await getUnitList()
@@ -49,6 +53,9 @@ export default {
             const resId = Local.get('newUserId')
               ? Local.get('newUserId')
               : res.data.data.id
+
+            this.isShow = true
+            console.log('this.$refs', this.$refs)
             this.$refs.encoder.getList(resId)
           }
         })

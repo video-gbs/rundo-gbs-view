@@ -12,6 +12,13 @@ const service = axios.create({
   timeout: requestTimeOut
 })
 
+const methodObj = {
+  get: 1,
+  post: 2,
+  put: 3,
+  delete: 4
+}
+
 //判空
 const isEmpty = function (obj) {
   return (
@@ -98,17 +105,36 @@ const init = {
       })
   }
 }
-
 //http request 拦截器
 service.interceptors.request.use(
   (config) => {
     init.timer = new Date().getTime()
+
     if (Local.get('access_token')) {
       config.headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${Local.get('access_token')}`
       }
     }
+
+    // let permissionDataUrl = Local.get("permissionDataUrl") ? Local.get("permissionDataUrl") : []
+    // console.log('permissionDataUrlpermissionDataUrlpermissionDataUrl', permissionDataUrl,config)
+    // if (permissionDataUrl.length > 0) {
+
+    //   const result = permissionDataUrl.findIndex((v) => {
+    //     return v.method === methodObj[config.method] && v.path === config.url
+    //   })
+
+    //   console.log('resultresultresultresultresult', result)
+
+    //   if (result !== -1) {
+    //     return config
+    //   } else {
+    //     return Promise.reject(new Error('没有授权此接口'))
+    //   }
+    // } else {
+    //   return config
+    // }
     return config
   },
   (error) => {
@@ -124,7 +150,7 @@ service.interceptors.response.use(
     if (Local.get('access_token')) {
       //有没有token
       isRefreshTokenExpired(resetTime)
-      if (resetTime < 120) {
+      if (resetTime < 1200) {
         if (!window.isReresh) {
           window.isReresh = true
           let refresh_token = Local.get('refresh_token')
@@ -135,8 +161,6 @@ service.interceptors.response.use(
     return response
   },
   async (err) => {
-    // debugger
-    console.log(err.response.status)
     if (err && err.response) {
       switch (err.response.status) {
         case 400:
@@ -197,7 +221,7 @@ service.interceptors.response.use(
           init.openMessage(`连接错误${err.response.status}`)
       }
     } else {
-      init.openMessage('连接服务器失败')
+      // init.openMessage('连接服务器失败')
     }
     return Promise.resolve(err.response)
   }

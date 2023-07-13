@@ -161,7 +161,10 @@ export default {
       immediate: true
     }
   },
-  created() {},
+  created() {
+    Local.set('permissionData', [])
+    Local.set('permissionDataUrl', [])
+  },
   mounted() {
     this.initMenuLists()
     this.windowWidth = document.documentElement.clientWidth
@@ -220,20 +223,52 @@ export default {
         : ''
     },
 
-    routerChildren(data) {
+    routerChild(data) {
       let resRouterChildren = []
       let childTemp = {}
-      data.forEach((item) => {
+      data.forEach((item, i) => {
         // 组装路由配置
         childTemp = {
           name: item.name,
           path: item.path,
           meta: { icon: item.icon, title: item.name },
-          component: (resolve) => require([`@/views${item.component}`], resolve)
+          component: item.component
+        }
+        if (item.childList) {
+          const childArr = this.routerChild(item.childList)
+          childTemp.children = childArr
         }
         resRouterChildren.push(childTemp)
       })
       return resRouterChildren
+    },
+
+    routerChildren(data, arr) {
+      data.forEach((datas, index) => {
+        arr.push({
+          path: datas.path,
+          name: datas.name,
+          types: datas.types,
+          hidden: datas.disabled === 1 ? true : false,
+          component:
+            datas.component === 'Layout'
+              ? Layout
+              : (resolve) => require([`@/views${datas.component}`], resolve),
+          meta: {
+            title: datas.name,
+            icon: datas.icon
+          },
+          id: datas.id,
+          // 子路由
+          children: []
+        })
+
+        if (datas.childList) {
+          const childArr = this.routerChildren(datas.childList, [])
+          arr[index].children = childArr
+        }
+      })
+      return arr
     },
 
     /**
@@ -263,7 +298,7 @@ export default {
             meta: { icon: item.icon, title: item.name },
             name: item.name,
             component: Layout,
-            children: this.routerChildren(item.childList)
+            children: this.routerChildren(item.childList, [])
           }
           params1 = {
             path: item.path,
@@ -275,8 +310,9 @@ export default {
             meta: { icon: item.icon, title: item.name },
             name: item.name,
             icon: item.icon,
+            id: item.id,
             component: item.component,
-            children: item.childList
+            children: this.routerChild(item.childList)
           }
           typeRouter.push(params1)
           this.routerLists.push(params)

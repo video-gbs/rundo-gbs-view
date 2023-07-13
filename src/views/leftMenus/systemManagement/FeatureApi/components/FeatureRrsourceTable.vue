@@ -13,7 +13,10 @@
     <div class="table-content">
       <div class="table-content-top">
         <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow(1)"
+          <el-button
+            v-permission="['/rbac/func/delete', 4]"
+            type="primary"
+            @click="dialogShow(1)"
             ><svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span></el-button
           >
@@ -48,6 +51,7 @@
         <el-table-column prop="disabled" label="是否禁用" width="120">
           <template slot-scope="scope">
             <el-switch
+              v-permission="['/rbac/func/resource/update/disabled', 3]"
               v-model="scope.row.disabled"
               active-color="#13ce66"
               inactive-color="#ff4949"
@@ -60,10 +64,16 @@
         </el-table-column>
         <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="dialogShow(0, scope.row)"
+            <el-button
+              v-permission="['/rbac/func/resource/update', 3]"
+              type="text"
+              @click="dialogShow(0, scope.row)"
               >编辑
             </el-button>
-            <el-button type="text" @click="deleteUser(scope.row)"
+            <el-button
+              v-permission="['/rbac/func/resource/delete', 4]"
+              type="text"
+              @click="deleteUser(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -89,10 +99,23 @@
           @keyup.enter="submit('featureResourceRoleForm')"
         >
           <el-form-item label="资源组：" prop="resourceKey">
-            <el-input
+            <!-- <el-input
               v-model="dialogForm.params.resourceKey"
               style="width: 436px"
-            />
+            /> -->
+            <el-select
+              v-model="dialogForm.params.resourceKey"
+              class="btn-lists-top-select"
+              placeholder="请选择资源类型："
+              style="width: 436px"
+            >
+              <el-option
+                v-for="o in resourceKeyOptions"
+                :label="o.resourceName"
+                :value="o.resourceKey"
+                :key="o.resourceValue"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="需要校验的参数：" prop="validateParam">
             <el-input
@@ -125,6 +148,7 @@ import {
   featureAssociate,
   featureResourceDelete
 } from '@/api/method/featureApi'
+import { getRootList } from '@/api/method/resourceInterface'
 
 import { Local } from '@/utils/storage'
 
@@ -137,6 +161,7 @@ export default {
         validateParam: '',
         resourceKey: ''
       },
+      resourceKeyOptions: [],
       isClick: false,
       defaultProps: {
         children: 'childList',
@@ -175,7 +200,7 @@ export default {
   props: ['funcId'],
   created() {
     this.resFuncId = this.$props.funcId
-    console.log('this.resFuncId', this.$props.funcId)
+    this.getRootList()
   },
   watch: {
     funcId(newVal) {
@@ -183,6 +208,20 @@ export default {
     }
   },
   methods: {
+    async getRootList() {
+      await getRootList()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.resourceKeyOptions = res.data.data
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    changeResourceType(val) {
+      this.searchResourceType = val
+    },
     async initFeatureResourceList(id) {
       await getFeatureResourceList({
         funcId: id
@@ -200,6 +239,8 @@ export default {
     },
 
     goBack(val) {
+      Local.set('permissionDataUrl', [])
+      this.$emit('getHomeFunc')
       this.$emit('changeIsClickedResourceBtn', val)
     },
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="main" v-if="isShow">
     <div class="panel-header-box">
       <div class="panel-header-box-border">功能接口管理</div>
     </div>
@@ -35,6 +35,7 @@ import leftTree from '@/views/leftMenus/systemManagement/components/leftTree'
 import FeatureApiTable from './components/FeatureApiTable.vue'
 import FeatureRrsourceTable from './components/FeatureRrsourceTable.vue'
 import { getMenuTree } from '@/api/method/menus'
+import { getHomeFunc } from '@/api/method/home'
 import { Local } from '@/utils/storage'
 export default {
   name: '',
@@ -42,6 +43,7 @@ export default {
 
   data() {
     return {
+      isShow: false,
       treeData: [],
       funcId: '',
       isClickedResourceBtn: false,
@@ -51,7 +53,11 @@ export default {
       }
     }
   },
+  created() {
+    this.getHomeFunc()
+  },
   mounted() {
+    Local.set('permissionDataUrl', [])
     this.init()
   },
   watch: {
@@ -60,6 +66,15 @@ export default {
     }
   },
   methods: {
+    async getHomeFunc() {
+      await getHomeFunc({ menuId: Local.get('funcId') }).then((res) => {
+        if (res.data.code === 0) {
+          Local.set('permissionData', res.data.data)
+          Local.set('permissionDataUrl', res.data.data)
+          this.isShow = true
+        }
+      })
+    },
     handleClick(val, event) {},
     async init() {
       await getMenuTree()
