@@ -3,6 +3,7 @@ import { Message } from 'element-ui'
 import router from '@/router'
 import { Local } from '@/utils/storage'
 import { newLogout } from '@/api/method/user'
+import { unzip } from '@/utils/pako'
 
 const requestTimeOut = 20 * 100000
 window.isReresh = false
@@ -150,17 +151,17 @@ service.interceptors.response.use(
     if (Local.get('access_token')) {
       //有没有token
       isRefreshTokenExpired(resetTime)
-      if (resetTime < 1200) {
-        if (!window.isReresh) {
-          window.isReresh = true
-          let refresh_token = Local.get('refresh_token')
-          init.updataTokenAPI(refresh_token)
-        }
-      } else window.isReresh = false
+
+      console.log('resetTime!!!!!', resetTime)
+      if (resetTime < 3580) {
+        let refresh_token = Local.get('refresh_token')
+        init.updataTokenAPI(refresh_token)
+      }
     }
     return response
   },
   async (err) => {
+    console.log('403~~~~~~~~', err.response)
     if (err && err.response) {
       switch (err.response.status) {
         case 400:
@@ -172,26 +173,29 @@ service.interceptors.response.use(
           Local.remove('expires_in')
           Local.remove('utilTime')
           Local.remove('refresh_token')
-          init.openMessage('登录失效')
+          init.openMessage(err.response.data.msg)
           router.replace({
             path: '/login',
             query: { redirect: router.currentRoute.fullPath }
           })
           return
         case 403:
-          Local.clear()
-          Local.remove('access_token')
-          Local.remove('expires_in')
-          Local.remove('utilTime')
-          Local.remove('refresh_token')
-          init.openMessage('登录失效')
-          router.replace({
-            path: '/login',
-            query: { redirect: router.currentRoute.fullPath }
-          })
-          return
+          console.log('进来403~~~~~~~~', err.response)
+          init.openMessage(err.response.data.msg)
+        // alert('403~~~~~~~~',unzip())
+        // Local.clear()
+        // Local.remove('access_token')
+        // Local.remove('expires_in')
+        // Local.remove('utilTime')
+        // Local.remove('refresh_token')
+        // init.openMessage('登录失效')
+        // router.replace({
+        //   path: '/login',
+        //   query: { redirect: router.currentRoute.fullPath }
+        // })
+        // return
         case 404:
-          init.openMessage('请求错误,未找到该资源')
+          // init.openMessage('请求错误,未找到该资源')
           break
         case 405:
           init.openMessage('请求方法未允许')

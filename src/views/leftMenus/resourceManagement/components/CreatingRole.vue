@@ -552,7 +552,14 @@ export default {
         this.featureApiTableData.forEach((item) => {
           delete this.selectedObj[item.id]
         })
+        this.featureApiTableData.forEach((item) => {
+          console.log('~~~~~~~~~~~~~~', item)
+          this.allRoleFuncList = this.allRoleFuncList.filter((item1) => {
+            return item1 !== item.id
+          })
+        })
       }
+      console.log('全部取消~~~~~~~~~~~~~~', this.allRoleFuncList)
       // 勾选数据 添加
       selection.forEach((item) => {
         this.selectedObj[item.id] = item
@@ -576,7 +583,7 @@ export default {
         selection.map((item1) => {
           resData.push(item1.id)
         })
-        this.allRoleFuncList = resData
+        // this.allRoleFuncList = resData
 
         console.log('resData', resData)
 
@@ -760,6 +767,13 @@ export default {
           this.selectedData.map((item) => {
             this.funcIds.push(item.id)
           })
+          this.funcIds = this.allRoleFuncList
+            .concat(this.funcIds)
+            .filter((item, index, array) => {
+              return array.indexOf(item) === index
+            })
+
+          console.log('this.funcIds============', this.funcIds)
           switch (this.$props.nameType) {
             case 'add':
               const params = {
@@ -791,19 +805,20 @@ export default {
                 ...this.form.params
               }
               console.log('params1', params1)
-              roleUpdate({ roleId: this.$route.query.row.id, ...params1 }).then(
-                (res) => {
-                  if (res.data.code === 0) {
-                    this.$message({
-                      type: 'success',
-                      message: '修改角色成功'
-                    })
+              roleUpdate({
+                roleId: this.$props.creatingRoleRow.id,
+                ...params1
+              }).then((res) => {
+                if (res.data.code === 0) {
+                  this.$message({
+                    type: 'success',
+                    message: '修改角色成功'
+                  })
 
-                    this.$emit('getList')
-                    this.goback()
-                  }
+                  this.$emit('getList')
+                  this.goback()
                 }
-              )
+              })
               break
 
             default:

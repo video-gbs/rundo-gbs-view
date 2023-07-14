@@ -26,7 +26,7 @@ export const buttonPermissions = Vue.directive('permission', {
 
     if ((currentTag, resMethod)) {
       let key = checkKey(currentTag, resMethod)
-
+      console.log('keykeykeykeykeykeykey', key)
       if (!key) {
         //没有权限
         if (el.type === 'button') {
