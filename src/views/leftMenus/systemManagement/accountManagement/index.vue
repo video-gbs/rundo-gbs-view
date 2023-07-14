@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="main" v-if="!isUserAddShow && !isUserEditShow">
     <div class="panel-header-box">
       <div class="panel-header-box-border">用户管理</div>
     </div>
@@ -16,20 +16,37 @@
       </div>
     </div>
   </div>
+  <UserAdd
+    v-else-if="isUserAddShow"
+    ref="userAdd"
+    @changeIsShow="changeIsShow"
+    @init="init"
+  />
+  <UserEdit
+    v-else-if="isUserEditShow"
+    ref="userEdit"
+    @changeIsShow="changeIsShow"
+    @init="init"
+    :userEditRow="userEditRow"
+  />
 </template>
 
 <script>
 import leftTree from '@/views/leftMenus/systemManagement/components/leftTree'
 import Encoder from './components/Encoder.vue'
+import UserAdd from './components/userAdd.vue'
+import UserEdit from './components/userEdit.vue'
 import { getUnitList } from '@/api/method/unitManagement'
 import { Local } from '@/utils/storage'
 export default {
   name: '',
-  components: { leftTree, Encoder },
+  components: { leftTree, Encoder, UserAdd, UserEdit },
 
   data() {
     return {
-      isShow: false,
+      isUserAddShow: false,
+      isUserEditShow: false,
+      userEditRow: {},
       treeData: [],
       defaultProps: {
         children: 'childList',
@@ -41,8 +58,13 @@ export default {
     this.init()
   },
   methods: {
-    changeIsShow(val) {
-      this.isShow = val
+    changeIsShow(val, name, row) {
+      if (name === 'add') {
+        this.isUserAddShow = val
+      } else {
+        this.isUserEditShow = val
+        this.userEditRow = row
+      }
     },
     handleClick(val, event) {},
     async init() {
@@ -53,9 +75,6 @@ export default {
             const resId = Local.get('newUserId')
               ? Local.get('newUserId')
               : res.data.data.id
-
-            this.isShow = true
-            console.log('this.$refs', this.$refs)
             this.$refs.encoder.getList(resId)
           }
         })

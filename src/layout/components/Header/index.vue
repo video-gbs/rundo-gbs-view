@@ -109,7 +109,6 @@ export default {
   watch: {
     changeTypeRouter(newValue, oldValue) {},
     changeRouterLists(newValue, oldValue) {
-      console.log(11111, newValue)
       // store.dispatch('user/dynamicRouters', newValue)
     }
   },
@@ -120,7 +119,7 @@ export default {
       .replace('"', '')
   },
   mounted() {
-    console.log('this.typeRouter~~~~~~~', this.typeRouter, this.routerLists)
+    // console.log('this.typeRouter~~~~~~~', this.typeRouter, this.routerLists)
   },
   methods: {
     /**
@@ -138,7 +137,7 @@ export default {
         })
     },
     clickRouter(data) {
-      console.log('routerLists~~~~~~', this.routerLists)
+      // console.log('routerLists~~~~~~', this.routerLists)
       Local.set('resRouterName', data.name)
       const resArray =
         this.routerLists && this.routerLists.length > 0
@@ -156,6 +155,7 @@ export default {
       resArray.map((item) => {
         if (item.name === data.name) {
           store.dispatch('user/changeSidebarRouter', item.children)
+          store.dispatch('user/changeActiveIndex', item.path)
           this.$router.push({ path: item.children[0].path })
         }
       })

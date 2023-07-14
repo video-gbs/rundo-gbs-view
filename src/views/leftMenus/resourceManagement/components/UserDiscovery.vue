@@ -328,6 +328,7 @@ import { getRolePageLists } from '@/api/method/user'
 export default {
   name: '',
   components: { LineFont, pagination },
+  props: ['userDiscoveryRow'],
   data() {
     return {
       form: {},
@@ -412,7 +413,7 @@ export default {
         page: this.params.pageNum,
         num: this.params.pageSize,
         isBinding: false,
-        roleId: this.$router.currentRoute.query.key,
+        roleId: this.$props.userDiscoveryRow.id,
         username: this.leftSearchName
       })
         .then((res) => {
@@ -433,7 +434,7 @@ export default {
         num: this.params1.pageSize,
         isBinding: true,
         username: this.rightSearchName,
-        roleId: this.$router.currentRoute.query.key
+        roleId: this.$props.userDiscoveryRow.id
       })
         .then((res) => {
           if (res.data.code === 0) {
@@ -492,7 +493,7 @@ export default {
       this.dialog.params.expiryEndTime = expiryEndTime
     },
     goback() {
-      this.$router.push({ path: '/roleManagement' })
+      this.$emit('changeIsClicked', 2)
     },
     //数组去重
     fn2(arr) {
@@ -571,7 +572,7 @@ export default {
         roleAssociate({
           userIds: userIdList,
           isAdd: true,
-          roleId: this.$router.currentRoute.query.key
+          roleId: this.$props.userDiscoveryRow.id
         }).then((res) => {
           if (res.data.code === 0) {
             this.$message({
@@ -620,7 +621,7 @@ export default {
         roleAssociate({
           userIds: userIdList1,
           isAdd: false,
-          roleId: this.$router.currentRoute.query.key
+          roleId: this.$props.userDiscoveryRow.id
         }).then((res) => {
           if (res.data.code === 0) {
             this.$message({
@@ -828,9 +829,8 @@ export default {
     line-height: 50px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
-    .back-svg {
-      width: 30px;
-      height: 30px;
+    .back_svg {
+      z-index: 99999999;
       cursor: pointer;
     }
     .back-title {

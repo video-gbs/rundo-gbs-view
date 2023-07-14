@@ -330,10 +330,14 @@ export default {
     }
   },
   created() {
-    this.getHomeFunc()
+    Local.set('permissionDataUrl', [])
   },
   mounted() {
-    Local.set('permissionDataUrl', [])
+    setTimeout(() => {
+      this.getHomeFunc()
+    }, 0)
+    // Local.set('permissionDataUrl', [])
+    // this.getHomeFunc()
   },
   methods: {
     async getHomeFunc() {

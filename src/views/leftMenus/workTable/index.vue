@@ -231,6 +231,7 @@ export default {
         childTemp = {
           name: item.name,
           path: item.path,
+          id: item.id,
           meta: { icon: item.icon, title: item.name },
           component: item.component
         }
@@ -297,13 +298,15 @@ export default {
             path: item.path,
             meta: { icon: item.icon, title: item.name },
             name: item.name,
+            id: item.id,
             component: Layout,
             children: this.routerChildren(item.childList, [])
           }
           params1 = {
             path: item.path,
             meta: { icon: item.icon, title: item.name },
-            name: item.name
+            name: item.name,
+            id: item.id
           }
           params2 = {
             path: item.path,
@@ -319,13 +322,6 @@ export default {
           resData.push(params2)
         })
 
-        console.log(
-          'this.routerLists~~~~~~',
-          typeRouter,
-          this.routerLists,
-          resData
-        )
-
         store.dispatch('user/dynamicRouters', resData)
 
         store.dispatch('user/changeDynamicRouters', resData)
@@ -340,8 +336,6 @@ export default {
       }
     },
     goContentList: antiShake(function (val, data, child) {
-      console.log(111111, val, data, child)
-
       Local.set('resRouterName', child.name)
       Local.set('isShowSideRouter', val)
 
@@ -350,11 +344,9 @@ export default {
       // store.dispatch('user/changeInit', false)
 
       if (val === 0) {
-        console.log('显示侧边，顶部')
         store.dispatch('user/changeRightWidth', true)
         store.dispatch('user/changeShowSidebar', true)
       } else {
-        console.log('不不不显示侧边，顶部')
         store.dispatch('user/changeRightWidth', false)
         store.dispatch('user/changeShowSidebar', false)
       }

@@ -54,11 +54,15 @@ export default {
     }
   },
   created() {
-    this.getHomeFunc()
+    Local.set('permissionDataUrl', [])
   },
   mounted() {
-    Local.set('permissionDataUrl', [])
-    this.init()
+    setTimeout(() => {
+      this.getHomeFunc()
+      this.init()
+    }, 0)
+    // Local.set('permissionDataUrl', [])
+    // this.getHomeFunc()
   },
   watch: {
     funcId(newVal) {
@@ -95,7 +99,6 @@ export default {
     changeIsClickedResourceBtn(val, id) {
       if (val === 1) {
         this.isClickedResourceBtn = true
-        console.log('this.$refs', this.$refs)
         this.funcId = id
         this.$nextTick(() => {
           this.$refs.featureRrsourceTable.initFeatureResourceList(id)

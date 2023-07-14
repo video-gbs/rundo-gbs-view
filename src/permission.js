@@ -21,7 +21,6 @@ function checkKey(currentTag, resMethod) {
 //自定义指令，用来控制按钮权限
 export const buttonPermissions = Vue.directive('permission', {
   inserted(el, binding) {
-    console.log(el)
     const currentTag = binding.value[0]
     const resMethod = binding.value[1]
 
@@ -30,7 +29,11 @@ export const buttonPermissions = Vue.directive('permission', {
 
       if (!key) {
         //没有权限
-        el.disabled = true
+        if (el.type === 'button') {
+          el.disabled = true
+        } else {
+          el.style['pointer-events'] = 'none'
+        }
         el.classList.add('is-disabled')
       }
     } else {

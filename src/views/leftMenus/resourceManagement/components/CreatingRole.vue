@@ -2,9 +2,9 @@
   <div class="creatingRole-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
-        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" />
+        <svg-icon icon-class="back-svg" class="back-svg" @click="goback" />
         <span class="back-title">{{
-          this.$route.query.key === 'add' ? '新建角色' : '编辑角色'
+          nameType === 'add' ? '新建角色' : '编辑角色'
         }}</span>
       </div>
     </div>
@@ -255,6 +255,7 @@ import { getFeatureList } from '@/api/method/featureApi'
 export default {
   name: '',
   components: { pagination, leftTree },
+  props: ['creatingRoleRow', 'nameType'],
   data() {
     const checkRoleName = (rule, value, cb) => {
       const regRoleName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
@@ -354,8 +355,8 @@ export default {
     }
   },
   created() {
-    if (this.$route.query.key !== 'add') {
-      const { roleDesc, roleName } = this.$router.currentRoute.query.row
+    if (this.$props.nameType !== 'add') {
+      const { roleDesc, roleName } = this.$props.creatingRoleRow
       this.form.params.roleDesc = roleDesc
       this.form.params.roleName = roleName
 
@@ -395,7 +396,7 @@ export default {
 
     // 获取全部的回显应用菜单权限树
     async getRoleFuncList() {
-      await getRoleFuncList({ roleId: this.$router.currentRoute.query.row.id })
+      await getRoleFuncList({ roleId: this.$props.creatingRoleRow.id })
         .then((res) => {
           if (res.data.code === 0) {
             this.allRoleFuncList = res.data.data
@@ -408,7 +409,7 @@ export default {
     },
     // 回显应用菜单权限树
     async getRoleMenuList() {
-      await getRoleMenuList({ roleId: this.$router.currentRoute.query.row.id })
+      await getRoleMenuList({ roleId: this.$props.creatingRoleRow.id })
         .then((res) => {
           if (res.data.code === 0) {
             this.expandedList1 = res.data.data
@@ -424,7 +425,7 @@ export default {
     // 回显角色某菜单下的功能信息
     async getRoleFuncMenuList(id) {
       await getRoleFuncMenuList({
-        roleId: this.$router.currentRoute.query.row.id,
+        roleId: this.$props.creatingRoleRow.id,
         menuId: id
       })
         .then((res) => {
@@ -441,7 +442,7 @@ export default {
     // 回显资源功能树
     async getRoleResourceList() {
       await getRoleResourceList({
-        roleId: this.$router.currentRoute.query.row.id
+        roleId: this.$props.creatingRoleRow.id
       })
         .then((res) => {
           if (res.data.code === 0) {
@@ -479,7 +480,7 @@ export default {
             this.$nextTick(() => {
               this.treeData2[resourceKey] = [res.data.data] || []
 
-              if (this.$route.query.key !== 'add') {
+              if (this.$props.nameType !== 'add') {
                 this.handleRowSelection1(
                   this.treeData2[resourceKey],
                   resourceKey
@@ -570,7 +571,7 @@ export default {
       }
 
       console.log('selection', selection, this.selectedObj)
-      if (this.$route.query.key !== 'add') {
+      if (this.$props.nameType !== 'add') {
         let resData = []
         selection.map((item1) => {
           resData.push(item1.id)
@@ -594,7 +595,7 @@ export default {
 
     changeResourceType(val) {
       this.resourceKey = val
-      if (this.$route.query.key !== 'add') {
+      if (this.$props.nameType !== 'add') {
         this.initGetResourceList(val, true)
       } else {
         this.initGetResourceList(val, false)
@@ -611,7 +612,7 @@ export default {
         if (res.data.code === 0) {
           this.featureApiTableData = res.data.data.list
 
-          if (this.$route.query.key !== 'add') {
+          if (this.$props.nameType !== 'add') {
             // this.allRoleFuncList = Array.from(
             //   new Set(this.allRoleFuncList.concat(checkedIds))
             // )
@@ -639,7 +640,7 @@ export default {
     },
 
     nodeClickHandle(data) {
-      if (this.$route.query.key !== 'add') {
+      if (this.$props.nameType !== 'add') {
         this.getRoleFuncMenuList(data.id)
       } else {
         this.getList(data.id)
@@ -672,6 +673,7 @@ export default {
       }
     },
     handleCheckChange(data, checked, indeterminate) {
+      console.log('data', data, this.activeIndex)
       // 获取所有选中的节点
       let resIds = []
       switch (this.activeIndex) {
@@ -686,9 +688,9 @@ export default {
           } else {
             //否则(为选中状态)
             //判断父节点id是否为空
-            if (data.resourcePid) {
+            if (data.menuPid) {
               //如果不为空则将其选中
-              this.$refs.addRoleTree1.setChecked(data.resourcePid, true)
+              this.$refs.addRoleTree1.setChecked(data.menuPid, true)
             }
           }
           let res1 = this.$refs.addRoleTree1.getCheckedNodes()
@@ -747,7 +749,8 @@ export default {
       }
     },
     goback() {
-      this.$router.push({ path: '/roleManagement' })
+      this.$emit('changeIsClicked', 2)
+      // this.$router.push({ path: '/roleManagement' })
     },
 
     save(formName) {
@@ -757,7 +760,7 @@ export default {
           this.selectedData.map((item) => {
             this.funcIds.push(item.id)
           })
-          switch (this.$route.query.key) {
+          switch (this.$props.nameType) {
             case 'add':
               const params = {
                 funcIds: this.funcIds,
@@ -774,6 +777,8 @@ export default {
                     type: 'success',
                     message: '角色新建成功'
                   })
+
+                  this.$emit('getList')
                   this.goback()
                 }
               })
@@ -793,6 +798,8 @@ export default {
                       type: 'success',
                       message: '修改角色成功'
                     })
+
+                    this.$emit('getList')
                     this.goback()
                   }
                 }
@@ -911,8 +918,6 @@ export default {
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     .back-svg {
-      width: 30px;
-      height: 30px;
       cursor: pointer;
     }
     .back-title {

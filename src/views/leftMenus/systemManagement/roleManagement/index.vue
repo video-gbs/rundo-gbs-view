@@ -1,5 +1,8 @@
 <template>
-  <div class="role_container">
+  <div
+    class="role_container"
+    v-if="!isClickedUserDiscovery && !isClickedCreatingRole"
+  >
     <div class="panel-header-box">
       <div class="panel-header-box-border">角色管理</div>
     </div>
@@ -58,15 +61,12 @@
     </div>
     <div class="table-list">
       <div class="table-content-top">
-        <!-- <el-checkbox v-model="checked" class="table-content-top-check"
-          >包含下级组织</el-checkbox
-        > -->
         <div class="btn-lists">
           <el-button @click="deteleAll($event)" style="width: 100px" plain
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span>
           </el-button>
-          <el-button type="primary" @click="goCreatingRole"
+          <el-button type="primary" @click="changeIsClicked('creatingRole', 1)"
             ><svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新建</span></el-button
           >
@@ -103,10 +103,10 @@
           label="描述"
           :show-overflow-tooltip="true"
         />
-        <el-table-column prop="status" label="状态" width="80">
+        <el-table-column prop="disabled" label="启用状态" width="80">
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.status"
+              v-model="scope.row.disabled"
               active-color="#13ce66"
               inactive-color="#ff4949"
               :active-value="0"
@@ -118,10 +118,14 @@
         </el-table-column>
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" @click="goActiveDiscovery(scope.row.id)"
+            <el-button
+              type="text"
+              @click="changeIsClicked('userDiscovery', 1, scope.row)"
               >关联用户
             </el-button>
-            <el-button type="text" @click="goEditRole(scope.row)"
+            <el-button
+              type="text"
+              @click="changeIsClicked('creatingRole', 2, scope.row)"
               >编辑</el-button
             >
             <el-button type="text" @click="deleteRole(scope.row)"
@@ -137,6 +141,21 @@
       />
     </div>
   </div>
+  <CreatingRole
+    v-else-if="isClickedCreatingRole"
+    ref="creatingRole"
+    :creatingRoleRow="creatingRoleRow"
+    :nameType="nameType"
+    @changeIsClicked="changeIsClicked"
+    @getList="getList"
+  />
+  <UserDiscovery
+    v-else
+    ref="userDiscovery"
+    :userDiscoveryRow="userDiscoveryRow"
+    @changeIsClicked="changeIsClicked"
+    @getList="getList"
+  />
 </template>
 
 <script>
@@ -150,10 +169,12 @@ import {
   roleAssociate
 } from '@/api/method/role'
 import pagination from '@/components/Pagination/index.vue'
+import CreatingRole from '../../resourceManagement/components/CreatingRole.vue'
+import UserDiscovery from '../../resourceManagement/components/UserDiscovery.vue'
 import { Local } from '@/utils/storage'
 export default {
   name: '',
-  components: { pagination },
+  components: { pagination, CreatingRole, UserDiscovery },
   data() {
     return {
       search: {
@@ -172,6 +193,12 @@ export default {
           value: 'ces'
         }
       ],
+      nameType: '',
+      isClickedCreatingRole: false,
+      isClickedUserDiscovery: false,
+      creatingRoleRow: {},
+      userDiscoveryRow: {},
+
       tableData: [],
       permissionTableData: [],
       searchParams: {
@@ -221,6 +248,26 @@ export default {
         .catch(function () {
           row.disabled = row.disabled === 0 ? 1 : 0
         })
+    },
+    changeIsClicked(name, val, row) {
+      if (val === 1) {
+        if (name === 'creatingRole') {
+          this.nameType = 'add'
+          this.isClickedCreatingRole = true
+        } else {
+          this.isClickedUserDiscovery = true
+          this.userDiscoveryRow = row
+        }
+      } else {
+        if (name === 'creatingRole') {
+          this.nameType = 'edit'
+          this.creatingRoleRow = row
+          this.isClickedCreatingRole = true
+        } else {
+          this.isClickedCreatingRole = false
+          this.isClickedUserDiscovery = false
+        }
+      }
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
@@ -297,9 +344,6 @@ export default {
       Local.set('rolePageNum', this.params.pageNum)
       this.$router.push({ path: '/userDiscovery', query: { key: id } })
     },
-    goCreatingRole() {
-      this.$router.push({ path: '/creatingRole', query: { key: 'add' } })
-    },
     goEditRole(row) {
       Local.set('rolePageNum', this.params.pageNum)
       this.$router.push({
@@ -307,6 +351,10 @@ export default {
         query: { key: 'edit', row: row }
       })
     },
+    goCreatingRole() {
+      this.$router.push({ path: '/creatingRole', query: { key: 'add' } })
+    },
+
     checkMenu(list) {
       list.forEach((item) => {
         if (item.permissionType === 1) {

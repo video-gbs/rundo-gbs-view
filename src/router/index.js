@@ -305,13 +305,13 @@ router.afterEach((to, from) => {
 const getLastUrl = (str, yourStr) => str.slice(str.lastIndexOf(yourStr))
 
 router.beforeEach(async (to, from, next) => {
-  console.log('进入路由守卫', to)
+  // console.log('进入路由守卫', to)
   const hasToken = Local.get('access_token')
   if (hasToken) {
     const init = store.state.user.init
     const dynamicRouters = JSON.parse(Local.get('dynamicRouters'))
 
-    console.log('~~~~~~~~~~~~~~~~', init, dynamicRouters)
+    // console.log('~~~~~~~~~~~~~~~~', init, dynamicRouters)
     if (!init && dynamicRouters) {
       // 刷新页面且有route记录数据，可再次追加动态路由
       store.dispatch('user/changeDynamicRouters', dynamicRouters)

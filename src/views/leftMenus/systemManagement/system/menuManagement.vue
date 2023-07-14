@@ -97,8 +97,8 @@
         </el-table-column>
         <el-table-column width="100" label="操作">
           <template slot-scope="scope">
-            <!-- v-permission="['/rbac/menu/update', 3]" -->
             <el-button
+              v-permission="['/rbac/menu/update', 3]"
               v-if="scope.row.id !== '0'"
               type="text"
               @click="dialogShow(0, scope.row)"
@@ -289,16 +289,18 @@ export default {
   },
   created() {
     Local.set('permissionDataUrl', [])
-    this.getHomeFunc()
   },
-  mounted() {},
+  mounted() {
+    setTimeout(() => {
+      this.getHomeFunc()
+    }, 0)
+  },
   methods: {
     async getHomeFunc() {
       await getHomeFunc({ menuId: Local.get('funcId') }).then((res) => {
         if (res.data.code === 0) {
           Local.set('permissionData', res.data.data)
           Local.set('permissionDataUrl', res.data.data)
-          this.isShow = true
           this.initGetMenuTree()
         }
       })
@@ -311,6 +313,8 @@ export default {
           this.tableData = [res.data.data]
 
           this.treeList = [res.data.data]
+
+          this.isShow = true
         }
       })
     },

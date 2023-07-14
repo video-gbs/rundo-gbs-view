@@ -30,7 +30,6 @@ const loadView = (viewPath) => {
 }
 
 const filterRouter = (routers) => {
-  console.log('filterRouter~~~~~~~~~', routers)
   return routers.filter((router) => {
     // 区分布局与视图文件，因为加载方式不同
     router.meta = { icon: router.icon, title: router.name }
@@ -94,10 +93,6 @@ const mutations = {
     state.init = true
     let routerMaps = filterRouter(routers)
     state.routerLists = routerMaps
-    console.log(
-      'routerMapsrouterMapsrouterMapsrouterMapsrouterMapsrouterMaps',
-      routerMaps
-    )
     routerMaps.map((item) => {
       if (item.name === Local.get('resRouterName')) {
         state.sidebarRouter = item.children

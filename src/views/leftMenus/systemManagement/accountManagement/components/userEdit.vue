@@ -62,7 +62,6 @@
                   v-model="form.expiryStartTime"
                   type="datetime"
                   placeholder="开始日期"
-                  disabled
                   style="width: 436px"
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
@@ -272,12 +271,14 @@ import pagination from '@/components/Pagination/index.vue'
 import { getUnitList } from '@/api/method/unitManagement'
 
 import { userUpdate } from '@/api/method/user'
+import { userSearchRole } from '@/api/method/role'
 
 import moment from 'moment'
 import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { pagination },
+  props: ['userEditRow'],
   data() {
     const checkPhone = (rule, value, cb) => {
       const regPhone = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
@@ -457,7 +458,7 @@ export default {
     }
   },
   created() {
-    console.log('this.$route.query.key', this.$route.query.key)
+    console.log('this.$props.userEditRow', this.$props.userEditRow)
     const {
       address,
       description,
@@ -469,7 +470,7 @@ export default {
       workName,
       username,
       sectionId
-    } = this.$route.query.key
+    } = this.$props.userEditRow
     this.form1.address = address
     this.form1.description = description
     this.form.expiryEndTime = expiryEndTime
@@ -487,25 +488,32 @@ export default {
     this.form.workName = workName
     this.form.username = username
     this.Id = sectionId
-
-    // let arr = res.data.records
-    // this.tableData = arr
-    // this.handleRowSelection(this.tableData)
-
-    // if (!this.isChecked) {
-    //   arr.forEach((item) => {
-    //     if (this.selectedData.includes(item.id)) {
-    //       this.$nextTick(() => {
-    //         this.$refs.userTable.toggleRowSelection(item, true)
-    //       })
-    //     }
-    //   })
-    // }
   },
   mounted() {
     this.init()
+    this.getLists()
   },
   methods: {
+    async getLists() {
+      await userSearchRole({
+        page: this.params.pageNum,
+        num: this.params.pageSize,
+        userId: this.$props.userEditRow.id,
+        roleName: this.roleName
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.tableData = res.data.data.list
+            this.handleRowSelection(this.tableData)
+            this.params.total = res.data.total
+            this.params.pages = res.data.pages
+            this.params.current = res.data.current
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     async init() {
       await getUnitList()
         .then((res) => {
@@ -585,7 +593,10 @@ export default {
     // 处理当前列表选中状态
     handleRowSelection(data) {
       data.forEach((item) => {
-        if (this.selectedObj[item.id]) {
+        if (
+          this.selectedObj[item.id] ||
+          item.userId === this.$props.userEditRow.id
+        ) {
           this.$nextTick(() => {
             this.$refs.userTable.toggleRowSelection(item)
           })
@@ -643,7 +654,8 @@ export default {
     },
 
     goback() {
-      this.$router.push({ path: '/accountManagement' })
+      this.$emit('init')
+      this.$emit('changeIsShow', false, 'edit')
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
@@ -663,6 +675,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 // 滚动条大小设置
 ::v-deep .box-card::-webkit-scrollbar {
   /*纵向滚动条*/

@@ -1,5 +1,5 @@
 <template>
-  <div class="department_main">
+  <div class="department_main" v-if="isShow">
     <div class="panel-header-box f jc-sb ai-c fw-w">
       <div>资源接口</div>
     </div>
@@ -20,29 +20,53 @@
               :key="o.resourceValue"
             />
           </el-select>
-          <el-button type="primary" @click="dialogRootShow">
+          <el-button
+            v-permission="['/rbac/resource/root/add', 2]"
+            type="primary"
+            @click="dialogRootShow"
+          >
             <svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增资源组</span>
           </el-button>
         </div>
         <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow">
+          <el-button
+            v-permission="['/rbac/resource/batch/add', 2]"
+            type="primary"
+            @click="dialogShow"
+          >
             <svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span>
           </el-button>
-          <el-button @click="dialogMoveShow">
+          <el-button
+            v-permission="['/rbac/resource/move/fs', 3]"
+            @click="dialogMoveShow"
+          >
             <svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
-          <div v-if="isClickTreeSort" @click="treeSort(1)" class="sort_div">
+          <div
+            v-permission="['/rbac/resource/move/bt', 3]"
+            v-if="isClickTreeSort"
+            @click="treeSort(1)"
+            class="sort_div"
+          >
             <svg-icon class="svg-btn" icon-class="sort-b" />
             <span class="btn-span">排序</span>
           </div>
-          <div v-else @click="treeSort(2)" class="clicked-button sort_div">
+          <div
+            v-permission="['/rbac/resource/move/bt', 3]"
+            v-else
+            @click="treeSort(2)"
+            class="clicked-button sort_div"
+          >
             <svg-icon class="svg-btn" icon-class="sort" />
             <span class="btn-span">排序</span>
           </div>
-          <el-button @click="deleteAccount($event)">
+          <el-button
+            v-permission="['/rbac/resource/delete', 4]"
+            @click="deleteAccount($event)"
+          >
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">删除</span>
           </el-button>
@@ -91,7 +115,11 @@
         </el-form>
 
         <div class="dialog-footer">
-          <el-button type="primary" @click="save('unitManagementForm')">
+          <el-button
+            v-permission="['/rbac/resource/update', 3]"
+            type="primary"
+            @click="save('unitManagementForm')"
+          >
             <svg-icon class="svg-btn" icon-class="save" />保 存
           </el-button>
         </div>
@@ -209,17 +237,6 @@
               </el-option>
             </el-select>
           </el-form-item>
-
-          <!-- <el-form-item label="资源key" prop="resourceKey">
-            <el-input
-              v-model="dialog.params.resourceKey"
-              :disabled="true"
-              placeholder="请输入"
-              clearable
-              style="width: 386px"
-            />
-          </el-form-item> -->
-
           <el-form-item label="资源类型" prop="resourceType">
             <el-select
               v-model="dialog.params.resourceType"
@@ -235,16 +252,6 @@
               />
             </el-select>
           </el-form-item>
-
-          <!-- <el-form-item label="资源组名称" prop="groupName">
-            <el-input
-              v-model="dialog.params.groupName"
-              placeholder="请输入"
-              clearable
-              style="width: 386px"
-            />
-          </el-form-item> -->
-
           <el-button
             class="add_resource"
             icon="el-icon-circle-plus"
@@ -390,6 +397,7 @@ export default {
     }
 
     return {
+      isShow: false,
       resourceName1: 'resourceName',
       lineTitle: {
         title: '新建资源',
@@ -557,9 +565,22 @@ export default {
     }
   },
   created() {
-    this.getRootList()
+    Local.set('permissionDataUrl', [])
+    setTimeout(() => {
+      this.getHomeFunc()
+
+      this.getRootList()
+    }, 0)
   },
   methods: {
+    async getHomeFunc() {
+      await getHomeFunc({ menuId: Local.get('funcId') }).then((res) => {
+        if (res.data.code === 0) {
+          Local.set('permissionData', res.data.data)
+          Local.set('permissionDataUrl', res.data.data)
+        }
+      })
+    },
     async getRootList() {
       await getRootList()
         .then((res) => {
@@ -568,6 +589,7 @@ export default {
             this.searchResourceType = res.data.data[0].resourceKey
             this.init(null, res.data.data[0].resourceKey)
             this.initTreeList(res.data.data[0].resourceKey)
+            this.isShow = true
           }
         })
         .catch((error) => {

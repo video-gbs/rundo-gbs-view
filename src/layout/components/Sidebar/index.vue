@@ -77,14 +77,13 @@ export default {
   },
 
   mounted() {
-    console.log('this.sidebarRouter~~~~~~~~~~~~~~~`', this.sidebarRouter)
+    // console.log('this.sidebarRouter~~~~~~~~~~~~~~~`', this.sidebarRouter)
     this.select(this.$route.path)
     this.myRouter = Object.assign([], this.sidebarRouter)
     this.setHide(this.myRouter)
   },
   methods: {
     setHide(v) {
-      console.log(1111111, v)
       v.forEach((i) => {
         if (i.children && i.children.length) {
           i.children.forEach((child) => {

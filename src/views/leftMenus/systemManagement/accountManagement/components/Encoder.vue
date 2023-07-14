@@ -43,7 +43,7 @@
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span></el-button
           >
-          <el-button type="primary" @click="addEquipment"
+          <el-button type="primary" @click="addEquipment('add')"
             ><svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span></el-button
           >
@@ -98,7 +98,7 @@
         />
         <el-table-column prop="createTime" label="创建时间" width="140" />
         <el-table-column prop="updateTime" label="更新时间" width="140" />
-        <el-table-column prop="disabled" label="禁用状态" width="120">
+        <el-table-column prop="disabled" label="启用状态" width="120">
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.disabled"
@@ -113,7 +113,7 @@
         </el-table-column>
         <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editEquipment(scope.row)"
+            <el-button type="text" @click="editEquipment('edit', scope.row)"
               >编辑
             </el-button>
 
@@ -315,13 +315,13 @@ export default {
     cxData() {
       this.getList(this.newUserId)
     },
-    addEquipment() {
-      this.$emit('changeIsShow', false)
-      this.$router.push(`/user`)
+    addEquipment(name) {
+      this.$emit('changeIsShow', true, name, {})
+      // this.$router.push(`/user`)
     },
-    editEquipment(row) {
+    editEquipment(name, row) {
       Local.set('accountManagementPageNum', this.params.pageNum)
-      this.$router.push({ path: '/editUser', query: { key: row } })
+      this.$emit('changeIsShow', true, name, row)
     },
     changeDisabledSwitch(row) {
       let text = row.disabled === 0 ? '启用' : '停用'

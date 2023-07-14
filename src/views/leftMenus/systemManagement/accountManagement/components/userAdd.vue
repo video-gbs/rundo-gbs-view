@@ -2,7 +2,7 @@
   <div class="userAdd-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
-        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" />
+        <svg-icon icon-class="back-svg" class="back-svg" @click="goback" />
         <span class="back-title">新建用户</span>
       </div>
     </div>
@@ -483,7 +483,7 @@ export default {
     search() {
       this.getLists()
     },
-    async getLists(id) {
+    async getLists() {
       await userSearchRole({
         page: this.params.pageNum,
         num: this.params.pageSize,
@@ -491,7 +491,7 @@ export default {
       })
         .then((res) => {
           if (res.data.code === 0) {
-            this.tableData = []
+            this.tableData = res.data.data.list
             this.handleRowSelection(this.tableData)
             this.params.total = res.data.total
             this.params.pages = res.data.pages
@@ -581,7 +581,8 @@ export default {
     }),
 
     goback() {
-      this.$router.push({ path: '/accountManagement' })
+      this.$emit('init')
+      this.$emit('changeIsShow', false, 'add')
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
@@ -601,6 +602,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 // 滚动条大小设置
 ::v-deep .box-card::-webkit-scrollbar {
   /*纵向滚动条*/
@@ -662,8 +666,6 @@ export default {
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     .back-svg {
-      width: 30px;
-      height: 30px;
       cursor: pointer;
     }
     .back-title {

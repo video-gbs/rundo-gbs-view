@@ -77,15 +77,13 @@ export default {
     this.onlyOneChild = null
     return {}
   },
-  mounted() {
-    console.log('', this.$props.item)
-  },
+  mounted() {},
   methods: {
     routerClick(item) {
+      // console.log(item,9923312239889)
       Local.set('funcId', item.id)
     },
     hasOneShowingChild(children = [], parent) {
-      console.log('children~~~~~~~~', children, parent)
       const showingChildren = children.filter((item) => {
         if (item.hidden) {
           return false
