@@ -72,15 +72,27 @@
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deteleAll($event)" style="width: 100px" plain>
+          <el-button
+            v-permission="['/expansion/device/batchDelete', 4]"
+            @click="deteleAll($event)"
+            style="width: 100px"
+            plain
+          >
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span>
           </el-button>
-          <el-button @click="moveEquipment">
+          <el-button
+            v-permission="['/expansion/device/move', 3]"
+            @click="moveEquipment"
+          >
             <svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
-          <el-button type="primary" @click="goChannelDiscovery">
+          <el-button
+            v-permission="['/expansion/device/add', 2]"
+            type="primary"
+            @click="goChannelDiscovery"
+          >
             <svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span>
           </el-button>
@@ -178,17 +190,17 @@
         </el-table-column>
         <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editData(scope.row)">编辑</el-button>
-            <!-- <el-button type="text" @click="restart(scope.row.id)"
-              >重启
-            </el-button>
-            <el-button type="text" @click="synchronizationData(scope.row.id)"
-              >同步
-            </el-button>
-            <el-button type="text" @click="deploymentData(scope.row.id)"
-              >布防
-            </el-button>-->
-            <el-button type="text" @click="deleteEncoder(scope.row)">
+            <el-button
+              v-permission="['/expansion/device/edit', 3]"
+              type="text"
+              @click="editData(scope.row)"
+              >编辑</el-button
+            >
+            <el-button
+              v-permission="['/expansion/device/delete', 4]"
+              type="text"
+              @click="deleteEncoder(scope.row)"
+            >
               <span class="delete-button">删除</span>
             </el-button>
           </template>
@@ -239,7 +251,6 @@
 import pagination from '@/components/Pagination/index.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import LineFont from '@/components/LineFont'
-
 import {
   getChannelById,
   deleteChannels,
@@ -317,28 +328,8 @@ export default {
       checked: false,
       dialogShow: false,
       dialogShow1: false,
-      dialogTableData: [
-        // {
-        //   name: '球机192.168……',
-        //   coding: '4400000000111500…',
-        //   type: 'IPC',
-        //   ip: '192.168.119.152',
-        //   city: '广东省/广州市/珠海区/新竹街道…',
-        //   manufacturer: '海康',
-        //   status: 1
-        // }
-      ],
-      tableData: [
-        // {
-        //   name: '球机192.168……',
-        //   coding: '4400000000111500…',
-        //   type: 'IPC',
-        //   ip: '192.168.119.152',
-        //   port: 8000,
-        //   manufacturer: '海康',
-        //   status: 1
-        // }
-      ],
+      dialogTableData: [],
+      tableData: [],
       areaNames: 'areaNames',
       idList: [],
       dialogVideoAreaId: '',
@@ -356,7 +347,6 @@ export default {
   },
   methods: {
     getList(orgId) {
-      // : '1620396812466147329'
       getChannelById({
         pageNum: this.params.pageNum,
         pageSize: this.params.pageSize,

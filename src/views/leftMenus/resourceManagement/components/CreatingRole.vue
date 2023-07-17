@@ -757,7 +757,6 @@ export default {
     },
     goback() {
       this.$emit('changeIsClicked', 2)
-      // this.$router.push({ path: '/roleManagement' })
     },
 
     save(formName) {

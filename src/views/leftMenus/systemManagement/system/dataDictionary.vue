@@ -329,28 +329,11 @@ export default {
       treeData: []
     }
   },
-  created() {
-    Local.set('permissionDataUrl', [])
-  },
+  created() {},
   mounted() {
-    setTimeout(() => {
-      this.getHomeFunc()
-    }, 0)
-    // Local.set('permissionDataUrl', [])
-    // this.getHomeFunc()
+    this.getList()
   },
   methods: {
-    async getHomeFunc() {
-      await getHomeFunc({ menuId: Local.get('funcId') }).then((res) => {
-        if (res.data.code === 0) {
-          Local.set('permissionData', res.data.data)
-          Local.set('permissionDataUrl', res.data.data)
-          this.isShow = true
-
-          this.getList()
-        }
-      })
-    },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
       this.getList()
@@ -480,6 +463,9 @@ export default {
             this.params.total = res.data.data.total
             this.params.pages = res.data.data.pages
             this.params.current = res.data.data.pageSize
+            setTimeout(() => {
+              this.isShow = true
+            }, 0)
           }
         })
         .catch((error) => console.log(error))

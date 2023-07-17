@@ -4,9 +4,12 @@ import { Local } from '@/utils/storage'
 // 检测传入的元素key是否可以显示
 function checkKey(currentTag, resMethod) {
   // 获取权限数组
+
   let permissionData = Local.get('permissionData')
     ? Local.get('permissionData')
     : []
+
+  console.log('permissionData~~~~~~~~', permissionData)
 
   //如果传入的元素key不在权限数组里，则不可显示
   const result = permissionData.findIndex((v) => {
@@ -24,9 +27,12 @@ export const buttonPermissions = Vue.directive('permission', {
     const currentTag = binding.value[0]
     const resMethod = binding.value[1]
 
+    console.log('currentTagcurrentTagcurrentTag', currentTag)
+    console.log('resMethodresMethodresMethodresMethod', resMethod)
+
     if ((currentTag, resMethod)) {
       let key = checkKey(currentTag, resMethod)
-      console.log('keykeykeykeykeykeykey', key)
+      // console.log('keykeykeykeykeykeykey', key)
       if (!key) {
         //没有权限
         if (el.type === 'button') {

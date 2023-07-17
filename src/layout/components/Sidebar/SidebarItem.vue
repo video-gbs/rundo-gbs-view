@@ -7,17 +7,17 @@
         !item.alwaysShow
       "
     >
-      <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
-        <el-menu-item
-          :index="resolvePath(onlyOneChild.path)"
-          :class="{ 'submenu-title-noDropdown': !isNest }"
-        >
-          <item
-            :icon="onlyOneChild.meta.icon || (item.meta && item.meta.icon)"
-            :title="onlyOneChild.meta.title"
-          />
-        </el-menu-item>
-      </app-link>
+      <!-- <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)"> -->
+      <el-menu-item
+        :index="resolvePath(onlyOneChild.path)"
+        :class="{ 'submenu-title-noDropdown': !isNest }"
+      >
+        <item
+          :icon="onlyOneChild.meta.icon || (item.meta && item.meta.icon)"
+          :title="onlyOneChild.meta.title"
+        />
+      </el-menu-item>
+      <!-- </app-link> -->
     </template>
 
     <el-submenu
@@ -53,6 +53,7 @@ import Item from './Item'
 import AppLink from './Link'
 import FixiOSBug from './FixiOSBug'
 import { Local } from '@/utils/storage'
+import { getHomeFunc } from '@/api/method/home'
 
 export default {
   name: 'SidebarItem',
@@ -80,8 +81,11 @@ export default {
   mounted() {},
   methods: {
     routerClick(item) {
-      // console.log(item,9923312239889)
-      Local.set('funcId', item.id)
+      getHomeFunc({ menuId: item.id }).then((res) => {
+        if (res.data.code === 0) {
+          Local.set('permissionData', res.data.data)
+        }
+      })
     },
     hasOneShowingChild(children = [], parent) {
       const showingChildren = children.filter((item) => {

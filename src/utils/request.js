@@ -153,7 +153,7 @@ service.interceptors.response.use(
       isRefreshTokenExpired(resetTime)
 
       console.log('resetTime!!!!!', resetTime)
-      if (resetTime < 3580) {
+      if (resetTime < 1200) {
         let refresh_token = Local.get('refresh_token')
         init.updataTokenAPI(refresh_token)
       }
@@ -181,7 +181,7 @@ service.interceptors.response.use(
           return
         case 403:
           console.log('进来403~~~~~~~~', err.response)
-          init.openMessage(err.response.data.msg)
+          init.openMessage(err.response.data.data)
         // alert('403~~~~~~~~',unzip())
         // Local.clear()
         // Local.remove('access_token')

@@ -65,7 +65,11 @@
 <script>
 import { Header } from '@/layout/components'
 import LineFont from '@/components/LineFont'
-import { getTypeTreeMenus, getHomeResource } from '@/api/method/home'
+import {
+  getTypeTreeMenus,
+  getHomeResource,
+  getHomeFunc
+} from '@/api/method/home'
 
 import { getMenuLists } from '@/api/method/user'
 
@@ -163,7 +167,6 @@ export default {
   },
   created() {
     Local.set('permissionData', [])
-    Local.set('permissionDataUrl', [])
   },
   mounted() {
     this.initMenuLists()
@@ -355,12 +358,19 @@ export default {
 
       this.saveComponents(data, child.name)
 
-      Local.set('funcId', child.childList[0].id)
+      this.getHomeFunc(child.childList[0].id)
       this.$router.push({ path: child.childList[0].path })
       setTimeout(() => {
         this.isGoContentListClicked = false
       }, 10000)
-    })
+    }),
+    async getHomeFunc(id) {
+      await getHomeFunc({ menuId: id }).then((res) => {
+        if (res.data.code === 0) {
+          Local.set('permissionData', res.data.data)
+        }
+      })
+    }
   }
 }
 </script>

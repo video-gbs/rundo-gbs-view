@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="main" v-if="!isRegistrationListShow && !isEditEquipment">
     <div class="panel-header-box">
       <div class="panel-header-box-border">前端设备</div>
     </div>
@@ -31,6 +31,7 @@
               ref="encoder"
               :detailsId="detailsId"
               :treeList="treeList"
+              @changeIsShow="changeIsShow"
             />
           </el-tab-pane>
           <el-tab-pane
@@ -48,25 +49,43 @@
       </div>
     </div>
   </div>
+
+  <RegistrationList
+    v-else-if="isRegistrationListShow"
+    ref="registrationList"
+    @changeIsShow="changeIsShow"
+  />
+  <EditEquipment
+    v-else
+    ref="editEquipment"
+    :editEquipmentRow="editEquipmentRow"
+    @changeIsShow="changeIsShow"
+  />
 </template>
 
 <script>
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import Encoder from './components/Encoder.vue'
 import Channel from './components/Channel.vue'
-import { getVideoAraeTree } from '@/api/method/role'
+import RegistrationList from './components/RegistrationList'
+import EditEquipment from './components/EditEquipment'
+
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
 export default {
   name: '',
-  components: { leftTree, Encoder, Channel },
+  components: { leftTree, Encoder, Channel, RegistrationList, EditEquipment },
   data() {
     return {
+      isRegistrationListShow: false,
+      isEditEquipment: false,
+      editEquipmentRow: {},
       activeName: '编码器',
       treeList: [],
       detailsId: '',
       areaNames: 'areaNames',
-      changRight: ''
+      changRight: '',
+      isShow: false
     }
   },
   created() {
@@ -76,7 +95,7 @@ export default {
     Local.remove('equipmentActiveName')
   },
   mounted() {
-    this.init()
+    // this.init()
   },
   computed: {
     ...mapGetters(['rightWidth', 'showSidebar']),
@@ -101,6 +120,15 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    changeIsShow(name, val, row) {
+      if (name === 'editEquipment') {
+        this.isEditEquipment = val
+        this.isRegistrationListShow = !val
+        this.editEquipmentRow = row
+      } else {
+        this.isRegistrationListShow = val
+      }
     },
     handleClick(val, event) {
       this.activeName = val.label

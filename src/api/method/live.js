@@ -1,9 +1,7 @@
 // 实施监控
 import request from '@/api/fetch'
 
-const expansion = '/expserver/expansion'
-
-const device = '/device-control'
+const expansion = '/expansion'
 
 const streamanege = '/stream-manage'
 
@@ -14,7 +12,7 @@ export function getPlayLists(data) {
 
 // 通道云台控制
 export function ptzControl(data) {
-  return request.put(`${device}/channel/north/ptz/control`, data)
+  return request.put(`${expansion}/channel/north/ptz/control`, data)
 }
 
 // 1.2通道云台控制
@@ -57,8 +55,8 @@ export function getPlayBackUrlLists(data) {
 }
 
 export function playStop(data) {
-  // 关闭流
-  return request.put(`${streamanege}/stream/north/play/stop`, data)
+  // 关闭流 新版
+  return request.put(`${streamanege}/stream/play/stop`, data)
 }
 
 export function pauseRecordView(data) {

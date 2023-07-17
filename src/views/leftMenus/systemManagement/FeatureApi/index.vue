@@ -35,7 +35,6 @@ import leftTree from '@/views/leftMenus/systemManagement/components/leftTree'
 import FeatureApiTable from './components/FeatureApiTable.vue'
 import FeatureRrsourceTable from './components/FeatureRrsourceTable.vue'
 import { getMenuTree } from '@/api/method/menus'
-import { getHomeFunc } from '@/api/method/home'
 import { Local } from '@/utils/storage'
 export default {
   name: '',
@@ -53,16 +52,9 @@ export default {
       }
     }
   },
-  created() {
-    Local.set('permissionDataUrl', [])
-  },
+  created() {},
   mounted() {
-    setTimeout(() => {
-      this.getHomeFunc()
-      this.init()
-    }, 0)
-    // Local.set('permissionDataUrl', [])
-    // this.getHomeFunc()
+    this.init()
   },
   watch: {
     funcId(newVal) {
@@ -70,20 +62,12 @@ export default {
     }
   },
   methods: {
-    async getHomeFunc() {
-      await getHomeFunc({ menuId: Local.get('funcId') }).then((res) => {
-        if (res.data.code === 0) {
-          Local.set('permissionData', res.data.data)
-          Local.set('permissionDataUrl', res.data.data)
-          this.isShow = true
-        }
-      })
-    },
     handleClick(val, event) {},
     async init() {
       await getMenuTree()
         .then((res) => {
           if (res.data.code === 0) {
+            this.isShow = true
             this.treeData = [res.data.data]
             this.$refs.featureApiTable.changeName(res.data.data)
             const resId = Local.get('featureApiId')

@@ -230,7 +230,6 @@ import {
   menuHidden
 } from '@/api/method/menus'
 import pagination from '@/components/Pagination/index.vue'
-import { getHomeFunc } from '@/api/method/home'
 import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 import { Local } from '@/utils/storage'
 export default {
@@ -287,24 +286,11 @@ export default {
       }
     }
   },
-  created() {
-    Local.set('permissionDataUrl', [])
-  },
+  created() {},
   mounted() {
-    setTimeout(() => {
-      this.getHomeFunc()
-    }, 0)
+    this.initGetMenuTree()
   },
   methods: {
-    async getHomeFunc() {
-      await getHomeFunc({ menuId: Local.get('funcId') }).then((res) => {
-        if (res.data.code === 0) {
-          Local.set('permissionData', res.data.data)
-          Local.set('permissionDataUrl', res.data.data)
-          this.initGetMenuTree()
-        }
-      })
-    },
     async initGetMenuTree() {
       await getMenuTree({
         ...this.searchParams
@@ -314,7 +300,9 @@ export default {
 
           this.treeList = [res.data.data]
 
-          this.isShow = true
+          setTimeout(() => {
+            this.isShow = true
+          }, 0)
         }
       })
     },

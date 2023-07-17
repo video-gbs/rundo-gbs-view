@@ -43,8 +43,8 @@
           <el-dropdown class trigger="click">
             <div class="user-info">
               <svg-icon icon-class="user2" class="user" />
-              <span class="fs14 mr10">
-                {{ userInfo.userName || '佚名用户' }}
+              <span class="fs14 mr10" v-if="isShowTopMenus">
+                {{ userName || '佚名用户' }}
               </span>
               <i class="el-icon-caret-bottom" />
             </div>
@@ -78,6 +78,8 @@ import { Local } from '@/utils/storage'
 import { logout, newLogout } from '@/api/method/user'
 import store from '@/store/index'
 
+// import { getHomeUser } from '@/api/method/home'
+
 // import { resetRouter } from '@/router/index'
 export default {
   props: {
@@ -94,7 +96,8 @@ export default {
       sideBarRouterList: [],
       sideBarRouterList1: [],
       sideBarRouterList2: [],
-      sideBarRouterList3: []
+      sideBarRouterList3: [],
+      userName: ''
     }
   },
   computed: {
@@ -108,20 +111,30 @@ export default {
   },
   watch: {
     changeTypeRouter(newValue, oldValue) {},
-    changeRouterLists(newValue, oldValue) {
-      // store.dispatch('user/dynamicRouters', newValue)
-    }
+    changeRouterLists(newValue, oldValue) {}
   },
   created() {
-    this.userInfo.userName = localStorage.getItem('rj_userName') || '佚名用户'
-    this.userInfo.userName = this.userInfo.userName
-      .replace('"', '')
-      .replace('"', '')
+    this.userName = Local.get('rj_userName') || '佚名用户'
+    this.userName = this.userName.replace('"', '').replace('"', '')
+    // this.getHomeUser()
   },
   mounted() {
     // console.log('this.typeRouter~~~~~~~', this.typeRouter, this.routerLists)
   },
   methods: {
+    async getHomeUser() {
+      await getHomeUser()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.userName = res.data.data.username
+              .replace('"', '')
+              .replace('"', '')
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     /**
      * 退出登录
      */

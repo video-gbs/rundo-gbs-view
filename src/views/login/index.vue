@@ -216,7 +216,7 @@ export default {
     window.onresize = this.throttle(this.setScale, 500, 500)
     this.initMap()
     Local.set('permissionData', [])
-    Local.set('permissionDataUrl', [])
+    Local.set('rj_userName', '')
   },
   methods: {
     async getHomeUser() {
@@ -317,8 +317,6 @@ export default {
           const { accessToken, refreshToken, expiresIn, tokenType } =
             res.data.data
 
-          console.log(accessToken, refreshToken, expiresIn, tokenType)
-
           this.getHomeUser()
 
           Local.set('rj_deptType', 0)
@@ -326,7 +324,6 @@ export default {
           Local.set('refresh_token', refreshToken)
           Local.set('expires_in', expiresIn)
           Local.set('token_type', tokenType)
-
           this.$router.push({ path: '/workTable' })
 
           this.loading = false

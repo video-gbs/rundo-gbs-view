@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="main" v-if="!isStreamMediaAssociatedShow">
     <div class="panel-header-box">
       <div class="panel-header-box-border">流媒体调度服务模块</div>
     </div>
@@ -83,9 +83,6 @@
                   <el-button type="text" @click="editData(scope.row)"
                     >编辑
                   </el-button>
-                  <!-- <el-button type="text" @click="showDetails(scope.row)"
-                    >详情
-                  </el-button> -->
                   <el-button type="text" @click="showCorrelationPage(scope.row)"
                     ><span class="delete-button">关联</span></el-button
                   >
@@ -157,6 +154,13 @@
       </el-dialog>
     </div>
   </div>
+  <StreamMediaAssociated
+    v-else
+    ref="streamMediaAssociated"
+    :streamMediaAssociatedRow="streamMediaAssociatedRow"
+    @changeIsShow="changeIsShow"
+    @init="init"
+  />
 </template>
 
 <script>
@@ -166,11 +170,14 @@ import LineFont from '@/components/LineFont'
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
 import { getNorthLists, updateNorthLists } from '@/api/method/moduleManagement'
+import StreamMediaAssociated from './StreamMediaAssociated'
 export default {
   name: '',
-  components: { leftTree, pagination, LineFont },
+  components: { leftTree, pagination, LineFont, StreamMediaAssociated },
   data() {
     return {
+      isStreamMediaAssociatedShow: false,
+      streamMediaAssociatedRow: {},
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -215,31 +222,22 @@ export default {
       },
       treeList: [
         {
-          areaName: '中央管理服务器',
+          name: '中央管理服务器',
           areaNames: '中央管理服务器',
           id: '1',
           level: 1,
-          children: [
+          childList: [
             {
-              areaName: '网关模块',
+              name: '网关模块',
               areaNames: '网关模块',
               id: '1-1',
               level: 2
-              // children: [
-              //   {
-              //     areaName: '',
-              //     areaNames: '',
-              //     id: '1-1-1',
-              //     level: 3
-              //   }
-              // ]
             },
             {
-              areaName: '流媒体调度服务模块',
+              name: '流媒体调度服务模块',
               areaNames: '流媒体调度服务模块',
               id: '1-2',
               level: 2
-              // children: [{ areaName: '', areaNames: '', id: '1-2-1', level: 3 }]
             }
           ]
         }
@@ -272,11 +270,11 @@ export default {
         num: this.params.pageSize,
         page: this.params.pageNum
       }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data.list
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
+        if (res.data.code === 0) {
+          this.tableData = res.data.data.list
+          this.params.total = res.data.data.total
+          this.params.pages = res.data.data.pages
+          this.params.current = res.data.data.current
         }
       })
     },
@@ -307,10 +305,15 @@ export default {
       this.editId = row.id
     },
     showCorrelationPage(row) {
-      this.$router.push({
-        path: '/streamMediaAssociated',
-        query: { key: row.id }
-      })
+      this.isStreamMediaAssociatedShow = true
+      this.streamMediaAssociatedRow = row
+      // this.$router.push({
+      //   path: '/streamMediaAssociated',
+      //   query: { key: row.id }
+      // })
+    },
+    changeIsShow(val) {
+      this.isStreamMediaAssociatedShow = val
     },
     async save() {
       await updateNorthLists({
@@ -318,7 +321,7 @@ export default {
         name: this.dialogForm.name,
         url: this.dialogForm.url
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.$message({
             type: 'success',
             message: '编辑成功'
@@ -336,6 +339,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 ::v-deep .moduleManagementTree .el-tree-node__expand-icon.expanded {
   -webkit-transform: rotate(0deg);
   transform: rotate(0deg);

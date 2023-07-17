@@ -2,7 +2,7 @@
   <div class="editEquipment-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
-        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
+        <svg-icon icon-class="back-svg" class="back-svg" @click="goback" /><span
           class="back-title"
           >编辑编码器设备</span
         >
@@ -272,6 +272,12 @@ export default {
       default: function () {
         return []
       }
+    },
+    editEquipmentRow: {
+      type: Object,
+      default: function () {
+        return {}
+      }
     }
   },
   data() {
@@ -426,16 +432,16 @@ export default {
       ip,
       gatewayId,
       deviceId
-    } = this.$route.query.row
-    if (this.$route.query.back === '2') {
-      this.form.deviceId = this.$route.query.row.originId
-      this.form.name = this.$route.query.row.deviceName
-      this.form.videoAreaId = '1'
-    } else {
-      this.form.deviceId = deviceId
-      this.form.videoAreaId = String(videoAreaId)
-      this.form.name = this.$route.query.row.name
-    }
+    } = this.$props.editEquipmentRow
+    // if (this.$route.query.back === '2') {
+    //   this.form.deviceId = this.$props.editEquipmentRow.originId
+    //   this.form.name = this.$props.editEquipmentRow.deviceName
+    //   this.form.videoAreaId = '1'
+    // } else {
+    //   this.form.deviceId = deviceId
+    //   this.form.videoAreaId = String(videoAreaId)
+    //   this.form.name = this.$props.editEquipmentRow.name
+    // }
     this.form1.ip = ip
     this.form1.transport = transport
     this.form1.latitude = latitude
@@ -449,7 +455,7 @@ export default {
     // this.form.deviceId = this.$route.query.back === '1'?deviceId:originId
     this.form.deviceType = deviceType + ''
     this.form.gatewayId = String(gatewayId)
-    this.editId = this.$route.query.row.id
+    this.editId = this.$props.editEquipmentRow.id
   },
   mounted() {
     this.init()
@@ -513,7 +519,7 @@ export default {
     },
     async getAllGatewayLists() {
       await getAllGatewayLists({
-        gatewayId: this.$route.query.row.gatewayId
+        gatewayId: this.$props.editEquipmentRow.gatewayId
       }).then((res) => {
         if (res.code === 0) {
           if (res.data && res.data.length > 0) {
@@ -557,17 +563,17 @@ export default {
         editEncoder({
           deviceId:
             this.$route.query.back === '1'
-              ? this.$route.query.row.deviceId
-              : this.$route.query.row.originId,
+              ? this.$props.editEquipmentRow.deviceId
+              : this.$props.editEquipmentRow.originId,
           id:
             this.$route.query.back === '1'
-              ? this.$route.query.row.id
-              : this.$route.query.row.deviceId,
-          onlineState: this.$route.query.row.onlineState,
+              ? this.$props.editEquipmentRow.id
+              : this.$props.editEquipmentRow.deviceId,
+          onlineState: this.$props.editEquipmentRow.onlineState,
           ...this.form,
           ...this.form1
         }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '编辑成功'
@@ -649,8 +655,6 @@ export default {
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     .back-svg {
-      width: 30px;
-      height: 30px;
       cursor: pointer;
     }
     .back-title {

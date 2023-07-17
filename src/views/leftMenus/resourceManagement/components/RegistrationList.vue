@@ -2,7 +2,7 @@
   <div class="registrationList-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
-        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
+        <svg-icon icon-class="back-svg" class="back-svg" @click="goback" /><span
           class="back-title"
           >待注册列表</span
         >
@@ -240,11 +240,11 @@ export default {
         page: this.params.pageNum,
         ...this.searchParams
       }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data.list
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
+        if (res.data.code === 0) {
+          this.tableData = res.data.data.list
+          this.params.total = res.data.data.total
+          this.params.pages = res.data.data.pages
+          this.params.current = res.data.data.pageSize
         }
       })
     },
@@ -264,7 +264,7 @@ export default {
         this.form.deviceType = Number(this.form.deviceType)
         this.form.gatewayId = 7
         addEncoder({ ...this.form, ...this.form1, deviceId: 1 }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '新建成功'
@@ -275,16 +275,10 @@ export default {
       })
     },
     goback() {
-      this.$router.push({ path: '/equipment' })
+      this.$emit('changeIsShow', '', false)
     },
     goAddRouter(row) {
-      this.$router.push({
-        path: '/editEquipment',
-        query: {
-          back: 2,
-          row: row
-        }
-      })
+      this.$emit('changeIsShow', 'editEquipment', true, row)
     },
     resetData(e) {
       this.searchParams = {
@@ -313,7 +307,7 @@ export default {
         type: 'warning'
       }).then(() => {
         deleteDevice(row.id).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -387,8 +381,6 @@ export default {
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     .back-svg {
-      width: 30px;
-      height: 30px;
       cursor: pointer;
     }
     .back-title {

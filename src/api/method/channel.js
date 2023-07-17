@@ -1,6 +1,6 @@
 import request from '@/api/fetch'
 
-const expansion = '/expserver/expansion'
+const expansion = '/expansion'
 // 通道
 // 新增通道
 export function addChannel(params) {

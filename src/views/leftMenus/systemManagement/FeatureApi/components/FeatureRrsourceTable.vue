@@ -239,8 +239,7 @@ export default {
     },
 
     goBack(val) {
-      Local.set('permissionDataUrl', [])
-      this.$emit('getHomeFunc')
+      // this.$emit('getHomeFunc')
       this.$emit('changeIsClickedResourceBtn', val)
     },
 

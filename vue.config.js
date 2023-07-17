@@ -25,7 +25,6 @@ const assetsCDN = {
     axios: 'axios'
   },
   css: [],
-  // https://unpkg.com/browse/vue@2.6.10/
   js: [
     '//cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js',
     '//cdn.jsdelivr.net/npm/vue-router@3.1.3/dist/vue-router.min.js',
@@ -37,14 +36,9 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || '后台管理系统' // page title
+const name = defaultSettings.title || '后台管理系统'
 
-// If your port is set to 80,
-// use administrator privileges to execute the command line.
-// For example, Mac: sudo npm run
-// You can change the port by the following methods:
-// port = 9528 npm run dev OR npm run dev --port = 9528
-const port = process.env.port || process.env.npm_config_port || 8080 // dev port
+const port = process.env.port || process.env.npm_config_port || 8080
 
 // 转发配置数组
 const urls = [
@@ -55,10 +49,10 @@ const urls = [
 
   // },
   // dev  本地
-  // {
-  //   target: 'http://xard-gbs-dev.runjian.com:8080',
-  //   proxy: '/api'
-  // }
+  {
+    target: 'http://192.192.192.92:9090',
+    proxy: '/expansion'
+  },
   // {
   //   target: 'http://xard-gbs-dev.runjian.com:8080',
   //   proxy: '/api'
@@ -91,19 +85,10 @@ function getProxys() {
       }
     }
   })
+  console.log('proxysproxysproxys',proxys)
   return proxys
 }
-
-// All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
-  /**
-   * You will need to set publicPath if you plan to deploy your site under a sub path,
-   * for example GitHub Pages. If you plan to deploy your site to https://foo.github.io/bar/,
-   * then publicPath should be set to "/bar/".
-   * In most cases please use '/' !!!
-   * Detail: https://cli.vuejs.org/config/#publicpath
-   */
-  // publicPath: '/',
   publicPath: './',
   outputDir: 'dist',
   assetsDir: 'static',
@@ -118,11 +103,8 @@ module.exports = {
       errors: true
     },
     proxy: getProxys()
-    // before: require('./mock/mock-server.js')
   },
   configureWebpack: {
-    // provide the app's title in webpack's name field, so that
-    // it can be accessed in index.html to inject the correct title.
     name: name,
     plugins: [
       new CopyWebpackPlugin([
@@ -154,12 +136,9 @@ module.exports = {
           return args
         })
     }
-    // it can improve the speed of the first screen, it is recommended to turn on preload
     config.plugin('preload').tap(() => [
       {
         rel: 'preload',
-        // to ignore runtime.js
-        // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-service/lib/config/app.js#L171
         fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
         include: 'initial'
       }
@@ -179,7 +158,6 @@ module.exports = {
     //   },
     // ])
 
-    // when there are many pages, it will cause too many meaningless requests
     config.plugins.delete('prefetch')
 
     // set svg-sprite-loader
@@ -213,7 +191,6 @@ module.exports = {
         .after('html')
         .use('script-ext-html-webpack-plugin', [
           {
-            // `runtime` must same as runtimeChunk name. default is `runtime`
             inline: /runtime\..*\.js$/
           }
         ])
@@ -225,32 +202,32 @@ module.exports = {
             name: 'chunk-libs',
             test: /[\\/]node_modules[\\/]/,
             priority: 10,
-            chunks: 'initial' // only package third parties that are initially dependent
+            chunks: 'initial'
           },
           elementUI: {
-            name: 'chunk-elementUI', // split elementUI into a single package
-            priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
-            test: /[\\/]node_modules[\\/]_?element-ui(.*)/ // in order to adapt to cnpm
+            name: 'chunk-elementUI',
+            priority: 20,
+            test: /[\\/]node_modules[\\/]_?element-ui(.*)/
           },
           commons: {
             name: 'chunk-commons',
-            test: resolve('src/components'), // can customize your rules
-            minChunks: 3, //  minimum common number
+            test: resolve('src/components'),
+            minChunks: 3,
             priority: 5,
             reuseExistingChunk: true
           }
         }
       })
-      // https:// webpack.js.org/configuration/optimization/#optimizationruntimechunk
+
       config.optimization.runtimeChunk = {
         name: (entrypoint) => `runtime~${entrypoint.name}`
       }
-      // config.optimization.runtimeChunk('single')
+
     })
   },
   css: {
     loaderOptions: {
-      // 全局引入src/styles/variables.scss文件下的变量
+
       scss: {
         prependData: `@import "~@/styles/variables.scss";@import "~@/styles/dom.scss";`
       }

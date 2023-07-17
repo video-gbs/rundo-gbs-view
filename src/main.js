@@ -19,8 +19,6 @@ import '@/plugin'
 import * as echarts from 'echarts'
 Vue.prototype.$echarts = echarts
 
-import {} from './permission'
-
 import API from '@/api'
 Vue.prototype.$api = API
 
@@ -43,6 +41,7 @@ Vue.prototype.$_config = config
 Vue.prototype.$photoUrl = config.photoUrlApi
 Vue.prototype.$filePreview = config.filePreview
 
+import {} from './permission'
 // 退出登录
 Vue.prototype.$logout = () => {
   Local.logout()

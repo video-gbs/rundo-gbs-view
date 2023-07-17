@@ -337,7 +337,6 @@ import {
   resourceUpdate,
   resourceDelete
 } from '@/api/method/resourceInterface'
-import { getHomeFunc } from '@/api/method/home'
 import { Local } from '@/utils/storage'
 import leftTree from '../components/leftTree'
 import LineFont from '@/components/LineFont'
@@ -564,23 +563,10 @@ export default {
       //  this.form=val
     }
   },
-  created() {
-    Local.set('permissionDataUrl', [])
-    setTimeout(() => {
-      this.getHomeFunc()
-
-      this.getRootList()
-    }, 0)
+  mounted() {
+    this.getRootList()
   },
   methods: {
-    async getHomeFunc() {
-      await getHomeFunc({ menuId: Local.get('funcId') }).then((res) => {
-        if (res.data.code === 0) {
-          Local.set('permissionData', res.data.data)
-          Local.set('permissionDataUrl', res.data.data)
-        }
-      })
-    },
     async getRootList() {
       await getRootList()
         .then((res) => {
@@ -589,7 +575,9 @@ export default {
             this.searchResourceType = res.data.data[0].resourceKey
             this.init(null, res.data.data[0].resourceKey)
             this.initTreeList(res.data.data[0].resourceKey)
-            this.isShow = true
+            setTimeout(() => {
+              this.isShow = true
+            }, 0)
           }
         })
         .catch((error) => {

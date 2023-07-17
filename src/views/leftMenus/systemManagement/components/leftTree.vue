@@ -30,7 +30,12 @@
               class="tree1"
             />
             <svg-icon v-else icon-class="tree2" class="tree2" />
-            {{ data.name || data.sectionName || data.resourceName }}
+            {{
+              data.name ||
+              data.sectionName ||
+              data.resourceName ||
+              data.areaNames
+            }}
 
             <div
               v-if="!isClickTreeSort && data.level !== '0'"
