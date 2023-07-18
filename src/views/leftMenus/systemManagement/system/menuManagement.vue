@@ -302,7 +302,7 @@ export default {
 
           setTimeout(() => {
             this.isShow = true
-          }, 0)
+          }, 100)
         }
       })
     },

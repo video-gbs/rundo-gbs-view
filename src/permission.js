@@ -9,8 +9,6 @@ function checkKey(currentTag, resMethod) {
     ? Local.get('permissionData')
     : []
 
-  console.log('permissionData~~~~~~~~', permissionData)
-
   //如果传入的元素key不在权限数组里，则不可显示
   const result = permissionData.findIndex((v) => {
     return v.method === resMethod && v.path === currentTag
@@ -26,9 +24,6 @@ export const buttonPermissions = Vue.directive('permission', {
   inserted(el, binding) {
     const currentTag = binding.value[0]
     const resMethod = binding.value[1]
-
-    console.log('currentTagcurrentTagcurrentTag', currentTag)
-    console.log('resMethodresMethodresMethodresMethod', resMethod)
 
     if ((currentTag, resMethod)) {
       let key = checkKey(currentTag, resMethod)

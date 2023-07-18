@@ -60,18 +60,15 @@ const init = {
       }
     })
       .then(function (res) {
-        console.log('res', res)
         if (res.data.code === 0) {
           // 防止重复调refresh_token接口
           that.isRefresh = false
           let result = res.data.data
-          console.log('result~~~~~~', result)
           Local.set('access_token', result.accessToken)
           Local.set('refresh_token', result.refreshToken)
           isRefreshTokenExpired(result.expiresIn)
           Local.set('expires_in', result.expiresIn)
         } else {
-          console.log(2, 'else')
           //刷新token失败只能跳转到登录页重新登录
           Local.clear()
           Local.remove('access_token')
@@ -86,8 +83,6 @@ const init = {
       })
       .catch(function (err) {
         //刷新token失败只能跳转到登录页重新登录
-
-        console.log(3, err)
         newLogout()
           .then((res) => {})
           .catch(() => {})
@@ -151,8 +146,6 @@ service.interceptors.response.use(
     if (Local.get('access_token')) {
       //有没有token
       isRefreshTokenExpired(resetTime)
-
-      console.log('resetTime!!!!!', resetTime)
       if (resetTime < 1200) {
         let refresh_token = Local.get('refresh_token')
         init.updataTokenAPI(refresh_token)
@@ -161,7 +154,6 @@ service.interceptors.response.use(
     return response
   },
   async (err) => {
-    console.log('403~~~~~~~~', err.response)
     if (err && err.response) {
       switch (err.response.status) {
         case 400:
@@ -180,7 +172,6 @@ service.interceptors.response.use(
           })
           return
         case 403:
-          console.log('进来403~~~~~~~~', err.response)
           init.openMessage(err.response.data.data)
         // alert('403~~~~~~~~',unzip())
         // Local.clear()

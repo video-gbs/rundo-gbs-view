@@ -17,7 +17,7 @@
               v-for="o in resourceKeyOptions"
               :label="o.resourceName"
               :value="o.resourceKey"
-              :key="o.resourceValue"
+              :key="o.resourceName"
             />
           </el-select>
           <el-button
@@ -577,7 +577,7 @@ export default {
             this.initTreeList(res.data.data[0].resourceKey)
             setTimeout(() => {
               this.isShow = true
-            }, 0)
+            }, 100)
           }
         })
         .catch((error) => {

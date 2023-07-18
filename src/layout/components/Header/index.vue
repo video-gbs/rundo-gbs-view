@@ -150,7 +150,6 @@ export default {
         })
     },
     clickRouter(data) {
-      // console.log('routerLists~~~~~~', this.routerLists)
       Local.set('resRouterName', data.name)
       const resArray =
         this.routerLists && this.routerLists.length > 0
@@ -162,8 +161,9 @@ export default {
         store.dispatch('user/changeRightWidth', false)
         store.dispatch('user/changeShowSidebar', false)
       } else {
-        store.dispatch('user/changeShowSidebar', true)
+        // store.dispatch('user/changeShowSidebar', true)
       }
+      console.log('data~~~~~~', data, resArray)
 
       resArray.map((item) => {
         if (item.name === data.name) {

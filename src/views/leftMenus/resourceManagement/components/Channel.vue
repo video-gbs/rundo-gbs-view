@@ -73,7 +73,7 @@
         >
         <div class="btn-lists">
           <el-button
-            v-permission="['/expansion/device/batchDelete', 4]"
+            v-permission="['/expansion/channel/batchDelete', 2]"
             @click="deteleAll($event)"
             style="width: 100px"
             plain
@@ -82,14 +82,14 @@
             <span class="btn-span">批量删除</span>
           </el-button>
           <el-button
-            v-permission="['/expansion/device/move', 3]"
+            v-permission="['/expansion/channel/move', 2]"
             @click="moveEquipment"
           >
             <svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
           <el-button
-            v-permission="['/expansion/device/add', 2]"
+            v-permission="['/expansion/channel/add', 2]"
             type="primary"
             @click="goChannelDiscovery"
           >
@@ -191,13 +191,13 @@
         <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
             <el-button
-              v-permission="['/expansion/device/edit', 3]"
+              v-permission="['/expansion/channel/edit', 3]"
               type="text"
               @click="editData(scope.row)"
               >编辑</el-button
             >
             <el-button
-              v-permission="['/expansion/device/delete', 4]"
+              v-permission="['/expansion/channel/delete', 4]"
               type="text"
               @click="deleteEncoder(scope.row)"
             >
@@ -333,32 +333,37 @@ export default {
       areaNames: 'areaNames',
       idList: [],
       dialogVideoAreaId: '',
-      equipmentCompanyOptionsList: []
+      equipmentCompanyOptionsList: [],
+      resDetailsId: ''
     }
+  },
+  watch: {
+    detailsId(newValue, oldValue) {
+      this.resDetailsId = newValue
+
+      this.getList()
+    },
+    deep: true
   },
   created() {
     this.params.pageNum = Local.get('channelPageNum')
     Local.remove('channelPageNum')
-    this.getDeviceTypesDictionaryList()
-    this.getDeviceTypesDictionaryList1()
   },
-  mounted() {
-    this.getList()
-  },
+  mounted() {},
   methods: {
     getList(orgId) {
       getChannelById({
         pageNum: this.params.pageNum,
         pageSize: this.params.pageSize,
-        videoAreaId: orgId ? orgId : this.$props.detailsId,
+        videoAreaId: orgId ? orgId : this.resDetailsId,
         includeEquipment: this.includeEquipment,
         ...this.searchParams
       }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data.records
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
+        if (res.data.code === 0) {
+          this.tableData = res.data.data.records
+          this.params.total = res.data.data.total
+          this.params.pages = res.data.data.pages
+          this.params.current = res.data.data.current
         }
       })
     },
@@ -395,30 +400,30 @@ export default {
         }
       })
     },
-    async getDeviceTypesDictionaryList() {
-      await getManufacturerDictionaryList('Appearance').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.deviceTypesOptionsList.push(obj)
-          })
-        }
-      })
-    },
-    async getDeviceTypesDictionaryList1() {
-      await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.equipmentCompanyOptionsList.push(obj)
-          })
-        }
-      })
-    },
+    // async getDeviceTypesDictionaryList() {
+    //   await getManufacturerDictionaryList('Appearance').then((res) => {
+    //     if (res.code === 0) {
+    //       res.data.map((item) => {
+    //         let obj = {}
+    //         obj.label = item.itemName
+    //         obj.value = item.itemValue
+    //         this.deviceTypesOptionsList.push(obj)
+    //       })
+    //     }
+    //   })
+    // },
+    // async getDeviceTypesDictionaryList1() {
+    //   await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
+    //     if (res.code === 0) {
+    //       res.data.map((item) => {
+    //         let obj = {}
+    //         obj.label = item.itemName
+    //         obj.value = item.itemValue
+    //         this.equipmentCompanyOptionsList.push(obj)
+    //       })
+    //     }
+    //   })
+    // },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
       this.getList()

@@ -52,12 +52,28 @@ export function syncChannel(id) {
   return request.get(`${expansion}/channel/channelSync/?deviceId=${id}`)
 }
 
-// 代注册列表编辑
-// export function deleteDevice(id) {
-//   return request.delete(`${device}/device/north/delete/?deviceId=${id}`)
-// }
+// 设备--安防设备列表
+export function deviceVideoAreaList(params) {
+  return request.get(`${expansion}/device/videoAreaList`, params)
+}
 
-// 代注册列表同步
-// export function syncDevice(id) {
-//   return request.put(`${device}/device/north/sync`)
-// }
+// 安防通道添加
+export function videoAreaAdd(data) {
+  return request.post(`${expansion}/videoArea/add`, data)
+}
+// 安防通道移动父子
+export function videoAreaMove(data) {
+  return request.put(`${expansion}/videoArea/move`, data)
+}
+// 安防通道排序
+export function videoAreaSort(data) {
+  return request.put(`${expansion}/videoArea/sort`, data)
+}
+// 安防通道编辑
+export function videoAreaEdit(data) {
+  return request.put(`${expansion}/videoArea/edit`, data)
+}
+// 安防通道删除
+export function videoAreaDelete(id) {
+  return request.put(`${expansion}/videoArea/delete?resourceId=${id}`)
+}
