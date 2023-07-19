@@ -87,7 +87,7 @@
             <span class="btn-span">移动</span></el-button
           >
           <el-button
-            v-permission="['/expansion/device/move', 2]"
+            v-permission="['/expansion/device/unregister/list', 1]"
             @click="goRegistrationList"
             style="width: 120px"
             ><svg-icon class="svg-btn" icon-class="move" />
@@ -349,7 +349,8 @@ import {
   moveEncoder,
   syncChannel
 } from '@/api/method/encoder'
-import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+
+import { getGroupDictLists } from '@/api/method/dictionary'
 import { Local } from '@/utils/storage'
 
 // import drawMixin from '@/utils/drawMixin'
@@ -424,7 +425,7 @@ export default {
       dialogShow1: false,
       dialogTableData: [],
       tableData: [],
-      areaNames: 'areaNames',
+      areaNames: 'resourceName',
       idList: [],
       dialogVideoAreaId: '',
       equipmentCompanyOptionsList: [],
@@ -434,8 +435,6 @@ export default {
   watch: {
     detailsId(newValue, oldValue) {
       this.resDetailsId = newValue
-
-      this.getList()
     },
     deep: true
   },
@@ -443,10 +442,14 @@ export default {
     this.params.pageNum = Local.get('encoderPageNum')
     Local.remove('encoderPageNum')
 
-    // this.getDeviceTypesDictionaryList()
-    // this.getDeviceTypesDictionaryList1()
+    this.getDeviceTypesDictionaryList()
+    this.getDeviceTypesDictionaryList1()
   },
-  mounted() {},
+  mounted() {
+    setTimeout(() => {
+      // this.getList()
+    }, 500)
+  },
   methods: {
     async getList(id) {
       console.log('this.resDetailsId', this.resDetailsId)
@@ -465,30 +468,30 @@ export default {
         }
       })
     },
-    // async getDeviceTypesDictionaryList() {
-    //   await getManufacturerDictionaryList('DeviceTypes').then((res) => {
-    //     if (res.code === 0) {
-    //       res.data.map((item) => {
-    //         let obj = {}
-    //         obj.label = item.itemName
-    //         obj.value = item.itemValue
-    //         this.deviceTypesOptionsList.push(obj)
-    //       })
-    //     }
-    //   })
-    // },
-    // async getDeviceTypesDictionaryList1() {
-    //   await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
-    //     if (res.code === 0) {
-    //       res.data.map((item) => {
-    //         let obj = {}
-    //         obj.label = item.itemName
-    //         obj.value = item.itemValue
-    //         this.equipmentCompanyOptionsList.push(obj)
-    //       })
-    //     }
-    //   })
-    // },
+    async getDeviceTypesDictionaryList() {
+      await getGroupDictLists('DeviceTypes').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.deviceTypesOptionsList.push(obj)
+          })
+        }
+      })
+    },
+    async getDeviceTypesDictionaryList1() {
+      await getGroupDictLists('EquipmentCompany').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.equipmentCompanyOptionsList.push(obj)
+          })
+        }
+      })
+    },
     handleSelectionChange(data) {
       const resName = []
       this.idList = []
@@ -510,7 +513,7 @@ export default {
         idList: this.idList,
         videoAreaId: this.dialogVideoAreaId
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.$message({
             type: 'success',
             message: '移动成功'
@@ -534,7 +537,7 @@ export default {
     },
     synchronizationData(id) {
       syncChannel(id).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.$message({
             type: 'success',
             message: '同步成功'
@@ -547,13 +550,7 @@ export default {
     goEditPage(row) {
       Local.set('encoderPageNum', this.params.pageNum)
       Local.set('equipmentActiveName', '编码器')
-      this.$router.push({
-        path: `/editEquipment`,
-        query: {
-          back: 1,
-          row: row
-        }
-      })
+      this.$emit('changeIsShow', 'editEquipment', true, row, '1')
     },
     deploymentData() {
       this.dialogShow1 = true
@@ -587,7 +584,7 @@ export default {
           roleIds.push(item.id)
         })
         deleteEncoders(roleIds).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -609,7 +606,7 @@ export default {
         }
       ).then(() => {
         deleteEncoder(row.id).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -642,12 +639,15 @@ export default {
     cxData() {
       this.getList()
     },
+
     addEquipment() {
-      this.$router.push(`/addEquipment`)
+      this.$emit('changeIsShow', 'addEquipment', true)
     },
+
     goRegistrationList() {
-      this.$emit('changeIsShow', '', true)
+      this.$emit('changeIsShow', 'registrationList', true)
     },
+
     moveEquipment(row) {
       if (this.$refs.encoderTable.selection.length === 0) {
         this.$message({

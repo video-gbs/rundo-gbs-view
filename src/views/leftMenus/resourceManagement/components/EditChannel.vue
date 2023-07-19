@@ -351,8 +351,8 @@ export default {
     async init(id) {
       await getVideoAraeTree()
         .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
+          if (res.data.code === 0) {
+            this.treeList = res.data.data
             this.$nextTick(() => {
               this.getTreeName(this.treeList, this.form.videoAreaId)
               this.form.videoAreaId = this.resName
@@ -365,8 +365,8 @@ export default {
     },
     async getTowardTypeOptionsList() {
       await getManufacturerDictionaryList('Toward').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
             let obj = {}
             obj.label = item.itemName
             obj.value = item.itemValue
@@ -377,8 +377,8 @@ export default {
     },
     async getAppearanceTypeOptionsList() {
       await getManufacturerDictionaryList('Appearance').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
             let obj1 = {}
             obj1.label = item.itemName
             obj1.value = item.itemValue
@@ -389,8 +389,8 @@ export default {
     },
     async getChannelTypeList() {
       await getManufacturerDictionaryList('ChannelType').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
             let obj1 = {}
             obj1.label = item.itemName
             obj1.value = item.itemValue
@@ -416,7 +416,7 @@ export default {
           deviceExpansionId: this.$route.query.row.deviceExpansionId,
           id: this.$route.query.row.id
         }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '编辑成功'

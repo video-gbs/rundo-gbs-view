@@ -338,7 +338,7 @@ export default {
 
     async getManufacturerDictionaryList() {
       await getManufacturerDictionaryList('MenuType').then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           res.data.map((item) => {
             let obj = {}
             obj.label = item.itemName

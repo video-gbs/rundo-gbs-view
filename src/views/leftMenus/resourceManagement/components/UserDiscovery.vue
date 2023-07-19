@@ -820,6 +820,7 @@ export default {
   display: block;
 }
 .activeDiscovery-content {
+  height: 100%;
   .panel-header-box {
     margin: 0;
     padding: 0 16px;

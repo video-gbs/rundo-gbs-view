@@ -374,7 +374,7 @@ export default {
         permissionIds: this.checkList
       }).then((res) => {
         this.buttonLoading = false
-        if (res.code === 10000) {
+        if (res.data.code === 10000) {
           this.$message({
             message: '保存成功！',
             type: 'success'

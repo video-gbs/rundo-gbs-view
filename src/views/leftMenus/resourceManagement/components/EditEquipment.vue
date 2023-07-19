@@ -2,7 +2,7 @@
   <div class="editEquipment-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
-        <svg-icon icon-class="back-svg" class="back-svg" @click="goback" /><span
+        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
           >编辑编码器设备</span
         >
@@ -259,10 +259,11 @@
 </template>
 
 <script>
-import { getVideoAraeTree } from '@/api/method/role'
+// import { getVideoAraeTree } from '@/api/method/role'
 import { editEncoder } from '@/api/method/encoder'
 import { getAllGatewayLists } from '@/api/method/moduleManagement'
-import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+import { getGroupDictLists } from '@/api/method/dictionary'
+import { channelVideoAreaList } from '@/api/method/channel'
 export default {
   name: '',
   components: {},
@@ -278,7 +279,53 @@ export default {
       default: function () {
         return {}
       }
+    },
+    resType: {
+      type: String,
+      efault: () => ''
     }
+  },
+  watch: {
+    editEquipmentRow(newValue, oldValue) {
+      this.resEditEquipmentRow = newValue
+
+      const {
+        model,
+        username,
+        deviceType,
+        manufacturer,
+        videoAreaId,
+        password,
+        transport,
+        latitude,
+        longitude,
+        port,
+        ip,
+        gatewayId,
+        deviceId
+      } = this.resEditEquipmentRow
+      this.form1.ip = ip
+      this.form1.transport = transport
+      this.form1.latitude = latitude
+      this.form1.longitude = longitude
+      this.form1.port = port
+      this.form.password = password
+      this.form.password = password
+      this.form.manufacturer = manufacturer
+      this.form.model = model
+      this.form.username = username
+      this.form.deviceType = deviceType + ''
+      this.form.gatewayId = String(gatewayId)
+      this.editId = this.$props.editEquipmentRow.id
+      // this.form.videoAreaId=videoAreaId
+      this.$nextTick(() => {
+        this.getTreeName(this.treeList, videoAreaId)
+        this.form.videoAreaId = this.resName
+      })
+
+      console.log('this.resEditEquipmentRow', this.resEditEquipmentRow)
+    },
+    deep: true
   },
   data() {
     const checkName = (rule, value, cb) => {
@@ -329,6 +376,7 @@ export default {
       }, 500)
     }
     return {
+      resEditEquipmentRow: {},
       form: {
         model: '',
         username: '',
@@ -354,8 +402,8 @@ export default {
       resName: '',
       isRequired: true,
       defaultProps: {
-        children: 'children',
-        label: 'areaName'
+        children: 'childList',
+        label: 'resourceName'
       },
       allNorthTypeOptions: [],
       manufacturerTypeOptions: [],
@@ -417,46 +465,7 @@ export default {
       }
     }
   },
-  created() {
-    const {
-      model,
-      username,
-      deviceType,
-      manufacturer,
-      videoAreaId,
-      password,
-      transport,
-      latitude,
-      longitude,
-      port,
-      ip,
-      gatewayId,
-      deviceId
-    } = this.$props.editEquipmentRow
-    // if (this.$route.query.back === '2') {
-    //   this.form.deviceId = this.$props.editEquipmentRow.originId
-    //   this.form.name = this.$props.editEquipmentRow.deviceName
-    //   this.form.videoAreaId = '1'
-    // } else {
-    //   this.form.deviceId = deviceId
-    //   this.form.videoAreaId = String(videoAreaId)
-    //   this.form.name = this.$props.editEquipmentRow.name
-    // }
-    this.form1.ip = ip
-    this.form1.transport = transport
-    this.form1.latitude = latitude
-    this.form1.longitude = longitude
-    this.form1.port = port
-    this.form.password = password
-    this.form.password = password
-    this.form.manufacturer = manufacturer
-    this.form.model = model
-    this.form.username = username
-    // this.form.deviceId = this.$route.query.back === '1'?deviceId:originId
-    this.form.deviceType = deviceType + ''
-    this.form.gatewayId = String(gatewayId)
-    this.editId = this.$props.editEquipmentRow.id
-  },
+  created() {},
   mounted() {
     this.init()
     this.getAllGatewayLists()
@@ -479,14 +488,10 @@ export default {
       })
     },
     async init(id) {
-      await getVideoAraeTree()
+      await channelVideoAreaList()
         .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
-            this.$nextTick(() => {
-              this.getTreeName(this.treeList, this.form.videoAreaId)
-              this.form.videoAreaId = this.resName
-            })
+          if (res.data.code === 0) {
+            this.treeList = [res.data.data]
           }
         })
         .catch((error) => {
@@ -494,9 +499,9 @@ export default {
         })
     },
     async getManufacturerDictionaryList() {
-      await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
+      await getGroupDictLists('EquipmentCompany').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
             let obj = {}
             obj.label = item.itemName
             obj.value = item.itemValue
@@ -506,9 +511,9 @@ export default {
       })
     },
     async getManufacturerDictionaryList1() {
-      await getManufacturerDictionaryList('TransportProtocol').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
+      await getGroupDictLists('TransportProtocol').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
             let obj1 = {}
             obj1.label = item.itemName
             obj1.value = item.itemValue
@@ -521,15 +526,15 @@ export default {
       await getAllGatewayLists({
         gatewayId: this.$props.editEquipmentRow.gatewayId
       }).then((res) => {
-        if (res.code === 0) {
-          if (res.data && res.data.length > 0) {
-            if (res.data[0].protocol === 'GB28181') {
+        if (res.data.code === 0) {
+          if (res.data.data && res.data.data.length > 0) {
+            if (res.data.data[0].protocol === 'GB28181') {
               this.isRequired = false
             } else {
               this.isRequired = true
             }
 
-            res.data.map((item) => {
+            res.data.data.map((item) => {
               let obj = {}
               obj.label = item.name
               obj.value = item.id
@@ -541,14 +546,14 @@ export default {
     },
     // async getAllGatewayLists1() {
     //   await getAllGatewayLists().then((res) => {
-    //     if (res.code === 0) {
+    //     if (res.data.code === 0) {
     //       console.log('res~~~~~~',res)
     //     }
     //   })
     // },
     // 点击节点选中
     nodeClickHandle(data) {
-      this.form.videoAreaId = data.areaName
+      this.form.videoAreaId = data.resourceName
       this.Id = data.id
       this.$refs.selectTree.blur()
     },
@@ -583,11 +588,13 @@ export default {
         })
       })
     },
+
     goback() {
-      if (this.$route.query.back === '1') {
-        this.$router.push({ path: '/equipment' })
+      this.$emit('changeIsShow', 'editEquipment', false)
+      if (this.$props.resType === '1') {
+        this.$emit('changeIsShow', 'registrationList', false)
       } else {
-        this.$router.push({ path: '/registrationList' })
+        this.$emit('changeIsShow', 'registrationList', true)
       }
     }
   }
@@ -645,6 +652,7 @@ export default {
   display: none !important;
 }
 .editEquipment-content {
+  height: 100%;
   .panel-header-box {
     margin: 0;
     padding: 0 16px;

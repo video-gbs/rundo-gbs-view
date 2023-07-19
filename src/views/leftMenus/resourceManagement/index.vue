@@ -1,166 +1,249 @@
 <template>
-  <div class="main" v-if="!isRegistrationListShow && !isEditEquipment">
-    <div class="panel-header-box">
-      <div class="panel-header-box-border">前端设备</div>
-    </div>
-    <div class="main-content">
-      <div class="securityArea_container">
-        <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow">
-            <svg-icon class="svg-btn" icon-class="add" />
-            <span class="btn-span">新增</span>
-          </el-button>
-          <el-button @click="dialogMoveShow">
-            <svg-icon class="svg-btn" icon-class="move" />
-            <span class="btn-span">移动</span>
-          </el-button>
-          <div v-if="isClickTreeSort" @click="treeSort(1)" class="sort_div">
-            <svg-icon class="svg-btn" icon-class="sort-b" />
-            <span class="btn-span">排序</span>
-          </div>
-          <div v-else @click="treeSort(2)" class="clicked-button sort_div">
-            <svg-icon class="svg-btn" icon-class="sort" />
-            <span class="btn-span">排序</span>
-          </div>
-          <el-button @click="deleteAccount($event)">
-            <svg-icon class="svg-btn" icon-class="del" />
-            <span class="btn-span">删除</span>
-          </el-button>
-        </div>
-        <leftTree
-          ref="deviceTree"
-          class="equipmentTree"
-          :treeData="treeList"
-          :isClickTreeSort="isClickTreeSort"
-          :defaultPropsName="areaNames"
-          @childClickHandle="childClickHandle"
-          @changeSort="changeSort"
-        />
-      </div>
-      <div
-        class="p10"
-        :class="!showSidebar ? 'right-table' : 'right-table-else'"
-      >
-        <el-tabs
-          v-model="activeName"
-          class="f1 f fd-c table-content"
-          type="border-card"
-          @tab-click="handleClick"
-        >
-          <el-tab-pane
-            label="编码器"
-            name="编码器"
-            class="encoder-pane pane-content"
-          >
-            <Encoder
-              ref="encoder"
-              :detailsId="deviceDetailsId"
-              :treeList="treeList"
-              @changeIsShow="changeIsShow"
-            />
-          </el-tab-pane>
-          <el-tab-pane
-            label="通道"
-            name="通道"
-            class="channel-pane pane-content"
-          >
-            <Channel
-              ref="channel"
-              :treeList="treeList"
-              :detailsId="channelDetailsId"
-            />
-          </el-tab-pane>
-        </el-tabs>
-      </div>
-    </div>
-    <el-dialog
-      v-if="editShow"
-      :title="dialog.title"
-      :visible.sync="dialog.show"
-      width="600px"
-      :before-close="handleClose"
+  <div class="main">
+    <div
+      style="height: 100%"
+      v-show="
+        !isRegistrationListShow &&
+        !isEditEquipment &&
+        !isAddEquipment &&
+        !isChannelDiscovery &&
+        !isEditChannel
+      "
     >
-      <div slot="title" class="dialog-title">
-        <LineFont
-          :line-title="lineTitle"
-          :text-style="textStyle"
-          :line-blue-style="lineBlueStyle"
-        />
+      <div class="panel-header-box">
+        <div class="panel-header-box-border">前端设备</div>
       </div>
-      <div>
-        <el-form
-          ref="accountForm"
-          class="params-form"
-          label-position="right"
-          label-width="auto"
-          :model="dialog.params"
-          :rules="dialogRules"
-          @keyup.enter="submit('accountForm')"
+      <div class="main-content">
+        <div class="securityArea_container">
+          <div class="btn-lists">
+            <el-button type="primary" @click="dialogShow">
+              <svg-icon class="svg-btn" icon-class="add" />
+              <span class="btn-span">新增</span>
+            </el-button>
+            <el-button @click="dialogMoveShow">
+              <svg-icon class="svg-btn" icon-class="move" />
+              <span class="btn-span">移动</span>
+            </el-button>
+            <div v-if="isClickTreeSort" @click="treeSort(1)" class="sort_div">
+              <svg-icon class="svg-btn" icon-class="sort-b" />
+              <span class="btn-span">排序</span>
+            </div>
+            <div v-else @click="treeSort(2)" class="clicked-button sort_div">
+              <svg-icon class="svg-btn" icon-class="sort" />
+              <span class="btn-span">排序</span>
+            </div>
+            <el-button @click="deleteAccount($event)">
+              <svg-icon class="svg-btn" icon-class="del" />
+              <span class="btn-span">删除</span>
+            </el-button>
+          </div>
+          <leftTree
+            ref="deviceTree"
+            class="equipmentTree"
+            :treeData="treeList"
+            :isClickTreeSort="isClickTreeSort"
+            :defaultPropsName="areaNames"
+            :hasEdit="hasEdit"
+            @childClickHandle="childClickHandle"
+            @changeSort="changeSort"
+            @editTree="editTree"
+          />
+        </div>
+        <div
+          class="p10"
+          :class="!showSidebar ? 'right-table' : 'right-table-else'"
         >
-          <el-form-item label="父节点名称" prop="resourcePid">
-            <el-select
-              ref="selectTree"
-              v-model="dialog.params.resourcePid"
-              placeholder="请选择"
-              :popper-append-to-body="false"
-              style="width: 436px"
-              class="selectTree"
+          <el-tabs
+            v-model="activeName"
+            class="f1 f fd-c table-content"
+            type="border-card"
+            @tab-click="handleClick"
+          >
+            <el-tab-pane
+              label="编码器"
+              name="编码器"
+              class="encoder-pane pane-content"
             >
-              <el-option :value="dialog.params.resourcePid">
-                <el-tree
-                  ref="dialogTree"
-                  class="unit-tree"
-                  :data="treeList"
-                  node-key="id"
-                  :props="defaultProps"
-                  :default-expanded-keys="Ids"
-                  highlight-current
-                  :expand-on-click-node="false"
-                  @node-click="nodeClickHandle"
-                ></el-tree>
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="通道名称" prop="name">
-            <el-input
-              v-model="dialog.params.name"
-              style="width: 436px"
-              clearable
-            ></el-input>
-          </el-form-item>
-        </el-form>
+              <Encoder
+                ref="encoder"
+                :detailsId="deviceDetailsId"
+                :treeList="treeList"
+                @changeIsShow="changeIsShow"
+              />
+            </el-tab-pane>
+            <el-tab-pane
+              label="通道"
+              name="通道"
+              class="channel-pane pane-content"
+            >
+              <Channel
+                ref="channel"
+                :treeList="treeList"
+                :detailsId="channelDetailsId"
+                @changeIsShow="changeIsShow"
+              />
+            </el-tab-pane>
+          </el-tabs>
+        </div>
       </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button
-          type="primary"
-          :loading="isClick"
-          @click="submit('accountForm')"
-          >确 定</el-button
-        >
-      </div>
-    </el-dialog>
+      <el-dialog
+        v-if="editShow"
+        :title="dialog.title"
+        :visible.sync="dialog.show"
+        width="600px"
+        :before-close="handleClose"
+      >
+        <div slot="title" class="dialog-title">
+          <LineFont
+            :line-title="lineTitle"
+            :text-style="textStyle"
+            :line-blue-style="lineBlueStyle"
+          />
+        </div>
+        <div>
+          <el-form
+            ref="accountForm"
+            class="params-form"
+            label-position="right"
+            label-width="auto"
+            :model="dialog.params"
+            :rules="dialogRules"
+            @keyup.enter="submit('accountForm')"
+          >
+            <el-form-item label="父节点名称" prop="resourcePid">
+              <el-select
+                ref="selectTree"
+                v-model="dialog.params.resourcePid"
+                placeholder="请选择"
+                :popper-append-to-body="false"
+                style="width: 436px"
+                class="selectTree"
+              >
+                <el-option :value="dialog.params.resourcePid">
+                  <el-tree
+                    ref="dialogTree"
+                    class="unit-tree"
+                    :data="treeList"
+                    node-key="id"
+                    :props="defaultProps"
+                    :default-expanded-keys="Ids"
+                    highlight-current
+                    :expand-on-click-node="false"
+                    @node-click="nodeClickHandle"
+                  ></el-tree>
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="通道名称" prop="name">
+              <el-input
+                v-model="dialog.params.name"
+                style="width: 436px"
+                clearable
+              ></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialog.show = false">取 消</el-button>
+          <el-button
+            type="primary"
+            :loading="isClick"
+            @click="submit('accountForm')"
+            >确 定</el-button
+          >
+        </div>
+      </el-dialog>
 
-    <moveTree
-      ref="moveTree"
-      :treeData="treeList"
-      :fatherId="fatherId"
-      :activeName="activeName"
+      <el-dialog
+        v-if="editShow1"
+        :title="dialog1.title"
+        :visible.sync="dialog1.show"
+        width="600px"
+        :before-close="handleClose"
+      >
+        <div slot="title" class="dialog-title">
+          <LineFont
+            :line-title="lineTitle1"
+            :text-style="textStyle"
+            :line-blue-style="lineBlueStyle"
+          />
+        </div>
+        <div>
+          <el-form
+            ref="accountForm"
+            class="params-form"
+            label-position="right"
+            label-width="auto"
+            :model="dialog1.params"
+            :rules="dialogRules1"
+            @keyup.enter="submit('accountForm')"
+          >
+            <el-form-item label="安防通道名称" prop="resourceName">
+              <el-input
+                v-model="dialog1.params.resourceName"
+                style="width: 436px"
+                clearable
+              ></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialog1.show = false">取 消</el-button>
+          <el-button
+            type="primary"
+            :loading="isClick1"
+            @click="submit1('accountForm')"
+            >确 定</el-button
+          >
+        </div>
+      </el-dialog>
+
+      <moveTree
+        ref="moveTree"
+        :treeData="treeList"
+        :fatherId="fatherId"
+        :deleteObj="deleteObj"
+        :activeName="activeName"
+        @init="init"
+      />
+    </div>
+
+    <RegistrationList
+      v-show="isRegistrationListShow"
+      ref="registrationList"
+      @changeIsShow="changeIsShow"
+      @init="init"
+    />
+
+    <AddEquipment
+      v-show="isAddEquipment"
+      ref="addEquipment"
+      @changeIsShow="changeIsShow"
+      @init="init"
+    />
+
+    <EditEquipment
+      v-show="isEditEquipment"
+      ref="editEquipment"
+      :editEquipmentRow="editEquipmentRow"
+      :resType="resType"
+      @changeIsShow="changeIsShow"
+      @init="init"
+    />
+    <EditChannel
+      v-show="isEditChannel"
+      ref="editChannel"
+      @changeIsShow="changeIsShow"
+      @init="init"
+    />
+
+    <ChannelDiscovery
+      v-show="isChannelDiscovery"
+      ref="channelDiscovery"
+      @changeIsShow="changeIsShow"
       @init="init"
     />
   </div>
-
-  <RegistrationList
-    v-else-if="isRegistrationListShow"
-    ref="registrationList"
-    @changeIsShow="changeIsShow"
-  />
-  <EditEquipment
-    v-else
-    ref="editEquipment"
-    :editEquipmentRow="editEquipmentRow"
-    @changeIsShow="changeIsShow"
-  />
 </template>
 
 <script>
@@ -171,6 +254,9 @@ import LineFont from '@/components/LineFont'
 import moveTree from './components/MoveTree'
 import RegistrationList from './components/RegistrationList'
 import EditEquipment from './components/EditEquipment'
+import AddEquipment from './components/AddEquipment'
+import ChannelDiscovery from './components/ChannelDiscovery'
+import EditChannel from './components/EditChannel'
 
 import {
   deviceVideoAreaList,
@@ -192,12 +278,20 @@ export default {
     LineFont,
     RegistrationList,
     EditEquipment,
+    AddEquipment,
+    ChannelDiscovery,
+    EditChannel,
     moveTree
   },
   data() {
     return {
       isRegistrationListShow: false,
       isEditEquipment: false,
+      isAddEquipment: false,
+      isChannelDiscovery: false,
+      isEditChannel: false,
+      editChannelRow: {},
+      hasEdit: true,
       editEquipmentRow: {},
       activeName: '编码器',
       treeList: [],
@@ -214,6 +308,10 @@ export default {
         title: '新建资源',
         notShowSmallTitle: false
       },
+      lineTitle1: {
+        title: '编辑安防通道资源',
+        notShowSmallTitle: false
+      },
       textStyle: {
         fontSize: '18px',
         fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
@@ -226,12 +324,22 @@ export default {
         height: '18px'
       },
       editShow: false,
+      editShow1: false,
       dialog: {
         show: false,
         title: '新建安防通道资源',
         params: {
           resourcePid: '',
           name: ''
+        }
+      },
+      dialog1: {
+        show: false,
+        title: '编辑安防通道资源',
+        params: {
+          resourceName: '',
+          resourceValue: '',
+          resourceKey: ''
         }
       },
       dialogRules: {
@@ -248,13 +356,27 @@ export default {
           trigger: 'change'
         }
       },
+      dialogRules1: {
+        resourceName: [
+          {
+            message: '此为必填项。',
+            required: true,
+            trigger: 'blur'
+          }
+        ]
+      },
       defaultProps: {
         children: 'childList',
         label: 'resourceName'
       },
       Id: '',
       fatherId: '',
-      isClick: false
+      isClick: false,
+      isClick1: false,
+      treeMsg: '',
+      isMore: false,
+      deleteObj: {},
+      resType: ''
     }
   },
   created() {
@@ -278,12 +400,19 @@ export default {
     }
   },
   methods: {
-    async init(name) {
+    async init(name, isMoved) {
       this.resTree1 = await channelVideoAreaList()
       this.resTree2 = await deviceVideoAreaList()
 
-      this.deviceDetailsId = this.resTree2.data.data.id
-      this.channelDetailsId = this.resTree1.data.data.id
+      if (!isMoved) {
+        this.deviceDetailsId = this.resTree2.data.data.id
+        this.channelDetailsId = this.resTree1.data.data.id
+
+        this.$refs.channel.getList(this.channelDetailsId)
+
+        this.$refs.encoder.getList(this.deviceDetailsId)
+      }
+
       if (this.activeName !== '编码器') {
         this.treeList = [this.resTree1.data.data]
         this.$refs.deviceTree.chooseId(this.channelDetailsId)
@@ -294,13 +423,29 @@ export default {
         this.fatherId = this.resTree2.data.data.id
       }
     },
-    changeIsShow(name, val, row) {
-      if (name === 'editEquipment') {
-        this.isEditEquipment = val
-        this.isRegistrationListShow = !val
-        this.editEquipmentRow = row
-      } else {
-        this.isRegistrationListShow = val
+    changeIsShow(name, val, row, type) {
+      switch (name) {
+        case 'registrationList':
+          this.isRegistrationListShow = val
+          break
+        case 'addEquipment':
+          this.isAddEquipment = val
+          break
+        case 'editChannel':
+          this.isEditChannel = val
+          this.editChannelRow = row
+          break
+
+        case 'editEquipment':
+          this.isEditEquipment = val
+          this.editEquipmentRow = row
+          this.resType = type
+          break
+        case 'channelDiscovery':
+          this.isChannelDiscovery = val
+          break
+        default:
+          break
       }
     },
     dialogShow() {
@@ -310,6 +455,16 @@ export default {
         name: ''
       }
       this.dialog.show = !this.dialog.show
+    },
+    editTree(data) {
+      console.log('data', data)
+      this.editShow1 = true
+      this.dialog1.params = {
+        resourceName: data.resourceName,
+        resourceValue: data.resourceValue,
+        resourceKey: data.resourceKey
+      }
+      this.dialog1.show = !this.dialog1.show
     },
     // 点击节点选中
     nodeClickHandle(data) {
@@ -341,7 +496,10 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        videoAreaDelete(this.deviceDetailsId)
+        videoAreaDelete({
+          resourceKey: this.deleteObj.resourceKey,
+          resourceValue: this.deleteObj.resourceValue
+        })
           .then((res) => {
             if (res.data.code === 0) {
               this.$message({
@@ -398,13 +556,50 @@ export default {
         }
       })
     },
+    submit1(formName) {
+      this.isClick1 = true
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          switch (this.dialog1.title) {
+            case '编辑安防通道资源':
+              videoAreaEdit(this.dialog1.params)
+                .then((res) => {
+                  if (res.data.code === 0) {
+                    this.$message({
+                      type: 'success',
+                      message: '编辑安防通道资源成功'
+                    })
+                    this.dialog1.show = false
+                    this.editShow1 = false
+                    this.isClick1 = false
+                  }
+                })
+                .catch((error) => {
+                  this.isClick1 = false
+                })
+              if (this.activeName !== '编码器') {
+                this.init('通道')
+                this.$refs.channel.getList()
+              } else {
+                this.init('编码器')
+                this.$refs.encoder.getList()
+              }
+
+              break
+            default:
+              break
+          }
+        }
+      })
+    },
     dialogMoveShow() {
       this.$refs.moveTree.changeMoveTreeShow()
     },
-    changeSort(val, id) {
+    changeSort(val, data) {
       if (val === 0) {
         videoAreaSort({
-          id,
+          resourceKey: data.resourceKey,
+          resourceValue: data.resourceValue,
           moveOp: val
         }).then((res) => {
           if (res.data.code === 0) {
@@ -418,11 +613,12 @@ export default {
               message: res.data.data
             })
           }
-          this.init(this.activeName)
+          this.init(this.activeName, true)
         })
       } else {
         videoAreaSort({
-          id,
+          resourceKey: data.resourceKey,
+          resourceValue: data.resourceValue,
           moveOp: val
         }).then((res) => {
           if (res.data.code === 0) {
@@ -436,13 +632,14 @@ export default {
               message: res.data.data
             })
           }
-          this.init(this.activeName)
+          this.init(this.activeName, true)
         })
       }
     },
     handleClose(done) {
       done()
     },
+
     treeSort(val) {
       if (val === 1) {
         this.isClickTreeSort = false
@@ -462,6 +659,7 @@ export default {
       }
     },
     childClickHandle(data) {
+      this.deleteObj = data
       this.fatherId = data.id
       if (this.activeName !== '编码器') {
         this.$refs.channel.getList(data.id)
@@ -469,6 +667,13 @@ export default {
       } else {
         this.$refs.encoder.getList(data.id)
         this.deviceDetailsId = data.id
+      }
+      if (data.childList && data.childList.length > 0) {
+        this.isMore = true
+        this.treeMsg = data.resourceName
+      } else {
+        this.isMore = false
+        this.treeMsg = data.resourceName
       }
     }
   }

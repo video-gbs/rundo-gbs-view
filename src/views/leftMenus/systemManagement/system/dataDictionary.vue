@@ -101,6 +101,7 @@
       />
     </div>
     <el-dialog
+      v-if="dialog.show"
       :title="dialog.title"
       :visible.sync="dialog.show"
       width="600px"
@@ -121,28 +122,28 @@
             <el-input
               v-model="dialog.params.groupName"
               clearable
-              :maxlength="15"
+              :maxlength="20"
             />
           </el-form-item>
           <el-form-item label="分组编码" prop="groupCode">
             <el-input
               v-model="dialog.params.groupCode"
               clearable
-              :maxlength="15"
+              :maxlength="20"
             />
           </el-form-item>
           <el-form-item label="字典项名称" prop="itemName">
             <el-input
               v-model="dialog.params.itemName"
               clearable
-              :maxlength="15"
+              :maxlength="20"
             />
           </el-form-item>
           <el-form-item label="字典项Value" prop="itemValue">
             <el-input
               v-model="dialog.params.itemValue"
               clearable
-              :maxlength="15"
+              :maxlength="20"
             />
           </el-form-item>
           <el-form-item label="字典项描述">
@@ -290,8 +291,8 @@ export default {
           { required: true, message: '请输入字典名称', trigger: 'change' },
           {
             min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
+            max: 20,
+            message: '长度在 3 到 20 个字符',
             trigger: 'change'
           }
         ],
@@ -299,8 +300,8 @@ export default {
           { required: true, message: '请输入字典项Value', trigger: 'change' },
           {
             min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
+            max: 20,
+            message: '长度在 3 到 20 个字符',
             trigger: 'change'
           }
         ],
@@ -308,8 +309,8 @@ export default {
           { required: true, message: '请输入字典编码', trigger: 'change' },
           {
             min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
+            max: 20,
+            message: '长度在 3 到 20 个字符',
             trigger: 'change'
           }
         ],
@@ -317,8 +318,8 @@ export default {
           { required: true, message: '请输入字典项名称', trigger: 'change' },
           {
             min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
+            max: 20,
+            message: '长度在 3 到 20 个字符',
             trigger: 'change'
           }
         ]

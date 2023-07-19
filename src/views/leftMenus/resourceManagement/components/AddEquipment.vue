@@ -256,10 +256,9 @@
 </template>
 
 <script>
-import { getVideoAraeTree } from '@/api/method/role'
-import { addEncoder } from '@/api/method/encoder'
+import { addEncoder, deviceVideoAreaList } from '@/api/method/encoder'
 import { getAllGatewayLists } from '@/api/method/moduleManagement'
-import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+import { getGroupDictLists } from '@/api/method/dictionary'
 export default {
   name: '',
   components: {},
@@ -336,8 +335,8 @@ export default {
       Id: '',
       resAreaName: '',
       defaultProps: {
-        children: 'children',
-        label: 'areaName'
+        children: 'childList',
+        label: 'resourceName'
       },
       allNorthTypeOptions: [],
       manufacturerTypeOptions: [],
@@ -402,16 +401,15 @@ export default {
   mounted() {
     this.init()
     this.getAllGatewayLists()
-    // this.getAllGatewayLists1()
     this.getManufacturerDictionaryList()
     this.getManufacturerDictionaryList1()
   },
   methods: {
     async init(id) {
-      await getVideoAraeTree()
+      await deviceVideoAreaList()
         .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
+          if (res.data.code === 0) {
+            this.treeList = [res.data.data]
           }
         })
         .catch((error) => {
@@ -419,9 +417,9 @@ export default {
         })
     },
     async getManufacturerDictionaryList() {
-      await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
+      await getGroupDictLists('EquipmentCompany').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
             let obj = {}
             obj.label = item.itemName
             obj.value = item.itemValue
@@ -431,9 +429,9 @@ export default {
       })
     },
     async getManufacturerDictionaryList1() {
-      await getManufacturerDictionaryList('TransportProtocol').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
+      await getGroupDictLists('TransportProtocol').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
             let obj1 = {}
             obj1.label = item.itemName
             obj1.value = item.itemValue
@@ -444,8 +442,8 @@ export default {
     },
     async getAllGatewayLists() {
       await getAllGatewayLists().then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
             let obj = {}
             obj.label = item.name
             obj.value = item.id
@@ -465,9 +463,9 @@ export default {
     },
     // 点击节点选中
     nodeClickHandle(data) {
-      this.form.videoAreaId = data.areaName
+      this.form.videoAreaId = data.resourceName
       this.Id = data.id
-      this.resAreaName = data.areaName
+      this.resAreaName = data.resourceName
       this.$refs.selectTree.blur()
     },
     save() {
@@ -482,12 +480,16 @@ export default {
         this.form.gatewayId = this.form.gatewayId.value
         addEncoder({ ...this.form, ...this.form1 })
           .then((res) => {
-            if (res.code === 0) {
+            if (res.data.code === 0) {
               this.$message({
                 type: 'success',
                 message: '新建成功'
               })
               this.goback()
+            } else {
+              this.form.deviceType = String(this.form.deviceType)
+              this.form.gatewayId = resGatewayId
+              this.form.videoAreaId = this.resAreaName
             }
           })
           .catch((error) => {
@@ -498,7 +500,7 @@ export default {
       })
     },
     goback() {
-      this.$router.push({ path: '/equipment' })
+      this.$emit('changeIsShow', 'addEquipment', false)
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="activeDiscovery-content">
+  <div class="channelDiscovery-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
@@ -8,7 +8,7 @@
         >
       </div>
     </div>
-    <div class="activeDiscovery-transfer">
+    <div class="channelDiscovery-transfer">
       <div class="securityArea_container">
         <leftTree
           :treeData="treeList"
@@ -109,7 +109,11 @@ import LineFont from '@/components/LineFont'
 import pagination from '@/components/Pagination/index.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 
-import { getFindChannelById, addChannel } from '@/api/method/channel'
+import {
+  getFindChannelById,
+  addChannel,
+  channelVideoAreaList
+} from '@/api/method/channel'
 
 import { getVideoAraeTree } from '@/api/method/role'
 
@@ -127,7 +131,7 @@ export default {
       selectedObj: {},
       selectedData: [],
       leftSearchName: '',
-      areaNames: 'areaNames',
+      areaNames: 'resourceName',
       selectedList: [],
       treeList: [],
       channelId: '',
@@ -176,10 +180,10 @@ export default {
   },
   methods: {
     async getVideoAraeTree() {
-      await getVideoAraeTree()
+      await channelVideoAreaList()
         .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
+          if (res.data.code === 0) {
+            this.treeList = [res.data.data]
           }
         })
         .catch((error) => {
@@ -237,12 +241,12 @@ export default {
         nameOrOriginId: this.leftSearchName
       })
         .then((res) => {
-          if (res.code === 0) {
-            this.tableData = res.data.records
+          if (res.data.code === 0) {
+            this.tableData = res.data.data.records
             this.handleRowSelection(this.tableData)
-            this.params.total = res.data.total
-            this.params.pages = res.data.pages
-            this.params.current = res.data.current
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.current
           }
         })
         .catch((error) => {
@@ -258,7 +262,7 @@ export default {
       this.init()
     },
     goback() {
-      this.$router.push({ path: '/equipment' })
+      this.$emit('changeIsShow', 'channelDiscovery', false)
     },
     //数组去重
     fn2(arr) {
@@ -303,7 +307,7 @@ export default {
           })
         })
         addChannel({ channelList, videoAreaId: this.channelId }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '添加通道成功'
@@ -431,8 +435,8 @@ export default {
 ::v-deep .contont .el-checkbox {
   display: block;
 }
-.activeDiscovery-content {
-  // height: 90%;
+.channelDiscovery-content {
+  height: 100%;
   .panel-header-box {
     margin: 0;
     padding: 0 20px;
@@ -464,7 +468,7 @@ export default {
     }
   }
 
-  .activeDiscovery-transfer {
+  .channelDiscovery-transfer {
     // display: flex;
     // justify-content: space-between;
     height: calc(100% - 106px);

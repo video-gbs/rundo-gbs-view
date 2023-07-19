@@ -493,9 +493,9 @@ export default {
           if (res.data.code === 0) {
             this.tableData = res.data.data.list
             this.handleRowSelection(this.tableData)
-            this.params.total = res.data.total
-            this.params.pages = res.data.pages
-            this.params.current = res.data.current
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.current
           }
         })
         .catch((error) => {

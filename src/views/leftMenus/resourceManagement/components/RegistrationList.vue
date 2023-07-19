@@ -275,11 +275,13 @@ export default {
       })
     },
     goback() {
-      this.$emit('changeIsShow', '', false)
+      this.$emit('changeIsShow', 'registrationList', false)
     },
+
     goAddRouter(row) {
-      this.$emit('changeIsShow', 'editEquipment', true, row)
+      this.$emit('changeIsShow', 'editEquipment', true, row, '2')
     },
+
     resetData(e) {
       this.searchParams = {
         deviceName: '',
@@ -371,6 +373,7 @@ export default {
   padding-bottom: 0;
 }
 .registrationList-content {
+  height: 100%;
   .panel-header-box {
     margin: 0;
     padding: 0 16px;

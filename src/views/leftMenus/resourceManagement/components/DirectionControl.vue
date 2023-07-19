@@ -366,7 +366,7 @@ export default {
         midPointX,
         midPointY
       }).then((res) => {
-        if (res.code === 0 && dragType === 2) {
+        if (res.data.code === 0 && dragType === 2) {
           this.lengthX = 0
           this.lengthY = 0
           this.midPointX = 0

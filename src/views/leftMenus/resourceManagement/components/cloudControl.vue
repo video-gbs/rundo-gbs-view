@@ -252,7 +252,7 @@ export default {
         channelExpansionId: this.resChannelId,
         presetId: this.nowPreset
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
         }
       })
     },
@@ -311,7 +311,7 @@ export default {
         presetId: this.nowPreset,
         presetName
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           if (this.nowPreset !== '') {
             this.nowPreset = presetName
           }
@@ -359,7 +359,7 @@ export default {
         presetId: this.nowPreset
       })
         .then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.optionLists = this.optionLists.filter((item) => {
               return item.presetId !== this.nowPreset
             })

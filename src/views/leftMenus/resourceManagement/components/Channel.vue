@@ -258,7 +258,7 @@ import {
   moveChannel
 } from '@/api/method/channel'
 
-import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+import { getGroupDictLists } from '@/api/method/dictionary'
 import { Local } from '@/utils/storage'
 
 export default {
@@ -340,16 +340,21 @@ export default {
   watch: {
     detailsId(newValue, oldValue) {
       this.resDetailsId = newValue
-
-      this.getList()
     },
     deep: true
   },
   created() {
     this.params.pageNum = Local.get('channelPageNum')
     Local.remove('channelPageNum')
+
+    this.getDeviceTypesDictionaryList()
+    this.getDeviceTypesDictionaryList1()
   },
-  mounted() {},
+  mounted() {
+    setTimeout(() => {
+      // this.getList()
+    }, 500)
+  },
   methods: {
     getList(orgId) {
       getChannelById({
@@ -389,7 +394,7 @@ export default {
         idList: this.idList,
         videoAreaId: this.dialogVideoAreaId
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.$message({
             type: 'success',
             message: '移动成功'
@@ -400,30 +405,30 @@ export default {
         }
       })
     },
-    // async getDeviceTypesDictionaryList() {
-    //   await getManufacturerDictionaryList('Appearance').then((res) => {
-    //     if (res.code === 0) {
-    //       res.data.map((item) => {
-    //         let obj = {}
-    //         obj.label = item.itemName
-    //         obj.value = item.itemValue
-    //         this.deviceTypesOptionsList.push(obj)
-    //       })
-    //     }
-    //   })
-    // },
-    // async getDeviceTypesDictionaryList1() {
-    //   await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
-    //     if (res.code === 0) {
-    //       res.data.map((item) => {
-    //         let obj = {}
-    //         obj.label = item.itemName
-    //         obj.value = item.itemValue
-    //         this.equipmentCompanyOptionsList.push(obj)
-    //       })
-    //     }
-    //   })
-    // },
+    async getDeviceTypesDictionaryList() {
+      await getGroupDictLists('Appearance').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.deviceTypesOptionsList.push(obj)
+          })
+        }
+      })
+    },
+    async getDeviceTypesDictionaryList1() {
+      await getGroupDictLists('EquipmentCompany').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.equipmentCompanyOptionsList.push(obj)
+          })
+        }
+      })
+    },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
       this.getList()
@@ -435,12 +440,13 @@ export default {
     editData(row) {
       Local.set('channelPageNum', this.params.pageNum)
       Local.set('equipmentActiveName', '通道')
-      this.$router.push({
-        path: `/editChannel`,
-        query: {
-          row: row
-        }
-      })
+      this.$emit('changeIsShow', 'editChannel', true, row)
+      // this.$router.push({
+      //   path: `/editChannel`,
+      //   query: {
+      //     row: row
+      //   }
+      // })
     },
     deploymentData() {
       this.dialogShow1 = true
@@ -466,7 +472,7 @@ export default {
           roleIds.push(item.id)
         })
         deleteChannels(roleIds).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -484,7 +490,7 @@ export default {
         type: 'warning'
       }).then(() => {
         deleteChannel(row.id).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -516,11 +522,13 @@ export default {
     cxData() {
       this.getList()
     },
+
     goChannelDiscovery() {
       Local.set('channelPageNum', this.params.pageNum)
       Local.set('equipmentActiveName', '通道')
-      this.$router.push(`/channelDiscovery`)
+      this.$emit('changeIsShow', 'channelDiscovery', true)
     },
+
     moveEquipment() {
       if (this.$refs.channelTable.selection.length === 0) {
         this.$message({

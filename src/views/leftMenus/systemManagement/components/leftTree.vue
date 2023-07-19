@@ -23,9 +23,9 @@
         :filter-node-method="filterNode"
       >
         <span slot-scope="{ node, data }" class="custom-tree-node">
-          <span>
+          <span @dblclick.stop="hasEdit ? nodeDbClick(data) : ''">
             <svg-icon
-              v-if="data.level === 1"
+              v-if="data.resourceType === 1"
               icon-class="tree1"
               class="tree1"
             />
@@ -44,12 +44,12 @@
               <svg-icon
                 icon-class="sortDown"
                 class="sort_down sort_btn"
-                @click="invokeSort(0, data.id)"
+                @click="invokeSort(0, data)"
               />
               <svg-icon
                 icon-class="sortUp"
                 class="sort_up sort_btn"
-                @click="invokeSort(1, data.id)"
+                @click="invokeSort(1, data)"
               />
             </div>
           </span>
@@ -81,6 +81,12 @@ export default {
         return true
       }
     },
+    hasEdit: {
+      type: Boolean,
+      default: function () {
+        return false
+      }
+    },
     defaultPropsName: {
       type: String,
       default: 'name'
@@ -102,8 +108,11 @@ export default {
       // data.icon = 'tree1'
       this.$emit('childClickHandle', data)
     },
-    invokeSort(val, id) {
-      this.$emit('changeSort', val, id)
+    invokeSort(val, data) {
+      this.$emit('changeSort', val, data)
+    },
+    nodeDbClick(data) {
+      this.$emit('editTree', data)
     },
     handleNodeClose(data) {
       // data.icon = 'tree2'

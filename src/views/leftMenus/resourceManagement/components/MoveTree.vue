@@ -83,6 +83,10 @@ export default {
       type: String,
       default: () => ''
     },
+    deleteObj: {
+      type: Object,
+      default: () => {}
+    },
     treeData: {
       type: Array,
       default: function () {
@@ -114,7 +118,7 @@ export default {
         height: '18px'
       },
       filterText: '',
-      childId: '',
+      tagResourceValue: '',
       isLoading: false
     }
   },
@@ -133,8 +137,9 @@ export default {
       this.isLoading = true
       // console.log('this.$props.fatherId', this.$props.fatherId)
       videoAreaMove({
-        id: this.$props.fatherId,
-        sectionPid: this.childId
+        presourceValue: this.tagResourceValue,
+        resourceKey: this.$props.deleteObj.resourceKey,
+        resourceValue: this.$props.deleteObj.resourceValue
       }).then((res) => {
         if (res.data.code === 0) {
           this.$message({
@@ -153,7 +158,7 @@ export default {
       })
     },
     handleNodeClick(data, index) {
-      this.childId = data.id
+      this.tagResourceValue = data.resourceValue
     },
     changeMoveTreeShow() {
       this.moveTreeShow = true
@@ -167,7 +172,7 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true
-      return data.orgName.indexOf(value) !== -1
+      return data.resourceName.indexOf(value) !== -1
     },
 
     // 拖拽事件 参数依次为：被拖拽节点对应的 Node、结束拖拽时最后进入的节点、被拖拽节点的放置位置（before、after、inner）、event

@@ -1,5 +1,5 @@
 <template>
-  <div class="activeDiscovery-content">
+  <div class="streamMediaAssociated-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back-svg" @click="goback" /><span
@@ -8,7 +8,7 @@
         >
       </div>
     </div>
-    <div class="activeDiscovery-transfer">
+    <div class="streamMediaAssociated-transfer">
       <div class="left-contnet">
         <div class="level" style="height: 100%">
           <!-- 左边框框 -->
@@ -587,7 +587,7 @@ export default {
 ::v-deep .contont .el-checkbox {
   display: block;
 }
-.activeDiscovery-content {
+.streamMediaAssociated-content {
   // height: 90%;
   .panel-header-box {
     margin: 0;
@@ -618,7 +618,7 @@ export default {
     }
   }
 
-  .activeDiscovery-transfer {
+  .streamMediaAssociated-transfer {
     height: calc(100% - 100px);
     margin: 20px;
     background: #ffffff;
