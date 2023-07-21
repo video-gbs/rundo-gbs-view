@@ -114,6 +114,10 @@
           fontWeight: 'bold',
           color: '#333333'
         }"
+        v-loading="tableLoading"
+        element-loading-text="加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="#fff"
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="80" align="center">
@@ -153,16 +157,11 @@
         <el-table-column prop="port" label="端口" width="80" />
         <el-table-column prop="manufacturer" label="设备厂家" width="100">
           <template slot-scope="scope">
-            <span
-              v-for="item in equipmentCompanyOptionsList"
-              :key="item.value"
-              >{{
-                item.value.toLowerCase() ===
-                scope.row.manufacturer.toLowerCase()
-                  ? item.label
-                  : ''
-              }}</span
-            >
+            <span v-for="item in manufacturerTypeOptions" :key="item.value">{{
+              item.value.toLowerCase() === scope.row.manufacturer.toLowerCase()
+                ? item.label
+                : ''
+            }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="onlineState" label="状态" width="80">
@@ -367,10 +366,15 @@ export default {
     treeList: {
       type: Array,
       default: () => []
+    },
+    manufacturerTypeOptions: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
     return {
+      tableLoading: true,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -427,8 +431,7 @@ export default {
       tableData: [],
       areaNames: 'resourceName',
       idList: [],
-      dialogVideoAreaId: '',
-      equipmentCompanyOptionsList: [],
+      dialogResourceValue: '',
       resDetailsId: ''
     }
   },
@@ -443,7 +446,6 @@ export default {
     Local.remove('encoderPageNum')
 
     this.getDeviceTypesDictionaryList()
-    this.getDeviceTypesDictionaryList1()
   },
   mounted() {
     setTimeout(() => {
@@ -452,21 +454,30 @@ export default {
   },
   methods: {
     async getList(id) {
-      console.log('this.resDetailsId', this.resDetailsId)
       await getEncoderById({
         pageNum: this.params.pageNum,
         pageSize: this.params.pageSize,
         videoAreaId: id ? id : this.resDetailsId,
         includeEquipment: this.includeEquipment,
         ...this.searchParams
-      }).then((res) => {
-        if (res.data.code === 0) {
-          this.tableData = res.data.data.records
-          this.params.total = res.data.data.total
-          this.params.pages = res.data.data.pages
-          this.params.current = res.data.data.current
-        }
       })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.tableData = res.data.data.records
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.current
+            this.tableLoading = false
+          } else {
+            this.tableLoading = false
+          }
+        })
+        .catch(() => {
+          this.tableLoading = false
+        })
+    },
+    changeTableLoading() {
+      this.tableLoading = true
     },
     async getDeviceTypesDictionaryList() {
       await getGroupDictLists('DeviceTypes').then((res) => {
@@ -476,18 +487,6 @@ export default {
             obj.label = item.itemName
             obj.value = item.itemValue
             this.deviceTypesOptionsList.push(obj)
-          })
-        }
-      })
-    },
-    async getDeviceTypesDictionaryList1() {
-      await getGroupDictLists('EquipmentCompany').then((res) => {
-        if (res.data.code === 0) {
-          res.data.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.equipmentCompanyOptionsList.push(obj)
           })
         }
       })
@@ -505,13 +504,13 @@ export default {
       }
     },
     childClickHandle(data) {
-      this.dialogVideoAreaId = data.id
+      this.dialogResourceValue = data.resourceValue
     },
 
     dialogMove() {
       moveEncoder({
         idList: this.idList,
-        videoAreaId: this.dialogVideoAreaId
+        presourceValue: this.dialogResourceValue
       }).then((res) => {
         if (res.data.code === 0) {
           this.$message({

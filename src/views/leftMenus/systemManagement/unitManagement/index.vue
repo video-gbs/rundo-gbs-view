@@ -1,28 +1,48 @@
 <template>
-  <div class="department_main">
+  <div class="department_main" v-if="isShow">
     <div class="panel-header-box f jc-sb ai-c fw-w">
       <div>部门管理</div>
     </div>
     <div class="main-content">
       <div class="securityArea_container">
         <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow">
+          <el-button
+            v-permission="['/rabc/section/add', 1]"
+            type="primary"
+            @click="dialogShow"
+          >
             <svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span>
           </el-button>
-          <el-button @click="dialogMoveShow">
+          <el-button
+            v-permission="['/rabc/section/move/fs', 3]"
+            @click="dialogMoveShow"
+          >
             <svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
-          <div v-if="isClickTreeSort" @click="treeSort(1)" class="sort_div">
+          <div
+            v-permission="['/rabc/section/move/bt', 3]"
+            v-if="isClickTreeSort"
+            @click="treeSort(1)"
+            class="sort_div"
+          >
             <svg-icon class="svg-btn" icon-class="sort-b" />
             <span class="btn-span">排序</span>
           </div>
-          <div v-else @click="treeSort(2)" class="clicked-button sort_div">
+          <div
+            v-permission="['/rabc/section/move/bt', 3]"
+            v-else
+            @click="treeSort(2)"
+            class="clicked-button sort_div"
+          >
             <svg-icon class="svg-btn" icon-class="sort" />
             <span class="btn-span">排序</span>
           </div>
-          <el-button @click="deleteAccount($event)">
+          <el-button
+            v-permission="['/rabc/section/delete', 4]"
+            @click="deleteAccount($event)"
+          >
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">删除</span>
           </el-button>
@@ -85,6 +105,7 @@
 
         <div class="dialog-footer">
           <el-button
+            v-permission="['/rabc/section/update', 3]"
             type="primary"
             :disabled="fatherName === '根节点'"
             @click="save('unitManagementForm')"
@@ -268,6 +289,7 @@ export default {
     }
 
     return {
+      isShow: false,
       lineTitle: {
         title: '新建部门',
         notShowSmallTitle: false
@@ -480,7 +502,6 @@ export default {
     },
 
     async init(id) {
-      console.log(111, id)
       await getUnitList()
         .then((res) => {
           if (res.data.code === 0) {
@@ -494,6 +515,9 @@ export default {
               resData = res.data.data
             }
             this.getUnitDetailsData(resData)
+            setTimeout(() => {
+              this.isShow = true
+            }, 100)
           }
         })
         .catch((error) => {

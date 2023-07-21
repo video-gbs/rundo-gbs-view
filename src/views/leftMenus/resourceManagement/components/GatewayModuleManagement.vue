@@ -4,14 +4,14 @@
       <div class="panel-header-box-border">网关管理</div>
     </div>
     <div class="main-content">
-      <div class="gatewayModuleManagement_container">
+      <!-- <div class="gatewayModuleManagement_container">
         <leftTree
           :treeData="treeList"
           @childClickHandle="childClickHandle"
           :defaultPropsName="areaNames"
           class="gatewayModuleManagementTree"
         />
-      </div>
+      </div> -->
       <div class="p10 right-table">
         <div class="table-list">
           <div class="table-content">
@@ -424,6 +424,7 @@ export default {
       this.init()
     },
     childClickHandle(data) {
+      console.log(data, 'childClickHandle')
       if (data.areaName === '网关模块') {
         this.$router.push({ path: '/gatewayModuleManagement' })
       } else {
@@ -653,7 +654,7 @@ export default {
     }
     .right-table {
       width: 100%;
-      margin: 6px 0 0 -10px;
+      margin: 10px;
       position: relative;
       .table-list {
         width: calc(100% - 0px);

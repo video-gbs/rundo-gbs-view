@@ -12,14 +12,14 @@
           @childClickHandle="childClickHandle"
         />
       </div>
-      <div class="right-table p10" v-if="!isClickedResourceBtn">
+      <div class="right-table p10" v-show="!isClickedResourceBtn">
         <FeatureApiTable
           ref="featureApiTable"
           :featureApiTableTreeData="treeData"
           @changeIsClickedResourceBtn="changeIsClickedResourceBtn"
         />
       </div>
-      <div class="right-table p10" v-else>
+      <div class="right-table p10" v-show="isClickedResourceBtn">
         <FeatureRrsourceTable
           ref="featureRrsourceTable"
           :funcId="funcId"
@@ -67,13 +67,19 @@ export default {
       await getMenuTree()
         .then((res) => {
           if (res.data.code === 0) {
-            this.isShow = true
-            this.treeData = [res.data.data]
-            this.$refs.featureApiTable.changeName(res.data.data)
-            const resId = Local.get('featureApiId')
-              ? Local.get('featureApiId')
-              : res.data.data.id
-            this.$refs.featureApiTable.getList(resId)
+            setTimeout(() => {
+              this.isShow = true
+            }, 100)
+            setTimeout(() => {
+              this.$nextTick(() => {
+                this.treeData = [res.data.data]
+                this.$refs.featureApiTable.changeName(res.data.data)
+                const resId = Local.get('featureApiId')
+                  ? Local.get('featureApiId')
+                  : res.data.data.id
+                this.$refs.featureApiTable.getList(resId)
+              })
+            }, 500)
           }
         })
         .catch((error) => {

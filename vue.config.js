@@ -1,8 +1,11 @@
 'use strict'
 const path = require('path')
+const webpack = require('webpack')
 const defaultSettings = require('./src/settings.js')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
+const productionGzipExtensions = ['js', 'css']
 // const px2rem = require('postcss-px2rem')
 // // 配置基本大小
 // const postcss = px2rem({
@@ -58,7 +61,7 @@ const urls = [
   //   proxy: '/api'
   // }
   // 测试新接口
-    {
+  {
     target: 'http://192.192.192.92:9090',
     proxy: '/rbac'
   }
@@ -85,7 +88,7 @@ function getProxys() {
       }
     }
   })
-  console.log('proxysproxysproxys',proxys)
+  console.log('proxysproxysproxys', proxys)
   return proxys
 }
 module.exports = {
@@ -107,6 +110,19 @@ module.exports = {
   configureWebpack: {
     name: name,
     plugins: [
+      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+      // 配置compression-webpack-plugin压缩
+      new CompressionWebpackPlugin({
+        algorithm: 'gzip',
+        test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
+        threshold: 10240,
+        minRatio: 0.8
+      }),
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 5,
+        minChunkSize: 100
+      }),
       new CopyWebpackPlugin([
         {
           from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml'

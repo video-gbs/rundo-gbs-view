@@ -167,6 +167,7 @@ export default {
   },
   created() {
     Local.set('permissionData', [])
+    Local.set('equipmentActiveName', '编码器')
   },
   mounted() {
     this.initMenuLists()

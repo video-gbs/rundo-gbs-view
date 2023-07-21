@@ -409,16 +409,16 @@ import TimePlayer from '../recordComponents/TimePlayer.vue'
 import TimePlayer1 from '../recordComponents/TimePlayer1.vue'
 import MonitorEquipmentGroup from './monitorEquipmentGroup'
 import DownloadVideoModal from '../recordComponents/DownloadVideoModal'
-import { channelVideoAreaList } from '@/api/method/channel'
 import { getPlaybackList } from '@/api/method/moduleManagement'
 import {
   getPlayBackUrlLists,
-  getChannelPlayList,
+  getChannelPlayBackList,
   playStop,
   pauseRecordView,
   resumeRecordView,
   speedRecordView,
-  getStreamInfo
+  getStreamInfo,
+  playVideoAreaListRecord
 } from '@/api/method/live'
 
 const ZOOM_TYPE = {
@@ -718,7 +718,7 @@ export default {
       }))
     },
     async init() {
-      await channelVideoAreaList()
+      await playVideoAreaListRecord()
         .then((res) => {
           if (res.data.code === 0) {
             this.treeList = [res.data.data]
@@ -996,7 +996,7 @@ export default {
             })
             return
           } else {
-            await getChannelPlayList(data.id)
+            await getChannelPlayBackList(data.id)
               .then((res) => {
                 if (res.data.code === 0) {
                   if (res.data.data && res.data.data.length > 0) {

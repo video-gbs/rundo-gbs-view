@@ -16,7 +16,7 @@
             placeholder="请选择"
           >
             <el-option
-              v-for="obj in deviceTypesOptionsList"
+              v-for="obj in resAppearanceTypeOptions"
               :key="obj.value"
               :label="obj.label"
               :value="obj.value"
@@ -110,6 +110,10 @@
           fontWeight: 'bold',
           color: '#333333'
         }"
+        v-loading="tableLoading"
+        element-loading-text="加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="#fff"
         @selection-change="handleSelectionChange"
       >
         <el-table-column
@@ -160,7 +164,7 @@
         <el-table-column prop="manufacturer" label="设备厂家" width="120">
           <template slot-scope="scope">
             <span
-              v-for="item in equipmentCompanyOptionsList"
+              v-for="item in resManufacturerTypeOptions"
               :key="item.value"
               >{{
                 item.value.toLowerCase() ===
@@ -272,10 +276,19 @@ export default {
     treeList: {
       type: Array,
       default: () => []
+    },
+    manufacturerTypeOptions: {
+      type: Array,
+      default: () => []
+    },
+    appearanceTypeOptions: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
     return {
+      tableLoading: true,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -324,7 +337,6 @@ export default {
           value: 1
         }
       ],
-      deviceTypesOptionsList: [],
       checked: false,
       dialogShow: false,
       dialogShow1: false,
@@ -332,23 +344,27 @@ export default {
       tableData: [],
       areaNames: 'areaNames',
       idList: [],
-      dialogVideoAreaId: '',
-      equipmentCompanyOptionsList: [],
-      resDetailsId: ''
+      dialogResourceValue: '',
+      resDetailsId: '',
+      resAppearanceTypeOptions: [],
+      resManufacturerTypeOptions: []
     }
   },
   watch: {
     detailsId(newValue, oldValue) {
       this.resDetailsId = newValue
     },
+    appearanceTypeOptions(newValue, oldValue) {
+      this.resAppearanceTypeOptions = newValue
+    },
+    manufacturerTypeOptions(newValue, oldValue) {
+      this.resManufacturerTypeOptions = newValue
+    },
     deep: true
   },
   created() {
     this.params.pageNum = Local.get('channelPageNum')
     Local.remove('channelPageNum')
-
-    this.getDeviceTypesDictionaryList()
-    this.getDeviceTypesDictionaryList1()
   },
   mounted() {
     setTimeout(() => {
@@ -363,15 +379,27 @@ export default {
         videoAreaId: orgId ? orgId : this.resDetailsId,
         includeEquipment: this.includeEquipment,
         ...this.searchParams
-      }).then((res) => {
-        if (res.data.code === 0) {
-          this.tableData = res.data.data.records
-          this.params.total = res.data.data.total
-          this.params.pages = res.data.data.pages
-          this.params.current = res.data.data.current
-        }
       })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.tableData = res.data.data.records
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.current
+            this.tableLoading = false
+          } else {
+            this.tableLoading = false
+          }
+        })
+        .catch(() => {
+          this.tableLoading = false
+        })
     },
+
+    changeTableLoading() {
+      this.tableLoading = true
+    },
+
     changeOrganization() {
       this.getList()
     },
@@ -387,12 +415,12 @@ export default {
       }
     },
     childClickHandle(data) {
-      this.dialogVideoAreaId = data.id
+      this.dialogResourceValue = data.resourceValue
     },
     dialogMove() {
       moveChannel({
         idList: this.idList,
-        videoAreaId: this.dialogVideoAreaId
+        presourceValue: this.dialogResourceValue
       }).then((res) => {
         if (res.data.code === 0) {
           this.$message({
@@ -402,30 +430,6 @@ export default {
           this.dialogShow = false
           this.params.pageNum = 1
           this.getList()
-        }
-      })
-    },
-    async getDeviceTypesDictionaryList() {
-      await getGroupDictLists('Appearance').then((res) => {
-        if (res.data.code === 0) {
-          res.data.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.deviceTypesOptionsList.push(obj)
-          })
-        }
-      })
-    },
-    async getDeviceTypesDictionaryList1() {
-      await getGroupDictLists('EquipmentCompany').then((res) => {
-        if (res.data.code === 0) {
-          res.data.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.equipmentCompanyOptionsList.push(obj)
-          })
         }
       })
     },

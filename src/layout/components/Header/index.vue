@@ -43,7 +43,7 @@
           <el-dropdown class trigger="click">
             <div class="user-info">
               <svg-icon icon-class="user2" class="user" />
-              <span class="fs14 mr10" v-if="isShowTopMenus">
+              <span class="fs14 mr10">
                 {{ userName || '佚名用户' }}
               </span>
               <i class="el-icon-caret-bottom" />
@@ -78,7 +78,7 @@ import { Local } from '@/utils/storage'
 import { logout, newLogout } from '@/api/method/user'
 import store from '@/store/index'
 
-// import { getHomeUser } from '@/api/method/home'
+import { getHomeFunc } from '@/api/method/home'
 
 // import { resetRouter } from '@/router/index'
 export default {
@@ -114,12 +114,11 @@ export default {
     changeRouterLists(newValue, oldValue) {}
   },
   created() {
-    this.userName = Local.get('rj_userName') || '佚名用户'
-    this.userName = this.userName.replace('"', '').replace('"', '')
     // this.getHomeUser()
   },
   mounted() {
-    // console.log('this.typeRouter~~~~~~~', this.typeRouter, this.routerLists)
+    this.userName = Local.get('rj_userName') || '佚名用户'
+    // this.userName = this.userName.replace('"', '').replace('"', '')
   },
   methods: {
     async getHomeUser() {
@@ -163,13 +162,19 @@ export default {
       } else {
         // store.dispatch('user/changeShowSidebar', true)
       }
-      console.log('data~~~~~~', data, resArray)
 
       resArray.map((item) => {
         if (item.name === data.name) {
           store.dispatch('user/changeSidebarRouter', item.children)
           store.dispatch('user/changeActiveIndex', item.path)
-          this.$router.push({ path: item.children[0].path })
+          getHomeFunc({ menuId: item.children[0].id }).then((res) => {
+            if (res.data.code === 0) {
+              console.log('data~~~~~~', data, resArray)
+              Local.set('permissionData', res.data.data)
+
+              this.$router.push({ path: item.children[0].path })
+            }
+          })
         }
       })
     }

@@ -212,7 +212,6 @@ export default {
         port: '',
         ip: ''
       },
-      treeList: [],
       List: '',
       Ids: [],
       Id: '',
@@ -279,6 +278,7 @@ export default {
     },
 
     goAddRouter(row) {
+      this.$emit('changeIsShow', 'registrationList', false)
       this.$emit('changeIsShow', 'editEquipment', true, row, '2')
     },
 

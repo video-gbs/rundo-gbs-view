@@ -120,6 +120,7 @@ import { getVideoAraeTree } from '@/api/method/role'
 export default {
   name: '',
   components: { LineFont, pagination, leftTree },
+  props: ['treeList'],
   data() {
     return {
       form: {},
@@ -133,7 +134,7 @@ export default {
       leftSearchName: '',
       areaNames: 'resourceName',
       selectedList: [],
-      treeList: [],
+      // treeList: [],
       channelId: '',
       tableData: [
         {
@@ -176,20 +177,20 @@ export default {
   },
   mounted() {
     this.init()
-    this.getVideoAraeTree()
+    // this.getVideoAraeTree()
   },
   methods: {
-    async getVideoAraeTree() {
-      await channelVideoAreaList()
-        .then((res) => {
-          if (res.data.code === 0) {
-            this.treeList = [res.data.data]
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
+    // async getVideoAraeTree() {
+    //   await channelVideoAreaList()
+    //     .then((res) => {
+    //       if (res.data.code === 0) {
+    //         this.treeList = [res.data.data]
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.log(error)
+    //     })
+    // },
 
     handleSelectChange(selection) {
       // 全选取消，删除当前页所有数据

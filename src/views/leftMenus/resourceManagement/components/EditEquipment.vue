@@ -274,6 +274,24 @@ export default {
         return []
       }
     },
+    transportProtocolTypeOptions: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
+    manufacturerTypeOptions: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
+    treeList: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
     editEquipmentRow: {
       type: Object,
       default: function () {
@@ -288,6 +306,7 @@ export default {
   watch: {
     editEquipmentRow(newValue, oldValue) {
       this.resEditEquipmentRow = newValue
+      console.log(this.resEditEquipmentRow, 9999)
 
       const {
         model,
@@ -301,9 +320,17 @@ export default {
         longitude,
         port,
         ip,
-        gatewayId,
-        deviceId
+        gatewayId
       } = this.resEditEquipmentRow
+      this.form.deviceId =
+        this.$props.resType === '1'
+          ? this.resEditEquipmentRow.deviceId
+          : this.resEditEquipmentRow.originId
+      this.form.name =
+        this.$props.resType === '1'
+          ? this.resEditEquipmentRow.name
+          : this.resEditEquipmentRow.deviceName
+
       this.form1.ip = ip
       this.form1.transport = transport
       this.form1.latitude = latitude
@@ -317,9 +344,9 @@ export default {
       this.form.deviceType = deviceType + ''
       this.form.gatewayId = String(gatewayId)
       this.editId = this.$props.editEquipmentRow.id
-      // this.form.videoAreaId=videoAreaId
+      this.form.videoAreaId = videoAreaId
       this.$nextTick(() => {
-        this.getTreeName(this.treeList, videoAreaId)
+        this.getTreeName(this.$props.treeList, videoAreaId)
         this.form.videoAreaId = this.resName
       })
 
@@ -377,6 +404,7 @@ export default {
     }
     return {
       resEditEquipmentRow: {},
+      pResourceValue: '',
       form: {
         model: '',
         username: '',
@@ -385,7 +413,8 @@ export default {
         videoAreaId: '',
         name: '',
         password: '',
-        gatewayId: ''
+        gatewayId: '',
+        deviceId: ''
       },
       form1: {
         ip: '',
@@ -394,7 +423,7 @@ export default {
         longitude: '',
         port: ''
       },
-      treeList: [],
+      // treeList: [],
       List: '',
       Ids: [],
       Id: '',
@@ -406,8 +435,6 @@ export default {
         label: 'resourceName'
       },
       allNorthTypeOptions: [],
-      manufacturerTypeOptions: [],
-      transportProtocolTypeOptions: [],
       rules: {
         name: {
           required: true,
@@ -467,58 +494,20 @@ export default {
   },
   created() {},
   mounted() {
-    this.init()
     this.getAllGatewayLists()
-    // this.getAllGatewayLists1()
-    this.getManufacturerDictionaryList()
-    this.getManufacturerDictionaryList1()
   },
   methods: {
     getTreeName(arr, id) {
       arr.map((item) => {
         if (item.id === id) {
-          this.resName = item.areaName
+          this.resName = item.resourceName
+          this.pResourceValue = item.resourceValue
           this.Id = id
           return
         } else {
-          if (item.children && item.children.length > 0) {
-            this.getTreeName(item.children, id)
+          if (item.childList && item.childList.length > 0) {
+            this.getTreeName(item.childList, id)
           }
-        }
-      })
-    },
-    async init(id) {
-      await channelVideoAreaList()
-        .then((res) => {
-          if (res.data.code === 0) {
-            this.treeList = [res.data.data]
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
-    async getManufacturerDictionaryList() {
-      await getGroupDictLists('EquipmentCompany').then((res) => {
-        if (res.data.code === 0) {
-          res.data.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.manufacturerTypeOptions.push(obj)
-          })
-        }
-      })
-    },
-    async getManufacturerDictionaryList1() {
-      await getGroupDictLists('TransportProtocol').then((res) => {
-        if (res.data.code === 0) {
-          res.data.data.map((item) => {
-            let obj1 = {}
-            obj1.label = item.itemName
-            obj1.value = item.itemValue
-            this.transportProtocolTypeOptions.push(obj1)
-          })
         }
       })
     },
@@ -554,6 +543,7 @@ export default {
     // 点击节点选中
     nodeClickHandle(data) {
       this.form.videoAreaId = data.resourceName
+      this.pResourceValue = data.resourceValue
       this.Id = data.id
       this.$refs.selectTree.blur()
     },
@@ -567,16 +557,17 @@ export default {
         this.form.deviceType = Number(this.form.deviceType)
         editEncoder({
           deviceId:
-            this.$route.query.back === '1'
+            this.$props.resType === '1'
               ? this.$props.editEquipmentRow.deviceId
               : this.$props.editEquipmentRow.originId,
           id:
-            this.$route.query.back === '1'
+            this.$props.resType === '1'
               ? this.$props.editEquipmentRow.id
               : this.$props.editEquipmentRow.deviceId,
           onlineState: this.$props.editEquipmentRow.onlineState,
           ...this.form,
-          ...this.form1
+          ...this.form1,
+          pResourceValue: this.pResourceValue
         }).then((res) => {
           if (res.data.code === 0) {
             this.$message({
@@ -592,9 +583,11 @@ export default {
     goback() {
       this.$emit('changeIsShow', 'editEquipment', false)
       if (this.$props.resType === '1') {
+        this.$emit('init', '编码器', true)
         this.$emit('changeIsShow', 'registrationList', false)
       } else {
         this.$emit('changeIsShow', 'registrationList', true)
+        this.$emit('invokeRegistrationList')
       }
     }
   }

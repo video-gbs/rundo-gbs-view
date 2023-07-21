@@ -1,5 +1,5 @@
 <template>
-  <div class="main" v-if="!isUserAddShow && !isUserEditShow">
+  <div class="main" v-if="!isUserAddShow && !isUserEditShow && isShow">
     <div class="panel-header-box">
       <div class="panel-header-box-border">用户管理</div>
     </div>
@@ -46,6 +46,7 @@ export default {
     return {
       isUserAddShow: false,
       isUserEditShow: false,
+      isShow: false,
       userEditRow: {},
       treeData: [],
       defaultProps: {
@@ -75,7 +76,14 @@ export default {
             const resId = Local.get('newUserId')
               ? Local.get('newUserId')
               : res.data.data.id
-            this.$refs.encoder.getList(resId)
+            setTimeout(() => {
+              this.isShow = true
+            }, 100)
+            setTimeout(() => {
+              this.$nextTick(() => {
+                this.$refs.encoder.getList(resId)
+              })
+            }, 500)
           }
         })
         .catch((error) => {

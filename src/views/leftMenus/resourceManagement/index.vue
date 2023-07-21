@@ -68,6 +68,7 @@
                 ref="encoder"
                 :detailsId="deviceDetailsId"
                 :treeList="treeList"
+                :manufacturerTypeOptions="manufacturerTypeOptions"
                 @changeIsShow="changeIsShow"
               />
             </el-tab-pane>
@@ -80,6 +81,8 @@
                 ref="channel"
                 :treeList="treeList"
                 :detailsId="channelDetailsId"
+                :manufacturerTypeOptions="manufacturerTypeOptions"
+                :appearanceTypeOptions="appearanceTypeOptions"
                 @changeIsShow="changeIsShow"
               />
             </el-tab-pane>
@@ -218,6 +221,9 @@
     <AddEquipment
       v-show="isAddEquipment"
       ref="addEquipment"
+      :treeList="treeList"
+      :manufacturerTypeOptions="manufacturerTypeOptions"
+      :transportProtocolTypeOptions="transportProtocolTypeOptions"
       @changeIsShow="changeIsShow"
       @init="init"
     />
@@ -226,13 +232,20 @@
       v-show="isEditEquipment"
       ref="editEquipment"
       :editEquipmentRow="editEquipmentRow"
+      :treeList="treeList"
       :resType="resType"
+      :manufacturerTypeOptions="manufacturerTypeOptions"
+      :transportProtocolTypeOptions="transportProtocolTypeOptions"
       @changeIsShow="changeIsShow"
+      @invokeRegistrationList="invokeRegistrationList"
       @init="init"
     />
     <EditChannel
       v-show="isEditChannel"
       ref="editChannel"
+      :treeList="treeList"
+      :editChannelRow="editChannelRow"
+      :appearanceTypeOptions="appearanceTypeOptions"
       @changeIsShow="changeIsShow"
       @init="init"
     />
@@ -240,6 +253,7 @@
     <ChannelDiscovery
       v-show="isChannelDiscovery"
       ref="channelDiscovery"
+      :treeList="treeList"
       @changeIsShow="changeIsShow"
       @init="init"
     />
@@ -266,7 +280,7 @@ import {
   videoAreaDelete
 } from '@/api/method/encoder'
 import { channelVideoAreaList } from '@/api/method/channel'
-
+import { getGroupDictLists } from '@/api/method/dictionary'
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
 export default {
@@ -376,7 +390,10 @@ export default {
       treeMsg: '',
       isMore: false,
       deleteObj: {},
-      resType: ''
+      resType: '',
+      manufacturerTypeOptions: [],
+      transportProtocolTypeOptions: [],
+      appearanceTypeOptions: []
     }
   },
   created() {
@@ -387,7 +404,11 @@ export default {
 
     this.init('编码器')
   },
-  mounted() {},
+  mounted() {
+    this.getEquipmentCompanyDictionaryList()
+    this.getTransportProtocolDictionaryList()
+    this.getAppearanceDictionaryList()
+  },
   computed: {
     ...mapGetters(['rightWidth', 'showSidebar']),
     hasChangeRightWidth() {
@@ -401,27 +422,65 @@ export default {
   },
   methods: {
     async init(name, isMoved) {
-      this.resTree1 = await channelVideoAreaList()
-      this.resTree2 = await deviceVideoAreaList()
-
-      if (!isMoved) {
-        this.deviceDetailsId = this.resTree2.data.data.id
-        this.channelDetailsId = this.resTree1.data.data.id
-
-        this.$refs.channel.getList(this.channelDetailsId)
-
-        this.$refs.encoder.getList(this.deviceDetailsId)
-      }
-
       if (this.activeName !== '编码器') {
+        this.resTree1 = await channelVideoAreaList()
         this.treeList = [this.resTree1.data.data]
-        this.$refs.deviceTree.chooseId(this.channelDetailsId)
         this.fatherId = this.resTree1.data.data.id
+        if (!isMoved) {
+          this.channelDetailsId = this.resTree1.data.data.id
+
+          this.$refs.channel.getList(this.channelDetailsId)
+        }
+
+        this.$refs.deviceTree.chooseId(this.channelDetailsId)
       } else {
+        this.resTree2 = await deviceVideoAreaList()
         this.treeList = [this.resTree2.data.data]
-        this.$refs.deviceTree.chooseId(this.deviceDetailsId)
         this.fatherId = this.resTree2.data.data.id
+        if (!isMoved) {
+          this.deviceDetailsId = this.resTree2.data.data.id
+
+          this.$refs.encoder.getList(this.deviceDetailsId)
+        }
+
+        this.$refs.deviceTree.chooseId(this.deviceDetailsId)
       }
+    },
+    async getEquipmentCompanyDictionaryList() {
+      await getGroupDictLists('EquipmentCompany').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.manufacturerTypeOptions.push(obj)
+          })
+        }
+      })
+    },
+    async getTransportProtocolDictionaryList() {
+      await getGroupDictLists('TransportProtocol').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
+            let obj1 = {}
+            obj1.label = item.itemName
+            obj1.value = item.itemValue
+            this.transportProtocolTypeOptions.push(obj1)
+          })
+        }
+      })
+    },
+    async getAppearanceDictionaryList() {
+      await getGroupDictLists('Appearance').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.appearanceTypeOptions.push(obj)
+          })
+        }
+      })
     },
     changeIsShow(name, val, row, type) {
       switch (name) {
@@ -647,15 +706,20 @@ export default {
         this.isClickTreeSort = true
       }
     },
+    // 调用兄弟组件方法
+    invokeRegistrationList() {
+      this.$refs.registrationList.init()
+    },
     handleClick(val, event) {
-      console.log(val)
       this.activeName = val.label
+
+      this.init(this.activeName, false)
       if (this.activeName !== '编码器') {
-        this.treeList = [this.resTree1.data.data]
         this.$refs.deviceTree.chooseId(this.channelDetailsId)
+        this.$refs.channel.changeTableLoading()
       } else {
-        this.treeList = [this.resTree2.data.data]
         this.$refs.deviceTree.chooseId(this.deviceDetailsId)
+        this.$refs.encoder.changeTableLoading()
       }
     },
     childClickHandle(data) {

@@ -257,11 +257,16 @@
 
 <script>
 import { addEncoder, deviceVideoAreaList } from '@/api/method/encoder'
-import { getAllGatewayLists } from '@/api/method/moduleManagement'
 import { getGroupDictLists } from '@/api/method/dictionary'
+import { getAllGatewayLists } from '@/api/method/moduleManagement'
 export default {
   name: '',
   components: {},
+  props: [
+    'treeList',
+    'manufacturerTypeOptions',
+    'transportProtocolTypeOptions'
+  ],
   data() {
     const checkName = (rule, value, cb) => {
       const regName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
@@ -329,7 +334,7 @@ export default {
         ip: ''
       },
       isRequired: true,
-      treeList: [],
+      // treeList: [],
       List: '',
       Ids: [],
       Id: '',
@@ -339,8 +344,6 @@ export default {
         label: 'resourceName'
       },
       allNorthTypeOptions: [],
-      manufacturerTypeOptions: [],
-      transportProtocolTypeOptions: [],
       rules: {
         name: {
           required: true,
@@ -399,47 +402,9 @@ export default {
     }
   },
   mounted() {
-    this.init()
     this.getAllGatewayLists()
-    this.getManufacturerDictionaryList()
-    this.getManufacturerDictionaryList1()
   },
   methods: {
-    async init(id) {
-      await deviceVideoAreaList()
-        .then((res) => {
-          if (res.data.code === 0) {
-            this.treeList = [res.data.data]
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
-    async getManufacturerDictionaryList() {
-      await getGroupDictLists('EquipmentCompany').then((res) => {
-        if (res.data.code === 0) {
-          res.data.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.manufacturerTypeOptions.push(obj)
-          })
-        }
-      })
-    },
-    async getManufacturerDictionaryList1() {
-      await getGroupDictLists('TransportProtocol').then((res) => {
-        if (res.data.code === 0) {
-          res.data.data.map((item) => {
-            let obj1 = {}
-            obj1.label = item.itemName
-            obj1.value = item.itemValue
-            this.transportProtocolTypeOptions.push(obj1)
-          })
-        }
-      })
-    },
     async getAllGatewayLists() {
       await getAllGatewayLists().then((res) => {
         if (res.data.code === 0) {
@@ -500,6 +465,7 @@ export default {
       })
     },
     goback() {
+      this.$emit('init', '编码器', true)
       this.$emit('changeIsShow', 'addEquipment', false)
     }
   }

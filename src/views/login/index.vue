@@ -214,7 +214,7 @@ export default {
   mounted() {
     this.windowWidth = document.documentElement.clientWidth
     window.onresize = this.throttle(this.setScale, 500, 500)
-    this.initMap()
+    // this.initMap()
     Local.set('permissionData', [])
     Local.set('rj_userName', '')
   },
@@ -224,6 +224,8 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             Local.set('rj_userName', res.data.data.username)
+
+            this.$router.push({ path: '/workTable' })
           }
         })
         .catch((error) => {
@@ -324,7 +326,6 @@ export default {
           Local.set('refresh_token', refreshToken)
           Local.set('expires_in', expiresIn)
           Local.set('token_type', tokenType)
-          this.$router.push({ path: '/workTable' })
 
           this.loading = false
         })

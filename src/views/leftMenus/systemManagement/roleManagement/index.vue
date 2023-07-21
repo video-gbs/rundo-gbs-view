@@ -1,7 +1,7 @@
 <template>
   <div
     class="role_container"
-    v-if="!isClickedUserDiscovery && !isClickedCreatingRole"
+    v-if="!isClickedUserDiscovery && !isClickedCreatingRole && isShow"
   >
     <div class="panel-header-box">
       <div class="panel-header-box-border">角色管理</div>
@@ -62,11 +62,18 @@
     <div class="table-list">
       <div class="table-content-top">
         <div class="btn-lists">
-          <el-button @click="deteleAll($event)" style="width: 100px" plain
+          <el-button
+            v-permission="['/rbac/role/batch/delete', 4]"
+            @click="deteleAll($event)"
+            style="width: 100px"
+            plain
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span>
           </el-button>
-          <el-button type="primary" @click="changeIsClicked('creatingRole', 1)"
+          <el-button
+            v-permission="['/rbac/role/add', 2]"
+            type="primary"
+            @click="changeIsClicked('creatingRole', 1)"
             ><svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新建</span></el-button
           >
@@ -106,6 +113,7 @@
         <el-table-column prop="disabled" label="启用状态" width="80">
           <template slot-scope="scope">
             <el-switch
+              v-permission="['/rbac/role/update/disabled', 3]"
               v-model="scope.row.disabled"
               active-color="#13ce66"
               inactive-color="#ff4949"
@@ -119,16 +127,21 @@
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
             <el-button
+              v-permission="['/rbac/role/associate', 2]"
               type="text"
               @click="changeIsClicked('userDiscovery', 1, scope.row)"
               >关联用户
             </el-button>
             <el-button
+              v-permission="['/rbac/role/update', 3]"
               type="text"
               @click="changeIsClicked('creatingRole', 2, scope.row)"
               >编辑</el-button
             >
-            <el-button type="text" @click="deleteRole(scope.row)"
+            <el-button
+              v-permission="['/rbac/role/batch/delete', 4]"
+              type="text"
+              @click="deleteRole(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -150,7 +163,7 @@
     @getList="getList"
   />
   <UserDiscovery
-    v-else
+    v-else-if="isClickedUserDiscovery"
     ref="userDiscovery"
     :userDiscoveryRow="userDiscoveryRow"
     @changeIsClicked="changeIsClicked"
@@ -177,6 +190,7 @@ export default {
   components: { pagination, CreatingRole, UserDiscovery },
   data() {
     return {
+      isShow: false,
       search: {
         userName: '',
         phone: '',
@@ -406,6 +420,10 @@ export default {
           this.params.total = res.data.data.total
           this.params.pages = res.data.data.pages
           this.params.current = res.data.data.current
+
+          setTimeout(() => {
+            this.isShow = true
+          }, 100)
         }
       })
     },

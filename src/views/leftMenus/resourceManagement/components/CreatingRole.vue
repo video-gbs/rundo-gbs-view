@@ -908,6 +908,29 @@ export default {
     padding-top: 0;
   }
 }
+
+// 滚动条大小设置
+::v-deep .role_featureApiTable::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .role_featureApiTable::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .role_featureApiTable::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .role_featureApiTable::-webkit-scrollbar-corner {
+  background-color: #111;
+}
 .btn-lists-top {
   position: absolute;
   left: 110px;
@@ -990,6 +1013,7 @@ export default {
         // justify-content: flex-start;
         .role_featureApiTable {
           width: calc(100% - 300px);
+          overflow-y: auto;
         }
       }
     }

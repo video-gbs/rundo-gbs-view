@@ -4,14 +4,14 @@
       <div class="panel-header-box-border">流媒体调度服务模块</div>
     </div>
     <div class="main-content">
-      <div class="moduleManagement_container">
+      <!-- <div class="moduleManagement_container">
         <leftTree
           :treeData="treeList"
           @childClickHandle="childClickHandle"
           :defaultPropsName="areaNames"
           class="moduleManagementTree"
         />
-      </div>
+      </div> -->
       <div class="p10 right-table">
         <div class="table-list">
           <div class="table-content">
@@ -487,7 +487,7 @@ export default {
     }
     .right-table {
       width: 100%;
-      margin: 6px 0 0 -10px;
+      margin: 10px;
       position: relative;
       .table-list {
         width: calc(100% - 0px);

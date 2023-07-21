@@ -331,8 +331,11 @@ import monitorEquipmentGroup from './components/monitorEquipmentGroup.vue'
 import cloudControl from './components/cloudControl.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 
-import { getPlayLists, getChannelPlayList } from '@/api/method/live'
-import { channelVideoAreaList } from '@/api/method/channel'
+import {
+  getPlayLists,
+  getChannelPlayList,
+  playVideoAreaList
+} from '@/api/method/live'
 import { Local } from '@/utils/storage'
 import { ptzPresetLists } from '@/api/method/live'
 
@@ -593,7 +596,7 @@ export default {
   },
   methods: {
     async init() {
-      await channelVideoAreaList()
+      await playVideoAreaList()
         .then((res) => {
           if (res.data.code === 0) {
             this.treeList = [res.data.data]

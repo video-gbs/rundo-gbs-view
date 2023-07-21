@@ -1,5 +1,5 @@
 <template>
-  <div class="encoder-content">
+  <div class="encoder-content" v-if="isShow">
     <div class="search">
       <el-form
         ref="query"
@@ -39,11 +39,18 @@
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deteleAll($event)" style="width: 100px" plain
+          <el-button
+            v-permission="['/rbac/user/batch/delete', 4]"
+            @click="deteleAll($event)"
+            style="width: 100px"
+            plain
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span></el-button
           >
-          <el-button type="primary" @click="addEquipment('add')"
+          <el-button
+            v-permission="['/rbac/user/add', 2]"
+            type="primary"
+            @click="addEquipment('add')"
             ><svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span></el-button
           >
@@ -101,6 +108,7 @@
         <el-table-column prop="disabled" label="启用状态" width="120">
           <template slot-scope="scope">
             <el-switch
+              v-permission="['/rbac/user/update/disabled', 3]"
               v-model="scope.row.disabled"
               active-color="#13ce66"
               inactive-color="#ff4949"
@@ -113,11 +121,17 @@
         </el-table-column>
         <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editEquipment('edit', scope.row)"
+            <el-button
+              v-permission="['/rbac/user/update', 2]"
+              type="text"
+              @click="editEquipment('edit', scope.row)"
               >编辑
             </el-button>
 
-            <el-button type="text" @click="deleteUser(scope.row)"
+            <el-button
+              v-permission="['/rbac/user/batch/delete', 4]"
+              type="text"
+              @click="deleteUser(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -150,6 +164,7 @@ export default {
   components: { pagination },
   data() {
     return {
+      isShow: false,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -186,6 +201,10 @@ export default {
           this.params.total = res.data.data.total
           this.params.pages = res.data.data.pageNum
           this.params.current = res.data.data.pageSize
+
+          setTimeout(() => {
+            this.isShow = true
+          }, 100)
         } else {
           this.$message({
             type: 'warning',

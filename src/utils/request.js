@@ -216,7 +216,7 @@ service.interceptors.response.use(
           init.openMessage(`连接错误${err.response.status}`)
       }
     } else {
-      // init.openMessage('连接服务器失败')
+      init.openMessage(err.response.msg)
     }
     return Promise.resolve(err.response)
   }

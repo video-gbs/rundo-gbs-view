@@ -191,10 +191,10 @@
 </template>
 
 <script>
-import { getVideoAraeTree } from '@/api/method/role'
 import { editChannel } from '@/api/method/encoder'
+import { channelVideoAreaList } from '@/api/method/channel'
 import { getAllNorthLists } from '@/api/method/moduleManagement'
-import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+import { getGroupDictLists } from '@/api/method/dictionary'
 export default {
   name: '',
   components: {},
@@ -203,6 +203,24 @@ export default {
       type: Array,
       default: function () {
         return []
+      }
+    },
+    appearanceTypeOptions: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
+    treeList: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
+    editChannelRow: {
+      type: Object,
+      default: function () {
+        return {}
       }
     }
   },
@@ -239,19 +257,20 @@ export default {
         height: '',
         installTime: ''
       },
-      treeList: [],
+      // treeList: [],
       List: '',
       Ids: [],
       Id: '',
       editId: '',
       resName: '',
+      pResourceValue: '',
       defaultProps: {
-        children: 'children',
-        label: 'areaName'
+        children: 'childList',
+        label: 'resourceName'
       },
+      resEditChannelRow: {},
       channelTypeOptions: [],
       towardTypeOptions: [],
-      appearanceTypeOptions: [],
       rules: {
         channelType: [
           { required: true, message: '此为必填项。', trigger: 'change' }
@@ -299,72 +318,81 @@ export default {
       }
     }
   },
-  created() {
-    const {
-      channelCode,
-      channelName,
-      channelType,
-      videoAreaId,
-      gb28181Code,
-      longitude,
-      latitude,
-      faceLocation,
-      ptzType,
-      installLocation,
-      height,
-      installTime
-    } = this.$route.query.row
-    this.form.channelCode = channelCode
-    this.form.channelName = channelName
-    this.form.channelType = String(channelType)
-    this.form.videoAreaId = videoAreaId
-    this.form.gb28181Code = gb28181Code
-    this.form.longitude = longitude
-    this.form.latitude = latitude
-    this.form.faceLocation = faceLocation
-    this.form.ptzType = String(ptzType)
-    this.form.installLocation = installLocation
-    this.form.height = height
-    this.form.installTime = installTime
-    this.editId = this.$route.query.row.id
+  watch: {
+    editChannelRow(newValue, oldValue) {
+      this.resEditChannelRow = newValue
+      console.log('this.resEditChannelRow', this.resEditChannelRow)
+
+      const {
+        channelCode,
+        channelName,
+        channelType,
+        videoAreaId,
+        gb28181Code,
+        longitude,
+        latitude,
+        faceLocation,
+        ptzType,
+        installLocation,
+        height,
+        installTime
+      } = this.resEditChannelRow
+
+      this.form.channelCode = channelCode
+      this.form.channelName = channelName
+      this.form.channelType = String(channelType)
+      this.form.videoAreaId = videoAreaId
+      this.form.gb28181Code = gb28181Code
+      this.form.longitude = longitude
+      this.form.latitude = latitude
+      this.form.faceLocation = faceLocation
+      this.form.ptzType = String(ptzType)
+      this.form.installLocation = installLocation
+      this.form.height = height
+      this.form.installTime = installTime
+      this.editId = this.resEditChannelRow.id
+      this.$nextTick(() => {
+        // console.log('this.treeList', this.treeList, this.form.videoAreaId)
+        this.getTreeName(this.$props.treeList, this.form.videoAreaId)
+        this.form.videoAreaId = this.resName
+      })
+    },
+    deep: true
   },
+  created() {},
   mounted() {
-    this.init()
+    // this.init()
     this.getTowardTypeOptionsList()
-    this.getAppearanceTypeOptionsList()
-    this.getChannelTypeList()
+    this.getChannelTypeDictionaryList()
   },
   methods: {
     getTreeName(arr, id) {
       arr.map((item) => {
         if (item.id === id) {
-          this.resName = item.areaName
+          this.resName = item.resourceName
+          this.pResourceValue = item.resourceValue
           this.Id = id
           return
         } else {
-          if (item.children && item.children.length > 0) {
-            this.getTreeName(item.children, id)
+          if (item.childList && item.childList.length > 0) {
+            this.getTreeName(item.childList, id)
           }
         }
       })
     },
-    async init(id) {
-      await getVideoAraeTree()
-        .then((res) => {
-          if (res.data.code === 0) {
-            this.treeList = res.data.data
-            this.$nextTick(() => {
-              this.getTreeName(this.treeList, this.form.videoAreaId)
-              this.form.videoAreaId = this.resName
-            })
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
+    // async init(id) {
+    //   await channelVideoAreaList()
+    //     .then((res) => {
+    //       if (res.data.code === 0) {
+    //         this.treeList = [res.data.data]
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.log(error)
+    //     })
+    // },
     async getTowardTypeOptionsList() {
-      await getManufacturerDictionaryList('Toward').then((res) => {
+      await getGroupDictLists('Toward').then((res) => {
         if (res.data.code === 0) {
           res.data.data.map((item) => {
             let obj = {}
@@ -375,20 +403,8 @@ export default {
         }
       })
     },
-    async getAppearanceTypeOptionsList() {
-      await getManufacturerDictionaryList('Appearance').then((res) => {
-        if (res.data.code === 0) {
-          res.data.data.map((item) => {
-            let obj1 = {}
-            obj1.label = item.itemName
-            obj1.value = item.itemValue
-            this.appearanceTypeOptions.push(obj1)
-          })
-        }
-      })
-    },
-    async getChannelTypeList() {
-      await getManufacturerDictionaryList('ChannelType').then((res) => {
+    async getChannelTypeDictionaryList() {
+      await getGroupDictLists('ChannelType').then((res) => {
         if (res.data.code === 0) {
           res.data.data.map((item) => {
             let obj1 = {}
@@ -401,7 +417,8 @@ export default {
     },
     // 点击节点选中
     nodeClickHandle(data) {
-      this.form.videoAreaId = data.areaName
+      this.form.videoAreaId = data.resourceName
+      this.pResourceValue = data.resourceValue
       this.Id = data.id
       this.$refs.selectTree.blur()
     },
@@ -413,8 +430,9 @@ export default {
 
         editChannel({
           ...this.form,
-          deviceExpansionId: this.$route.query.row.deviceExpansionId,
-          id: this.$route.query.row.id
+          deviceExpansionId: this.resEditChannelRow.deviceExpansionId,
+          pResourceValue: this.pResourceValue,
+          id: this.resEditChannelRow.id
         }).then((res) => {
           if (res.data.code === 0) {
             this.$message({
@@ -427,7 +445,7 @@ export default {
       })
     },
     goback() {
-      this.$router.push({ path: '/equipment' })
+      this.$emit('changeIsShow', 'editChannel', false)
     }
   }
 }
