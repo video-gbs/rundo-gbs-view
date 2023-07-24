@@ -53,7 +53,7 @@ const urls = [
   // },
   // dev  本地
   {
-    target: 'http://192.192.192.92:9090',
+    target: 'http://xard-gbs-test.runjian.com:8080',
     proxy: '/expansion'
   },
   // {
