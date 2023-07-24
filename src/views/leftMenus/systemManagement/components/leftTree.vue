@@ -12,7 +12,7 @@
         ref="tree"
         :data="treeData"
         class="tree"
-        :props="{ children: 'children', label: this.defaultPropsName }"
+        :props="{ children: 'childList', label: defaultPropsName }"
         default-expand-all
         :default-expanded-keys="['根节点']"
         :current-node-key="resCurrentKey"
@@ -23,14 +23,35 @@
         :filter-node-method="filterNode"
       >
         <span slot-scope="{ node, data }" class="custom-tree-node">
-          <span>
+          <span @dblclick.stop="hasEdit ? nodeDbClick(data) : ''">
             <svg-icon
-              v-if="data.level === 1"
+              v-if="data.resourceType === 1"
               icon-class="tree1"
               class="tree1"
             />
             <svg-icon v-else icon-class="tree2" class="tree2" />
-            {{ data.orgName || data.areaName }}
+            {{
+              data.name ||
+              data.sectionName ||
+              data.resourceName ||
+              data.areaNames
+            }}
+
+            <div
+              v-if="!isClickTreeSort && data.level !== '0'"
+              class="sort_btns"
+            >
+              <svg-icon
+                icon-class="sortDown"
+                class="sort_down sort_btn"
+                @click="invokeSort(0, data)"
+              />
+              <svg-icon
+                icon-class="sortUp"
+                class="sort_up sort_btn"
+                @click="invokeSort(1, data)"
+              />
+            </div>
           </span>
         </span>
       </el-tree>
@@ -44,7 +65,7 @@ export default {
     return {
       data: [],
       filterText: '',
-      resCurrentKey: '1'
+      resCurrentKey: '0'
     }
   },
   props: {
@@ -54,9 +75,21 @@ export default {
         return []
       }
     },
+    isClickTreeSort: {
+      type: Boolean,
+      default: function () {
+        return true
+      }
+    },
+    hasEdit: {
+      type: Boolean,
+      default: function () {
+        return false
+      }
+    },
     defaultPropsName: {
       type: String,
-      default: 'orgName'
+      default: 'name'
     }
   },
   watch: {
@@ -75,11 +108,16 @@ export default {
       // data.icon = 'tree1'
       this.$emit('childClickHandle', data)
     },
+    invokeSort(val, data) {
+      this.$emit('changeSort', val, data)
+    },
+    nodeDbClick(data) {
+      this.$emit('editTree', data)
+    },
     handleNodeClose(data) {
       // data.icon = 'tree2'
     },
     chooseId(id) {
-      console.log('id', typeof id, this.$refs)
       setTimeout(() => {
         this.$nextTick(() => {
           this.$refs.tree.setCurrentKey(id)
@@ -90,10 +128,12 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true
-      if (this.$props.defaultPropsName === 'orgName') {
-        return data.orgName && data.orgName.indexOf(value) !== -1
+      if (this.$props.defaultPropsName === 'name') {
+        return data.name && data.name.indexOf(value) !== -1
+      } else if (this.$props.defaultPropsName === 'resourceName') {
+        return data.resourceName && data.resourceName.indexOf(value) !== -1
       } else {
-        return data.areaNames && data.areaNames.indexOf(value) !== -1
+        return data.sectionName && data.sectionName.indexOf(value) !== -1
       }
     }
   }
@@ -207,6 +247,18 @@ export default {
 }
 .tree .custom-tree-node {
   // padding-left: 10px;
+}
+.sort_btns {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  .sort_btn {
+    width: 20px;
+    height: 20px;
+  }
+  .sort_down {
+    margin-right: 10px;
+  }
 }
 // 去掉顶部线条
 .tree {

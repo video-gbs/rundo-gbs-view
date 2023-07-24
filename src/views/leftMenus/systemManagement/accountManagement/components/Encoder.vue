@@ -1,5 +1,5 @@
 <template>
-  <div class="encoder-content">
+  <div class="encoder-content" v-if="isShow">
     <div class="search">
       <el-form
         ref="query"
@@ -8,15 +8,11 @@
         :model="searchParams"
         label-width="100px"
       >
-        <el-form-item label="用户账号:">
-          <el-input
-            v-model="searchParams.userAccount"
-            clearable
-            :maxlength="15"
-          />
+        <el-form-item label="工作名称:">
+          <el-input v-model="searchParams.workName" clearable :maxlength="15" />
         </el-form-item>
         <el-form-item label="用户姓名:">
-          <el-input v-model="searchParams.userName" clearable :maxlength="15" />
+          <el-input v-model="searchParams.username" clearable :maxlength="15" />
         </el-form-item>
         <el-form-item
           style="float: right; margin-right: 20px"
@@ -43,20 +39,27 @@
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deteleAll($event)" style="width: 100px" plain
+          <el-button
+            v-permission="['/rbac/user/batch/delete', 4]"
+            @click="deteleAll($event)"
+            style="width: 100px"
+            plain
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span></el-button
           >
-          <el-button type="primary" @click="addEquipment"
+          <el-button
+            v-permission="['/rbac/user/add', 2]"
+            type="primary"
+            @click="addEquipment('add')"
             ><svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span></el-button
           >
         </div>
       </div>
       <el-table
-        ref="encoderTable"
+        ref="userTable"
         class="table-content-bottom"
-        :data="tableData1"
+        :data="userTableData"
         border
         :header-cell-style="{
           background: 'rgba(0, 75, 173, 0.06)',
@@ -71,48 +74,64 @@
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
         <el-table-column
-          prop="userAccount"
-          label="用户账户"
+          prop="workName"
+          label="工作名称"
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          prop="userName"
+          prop="username"
           label="用户姓名"
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          prop="orgName"
-          label="所属部门"
-          width="240"
+          prop="workNum"
+          label="工号"
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          prop="roleName"
-          label="角色"
+          prop="phone"
+          label="手机号码"
           :show-overflow-tooltip="true"
         />
-        <el-table-column prop="jobNo" label="用户工号" />
-        <el-table-column prop="createdTime" label="创建时间" width="140" />
-        <el-table-column prop="updatedTime" label="更新时间" width="140" />
-        <el-table-column prop="status" label="状态" width="80">
+        <el-table-column
+          prop="address"
+          label="地址"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column
+          prop="description"
+          label="描述"
+          :show-overflow-tooltip="true"
+        />
+        <el-table-column prop="createTime" label="创建时间" width="140" />
+        <el-table-column prop="updateTime" label="更新时间" width="140" />
+        <el-table-column prop="disabled" label="启用状态" width="120">
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.status"
+              v-permission="['/rbac/user/update/disabled', 3]"
+              v-model="scope.row.disabled"
               active-color="#13ce66"
               inactive-color="#ff4949"
               :active-value="0"
               :inactive-value="1"
-              @change="changeSwitch(scope.row)"
+              @change="changeDisabledSwitch(scope.row)"
             >
             </el-switch>
           </template>
         </el-table-column>
         <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editEquipment(scope.row)"
+            <el-button
+              v-permission="['/rbac/user/update', 2]"
+              type="text"
+              @click="editEquipment('edit', scope.row)"
               >编辑
             </el-button>
-            <el-button type="text" @click="deleteUser(scope.row)"
+
+            <el-button
+              v-permission="['/rbac/user/batch/delete', 4]"
+              type="text"
+              @click="deleteUser(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -124,244 +143,98 @@
         @current-change="currentChange"
       />
     </div>
-
-    <!-- <el-dialog title="移动位置" :visible.sync="dialogShow" width="30%">
-      <div slot="title" class="dialog-title">
-        <LineFont
-          :line-title="lineTitle"
-          :text-style="textStyle"
-          :line-blue-style="lineBlueStyle"
-        />
-      </div>
-      <el-form label-width="100px" :model="dialogForm">
-        <el-form-item label="设备数量：">
-          {{ dialogForm.num }}
-        </el-form-item>
-        <el-form-item label="设备名称：">
-          <span class="dialogEquipmentName">{{
-            dialogForm.dialogEquipmentName
-          }}</span>
-        </el-form-item>
-      </el-form>
-      <div class="securityArea_container">
-        <leftTree :treeData="treeData" @childClickHandle="childClickHandle" />
-      </div>
-
-      <div class="dialog-footer">
-        <el-button @click="dialogShow = false">取消</el-button>
-        <el-button type="primary"
-          ><svg-icon class="svg-btn" icon-class="save" />确认</el-button
-        >
-      </div>
-    </el-dialog>
-
-    <el-dialog title="选择编码器" :visible.sync="dialogShow1" width="80%">
-      <div slot="title" class="dialog-title">
-        <LineFont
-          :line-title="lineTitle1"
-          :text-style="textStyle"
-          :line-blue-style="lineBlueStyle"
-        />
-      </div>
-      <el-form label-width="80px" :model="dialogForm1">
-        <el-row>
-          <el-col :span="8">
-            <el-form-item label="当前目录">
-              <el-select
-                v-model="dialogForm1.region"
-                placeholder="请选择活动区域"
-              >
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8" style="float: right">
-            <el-form-item>
-              <el-input
-                placeholder="请输入搜索关键字"
-                suffix-icon="el-icon-search"
-                class="search-input"
-                v-model="dialogForm1.inputValue"
-              ></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-
-      <el-table
-        ref="encoderTable1"
-        class="table-content-bottom"
-        :data="dialogTableData"
-        border
-        :header-cell-style="{
-          background: 'rgba(0, 75, 173, 0.06)',
-          fontSize: '14px',
-          fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
-          fontWeight: 'bold',
-          color: '#333333'
-        }"
-      >
-        <el-table-column type="selection" width="80" align="center">
-        </el-table-column>
-        <el-table-column type="index" width="50" align="center" label="序号">
-        </el-table-column>
-        <el-table-column
-          prop="name"
-          label="设备名称"
-          :show-overflow-tooltip="true"
-        />
-        <el-table-column
-          prop="coding"
-          label="设备编码"
-          :show-overflow-tooltip="true"
-        />
-        <el-table-column
-          prop="ip"
-          label="IP地址"
-          :show-overflow-tooltip="true"
-        />
-        <el-table-column prop="manufacturer" label="设备厂家" width="80" />
-        <el-table-column prop="city" label="所属行政区域" width="240" />
-      </el-table>
-
-      <pagination
-        :pages-data="params"
-        @size-change="sizeChange"
-        @current-change="currentChange"
-      />
-
-      <div class="dialog-footer">
-        <el-button @click="dialogShow1 = false">取消</el-button>
-        <el-button type="primary"
-          ><svg-icon class="svg-btn" icon-class="save" />确认</el-button
-        >
-      </div>
-    </el-dialog> -->
   </div>
 </template>
 
 <script>
 import pagination from '@/components/Pagination/index.vue'
-import LineFont from '@/components/LineFont'
 
 import {
-  getUserLists,
-  deteleUser,
-  changeUserStatus,
-  deteleAllUser
+  getUserList,
+  userAdd,
+  userUpdate,
+  userDelete,
+  userUpdateDisabled
 } from '@/api/method/user'
 
 import { Local } from '@/utils/storage'
 
 export default {
   name: '',
-  components: { pagination, LineFont },
+  components: { pagination },
   data() {
     return {
+      isShow: false,
       params: {
         pageNum: 1,
         pageSize: 10,
         total: 0
       },
-      lineTitle: {
-        title: '移动位置',
-        notShowSmallTitle: false
-      },
-      lineTitle1: {
-        title: '选择编码器',
-        notShowSmallTitle: false
-      },
-      textStyle: {
-        fontSize: '18px',
-        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
-        fontWeight: 'bold',
-        color: '#333333'
-      },
-      lineBlueStyle: {
-        background: 'rgba(30, 86, 160, 1)',
-        width: '3px',
-        height: '18px'
-      },
-      dialogForm: {
-        num: 3,
-        dialogEquipmentName:
-          '海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ; 海康NVR ; 海康IPC ; 34020000001320000028 ;'
-      },
-      dialogForm1: {
-        inputValue: ''
-      },
+      resName: '',
       searchParams: {
-        userName: '',
-        userAccount: ''
+        username: '',
+        workName: ''
       },
-      query: {},
-      optionsList: [
-        {
-          label: 'ces',
-          value: 'ces'
-        }
-      ],
-      checked: false,
-      dialogShow: false,
-      dialogShow1: false,
-      dialogTableData: [
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          city: '广东省/广州市/珠海区/新竹街道…',
-          manufacturer: '海康',
-          status: 1
-        }
-      ],
       accountChecked: true,
-      tableData: [
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1
-        }
-      ],
-      tableData1: [],
-      orgId: '',
-      editRolesDetail: []
+      userTableData: [],
+      newUserId: ''
     }
   },
   created() {
     this.params.pageNum = Local.get('accountManagementPageNum')
     Local.remove('accountManagementPageNum')
   },
+
   mounted() {},
   methods: {
-    getList(id) {
-      getUserLists({
-        current: this.params.pageNum,
-        pageSize: this.params.pageSize,
-        orgId: id ? id : this.orgId,
-        contain: this.accountChecked ? 1 : 0,
+    async getList(id) {
+      await getUserList({
+        page: this.params.pageNum,
+        num: this.params.pageSize,
+        sectionId: id ? id : this.newUserId,
+        isInclude: this.accountChecked,
         ...this.searchParams
       }).then((res) => {
-        if (res.code === 0) {
-          this.tableData1 = res.data.records
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
+        if (res.data.code === 0) {
+          this.newUserId = id
+          this.userTableData = res.data.data.list
+          this.params.total = res.data.data.total
+          this.params.pages = res.data.data.pageNum
+          this.params.current = res.data.data.pageSize
+
+          setTimeout(() => {
+            this.isShow = true
+          }, 100)
+        } else {
+          this.$message({
+            type: 'warning',
+            message: res.data.data
+          })
+          this.userTableData = []
         }
       })
     },
     changeAccountChecked(val) {
-      this.getList()
+      this.getList(this.newUserId)
+    },
+    // 回显树名字
+    getTreeName(arr, id) {
+      arr.map((item) => {
+        if (item.id === id) {
+          this.resName = item.name
+          this.Id = id
+          return
+        } else {
+          if (item.childList && item.childList.length > 0) {
+            this.getTreeName(item.childList, id)
+          }
+        }
+      })
     },
     resetData(e) {
       this.searchParams = {
-        userName: '',
-        userAccount: ''
+        username: '',
+        workName: ''
       }
       let target = e.target
       if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
@@ -373,25 +246,26 @@ export default {
       }
       target.blur()
       this.params.pageNum = 1
-      this.getList()
+
+      this.getList('0')
     },
     saveId(id) {
-      this.orgId = id
+      this.newUserId = id
     },
     deleteUser(row) {
-      this.$confirm(`确定删除用户${row.userName}？`, '提示', {
+      this.$confirm(`确定删除用户${row.username}？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deteleUser(row.id).then((res) => {
-          if (res.code === 0) {
+        userDelete(row.id).then((res) => {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
             })
             this.params.pageNum = 1
-            this.getList(this.orgId)
+            this.getList(this.newUserId)
           }
         })
       })
@@ -406,7 +280,7 @@ export default {
         target = e.target
       }
       target.blur()
-      if (this.$refs.encoderTable.selection.length === 0) {
+      if (this.$refs.userTable.selection.length === 0) {
         this.$message({
           message: '请勾选用户',
           type: 'warning'
@@ -415,8 +289,8 @@ export default {
       }
       this.$confirm(
         `确定删除${
-          this.$refs.encoderTable.selection.length > 0
-            ? this.$refs.encoderTable.selection.length
+          this.$refs.userTable.selection.length > 0
+            ? this.$refs.userTable.selection.length
             : 0
         }个用户？`,
         '提示',
@@ -427,29 +301,29 @@ export default {
         }
       ).then(() => {
         const roleIds = []
-        // console.log('this.$refs.encoderTable.selection',this.$refs)
-        this.$refs.encoderTable.selection.map((item) => {
+        // console.log('this.$refs.userTable.selection',this.$refs)
+        this.$refs.userTable.selection.map((item) => {
           roleIds.push(item.id)
         })
-        deteleAllUser(roleIds).then((res) => {
-          if (res.code === 0) {
+        userDelete(roleIds).then((res) => {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
             })
             this.params.pageNum = 1
-            this.getList(this.orgId)
+            this.getList(this.newUserId)
           }
         })
       })
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
-      this.getList()
+      this.getList(this.newUserId)
     },
     currentChange(proCount) {
       this.params.proCount = proCount
-      this.getList()
+      this.getList(this.newUserId)
     },
     synchronizationData() {
       this.$router.push(`/activeDiscovery/transfer`)
@@ -458,31 +332,32 @@ export default {
       this.dialogShow1 = true
     },
     cxData() {
-      this.getList()
+      this.getList(this.newUserId)
     },
-    addEquipment() {
-      this.$router.push(`/user`)
+    addEquipment(name) {
+      this.$emit('changeIsShow', true, name, {})
+      // this.$router.push(`/user`)
     },
-    editEquipment(row) {
+    editEquipment(name, row) {
       Local.set('accountManagementPageNum', this.params.pageNum)
-      this.$router.push({ path: '/editUser', query: { key: row.id } })
+      this.$emit('changeIsShow', true, name, row)
     },
-    changeSwitch(row) {
-      let text = row.status === 0 ? '启用' : '停用'
+    changeDisabledSwitch(row) {
+      let text = row.disabled === 0 ? '启用' : '停用'
 
-      this.$confirm('确认要"' + text + '""' + row.userName + '"吗?', '警告', {
+      this.$confirm('确认要"' + text + '""' + row.username + '"吗?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(function () {
-          changeUserStatus({
-            id: row.id,
-            status: row.status
+          userUpdateDisabled({
+            userId: row.id,
+            disabled: row.disabled
           }).then((res) => {})
         })
         .catch(function () {
-          row.status = row.status === 0 ? 1 : 0
+          row.disabled = row.disabled === 0 ? 1 : 0
         })
     }
   }
@@ -490,6 +365,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
+::v-deep .el-dialog__header {
+  border-bottom: 1px solid #eaeaea;
+}
+::v-deep .el-dialog__footer {
+  border-top: 1px solid #eaeaea;
+}
 ::v-deep .table-content-bottom .el-table__fixed-right {
   height: 100% !important;
 }
@@ -527,9 +411,14 @@ export default {
 ::v-deep .el-dialog__body {
   padding-bottom: 0;
 }
-::v-deep .el-dialog__header {
-  border-bottom: 1px solid rgba(234, 234, 234, 1);
-  padding: 0 20px;
+
+.selectTree {
+  .el-select-dropdown__item {
+    height: 200px !important;
+    min-width: 260px;
+    overflow-y: scroll !important;
+    background: #fff !important;
+  }
 }
 
 .encoder-content {
@@ -627,30 +516,9 @@ export default {
     left: -6px;
   }
 }
-.dialog-footer {
-  width: 100%;
-  height: 52px;
-  line-height: 52px;
-  position: relative;
-  bottom: 0;
-  right: 0px;
-  text-align: right;
-  border-top: 1px solid #eaeaea;
-  > .el-button {
-    margin-right: 20px;
-  }
-  .svg-btn {
-    position: relative;
-    top: 1px;
-    left: -4px;
-  }
-}
 .svg-btn {
   position: relative;
   top: 1px;
   left: -4px;
 }
-// ::v-deep .el-table::before {
-//   height: 0;
-// }
 </style>

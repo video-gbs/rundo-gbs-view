@@ -14,9 +14,7 @@ import router from './router'
 import { Local } from './utils/storage'
 
 import '@/icons'
-import '@/permission'
 import '@/utils/extends'
-// import '@/utils/flexible'
 import '@/plugin'
 import * as echarts from 'echarts'
 Vue.prototype.$echarts = echarts
@@ -31,6 +29,8 @@ Vue.prototype.$moment = moment
 import VideoTimeline from '@wanglin1994/video-timeline'
 Vue.use(VideoTimeline)
 
+// import { Base64 } from 'js-base64'
+// Vue.use(Base64)
 // 引入字典
 import _dict from '@/dict/index'
 
@@ -41,6 +41,7 @@ Vue.prototype.$_config = config
 Vue.prototype.$photoUrl = config.photoUrlApi
 Vue.prototype.$filePreview = config.filePreview
 
+import {} from './permission'
 // 退出登录
 Vue.prototype.$logout = () => {
   Local.logout()

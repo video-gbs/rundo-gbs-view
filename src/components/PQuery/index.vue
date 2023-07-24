@@ -149,7 +149,7 @@ export default {
           .list(form)
           .then((res) => {
             this.value.total = res.data.data.total
-            this.$emit('query', res.data)
+            this.$emit('query', res.data.data)
             this.$store.dispatch('app/setLoading', false)
           })
           .catch(() => {

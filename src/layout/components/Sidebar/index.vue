@@ -31,12 +31,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import Logo from './Logo'
 import SidebarItem from './SidebarItem'
 import variables from '@/styles/variables.scss'
 
 export default {
-  components: { SidebarItem, Logo },
+  components: { SidebarItem },
   props: {
     sidebarLists: {
       type: Array,
@@ -78,20 +77,18 @@ export default {
   },
 
   mounted() {
-    this.select(this.$route.path)
+    // console.log('this.sidebarRouter~~~~~~~~~~~~~~~`', this.sidebarRouter)
+    // this.select(this.$route.path)
     this.myRouter = Object.assign([], this.sidebarRouter)
-    const ut = localStorage.getItem('rj_deptType') || 9999
-    this.setHide(this.myRouter, ut * 1)
+    this.setHide(this.myRouter)
   },
   methods: {
-    setHide(v, ut) {
+    setHide(v) {
       v.forEach((i) => {
-        if (i.author !== null && i.author !== undefined) {
-          this.$set(i, 'authorHidden', false)
-          !i.author.includes(ut) && this.$set(i, 'authorHidden', true)
-        }
         if (i.children && i.children.length) {
-          this.setHide(i.children, ut)
+          i.children.forEach((child) => {
+            child.hidden = true
+          })
         }
       })
     },
@@ -103,7 +100,6 @@ export default {
         )
       ) {
         this.$store.state.tabs.tabList.push(this.$route)
-        // this.$store.commit("tabList", this.$store.state.tabs.tabList);
       }
     }
   }

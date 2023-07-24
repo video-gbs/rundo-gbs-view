@@ -112,6 +112,8 @@
         </div>
       </div>
     </div>
+
+    <!-- <div id="map_container"></div> -->
   </div>
 </template>
 
@@ -119,10 +121,20 @@
 import Code from '@/views/leftMenus/systemManagement//components/Code'
 
 import { validUsername } from '@/utils/validate'
-import { login } from '@/api/method/user'
+import { login, newLogin } from '@/api/method/user'
+import { getHomeUser } from '@/api/method/home'
 import { Local } from '@/utils/storage'
 import store from '@/store/index'
-import { getRouters } from '@/api/method/menus'
+
+import axios from 'axios'
+import Cookies from 'js-cookie'
+
+import AMapLoader from '@amap/amap-jsapi-loader'
+window._AMapSecurityConfig = {
+  // 设置安全密钥
+  securityJsCode: '53f79308351ca5147392f915cfc133d5'
+}
+
 export default {
   name: 'Login',
   components: { Code },
@@ -151,6 +163,11 @@ export default {
     }
 
     return {
+      map: null,
+      mouseTool: null,
+      overlays: [],
+      auto: null,
+      placeSearch: null,
       identifyCode: '',
       // identifyCodes: ['0','1','2','3'...'a','b','c'...'z'],
       loginForm: {
@@ -197,8 +214,61 @@ export default {
   mounted() {
     this.windowWidth = document.documentElement.clientWidth
     window.onresize = this.throttle(this.setScale, 500, 500)
+    // this.initMap()
+    Local.set('permissionData', [])
+    Local.set('rj_userName', '')
   },
   methods: {
+    async getHomeUser() {
+      await getHomeUser()
+        .then((res) => {
+          if (res.data.code === 0) {
+            Local.set('rj_userName', res.data.data.username)
+
+            this.$router.push({ path: '/workTable' })
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    initMap() {
+      AMapLoader.load({
+        key: '60e29aaeb21c23592a0396a255db259e', // 申请好的Web端开发者Key，首次调用 load 时必填
+        version: '2.0', // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+        plugins: ['AMap.AutoComplete', 'AMap.PlaceSearch'] // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+        // "plugins": [],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+      })
+        .then((AMap) => {
+          this.map = new AMap.Map('map_container', {
+            viewMode: '2D', //  是否为3D地图模式
+            zoom: 13, // 初始化地图级别
+            center: [113.459, 23.1064], //中心点坐标
+            resizeEnable: true
+          })
+
+          this.auto = new AMap.AutoComplete({
+            input: this.iptId // 搜索框的id
+          })
+          this.placeSearch = new AMap.PlaceSearch({
+            map: this.map,
+            panel: 'panel', // 结果列表将在此容器中进行展示。
+            // city: "010", // 兴趣点城市
+            autoFitView: true, // 是否自动调整地图视野使绘制的 Marker点都处于视口的可见范围
+            extensions: 'base' //返回基本地址信息
+          })
+          this.auto.on('select', this.select) //注册监听，当选中某条记录时会触发
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+    },
+
+    select(e) {
+      this.placeSearch.setCity(e.poi.adcode)
+      this.placeSearch.search(e.poi.name) //关键字查询查询
+    },
+
     pwdShowChange() {
       this.passwordType = this.passwordType === 'password' ? 'type' : 'password'
     },
@@ -235,34 +305,40 @@ export default {
       })
     },
     handleLogin() {
-      // this.$refs.loginForm.validate((valid) => {
-      // if (valid) {
       this.loading = true
-      Local.setToken('')
-      Local.set('rj_token', '')
-      login(this.loginForm)
+      Local.set('access_token', '')
+
+      axios({
+        method: 'post',
+        url: `http://192.192.192.92:9090/oauth2/token?grant_type=password&scope=all&username=${this.loginForm.username}&password=${this.loginForm.password}`,
+        headers: {
+          Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+        }
+      })
         .then((res) => {
-          if (res.code === 0 || res.code === 200) {
-            const { deptType, username, token } = res.data
-            Local.set('rj_deptType', 0)
-            Local.set('rj_userName', username)
-            Local.setToken(token)
-            Local.set('rj_token', token)
-            // getRouters().then((res) => {
-            //   store.dispatch('user/dynamicRouters', res)
-            this.$router.push({ path: '/workTable' })
-            // })
-            this.loading = false
-          }
-        })
-        .catch(() => {
+          const { accessToken, refreshToken, expiresIn, tokenType } =
+            res.data.data
+
+          this.getHomeUser()
+
+          Local.set('rj_deptType', 0)
+          Local.set('access_token', accessToken)
+          Local.set('refresh_token', refreshToken)
+          Local.set('expires_in', expiresIn)
+          Local.set('token_type', tokenType)
+
           this.loading = false
         })
-      //   } else {
-      //     console.log("error submit!!");
-      //     return false;
-      //   }
-      // });
+        .catch((error) => {
+          console.log(1, error.response)
+
+          this.loading = false
+
+          this.$message({
+            type: 'error',
+            message: error.response.data.data
+          })
+        })
     }
   }
 }
@@ -554,5 +630,9 @@ body {
     }
   }
 }
-/* end 媒体查询 */
+
+#map_container {
+  height: 100%;
+  width: 100%;
+}
 </style>

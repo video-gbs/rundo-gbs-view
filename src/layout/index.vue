@@ -1,7 +1,6 @@
 <template>
   <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
     <Header class="wrapper-header" :isShowTopMenus="isShowTopMenus" />
-    <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" />
     <div class="main-container f fd-c ai-s">
       <app-main />
     </div>
@@ -13,7 +12,6 @@
       :isShowTopMenus="!isShowTopMenus"
       @changeSidebarLists="changeSidebarLists"
     />
-    <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" />
     <sidebar
       class="sidebar-container"
       v-if="showSidebar"
@@ -30,8 +28,7 @@
 </template>
 
 <script>
-import { Header, Sidebar, AppMain, Navbar, TagsView } from './components'
-// import resize from '@/utils/resize'
+import { Header, Sidebar, AppMain, Navbar } from './components'
 import Breadcrumb from '../components/Breadcrumb'
 import store from '@/store/index'
 import { mapGetters } from 'vuex'
@@ -43,10 +40,8 @@ export default {
     AppMain,
     Header,
     Navbar,
-    TagsView,
     Breadcrumb
   },
-  // mixins: [resize],
   data() {
     return {
       nowWidth: '',
@@ -102,6 +97,7 @@ export default {
   },
   created() {
     this.nowRouter = this.$route.matched.filter((item) => item.name)
+
     this.setScale()
     this.initTabList()
   },

@@ -1,97 +1,46 @@
-import router from './router'
-import store from '@/store/index'
-import NProgress from 'nprogress'
-import { Message } from 'element-ui'
-import 'nprogress/nprogress.css'
+import Vue from 'vue'
 import { Local } from '@/utils/storage'
-import getPageTitle from '@/utils/get-page-title'
-import Layout from '@/layout'
 
-NProgress.configure({ showSpinner: false })
+// 检测传入的元素key是否可以显示
+function checkKey(currentTag, resMethod) {
+  // 获取权限数组
 
-// const whiteList = ['/login','/workTable']
+  let permissionData = Local.get('permissionData')
+    ? Local.get('permissionData')
+    : []
 
-// router.afterEach((to, from) => {
-//   document.title = getPageTitle(to.meta.title)
-// })
-// router.beforeEach(async (to, from, next) => {
-//   console.log('to~~~~~~~~~~~~~~~~~', to)
-//   console.log('from~~~~~~~~~~~~~~~~~', from)
-//   const hasToken = Local.getToken()
-//   console.log(
-//     'sessionStorage~~~~~~~~~~~~~~~~~',
-//     sessionStorage.getItem('dynamicRouters')
-//   )
-//   console.log('store~~~~~~~~~~~~~~~~~', store.state.user.routerLists)
-//   console.log('router！！！！！！！！！！！！', router)
-//   if (
-//     hasToken &&
-//     store.state.user.routerLists.length !== 0 &&
-//     sessionStorage.getItem('dynamicRouters')
-//   ) {
-//     // if(to.path === '/workTable'){
+  //如果传入的元素key不在权限数组里，则不可显示
+  const result = permissionData.findIndex((v) => {
+    return v.method === resMethod && v.path === currentTag
+  })
+  if (result !== -1) {
+    return true
+  } else {
+    return false
+  }
+}
+//自定义指令，用来控制按钮权限
+export const buttonPermissions = Vue.directive('permission', {
+  inserted(el, binding) {
+    const currentTag = binding.value[0]
+    const resMethod = binding.value[1]
 
-//     //   store.dispatch('user/changeInit', false)
-//     // }
-//     if (!store.state.user.init) {
-//       const accessRouteses = store.state.user.routerLists
-//       console.log('accessRouteses~~~~~~~~~~~~~~~~~', accessRouteses)
-//       store.dispatch('user/dynamicRouters', accessRouteses)
-//       next({ ...to, replace: true })
-//     } else {
-//       next()
-//     }
-//   } else {
-//     if (whiteList.indexOf(to.path) !== -1) {
-//       next()
-//     } else {
-//       next(`/login`)
-//     }
-//   }
-// })
+    if ((currentTag, resMethod)) {
+      let key = checkKey(currentTag, resMethod)
+      // console.log('keykeykeykeykeykeykey', key)
+      if (!key) {
+        //没有权限
+        if (el.type === 'button') {
+          el.disabled = true
+        } else {
+          el.style['pointer-events'] = 'none'
+        }
+        el.classList.add('is-disabled')
+      }
+    } else {
+      throw new Error('缺少唯一指令')
+    }
+  }
+})
 
-// 如果跳往登录页，则转到首页
-// function isLogin(to, next, callback) {
-//   if (to.path == '/login') {
-//     next('/')
-//   } else {
-//     callback()
-//   }
-// }
-
-// router.afterEach(() => {
-//   NProgress.done()
-// })
-
-// function hasPermission(roles, route) {
-//   if (route.meta && route.meta.roles) {
-//       return roles.some(role => route.meta.roles.includes(role))
-//   } else {
-//       return true
-//   }
-// }
-
-// function filterAsyncRouter (routerMap, roles) {
-//   const accessedRouters = routerMap.filter(route => {
-//     if (hasPermission(roles, route)) {
-//       if (route.children && route.children.length) {
-//         route.children = filterAsyncRouter(route.children, roles)
-//       }
-//       return true
-//     }
-//     return false
-//   })
-//   return accessedRouters
-// }
-
-// 目前没有加入权限控制
-
-// function filterAsyncRouter(asyncRouterMap) {
-//   const accessedRouters = asyncRouterMap.filter((route) => {
-//     if (route.children && route.children.length) {
-//       route.children = filterAsyncRouter(route.children)
-//     }
-//     return true
-//   })
-//   return accessedRouters
-// }
+// export default permission

@@ -1,6 +1,6 @@
 import request from '@/api/fetch'
 
-const expansion = '/expserver/expansion'
+const expansion = '/expansion'
 // 通道
 // 新增通道
 export function addChannel(params) {
@@ -37,7 +37,7 @@ export function editChannel(params) {
   return request.put(`${expansion}/channel/edit`, params)
 }
 
-// // 移动
-// export function moveChannel(params) {
-//   return request.put(`${expansion}/channel/move`,params)
-// }
+// 设备--通道列表
+export function channelVideoAreaList(params) {
+  return request.get(`${expansion}/channel/videoAreaList`, params)
+}

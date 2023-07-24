@@ -33,8 +33,8 @@
                           :data="treeList"
                           class="tree"
                           :props="{
-                            children: 'children',
-                            label: 'areaNames'
+                            children: 'childList',
+                            label: 'resourceName'
                           }"
                           default-expand-all
                           :default-expanded-keys="['根节点']"
@@ -50,7 +50,7 @@
                           >
                             <span>
                               <svg-icon
-                                v-if="data.level === 1"
+                                v-if="data.resourceType === 1"
                                 icon-class="tree1"
                                 class="tree1"
                               />
@@ -59,7 +59,7 @@
                                 :icon-class="getIconType(data)"
                                 class="tree2"
                               />
-                              {{ data.orgName || data.areaName }}
+                              {{ data.resourceName }}
                             </span>
                           </span>
                         </el-tree>
@@ -409,16 +409,16 @@ import TimePlayer from '../recordComponents/TimePlayer.vue'
 import TimePlayer1 from '../recordComponents/TimePlayer1.vue'
 import MonitorEquipmentGroup from './monitorEquipmentGroup'
 import DownloadVideoModal from '../recordComponents/DownloadVideoModal'
-import { getVideoAraeTree } from '@/api/method/role'
 import { getPlaybackList } from '@/api/method/moduleManagement'
 import {
   getPlayBackUrlLists,
-  getChannelPlayList,
+  getChannelPlayBackList,
   playStop,
   pauseRecordView,
   resumeRecordView,
   speedRecordView,
-  getStreamInfo
+  getStreamInfo,
+  playVideoAreaListRecord
 } from '@/api/method/live'
 
 const ZOOM_TYPE = {
@@ -718,11 +718,12 @@ export default {
       }))
     },
     async init() {
-      await getVideoAraeTree()
+      await playVideoAreaListRecord()
         .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
-            this.initDatas = res.data
+          if (res.data.code === 0) {
+            this.treeList = [res.data.data]
+
+            this.initData = [res.data.data]
           }
         })
         .catch((error) => {
@@ -796,7 +797,7 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true
-      return data.areaNames && data.areaNames.indexOf(value) !== -1
+      return data.resourceName && data.resourceName.indexOf(value) !== -1
       // }
     },
 
@@ -812,7 +813,7 @@ export default {
         endTime: date[1]
       })
         .then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             if (res.data && res.data.recordList.length > 0) {
               listData = res.data.recordList.map((item) => {
                 const { startTime, endTime } = item
@@ -974,7 +975,7 @@ export default {
     async getDeviceList(id) {
       await getPlayLists({ channelId: id })
         .then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
           }
         })
         .catch(function (error) {
@@ -995,29 +996,29 @@ export default {
             })
             return
           } else {
-            await getChannelPlayList(data.id)
+            await getChannelPlayBackList(data.id)
               .then((res) => {
-                if (res.code === 0) {
-                  if (res.data && res.data.length > 0) {
-                    res.data.map((item) => {
+                if (res.data.code === 0) {
+                  if (res.data.data && res.data.data.length > 0) {
+                    res.data.data.map((item) => {
                       this.resArray.push({
                         onlineState: item.onlineState,
-                        areaName: item.channelName,
-                        areaNames: item.channelName,
+                        resourceName: item.channelName,
+                        resourceNames: item.channelName,
                         areaPid: item.id,
                         id: item.id,
                         ptzType: item.ptzType,
-                        children: []
+                        childList: []
                       })
                     })
 
                     this.detailsId.push(data.id)
                     let arr = []
                     if (data.id === '1') {
-                      arr = this.resArray.concat(this.initDatas[0].children)
+                      arr = this.resArray.concat(this.initDatas[0].childList)
                     } else {
-                      arr = data.children
-                        ? this.resArray.concat(data.children)
+                      arr = data.childList
+                        ? this.resArray.concat(data.childList)
                         : this.resArray
 
                       const obj = {}
@@ -1123,7 +1124,9 @@ export default {
         this.timeLists = ['']
         this.timeLists = [...this.timeLists]
         this.currentList = ''
-        this.currentSpeed = [2]
+        for (let i = 0; i < this.spilt; i++) {
+          this.currentSpeed[i] = [2]
+        }
       } else {
         this.cloudPlayerUrl = ['']
       }
@@ -1237,8 +1240,8 @@ export default {
         channelExpansionId: Local.get('recordCloudId')[this.playerIdx],
         streamId: Local.get('recordStreamId')[this.playerIdx]
       }).then((res) => {
-        if (res.code === 0) {
-          this.tracks = res.data.tracks
+        if (res.data.code === 0) {
+          this.tracks = res.data.data.tracks
         } else {
           this.$message({
             showClose: true,
@@ -1621,14 +1624,14 @@ export default {
         await playStop({
           streamId: this.channelId
         }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             getPlayBackUrlLists({
               channelId: this.channelId,
               startTime: row.startTime ? row.startTime : videoTime[0],
               endTime: row.endTime ? row.endTime : videoTime[1]
             })
               .then((res) => {
-                if (res.code === 0) {
+                if (res.data.code === 0) {
                   // console.log(res.data.wsFlv.slice(5))
                   if (!this.isNext) {
                     this.setTimeLists(videoTime, this.playerIdx)
@@ -1677,7 +1680,7 @@ export default {
         speed: this.speedArr[this.currentSpeed[this.playerIdx]],
         streamId: this.streamId
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.clickedPbPause = false
           this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
           this.isClickCx = true
@@ -1693,7 +1696,7 @@ export default {
         speed: this.speedArr[this.currentSpeed[this.playerIdx]],
         streamId: this.streamId
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.clickedPbPause = true
           this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
           this.isClickCx = false
@@ -1709,7 +1712,7 @@ export default {
         speed: command,
         streamId: this.streamId
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           Local.set('playbackRate', command)
 
           this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)

@@ -220,8 +220,8 @@ export default {
         channelExpansionId: Local.get('flvCloudId')[this.resPlayerIdx],
         streamId: Local.get('flvStreamId')[this.resPlayerIdx]
       }).then((res) => {
-        if (res.code === 0) {
-          this.tracks = res.data.tracks
+        if (res.data.code === 0) {
+          this.tracks = res.data.data.tracks
           this.isShowStream = true
         }
       })

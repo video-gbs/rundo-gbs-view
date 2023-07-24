@@ -2,10 +2,11 @@
 import request from '@/api/fetch'
 
 const rundoAuthServer = '/auth'
+const rbac = '/rbac'
 
 // 角色管理
 //列表
-export function getRoleLists(data) {
+export function getRoleLists1(data) {
   // 权限树
   return request.post(`${rundoAuthServer}/sysRoleInfo/getListByPage`, data)
 }
@@ -49,11 +50,6 @@ export function setAppAuth(params) {
   return request.post(`/politics/sys/roles/perm/save`, params)
 }
 
-// export function getRolesList(params) {
-//   // 角色列表
-//   return request.post(`/politics/sys/roles/list`, params)
-// }
-
 export function getRolesList(params) {
   // 角色列表
   return request.get(`${rundoAuthServer}/sysRoleInfo/getList`, params)
@@ -68,11 +64,6 @@ export function editRoles(params) {
   // 编辑角色
   return request.post(`${rundoAuthServer}/sysRoleInfo/update`, params)
 }
-
-// export function deleteRoles(id) {
-//   // 删除角色
-//   return request.delete(`${rundoAuthServer}/politics/sys/roles/del/${id}`)
-// }
 
 export function getSysOrgTree(params) {
   // 部门组织结构树
@@ -135,4 +126,53 @@ export function changeRoleStatus(data) {
 // 角色隐藏切换
 export function changeRoleHidden(data) {
   return request.post(`${rundoAuthServer}/sysMenuInfo/hidden/change`, data)
+}
+
+// 新角色模块
+export function getRoleLists(data) {
+  // 分页查询角色
+  return request.get(`${rbac}/role/page`, data)
+}
+
+export function userSearchRole(data) {
+  // 用户页面的角色查询
+  return request.get(`${rbac}/role/page/user`, data)
+}
+export function roleAdd(data) {
+  // 添加角色
+  return request.post(`${rbac}/role/add`, data)
+}
+export function roleDisable(data) {
+  // 修改角色禁用状态
+  return request.put(`${rbac}/role/update/disabled`, data)
+}
+export function roleUpdate(data) {
+  // 修改角色
+  return request.put(`${rbac}/role/update`, data)
+}
+export function roleDelete(ids) {
+  // 删除角色
+  return request.delete(`${rbac}/role/delete/batch?roleIds=${ids}`)
+}
+export function roleAssociate(data) {
+  // 角色关联用户
+  return request.post(`${rbac}/role/associate`, data)
+}
+
+// 编辑角色调用接口
+export function getRoleMenuList(data) {
+  // 获取角色菜单信息
+  return request.get(`${rbac}/role/menu`, data)
+}
+export function getRoleResourceList(data) {
+  // 获取角色资源信息
+  return request.get(`${rbac}/role/resource`, data)
+}
+export function getRoleFuncMenuList(data) {
+  // 获取角色某菜单下的功能信息
+  return request.get(`${rbac}/role/func/menu`, data)
+}
+export function getRoleFuncList(data) {
+  // 获取角色全部功能信息
+  return request.get(`${rbac}/role/func`, data)
 }

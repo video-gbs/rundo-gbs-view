@@ -17,9 +17,9 @@
         <el-form ref="form" :model="form" label-width="auto" :rules="rules">
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="userAccount" label="用户账号">
+              <el-form-item prop="username" label="用户账号">
                 <el-input
-                  v-model="form.userAccount"
+                  v-model="form.username"
                   style="width: 436px"
                   disabled
                 ></el-input>
@@ -37,9 +37,9 @@
           </el-row>
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="userName" label="用户姓名">
+              <el-form-item prop="workName" label="工作名称">
                 <el-input
-                  v-model="form.userName"
+                  v-model="form.workName"
                   style="width: 436px"
                   clearable
                 ></el-input>
@@ -57,12 +57,11 @@
           </el-row>
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="expiryDateStart" label="有效日期（开始）">
+              <el-form-item prop="expiryStartTime" label="有效日期（开始）">
                 <el-date-picker
-                  v-model="form.expiryDateStart"
+                  v-model="form.expiryStartTime"
                   type="datetime"
                   placeholder="开始日期"
-                  disabled
                   style="width: 436px"
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
@@ -71,16 +70,16 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item prop="orgId" label="所属部门">
+              <el-form-item prop="sectionId" label="所属部门">
                 <el-select
                   ref="selectTree"
-                  v-model="form.orgId"
+                  v-model="form.sectionId"
                   placeholder="请选择"
                   :popper-append-to-body="false"
                   style="width: 436px"
                   class="selectTree"
                 >
-                  <el-option :value="List">
+                  <el-option :value="form.sectionId">
                     <el-tree
                       ref="userEditTree"
                       class="userEdit-tree"
@@ -100,9 +99,9 @@
           </el-row>
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="desc" label="有效日期（结束）">
+              <el-form-item prop="expiryEndTime" label="有效日期（结束）">
                 <el-date-picker
-                  v-model="form.expiryDateEnd"
+                  v-model="form.expiryEndTime"
                   type="datetime"
                   @change="changeExpiryDateEnd"
                   clearable
@@ -132,12 +131,12 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item
-                  prop="jobNo"
+                  prop="workNum"
                   label="用户工号"
                   style="margin-left: 35px"
                 >
                   <el-input
-                    v-model="form1.jobNo"
+                    v-model="form1.workNum"
                     style="width: 436px"
                     clearable
                   ></el-input>
@@ -243,7 +242,7 @@
               :show-overflow-tooltip="true"
             />
             <el-table-column
-              prop="userAccount"
+              prop="username"
               label="创建人"
               :show-overflow-tooltip="true"
             />
@@ -269,24 +268,22 @@
 
 <script>
 import pagination from '@/components/Pagination/index.vue'
-import {
-  // getVideoAraeTree,
-  getUserInfoList,
-  getDepartmentTree
-} from '@/api/method/role'
+import { getUnitList } from '@/api/method/unitManagement'
 
-import { getEditRolesDetail, editUser } from '@/api/method/user'
+import { userUpdate } from '@/api/method/user'
+import { userSearchRole } from '@/api/method/role'
 
 import moment from 'moment'
 import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { pagination },
+  props: ['userEditRow'],
   data() {
     const checkPhone = (rule, value, cb) => {
       const regPhone = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
 
-      if (value.length === 0) {
+      if (value === '' || value === null || value.length === 0) {
         return cb()
       }
       setTimeout(() => {
@@ -332,12 +329,12 @@ export default {
       }, 500)
     }
     const checkPassword = (rule, value, cb) => {
-      const regPassword =
-        /^(?!^\d+$)(?!^[a-z]+$)(?!^[A-Z]+$)(?!^[^a-z0-9]+$)(?!^[^A-Z0-9]+$)(?!^.*[\u4E00-\u9FA5].*$)^\S*$/
-      if (value.length === 0) {
+      if (value === '' || value === null || value.length === 0) {
         return cb()
       }
       setTimeout(() => {
+        const regPassword =
+          /^(?!^\d+$)(?!^[a-z]+$)(?!^[A-Z]+$)(?!^[^a-z0-9]+$)(?!^[^A-Z0-9]+$)(?!^.*[\u4E00-\u9FA5].*$)^\S*$/
         if (regPassword.test(value)) {
           return cb()
         } else {
@@ -366,37 +363,32 @@ export default {
       Ids: [],
       Id: '',
       defaultProps: {
-        children: 'children',
-        label: 'orgName'
+        children: 'childList',
+        label: 'sectionName'
       },
       // isCheckedId: '',
       isChecked: false,
       form: {
-        userAccount: '',
-        password: '',
-        userName: '',
-        rePassword: '',
-        expiryDateStart: '',
-        orgId: '',
-        expiryDateEnd: ''
+        username: '',
+        password: null,
+        rePassword: null,
+        expiryEndTime: '',
+        sectionId: '',
+        expiryStartTime: '',
+        workName: ''
       },
+      resName: '',
       form1: {
         address: '',
         description: '',
-        phone: '',
-        jobNo: ''
+        phone: null,
+        workNum: ''
       },
+
       roleIds: [],
+      userId: '',
       rules: {
-        userAccount: {
-          required: true,
-          max: 32,
-          validator: checkUserAccount,
-          // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-          // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
-          trigger: 'blur'
-        },
-        userName: {
+        username: {
           max: 32,
           validator: checkUserAccount1,
           // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
@@ -424,21 +416,21 @@ export default {
           trigger: 'blur'
         },
 
-        orgId: [
+        sectionId: [
           {
             required: true,
             message: '请选择部门',
             trigger: 'change'
           }
         ],
-        expiryDateStart: [
+        expiryStartTime: [
           {
             required: true,
             message: '此为必填项。',
             trigger: 'change'
           }
         ],
-        jobNo: {
+        workNum: {
           max: 32,
           // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
           // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
@@ -465,27 +457,101 @@ export default {
       }
     }
   },
+  created() {
+    console.log('this.$props.userEditRow', this.$props.userEditRow)
+    const {
+      address,
+      description,
+      expiryEndTime,
+      expiryStartTime,
+      workNum,
+      id,
+      phone,
+      workName,
+      username,
+      sectionId
+    } = this.$props.userEditRow
+    this.form1.address = address
+    this.form1.description = description
+    this.form.expiryEndTime = expiryEndTime
+    this.form.expiryStartTime = expiryStartTime
+    this.form1.workNum = workNum
+    this.userId = id
+    this.form.password = null
+    this.form1.phone = phone
+    this.form.rePassword = null
+    this.form.sectionId = sectionId
+    this.form.roleIds = []
+
+    this.selectedData = []
+
+    this.form.workName = workName
+    this.form.username = username
+    this.Id = sectionId
+  },
   mounted() {
     this.init()
     this.getLists()
   },
   methods: {
-    async init() {
-      await getDepartmentTree()
+    async getLists() {
+      await userSearchRole({
+        page: this.params.pageNum,
+        num: this.params.pageSize,
+        userId: this.$props.userEditRow.id,
+        roleName: this.roleName
+      })
         .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
+          if (res.data.code === 0) {
+            this.tableData = res.data.data.list
+            this.handleRowSelection(this.tableData)
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.current
           }
         })
         .catch((error) => {
           console.log(error)
         })
     },
+    async init() {
+      await getUnitList()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.treeList = [res.data.data]
+            this.getTreeName(this.treeList, this.form.sectionId)
+            console.log(
+              'this.form.sectionId',
+              this.form.sectionId,
+              this.resName
+            )
+            this.form.sectionId = this.resName
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
+    // 回显树名字
+    getTreeName(arr, id) {
+      arr.map((item) => {
+        if (item.id === id) {
+          this.resName = item.sectionName
+          this.Id = id
+          return
+        } else {
+          if (item.childList && item.childList.length > 0) {
+            this.getTreeName(item.childList, id)
+          }
+        }
+      })
+    },
     changeExpiryDateEnd(val) {
       if (val === null) {
-        this.form.expiryDateEnd = ''
+        this.form.expiryEndTime = ''
       } else {
-        this.form.expiryDateEnd = val
+        this.form.expiryEndTime = val
       }
     },
     search() {
@@ -527,93 +593,15 @@ export default {
     // 处理当前列表选中状态
     handleRowSelection(data) {
       data.forEach((item) => {
-        if (this.selectedObj[item.id]) {
+        if (
+          this.selectedObj[item.id] ||
+          item.userId === this.$props.userEditRow.id
+        ) {
           this.$nextTick(() => {
             this.$refs.userTable.toggleRowSelection(item)
           })
         }
       })
-    },
-
-    async getLists(id) {
-      await getUserInfoList({
-        current: this.params.pageNum,
-        pageSize: this.params.pageSize,
-        roleName: this.roleName
-      })
-        .then((res) => {
-          if (res.code === 0) {
-            getEditRolesDetail(this.$route.query.key).then((res1) => {
-              if (res1.code === 0) {
-                const {
-                  address,
-                  description,
-                  expiryDateEnd,
-                  expiryDateStart,
-                  jobNo,
-                  id,
-                  password,
-                  phone,
-                  rePassword,
-                  roleIds,
-                  userAccount,
-                  userName,
-                  orgName,
-                  orgId
-                } = res1.data
-                this.form1.address = address
-                this.form1.description = description
-                this.form.expiryDateEnd = expiryDateEnd
-                this.form.expiryDateStart = expiryDateStart
-                this.form1.jobNo = jobNo
-                this.form.id = id
-                this.form.orgId = orgName
-                this.form.password = password
-                this.form1.phone = phone
-                this.form.rePassword = rePassword
-                this.form.roleIds = roleIds
-
-                this.selectedData = roleIds
-
-                this.form.userAccount = userAccount
-                this.form.userName = userName
-                this.Id = orgId
-
-                let arr = res.data.records
-                this.tableData = arr
-                this.handleRowSelection(this.tableData)
-                this.params.total = res.data.total
-                this.params.pages = res.data.pages
-                this.params.current = res.data.current
-                // arr.forEach((item) => {
-                //   for (let j in this.form.roleIds) {
-                //     //console.log(arr[j])
-                //     if (item.id === this.form.roleIds[j]) {
-                //       //把对应的数据回显的时候，勾选上
-                //       this.$nextTick(() => {
-                //         this.$refs.userTable.toggleRowSelection(item, true)
-                //       })
-                //       break
-                //     }
-                //   }
-                // })
-
-                if (!this.isChecked) {
-                  arr.forEach((item) => {
-                    if (this.selectedData.includes(item.id)) {
-                      this.$nextTick(() => {
-                        this.$refs.userTable.toggleRowSelection(item, true)
-                      })
-                    }
-                  })
-                }
-              }
-            })
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
     },
 
     handlePasswordCheck(password, rePassword) {
@@ -642,13 +630,18 @@ export default {
         // ) {
         //   return
         // }
-        this.form.orgId = this.Id
+        this.form.sectionId = this.Id
         const roleIds = []
         this.selectedData.map((item) => {
           roleIds.push(item.id)
         })
-        editUser({ ...this.form, ...this.form1, roleIds }).then((res) => {
-          if (res.code === 0) {
+        userUpdate({
+          userId: this.userId,
+          ...this.form,
+          ...this.form1,
+          roleIds
+        }).then((res) => {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '编辑成功'
@@ -661,7 +654,8 @@ export default {
     },
 
     goback() {
-      this.$router.push({ path: '/accountManagement' })
+      this.$emit('init')
+      this.$emit('changeIsShow', false, 'edit')
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
@@ -672,7 +666,7 @@ export default {
       this.getLists()
     },
     nodeClickHandle(data) {
-      this.form.orgId = data.orgName
+      this.form.sectionId = data.sectionName
       this.Id = data.id
       this.$refs.selectTree.blur()
     }
@@ -681,6 +675,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 // 滚动条大小设置
 ::v-deep .box-card::-webkit-scrollbar {
   /*纵向滚动条*/

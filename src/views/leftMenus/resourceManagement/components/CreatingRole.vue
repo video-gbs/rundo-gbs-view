@@ -2,9 +2,9 @@
   <div class="creatingRole-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
-        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" />
+        <svg-icon icon-class="back-svg" class="back-svg" @click="goback" />
         <span class="back-title">{{
-          this.$route.query.key === 'add' ? '新建角色' : '编辑角色'
+          nameType === 'add' ? '新建角色' : '编辑角色'
         }}</span>
       </div>
     </div>
@@ -52,6 +52,21 @@
           <span>权限配置</span>
         </div>
         <div class="text item tree-bottom">
+          <div class="btn-lists-top" v-if="activeIndex !== '应用菜单权限'">
+            <el-select
+              class="btn-lists-top-select"
+              v-model="resourceKey"
+              placeholder="请选择资源类型："
+              @change="changeResourceType"
+            >
+              <el-option
+                v-for="o in resourceKeyOptions"
+                :label="o.resourceName"
+                :value="o.resourceKey"
+                :key="o.resourceValue"
+              />
+            </el-select>
+          </div>
           <el-tabs
             v-model="activeName"
             class="f1 f fd-c top-pane"
@@ -60,51 +75,138 @@
             <el-tab-pane label="系统权限" name="系统权限" class="role-pane">
               <div class="left-lists">
                 <div class="left-lists-table-menu">
-                  <!-- <el-menu
-                    :default-active="activeIndex"
-                    class="el-menu-vertical-demo"
-                  >
-                    <el-menu-item>
-                      <span slot="title">{{ o.name }}</span>
-                    </el-menu-item>
-                  </el-menu>-->
-
                   <el-tabs
-                    tab-position="left"
                     class="el-menu-vertical-demo"
                     v-model="activeIndex"
+                    tab-position="left"
+                    @tab-click="handleClick"
                   >
                     <el-tab-pane
-                      v-for="(item, index) in sysTypeOptions"
-                      :label="item.label"
-                      :value="item.value"
-                      :key="item.value"
-                      :index="item.active"
-                      :lazy="lazyLoading"
                       class="typeTree-pane"
+                      label="应用菜单权限"
+                      name="应用菜单权限"
                     >
-                      <div class="left-lists-table-tree">
+                      <div
+                        class="left-lists-table-tree left-lists-table-tree-menu"
+                      >
                         <el-tree
-                          :ref="`addRoleTree${[index]}`"
-                          :data="allTreeData[index]"
+                          ref="addRoleTree1"
+                          :data="treeData1"
                           class="addRoleTree"
                           show-checkbox
                           node-key="id"
-                          :check-strictly="ischeckStrictly[index]"
-                          :props="getDefaultProps(index)"
+                          :props="defaultProps"
+                          :expand-on-click-node="false"
+                          :check-strictly="true"
                           :default-expand-all="true"
                           highlight-current
+                          @node-click="nodeClickHandle"
                           @check-change="handleCheckChange"
-                          :default-expanded-keys="expandedList[index]"
-                          :default-checked-keys="checkedList[index]"
+                          :default-expanded-keys="expandedList1"
+                          :default-checked-keys="checkedList1"
                         >
                           <span
                             slot-scope="{ node, data }"
                             class="custom-tree-node"
                           >
-                            <span>{{
-                              data.orgName || data.areaName || data.name
-                            }}</span>
+                            <span>{{ data.name }}</span>
+                          </span>
+                        </el-tree>
+                        <div class="role_featureApiTable">
+                          <el-table
+                            v-if="isLeftChecked"
+                            ref="featureApiTable"
+                            class="table-content-bottom"
+                            :data="featureApiTableData"
+                            row-key="id"
+                            @selection-change="handleSelectChange"
+                            @select="handleSelect"
+                            border
+                            :header-cell-style="{
+                              background: 'rgba(0, 75, 173, 0.06)',
+                              fontSize: '14px',
+                              fontFamily:
+                                'Microsoft YaHei-Bold, Microsoft YaHei',
+                              fontWeight: 'bold',
+                              color: '#333333'
+                            }"
+                          >
+                            <el-table-column
+                              type="selection"
+                              width="80"
+                              align="center"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                              type="index"
+                              width="50"
+                              align="center"
+                              label="序号"
+                            >
+                            </el-table-column>
+                            <el-table-column
+                              prop="serviceName"
+                              label="服务名称"
+                              :show-overflow-tooltip="true"
+                            />
+                            <el-table-column
+                              prop="funcName"
+                              label="功能名称"
+                              :show-overflow-tooltip="true"
+                            />
+                            <el-table-column
+                              prop="path"
+                              label="资源路径"
+                              :show-overflow-tooltip="true"
+                            />
+                            <el-table-column prop="method" label="请求方法">
+                              <template slot-scope="scope">
+                                <span
+                                  v-for="item in methodOptions"
+                                  :key="item.value"
+                                  >{{
+                                    item.value === scope.row.method
+                                      ? item.label
+                                      : ''
+                                  }}</span
+                                >
+                              </template>
+                            </el-table-column>
+                          </el-table>
+                          <pagination
+                            :pages-data="params"
+                            @size-change="sizeChange"
+                            @current-change="currentChange"
+                          />
+                        </div>
+                      </div>
+                    </el-tab-pane>
+                    <el-tab-pane
+                      class="typeTree-pane"
+                      label="资源功能权限"
+                      name="资源功能权限"
+                    >
+                      <div class="left-lists-table-tree">
+                        <el-tree
+                          :ref="'addRoleTree2' + resourceKey"
+                          :data="treeData2[resourceKey]"
+                          class="addRoleTree"
+                          show-checkbox
+                          node-key="id"
+                          :props="defaultProps1"
+                          :expand-on-click-node="false"
+                          :check-strictly="true"
+                          :default-expand-all="true"
+                          highlight-current
+                          @check-change="handleCheckChange"
+                          :default-expanded-keys="expandedList2[resourceKey]"
+                          :default-checked-keys="checkedList2[resourceKey]"
+                        >
+                          <span
+                            slot-scope="{ node, data }"
+                            class="custom-tree-node"
+                          >
+                            <span>{{ data.resourceName }}</span>
                           </span>
                         </el-tree>
                       </div>
@@ -113,186 +215,6 @@
                 </div>
               </div>
             </el-tab-pane>
-
-            <!-- <el-tab-pane label="资源权限" name="资源权限">
-              <div class="right-lists">
-                <div class="right-lists-table-menu">
-                  <el-menu
-                    default-active="2"
-                    class="el-menu-vertical-demo"
-                    @open="handleOpen"
-                    @close="handleClose"
-                  >
-                    <el-menu-item index="2">
-                      <i class="el-icon-menu"></i>
-                      <span slot="title">视频资源</span>
-                    </el-menu-item>
-                    <el-menu-item index="4">
-                      <i class="el-icon-setting"></i>
-                      <span slot="title">电视墙</span>
-                    </el-menu-item>
-                  </el-menu>
-                </div>
-                <div class="right-lists-table-tree">
-                  <leftTree :treeData="treeData" />
-                </div>
-
-                <div class="right-lists-table">
-                  <div class="right-lists-table-div">
-                    <el-input
-                      placeholder="请输入搜索关键字"
-                      suffix-icon="el-icon-search"
-                      class="search-input"
-                    ></el-input>
-                    <el-button
-                      v-if="isCheckedAll"
-                      type="primary"
-                      @click="checkedAll(tableData)"
-                      ><svg-icon
-                        class="svg-btn"
-                        icon-class="checkedAll"
-                      />全选</el-button
-                    >
-                    <el-button
-                      v-else
-                      type="primary"
-                      @click="cancellCheckedAll(tableData)"
-                      ><svg-icon
-                        class="svg-btn"
-                        icon-class="checkedAll"
-                      />取消全选</el-button
-                    >
-                  </div>
-                  <el-table
-                    ref="tableChecked"
-                    class="table-content-bottom"
-                    :data="tableData"
-                    border
-                    :header-cell-style="{
-                      background: 'rgba(0, 75, 173, 0.06)',
-                      fontSize: '14px',
-                      fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
-                      fontWeight: 'bold',
-                      color: '#333333'
-                    }"
-                    @selection-change="handleSelectionChange"
-                  >
-                    <el-table-column
-                      type="index"
-                      width="50"
-                      align="center"
-                      label="序号"
-                    >
-                    </el-table-column>
-                    <el-table-column
-                      prop="name"
-                      label="通道名称"
-                      :show-overflow-tooltip="true"
-                    />
-                    <el-table-column
-                      prop="preview"
-                      label="预览"
-                      :show-overflow-tooltip="true"
-                    >
-                      <template slot="header" slot-scope="scope">
-                        <el-checkbox
-                          v-model="previewCheckAll"
-                          :scope="scope"
-                          :indeterminate="previewIndeterminate"
-                          @change="checkColumnAll(scope)"
-                          >预览</el-checkbox
-                        >
-                      </template>
-                      <template slot-scope="scope">
-                        <el-checkbox
-                          v-model="scope.row.previewChecked"
-                          @change="tableCheckboxChange('预览', scope.row)"
-                          >预览</el-checkbox
-                        >
-                      </template>
-                    </el-table-column>
-                    <el-table-column
-                      prop="playback"
-                      label="回放"
-                      :show-overflow-tooltip="true"
-                    >
-                      <template slot="header" slot-scope="scope">
-                        <el-checkbox
-                          v-model="playbackCheckAll"
-                          :indeterminate="playbackIndeterminate"
-                          @change="checkColumnAll(scope)"
-                          >回放</el-checkbox
-                        >
-                      </template>
-                      <template slot-scope="scope">
-                        <el-checkbox
-                          v-model="scope.row.playbackChecked"
-                          @change="tableCheckboxChange('回放', scope.row)"
-                          >回放</el-checkbox
-                        >
-                      </template>
-                    </el-table-column>
-                    <el-table-column prop="control" label="云台控制">
-                      <template slot="header" slot-scope="scope">
-                        <el-checkbox
-                          v-model="controlCheckAll"
-                          :indeterminate="controlIndeterminate"
-                          @change="checkColumnAll(scope)"
-                          >云台控制</el-checkbox
-                        >
-                      </template>
-                      <template slot-scope="scope">
-                        <el-checkbox
-                          v-model="scope.row.controlChecked"
-                          @change="tableCheckboxChange('云台控制', scope.row)"
-                          >云台控制</el-checkbox
-                        >
-                      </template>
-                    </el-table-column>
-                    <el-table-column prop="videoDownload" label="录像下载">
-                      <template slot="header" slot-scope="scope">
-                        <el-checkbox
-                          v-model="downloadCheckAll"
-                          :indeterminate="downloadIndeterminate"
-                          @change="checkColumnAll(scope)"
-                          >录像下载</el-checkbox
-                        >
-                      </template>
-                      <template slot-scope="scope">
-                        <el-checkbox
-                          v-model="scope.row.downloadChecked"
-                          @change="tableCheckboxChange('录像下载', scope.row)"
-                          >录像下载</el-checkbox
-                        >
-                      </template>
-                    </el-table-column>
-                    <el-table-column prop="alarm" label="告警下载">
-                      <template slot="header" slot-scope="scope">
-                        <el-checkbox
-                          v-model="alarmCheckAll"
-                          :indeterminate="alarmIndeterminate"
-                          @change="checkColumnAll(scope)"
-                          >告警下载</el-checkbox
-                        >
-                      </template>
-                      <template slot-scope="scope">
-                        <el-checkbox
-                          v-model="scope.row.alarmChecked"
-                          @change="tableCheckboxChange('告警下载', scope.row)"
-                          >告警下载</el-checkbox
-                        >
-                      </template>
-                    </el-table-column>
-                  </el-table>
-
-                  <pagination
-                    :pages-data="params"
-                    @size-change="sizeChange"
-                    @current-change="currentChange"
-                  />
-                </div>
-              </div>
-            </el-tab-pane>-->
           </el-tabs>
         </div>
       </div>
@@ -310,20 +232,30 @@
 </template>
 
 <script>
-import LineFont from '@/components/LineFont'
 import pagination from '@/components/Pagination/index.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import {
   getVideoAraeTree,
   getAppMenuApiTree,
   getDepartmentTree,
-  getRoleDetail,
-  editRoles,
-  addRoles
+  roleUpdate,
+  roleAdd,
+  getRoleMenuList,
+  getRoleResourceList,
+  getRoleFuncMenuList,
+  getRoleFuncList
 } from '@/api/method/role'
+
+import { getRootList, getResourceList } from '@/api/method/resourceInterface'
+
+import { getMenuTree } from '@/api/method/menus'
+
+import { getFeatureList } from '@/api/method/featureApi'
+
 export default {
   name: '',
-  components: { LineFont, pagination, leftTree },
+  components: { pagination, leftTree },
+  props: ['creatingRoleRow', 'nameType'],
   data() {
     const checkRoleName = (rule, value, cb) => {
       const regRoleName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
@@ -351,45 +283,44 @@ export default {
           roleName: ''
         }
       },
+      params: {
+        pageNum: 1,
+        pageSize: 10,
+        total: 0
+      },
+      featureApiTableData: [],
+      isLeftChecked: true,
+      resourceKey: '',
+      resourceKeyOptions: [],
       activeName: '系统权限',
       ischeckStrictly: [false, false, false, true, true],
-      // params: {
-      //   pageNum: 1,
-      //   pageSize: 10,
-      //   total: 0
-      // },
-      activeIndex: 0,
-      expandedList: [],
-      checkedList: [],
-      sysTypeOptions: [
-        { label: '应用菜单权限', value: 1, name: '应用菜单权限', active: '1' },
-        { label: '配置菜单权限', value: 2, name: '配置菜单权限', active: '2' },
-        { label: '运维菜单权限', value: 3, name: '运维菜单权限', active: '3' },
-        { label: '部门管理权限', value: 4, name: '部门管理权限', active: '4' },
-        { label: '安防区域权限', value: 5, name: '安防区域权限', active: '5' }
-      ],
+      activeIndex: '应用菜单权限',
+      expandedList1: [],
+      checkedList1: [],
+      expandedList2: {},
+      checkedList2: {},
       checked: false,
-      // data: [],
-      allTreeData: [],
+      treeData1: [],
+      treeData2: {},
+      methodOptions: [
+        { label: 'post', value: 2 },
+        { label: 'get', value: 1 },
+        { label: 'put', value: 3 },
+        { label: 'delete', value: 4 }
+      ],
       defaultProps: {
-        children: 'children',
+        children: 'childList',
         label: 'name'
       },
       defaultProps1: {
-        children: 'children',
-        label: 'areaNames'
-      },
-      defaultProps2: {
-        children: 'children',
-        label: 'orgName'
+        children: 'childList',
+        label: 'resourceName'
       },
       rules: {
         roleName: {
           required: true,
           max: 32,
           validator: checkRoleName,
-          // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-          // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
           trigger: 'blur'
         },
         roleDesc: {
@@ -398,256 +329,495 @@ export default {
           max: 128
         }
       },
-      tableData: [
-        {
-          name: '球机192.168……',
-          coding: '4400000000111500…',
-          type: 'IPC',
-          ip: '192.168.119.152',
-          port: 8000,
-          manufacturer: '海康',
-          status: 1,
-          previewChecked: false,
-          playbackChecked: false,
-          controlChecked: false,
-          downloadChecked: false,
-          alarmChecked: false
-        }
-      ],
-      lineTitle: {
-        title: '未选择列表',
-        notShowSmallTitle: false
-      },
-      lineTitle1: {
-        title: '已选择列表',
-        notShowSmallTitle: false
-      },
-      textStyle: {
-        fontSize: '16px',
-        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
-        fontWeight: 'bold',
-        color: '#333333'
-      },
-      lineBlueStyle: {
-        background: 'rgba(30, 86, 160, 1)',
-        width: '3px',
-        height: '18px'
-      },
-      appIds: [],
-      areaIds: [],
-      configIds: [],
-      devopsIds: [],
-      orgIds: [],
+      Id: '',
+      selectedObj: {},
+      selectedData: [],
+      resLists: {},
+      // 菜单数组
+      menuIds: [],
+      // 功能数组
+      funcIds: [],
+      // 资源数组
+      resourceIds: [],
       type: 1,
-      lazyLoading: true
+      allRoleFuncList: [],
+      updateRoleResourceList: [],
+      updateIdsList: [],
+      updateRoleFuncMenuIds: []
     }
   },
   watch: {
     allTreeData: {
-      handler(n, o) {},
-      deep: true // 深度监听父组件传过来对象变化
+      handler(n, o) {
+        console.log(n, o)
+      },
+      deep: true
     }
   },
   created() {
-    if (this.$route.query.key !== 'add') {
-      this.getRoleDetail()
+    if (this.$props.nameType !== 'add') {
+      const { roleDesc, roleName } = this.$props.creatingRoleRow
+      this.form.params.roleDesc = roleDesc
+      this.form.params.roleName = roleName
+
+      this.getRoleFuncList()
+
+      this.getRoleMenuList()
+
+      this.getRoleResourceList()
     }
-    this.init()
+    this.getRootList()
   },
   mounted() {
-    // this.handleCheckChange()
+    this.initGetMenuTree()
   },
   methods: {
-    async getRoleDetail() {
-      await getRoleDetail(this.$route.query.row).then((res) => {
-        if (res.code === 0) {
-          const {
-            roleDesc,
-            roleName,
-            appIds,
-            areaIds,
-            configIds,
-            devopsIds,
-            orgIds
-          } = res.data
-          this.form.params.roleDesc = roleDesc
-          this.form.params.roleName = roleName
-          this.appIds = appIds
-          this.areaIds = areaIds
-          this.configIds = configIds
-          this.devopsIds = devopsIds
-          this.orgIds = orgIds
-          let res1 = []
-          let res2 = []
-          let res3 = []
-          appIds.map((item1) => {
-            res1.push(item1.slice(2))
+    async getRootList() {
+      await getRootList()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.resourceKeyOptions = res.data.data
+            this.resourceKey = res.data.data[0].resourceKey
+
+            this.initGetResourceList(this.resourceKey, false)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    handleClick(tab, event) {
+      if (tab.name === '应用菜单权限') {
+        return this.defaultProps
+      } else {
+        return this.defaultProp1
+      }
+    },
+
+    // 获取全部的回显应用菜单权限树
+    async getRoleFuncList() {
+      await getRoleFuncList({ roleId: this.$props.creatingRoleRow.id })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.allRoleFuncList = res.data.data
+            // this.funcIds = res.data.data
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    // 回显应用菜单权限树
+    async getRoleMenuList() {
+      await getRoleMenuList({ roleId: this.$props.creatingRoleRow.id })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.expandedList1 = res.data.data
+            this.checkedList1 = res.data.data
+            this.menuIds = res.data.data
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
+    // 回显角色某菜单下的功能信息
+    async getRoleFuncMenuList(id) {
+      await getRoleFuncMenuList({
+        roleId: this.$props.creatingRoleRow.id,
+        menuId: id
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.updateRoleFuncMenuIds = res.data.data
+            this.getList(id)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
+    // 回显资源功能树
+    async getRoleResourceList() {
+      await getRoleResourceList({
+        roleId: this.$props.creatingRoleRow.id
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.updateRoleResourceList = []
+            this.updateRoleResourceList = res.data.data
+            this.resourceIds = res.data.data
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
+    // 应用菜单树
+    async initGetMenuTree() {
+      await getMenuTree()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.treeData1 = [res.data.data]
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
+    // 资源功能树
+    async initGetResourceList(resourceKey, value) {
+      await getResourceList({
+        resourceKey,
+        isIncludeResource: true
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$nextTick(() => {
+              this.treeData2[resourceKey] = [res.data.data] || []
+
+              if (this.$props.nameType !== 'add') {
+                this.handleRowSelection1(
+                  this.treeData2[resourceKey],
+                  resourceKey
+                )
+              }
+              this.$forceUpdate()
+            })
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
+    // 处理当前列表选中状态
+    handleRowSelection(data) {
+      console.log('处理当前列表选中状态', data, this.selectedObj)
+      data.forEach((item) => {
+        if (this.selectedObj[item.id]) {
+          this.$nextTick(() => {
+            this.$refs.featureApiTable.toggleRowSelection(item)
+            this.$forceUpdate()
           })
-          configIds.map((item2) => {
-            res2.push(item2.slice(2))
-          })
-          devopsIds.map((item3) => {
-            res3.push(item3.slice(2))
-          })
-          ;(this.expandedList[0] = res1),
-            (this.expandedList[1] = res2),
-            (this.expandedList[2] = res3),
-            (this.expandedList[3] = orgIds),
-            (this.expandedList[4] = areaIds),
-            (this.checkedList[0] = res1),
-            (this.checkedList[1] = res2),
-            (this.checkedList[2] = res3),
-            (this.checkedList[3] = orgIds),
-            (this.checkedList[4] = areaIds)
         }
       })
     },
 
-    async init() {
-      const tree1 = await getAppMenuApiTree(1)
-      const tree2 = await getAppMenuApiTree(2)
-      const tree3 = await getAppMenuApiTree(3)
-      const tree4 = await getDepartmentTree()
-      const tree5 = await getVideoAraeTree()
-
-      // this.$nextTick(() => {
-      this.allTreeData[0] = tree1.data ? tree1.data : []
-      this.allTreeData[1] = tree2.data ? tree2.data : []
-
-      this.allTreeData[2] = tree3.data ? tree3.data : []
-      this.allTreeData[3] = tree4.data ? tree4.data : []
-      this.allTreeData[4] = tree5.data ? tree5.data : []
-      // })
-      this.lazyLoading = false
+    setCheckedLists(arr) {
+      arr.map((item) => {
+        if (item.id === this.resLists[this.resourceKey][0].id) {
+          return item
+        } else {
+          if (item.childList && item.childList.length > 0) {
+            this.setCheckedLists(item.childList)
+          }
+        }
+      })
     },
 
+    // setCheckedLists1(arr, resourceKey) {
+    //   arr.map((item) => {
+    //     this.updateRoleResourceList.forEach((item1) => {
+    //       if (item.id === item1) {
+    //         this.updateIdsList.push(item.id)
+    //       } else {
+    //         if (item.childList && item.childList.length > 0) {
+    //           this.setCheckedLists1(item.childList)
+    //         }
+    //       }
+    //     })
+    //   })
+    // },
+
+    handleRowSelection1(data, resourceKey) {
+      // this.setCheckedLists1(data, resourceKey)
+      // console.log('this.updateIdsList', this.updateIdsList)
+      this.$nextTick(() => {
+        this.expandedList2[resourceKey] = this.updateRoleResourceList
+        this.checkedList2[resourceKey] = this.updateRoleResourceList
+        this.$refs['addRoleTree2' + resourceKey].setCheckedNodes(
+          this.updateRoleResourceList
+        )
+      })
+    },
+
+    handleSelectChange(selection) {
+      // 全选取消，删除当前页所有数据
+      if (selection.length === 0) {
+        this.featureApiTableData.forEach((item) => {
+          delete this.selectedObj[item.id]
+        })
+        this.featureApiTableData.forEach((item) => {
+          console.log('~~~~~~~~~~~~~~', item)
+          this.allRoleFuncList = this.allRoleFuncList.filter((item1) => {
+            return item1 !== item.id
+          })
+        })
+      }
+      console.log('全部取消~~~~~~~~~~~~~~', this.allRoleFuncList)
+      // 勾选数据 添加
+      selection.forEach((item) => {
+        this.selectedObj[item.id] = item
+      })
+      // 获取所有分页勾选的数据
+      this.selectedData = []
+      for (const key in this.selectedObj) {
+        this.selectedData.push(this.selectedObj[key])
+      }
+    },
+
+    handleSelect(selection, row) {
+      // 取消单个勾选时，删除对应属性
+      if (!selection.some((item) => item.id === row.id)) {
+        delete this.selectedObj[row.id]
+      }
+
+      console.log('selection', selection, this.selectedObj)
+      if (this.$props.nameType !== 'add') {
+        let resData = []
+        selection.map((item1) => {
+          resData.push(item1.id)
+        })
+        // this.allRoleFuncList = resData
+
+        console.log('resData', resData)
+
+        console.log('this.allRoleFuncList````````', this.allRoleFuncList)
+      }
+    },
+
+    sizeChange(pageSize) {
+      this.params.pageSize = pageSize
+      this.getList(this.Id)
+    },
+    currentChange(proCount) {
+      this.params.proCount = proCount
+      this.getList(this.Id)
+    },
+
+    changeResourceType(val) {
+      this.resourceKey = val
+      if (this.$props.nameType !== 'add') {
+        this.initGetResourceList(val, true)
+      } else {
+        this.initGetResourceList(val, false)
+      }
+    },
+
+    async getList(id) {
+      await getFeatureList({
+        page: this.params.pageNum,
+        num: this.params.pageSize,
+        menuId: id,
+        isInclude: false
+      }).then((res) => {
+        if (res.data.code === 0) {
+          this.featureApiTableData = res.data.data.list
+
+          if (this.$props.nameType !== 'add') {
+            // this.allRoleFuncList = Array.from(
+            //   new Set(this.allRoleFuncList.concat(checkedIds))
+            // )
+            res.data.data.list.map((item) => {
+              this.allRoleFuncList.forEach((item1) => {
+                if (item.id === item1) {
+                  this.selectedObj[item1] = item
+                }
+              })
+            })
+          }
+
+          this.handleRowSelection(this.featureApiTableData)
+          this.params.total = res.data.data.total
+          this.params.pages = res.data.data.pageNum
+          this.params.current = res.data.data.pageSize
+        } else {
+          this.$message({
+            type: 'warning',
+            message: res.data.data
+          })
+          this.featureApiTableData = []
+        }
+      })
+    },
+
+    nodeClickHandle(data) {
+      if (this.$props.nameType !== 'add') {
+        this.getRoleFuncMenuList(data.id)
+      } else {
+        this.getList(data.id)
+      }
+      this.Id = data.id
+    },
+
+    //递归设置父节点全部选中
+    setParentNode(node) {
+      if (node.parent) {
+        //循环对象的parent属性，设对象节点选择框为选中状态
+        for (const key in node) {
+          if (key === 'parent') {
+            node[key].checked = true
+            //递归调用相应父节点处理函数
+            this.setParentNode(node[key])
+          }
+        }
+      }
+    },
+    //递归设置子节点全部取消选中
+    setChildNode(node) {
+      if (node.childNodes && node.childNodes.length) {
+        //将此节点下所有子节点设为选中状态
+        node.childNodes.forEach((item) => {
+          item.checked = false
+          //递归调用相应子节点处理函数
+          this.setChildNode(item)
+        })
+      }
+    },
     handleCheckChange(data, checked, indeterminate) {
-      //获取所有选中的节点 start
+      console.log('data', data, this.activeIndex)
+      // 获取所有选中的节点
       let resIds = []
-      const num = Number(this.activeIndex)
-      switch (num) {
-        case 0:
-          let res = this.$refs.addRoleTree0[0].getCheckedNodes()
-          res.forEach((item) => {
-            resIds.push(item.idStr)
-          })
-          this.appIds = resIds
-          this.expandedList[num] = resIds
-          this.checkedList[num] = resIds
-          break
-        case 1:
-          let res1 = this.$refs.addRoleTree1[0].getCheckedNodes()
+      switch (this.activeIndex) {
+        case '应用菜单权限':
+          if (checked === false) {
+            //如果当前节点有子集
+            if (data.childList) {
+              data.childList.map((item1) => {
+                this.$refs.addRoleTree1.setChecked(item1.id, false)
+              })
+            }
+          } else {
+            //否则(为选中状态)
+            //判断父节点id是否为空
+            if (data.menuPid) {
+              //如果不为空则将其选中
+              this.$refs.addRoleTree1.setChecked(data.menuPid, true)
+            }
+          }
+          let res1 = this.$refs.addRoleTree1.getCheckedNodes()
           res1.forEach((item) => {
-            resIds.push(item.idStr)
-          })
-          this.configIds = resIds
-          this.expandedList[num] = resIds
-          this.checkedList[num] = resIds
-          break
-        case 2:
-          let res2 = this.$refs.addRoleTree2[0].getCheckedNodes()
-          res2.forEach((item) => {
-            resIds.push(item.idStr)
-          })
-          this.devopsIds = resIds
-          this.expandedList[num] = resIds
-          this.checkedList[num] = resIds
-          break
-        case 3:
-          console.log(2222)
-          let res3 = this.$refs.addRoleTree3[0].getCheckedNodes()
-          res3.forEach((item) => {
             resIds.push(item.id)
           })
-          this.orgIds = resIds
-          this.expandedList[num] = resIds
-          this.checkedList[num] = resIds
+
+          this.menuIds = resIds
+          this.expandedList1 = resIds
+          this.checkedList1 = resIds
           break
-        case 4:
-          console.log(11111)
-          let res4 = this.$refs.addRoleTree4[0].getCheckedNodes()
-          res4.forEach((item) => {
+        case '资源功能权限':
+          if (checked === false) {
+            if (data.childList) {
+              data.childList.map((item2) => {
+                this.$refs['addRoleTree2' + this.resourceKey].setChecked(
+                  item2.id,
+                  false
+                )
+              })
+            }
+          } else {
+            if (data.resourcePid) {
+              this.$refs['addRoleTree2' + this.resourceKey].setChecked(
+                data.resourcePid,
+                true
+              )
+            }
+          }
+          this.resLists[this.resourceKey] =
+            this.$refs['addRoleTree2' + this.resourceKey].getCheckedNodes()
+
+          this.resLists[this.resourceKey].forEach((item) => {
             resIds.push(item.id)
           })
-          this.areaIds = resIds
-          this.expandedList[num] = resIds
-          this.checkedList[num] = resIds
+          let resIdLists = []
+          this.resourceIds = []
+          for (const key in this.resLists) {
+            resIdLists.push(this.resLists[key])
+          }
+
+          resIdLists.forEach((item1) => {
+            item1.map((child) => {
+              this.resourceIds.push(child.id)
+            })
+          })
+
+          this.updateRoleResourceList = []
+          this.updateRoleResourceList = this.resourceIds
+          // return
+          this.expandedList2[this.resourceKey] = resIds
+          this.checkedList2[this.resourceKey] = resIds
           break
         default:
           break
       }
     },
-    async getVideoAraeTree() {
-      await getVideoAraeTree().then((res) => {
-        if (res.code === 0) {
-          this.treeData = res.data
-        }
-      })
-    },
-    async getDepartmentTree() {
-      await getDepartmentTree().then((res) => {
-        if (res.code === 0) {
-          this.treeData = res.data
-        }
-      })
-    },
-    getDefaultProps(index) {
-      if (index === 0 || index === 1 || index === 2) {
-        return this.defaultProps
-      } else if (index === 3) {
-        return this.defaultProps2
-      } else {
-        return this.defaultProp1
-      }
-    },
     goback() {
-      this.$router.push({ path: '/roleManagement' })
+      this.$emit('changeIsClicked', 2)
     },
+
     save(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          switch (this.$route.query.key) {
+          this.funcIds = []
+          this.selectedData.map((item) => {
+            this.funcIds.push(item.id)
+          })
+          this.funcIds = this.allRoleFuncList
+            .concat(this.funcIds)
+            .filter((item, index, array) => {
+              return array.indexOf(item) === index
+            })
+
+          console.log('this.funcIds============', this.funcIds)
+          switch (this.$props.nameType) {
             case 'add':
               const params = {
-                appIds: this.appIds,
-                areaIds: this.areaIds,
-                configIds: this.configIds,
-                devopsIds: this.devopsIds,
-                orgIds: this.orgIds,
-                roleDesc: this.form.params.roleDesc,
-                roleName: this.form.params.roleName
+                funcIds: this.funcIds,
+                menuIds: this.menuIds,
+                resourceIds: this.resourceIds,
+                ...this.form.params
               }
-              addRoles(params).then((res) => {
-                if (res.code === 0) {
+
+              console.log('this.params~~~~~~~~~~~~~~~', params)
+              // return
+              roleAdd(params).then((res) => {
+                if (res.data.code === 0) {
                   this.$message({
                     type: 'success',
                     message: '角色新建成功'
                   })
+
+                  this.$emit('getList')
                   this.goback()
                 }
               })
               break
             case 'edit':
               const params1 = {
-                appIds: this.appIds,
-                areaIds: this.areaIds,
-                configIds: this.configIds,
-                devopsIds: this.devopsIds,
-                orgIds: this.orgIds,
-                roleDesc: this.form.params.roleDesc,
-                roleName: this.form.params.roleName
+                funcIds: this.funcIds,
+                menuIds: this.menuIds,
+                resourceIds: this.resourceIds,
+                ...this.form.params
               }
-              editRoles({ id: this.$route.query.row, ...params1 }).then(
-                (res) => {
-                  if (res.code === 0) {
-                    this.$message({
-                      type: 'success',
-                      message: '修改角色成功'
-                    })
-                    this.goback()
-                  }
+              console.log('params1', params1)
+              roleUpdate({
+                roleId: this.$props.creatingRoleRow.id,
+                ...params1
+              }).then((res) => {
+                if (res.data.code === 0) {
+                  this.$message({
+                    type: 'success',
+                    message: '修改角色成功'
+                  })
+
+                  this.$emit('getList')
+                  this.goback()
                 }
-              )
+              })
               break
 
             default:
@@ -656,244 +826,6 @@ export default {
         }
       })
     }
-    // checkedAll(tableData) {
-    //   this.isCheckedAll = false
-    //   tableData.forEach((item) => {
-    //     item.previewChecked = true
-    //     item.playbackChecked = true
-    //     item.controlChecked = true
-    //     item.downloadChecked = true
-    //     item.alarmChecked = true
-    //   })
-
-    //   this.previewCheckAll = true
-    //   this.playbackCheckAll = true
-    //   this.controlCheckAll = true
-    //   this.downloadCheckAll = true
-    //   this.alarmCheckAll = true
-    // },
-    // cancellCheckedAll(tableData) {
-    //   this.isCheckedAll = true
-
-    //   tableData.forEach((item) => {
-    //     item.previewChecked = false
-    //     item.playbackChecked = false
-    //     item.controlChecked = false
-    //     item.downloadChecked = false
-    //     item.alarmChecked = false
-    //   })
-    //   this.previewCheckAll = false
-    //   this.playbackCheckAll = false
-    //   this.controlCheckAll = false
-    //   this.downloadCheckAll = false
-    //   this.alarmCheckAll = false
-
-    //   this.previewIndeterminate = false
-    //   this.playbackIndeterminate = false
-    //   this.controlIndeterminate = false
-    //   this.downloadIndeterminate = false
-    //   this.alarmIndeterminate = false
-
-    //   // this.$refs.tableChecked.clearSelection(tableData)
-    // },
-    // 预览列选中逻辑
-    // checkColumnAll(val) {
-    //   switch (val.column.label) {
-    //     case '预览':
-    //       if (val._self.previewCheckAll) {
-    //         this.tableData.forEach((item) => {
-    //           item.previewChecked = true
-    //         })
-    //         this.previewIndeterminate = false
-    //       } else {
-    //         this.tableData.forEach((item) => {
-    //           item.previewChecked = false
-    //         })
-    //         this.previewIndeterminate = false
-    //       }
-    //       break
-    //     case '回放':
-    //       if (val._self.playbackCheckAll) {
-    //         this.tableData.forEach((item) => {
-    //           item.playbackChecked = true
-    //         })
-    //         this.playbackIndeterminate = false
-    //       } else {
-    //         this.tableData.forEach((item) => {
-    //           item.playbackChecked = false
-    //         })
-    //         this.playbackIndeterminate = false
-    //       }
-    //       break
-    //     case '云台控制':
-    //       if (val._self.controlCheckAll) {
-    //         this.tableData.forEach((item) => {
-    //           item.controlChecked = true
-    //         })
-    //         this.controlIndeterminate = false
-    //       } else {
-    //         this.tableData.forEach((item) => {
-    //           item.controlChecked = false
-    //         })
-    //         this.controlIndeterminate = false
-    //       }
-    //       break
-    //     case '录像下载':
-    //       if (val._self.downloadCheckAll) {
-    //         this.tableData.forEach((item) => {
-    //           item.downloadChecked = true
-    //         })
-    //         this.downloadIndeterminate = false
-    //       } else {
-    //         this.tableData.forEach((item) => {
-    //           item.downloadChecked = false
-    //         })
-    //         this.downloadIndeterminate = false
-    //       }
-    //       break
-    //     case '告警下载':
-    //       if (val._self.alarmCheckAll) {
-    //         this.tableData.forEach((item) => {
-    //           item.alarmChecked = true
-    //         })
-    //         this.alarmIndeterminate = false
-    //       } else {
-    //         this.tableData.forEach((item) => {
-    //           item.alarmChecked = false
-    //         })
-    //         this.alarmIndeterminate = false
-    //       }
-    //       break
-
-    //     default:
-    //       break
-    //   }
-    // },
-    // tableCheckboxChange(name, row) {
-
-    //   let isAllTrue = ''
-    //   let isAllFalse = ''
-    //   switch (name) {
-    //     case '预览':
-    //       setTimeout(() => {
-    //         isAllTrue = this.tableData.every(
-    //           (item) => item.previewChecked === true
-    //         )
-    //         isAllFalse = this.tableData.every(
-    //           (item) => item.previewChecked === false
-    //         )
-    //         if (isAllTrue) {
-    //           this.previewIndeterminate = false
-    //           this.previewCheckAll = true
-    //         } else if (isAllFalse) {
-    //           this.previewIndeterminate = false
-    //           this.previewCheckAll = false
-    //         } else {
-    //           this.previewCheckAll = false
-    //           this.previewIndeterminate = true
-    //         }
-    //       }, 0)
-    //       break
-    //     case '回放':
-    //       setTimeout(() => {
-    //         isAllTrue = this.tableData.every(
-    //           (item) => item.playbackChecked === true
-    //         )
-    //         isAllFalse = this.tableData.every(
-    //           (item) => item.playbackChecked === false
-    //         )
-    //         if (isAllTrue) {
-    //           this.playbackIndeterminate = false
-    //           this.playbackCheckAll = true
-    //         } else if (isAllFalse) {
-    //           this.playbackIndeterminate = false
-    //           this.playbackCheckAll = false
-    //         } else {
-    //           this.playbackCheckAll = false
-    //           this.playbackIndeterminate = true
-    //         }
-    //       }, 0)
-    //       break
-    //     case '云台控制':
-    //       setTimeout(() => {
-    //         isAllTrue = this.tableData.every(
-    //           (item) => item.controlChecked === true
-    //         )
-    //         isAllFalse = this.tableData.every(
-    //           (item) => item.controlChecked === false
-    //         )
-    //         if (isAllTrue) {
-    //           this.controlIndeterminate = false
-    //           this.controlCheckAll = true
-    //         } else if (isAllFalse) {
-    //           this.controlIndeterminate = false
-    //           this.controlCheckAll = false
-    //         } else {
-    //           this.controlCheckAll = false
-    //           this.controlIndeterminate = true
-    //         }
-    //       }, 0)
-    //       break
-    //     case '录像下载':
-    //       setTimeout(() => {
-    //         isAllTrue = this.tableData.every(
-    //           (item) => item.downloadChecked === true
-    //         )
-    //         isAllFalse = this.tableData.every(
-    //           (item) => item.downloadChecked === false
-    //         )
-    //         if (isAllTrue) {
-    //           this.pdownloadIndeterminate = false
-    //           this.downloadCheckAll = true
-    //         } else if (isAllFalse) {
-    //           this.downloadIndeterminate = false
-    //           this.downloadCheckAll = false
-    //         } else {
-    //           this.downloadCheckAll = false
-    //           this.downloadIndeterminate = true
-    //         }
-    //       }, 0)
-    //       break
-    //     case '告警下载':
-    //       setTimeout(() => {
-    //         isAllTrue = this.tableData.every(
-    //           (item) => item.alarmChecked === true
-    //         )
-    //         isAllFalse = this.tableData.every(
-    //           (item) => item.alarmChecked === false
-    //         )
-    //         if (isAllTrue) {
-    //           this.alarmIndeterminate = false
-    //           this.alarmCheckAll = true
-    //         } else if (isAllFalse) {
-    //           this.alarmIndeterminate = false
-    //           this.alarmCheckAll = false
-    //         } else {
-    //           this.alarmCheckAll = false
-    //           this.alarmIndeterminate = true
-    //         }
-    //       }, 0)
-    //       break
-
-    //     default:
-    //       break
-    //   }
-    // },
-    // previewChecked(row) {
-    //   console.log('1111', row)
-    // },
-    // // 回放列选中逻辑
-    // playbackCheckAllDetail() {},
-    // playbackChecked() {},
-    // 云台控制列选中逻辑
-    // controlCheckAllDetail() {},
-    // controlChecked() {},
-    // 下载列选中逻辑
-    // downloadCheckAllDetail() {},
-    // downloadChecked() {},
-    // 告警列选中逻辑
-    // alarmCheckAllDetail() {},
-    // alarmChecked() {}
   }
 }
 </script>
@@ -977,6 +909,38 @@ export default {
   }
 }
 
+// 滚动条大小设置
+::v-deep .role_featureApiTable::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .role_featureApiTable::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .role_featureApiTable::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .role_featureApiTable::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+.btn-lists-top {
+  position: absolute;
+  left: 110px;
+  top: 5px;
+  z-index: 9999999;
+  .btn-lists-top-select {
+    widows: 436px;
+  }
+}
+
 .creatingRole-content {
   height: calc(100% - 16px);
   overflow-y: auto;
@@ -991,8 +955,6 @@ export default {
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     .back-svg {
-      width: 30px;
-      height: 30px;
       cursor: pointer;
     }
     .back-title {
@@ -1025,8 +987,10 @@ export default {
     .left-lists {
       display: flex;
       height: calc(100% - 0px);
+      width: 100%;
       .left-lists-table-menu {
         height: 100%;
+        width: 100%;
         text-align: center;
         .el-menu-vertical-demo {
           height: 100%;
@@ -1040,6 +1004,15 @@ export default {
         .addRoleTree {
           max-height: 350px;
           width: 300px;
+          margin-right: 20px;
+          overflow-y: auto;
+        }
+      }
+      .left-lists-table-tree-menu {
+        display: flex;
+        // justify-content: flex-start;
+        .role_featureApiTable {
+          width: calc(100% - 300px);
           overflow-y: auto;
         }
       }
@@ -1113,6 +1086,7 @@ export default {
       margin-top: 20px;
       height: calc(100% - 82px);
       overflow: auto;
+      position: relative;
     }
   }
 }

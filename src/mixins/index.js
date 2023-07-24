@@ -21,7 +21,7 @@ export default {
       ).then((action) => {
         detfn &&
           detfn(v.id).then((res) => {
-            res.code === 10000 && this.$message.success('删除成功')
+            res.data.code === 10000 && this.$message.success('删除成功')
             getFn && getFn()
           })
       })
@@ -30,7 +30,7 @@ export default {
       fn &&
         fn(v.id, v.isShow)
           .then((res) => {
-            // res.code === 10000 && (v.isShow = v.isShow ? 0 : 1)
+            // res.data.code === 10000 && (v.isShow = v.isShow ? 0 : 1)
           })
           .catch(() => {
             v.isShow = v.isShow ? 0 : 1

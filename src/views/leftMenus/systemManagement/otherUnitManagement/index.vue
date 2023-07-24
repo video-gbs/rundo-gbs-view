@@ -467,7 +467,7 @@ export default {
     },
     // getList() {
     //   otherUnitDeptRoleList().then((res) => {
-    //     if (res.code === 10000) {
+    //     if (res.data.code === 10000) {
     //       res.data.map((item) => {
     //         const obj = {
     //           id: '',
@@ -496,7 +496,7 @@ export default {
             id: this.passwordForm.id,
             password: this.passwordForm.password
           }).then((res) => {
-            if (res.code === 10000) {
+            if (res.data.code === 10000) {
               this.$message({
                 type: 'success',
                 message: '修改成功'
@@ -602,7 +602,7 @@ export default {
         type: 'warning'
       }).then(() => {
         otherUnitDelete(row.id).then((res) => {
-          if (res.code === 10000) {
+          if (res.data.code === 10000) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -616,7 +616,7 @@ export default {
     getDeptList() {
       // 获取部门
       unitList({ current: 1, size: 399 }).then((res) => {
-        if (res.code === 10000) {
+        if (res.data.code === 10000) {
           this.deptList = [...this.deptList, ...res.data?.records]
         }
       })
@@ -626,7 +626,7 @@ export default {
     },
     getOtherUnitList() {
       otherUnitListByDept(this.search).then((res) => {
-        if (res.code === 10000) {
+        if (res.data.code === 10000) {
           this.tableData = res.data.rows
           this.search.total = res.data.total
           this.search.pages = res.data.size
@@ -649,7 +649,7 @@ export default {
                 return
               }
               otherUnitAdd(this.dialog.params).then((res) => {
-                if (res.code === 10000) {
+                if (res.data.code === 10000) {
                   this.$message({
                     type: 'success',
                     message: '其他单位账号新增成功'
@@ -662,7 +662,7 @@ export default {
             case '编辑用户':
               otherUnitEdit({ id: this.editId, ...this.dialog.params }).then(
                 (res) => {
-                  if (res.code === 10000) {
+                  if (res.data.code === 10000) {
                     this.$message({
                       type: 'success',
                       message: '账号修改成功'

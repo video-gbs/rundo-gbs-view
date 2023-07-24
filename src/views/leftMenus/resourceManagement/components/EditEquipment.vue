@@ -259,10 +259,11 @@
 </template>
 
 <script>
-import { getVideoAraeTree } from '@/api/method/role'
+// import { getVideoAraeTree } from '@/api/method/role'
 import { editEncoder } from '@/api/method/encoder'
 import { getAllGatewayLists } from '@/api/method/moduleManagement'
-import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+import { getGroupDictLists } from '@/api/method/dictionary'
+import { channelVideoAreaList } from '@/api/method/channel'
 export default {
   name: '',
   components: {},
@@ -272,7 +273,86 @@ export default {
       default: function () {
         return []
       }
+    },
+    transportProtocolTypeOptions: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
+    manufacturerTypeOptions: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
+    treeList: {
+      type: Array,
+      default: function () {
+        return []
+      }
+    },
+    editEquipmentRow: {
+      type: Object,
+      default: function () {
+        return {}
+      }
+    },
+    resType: {
+      type: String,
+      efault: () => ''
     }
+  },
+  watch: {
+    editEquipmentRow(newValue, oldValue) {
+      this.resEditEquipmentRow = newValue
+      console.log(this.resEditEquipmentRow, 9999)
+
+      const {
+        model,
+        username,
+        deviceType,
+        manufacturer,
+        videoAreaId,
+        password,
+        transport,
+        latitude,
+        longitude,
+        port,
+        ip,
+        gatewayId
+      } = this.resEditEquipmentRow
+      this.form.deviceId =
+        this.$props.resType === '1'
+          ? this.resEditEquipmentRow.deviceId
+          : this.resEditEquipmentRow.originId
+      this.form.name =
+        this.$props.resType === '1'
+          ? this.resEditEquipmentRow.name
+          : this.resEditEquipmentRow.deviceName
+
+      this.form1.ip = ip
+      this.form1.transport = transport
+      this.form1.latitude = latitude
+      this.form1.longitude = longitude
+      this.form1.port = port
+      this.form.password = password
+      this.form.password = password
+      this.form.manufacturer = manufacturer
+      this.form.model = model
+      this.form.username = username
+      this.form.deviceType = deviceType + ''
+      this.form.gatewayId = String(gatewayId)
+      this.editId = this.$props.editEquipmentRow.id
+      this.form.videoAreaId = videoAreaId
+      this.$nextTick(() => {
+        this.getTreeName(this.$props.treeList, videoAreaId)
+        this.form.videoAreaId = this.resName
+      })
+
+      console.log('this.resEditEquipmentRow', this.resEditEquipmentRow)
+    },
+    deep: true
   },
   data() {
     const checkName = (rule, value, cb) => {
@@ -323,6 +403,8 @@ export default {
       }, 500)
     }
     return {
+      resEditEquipmentRow: {},
+      pResourceValue: '',
       form: {
         model: '',
         username: '',
@@ -331,7 +413,8 @@ export default {
         videoAreaId: '',
         name: '',
         password: '',
-        gatewayId: ''
+        gatewayId: '',
+        deviceId: ''
       },
       form1: {
         ip: '',
@@ -340,7 +423,7 @@ export default {
         longitude: '',
         port: ''
       },
-      treeList: [],
+      // treeList: [],
       List: '',
       Ids: [],
       Id: '',
@@ -348,12 +431,10 @@ export default {
       resName: '',
       isRequired: true,
       defaultProps: {
-        children: 'children',
-        label: 'areaName'
+        children: 'childList',
+        label: 'resourceName'
       },
       allNorthTypeOptions: [],
-      manufacturerTypeOptions: [],
-      transportProtocolTypeOptions: [],
       rules: {
         name: {
           required: true,
@@ -411,119 +492,38 @@ export default {
       }
     }
   },
-  created() {
-    const {
-      model,
-      username,
-      deviceType,
-      manufacturer,
-      videoAreaId,
-      password,
-      transport,
-      latitude,
-      longitude,
-      port,
-      ip,
-      gatewayId,
-      deviceId
-    } = this.$route.query.row
-    if (this.$route.query.back === '2') {
-      this.form.deviceId = this.$route.query.row.originId
-      this.form.name = this.$route.query.row.deviceName
-      this.form.videoAreaId = '1'
-    } else {
-      this.form.deviceId = deviceId
-      this.form.videoAreaId = String(videoAreaId)
-      this.form.name = this.$route.query.row.name
-    }
-    this.form1.ip = ip
-    this.form1.transport = transport
-    this.form1.latitude = latitude
-    this.form1.longitude = longitude
-    this.form1.port = port
-    this.form.password = password
-    this.form.password = password
-    this.form.manufacturer = manufacturer
-    this.form.model = model
-    this.form.username = username
-    // this.form.deviceId = this.$route.query.back === '1'?deviceId:originId
-    this.form.deviceType = deviceType + ''
-    this.form.gatewayId = String(gatewayId)
-    this.editId = this.$route.query.row.id
-  },
+  created() {},
   mounted() {
-    this.init()
     this.getAllGatewayLists()
-    // this.getAllGatewayLists1()
-    this.getManufacturerDictionaryList()
-    this.getManufacturerDictionaryList1()
   },
   methods: {
     getTreeName(arr, id) {
       arr.map((item) => {
         if (item.id === id) {
-          this.resName = item.areaName
+          this.resName = item.resourceName
+          this.pResourceValue = item.resourceValue
           this.Id = id
           return
         } else {
-          if (item.children && item.children.length > 0) {
-            this.getTreeName(item.children, id)
+          if (item.childList && item.childList.length > 0) {
+            this.getTreeName(item.childList, id)
           }
-        }
-      })
-    },
-    async init(id) {
-      await getVideoAraeTree()
-        .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
-            this.$nextTick(() => {
-              this.getTreeName(this.treeList, this.form.videoAreaId)
-              this.form.videoAreaId = this.resName
-            })
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
-    async getManufacturerDictionaryList() {
-      await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.manufacturerTypeOptions.push(obj)
-          })
-        }
-      })
-    },
-    async getManufacturerDictionaryList1() {
-      await getManufacturerDictionaryList('TransportProtocol').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
-            let obj1 = {}
-            obj1.label = item.itemName
-            obj1.value = item.itemValue
-            this.transportProtocolTypeOptions.push(obj1)
-          })
         }
       })
     },
     async getAllGatewayLists() {
       await getAllGatewayLists({
-        gatewayId: this.$route.query.row.gatewayId
+        gatewayId: this.$props.editEquipmentRow.gatewayId
       }).then((res) => {
-        if (res.code === 0) {
-          if (res.data && res.data.length > 0) {
-            if (res.data[0].protocol === 'GB28181') {
+        if (res.data.code === 0) {
+          if (res.data.data && res.data.data.length > 0) {
+            if (res.data.data[0].protocol === 'GB28181') {
               this.isRequired = false
             } else {
               this.isRequired = true
             }
 
-            res.data.map((item) => {
+            res.data.data.map((item) => {
               let obj = {}
               obj.label = item.name
               obj.value = item.id
@@ -535,14 +535,15 @@ export default {
     },
     // async getAllGatewayLists1() {
     //   await getAllGatewayLists().then((res) => {
-    //     if (res.code === 0) {
+    //     if (res.data.code === 0) {
     //       console.log('res~~~~~~',res)
     //     }
     //   })
     // },
     // 点击节点选中
     nodeClickHandle(data) {
-      this.form.videoAreaId = data.areaName
+      this.form.videoAreaId = data.resourceName
+      this.pResourceValue = data.resourceValue
       this.Id = data.id
       this.$refs.selectTree.blur()
     },
@@ -556,18 +557,19 @@ export default {
         this.form.deviceType = Number(this.form.deviceType)
         editEncoder({
           deviceId:
-            this.$route.query.back === '1'
-              ? this.$route.query.row.deviceId
-              : this.$route.query.row.originId,
+            this.$props.resType === '1'
+              ? this.$props.editEquipmentRow.deviceId
+              : this.$props.editEquipmentRow.originId,
           id:
-            this.$route.query.back === '1'
-              ? this.$route.query.row.id
-              : this.$route.query.row.deviceId,
-          onlineState: this.$route.query.row.onlineState,
+            this.$props.resType === '1'
+              ? this.$props.editEquipmentRow.id
+              : this.$props.editEquipmentRow.deviceId,
+          onlineState: this.$props.editEquipmentRow.onlineState,
           ...this.form,
-          ...this.form1
+          ...this.form1,
+          pResourceValue: this.pResourceValue
         }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '编辑成功'
@@ -577,11 +579,15 @@ export default {
         })
       })
     },
+
     goback() {
-      if (this.$route.query.back === '1') {
-        this.$router.push({ path: '/equipment' })
+      this.$emit('changeIsShow', 'editEquipment', false)
+      if (this.$props.resType === '1') {
+        this.$emit('init', '编码器', true)
+        this.$emit('changeIsShow', 'registrationList', false)
       } else {
-        this.$router.push({ path: '/registrationList' })
+        this.$emit('changeIsShow', 'registrationList', true)
+        this.$emit('invokeRegistrationList')
       }
     }
   }
@@ -639,6 +645,7 @@ export default {
   display: none !important;
 }
 .editEquipment-content {
+  height: 100%;
   .panel-header-box {
     margin: 0;
     padding: 0 16px;
@@ -649,8 +656,6 @@ export default {
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     .back-svg {
-      width: 30px;
-      height: 30px;
       cursor: pointer;
     }
     .back-title {

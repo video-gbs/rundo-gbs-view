@@ -1,14 +1,14 @@
 <template>
-  <div class="activeDiscovery-content">
+  <div class="streamMediaAssociated-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
-        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
+        <svg-icon icon-class="back-svg" class="back-svg" @click="goback" /><span
           class="back-title"
           >关联</span
         >
       </div>
     </div>
-    <div class="activeDiscovery-transfer">
+    <div class="streamMediaAssociated-transfer">
       <div class="left-contnet">
         <div class="level" style="height: 100%">
           <!-- 左边框框 -->
@@ -207,6 +207,7 @@ import {
 export default {
   name: '',
   components: { LineFont, pagination },
+  props: ['streamMediaAssociatedRow'],
   data() {
     return {
       params: {
@@ -263,17 +264,17 @@ export default {
     },
     async leftInit() {
       await getAllUnNorthDispatchLists({
-        page: this.params.pageNum,
         num: this.params.pageSize,
-        dispatchId: this.$router.currentRoute.query.key,
+        page: this.params.pageNum,
+        dispatchId: this.$props.streamMediaAssociatedRow.id,
         name: this.leftSearchName
       })
         .then((res) => {
-          if (res.code === 0) {
-            this.leftTableData = res.data.list
-            this.params.total = res.data.total
-            this.params.pages = res.data.pages
-            this.params.current = res.data.current
+          if (res.data.code === 0) {
+            this.leftTableData = res.data.data.list
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.pageSize
           }
         })
         .catch((error) => {
@@ -282,17 +283,17 @@ export default {
     },
     async rightInit() {
       await getAllNorthDispatchLists({
-        page: this.params1.pageNum,
-        num: this.params1.pageSize,
-        dispatchId: this.$router.currentRoute.query.key,
+        num: this.params.pageSize,
+        page: this.params.pageNum,
+        dispatchId: this.$props.streamMediaAssociatedRow.id,
         name: this.rightSearchName
       })
         .then((res) => {
-          if (res.code === 0) {
-            this.rightTableData = res.data.list
-            this.params1.total = res.data.total
-            this.params1.pages = res.data.pages
-            this.params1.current = res.data.current
+          if (res.data.code === 0) {
+            this.rightTableData = res.data.data.list
+            this.params1.total = res.data.data.total
+            this.params1.pages = res.data.data.pages
+            this.params1.current = res.data.data.pageSize
           }
         })
         .catch((error) => {
@@ -316,7 +317,8 @@ export default {
       this.rightInit()
     },
     goback() {
-      this.$router.push({ path: '/ModuleManagement' })
+      this.$emit('init')
+      this.$emit('changeIsShow', false)
     },
     //数组去重
     fn2(arr) {
@@ -399,15 +401,15 @@ export default {
         })
         bindingNorthLists({
           gatewayIds,
-          dispatchId: this.$router.currentRoute.query.key
+          dispatchId: this.$props.streamMediaAssociatedRow.id
         }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '关联网关成功'
             })
-            this.params1.pageSize = 1
-            this.params.pageSize = 1
+            this.params1.pageNum = 1
+            this.params.pageNum = 1
             this.rightInit()
             this.leftInit()
           }
@@ -448,15 +450,15 @@ export default {
 
         unbindingNorthLists({
           gatewayIds: gatewayIds1,
-          dispatchId: this.$router.currentRoute.query.key
+          dispatchId: this.$props.streamMediaAssociatedRow.id
         }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '解除网关成功'
             })
-            this.params1.pageSize = 1
-            this.params.pageSize = 1
+            this.params1.pageNum = 1
+            this.params.pageNum = 1
             this.rightInit()
             this.leftInit()
           }
@@ -585,7 +587,7 @@ export default {
 ::v-deep .contont .el-checkbox {
   display: block;
 }
-.activeDiscovery-content {
+.streamMediaAssociated-content {
   // height: 90%;
   .panel-header-box {
     margin: 0;
@@ -597,8 +599,6 @@ export default {
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     .back-svg {
-      width: 30px;
-      height: 30px;
       cursor: pointer;
     }
     .back-title {
@@ -618,7 +618,7 @@ export default {
     }
   }
 
-  .activeDiscovery-transfer {
+  .streamMediaAssociated-transfer {
     height: calc(100% - 100px);
     margin: 20px;
     background: #ffffff;

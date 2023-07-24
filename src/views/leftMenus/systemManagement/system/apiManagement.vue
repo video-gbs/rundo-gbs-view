@@ -323,7 +323,7 @@ export default {
   methods: {
     init() {
       getSysOrgTree({ id: 1 }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.treeData = res.data
         }
       })
@@ -404,7 +404,7 @@ export default {
       this.permissionDialog.show = !this.permissionDialog.show
       this.roleId = id
       permissionTree(id).then((res) => {
-        if (res.code === 10000) {
+        if (res.data.code === 10000) {
           this.permissionTableData = res.data
         }
       })
@@ -428,7 +428,7 @@ export default {
         permissionIds: this.checkList
       }).then((res) => {
         this.buttonLoading = false
-        if (res.code === 10000) {
+        if (res.data.code === 10000) {
           this.$message({
             message: '保存成功！',
             type: 'success'
@@ -444,7 +444,7 @@ export default {
         pageSize: this.params.pageSize,
         ...this.searchParams
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.tableData = res.data.records
           this.params.total = res.data.total
           this.params.pages = res.data.pages
@@ -459,7 +459,7 @@ export default {
         type: 'warning'
       }).then(() => {
         deleteDictionary(row.id).then((res) => {
-          if (res.code === 10000) {
+          if (res.data.code === 10000) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -476,7 +476,7 @@ export default {
           switch (this.dialog.title) {
             case '新建':
               addDictionary(this.dialog.params).then((res) => {
-                if (res.code === 0) {
+                if (res.data.code === 0) {
                   this.$message({
                     type: 'success',
                     message: '新建成功'
@@ -489,7 +489,7 @@ export default {
             case '编辑':
               editDictionary({ id: this.editId, ...this.dialog.params }).then(
                 (res) => {
-                  if (res.code === 0) {
+                  if (res.data.code === 0) {
                     this.$message.success('编辑成功')
                     this.dialog.show = false
                     this.getList()

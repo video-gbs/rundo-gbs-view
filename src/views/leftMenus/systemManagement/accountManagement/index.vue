@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="main" v-if="!isUserAddShow && !isUserEditShow && isShow">
     <div class="panel-header-box">
       <div class="panel-header-box-border">用户管理</div>
     </div>
@@ -12,27 +12,46 @@
         />
       </div>
       <div class="right-table p10">
-        <Encoder ref="encoder" />
+        <Encoder ref="encoder" @changeIsShow="changeIsShow" />
       </div>
     </div>
   </div>
+  <UserAdd
+    v-else-if="isUserAddShow"
+    ref="userAdd"
+    @changeIsShow="changeIsShow"
+    @init="init"
+  />
+  <UserEdit
+    v-else-if="isUserEditShow"
+    ref="userEdit"
+    @changeIsShow="changeIsShow"
+    @init="init"
+    :userEditRow="userEditRow"
+  />
 </template>
 
 <script>
 import leftTree from '@/views/leftMenus/systemManagement/components/leftTree'
 import Encoder from './components/Encoder.vue'
-import { getDepartmentTree } from '@/api/method/role'
+import UserAdd from './components/userAdd.vue'
+import UserEdit from './components/userEdit.vue'
+import { getUnitList } from '@/api/method/unitManagement'
 import { Local } from '@/utils/storage'
 export default {
   name: '',
-  components: { leftTree, Encoder },
+  components: { leftTree, Encoder, UserAdd, UserEdit },
 
   data() {
     return {
+      isUserAddShow: false,
+      isUserEditShow: false,
+      isShow: false,
+      userEditRow: {},
       treeData: [],
       defaultProps: {
-        children: 'children',
-        label: 'orgName'
+        children: 'childList',
+        label: 'sectionName'
       }
     }
   },
@@ -40,16 +59,31 @@ export default {
     this.init()
   },
   methods: {
+    changeIsShow(val, name, row) {
+      if (name === 'add') {
+        this.isUserAddShow = val
+      } else {
+        this.isUserEditShow = val
+        this.userEditRow = row
+      }
+    },
     handleClick(val, event) {},
     async init() {
-      await getDepartmentTree()
+      await getUnitList()
         .then((res) => {
-          if (res.code === 0) {
-            this.treeData = res.data
-            const resId = Local.get('treeId')
-              ? Local.get('treeId')
-              : res.data[0].id
-            this.$refs.encoder.getList(resId)
+          if (res.data.code === 0) {
+            this.treeData = [res.data.data]
+            const resId = Local.get('newUserId')
+              ? Local.get('newUserId')
+              : res.data.data.id
+            setTimeout(() => {
+              this.isShow = true
+            }, 100)
+            setTimeout(() => {
+              this.$nextTick(() => {
+                this.$refs.encoder.getList(resId)
+              })
+            }, 500)
           }
         })
         .catch((error) => {
@@ -59,7 +93,7 @@ export default {
     childClickHandle(data) {
       this.$refs.encoder.saveId(data.id)
 
-      Local.set('treeId', data.id)
+      Local.set('newUserId', data.id)
       this.$refs.encoder.getList(data.id)
     }
   }

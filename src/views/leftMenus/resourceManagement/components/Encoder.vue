@@ -72,19 +72,31 @@
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deteleAll($event)" style="width: 100px" plain
+          <el-button
+            v-permission="['/expansion/device/batchDelete', 2]"
+            @click="deteleAll($event)"
+            style="width: 100px"
+            plain
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span></el-button
           >
-          <el-button @click="moveEquipment"
+          <el-button
+            v-permission="['/expansion/device/move', 2]"
+            @click="moveEquipment"
             ><svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span></el-button
           >
-          <el-button @click="goRegistrationList" style="width: 120px"
+          <el-button
+            v-permission="['/expansion/device/unregister/list', 1]"
+            @click="goRegistrationList"
+            style="width: 120px"
             ><svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">待注册列表</span></el-button
           >
-          <el-button type="primary" @click="addEquipment"
+          <el-button
+            v-permission="['/expansion/device/add', 2]"
+            type="primary"
+            @click="addEquipment"
             ><svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span></el-button
           >
@@ -102,6 +114,10 @@
           fontWeight: 'bold',
           color: '#333333'
         }"
+        v-loading="tableLoading"
+        element-loading-text="加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="#fff"
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="80" align="center">
@@ -141,16 +157,11 @@
         <el-table-column prop="port" label="端口" width="80" />
         <el-table-column prop="manufacturer" label="设备厂家" width="100">
           <template slot-scope="scope">
-            <span
-              v-for="item in equipmentCompanyOptionsList"
-              :key="item.value"
-              >{{
-                item.value.toLowerCase() ===
-                scope.row.manufacturer.toLowerCase()
-                  ? item.label
-                  : ''
-              }}</span
-            >
+            <span v-for="item in manufacturerTypeOptions" :key="item.value">{{
+              item.value.toLowerCase() === scope.row.manufacturer.toLowerCase()
+                ? item.label
+                : ''
+            }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="onlineState" label="状态" width="80">
@@ -173,21 +184,22 @@
         <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
             <el-button
+              v-permission="['/expansion/channel/channelSync', 1]"
               type="text"
               :disabled="scope.row.onlineState !== 1"
               @click="synchronizationData(scope.row.id)"
               >同步
             </el-button>
-            <el-button type="text" @click="goEditPage(scope.row)"
+            <el-button
+              v-permission="['/expansion/device/edit', 3]"
+              type="text"
+              @click="goEditPage(scope.row)"
               >编辑
             </el-button>
-            <!-- <el-button type="text" @click="restart(scope.row.id)"
-              >重启
-            </el-button>
-            <el-button type="text" @click="deploymentData(scope.row.id)"
-              >布防
-            </el-button> -->
-            <el-button type="text" @click="deleteEncoder(scope.row)"
+            <el-button
+              v-permission="['/expansion/device/delete', 4]"
+              type="text"
+              @click="deleteEncoder(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -329,7 +341,6 @@
 import pagination from '@/components/Pagination/index.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import LineFont from '@/components/LineFont'
-
 import {
   getEncoderById,
   deleteEncoders,
@@ -337,7 +348,8 @@ import {
   moveEncoder,
   syncChannel
 } from '@/api/method/encoder'
-import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+
+import { getGroupDictLists } from '@/api/method/dictionary'
 import { Local } from '@/utils/storage'
 
 // import drawMixin from '@/utils/drawMixin'
@@ -354,10 +366,15 @@ export default {
     treeList: {
       type: Array,
       default: () => []
+    },
+    manufacturerTypeOptions: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
     return {
+      tableLoading: true,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -410,81 +427,66 @@ export default {
       checked: false,
       dialogShow: false,
       dialogShow1: false,
-      dialogTableData: [
-        // {
-        //   name: '球机192.168……',
-        //   coding: '4400000000111500…',
-        //   type: 'IPC',
-        //   ip: '192.168.119.152',
-        //   city: '广东省/广州市/珠海区/新竹街道…',
-        //   manufacturer: '海康',
-        //   status: 1
-        // }
-      ],
-      tableData: [
-        // {
-        //   name: '球机192.168……',
-        //   coding: '4400000000111500…',
-        //   type: 'IPC',
-        //   ip: '192.168.119.152',
-        //   port: 8000,
-        //   manufacturer: '海康',
-        //   status: 1
-        // }
-      ],
-      areaNames: 'areaNames',
+      dialogTableData: [],
+      tableData: [],
+      areaNames: 'resourceName',
       idList: [],
-      dialogVideoAreaId: '',
-      equipmentCompanyOptionsList: []
+      dialogResourceValue: '',
+      resDetailsId: ''
     }
+  },
+  watch: {
+    detailsId(newValue, oldValue) {
+      this.resDetailsId = newValue
+    },
+    deep: true
   },
   created() {
     this.params.pageNum = Local.get('encoderPageNum')
     Local.remove('encoderPageNum')
 
     this.getDeviceTypesDictionaryList()
-    this.getDeviceTypesDictionaryList1()
   },
   mounted() {
-    this.getList()
+    setTimeout(() => {
+      // this.getList()
+    }, 500)
   },
   methods: {
     async getList(id) {
       await getEncoderById({
         pageNum: this.params.pageNum,
         pageSize: this.params.pageSize,
-        videoAreaId: id ? id : this.$props.detailsId,
+        videoAreaId: id ? id : this.resDetailsId,
         includeEquipment: this.includeEquipment,
         ...this.searchParams
-      }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data.records
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
-        }
       })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.tableData = res.data.data.records
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.current
+            this.tableLoading = false
+          } else {
+            this.tableLoading = false
+          }
+        })
+        .catch(() => {
+          this.tableLoading = false
+        })
+    },
+    changeTableLoading() {
+      this.tableLoading = true
     },
     async getDeviceTypesDictionaryList() {
-      await getManufacturerDictionaryList('DeviceTypes').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
+      await getGroupDictLists('DeviceTypes').then((res) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
             let obj = {}
             obj.label = item.itemName
             obj.value = item.itemValue
             this.deviceTypesOptionsList.push(obj)
-          })
-        }
-      })
-    },
-    async getDeviceTypesDictionaryList1() {
-      await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.equipmentCompanyOptionsList.push(obj)
           })
         }
       })
@@ -502,15 +504,15 @@ export default {
       }
     },
     childClickHandle(data) {
-      this.dialogVideoAreaId = data.id
+      this.dialogResourceValue = data.resourceValue
     },
 
     dialogMove() {
       moveEncoder({
         idList: this.idList,
-        videoAreaId: this.dialogVideoAreaId
+        presourceValue: this.dialogResourceValue
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.$message({
             type: 'success',
             message: '移动成功'
@@ -534,7 +536,7 @@ export default {
     },
     synchronizationData(id) {
       syncChannel(id).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.$message({
             type: 'success',
             message: '同步成功'
@@ -547,13 +549,7 @@ export default {
     goEditPage(row) {
       Local.set('encoderPageNum', this.params.pageNum)
       Local.set('equipmentActiveName', '编码器')
-      this.$router.push({
-        path: `/editEquipment`,
-        query: {
-          back: 1,
-          row: row
-        }
-      })
+      this.$emit('changeIsShow', 'editEquipment', true, row, '1')
     },
     deploymentData() {
       this.dialogShow1 = true
@@ -587,7 +583,7 @@ export default {
           roleIds.push(item.id)
         })
         deleteEncoders(roleIds).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -609,7 +605,7 @@ export default {
         }
       ).then(() => {
         deleteEncoder(row.id).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -642,12 +638,15 @@ export default {
     cxData() {
       this.getList()
     },
+
     addEquipment() {
-      this.$router.push(`/addEquipment`)
+      this.$emit('changeIsShow', 'addEquipment', true)
     },
+
     goRegistrationList() {
-      this.$router.push(`/registrationList`)
+      this.$emit('changeIsShow', 'registrationList', true)
     },
+
     moveEquipment(row) {
       if (this.$refs.encoderTable.selection.length === 0) {
         this.$message({

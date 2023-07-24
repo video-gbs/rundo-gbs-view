@@ -126,8 +126,8 @@ export default {
             '&stream=' +
             stream
         }).then(function (res) {
-          if (res.data.code == 0 && res.data.online) {
-            that.tracks = res.data.tracks
+          if (res.data.code == 0 && res.data.data.online) {
+            that.tracks = res.data.data.tracks
             that.isShowStream = true
           } else {
             that.$message({

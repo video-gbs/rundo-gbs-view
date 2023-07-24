@@ -16,7 +16,7 @@
             placeholder="请选择"
           >
             <el-option
-              v-for="obj in deviceTypesOptionsList"
+              v-for="obj in resAppearanceTypeOptions"
               :key="obj.value"
               :label="obj.label"
               :value="obj.value"
@@ -72,15 +72,27 @@
           >包含下级组织</el-checkbox
         >
         <div class="btn-lists">
-          <el-button @click="deteleAll($event)" style="width: 100px" plain>
+          <el-button
+            v-permission="['/expansion/channel/batchDelete', 2]"
+            @click="deteleAll($event)"
+            style="width: 100px"
+            plain
+          >
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span>
           </el-button>
-          <el-button @click="moveEquipment">
+          <el-button
+            v-permission="['/expansion/channel/move', 2]"
+            @click="moveEquipment"
+          >
             <svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
-          <el-button type="primary" @click="goChannelDiscovery">
+          <el-button
+            v-permission="['/expansion/channel/add', 2]"
+            type="primary"
+            @click="goChannelDiscovery"
+          >
             <svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新增</span>
           </el-button>
@@ -98,6 +110,10 @@
           fontWeight: 'bold',
           color: '#333333'
         }"
+        v-loading="tableLoading"
+        element-loading-text="加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="#fff"
         @selection-change="handleSelectionChange"
       >
         <el-table-column
@@ -148,7 +164,7 @@
         <el-table-column prop="manufacturer" label="设备厂家" width="120">
           <template slot-scope="scope">
             <span
-              v-for="item in equipmentCompanyOptionsList"
+              v-for="item in resManufacturerTypeOptions"
               :key="item.value"
               >{{
                 item.value.toLowerCase() ===
@@ -178,17 +194,17 @@
         </el-table-column>
         <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text" @click="editData(scope.row)">编辑</el-button>
-            <!-- <el-button type="text" @click="restart(scope.row.id)"
-              >重启
-            </el-button>
-            <el-button type="text" @click="synchronizationData(scope.row.id)"
-              >同步
-            </el-button>
-            <el-button type="text" @click="deploymentData(scope.row.id)"
-              >布防
-            </el-button>-->
-            <el-button type="text" @click="deleteEncoder(scope.row)">
+            <el-button
+              v-permission="['/expansion/channel/edit', 3]"
+              type="text"
+              @click="editData(scope.row)"
+              >编辑</el-button
+            >
+            <el-button
+              v-permission="['/expansion/channel/delete', 4]"
+              type="text"
+              @click="deleteEncoder(scope.row)"
+            >
               <span class="delete-button">删除</span>
             </el-button>
           </template>
@@ -239,7 +255,6 @@
 import pagination from '@/components/Pagination/index.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import LineFont from '@/components/LineFont'
-
 import {
   getChannelById,
   deleteChannels,
@@ -247,7 +262,7 @@ import {
   moveChannel
 } from '@/api/method/channel'
 
-import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+import { getGroupDictLists } from '@/api/method/dictionary'
 import { Local } from '@/utils/storage'
 
 export default {
@@ -261,10 +276,19 @@ export default {
     treeList: {
       type: Array,
       default: () => []
+    },
+    manufacturerTypeOptions: {
+      type: Array,
+      default: () => []
+    },
+    appearanceTypeOptions: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
     return {
+      tableLoading: true,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -313,65 +337,69 @@ export default {
           value: 1
         }
       ],
-      deviceTypesOptionsList: [],
       checked: false,
       dialogShow: false,
       dialogShow1: false,
-      dialogTableData: [
-        // {
-        //   name: '球机192.168……',
-        //   coding: '4400000000111500…',
-        //   type: 'IPC',
-        //   ip: '192.168.119.152',
-        //   city: '广东省/广州市/珠海区/新竹街道…',
-        //   manufacturer: '海康',
-        //   status: 1
-        // }
-      ],
-      tableData: [
-        // {
-        //   name: '球机192.168……',
-        //   coding: '4400000000111500…',
-        //   type: 'IPC',
-        //   ip: '192.168.119.152',
-        //   port: 8000,
-        //   manufacturer: '海康',
-        //   status: 1
-        // }
-      ],
+      dialogTableData: [],
+      tableData: [],
       areaNames: 'areaNames',
       idList: [],
-      dialogVideoAreaId: '',
-      equipmentCompanyOptionsList: []
+      dialogResourceValue: '',
+      resDetailsId: '',
+      resAppearanceTypeOptions: [],
+      resManufacturerTypeOptions: []
     }
+  },
+  watch: {
+    detailsId(newValue, oldValue) {
+      this.resDetailsId = newValue
+    },
+    appearanceTypeOptions(newValue, oldValue) {
+      this.resAppearanceTypeOptions = newValue
+    },
+    manufacturerTypeOptions(newValue, oldValue) {
+      this.resManufacturerTypeOptions = newValue
+    },
+    deep: true
   },
   created() {
     this.params.pageNum = Local.get('channelPageNum')
     Local.remove('channelPageNum')
-    this.getDeviceTypesDictionaryList()
-    this.getDeviceTypesDictionaryList1()
   },
   mounted() {
-    this.getList()
+    setTimeout(() => {
+      // this.getList()
+    }, 500)
   },
   methods: {
     getList(orgId) {
-      // : '1620396812466147329'
       getChannelById({
         pageNum: this.params.pageNum,
         pageSize: this.params.pageSize,
-        videoAreaId: orgId ? orgId : this.$props.detailsId,
+        videoAreaId: orgId ? orgId : this.resDetailsId,
         includeEquipment: this.includeEquipment,
         ...this.searchParams
-      }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data.records
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
-        }
       })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.tableData = res.data.data.records
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.current
+            this.tableLoading = false
+          } else {
+            this.tableLoading = false
+          }
+        })
+        .catch(() => {
+          this.tableLoading = false
+        })
     },
+
+    changeTableLoading() {
+      this.tableLoading = true
+    },
+
     changeOrganization() {
       this.getList()
     },
@@ -387,14 +415,14 @@ export default {
       }
     },
     childClickHandle(data) {
-      this.dialogVideoAreaId = data.id
+      this.dialogResourceValue = data.resourceValue
     },
     dialogMove() {
       moveChannel({
         idList: this.idList,
-        videoAreaId: this.dialogVideoAreaId
+        presourceValue: this.dialogResourceValue
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.$message({
             type: 'success',
             message: '移动成功'
@@ -402,30 +430,6 @@ export default {
           this.dialogShow = false
           this.params.pageNum = 1
           this.getList()
-        }
-      })
-    },
-    async getDeviceTypesDictionaryList() {
-      await getManufacturerDictionaryList('Appearance').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.deviceTypesOptionsList.push(obj)
-          })
-        }
-      })
-    },
-    async getDeviceTypesDictionaryList1() {
-      await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.equipmentCompanyOptionsList.push(obj)
-          })
         }
       })
     },
@@ -440,12 +444,13 @@ export default {
     editData(row) {
       Local.set('channelPageNum', this.params.pageNum)
       Local.set('equipmentActiveName', '通道')
-      this.$router.push({
-        path: `/editChannel`,
-        query: {
-          row: row
-        }
-      })
+      this.$emit('changeIsShow', 'editChannel', true, row)
+      // this.$router.push({
+      //   path: `/editChannel`,
+      //   query: {
+      //     row: row
+      //   }
+      // })
     },
     deploymentData() {
       this.dialogShow1 = true
@@ -471,7 +476,7 @@ export default {
           roleIds.push(item.id)
         })
         deleteChannels(roleIds).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -489,7 +494,7 @@ export default {
         type: 'warning'
       }).then(() => {
         deleteChannel(row.id).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -521,11 +526,13 @@ export default {
     cxData() {
       this.getList()
     },
+
     goChannelDiscovery() {
       Local.set('channelPageNum', this.params.pageNum)
       Local.set('equipmentActiveName', '通道')
-      this.$router.push(`/channelDiscovery`)
+      this.$emit('changeIsShow', 'channelDiscovery', true)
     },
+
     moveEquipment() {
       if (this.$refs.channelTable.selection.length === 0) {
         this.$message({

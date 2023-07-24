@@ -131,7 +131,7 @@ export default {
       // console.log('this.$props.fatherId', this.$props.fatherId)
       moveDepart({ id: this.$props.fatherId, areaPid: this.childId }).then(
         (res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '移动成功'
@@ -157,7 +157,7 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true
-      return data.areaName.indexOf(value) !== -1
+      return data.resourceName.indexOf(value) !== -1
     },
 
     // 拖拽事件 参数依次为：被拖拽节点对应的 Node、结束拖拽时最后进入的节点、被拖拽节点的放置位置（before、after、inner）、event

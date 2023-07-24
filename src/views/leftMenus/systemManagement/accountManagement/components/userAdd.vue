@@ -2,7 +2,7 @@
   <div class="userAdd-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
-        <svg-icon icon-class="back-svg" class="back_svg" @click="goback" />
+        <svg-icon icon-class="back-svg" class="back-svg" @click="goback" />
         <span class="back-title">新建用户</span>
       </div>
     </div>
@@ -15,9 +15,9 @@
         <el-form ref="form" :model="form" label-width="auto" :rules="rules">
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="userAccount" label="用户账号">
+              <el-form-item prop="username" label="用户账号">
                 <el-input
-                  v-model="form.userAccount"
+                  v-model="form.username"
                   style="width: 436px"
                   clearable
                 ></el-input>
@@ -35,9 +35,9 @@
           </el-row>
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="userName" label="用户姓名">
+              <el-form-item prop="workName" label="工作名称">
                 <el-input
-                  v-model="form.userName"
+                  v-model="form.workName"
                   style="width: 436px"
                   clearable
                 ></el-input>
@@ -55,9 +55,9 @@
           </el-row>
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="expiryDateStart" label="有效日期（开始）">
+              <el-form-item prop="expiryStartTime" label="有效日期（开始）">
                 <el-date-picker
-                  v-model="form.expiryDateStart"
+                  v-model="form.expiryStartTime"
                   type="datetime"
                   placeholder="开始日期"
                   style="width: 436px"
@@ -68,16 +68,16 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item prop="orgId" label="所属部门">
+              <el-form-item prop="sectionId" label="所属部门">
                 <el-select
                   ref="selectTree"
-                  v-model="form.orgId"
+                  v-model="form.sectionId"
                   placeholder="请选择"
                   :popper-append-to-body="false"
                   style="width: 436px"
                   class="selectTree"
                 >
-                  <el-option :value="List">
+                  <el-option :value="form.sectionId">
                     <el-tree
                       ref="userAddTree"
                       class="userAddTree"
@@ -96,9 +96,9 @@
           </el-row>
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="desc" label="有效日期（结束）">
+              <el-form-item prop="expiryEndTime" label="有效日期（结束）">
                 <el-date-picker
-                  v-model="form.expiryDateEnd"
+                  v-model="form.expiryEndTime"
                   type="datetime"
                   placeholder="结束日期"
                   clearable
@@ -108,7 +108,6 @@
                 ></el-date-picker>
               </el-form-item>
             </el-col>
-            <!-- <el-col :span="12"></el-col> -->
           </el-row>
         </el-form>
       </div>
@@ -127,12 +126,12 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item
-                  prop="jobNo"
+                  prop="workNum"
                   label="用户工号"
                   style="margin-left: 35px"
                 >
                   <el-input
-                    v-model="form1.jobNo"
+                    v-model="form1.workNum"
                     style="width: 436px"
                     clearable
                   ></el-input>
@@ -241,7 +240,7 @@
               :show-overflow-tooltip="true"
             />
             <el-table-column
-              prop="userAccount"
+              prop="username"
               label="创建人"
               :show-overflow-tooltip="true"
             />
@@ -267,8 +266,10 @@
 
 <script>
 import pagination from '@/components/Pagination/index.vue'
-import { getDepartmentTree, getRoleLists } from '@/api/method/role'
-import { addUser } from '@/api/method/user'
+import { getUnitList } from '@/api/method/unitManagement'
+import { userSearchRole } from '@/api/method/role'
+
+import { userAdd } from '@/api/method/user'
 import moment from 'moment'
 
 import { antiShake } from '@/utils/index.js'
@@ -278,11 +279,11 @@ export default {
   components: { pagination },
   data() {
     const checkPhone = (rule, value, cb) => {
-      const regPhone = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
-      if (value.length === 0) {
+      if (value === '' || value === null || value.length === 0) {
         return cb()
       }
       setTimeout(() => {
+        const regPhone = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
         if (regPhone.test(value)) {
           return cb()
         } else {
@@ -357,37 +358,29 @@ export default {
       Ids: [],
       Id: '',
       defaultProps: {
-        children: 'children',
-        label: 'orgName'
+        children: 'childList',
+        label: 'sectionName'
       },
       form: {
-        userAccount: '',
+        username: '',
         password: '',
-        userName: '',
         rePassword: '',
-        expiryDateStart: '',
-        orgId: '',
-        expiryDateEnd: ''
+        expiryEndTime: '',
+        sectionId: '',
+        expiryStartTime: ''
       },
       form1: {
         address: '',
         description: '',
-        phone: '',
-        jobNo: ''
+        phone: null,
+        workNum: ''
       },
       roleIds: [],
       rules: {
-        userAccount: {
+        username: {
           required: true,
           max: 32,
           validator: checkUserAccount,
-          // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-          // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){0,32}$/,
-          trigger: 'blur'
-        },
-        userName: {
-          max: 32,
-          validator: checkUserAccount1,
           // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
           // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){0,32}$/,
           trigger: 'blur'
@@ -416,21 +409,21 @@ export default {
           trigger: 'blur'
         },
 
-        orgId: [
+        sectionId: [
           {
             required: true,
             message: '请选择部门',
             trigger: 'change'
           }
         ],
-        expiryDateStart: [
+        expiryStartTime: [
           {
             required: true,
             message: '此为必填项。',
             trigger: 'change'
           }
         ],
-        jobNo: {
+        workNum: {
           max: 32,
           validator: checkUserAccount1,
           // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
@@ -459,29 +452,28 @@ export default {
   },
   mounted() {
     ;(this.form = {
-      userAccount: '',
+      username: '',
       password: '',
-      userName: '',
       rePassword: '',
-      expiryDateStart: '',
-      orgId: '',
-      expiryDateEnd: ''
+      expiryEndTime: '',
+      sectionId: '',
+      expiryStartTime: ''
     }),
-      (this.form1 = {
-        address: '',
-        description: '',
-        phone: '',
-        jobNo: ''
-      }),
       this.init()
-    this.getLists()
+    ;(this.form1 = {
+      address: '',
+      description: '',
+      phone: null,
+      workNum: ''
+    }),
+      this.getLists()
   },
   methods: {
     async init(id) {
-      await getDepartmentTree()
+      await getUnitList()
         .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
+          if (res.data.code === 0) {
+            this.treeList = [res.data.data]
           }
         })
         .catch((error) => {
@@ -491,19 +483,19 @@ export default {
     search() {
       this.getLists()
     },
-    async getLists(id) {
-      await getRoleLists({
-        current: this.params.pageNum,
-        pageSize: this.params.pageSize,
+    async getLists() {
+      await userSearchRole({
+        page: this.params.pageNum,
+        num: this.params.pageSize,
         roleName: this.roleName
       })
         .then((res) => {
-          if (res.code === 0) {
-            this.tableData = res.data.records
+          if (res.data.code === 0) {
+            this.tableData = res.data.data.list
             this.handleRowSelection(this.tableData)
-            this.params.total = res.data.total
-            this.params.pages = res.data.pages
-            this.params.current = res.data.current
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.current
           }
         })
         .catch((error) => {
@@ -570,13 +562,14 @@ export default {
         ) {
           return
         }
-        this.form.orgId = this.Id
+        this.form.sectionId = this.Id
         const roleIds = []
         this.selectedData.map((item) => {
           roleIds.push(item.id)
         })
-        addUser({ roleIds, ...this.form, ...this.form1 }).then((res) => {
-          if (res.code === 0) {
+        console.log('...this.form', roleIds, this.form, this.form1)
+        userAdd({ roleIds, ...this.form, ...this.form1 }).then((res) => {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '新建成功'
@@ -588,7 +581,8 @@ export default {
     }),
 
     goback() {
-      this.$router.push({ path: '/accountManagement' })
+      this.$emit('init')
+      this.$emit('changeIsShow', false, 'add')
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
@@ -599,7 +593,7 @@ export default {
       this.getLists()
     },
     nodeClickHandle(data) {
-      this.form.orgId = data.orgName
+      this.form.sectionId = data.sectionName
       this.Id = data.id
       this.$refs.selectTree.blur()
     }
@@ -608,6 +602,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 // 滚动条大小设置
 ::v-deep .box-card::-webkit-scrollbar {
   /*纵向滚动条*/
@@ -669,8 +666,6 @@ export default {
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     .back-svg {
-      width: 30px;
-      height: 30px;
       cursor: pointer;
     }
     .back-title {
