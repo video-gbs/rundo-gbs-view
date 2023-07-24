@@ -54,7 +54,7 @@ const init = {
     let that = this
     axios({
       method: 'post',
-      url: `http://xard-gbs-test.runjian.com:8080/oauth2/token?grant_type=refresh_token&refresh_token=${refreshToken}`,
+      url: `http://xard-gbs-test.runjian.com:8080/api/oauth2/token?grant_type=refresh_token&refresh_token=${refreshToken}`,
       headers: {
         Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
       }
