@@ -245,14 +245,16 @@ import {
   getRoleFuncMenuList,
   getRoleFuncList,
   getRoleResourceTreeNew,
-  getRoleResourceRootNew
+  getRoleResourceRootNew,
+  getRoleMenuTreeNew,
+  getRoleFuncPageNew
 } from '@/api/method/role'
 
 // import { getRootList } from '@/api/method/resourceInterface'
 
-import { getMenuTree } from '@/api/method/menus'
+// import { getMenuTree } from '@/api/method/menus'
 
-import { getFeatureList } from '@/api/method/featureApi'
+// import { getFeatureList } from '@/api/method/featureApi'
 
 export default {
   name: '',
@@ -460,7 +462,7 @@ export default {
 
     // 应用菜单树
     async initGetMenuTree() {
-      await getMenuTree()
+      await getRoleMenuTreeNew()
         .then((res) => {
           if (res.data.code === 0) {
             this.treeData1 = [res.data.data]
@@ -611,11 +613,10 @@ export default {
     },
 
     async getList(id) {
-      await getFeatureList({
+      await getRoleFuncPageNew({
         page: this.params.pageNum,
         num: this.params.pageSize,
-        menuId: id,
-        isInclude: false
+        menuId: id
       }).then((res) => {
         if (res.data.code === 0) {
           this.featureApiTableData = res.data.data.list

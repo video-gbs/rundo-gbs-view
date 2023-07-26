@@ -186,3 +186,12 @@ export function getRoleResourceRootNew(data) {
   // 查询资源树根节点
   return request.get(`${rbac}/role/resource/root`, data)
 }
+
+export function getRoleMenuTreeNew(data) {
+  // 获取菜单树
+  return request.get(`${rbac}/role/menu/tree`, data)
+}
+export function getRoleFuncPageNew(data) {
+  // 获取功能列表
+  return request.get(`${rbac}/role/func/page`, data)
+}
