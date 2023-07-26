@@ -142,14 +142,19 @@ service.interceptors.request.use(
 //响应拦截器即异常处理
 service.interceptors.response.use(
   (response) => {
-    let resetTime = Local.get('expires_in')
-    if (Local.get('access_token')) {
-      //有没有token
-      isRefreshTokenExpired(resetTime)
-      if (resetTime < 1200) {
-        let refresh_token = Local.get('refresh_token')
-        init.updataTokenAPI(refresh_token)
+    const code = response.data.code || 0
+    if (code === 0) {
+      let resetTime = Local.get('expires_in')
+      if (Local.get('access_token')) {
+        //有没有token
+        isRefreshTokenExpired(resetTime)
+        if (resetTime < 1200) {
+          let refresh_token = Local.get('refresh_token')
+          init.updataTokenAPI(refresh_token)
+        }
       }
+    } else {
+      init.openMessage(response.data.msg)
     }
     return response
   },
@@ -173,20 +178,8 @@ service.interceptors.response.use(
           return
         case 403:
           init.openMessage(err.response.data.data)
-        // alert('403~~~~~~~~',unzip())
-        // Local.clear()
-        // Local.remove('access_token')
-        // Local.remove('expires_in')
-        // Local.remove('utilTime')
-        // Local.remove('refresh_token')
-        // init.openMessage('登录失效')
-        // router.replace({
-        //   path: '/login',
-        //   query: { redirect: router.currentRoute.fullPath }
-        // })
-        // return
         case 404:
-          // init.openMessage('请求错误,未找到该资源')
+          init.openMessage('请求错误,未找到该资源')
           break
         case 405:
           init.openMessage('请求方法未允许')
