@@ -243,10 +243,12 @@ import {
   getRoleMenuList,
   getRoleResourceList,
   getRoleFuncMenuList,
-  getRoleFuncList
+  getRoleFuncList,
+  getRoleResourceTreeNew,
+  getRoleResourceRootNew
 } from '@/api/method/role'
 
-import { getRootList, getResourceList } from '@/api/method/resourceInterface'
+// import { getRootList } from '@/api/method/resourceInterface'
 
 import { getMenuTree } from '@/api/method/menus'
 
@@ -373,7 +375,7 @@ export default {
   },
   methods: {
     async getRootList() {
-      await getRootList()
+      await getRoleResourceRootNew()
         .then((res) => {
           if (res.data.code === 0) {
             this.resourceKeyOptions = res.data.data
@@ -471,9 +473,8 @@ export default {
 
     // 资源功能树
     async initGetResourceList(resourceKey, value) {
-      await getResourceList({
-        resourceKey,
-        isIncludeResource: true
+      await getRoleResourceTreeNew({
+        resourceKey
       })
         .then((res) => {
           if (res.data.code === 0) {
