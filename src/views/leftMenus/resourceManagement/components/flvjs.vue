@@ -119,7 +119,7 @@ export default {
       timerId1: null,
       loadStatus: true,
       statusMsg: '摄像机未开启，请联系',
-      lastDecodedFrame: null,
+      lastDecodedFrame: 0,
       isShowStream: false,
       tracks: [],
       resVideoUrl: '',
@@ -236,7 +236,6 @@ export default {
     createVideo() {
       this.reconnectIng = true
       let that = this
-      const videoElement = document.getElementById(that.idx)
 
       if (flvjs.isSupported()) {
         // 存在视频先销毁
@@ -247,6 +246,7 @@ export default {
           that.player.destroy()
           that.player = null
         }
+        const videoElement = document.getElementById(that.idx)
         that.flvPlayer = flvjs.createPlayer(
           {
             type: 'flv',
@@ -283,14 +283,14 @@ export default {
           console.log('errorType:', errorType)
           console.log('errorDetail:', errorDetail)
           console.log('errorInfo:', errorInfo)
-          // if (that.flvPlayer) {
-          //   this.player.pause()
-          //   this.player.unload()
-          //   this.player.detachMediaElement()
-          //   this.player.destroy()
-          //   this.player = null
-          //   that.createVideo()
-          // }
+          if (that.player) {
+            that.player.pause()
+            that.player.unload()
+            that.player.detachMediaElement()
+            that.player.destroy()
+            that.player = null
+            that.createVideo()
+          }
         }
       )
       that.flvPlayer.on('statistics_info', function (res) {
@@ -397,6 +397,15 @@ export default {
       this.$emit('close', this.index)
     }
   },
+  beforeDestroy() {
+    if (this.flvPlayer) {
+      this.flvPlayer.pause()
+      this.flvPlayer.destroy()
+      this.player.detachMediaElement()
+      this.player.destroy()
+      this.flvPlayer = null
+    }
+  },
   destroyed() {
     if (this.timerId) {
       clearInterval(this.timerId)
@@ -406,7 +415,7 @@ export default {
       clearInterval(this.timerId1)
       this.timerId = null
     }
-    if (this.flvPlayer !== null) {
+    if (this.flvPlayer) {
       this.flvPlayer.pause()
       this.flvPlayer.destroy()
       this.player.detachMediaElement()
