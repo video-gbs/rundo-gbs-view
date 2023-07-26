@@ -236,17 +236,17 @@ export default {
     createVideo() {
       this.reconnectIng = true
       let that = this
-      if (that.flvPlayer) {
-        that.flvPlayer.pause()
-        that.flvPlayer.destroy()
-        that.flvPlayer = null
-      }
-      if (that.timerId !== null) {
-        clearInterval(that.timerId)
-      }
       const videoElement = document.getElementById(that.idx)
 
       if (flvjs.isSupported()) {
+        // 存在视频先销毁
+        if (that.player !== null) {
+          that.player.pause()
+          that.player.unload()
+          that.player.detachMediaElement()
+          that.player.destroy()
+          that.player = null
+        }
         that.flvPlayer = flvjs.createPlayer(
           {
             type: 'flv',
@@ -266,26 +266,29 @@ export default {
           }
         )
       }
+      // 存入DOM
+
+      that.flvPlayer.attachMediaElement(videoElement)
+
+      that.flvPlayer.load()
+      setTimeout(function () {
+        if (that.resVideoUrl !== '' && that.resVideoUrl !== null) {
+          that.flvPlayer.play()
+        }
+      }, 300)
+
       that.flvPlayer.on(
         flvjs.Events.ERROR,
         (errorType, errorDetail, errorInfo) => {
           console.log('errorType:', errorType)
           console.log('errorDetail:', errorDetail)
           console.log('errorInfo:', errorInfo)
-
-          // that.player && that.player.close()
-          // that.$emit('close', that.index)
-
-          //视频出错后销毁重新创建
-          // if (that.flvPlayer) {
-          //   console.log('that.flvPlayer~~~~~~~~~~~~~~~~~~', that.flvPlayer)
-          //   that.flvPlayer.pause()
-          //   that.flvPlayer.unload()
-          //   that.flvPlayer.detachMediaElement()
-          //   that.flvPlayer.destroy()
-          //   that.flvPlayer = null
-          // }
           if (that.flvPlayer) {
+            this.player.pause()
+            this.player.unload()
+            this.player.detachMediaElement()
+            this.player.destroy()
+            this.player = null
             that.createVideo()
           }
         }
@@ -301,23 +304,20 @@ export default {
         } else {
           that.lastDecodedFrame = 0
           if (that.flvPlayer) {
+            this.player.pause()
+            this.player.unload()
+            this.player.detachMediaElement()
+            this.player.destroy()
+            this.player = null
             that.createVideo()
           }
         }
       })
 
-      that.flvPlayer.attachMediaElement(videoElement)
+      // if (that.timerId !== null) {
+      //   clearInterval(that.timerId)
+      // }
 
-      that.flvPlayer.load()
-      setTimeout(function () {
-        if (that.resVideoUrl !== '' && that.resVideoUrl !== null) {
-          that.flvPlayer.play()
-        }
-      }, 300)
-
-      if (that.timerId !== null) {
-        clearInterval(that.timerId)
-      }
       that.timerId = setInterval(() => {
         if (!videoElement.buffered || !videoElement.buffered.length) return
         const end = videoElement.buffered.end(0) // 视频结尾时间
@@ -347,9 +347,9 @@ export default {
         }
       }, 1000)
 
-      if (that.timerId1 !== null) {
-        clearInterval(that.timerId1)
-      }
+      // if (that.timerId1 !== null) {
+      //   clearInterval(that.timerId1)
+      // }
       that.timerId1 = setInterval(() => {
         if (that.reconnectCount > 3) {
           console.info('重连大于10次，不再重连')
@@ -361,9 +361,9 @@ export default {
         }
 
         if (!videoElement.buffered || !videoElement.buffered.length) return
-        const end = videoElement.buffered.end(0) // 视频结尾时间
+        const end1 = videoElement.buffered.end(0) // 视频结尾时间
 
-        if (end === that.prevEnd) {
+        if (end1 === that.prevEnd) {
           that.reconnectCount++
           console.info('重连', that.reconnectCount)
           if (that.flvPlayer) {
@@ -381,7 +381,7 @@ export default {
           that.flvPlayer.play()
         }
 
-        that.prevEnd = end
+        that.prevEnd = end1
       }, 10000)
     },
     setsrc() {
@@ -409,6 +409,8 @@ export default {
     if (this.flvPlayer !== null) {
       this.flvPlayer.pause()
       this.flvPlayer.destroy()
+      this.player.detachMediaElement()
+      this.player.destroy()
       this.flvPlayer = null
     }
   }
