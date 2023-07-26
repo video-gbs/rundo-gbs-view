@@ -283,14 +283,14 @@ export default {
           console.log('errorType:', errorType)
           console.log('errorDetail:', errorDetail)
           console.log('errorInfo:', errorInfo)
-          if (that.flvPlayer) {
-            this.player.pause()
-            this.player.unload()
-            this.player.detachMediaElement()
-            this.player.destroy()
-            this.player = null
-            that.createVideo()
-          }
+          // if (that.flvPlayer) {
+          //   this.player.pause()
+          //   this.player.unload()
+          //   this.player.detachMediaElement()
+          //   this.player.destroy()
+          //   this.player = null
+          //   that.createVideo()
+          // }
         }
       )
       that.flvPlayer.on('statistics_info', function (res) {
