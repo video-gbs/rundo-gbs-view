@@ -116,6 +116,7 @@ export default {
       reconnectCount: 0, // 重连次数
 
       timerId: null,
+      timerId1: null,
       loadStatus: true,
       statusMsg: '摄像机未开启，请联系',
       lastDecodedFrame: null,
@@ -150,16 +151,16 @@ export default {
       clearInterval(this.timerId)
       this.timerId = null
     }
+    if (this.timerId1) {
+      clearInterval(this.timerId1)
+      this.timerId1 = null
+    }
   },
   mounted() {
     this.$on('closeAll', () => {
       this.player && this.player.close()
       this.$emit('close', this.index)
     })
-
-    window.onerror = (msg) => {
-      // console.error(msg)
-    }
 
     this.$nextTick(async () => {
       this.setsrc()
@@ -201,18 +202,7 @@ export default {
     deep: true,
     immediate: true
   },
-  computed() {},
   methods: {
-    // getFrameRate() {
-    //   const video = this.$refs.testVideo
-    //   const time = video.currentTime
-    //   const totalFrames = Math.round(video.duration * video.fps)
-    //   const currentFrame = Math.round(time * video.fps)
-
-    //   console.log(
-    //     `当前时间：${time}，视频总帧数：${totalFrames}，当前帧数：${currentFrame}`
-    //   )
-    // },
     //获取码流信息
     async getStreamInfo() {
       this.tracks = []
@@ -287,34 +277,40 @@ export default {
           // that.$emit('close', that.index)
 
           //视频出错后销毁重新创建
+          // if (that.flvPlayer) {
+          //   console.log('that.flvPlayer~~~~~~~~~~~~~~~~~~', that.flvPlayer)
+          //   that.flvPlayer.pause()
+          //   that.flvPlayer.unload()
+          //   that.flvPlayer.detachMediaElement()
+          //   that.flvPlayer.destroy()
+          //   that.flvPlayer = null
+          // }
           if (that.flvPlayer) {
-            console.log('that.flvPlayer~~~~~~~~~~~~~~~~~~', that.flvPlayer)
-            that.flvPlayer.pause()
-            that.flvPlayer.unload()
-            that.flvPlayer.detachMediaElement()
-            that.flvPlayer.destroy()
-            that.flvPlayer = null
+            that.createVideo()
           }
-          that.createVideo()
         }
       )
       that.flvPlayer.on('statistics_info', function (res) {
-        if (!that.lastDecodedFrame) {
+        if (that.lastDecodedFrame === 0) {
           that.lastDecodedFrame = res.decodedFrames
           return
         }
-        if (that.lastDecodedFrame != res.decodedFrames) {
+        if (that.lastDecodedFrame !== res.decodedFrames) {
           that.reconnectIng = false
           that.lastDecodedFrame = res.decodedFrames
         } else {
           that.lastDecodedFrame = 0
+          if (that.flvPlayer) {
+            that.createVideo()
+          }
         }
       })
 
       that.flvPlayer.attachMediaElement(videoElement)
+
+      that.flvPlayer.load()
       setTimeout(function () {
         if (that.resVideoUrl !== '' && that.resVideoUrl !== null) {
-          that.flvPlayer.load()
           that.flvPlayer.play()
         }
       }, 300)
@@ -323,32 +319,31 @@ export default {
         clearInterval(that.timerId)
       }
       that.timerId = setInterval(() => {
-        if (videoElement.buffered.length > 0) {
-          const end = videoElement.buffered.end(0) // 视频结尾时间
-          const current = videoElement.currentTime //  视频当前时间
-          const diff = end - current // 相差时间
-          const diffCritical = 4 // 这里设定了超过4秒以上就进行跳转
-          const diffSpeedUp = 2 // 这里设置了超过1秒以上则进行视频加速播放
-          const maxPlaybackRate = 4 // 自定义设置允许的最大播放速度
-          let playbackRate = 1.0 // 播放速度
-          // 延迟过大，通过跳帧的方式更新视频
-          if (diff > 10 || diff < 0) {
-            that.flvPlayer.currentTime = this.flvPlayer.buffered.end(0) - 1
-            return
-          }
+        if (!videoElement.buffered || !videoElement.buffered.length) return
+        const end = videoElement.buffered.end(0) // 视频结尾时间
+        const current = videoElement.currentTime //  视频当前时间
+        const diff = end - current // 相差时间
+        const diffCritical = 4 // 这里设定了超过4秒以上就进行跳转
+        const diffSpeedUp = 2 // 这里设置了超过1秒以上则进行视频加速播放
+        const maxPlaybackRate = 4 // 自定义设置允许的最大播放速度
+        let playbackRate = 1.0 // 播放速度
+        // 延迟过大，通过跳帧的方式更新视频
+        if (diff > 10 || diff < 0) {
+          that.flvPlayer.currentTime = that.flvPlayer.buffered.end(0) - 1
+          return
+        }
 
-          // 追帧
-          if (diff > 1) {
-            videoElement.playbackRate = 1.1
-          } else {
-            videoElement.playbackRate = 1
-          }
+        // 追帧
+        if (diff > 1) {
+          videoElement.playbackRate = 1.1
+        } else {
+          videoElement.playbackRate = 1
+        }
 
-          if (diff > diffSpeedUp) {
-            videoElement.currentTime = end - 0.2
-          }
-          if (videoElement.paused) {
-          }
+        if (diff > diffSpeedUp) {
+          videoElement.currentTime = end - 0.2
+        }
+        if (videoElement.paused) {
         }
       }, 1000)
 
@@ -365,29 +360,28 @@ export default {
           return
         }
 
-        if (videoElement.buffered.length > 0) {
-          const end = videoElement.buffered.end(0) // 视频结尾时间
+        if (!videoElement.buffered || !videoElement.buffered.length) return
+        const end = videoElement.buffered.end(0) // 视频结尾时间
 
-          if (end === that.prevEnd) {
-            that.reconnectCount++
-            console.info('重连', that.reconnectCount)
-            if (that.flvPlayer) {
-              that.flvPlayer.pause()
-              that.flvPlayer.unload()
-              that.flvPlayer.detachMediaElement()
-              that.flvPlayer.destroy()
-              that.flvPlayer = null
-              that.createVideo()
-            }
+        if (end === that.prevEnd) {
+          that.reconnectCount++
+          console.info('重连', that.reconnectCount)
+          if (that.flvPlayer) {
+            that.flvPlayer.pause()
+            that.flvPlayer.unload()
+            that.flvPlayer.detachMediaElement()
+            that.flvPlayer.destroy()
+            that.flvPlayer = null
+            that.createVideo()
           }
-
-          if (videoElement.paused) {
-            console.info('重新播放')
-            that.flvPlayer.play()
-          }
-
-          that.prevEnd = end
         }
+
+        if (videoElement.paused) {
+          console.info('重新播放')
+          that.flvPlayer.play()
+        }
+
+        that.prevEnd = end
       }, 10000)
     },
     setsrc() {
