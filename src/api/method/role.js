@@ -176,3 +176,13 @@ export function getRoleFuncList(data) {
   // 获取角色全部功能信息
   return request.get(`${rbac}/role/func`, data)
 }
+
+// 新增接口
+export function getRoleResourceTreeNew(data) {
+  // 查询资源树
+  return request.get(`${rbac}/role/resource/tree`, data)
+}
+export function getRoleResourceRootNew(data) {
+  // 查询资源树根节点
+  return request.get(`${rbac}/role/resource/root`, data)
+}
