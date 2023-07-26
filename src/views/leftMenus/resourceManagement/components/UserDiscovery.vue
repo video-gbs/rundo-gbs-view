@@ -174,7 +174,7 @@
                   :show-overflow-tooltip="true"
                 />
                 <el-table-column
-                  prop="username"
+                  prop="workName"
                   label="用户名称"
                   :show-overflow-tooltip="true"
                 />
