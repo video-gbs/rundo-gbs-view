@@ -237,6 +237,7 @@ export default {
       this.reconnectIng = true
       let that = this
 
+      const videoElement = document.getElementById(that.idx)
       if (flvjs.isSupported()) {
         // 存在视频先销毁
         if (that.player !== null) {
@@ -246,7 +247,6 @@ export default {
           that.player.destroy()
           that.player = null
         }
-        const videoElement = document.getElementById(that.idx)
         that.flvPlayer = flvjs.createPlayer(
           {
             type: 'flv',
