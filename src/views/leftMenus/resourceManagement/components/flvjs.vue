@@ -251,7 +251,8 @@ export default {
           {
             type: 'flv',
             url: that.resVideoUrl,
-            isLive: true
+            isLive: true,
+            hasAudio: false
           },
 
           {
