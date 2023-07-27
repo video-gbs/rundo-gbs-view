@@ -242,7 +242,7 @@
               :show-overflow-tooltip="true"
             />
             <el-table-column
-              prop="username"
+              prop="createBy"
               label="创建人"
               :show-overflow-tooltip="true"
             />

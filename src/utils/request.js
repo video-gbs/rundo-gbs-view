@@ -146,6 +146,7 @@ service.interceptors.response.use(
     if (code === 0) {
       let resetTime = Local.get('expires_in')
       if (Local.get('access_token')) {
+        console.log('获取刷新tonken时间~~~~~~~~~~~~~', resetTime)
         //有没有token
         isRefreshTokenExpired(resetTime)
         if (resetTime < 1200) {
