@@ -172,6 +172,7 @@ service.interceptors.response.use(
           Local.remove('utilTime')
           Local.remove('refresh_token')
           init.openMessage(err.response.data.msg)
+          clearInterval(window.interval)
           router.replace({
             path: '/login',
             query: { redirect: router.currentRoute.fullPath }
