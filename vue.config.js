@@ -54,17 +54,17 @@ const urls = [
   // dev  本地
   {
     target: 'http://xard-gbs-test.runjian.com:8080',
-    proxy: '/expansion'
-  },
+    proxy: '/api'
+  }
   // {
   //   target: 'http://xard-gbs-dev.runjian.com:8080',
   //   proxy: '/api'
   // }
   // 测试新接口
-  {
-    target: 'http://192.192.192.92:9090',
-    proxy: '/rbac'
-  }
+  // {
+  //   target: 'http://192.192.192.92:9090',
+  //   proxy: '/rbac'
+  // }
 ]
 
 

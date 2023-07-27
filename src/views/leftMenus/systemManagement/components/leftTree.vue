@@ -12,7 +12,7 @@
         ref="tree"
         :data="treeData"
         class="tree"
-        :props="{ children: 'childList', label: defaultPropsName }"
+        :props="{ children: 'childList', label: resDefaultPropsName }"
         default-expand-all
         :default-expanded-keys="['根节点']"
         :current-node-key="resCurrentKey"
@@ -65,7 +65,8 @@ export default {
     return {
       data: [],
       filterText: '',
-      resCurrentKey: '0'
+      resCurrentKey: '0',
+      resDefaultPropsName: 'name'
     }
   },
   props: {
@@ -89,7 +90,7 @@ export default {
     },
     defaultPropsName: {
       type: String,
-      default: 'name'
+      default: ''
     }
   },
   watch: {
@@ -98,7 +99,12 @@ export default {
     },
     resCurrentKey(val) {
       this.resCurrentKey = val
-    }
+    },
+    defaultPropsName(newVal, oldValue) {
+      console.log(1111111111, newVal)
+      this.resDefaultPropsName = newVal
+    },
+    deep: true
   },
   mounted() {
     // this.init()
@@ -127,6 +133,7 @@ export default {
       }, 500)
     },
     filterNode(value, data) {
+      console.log('filterNode~~~~', value, data, this.$props.defaultPropsName)
       if (!value) return true
       if (this.$props.defaultPropsName === 'name') {
         return data.name && data.name.indexOf(value) !== -1

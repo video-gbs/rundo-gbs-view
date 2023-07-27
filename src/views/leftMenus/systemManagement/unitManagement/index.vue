@@ -52,7 +52,7 @@
           class="unitTree"
           :treeData="treeList"
           :currentKey="currentKey"
-          :defaultPropsName="resourceName"
+          :defaultPropsName="areaNames"
           :isClickTreeSort="isClickTreeSort"
           @childClickHandle="childClickHandle"
           @changeSort="changeSort"
@@ -321,7 +321,7 @@ export default {
       isClick: false,
       editShow: false,
       currentKey: '0',
-      areaNames: 'resourceName',
+      areaNames: 'sectionName',
       form: {
         sectionName: '',
         description: '',
