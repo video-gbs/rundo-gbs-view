@@ -162,7 +162,7 @@ service.interceptors.response.use(
     if (err && err.response) {
       switch (err.response.status) {
         case 400:
-          console.log('错误请求')
+          init.openMessage(err.response.data.data)
           break
         case 401:
           Local.clear()
@@ -209,7 +209,7 @@ service.interceptors.response.use(
           init.openMessage(`连接错误${err.response.status}`)
       }
     } else {
-      init.openMessage(err.response.msg)
+      init.openMessage(err.response.data.data)
     }
     return Promise.resolve(err.response)
   }

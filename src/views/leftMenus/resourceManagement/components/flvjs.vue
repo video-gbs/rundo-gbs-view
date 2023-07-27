@@ -399,29 +399,29 @@ export default {
     }
   },
   beforeDestroy() {
-    if (this.flvPlayer) {
-      this.flvPlayer.pause()
-      this.flvPlayer.destroy()
-      this.player.detachMediaElement()
-      this.player.destroy()
-      this.flvPlayer = null
+    const that = this
+    if (that.flvPlayer) {
+      that.flvPlayer.pause()
+      that.flvPlayer.destroy()
+      that.player.detachMediaElement()
+      that.flvPlayer = null
     }
   },
   destroyed() {
-    if (this.timerId) {
-      clearInterval(this.timerId)
-      this.timerId = null
+    const that = this
+    if (that.timerId) {
+      clearInterval(that.timerId)
+      that.timerId = null
     }
-    if (this.timerId1) {
-      clearInterval(this.timerId1)
-      this.timerId = null
+    if (that.timerId1) {
+      clearInterval(that.timerId1)
+      that.timerId = null
     }
-    if (this.flvPlayer) {
-      this.flvPlayer.pause()
-      this.flvPlayer.destroy()
-      this.player.detachMediaElement()
-      this.player.destroy()
-      this.flvPlayer = null
+    if (that.flvPlayer) {
+      that.flvPlayer.pause()
+      that.flvPlayer.destroy()
+      that.player.detachMediaElement()
+      that.flvPlayer = null
     }
   }
 }

@@ -633,7 +633,7 @@ export default {
     // 点击节点选中
     nodeClickHandle(data) {
       console.log(data, 111111)
-      this.dialog.params.resourcePid = data.id
+      this.dialog.params.resourcePid = data.resourceName
       // this.dialog.params.resourceKey = data.resourceKey
       this.Id = data.id
       this.$refs.selectTree.blur()

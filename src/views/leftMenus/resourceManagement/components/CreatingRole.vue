@@ -63,7 +63,7 @@
                 v-for="o in resourceKeyOptions"
                 :label="o.resourceName"
                 :value="o.resourceKey"
-                :key="o.resourceValue"
+                :key="o.resourceName"
               />
             </el-select>
           </div>
@@ -539,7 +539,12 @@ export default {
 
     handleRowSelection1(data, resourceKey) {
       // this.setCheckedLists1(data, resourceKey)
-      // console.log('this.updateIdsList', this.updateIdsList)
+      console.log(
+        'handleRowSelection1~~~~~~~~~',
+        data,
+        resourceKey,
+        this.updateRoleResourceList
+      )
       this.$nextTick(() => {
         this.expandedList2[resourceKey] = this.updateRoleResourceList
         this.checkedList2[resourceKey] = this.updateRoleResourceList
@@ -747,8 +752,16 @@ export default {
             })
           })
 
-          this.updateRoleResourceList = []
-          this.updateRoleResourceList = this.resourceIds
+          // this.updateRoleResourceList = []
+          this.updateRoleResourceList = Array.from(
+            new Set(this.updateRoleResourceList.concat(this.resourceIds))
+          )
+
+          console.log(
+            'this.resourceIds~~~~~~~~~~~~~~~',
+            this.updateRoleResourceList,
+            this.resourceIds
+          )
           // return
           this.expandedList2[this.resourceKey] = resIds
           this.checkedList2[this.resourceKey] = resIds
