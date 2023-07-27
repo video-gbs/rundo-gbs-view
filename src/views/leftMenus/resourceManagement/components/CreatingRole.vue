@@ -346,6 +346,7 @@ export default {
       type: 1,
       allRoleFuncList: [],
       updateRoleResourceList: [],
+      // deepUpdateRoleResourceList: [],
       updateIdsList: [],
       updateRoleFuncMenuIds: []
     }
@@ -451,7 +452,9 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.updateRoleResourceList = []
+            // this.deepUpdateRoleResourceList = []
             this.updateRoleResourceList = res.data.data
+            // this.deepUpdateRoleResourceList = res.data.data
             this.resourceIds = res.data.data
           }
         })
@@ -523,28 +526,15 @@ export default {
       })
     },
 
-    // setCheckedLists1(arr, resourceKey) {
-    //   arr.map((item) => {
-    //     this.updateRoleResourceList.forEach((item1) => {
-    //       if (item.id === item1) {
-    //         this.updateIdsList.push(item.id)
-    //       } else {
-    //         if (item.childList && item.childList.length > 0) {
-    //           this.setCheckedLists1(item.childList)
-    //         }
-    //       }
-    //     })
-    //   })
-    // },
-
     handleRowSelection1(data, resourceKey) {
       // this.setCheckedLists1(data, resourceKey)
-      console.log(
-        'handleRowSelection1~~~~~~~~~',
-        data,
-        resourceKey,
-        this.updateRoleResourceList
-      )
+      // console.log(
+      //   'handleRowSelection1~~~~~~~~~',
+      //   data,
+      //   resourceKey,
+      //   this.updateRoleResourceList,
+      //   this.deepUpdateRoleResourceList
+      // )
       this.$nextTick(() => {
         this.expandedList2[resourceKey] = this.updateRoleResourceList
         this.checkedList2[resourceKey] = this.updateRoleResourceList
@@ -718,6 +708,9 @@ export default {
           break
         case '资源功能权限':
           if (checked === false) {
+            this.updateRoleResourceList = this.updateRoleResourceList.filter(
+              (item) => item !== data.id
+            )
             if (data.childList) {
               data.childList.map((item2) => {
                 this.$refs['addRoleTree2' + this.resourceKey].setChecked(
@@ -751,17 +744,25 @@ export default {
               this.resourceIds.push(child.id)
             })
           })
-
-          // this.updateRoleResourceList = []
-          this.updateRoleResourceList = Array.from(
-            new Set(this.updateRoleResourceList.concat(this.resourceIds))
+          console.log(
+            'this.updateRoleResourceList~~~`',
+            this.updateRoleResourceList,
+            resIds
           )
+
+          console.log('this.resourceIds~~~`', this.resourceIds)
+          // return
+
+          this.updateRoleResourceList = [
+            ...new Set([...this.updateRoleResourceList, ...this.resourceIds])
+          ]
 
           console.log(
-            'this.resourceIds~~~~~~~~~~~~~~~',
-            this.updateRoleResourceList,
-            this.resourceIds
+            'this.updateRoleResourceList!!!!!!!!!!!!!',
+            this.updateRoleResourceList
           )
+
+          // this.updateRoleResourceList = this.resourceIds
           // return
           this.expandedList2[this.resourceKey] = resIds
           this.checkedList2[this.resourceKey] = resIds
