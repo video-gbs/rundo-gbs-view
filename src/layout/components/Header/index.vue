@@ -145,6 +145,7 @@ export default {
           Local.setToken('')
           Local.remove('access_token')
           Local.remove('rj_deptType')
+          clearInterval(window.interval)
           this.$router.push({ path: '/login' })
         })
     },

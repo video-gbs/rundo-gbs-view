@@ -591,10 +591,11 @@ export default {
         this.isClickTreeSort = true
       }
     },
-    changeSort(val, id) {
+    changeSort(val, data) {
+      console.log(data, 9999999)
       if (val === 0) {
         moveResourceXd({
-          id,
+          id: data.id,
           moveOp: val
         }).then((res) => {
           if (res.data.code === 0) {
@@ -612,7 +613,7 @@ export default {
         })
       } else {
         moveResourceXd({
-          id,
+          id: data.id,
           moveOp: val
         }).then((res) => {
           if (res.data.code === 0) {
