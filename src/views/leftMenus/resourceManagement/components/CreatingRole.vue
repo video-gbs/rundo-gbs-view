@@ -794,7 +794,7 @@ export default {
               const params = {
                 funcIds: this.funcIds,
                 menuIds: this.menuIds,
-                resourceIds: this.resourceIds,
+                resourceIds: this.updateRoleResourceList,
                 ...this.form.params
               }
 
@@ -816,10 +816,11 @@ export default {
               const params1 = {
                 funcIds: this.funcIds,
                 menuIds: this.menuIds,
-                resourceIds: this.resourceIds,
+                resourceIds: this.updateRoleResourceList,
                 ...this.form.params
               }
               console.log('params1', params1)
+              // return
               roleUpdate({
                 roleId: this.$props.creatingRoleRow.id,
                 ...params1
