@@ -74,7 +74,21 @@
       >
         <el-table-column prop="name" label="菜单名称">
           <template slot-scope="scope">
+            <!-- <div> -->
+            <svg-icon
+              v-if="scope.row.menuType === 1"
+              icon-class="mulu"
+              class="tree1"
+            />
+            <svg-icon
+              v-else-if="scope.row.menuType === 2"
+              icon-class="ziyuan"
+              class="tree1"
+            />
+            <svg-icon v-else icon-class="yemian" class="tree1" />
+
             <span>{{ scope.row.name }}</span>
+            <!-- </div> -->
           </template>
         </el-table-column>
         <el-table-column prop="path" label="跳转URL" width="180" />
@@ -921,5 +935,12 @@ export default {
   top: 16px;
   border-width: 1px;
   border-top: 1px solid #dddddd;
+}
+.tree1 {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  position: relative;
+  top: 3px;
 }
 </style>
