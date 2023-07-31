@@ -76,13 +76,13 @@
           <template slot-scope="scope">
             <!-- <div> -->
             <svg-icon
-              v-if="scope.row.menuType === 1"
-              icon-class="mulu"
+              v-if="scope.row.menuType === 0"
+              icon-class="xunimulu"
               class="tree1"
             />
             <svg-icon
-              v-else-if="scope.row.menuType === 2"
-              icon-class="ziyuan"
+              v-else-if="scope.row.menuType === 1"
+              icon-class="mulu"
               class="tree1"
             />
             <svg-icon v-else icon-class="yemian" class="tree1" />
