@@ -463,10 +463,10 @@ export default {
         this.isClickTreeSort = true
       }
     },
-    changeSort(val, id) {
+    changeSort(val, data) {
       if (val === 0) {
         moveUnitXd({
-          id,
+          id: data.id,
           moveOp: val
         }).then((res) => {
           if (res.data.code === 0) {
@@ -484,7 +484,7 @@ export default {
         })
       } else {
         moveUnitXd({
-          id,
+          id: data.id,
           moveOp: val
         }).then((res) => {
           if (res.data.code === 0) {
