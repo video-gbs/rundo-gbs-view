@@ -435,7 +435,7 @@ export default {
       this.dialogShow = true
       const { protocol, name, port, ip, serialNum, signType, gatewayType } = row
       this.dialogForm.signType = signType
-      this.dialogForm.gatewayType = gatewayType
+      this.dialogForm.gatewayType = String(gatewayType)
       this.dialogForm.protocol = protocol
       this.dialogForm.name = name
       this.dialogForm.port = port
@@ -444,7 +444,9 @@ export default {
       this.editId = row.id
     },
     async showCorrelationPage(row) {
+      console.log('row~~~~~~~', row)
       this.dialogShowDetailsForm.name = row.name
+      this.dialogShowDetailsForm.gatewayType = String(row.gatewayType)
       this.allNorthTypeOptions = [
         {
           label: '',

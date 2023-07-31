@@ -751,7 +751,10 @@ export default {
             } else {
               this.detailsId = res.data.data.id
               resData = res.data.data
-              this.$refs.unitTree.chooseId(res.data.data.id)
+              setTimeout(() => {
+                this.$refs.unitTree.chooseId(res.data.data.id)
+              }, 500)
+
               console.log(resData, 2222)
             }
 

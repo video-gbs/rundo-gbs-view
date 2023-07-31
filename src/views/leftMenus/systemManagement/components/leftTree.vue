@@ -26,10 +26,11 @@
           <span @dblclick.stop="hasEdit ? nodeDbClick(data) : ''">
             <svg-icon
               v-if="data.resourceType === 1"
-              icon-class="tree1"
+              icon-class="mulu"
               class="tree1"
             />
-            <svg-icon v-else icon-class="tree2" class="tree2" />
+            <svg-icon v-else icon-class="ziyuan" class="tree2" />
+            <!-- <svg-icon v-else-if="data.menuType === 2" icon-class="yemian" class="tree2" /> -->
             {{
               data.name ||
               data.sectionName ||
