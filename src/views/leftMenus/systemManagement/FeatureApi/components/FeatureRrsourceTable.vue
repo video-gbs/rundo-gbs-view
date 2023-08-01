@@ -47,7 +47,15 @@
           label="需要校验的参数"
           :show-overflow-tooltip="true"
         />
-
+        <el-table-column
+          prop="enableMultiCheck"
+          label="多维校验状态"
+          :show-overflow-tooltip="true"
+        >
+          <template slot-scope="scope">
+            <span>{{ scope.row.enableMultiCheck === 0 ? '否' : '是' }}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="disabled" label="是否禁用" width="120">
           <template slot-scope="scope">
             <el-switch
@@ -92,7 +100,7 @@
           ref="featureResourceRoleForm"
           class="params-form"
           size="mini"
-          label-width="140px"
+          label-width="150px"
           :rules="rules"
           label-position="right"
           :model="dialogForm.params"
@@ -113,7 +121,7 @@
                 v-for="o in resourceKeyOptions"
                 :label="o.resourceName"
                 :value="o.resourceKey"
-                :key="o.resourceValue"
+                :key="o.resourceKey"
               />
             </el-select>
           </el-form-item>
@@ -122,6 +130,12 @@
               v-model="dialogForm.params.validateParam"
               style="width: 436px"
             />
+          </el-form-item>
+          <el-form-item label="是否启用多维校验：" prop="enableMultiCheck">
+            <el-radio-group v-model="dialogForm.params.enableMultiCheck">
+              <el-radio :label="1">是</el-radio>
+              <el-radio :label="0">否</el-radio>
+            </el-radio-group>
           </el-form-item>
         </el-form>
       </div>
@@ -179,13 +193,17 @@ export default {
         title1: '新建',
         params: {
           resourceKey: '',
-          validateParam: ''
+          validateParam: '',
+          enableMultiCheck: 0
         }
       },
       rules: {
         resourceKey: [{ required: true, message: '请选择', trigger: 'blur' }],
         validateParam: [
           { required: true, message: '请填写功能名称', trigger: 'blur' }
+        ],
+        enableMultiCheck: [
+          { required: true, message: '请选择', trigger: 'change' }
         ]
       },
       Id: '',
