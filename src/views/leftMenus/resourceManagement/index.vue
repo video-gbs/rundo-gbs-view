@@ -311,7 +311,7 @@ export default {
       editEquipmentRow: {},
       activeName: '编码器',
       treeList: [],
-
+      Ids: [],
       resTree1: {},
       resTree2: {},
       channelDetailsId: '',
@@ -349,6 +349,7 @@ export default {
           name: ''
         }
       },
+      newResourceKey: '',
       dialog1: {
         show: false,
         title: '编辑安防通道资源',
@@ -428,6 +429,7 @@ export default {
         this.resTree1 = await channelVideoAreaList()
         this.treeList = [this.resTree1.data.data]
         this.fatherId = this.resTree1.data.data.id
+        this.newResourceKey = this.resTree1.data.data.resourceKey
         if (!isMoved) {
           this.channelDetailsId = this.resTree1.data.data.id
 
@@ -439,6 +441,7 @@ export default {
         this.resTree2 = await deviceVideoAreaList()
         this.treeList = [this.resTree2.data.data]
         this.fatherId = this.resTree2.data.data.id
+        this.newResourceKey = this.resTree2.data.data.resourceKey
         if (!isMoved) {
           this.deviceDetailsId = this.resTree2.data.data.id
 
@@ -593,7 +596,10 @@ export default {
           switch (this.dialog.title) {
             case '新建安防通道资源':
               this.dialog.params.resourcePid = this.Id
-              videoAreaAdd(this.dialog.params)
+              videoAreaAdd({
+                resourceKey: this.newResourceKey,
+                ...this.dialog.params
+              })
                 .then((res) => {
                   if (res.data.code === 0) {
                     this.$message({

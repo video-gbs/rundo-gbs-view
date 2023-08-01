@@ -62,3 +62,10 @@ export function getPlaybackList(data) {
   // 获取所有下拉网关
   return request.get(`${expansion}/channel/record`, data)
 }
+
+export function getGatewayId(id) {
+  // 获取所有下拉网关
+  return request.get(
+    `${expansion}/gateway-dispatch/gateway/data?gatewayId=${id}`
+  )
+}
