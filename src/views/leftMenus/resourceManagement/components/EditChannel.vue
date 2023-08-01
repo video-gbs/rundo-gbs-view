@@ -446,6 +446,7 @@ export default {
     },
     goback() {
       this.$emit('changeIsShow', 'editChannel', false)
+      this.$emit('initChannelList')
     }
   }
 }

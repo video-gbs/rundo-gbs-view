@@ -581,9 +581,12 @@ export default {
     },
 
     goback() {
+      console.log('this.$props.resType', this.$props.resType)
       this.$emit('changeIsShow', 'editEquipment', false)
       if (this.$props.resType === '1') {
         this.$emit('init', '编码器', true)
+
+        this.$emit('initEncoderList')
         this.$emit('changeIsShow', 'registrationList', false)
       } else {
         this.$emit('changeIsShow', 'registrationList', true)
