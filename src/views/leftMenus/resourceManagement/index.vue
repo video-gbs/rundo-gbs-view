@@ -239,6 +239,7 @@
       @changeIsShow="changeIsShow"
       @invokeRegistrationList="invokeRegistrationList"
       @init="init"
+      @initEncoderList="initEncoderList"
     />
     <EditChannel
       v-show="isEditChannel"
@@ -248,6 +249,7 @@
       :appearanceTypeOptions="appearanceTypeOptions"
       @changeIsShow="changeIsShow"
       @init="init"
+      @initChannelList="initChannelList"
     />
 
     <ChannelDiscovery
@@ -402,7 +404,7 @@ export default {
       : '编码器'
     Local.remove('equipmentActiveName')
 
-    this.init('编码器')
+    this.init('编码器', false)
   },
   mounted() {
     this.getEquipmentCompanyDictionaryList()
@@ -445,6 +447,12 @@ export default {
 
         this.$refs.deviceTree.chooseId(this.deviceDetailsId)
       }
+    },
+    async initEncoderList() {
+      this.$refs.encoder.getList(this.deviceDetailsId)
+    },
+    async initChannelList() {
+      this.$refs.channel.getList(this.channelDetailsId)
     },
     async getEquipmentCompanyDictionaryList() {
       await getGroupDictLists('EquipmentCompany').then((res) => {
