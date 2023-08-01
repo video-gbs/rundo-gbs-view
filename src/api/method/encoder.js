@@ -74,6 +74,8 @@ export function videoAreaEdit(data) {
   return request.put(`${expansion}/videoArea/edit`, data)
 }
 // 安防通道删除
-export function videoAreaDelete(id) {
-  return request.delete(`${expansion}/videoArea/delete?resourceId=${id}`)
+export function videoAreaDelete(data) {
+  return request.delete(
+    `${expansion}/videoArea/delete?resourceKey=${data.resourceKey}&resourceValue=${data.resourceValue}`
+  )
 }
