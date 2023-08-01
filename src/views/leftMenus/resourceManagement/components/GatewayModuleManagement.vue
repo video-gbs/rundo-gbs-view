@@ -287,7 +287,8 @@ import {
   getModuleLists,
   updateModuleLists,
   getAllNorthLists,
-  gatewayCorrelation
+  gatewayCorrelation,
+  getGatewayId
 } from '@/api/method/moduleManagement'
 export default {
   name: '',
@@ -433,7 +434,16 @@ export default {
     },
     editData(row) {
       this.dialogShow = true
-      const { protocol, name, port, ip, serialNum, signType, gatewayType } = row
+      const {
+        protocol,
+        name,
+        port,
+        ip,
+        serialNum,
+        signType,
+        dispatchId,
+        gatewayType
+      } = row
       this.dialogForm.signType = signType
       this.dialogForm.gatewayType = String(gatewayType)
       this.dialogForm.protocol = protocol
@@ -446,7 +456,12 @@ export default {
     async showCorrelationPage(row) {
       console.log('row~~~~~~~', row)
       this.dialogShowDetailsForm.name = row.name
-      this.dialogShowDetailsForm.gatewayType = String(row.gatewayType)
+
+      await getGatewayId(row.id).then((res) => {
+        if (res.data.code === 0) {
+          this.dialogShowDetailsForm.gatewayType = res.data.data
+        }
+      })
       this.allNorthTypeOptions = [
         {
           label: '',
