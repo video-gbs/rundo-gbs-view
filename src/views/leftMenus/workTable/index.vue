@@ -220,11 +220,23 @@ export default {
       this.windowWidth = document.documentElement.clientWidth
     },
     getBackground(item) {
-      return item.icon
+      let result = false
+      let url = './' + item.icon + '.png'
+      // console.log('url~~~~~~~~~~',url)
+      // 获取所有图片地址
+      const files = require.context('../../../assets/imgs/', false, /\.png$/)
+
+      files.keys().forEach((item) => {
+        if (item === url) {
+          result = true
+        }
+      })
+      //  console.log('result~~~~~~~~~~',result)
+      return result
         ? 'url(' +
             require('../../../assets/imgs/' + item.icon + '.png') +
             ') center center no-repeat'
-        : ''
+        : 'none'
     },
 
     routerChild(data) {

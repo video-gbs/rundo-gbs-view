@@ -156,6 +156,7 @@ service.interceptors.response.use(
       }
     } else {
       init.openMessage(response.data.msg)
+      return Promise.resolve(response)
     }
     return response
   },
@@ -164,7 +165,9 @@ service.interceptors.response.use(
       switch (err.response.status) {
         case 400:
           init.openMessage(err.response.data.data)
-          break
+          // console.log('4000000000000')
+          return Promise.resolve(err)
+        // break
         case 401:
           Local.clear()
           Local.remove('access_token')

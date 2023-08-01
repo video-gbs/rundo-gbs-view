@@ -509,7 +509,7 @@ export default {
                     this.initGetMenuTree()
                   }
                 })
-                .catch(() => {
+                .catch((err) => {
                   this.isClick = false
                 })
               break
