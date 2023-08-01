@@ -102,6 +102,7 @@ export default {
       }
     },
     childClickHandle(data) {
+      this.isClickedResourceBtn = false
       this.$refs.featureApiTable.saveId(data.id)
 
       Local.set('featureApiId', data.id)
