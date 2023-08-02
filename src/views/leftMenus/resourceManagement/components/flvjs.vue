@@ -34,7 +34,7 @@
       :idx="idx"
       :player="player"
       :deviceData="deviceData"
-      :onOpenControl="handleOpenControl"
+      @handleOpenControl="handleOpenControl"
       :showControl="showControl"
       :isShowStream="isShowStream"
       @handleShowStream="handleShowStream"
@@ -216,6 +216,7 @@ export default {
         }
       })
     },
+
     handleShowStream(i) {
       if (!this.isShowStream) {
         this.$emit('videoClick', i + 1)
@@ -229,7 +230,8 @@ export default {
     handBoxSelection() {
       this.isShowStream = !this.isShowStream
     },
-    handleOpenControl() {
+    handleOpenControl(i) {
+      this.$emit('videoClick', i + 1)
       this.showControl = !this.showControl
       this.showContentList = Local.get('videoUrl')
     },
