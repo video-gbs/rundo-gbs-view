@@ -205,11 +205,11 @@ export default {
     // 点击放大
     onBoxSelection(value) {
       this.isBoxSelection = !this.isBoxSelection
-      if (value === 1) {
-        this.$listeners.showPlayerBoxMini(this.$props.boxSelectionNum, true)
-      } else {
-        this.$listeners.showPlayerBoxMini(this.$props.boxSelectionNum, false)
-      }
+      // if (value === 1) {
+      //   this.$listeners.showPlayerBoxMini(this.$props.boxSelectionNum, true)
+      // } else {
+      //   this.$listeners.showPlayerBoxMini(this.$props.boxSelectionNum, false)
+      // }
     }
   },
   destroyed() {
