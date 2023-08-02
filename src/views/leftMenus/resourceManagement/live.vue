@@ -1378,6 +1378,7 @@ export default {
       window.localStorage.setItem('playData', JSON.stringify(data))
     },
     videoClick(i) {
+      console.log('videoClick~~~~~~~~', i)
       this.$refs.cloudControl.$refs.directionControl.changeType(
         i - 1,
         this.isClicked.length
@@ -1386,9 +1387,24 @@ export default {
     },
     // 放大缩小视频容器
     toogleVideo(i) {
+      // console.log('双击',i)
+      const directionControlDom = document.getElementsByClassName(
+        'playtoolDirectionControl'
+      )
+        ? document.getElementsByClassName('playtoolDirectionControl')
+        : []
+
       if (this.fullPlayerIdx === -1) {
+        directionControlDom.forEach((item, index) => {
+          if (index !== i - 1) {
+            item.style.display = 'none'
+          }
+        })
         this.fullPlayerIdx = i
       } else {
+        directionControlDom.forEach((item, index) => {
+          item.style.display = 'block'
+        })
         this.fullPlayerIdx = -1
       }
     },

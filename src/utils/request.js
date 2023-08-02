@@ -183,6 +183,7 @@ service.interceptors.response.use(
           return
         case 403:
           init.openMessage(err.response.data.data)
+          break
         case 404:
           init.openMessage('请求错误,未找到该资源')
           break
