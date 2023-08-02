@@ -233,7 +233,6 @@ export default {
       hoverClass: '', //鼠标移动的位置
       DIRECTIONS_CLASS,
       resShowContent: [],
-      hasChange: false,
       status: {
         up: 8,
         left: 2,
@@ -275,12 +274,8 @@ export default {
         this.$forceUpdate()
       })
     },
-    playerIdx(val) {
+    playerIdx(val, oldVal) {
       this.resPlayerIdx = val
-      console.log('this.resPlayerIdxthis.resPlayerIdx', this.resPlayerIdx)
-      Local.set('resPlayerIdx', this.resPlayerIdx)
-      this.hasChange = true
-
       this.resShowContent.map((item, index) => {
         if (item && item !== '' && item.length > 0) {
           this.initTopType[index] = true
@@ -781,31 +776,24 @@ export default {
     },
     // 云台控制
     ptzCamera(cmdCode) {
-      let channelExpansionNum = ''
-      if (this.hasChange) {
-        channelExpansionNum = this.resPlayerIdx
-      } else {
-        channelExpansionNum = Local.get('resPlayerIdx')
-      }
-      console.log('channelExpansionNumchannelExpansionNumchannelExpansionNum')
-      ptzControl1({
-        channelExpansionId: Local.get('flvCloudId')[channelExpansionNum],
-        ptzOperationType: this.status[cmdCode],
-        operationValue: this.speed
-      })
+      setTimeout(() => {
+        ptzControl1({
+          channelExpansionId:
+            Local.get('flvCloudId')[Local.get('resPlayerIdx')],
+          ptzOperationType: this.status[cmdCode],
+          operationValue: this.speed
+        })
+      }, 500)
     },
     ptzCameraStop(cmdCode) {
-      let channelExpansionNum = ''
-      if (this.hasChange) {
-        channelExpansionNum = this.resPlayerIdx
-      } else {
-        channelExpansionNum = Local.get('resPlayerIdx')
-      }
-      ptzControl1({
-        channelExpansionId: Local.get('flvCloudId')[channelExpansionNum],
-        ptzOperationType: 0,
-        operationValue: this.speed
-      })
+      setTimeout(() => {
+        ptzControl1({
+          channelExpansionId:
+            Local.get('flvCloudId')[Local.get('resPlayerIdx')],
+          ptzOperationType: 0,
+          operationValue: this.speed
+        })
+      }, 500)
     }
   }
 }
