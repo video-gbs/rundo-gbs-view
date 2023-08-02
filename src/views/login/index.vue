@@ -217,6 +217,7 @@ export default {
     // this.initMap()
     Local.set('permissionData', [])
     Local.set('rj_userName', '')
+    Local.set('expires_in', '')
   },
   methods: {
     async getHomeUser() {
@@ -304,6 +305,13 @@ export default {
         this.$refs.password.focus()
       })
     },
+    isRefreshTokenExpired(timestamp) {
+      clearInterval(window.interval)
+      window.interval = setInterval(() => {
+        timestamp = timestamp - 1
+        Local.set('expires_in', timestamp)
+      }, 1000)
+    },
     handleLogin() {
       this.loading = true
       Local.set('access_token', '')
@@ -325,6 +333,7 @@ export default {
           Local.set('access_token', accessToken)
           Local.set('refresh_token', refreshToken)
           console.log('expiresIn~~~~~~~~~~~~~~', expiresIn)
+          this.isRefreshTokenExpired(expiresIn)
           Local.set('expires_in', expiresIn)
           Local.set('token_type', tokenType)
 
