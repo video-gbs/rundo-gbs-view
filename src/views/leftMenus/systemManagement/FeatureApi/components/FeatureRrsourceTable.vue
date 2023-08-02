@@ -49,7 +49,7 @@
         />
         <el-table-column
           prop="multiGroup"
-          label="多维校验状态"
+          label="多维校验组"
           :show-overflow-tooltip="true"
         />
         <!-- <template slot-scope="scope">
@@ -131,7 +131,7 @@
               style="width: 436px"
             />
           </el-form-item>
-          <el-form-item label="是否启用多维校验：" prop="multiGroup">
+          <el-form-item label="多维校验组：" prop="multiGroup">
             <!-- <el-radio-group v-model="dialogForm.params.multiGroup">
               <el-radio :label="'1'">是</el-radio>
               <el-radio :label="'0'">否</el-radio>
