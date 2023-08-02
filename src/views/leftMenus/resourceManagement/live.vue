@@ -714,24 +714,28 @@ export default {
 
         // A(左上) part
         if (this.mouseX < this.downX && this.mouseY < this.downY) {
+          console.log('左上~~~~~', this.mouseX, this.downX)
           this.rect.style.left = this.mouseX - this.left + 'px'
           this.rect.style.top = this.mouseY - this.top + 'px'
           this.videoZoomFlag = false
         }
         // B(右上) part
         if (this.mouseX > this.downX && this.mouseY < this.downY) {
+          console.log('右上~~~~~', this.mouseX, this.downX)
           this.rect.style.left = this.downX - this.left + 'px'
           this.rect.style.top = this.mouseY - this.top + 'px'
           this.videoZoomFlag = false
         }
         // C(左下) part
         if (this.mouseX < this.downX && this.mouseY > this.downY) {
+          console.log('左下~~~~~', this.mouseX, this.downX)
           this.rect.style.left = this.mouseX - this.left + 'px'
           this.rect.style.top = this.downY - this.top + 'px'
           this.videoZoomFlag = false
         }
         // D(右下) part
         if (this.mouseX > this.downX && this.mouseY > this.downY) {
+          console.log('右下~~~~~', this.mouseX, this.downX)
           this.rect.style.left = this.downX - this.left + 'px'
           this.rect.style.top = this.downY - this.top + 'px'
           this.videoZoomFlag = true
@@ -890,7 +894,7 @@ export default {
       this.downY = 0
       this.mouseX = 0
       this.mouseY = 0
-      this.rect = null
+      this.rect = false
       this.rectInfo = {
         videoWidth: 0,
         videoHeight: 0,

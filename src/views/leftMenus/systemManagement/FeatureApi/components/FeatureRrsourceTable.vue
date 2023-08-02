@@ -48,12 +48,12 @@
           :show-overflow-tooltip="true"
         />
         <el-table-column
-          prop="enableMultiCheck"
+          prop="multiGroup"
           label="多维校验状态"
           :show-overflow-tooltip="true"
         >
           <template slot-scope="scope">
-            <span>{{ scope.row.enableMultiCheck === 0 ? '否' : '是' }}</span>
+            <span>{{ scope.row.multiGroup === 0 ? '否' : '是' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="disabled" label="是否禁用" width="120">
@@ -131,8 +131,8 @@
               style="width: 436px"
             />
           </el-form-item>
-          <el-form-item label="是否启用多维校验：" prop="enableMultiCheck">
-            <el-radio-group v-model="dialogForm.params.enableMultiCheck">
+          <el-form-item label="是否启用多维校验：" prop="multiGroup">
+            <el-radio-group v-model="dialogForm.params.multiGroup">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="0">否</el-radio>
             </el-radio-group>
@@ -194,7 +194,7 @@ export default {
         params: {
           resourceKey: '',
           validateParam: '',
-          enableMultiCheck: 0
+          multiGroup: 0
         }
       },
       rules: {
@@ -202,9 +202,7 @@ export default {
         validateParam: [
           { required: true, message: '请填写功能名称', trigger: 'blur' }
         ],
-        enableMultiCheck: [
-          { required: true, message: '请选择', trigger: 'change' }
-        ]
+        multiGroup: [{ required: true, message: '请选择', trigger: 'change' }]
       },
       Id: '',
       editId: '',
