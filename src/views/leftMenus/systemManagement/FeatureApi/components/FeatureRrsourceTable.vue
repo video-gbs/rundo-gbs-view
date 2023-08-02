@@ -300,9 +300,11 @@ export default {
 
     dialogShow(type, row) {
       if (type === 0) {
-        const { resourceKey, validateParam } = row
+        const { resourceKey, validateParam, multiGroup } = row
         this.dialogForm.params.resourceKey = resourceKey
         this.dialogForm.params.validateParam = validateParam
+        this.dialogForm.params.multiGroup = multiGroup
+
         this.editId = row.id
       }
       this.dialogForm.title1 = type === 1 ? '新建' : '编辑'
