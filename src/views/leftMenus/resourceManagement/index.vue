@@ -259,6 +259,7 @@
       :treeList="treeList"
       @changeIsShow="changeIsShow"
       @init="init"
+      @initChannelList="initChannelList"
     />
   </div>
 </template>
@@ -458,6 +459,7 @@ export default {
     async initChannelDiscovery() {
       this.$refs.channelDiscovery.init()
     },
+
     async initEncoderList() {
       this.$refs.encoder.getList(this.deviceDetailsId)
     },
