@@ -10,7 +10,7 @@
         v-for="item in DIRECTIONS_CLASS"
         :key="item.command"
         :class="item.className"
-        @mousedown="ptzCamera(item.command)"
+        @mousedown="ptzCamera($event, item.command)"
         @mouseup="ptzCameraStop(item.command)"
         @mouseout="handleMouseout"
         @mouseover="handleHoverWheel(item.className)"
@@ -233,6 +233,7 @@ export default {
       hoverClass: '', //鼠标移动的位置
       DIRECTIONS_CLASS,
       resShowContent: [],
+      resNum: '',
       status: {
         up: 8,
         left: 2,
@@ -775,25 +776,25 @@ export default {
       this.hoverClass = ''
     },
     // 云台控制
-    ptzCamera(cmdCode) {
-      setTimeout(() => {
-        ptzControl1({
-          channelExpansionId:
-            Local.get('flvCloudId')[Local.get('resPlayerIdx')],
-          ptzOperationType: this.status[cmdCode],
-          operationValue: this.speed
-        })
-      }, 500)
+    ptzCamera(event, cmdCode) {
+      console.log(event.target.parentNode.parentNode.parentNode.__vue__.index)
+      this.resNum = event.target.parentNode.parentNode.parentNode.__vue__.index
+      // setTimeout(() => {
+      ptzControl1({
+        channelExpansionId: Local.get('flvCloudId')[this.resNum],
+        ptzOperationType: this.status[cmdCode],
+        operationValue: this.speed
+      })
+      // }, 500)
     },
     ptzCameraStop(cmdCode) {
-      setTimeout(() => {
-        ptzControl1({
-          channelExpansionId:
-            Local.get('flvCloudId')[Local.get('resPlayerIdx')],
-          ptzOperationType: 0,
-          operationValue: this.speed
-        })
-      }, 500)
+      // setTimeout(() => {
+      ptzControl1({
+        channelExpansionId: Local.get('flvCloudId')[this.resNum],
+        ptzOperationType: 0,
+        operationValue: this.speed
+      })
+      // }, 500)
     }
   }
 }

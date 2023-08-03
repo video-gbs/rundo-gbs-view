@@ -205,8 +205,8 @@ export default {
         resourceKey: [{ required: true, message: '请选择', trigger: 'blur' }],
         validateParam: [
           { required: true, message: '请填写功能名称', trigger: 'blur' }
-        ],
-        multiGroup: [{ required: true, message: '请填写', trigger: 'blur' }]
+        ]
+        // multiGroup: [{ required: true, message: '请填写', trigger: 'blur' }]
       },
       Id: '',
       editId: '',
