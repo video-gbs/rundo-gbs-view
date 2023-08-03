@@ -503,7 +503,7 @@ export default {
 
     // 处理当前列表选中状态
     handleRowSelection(data) {
-      console.log('处理当前列表选中状态', data, this.selectedObj)
+      // console.log('处理当前列表选中状态', data, this.selectedObj)
       data.forEach((item) => {
         if (this.selectedObj[item.id]) {
           this.$nextTick(() => {
@@ -551,13 +551,13 @@ export default {
           delete this.selectedObj[item.id]
         })
         this.featureApiTableData.forEach((item) => {
-          console.log('~~~~~~~~~~~~~~', item)
+          // console.log('~~~~~~~~~~~~~~', item)
           this.allRoleFuncList = this.allRoleFuncList.filter((item1) => {
             return item1 !== item.id
           })
         })
       }
-      console.log('全部取消~~~~~~~~~~~~~~', this.allRoleFuncList)
+      // console.log('全部取消~~~~~~~~~~~~~~', this.allRoleFuncList)
       // 勾选数据 添加
       selection.forEach((item) => {
         this.selectedObj[item.id] = item
@@ -575,7 +575,7 @@ export default {
         delete this.selectedObj[row.id]
       }
 
-      console.log('selection', selection, this.selectedObj)
+      // console.log('selection', selection, this.selectedObj)
       if (this.$props.nameType !== 'add') {
         let resData = []
         selection.map((item1) => {
@@ -583,9 +583,9 @@ export default {
         })
         // this.allRoleFuncList = resData
 
-        console.log('resData', resData)
+        // console.log('resData', resData)
 
-        console.log('this.allRoleFuncList````````', this.allRoleFuncList)
+        // console.log('this.allRoleFuncList````````', this.allRoleFuncList)
       }
     },
 
@@ -677,7 +677,7 @@ export default {
       }
     },
     handleCheckChange(data, checked, indeterminate) {
-      console.log('data', data, this.activeIndex)
+      // console.log('data', data, this.activeIndex)
       // 获取所有选中的节点
       let resIds = []
       switch (this.activeIndex) {
@@ -744,23 +744,23 @@ export default {
               this.resourceIds.push(child.id)
             })
           })
-          console.log(
-            'this.updateRoleResourceList~~~`',
-            this.updateRoleResourceList,
-            resIds
-          )
+          // console.log(
+          //   'this.updateRoleResourceList~~~`',
+          //   this.updateRoleResourceList,
+          //   resIds
+          // )
 
-          console.log('this.resourceIds~~~`', this.resourceIds)
+          // console.log('this.resourceIds~~~`', this.resourceIds)
           // return
 
           this.updateRoleResourceList = [
             ...new Set([...this.updateRoleResourceList, ...this.resourceIds])
           ]
 
-          console.log(
-            'this.updateRoleResourceList!!!!!!!!!!!!!',
-            this.updateRoleResourceList
-          )
+          // console.log(
+          //   'this.updateRoleResourceList!!!!!!!!!!!!!',
+          //   this.updateRoleResourceList
+          // )
 
           // this.updateRoleResourceList = this.resourceIds
           // return
@@ -788,7 +788,7 @@ export default {
               return array.indexOf(item) === index
             })
 
-          console.log('this.funcIds============', this.funcIds)
+          // console.log('this.funcIds============', this.funcIds)
           switch (this.$props.nameType) {
             case 'add':
               const params = {
@@ -798,7 +798,7 @@ export default {
                 ...this.form.params
               }
 
-              console.log('this.params~~~~~~~~~~~~~~~', params)
+              // console.log('this.params~~~~~~~~~~~~~~~', params)
               // return
               roleAdd(params).then((res) => {
                 if (res.data.code === 0) {
@@ -819,7 +819,7 @@ export default {
                 resourceIds: this.updateRoleResourceList,
                 ...this.form.params
               }
-              console.log('params1', params1)
+              // console.log('params1', params1)
               // return
               roleUpdate({
                 roleId: this.$props.creatingRoleRow.id,
@@ -929,7 +929,7 @@ export default {
 // 滚动条大小设置
 ::v-deep .role_featureApiTable::-webkit-scrollbar {
   /*纵向滚动条*/
-  width: 5px;
+  width: 0px;
   /*横向滚动条*/
   height: 5px;
 }
