@@ -430,6 +430,7 @@ export default {
         this.treeList = [this.resTree1.data.data]
         this.fatherId = this.resTree1.data.data.id
         this.newResourceKey = this.resTree1.data.data.resourceKey
+        this.deleteObj = this.resTree1.data.data
         if (!isMoved) {
           this.channelDetailsId = this.resTree1.data.data.id
 
@@ -442,6 +443,7 @@ export default {
         this.treeList = [this.resTree2.data.data]
         this.fatherId = this.resTree2.data.data.id
         this.newResourceKey = this.resTree2.data.data.resourceKey
+        this.deleteObj = this.resTree2.data.data
         if (!isMoved) {
           this.deviceDetailsId = this.resTree2.data.data.id
 

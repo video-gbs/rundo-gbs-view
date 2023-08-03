@@ -6,21 +6,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const productionGzipExtensions = ['js', 'css']
-// const px2rem = require('postcss-px2rem')
-// // 配置基本大小
-// const postcss = px2rem({
-//   //配置rem基准值 基准大小 baseSize
-//   remUnit: 192 // 设计稿尺寸1920/10
-// })
-// 本地环境
-// const devEnv = require('')
-// // 测试环境
-// const defaultSettings = require('')
-// 生产环境
-// const proEnv = require('')
 
 const assetsCDN = {
-  // webpack build externals
   externals: {
     vue: 'Vue',
     'vue-router': 'VueRouter',
@@ -88,7 +75,6 @@ function getProxys() {
       }
     }
   })
-  console.log('proxysproxysproxys', proxys)
   return proxys
 }
 module.exports = {
@@ -110,6 +96,12 @@ module.exports = {
   configureWebpack: {
     name: name,
     plugins: [
+      // AutoImport({
+      //   resolvers: [ElementPlusResolver()]
+      // }),
+      // Components({
+      //   resolvers: [ElementPlusResolver()]
+      // }),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
       // 配置compression-webpack-plugin压缩
@@ -159,35 +151,9 @@ module.exports = {
         include: 'initial'
       }
     ])
-    // config.plugin("preload-index").tap(() => [
-    //   {
-    //     rel: "preload",
-    //     fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-    //     include: "initial",
-    //   },
-    // ]);
-    // config.plugin("preload-qr").tap(() => [
-    //   {
-    //     rel: "preload",
-    //     fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-    //     include: "initial",
-    //   },
-    // ])
 
     config.plugins.delete('prefetch')
 
-    // set svg-sprite-loader
-    // config.module
-    //   .rule('css')
-    //   .test(/\.css$/)
-    //   .oneOf('vue')
-    //   .use('px2rem-loader')
-    //   .loader('px2rem-loader')
-    //   .options({
-    //     remUnit: 192,
-    //     remPrecision: 8
-    //   })
-    //   .end()
     config.module.rule('svg').exclude.add(resolve('src/icons')).end()
     config.module
       .rule('icons')

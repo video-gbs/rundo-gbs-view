@@ -81,6 +81,13 @@
                   label="所属设备"
                   width="240"
                 />
+                <el-table-column prop="signState" label="状态" width="140">
+                  <template slot-scope="scope">
+                    <span>{{
+                      scope.row.signState === 1 ? '待添加' : '删除'
+                    }}</span>
+                  </template>
+                </el-table-column>
               </el-table>
 
               <pagination

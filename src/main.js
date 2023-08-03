@@ -31,10 +31,6 @@ Vue.use(VideoTimeline)
 
 // import { Base64 } from 'js-base64'
 // Vue.use(Base64)
-// 引入字典
-import _dict from '@/dict/index'
-
-Vue.prototype.$dict = _dict
 
 import config from '@/config/index'
 Vue.prototype.$_config = config
