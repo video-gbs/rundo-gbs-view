@@ -531,6 +531,7 @@ export default {
       Local.set('channelPageNum', this.params.pageNum)
       Local.set('equipmentActiveName', '通道')
       this.$emit('changeIsShow', 'channelDiscovery', true)
+      this.$emit('initChannelDiscovery')
     },
 
     moveEquipment() {

@@ -84,6 +84,7 @@
                 :manufacturerTypeOptions="manufacturerTypeOptions"
                 :appearanceTypeOptions="appearanceTypeOptions"
                 @changeIsShow="changeIsShow"
+                @initChannelDiscovery="initChannelDiscovery"
               />
             </el-tab-pane>
           </el-tabs>
@@ -452,6 +453,10 @@ export default {
 
         this.$refs.deviceTree.chooseId(this.deviceDetailsId)
       }
+    },
+
+    async initChannelDiscovery() {
+      this.$refs.channelDiscovery.init()
     },
     async initEncoderList() {
       this.$refs.encoder.getList(this.deviceDetailsId)

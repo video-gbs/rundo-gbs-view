@@ -49,8 +49,12 @@ const urls = [
   // }
   // 测试新接口
   // {
-  //   target: 'http://192.192.192.92:9090',
+  //   target: 'http://172.20.0.75:9090',
   //   proxy: '/rbac'
+  // },
+  // {
+  //   target: 'http://172.20.0.75:9090',
+  //   proxy: '/expansion'
   // }
 ]
 
@@ -84,7 +88,7 @@ module.exports = {
   lintOnSave: false,
   productionSourceMap: false,
   devServer: {
-    public: '127.0.0.1',
+    public: '172.20.0.101',
     port: port,
     open: true,
     overlay: {
