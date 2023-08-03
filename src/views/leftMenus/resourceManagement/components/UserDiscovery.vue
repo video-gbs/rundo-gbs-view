@@ -21,12 +21,8 @@
               />
             </div>
             <div class="level searchbox">
-              <el-checkbox
-                v-model="isRightClicked"
-                class="table-content-top-check"
-                >已勾选 {{ tableLeftSelectionLength }}/{{
-                  params.total
-                }}</el-checkbox
+              <span class="table-content-top-check"
+                >已勾选 {{ tableLeftSelectionLength }}/{{ params.total }}</span
               >
               <el-input
                 placeholder="请输入用户账号"
@@ -123,12 +119,11 @@
               />
             </div>
             <div class="level searchbox">
-              <el-checkbox
-                v-model="isLeftClicked"
-                class="table-content-top-check"
+              <!-- v-model="isLeftClicked" -->
+              <span class="table-content-top-check"
                 >已勾选 {{ tableRightSelectionLength }}/{{
                   params1.total
-                }}</el-checkbox
+                }}</span
               >
               <el-input
                 placeholder="请输入用户账号"
