@@ -271,6 +271,7 @@ export default {
     },
     goback() {
       this.$emit('changeIsShow', 'channelDiscovery', false)
+      this.$emit('initChannelList')
     },
     //数组去重
     fn2(arr) {
