@@ -146,15 +146,11 @@ export default {
             type: 'success',
             message: '移动成功'
           })
-        } else {
-          this.$message({
-            type: 'warning',
-            message: res.data.data
-          })
+
+          this.$emit('init', this.$props.activeName)
+          this.isLoading = false
+          this.moveTreeShow = false
         }
-        this.$emit('init', this.$props.activeName)
-        this.isLoading = false
-        this.moveTreeShow = false
       })
     },
     handleNodeClick(data, index) {

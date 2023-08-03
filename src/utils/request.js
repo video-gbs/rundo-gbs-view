@@ -3,7 +3,6 @@ import { Message } from 'element-ui'
 import router from '@/router'
 import { Local } from '@/utils/storage'
 import { newLogout } from '@/api/method/user'
-import { unzip } from '@/utils/pako'
 
 const requestTimeOut = 20 * 100000
 window.isReresh = false
