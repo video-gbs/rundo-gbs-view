@@ -135,10 +135,12 @@ export default {
               type: 'success',
               message: '移动成功'
             })
+            this.$emit('init')
+            this.isLoading = false
+            this.moveTreeShow = false
+          } else {
+            this.isLoading = false
           }
-          this.$emit('init')
-          this.isLoading = false
-          this.moveTreeShow = false
         })
         .catch(() => {
           this.isLoading = false

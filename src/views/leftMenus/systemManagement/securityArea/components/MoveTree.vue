@@ -140,6 +140,8 @@ export default {
             this.$emit('init')
             this.isLoading = false
             this.moveTreeShow = false
+          } else {
+            this.isLoading = false
           }
         })
         .catch(() => {

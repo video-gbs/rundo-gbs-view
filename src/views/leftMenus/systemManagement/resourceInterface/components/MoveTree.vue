@@ -145,6 +145,8 @@ export default {
             this.$emit('init', '', this.$props.resourceType)
             this.isLoading = false
             this.moveTreeShow = false
+          } else {
+            this.isLoading = false
           }
         })
         .catch(() => {
