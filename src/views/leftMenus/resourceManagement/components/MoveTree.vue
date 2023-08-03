@@ -140,18 +140,22 @@ export default {
         presourceValue: this.tagResourceValue,
         resourceKey: this.$props.deleteObj.resourceKey,
         resourceValue: this.$props.deleteObj.resourceValue
-      }).then((res) => {
-        if (res.data.code === 0) {
-          this.$message({
-            type: 'success',
-            message: '移动成功'
-          })
-
-          this.$emit('init', this.$props.activeName)
-          this.isLoading = false
-          this.moveTreeShow = false
-        }
       })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '移动成功'
+            })
+
+            this.$emit('init', this.$props.activeName)
+            this.isLoading = false
+            this.moveTreeShow = false
+          }
+        })
+        .catch(() => {
+          this.isLoading = false
+        })
     },
     handleNodeClick(data, index) {
       this.tagResourceValue = data.resourceValue

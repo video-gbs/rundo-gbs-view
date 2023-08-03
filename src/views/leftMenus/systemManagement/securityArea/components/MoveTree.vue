@@ -127,21 +127,24 @@ export default {
       done()
     },
     moveTree() {
-      this.loading = true
+      this.isLoading = true
       // console.log('this.$props.fatherId', this.$props.fatherId)
-      moveDepart({ id: this.$props.fatherId, areaPid: this.childId }).then(
-        (res) => {
+      moveDepart({ id: this.$props.fatherId, areaPid: this.childId })
+        .then((res) => {
           if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '移动成功'
             })
+
+            this.$emit('init')
+            this.isLoading = false
+            this.moveTreeShow = false
           }
-          this.$emit('init')
-          this.loading = false
-          this.moveTreeShow = false
-        }
-      )
+        })
+        .catch(() => {
+          this.isLoading = false
+        })
     },
     changeMoveTreeShow() {
       this.moveTreeShow = true
