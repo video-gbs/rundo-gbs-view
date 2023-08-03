@@ -134,22 +134,22 @@ export default {
       moveResourceFz({
         id: this.$props.fatherId,
         resourcePid: this.childId
-      }).then((res) => {
-        if (res.data.code === 0) {
-          this.$message({
-            type: 'success',
-            message: '移动成功'
-          })
-        } else {
-          this.$message({
-            type: 'warning',
-            message: res.data.data
-          })
-        }
-        this.$emit('init', '', this.$props.resourceType)
-        this.isLoading = false
-        this.moveTreeShow = false
       })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '移动成功'
+            })
+
+            this.$emit('init', '', this.$props.resourceType)
+            this.isLoading = false
+            this.moveTreeShow = false
+          }
+        })
+        .catch(() => {
+          this.isLoading = false
+        })
     },
     handleNodeClick(data, index) {
       this.childId = data.id

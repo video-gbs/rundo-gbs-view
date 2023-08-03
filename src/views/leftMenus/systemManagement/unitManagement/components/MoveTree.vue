@@ -128,8 +128,8 @@ export default {
     moveTree() {
       this.isLoading = true
       // console.log('this.$props.fatherId', this.$props.fatherId)
-      moveUnitFz({ id: this.$props.fatherId, sectionPid: this.childId }).then(
-        (res) => {
+      moveUnitFz({ id: this.$props.fatherId, sectionPid: this.childId })
+        .then((res) => {
           if (res.data.code === 0) {
             this.$message({
               type: 'success',
@@ -139,8 +139,10 @@ export default {
           this.$emit('init')
           this.isLoading = false
           this.moveTreeShow = false
-        }
-      )
+        })
+        .catch(() => {
+          this.isLoading = false
+        })
     },
     handleNodeClick(data, index) {
       this.childId = data.id

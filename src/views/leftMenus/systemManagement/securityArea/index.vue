@@ -404,22 +404,26 @@ export default {
             case '新建部门':
               this.dialog.params.areaPid = this.Id ? this.Id : this.fatherId
               this.isLoading = true
-              unitAdd(this.dialog.params).then((res) => {
-                if (res.data.code === 0) {
-                  this.$message({
-                    type: 'success',
-                    message: '新建成功'
-                  })
-                  this.isLoading = false
-                  this.dialog.show = false
-                  this.detailsId = res.data.id
-                  this.init(this.detailsId)
+              unitAdd(this.dialog.params)
+                .then((res) => {
+                  if (res.data.code === 0) {
+                    this.$message({
+                      type: 'success',
+                      message: '新建成功'
+                    })
+                    this.isLoading = false
+                    this.dialog.show = false
+                    this.detailsId = res.data.id
+                    this.init(this.detailsId)
 
-                  this.$refs.securityAreaTree.chooseId(
-                    this.Id ? this.Id : this.fatherId
-                  )
-                }
-              })
+                    this.$refs.securityAreaTree.chooseId(
+                      this.Id ? this.Id : this.fatherId
+                    )
+                  }
+                })
+                .catch(() => {
+                  this.isLoading = false
+                })
               break
             default:
               break
