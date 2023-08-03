@@ -419,6 +419,8 @@ export default {
                     this.$refs.securityAreaTree.chooseId(
                       this.Id ? this.Id : this.fatherId
                     )
+                  } else {
+                    this.isLoading = false
                   }
                 })
                 .catch(() => {
