@@ -882,6 +882,8 @@ export default {
                     this.i = 1
                     this.isClickRoot = false
                     this.getRootList()
+                  } else {
+                    this.isClickRoot = false
                   }
                 })
                 .catch((error) => {
@@ -938,6 +940,8 @@ export default {
                     this.i = 1
                     this.isClick = false
                     this.init(null, this.searchResourceType)
+                  } else {
+                    this.isClick = false
                   }
                 })
                 .catch((error) => {

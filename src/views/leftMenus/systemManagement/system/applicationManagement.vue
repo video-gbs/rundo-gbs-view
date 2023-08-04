@@ -505,17 +505,23 @@ export default {
       editApplication({
         roleId: this.roleId,
         permissionIds: this.checkList
-      }).then((res) => {
-        this.buttonLoading = false
-        if (res.data.code === 10000) {
-          this.$message({
-            message: '保存成功！',
-            type: 'success'
-          })
-          this.permissionDialog.show = !this.permissionDialog.show
-          // this.$router.go(-1)
-        }
       })
+        .then((res) => {
+          if (res.data.code === 10000) {
+            this.$message({
+              message: '保存成功！',
+              type: 'success'
+            })
+
+            this.buttonLoading = false
+            this.permissionDialog.show = !this.permissionDialog.show
+          } else {
+            this.buttonLoading = false
+          }
+        })
+        .catch(() => {
+          this.buttonLoading = false
+        })
     },
     getList() {
       getAddApplicationList({
