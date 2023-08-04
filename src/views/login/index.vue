@@ -127,7 +127,6 @@ import { Local } from '@/utils/storage'
 import store from '@/store/index'
 
 import axios from 'axios'
-import Cookies from 'js-cookie'
 
 import AMapLoader from '@amap/amap-jsapi-loader'
 window._AMapSecurityConfig = {
