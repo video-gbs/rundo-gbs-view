@@ -1,5 +1,9 @@
 <template>
-  <div class="direction-control" @dblclick.stop>
+  <div
+    v-permission="['/expansion/ptz/operation', 3]"
+    class="direction-control"
+    @dblclick.stop
+  >
     <!--    方向盘-->
     <div
       :class="`steering-wheel ${hoverClass}`"
@@ -7,7 +11,6 @@
     >
       <div class="hover-arrow" />
       <div
-        v-permission="['/expansion/ptz/operation', 3]"
         v-for="item in DIRECTIONS_CLASS"
         :key="item.command"
         :class="item.className"
@@ -1289,5 +1292,9 @@ export default {
       }
     }
   }
+}
+.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 </style>

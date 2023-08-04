@@ -2712,4 +2712,8 @@ export default {
     color: rgba(0, 0, 0, 0.25);
   }
 }
+.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
 </style>

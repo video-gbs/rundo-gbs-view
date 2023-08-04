@@ -573,6 +573,11 @@ export default {
       // 取消单个勾选时，删除对应属性
       if (!selection.some((item) => item.id === row.id)) {
         delete this.selectedObj[row.id]
+        this.allRoleFuncList = this.allRoleFuncList.filter((item1) => {
+          return item1 !== row.id
+        })
+      } else {
+        this.allRoleFuncList.push(row.id)
       }
 
       // console.log('selection', selection, this.selectedObj)
@@ -787,8 +792,6 @@ export default {
             .filter((item, index, array) => {
               return array.indexOf(item) === index
             })
-
-          // console.log('this.funcIds============', this.funcIds)
           switch (this.$props.nameType) {
             case 'add':
               const params = {

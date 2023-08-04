@@ -148,7 +148,7 @@ service.interceptors.response.use(
         console.log('获取刷新tonken时间~~~~~~~~~~~~~', resetTime)
         //有没有token
         // isRefreshTokenExpired(resetTime)
-        if (resetTime < 1200) {
+        if (resetTime < 3000) {
           let refresh_token = Local.get('refresh_token')
           init.updataTokenAPI(refresh_token)
         }
