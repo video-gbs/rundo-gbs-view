@@ -138,7 +138,7 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="通道名称" prop="name">
+            <el-form-item label="目录名称" prop="name">
               <el-input
                 v-model="dialog.params.name"
                 style="width: 436px"
@@ -323,7 +323,7 @@ export default {
       isShow: false,
       isClickTreeSort: true,
       lineTitle: {
-        title: '新建资源',
+        title: '新建目录',
         notShowSmallTitle: false
       },
       lineTitle1: {
@@ -618,6 +618,8 @@ export default {
                     this.dialog.show = false
                     this.editShow = false
                     this.isClick = false
+                  } else {
+                    this.isClick = false
                   }
                 })
                 .catch((error) => {
@@ -654,6 +656,8 @@ export default {
                     this.dialog1.show = false
                     this.editShow1 = false
                     this.isClick1 = false
+                  } else {
+                    this.isClick1 = false
                   }
                 })
                 .catch((error) => {
@@ -689,11 +693,6 @@ export default {
               type: 'success',
               message: '移动成功'
             })
-          } else {
-            this.$message({
-              type: 'warning',
-              message: res.data.data
-            })
           }
           this.init(this.activeName, true)
         })
@@ -707,11 +706,6 @@ export default {
             this.$message({
               type: 'success',
               message: '移动成功'
-            })
-          } else {
-            this.$message({
-              type: 'warning',
-              message: res.data.data
             })
           }
           this.init(this.activeName, true)

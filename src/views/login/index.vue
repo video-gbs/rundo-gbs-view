@@ -349,6 +349,9 @@ export default {
             message: error.response.data.data
           })
         })
+        .finally(() => {
+          this.loading = false
+        })
     }
   }
 }

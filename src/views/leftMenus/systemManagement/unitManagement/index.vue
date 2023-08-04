@@ -625,6 +625,8 @@ export default {
                     this.isClick = false
                     this.detailsId = res.data.id
                     this.init(this.detailsId)
+                  } else {
+                    this.isClick = false
                   }
                 })
                 .catch((error) => {

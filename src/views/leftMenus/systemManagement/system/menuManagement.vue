@@ -507,6 +507,8 @@ export default {
                     this.isClick = false
                     this.dialogForm.show = false
                     this.initGetMenuTree()
+                  } else {
+                    this.isClick = false
                   }
                 })
                 .catch((err) => {
