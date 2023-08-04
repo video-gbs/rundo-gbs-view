@@ -316,6 +316,7 @@ export default {
       }, 500)
     }
     return {
+      treeValue: '',
       form: {
         model: '',
         username: '',
@@ -430,6 +431,7 @@ export default {
     nodeClickHandle(data) {
       this.form.videoAreaId = data.resourceName
       this.Id = data.id
+      this.treeValue = data.resourceValue
       this.resAreaName = data.resourceName
       this.$refs.selectTree.blur()
     },
@@ -440,10 +442,18 @@ export default {
         this.$refs.form1.validate()
       ]).then(() => {
         const resGatewayId = this.form.gatewayId
-        this.form.videoAreaId = this.Id
+        // this.form.videoAreaId = this.Id
+        // this.form.videoAreaId = this.treeValue
         this.form.deviceType = Number(this.form.deviceType)
         this.form.gatewayId = this.form.gatewayId.value
-        addEncoder({ ...this.form, ...this.form1 })
+        const { videoAreaId, ...restObj } = this.form
+        // console.log('restObj', restObj)
+        // return
+        addEncoder({
+          pResourceValue: this.treeValue,
+          ...restObj,
+          ...this.form1
+        })
           .then((res) => {
             if (res.data.code === 0) {
               this.$message({

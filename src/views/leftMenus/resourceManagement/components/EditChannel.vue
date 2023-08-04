@@ -427,23 +427,31 @@ export default {
       Promise.all([this.$refs.form.validate()]).then(() => {
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
-
+        // const { videoAreaId, ...restObj } = this.form
         editChannel({
           ...this.form,
+          pResourceValue: this.pResourceValue,
           deviceExpansionId: this.resEditChannelRow.deviceExpansionId,
           pResourceValue: this.pResourceValue,
           id: this.resEditChannelRow.id
-        }).then((res) => {
-          if (res.data.code === 0) {
-            this.$message({
-              type: 'success',
-              message: '编辑成功'
-            })
-            this.goback()
-          } else {
-            this.form.videoAreaId = this.resName
-          }
         })
+          .then((res) => {
+            if (res.data.code === 0) {
+              this.$message({
+                type: 'success',
+                message: '编辑成功'
+              })
+              this.goback()
+            } else {
+              this.form.videoAreaId = this.resName
+            }
+          })
+          .catch(() => {
+            this.form.videoAreaId = this.resName
+          })
+          .finally(() => {
+            this.form.videoAreaId = this.resName
+          })
       })
     },
     goback() {

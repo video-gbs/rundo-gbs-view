@@ -7,6 +7,7 @@
     >
       <div class="hover-arrow" />
       <div
+        v-permission="['/expansion/ptz/operation', 3]"
         v-for="item in DIRECTIONS_CLASS"
         :key="item.command"
         :class="item.className"
@@ -65,7 +66,12 @@
           v-for="(item, index) in topBtnLists"
           :key="index"
         >
-          <el-tooltip effect="dark" :content="item.showName1" placement="top">
+          <el-tooltip
+            v-permission="['/expansion/ptz/operation', 3]"
+            effect="dark"
+            :content="item.showName1"
+            placement="top"
+          >
             <svg-icon
               :class="
                 initTopType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
@@ -91,7 +97,12 @@
           </el-tooltip>
 
           <span class="cloudBtns-control-top-line"></span>
-          <el-tooltip effect="dark" :content="item.showName2" placement="top">
+          <el-tooltip
+            v-permission="['/expansion/ptz/operation', 3]"
+            effect="dark"
+            :content="item.showName2"
+            placement="top"
+          >
             <svg-icon
               class="cloudBtn-right"
               :class="
@@ -121,7 +132,12 @@
 
       <div class="cloudBtns-control-bottom">
         <div class="cloudBtns-control-content">
-          <el-tooltip effect="dark" content="一键聚焦" placement="top">
+          <el-tooltip
+            v-permission="['/expansion/ptz/operation', 3]"
+            effect="dark"
+            content="一键聚焦"
+            placement="top"
+          >
             <svg-icon
               :class="initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'"
               :icon-class="
@@ -138,6 +154,7 @@
 
           <span class="cloudBtns-control-line"></span>
           <el-tooltip
+            v-permission="['/expansion/ptz/3d/zoom', 3]"
             effect="dark"
             content="3D放大"
             placement="top"
@@ -160,7 +177,13 @@
               @mouseleave="changeHover(2, '移出')"
             />
           </el-tooltip>
-          <el-tooltip effect="dark" content="取消3D放大" placement="top" v-else>
+          <el-tooltip
+            v-permission="['/expansion/ptz/3d/zoom', 3]"
+            effect="dark"
+            content="取消3D放大"
+            placement="top"
+            v-else
+          >
             <svg-icon
               class="cloudBtn-right cloudBtn"
               icon-class="3Dfangda-h"
@@ -778,10 +801,15 @@ export default {
     // 云台控制
     ptzCamera(event, cmdCode) {
       console.log(event.target.parentNode.parentNode.parentNode.__vue__.index)
-      this.resNum = event.target.parentNode.parentNode.parentNode.__vue__.index
+      if (event.target.parentNode.parentNode.parentNode.__vue__.index) {
+        this.resNum =
+          event.target.parentNode.parentNode.parentNode.__vue__.index
+        Local.set('resPlayerIdx', this.resNum)
+      }
+
       // setTimeout(() => {
       ptzControl1({
-        channelExpansionId: Local.get('flvCloudId')[this.resNum],
+        channelExpansionId: Local.get('flvCloudId')[Local.get('resPlayerIdx')],
         ptzOperationType: this.status[cmdCode],
         operationValue: this.speed
       })
@@ -790,7 +818,7 @@ export default {
     ptzCameraStop(cmdCode) {
       // setTimeout(() => {
       ptzControl1({
-        channelExpansionId: Local.get('flvCloudId')[this.resNum],
+        channelExpansionId: Local.get('flvCloudId')[Local.get('resPlayerIdx')],
         ptzOperationType: 0,
         operationValue: this.speed
       })

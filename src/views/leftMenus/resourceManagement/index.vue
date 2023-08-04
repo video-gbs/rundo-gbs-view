@@ -390,6 +390,7 @@ export default {
       },
       Id: '',
       fatherId: '',
+      treeValue: '',
       isClick: false,
       isClick1: false,
       treeMsg: '',
@@ -432,6 +433,7 @@ export default {
         this.treeList = [this.resTree1.data.data]
         this.fatherId = this.resTree1.data.data.id
         this.newResourceKey = this.resTree1.data.data.resourceKey
+        this.treeValue = this.resTree1.data.data.resourceValue
         this.deleteObj = this.resTree1.data.data
         if (!isMoved) {
           this.channelDetailsId = this.resTree1.data.data.id
@@ -445,6 +447,7 @@ export default {
         this.treeList = [this.resTree2.data.data]
         this.fatherId = this.resTree2.data.data.id
         this.newResourceKey = this.resTree2.data.data.resourceKey
+        this.treeValue = this.resTree2.data.data.resourceValue
         this.deleteObj = this.resTree2.data.data
         if (!isMoved) {
           this.deviceDetailsId = this.resTree2.data.data.id
@@ -550,6 +553,7 @@ export default {
       console.log(data, 111111)
       this.dialog.params.resourcePid = data.resourceName
       this.Id = data.id
+      this.treeValue = data.resourceValue
       this.$refs.selectTree.blur()
     },
     deleteAccount(e) {
@@ -604,10 +608,11 @@ export default {
         if (valid) {
           switch (this.dialog.title) {
             case '新建安防通道资源':
-              this.dialog.params.resourcePid = this.Id
+              // this.dialog.params.resourcePid = this.treeValue
               videoAreaAdd({
                 resourceKey: this.newResourceKey,
-                ...this.dialog.params
+                pResourceValue: this.treeValue,
+                name: this.dialog.params.name
               })
                 .then((res) => {
                   if (res.data.code === 0) {
