@@ -170,7 +170,10 @@
 
             <!-- 时间进度条 -->
 
-            <div class="player-time">
+            <div
+              class="player-time"
+              v-permission="['/expansion/play/record/seek', 3]"
+            >
               <template v-if="tabsActiveName === 'device'">
                 <TimePlayer1
                   ref="TimePlayer"
@@ -256,6 +259,11 @@
                 </el-date-picker>
 
                 <el-tooltip
+                  v-permission="
+                    play[playerIdx]
+                      ? ['/expansion/play/record/pause', 3]
+                      : ['/expansion/play/record/resume', 3]
+                  "
                   :content="play[playerIdx] ? '暂停' : '播放'"
                   placement="top"
                 >
@@ -271,7 +279,11 @@
                   />
                 </el-tooltip>
                 <div class="speed-box">
-                  <el-tooltip content="减速" placement="top">
+                  <el-tooltip
+                    v-permission="['/expansion/play/record/speed', 3]"
+                    content="减速"
+                    placement="top"
+                  >
                     <span
                       @click="
                         hasStreamId[playerIdx] ? handleChangeSpeed('sub') : ''
@@ -284,7 +296,11 @@
                   <span class="speed-text"
                     >{{ speedArr[currentSpeed[playerIdx]] }}x</span
                   >
-                  <el-tooltip content="快进" placement="top">
+                  <el-tooltip
+                    v-permission="['/expansion/play/record/speed', 3]"
+                    content="快进"
+                    placement="top"
+                  >
                     <span
                       @click="
                         hasStreamId[playerIdx] ? handleChangeSpeed('plus') : ''

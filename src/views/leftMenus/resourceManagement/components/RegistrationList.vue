@@ -308,7 +308,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteDevice(row.id).then((res) => {
+        deleteDevice(row.deviceId).then((res) => {
           if (res.data.code === 0) {
             this.$message({
               type: 'success',

@@ -143,6 +143,7 @@ export default {
       selectedList: [],
       // treeList: [],
       channelId: '',
+      treeValue: '',
       tableData: [
         {
           name: '球机192.168……',
@@ -241,6 +242,7 @@ export default {
 
     childClickHandle(data) {
       this.channelId = data.id
+      this.treeValue = data.resourceValue
     },
     async init() {
       await getFindChannelById({
@@ -315,7 +317,11 @@ export default {
             onlineState: item.onlineState
           })
         })
-        addChannel({ channelList, videoAreaId: this.channelId }).then((res) => {
+        addChannel({
+          channelList,
+          videoAreaId: this.channelId,
+          pResourceValue: this.treeValue
+        }).then((res) => {
           if (res.data.code === 0) {
             this.$message({
               type: 'success',

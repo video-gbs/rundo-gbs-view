@@ -33,7 +33,9 @@ export function ptzPresetEdit(data) {
 // 预置位删除
 
 export function ptzPresetDelete(data) {
-  return request.delete1(`${expansion}/ptz/preset/delete`, data)
+  return request.delete(
+    `${expansion}/ptz/preset/delete?channelExpansionId=${data.channelExpansionId}&presetId=${data.presetId}`
+  )
 }
 
 // 预置位查询

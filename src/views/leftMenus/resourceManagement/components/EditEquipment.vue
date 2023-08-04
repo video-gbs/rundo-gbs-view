@@ -555,6 +555,8 @@ export default {
       ]).then(() => {
         this.form.videoAreaId = this.Id
         this.form.deviceType = Number(this.form.deviceType)
+
+        // const { videoAreaId, ...restObj } = this.form
         editEncoder({
           deviceId:
             this.$props.resType === '1'
@@ -565,18 +567,26 @@ export default {
               ? this.$props.editEquipmentRow.id
               : this.$props.editEquipmentRow.deviceId,
           onlineState: this.$props.editEquipmentRow.onlineState,
+          pResourceValue: this.pResourceValue,
           ...this.form,
           ...this.form1,
           pResourceValue: this.pResourceValue
-        }).then((res) => {
-          if (res.data.code === 0) {
-            this.$message({
-              type: 'success',
-              message: '编辑成功'
-            })
-            this.goback()
-          }
         })
+          .then((res) => {
+            if (res.data.code === 0) {
+              this.$message({
+                type: 'success',
+                message: '编辑成功'
+              })
+              this.goback()
+            }
+          })
+          .catch(() => {
+            this.form.videoAreaId = this.resName
+          })
+          .finally(() => {
+            this.form.videoAreaId = this.resName
+          })
       })
     },
 
