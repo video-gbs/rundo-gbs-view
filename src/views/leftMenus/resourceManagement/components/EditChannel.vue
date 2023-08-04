@@ -440,6 +440,8 @@ export default {
               message: '编辑成功'
             })
             this.goback()
+          } else {
+            this.form.videoAreaId = this.resName
           }
         })
       })

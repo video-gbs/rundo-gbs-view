@@ -405,6 +405,7 @@ export default {
     },
     handleSelectionChange(data) {
       const resName = []
+      this.idList = []
       if (data && data.length > 0) {
         data.map((item) => {
           this.idList.push(item.id)
