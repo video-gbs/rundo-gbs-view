@@ -441,10 +441,11 @@ export default {
           path: '',
           method: ''
         }
+
+        this.dialogForm.params.menuId = this.fatherName
       }
       this.dialogForm.title1 = type === 1 ? '新建' : '编辑'
 
-      this.dialogForm.params.menuId = this.fatherName
       this.dialogForm.show = !this.dialogForm.show
     },
 
