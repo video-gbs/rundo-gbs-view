@@ -830,8 +830,8 @@ export default {
       })
         .then((res) => {
           if (res.data.code === 0) {
-            if (res.data && res.data.recordList.length > 0) {
-              listData = res.data.recordList.map((item) => {
+            if (res.data.data && res.data.data.recordList.length > 0) {
+              listData = res.data.data.recordList.map((item) => {
                 const { startTime, endTime } = item
                 item.duration =
                   (new Date(endTime).getTime() -
@@ -1651,19 +1651,25 @@ export default {
                   // console.log(res.data.wsFlv.slice(5))
                   if (!this.isNext) {
                     this.setTimeLists(videoTime, this.playerIdx)
-                    this.setPlayUrl(res.data.wsFlv, this.playerIdx)
-                    this.setRecordStreamId(res.data.streamId, this.playerIdx)
+                    this.setPlayUrl(res.data.data.wsFlv, this.playerIdx)
+                    this.setRecordStreamId(
+                      res.data.data.streamId,
+                      this.playerIdx
+                    )
 
                     this.setRecordCloudId(this.channelId, this.playerIdx)
                   } else {
                     this.setTimeLists(videoTime, this.playerIdx)
-                    this.setPlayUrl(res.data.wsFlv, this.playerIdx)
-                    this.setRecordStreamId(res.data.streamId, this.playerIdx)
+                    this.setPlayUrl(res.data.data.wsFlv, this.playerIdx)
+                    this.setRecordStreamId(
+                      res.data.data.streamId,
+                      this.playerIdx
+                    )
 
                     this.setRecordCloudId(this.channelId, this.playerIdx)
                   }
 
-                  this.streamId = res.data.streamId
+                  this.streamId = res.data.data.streamId
 
                   this.play[this.playerIdx] = true
 
