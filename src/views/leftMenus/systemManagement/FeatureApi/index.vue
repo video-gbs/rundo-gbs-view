@@ -9,6 +9,7 @@
           ref="featureApiTree"
           class="featureApiTree"
           :treeData="treeData"
+          :defaultPropsName="areaNames"
           @childClickHandle="childClickHandle"
         />
       </div>
@@ -42,6 +43,7 @@ export default {
 
   data() {
     return {
+      areaNames: 'name',
       isShow: false,
       treeData: [],
       funcId: '',
