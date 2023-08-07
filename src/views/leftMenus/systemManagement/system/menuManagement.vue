@@ -147,7 +147,7 @@
           :model="dialogForm.params"
           @keyup.enter="submit('roleForm')"
         >
-          <el-form-item label="上级菜单：" prop="menuPid">
+          <el-form-item v-if="!showSjcd" label="上级菜单：" prop="menuPid">
             <el-select
               ref="selectTree"
               v-model="dialogForm.params.menuPid"
@@ -251,6 +251,7 @@ export default {
   components: { pagination },
   data() {
     return {
+      showSjcd: false,
       isShow: false,
       tableData: [],
       isClick: false,
@@ -470,7 +471,16 @@ export default {
           disabled: 1
         }
       }
+
       this.dialogForm.title1 = type === 1 ? '新建' : '编辑'
+      if (this.dialogForm.title1 === '新建') {
+        this.showSjcd = false
+        this.$forceUpdate()
+      } else {
+        this.showSjcd = true
+        this.$forceUpdate()
+      }
+
       this.dialogForm.show = !this.dialogForm.show
     },
     deleteRole(row) {
