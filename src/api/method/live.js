@@ -98,5 +98,5 @@ export function playVideoAreaList(params) {
 
 // 设备--录像回放通道列表
 export function playVideoAreaListRecord(params) {
-  return request.get(`${expansion}/play/videoAreaList`, params)
+  return request.get(`${expansion}/play/back/videoAreaList`, params)
 }
