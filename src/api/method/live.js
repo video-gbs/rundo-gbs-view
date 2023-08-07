@@ -83,7 +83,7 @@ export function speedRecordView(data) {
 
 export function getStreamInfo(data) {
   // 码流信息
-  return request.get(`${expansion}/play/streamId/info`, data)
+  return request.get(`${expansion}/play/back/streamId/info`, data)
 }
 
 export function ptz3dEnlarge(data) {
