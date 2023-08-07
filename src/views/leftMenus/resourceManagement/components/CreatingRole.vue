@@ -13,7 +13,7 @@
         <svg-icon icon-class="jibenxinxi" class="pjqktj_svg" />
         <span>基本信息</span>
       </div>
-      <div class="text item" style="margin-top: 18px">
+      <div class="text item">
         <el-form
           ref="accountForm"
           class="params-form"
@@ -27,7 +27,7 @@
           <el-form-item
             label="角色名称"
             prop="roleName"
-            style="margin-bottom: 40px"
+            style="margin-bottom: 15px"
           >
             <el-input
               v-model="form.params.roleName"
@@ -37,11 +37,7 @@
             />
           </el-form-item>
 
-          <el-form-item
-            label="描述"
-            prop="roleDesc"
-            style="margin-bottom: 50px"
-          >
+          <el-form-item label="描述" prop="roleDesc" style="margin-bottom: 5px">
             <el-input v-model="form.params.roleDesc" type="textarea" />
           </el-form-item>
         </el-form>
@@ -913,7 +909,7 @@ export default {
   height: calc(100% - 62px);
 }
 ::v-deep .top-pane > .el-tabs__content {
-  height: calc(100% - 94px);
+  height: calc(100% - 34px);
 }
 ::v-deep .role-pane {
   max-height: calc(100% - 10px);
@@ -1022,7 +1018,12 @@ export default {
       .left-lists-table-tree {
         margin-left: 20px;
         .addRoleTree {
-          max-height: 350px;
+          @media (max-width: 1920px) {
+            max-height: 400px;
+          }
+          @media (min-width: 1920px) {
+            max-height: 450px;
+          }
           width: 300px;
           margin-right: 20px;
           overflow-y: auto;
@@ -1058,7 +1059,7 @@ export default {
   }
   .box-card1 {
     margin: 0 -20px;
-    height: calc(100% - 226px);
+    height: calc(100% - 196px);
 
     .clearfix1 {
       height: 62px;
@@ -1104,7 +1105,7 @@ export default {
     }
     .tree-bottom {
       margin-top: 20px;
-      height: calc(100% - 82px);
+      height: calc(100% - 80px);
       overflow: auto;
       position: relative;
     }
