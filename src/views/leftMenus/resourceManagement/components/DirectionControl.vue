@@ -69,12 +69,7 @@
           v-for="(item, index) in topBtnLists"
           :key="index"
         >
-          <el-tooltip
-            v-permission="['/expansion/ptz/operation', 3]"
-            effect="dark"
-            :content="item.showName1"
-            placement="top"
-          >
+          <el-tooltip effect="dark" :content="item.showName1" placement="top">
             <svg-icon
               :class="
                 initTopType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'
@@ -100,12 +95,7 @@
           </el-tooltip>
 
           <span class="cloudBtns-control-top-line"></span>
-          <el-tooltip
-            v-permission="['/expansion/ptz/operation', 3]"
-            effect="dark"
-            :content="item.showName2"
-            placement="top"
-          >
+          <el-tooltip effect="dark" :content="item.showName2" placement="top">
             <svg-icon
               class="cloudBtn-right"
               :class="
@@ -135,12 +125,7 @@
 
       <div class="cloudBtns-control-bottom">
         <div class="cloudBtns-control-content">
-          <el-tooltip
-            v-permission="['/expansion/ptz/operation', 3]"
-            effect="dark"
-            content="一键聚焦"
-            placement="top"
-          >
+          <el-tooltip effect="dark" content="一键聚焦" placement="top">
             <svg-icon
               :class="initType[resPlayerIdx] ? 'cloudBtn' : 'cloudBtnDisable'"
               :icon-class="
@@ -157,7 +142,6 @@
 
           <span class="cloudBtns-control-line"></span>
           <el-tooltip
-            v-permission="['/expansion/ptz/3d/zoom', 3]"
             effect="dark"
             content="3D放大"
             placement="top"
@@ -1294,7 +1278,7 @@ export default {
   }
 }
 .is-disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
+  cursor: not-allowed !important;
+  opacity: 0.1;
 }
 </style>

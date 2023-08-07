@@ -46,12 +46,12 @@ export function ptzPresetLists(data) {
 
 // 获取实施监控通道
 export function getChannelPlayList(id) {
-  return request.get(`${expansion}/channel/playList/?videoAreaId=${id}`)
+  return request.get(`${expansion}/channel/playList?videoAreaId=${id}`)
 }
 
 // 获取录像回放通道
 export function getChannelPlayBackList(id) {
-  return request.get(`${expansion}/channel/playBackList/?videoAreaId=${id}`)
+  return request.get(`${expansion}/channel/playBackList?videoAreaId=${id}`)
 }
 
 export function getPlayBackUrlLists(data) {

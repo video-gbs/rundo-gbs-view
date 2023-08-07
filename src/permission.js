@@ -13,6 +13,7 @@ function checkKey(currentTag, resMethod) {
   const result = permissionData.findIndex((v) => {
     return v.method === resMethod && v.path === currentTag
   })
+
   if (result !== -1) {
     return true
   } else {
@@ -24,13 +25,16 @@ export const buttonPermissions = Vue.directive('permission', {
   inserted(el, binding) {
     const currentTag = binding.value[0]
     const resMethod = binding.value[1]
+    // console.log('el', el.type)
+    // console.log('currentTag', currentTag)
+    // console.log('resMethod', resMethod)
 
     if ((currentTag, resMethod)) {
       let key = checkKey(currentTag, resMethod)
       // console.log('keykeykeykeykeykeykey', key)
       if (!key) {
         //没有权限
-        if (el.type === 'button') {
+        if (el.type && el.type === 'button') {
           el.disabled = true
         } else {
           el.style['pointer-events'] = 'none'
