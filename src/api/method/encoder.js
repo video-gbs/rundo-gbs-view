@@ -19,7 +19,7 @@ export function deleteEncoders(params) {
 
 // 删除
 export function deleteEncoder(id) {
-  return request.delete(`${expansion}/device/delete/?id=${id}`)
+  return request.delete(`${expansion}/device/delete?id=${id}`)
 }
 
 // 移动
@@ -44,7 +44,7 @@ export function getDeviceList(params) {
 
 // 代注册列表删除 新版
 export function deleteDevice(id) {
-  return request.delete(`${expansion}/device/delete/?id=${id}`)
+  return request.delete(`${expansion}/device/delete?id=${id}`)
 }
 
 // 编码器同步
