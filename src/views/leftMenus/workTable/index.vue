@@ -360,6 +360,7 @@ export default {
       }
     },
     goContentList: antiShake(function (val, data, child) {
+      console.log('goContentList', val, data, child)
       Local.set('resRouterName', child.name)
       Local.set('isShowSideRouter', val)
 
@@ -378,19 +379,25 @@ export default {
       store.dispatch('user/changeActiveIndex', child.path)
 
       this.saveComponents(data, child.name)
-
-      getHomeFunc({
-        menuId: child.childList[0] ? child.childList[0].id : ''
-      }).then((res) => {
-        if (res.data.code === 0) {
-          Local.set('permissionData', res.data.data)
-          this.$router.push({ path: child.childList[0].path })
-        }
-      })
+      if (child.childList[0]) {
+        getHomeFunc({
+          menuId: child.childList[0] ? child.childList[0].id : ''
+        }).then((res) => {
+          if (res.data.code === 0) {
+            Local.set('permissionData', res.data.data)
+            this.$router.push({ path: child.childList[0].path })
+          }
+        })
+      } else {
+        this.$message({
+          type: 'error',
+          message: '用户无权限:' + child.name + '目录下的页面未授权，无法跳转'
+        })
+      }
 
       setTimeout(() => {
         this.isGoContentListClicked = false
-      }, 10000)
+      }, 5000)
     })
   }
 }
