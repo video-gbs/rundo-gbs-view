@@ -137,7 +137,7 @@ export default {
       this.isLoading = true
       // console.log('this.$props.fatherId', this.$props.fatherId)
       videoAreaMove({
-        presourceValue: this.tagResourceValue,
+        pResourceValue: this.tagResourceValue,
         resourceKey: this.$props.deleteObj.resourceKey,
         resourceValue: this.$props.deleteObj.resourceValue
       })

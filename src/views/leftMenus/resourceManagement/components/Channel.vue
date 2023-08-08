@@ -73,7 +73,7 @@
         >
         <div class="btn-lists">
           <el-button
-            v-permission="['/expansion/channel/batchDelete', 2]"
+            v-permission="['/expansion/channel/batchDelete', 4]"
             @click="deteleAll($event)"
             style="width: 100px"
             plain
@@ -421,7 +421,7 @@ export default {
     dialogMove() {
       moveChannel({
         idList: this.idList,
-        presourceValue: this.dialogResourceValue
+        pResourceValue: this.dialogResourceValue
       }).then((res) => {
         if (res.data.code === 0) {
           this.$message({
