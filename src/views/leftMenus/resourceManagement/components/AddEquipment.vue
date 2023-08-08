@@ -1,5 +1,5 @@
 <template>
-  <div class="addEquipment-content">
+  <div class="addEquipment-content" v-if="isShow">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
@@ -316,6 +316,7 @@ export default {
       }, 500)
     }
     return {
+      isShow: false,
       treeValue: '',
       form: {
         model: '',
@@ -419,6 +420,9 @@ export default {
         }
       })
     },
+    changeIsShow(val) {
+      this.isShow = val
+    },
     changeRequired(val) {
       if (val.protocol === 'GB28181') {
         this.isRequired = false
@@ -460,6 +464,25 @@ export default {
                 type: 'success',
                 message: '新建成功'
               })
+              ;(this.form = {
+                gatewayId: '',
+                model: '',
+                username: '',
+                deviceType: '1',
+                manufacturer: '',
+                videoAreaId: '',
+                deviceId: '',
+                name: '',
+                password: ''
+              }),
+                (this.form1 = {
+                  transport: '',
+                  longitude: '',
+                  longitude: '',
+                  port: '',
+                  ip: ''
+                }),
+                (this.isShow = false)
               this.goback()
             } else {
               this.form.deviceType = String(this.form.deviceType)

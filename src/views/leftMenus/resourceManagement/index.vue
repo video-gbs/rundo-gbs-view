@@ -70,6 +70,7 @@
                 :treeList="treeList"
                 :manufacturerTypeOptions="manufacturerTypeOptions"
                 @changeIsShow="changeIsShow"
+                @initChangeIsShow="initChangeIsShow"
               />
             </el-tab-pane>
             <el-tab-pane
@@ -744,6 +745,9 @@ export default {
       } else {
         this.isClickTreeSort = true
       }
+    },
+    initChangeIsShow(val) {
+      this.$refs.addEquipment.changeIsShow(val)
     },
     // 调用兄弟组件方法
     invokeRegistrationList() {
