@@ -3,6 +3,7 @@ import { Message } from 'element-ui'
 import router from '@/router'
 import { Local } from '@/utils/storage'
 import { newLogout } from '@/api/method/user'
+// showMessage
 
 const requestTimeOut = 20 * 100000
 window.isReresh = false
@@ -178,14 +179,15 @@ service.interceptors.response.use(
             path: '/login',
             query: { redirect: router.currentRoute.fullPath }
           })
-          return
+          return Promise.resolve(err)
         case 403:
           init.openMessage(
             err.response.data.data
               ? err.response.data.msg + ':' + err.response.data.data
               : err.response.data.msg
           )
-          break
+
+          return Promise.resolve(err)
         case 404:
           init.openMessage('请求错误,未找到该资源')
           break

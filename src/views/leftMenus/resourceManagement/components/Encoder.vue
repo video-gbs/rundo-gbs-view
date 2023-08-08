@@ -640,6 +640,7 @@ export default {
     },
 
     addEquipment() {
+      this.$emit('initChangeIsShow', true)
       this.$emit('changeIsShow', 'addEquipment', true)
     },
 
