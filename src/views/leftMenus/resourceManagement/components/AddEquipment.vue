@@ -476,6 +476,7 @@ export default {
     },
     goback() {
       this.$emit('init', '编码器', true)
+      this.$emit('initEncoderList')
       this.$emit('changeIsShow', 'addEquipment', false)
     }
   }

@@ -227,6 +227,7 @@
       :transportProtocolTypeOptions="transportProtocolTypeOptions"
       @changeIsShow="changeIsShow"
       @init="init"
+      @initEncoderList="initEncoderList"
     />
 
     <EditEquipment
