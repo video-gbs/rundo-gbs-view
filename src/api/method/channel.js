@@ -24,7 +24,7 @@ export function deleteChannels(params) {
 
 // 删除
 export function deleteChannel(id) {
-  return request.delete(`${expansion}/channel/delete/?id=${id}`)
+  return request.delete(`${expansion}/channel/delete?id=${id}`)
 }
 
 // 移动
