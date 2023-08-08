@@ -152,7 +152,7 @@ export function roleUpdate(data) {
 }
 export function roleDelete(ids) {
   // 删除角色
-  return request.delete(`${rbac}/role/delete/batch?roleIds=${ids}`)
+  return request.delete(`${rbac}/role/batch/delete?roleIds=${ids}`)
 }
 export function roleAssociate(data) {
   // 角色关联用户
