@@ -39,10 +39,10 @@ const methods = {
     })
   },
   delete1(url, data, headers) {
+    const resUrl = url + data.map((item) => 'idList=' + item).join('&')
     return request({
       method: 'DELETE',
-      url,
-      data,
+      url: resUrl,
       headers
     })
   },

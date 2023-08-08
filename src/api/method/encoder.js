@@ -13,8 +13,8 @@ export function getEncoderById(params) {
 }
 
 // 批量删除
-export function deleteEncoders(ids) {
-  return request.delete(`${expansion}/device/batchDelete?idList=${ids}`)
+export function deleteEncoders(data) {
+  return request.delete1(`${expansion}/device/batchDelete?`, data)
 }
 
 // 删除
