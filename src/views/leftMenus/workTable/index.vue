@@ -173,6 +173,14 @@ export default {
     this.initMenuLists()
     this.windowWidth = document.documentElement.clientWidth
     window.onresize = this.throttle(this.setScale, 500, 500)
+    let timestamp = Local.get('expires_in')
+
+    clearInterval(window.interval)
+
+    window.interval = setInterval(() => {
+      timestamp = timestamp - 1
+      Local.set('expires_in', timestamp)
+    }, 1000)
   },
   methods: {
     async getHomeMenu() {
