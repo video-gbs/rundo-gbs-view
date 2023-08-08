@@ -18,8 +18,8 @@ export function getChannelById(params) {
 }
 
 // 批量删除
-export function deleteChannels(params) {
-  return request.post(`${expansion}/channel/batchDelete`, params)
+export function deleteChannels(ids) {
+  return request.delete(`${expansion}/channel/batchDelete?idList=${ids}`)
 }
 
 // 删除

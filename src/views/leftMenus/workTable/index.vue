@@ -379,7 +379,9 @@ export default {
 
       this.saveComponents(data, child.name)
 
-      getHomeFunc({ menuId: child.childList[0].id }).then((res) => {
+      getHomeFunc({
+        menuId: child.childList[0] ? child.childList[0].id : ''
+      }).then((res) => {
         if (res.data.code === 0) {
           Local.set('permissionData', res.data.data)
           this.$router.push({ path: child.childList[0].path })

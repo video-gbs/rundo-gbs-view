@@ -41,6 +41,7 @@
             end-placeholder="结束日期"
             format="yyyy-MM-dd HH:mm:ss"
             value-format="yyyy-MM-dd HH:mm:ss"
+            :default-time="['00:00:00', '23:59:59']"
           >
           </el-date-picker>
         </el-form-item>
