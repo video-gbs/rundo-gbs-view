@@ -1083,7 +1083,7 @@ export default {
         new Date(this.formData.date[0]).getTime() < new Date(val).getTime() &&
         new Date(val).getTime() < new Date(this.formData.date[1]).getTime()
       ) {
-        this.playRecord({}, [val, this.formData.date[1]])
+        this.playRecord({}, [], [val, this.formData.date[1]])
       } else {
         this.$message({
           message: '该时间段暂无录像',
@@ -1192,6 +1192,8 @@ export default {
           })
           return
         }
+        Local.set('playbackRate', 1)
+        this.currentSpeed[this.playerIdx] = [2]
 
         this.formData.loading = true
 
@@ -1641,6 +1643,7 @@ export default {
           streamId: this.channelId
         }).then((res) => {
           if (res.data.code === 0) {
+            console.log('videoTime~~~~~~~', row, playTime, videoTime)
             getPlayBackUrlLists({
               channelId: this.channelId,
               startTime: row.startTime ? row.startTime : videoTime[0],
