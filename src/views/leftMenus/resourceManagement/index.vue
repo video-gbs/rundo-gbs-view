@@ -430,13 +430,21 @@ export default {
     async init(name, isMoved) {
       if (this.activeName !== '编码器') {
         this.resTree1 = await channelVideoAreaList()
-        this.treeList = [this.resTree1.data.data]
-        this.fatherId = this.resTree1.data.data.id
-        this.newResourceKey = this.resTree1.data.data.resourceKey
-        this.treeValue = this.resTree1.data.data.resourceValue
+        this.treeList = this.resTree1.data.data ? [this.resTree1.data.data] : []
+        this.fatherId = this.resTree1.data.data
+          ? this.resTree1.data.data.id
+          : ''
+        this.newResourceKey = this.resTree1.data.data
+          ? this.resTree1.data.data.resourceKey
+          : ''
+        this.treeValue = this.resTree1.data.data
+          ? this.resTree1.data.data.resourceValue
+          : ''
         this.deleteObj = this.resTree1.data.data
         if (!isMoved) {
-          this.channelDetailsId = this.resTree1.data.data.id
+          this.channelDetailsId = this.resTree1.data.data
+            ? this.resTree1.data.data.id
+            : ''
 
           this.$refs.channel.getList(this.channelDetailsId)
         }
@@ -444,13 +452,21 @@ export default {
         this.$refs.deviceTree.chooseId(this.channelDetailsId)
       } else {
         this.resTree2 = await deviceVideoAreaList()
-        this.treeList = [this.resTree2.data.data]
-        this.fatherId = this.resTree2.data.data.id
-        this.newResourceKey = this.resTree2.data.data.resourceKey
-        this.treeValue = this.resTree2.data.data.resourceValue
+        this.treeList = this.resTree2.data.data ? [this.resTree2.data.data] : []
+        this.fatherId = this.resTree2.data.data
+          ? this.resTree2.data.data.id
+          : ''
+        this.newResourceKey = this.resTree2.data.data
+          ? this.resTree2.data.data.resourceKey
+          : ''
+        this.treeValue = this.resTree2.data.data
+          ? this.resTree2.data.data.resourceValue
+          : ''
         this.deleteObj = this.resTree2.data.data
         if (!isMoved) {
-          this.deviceDetailsId = this.resTree2.data.data.id
+          this.deviceDetailsId = this.resTree2.data.data
+            ? this.resTree2.data.data.id
+            : ''
 
           this.$refs.encoder.getList(this.deviceDetailsId)
         }
