@@ -313,6 +313,15 @@ router.beforeEach(async (to, from, next) => {
 
     // console.log('~~~~~~~~~~~~~~~~', init, dynamicRouters)
     if (!init && dynamicRouters) {
+      // console.log('刷新了页面')
+      let timestamp = Local.get('expires_in')
+
+      clearInterval(window.interval)
+
+      window.interval = setInterval(() => {
+        timestamp = timestamp - 1
+        Local.set('expires_in', timestamp)
+      }, 1000)
       // 刷新页面且有route记录数据，可再次追加动态路由
       store.dispatch('user/changeDynamicRouters', dynamicRouters)
       next({ ...to, replace: true })
