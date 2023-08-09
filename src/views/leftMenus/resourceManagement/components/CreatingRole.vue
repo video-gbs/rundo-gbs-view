@@ -1037,7 +1037,8 @@ export default {
         // justify-content: flex-start;
         .role_featureApiTable {
           width: calc(100% - 300px);
-          overflow-y: auto;
+          height: 100%;
+          // overflow-y: auto;
         }
       }
     }

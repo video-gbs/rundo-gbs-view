@@ -215,6 +215,7 @@ export default {
     window.onresize = this.throttle(this.setScale, 500, 500)
     // this.initMap()
     Local.set('permissionData', [])
+    Local.set('permissionMenuId', '')
     Local.set('rj_userName', '')
     Local.set('expires_in', '')
   },

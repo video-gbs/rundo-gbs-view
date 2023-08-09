@@ -6,6 +6,7 @@ import 'nprogress/nprogress.css'
 import getPageTitle from '@/utils/get-page-title'
 import Layout from '@/layout'
 import { Local } from '@/utils/storage'
+import { getHomeFunc } from '@/api/method/home'
 
 Vue.use(Router)
 
@@ -314,6 +315,11 @@ router.beforeEach(async (to, from, next) => {
     // console.log('~~~~~~~~~~~~~~~~', init, dynamicRouters)
     if (!init && dynamicRouters) {
       // console.log('刷新了页面')
+      getHomeFunc({ menuId: Local.get('permissionMenuId') }).then((res) => {
+        if (res.data.code === 0) {
+          Local.set('permissionData', res.data.data)
+        }
+      })
       let timestamp = Local.get('expires_in')
 
       clearInterval(window.interval)

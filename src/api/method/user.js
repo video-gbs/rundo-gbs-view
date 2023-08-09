@@ -41,7 +41,7 @@ export function userUpdate(params) {
 }
 export function userDelete(ids) {
   // 删除用户
-  return request.delete(`${rbac}/user/delete?userIds=${ids}`)
+  return request.delete(`${rbac}/user/batch/delete?userIds=${ids}`)
 }
 export function userUpdateDisabled(params) {
   // 修改用户禁用状态

@@ -172,6 +172,7 @@ export default {
             if (res.data.code === 0) {
               console.log('data~~~~~~', data, resArray)
               Local.set('permissionData', res.data.data)
+              Local.set('permissionMenuId', item.children[0].id)
 
               this.$router.push({ path: item.children[0].path })
             }

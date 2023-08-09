@@ -167,6 +167,7 @@ export default {
   },
   created() {
     Local.set('permissionData', [])
+    Local.set('permissionMenuId', '')
     Local.set('equipmentActiveName', '编码器')
   },
   mounted() {
@@ -385,6 +386,10 @@ export default {
         }).then((res) => {
           if (res.data.code === 0) {
             Local.set('permissionData', res.data.data)
+            Local.set(
+              'permissionMenuId',
+              child.childList[0] ? child.childList[0].id : ''
+            )
             this.$router.push({ path: child.childList[0].path })
           }
         })
