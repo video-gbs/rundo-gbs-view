@@ -1641,51 +1641,83 @@ export default {
 
     playRecord: (function () {
       return async function (row, playTime, videoTime) {
-        await playStop({
-          streamId: this.channelId
-        }).then((res) => {
-          if (res.data.code === 0) {
-            console.log('videoTime~~~~~~~', row, playTime, videoTime)
-            getPlayBackUrlLists({
-              channelId: this.channelId,
-              startTime: row.startTime ? row.startTime : videoTime[0],
-              endTime: row.endTime ? row.endTime : videoTime[1]
-            })
-              .then((res) => {
-                if (res.data.code === 0) {
-                  // console.log(res.data.wsFlv.slice(5))
-                  if (!this.isNext) {
-                    this.setTimeLists(videoTime, this.playerIdx)
-                    this.setPlayUrl(res.data.data.wsFlv, this.playerIdx)
-                    this.setRecordStreamId(
-                      res.data.data.streamId,
-                      this.playerIdx
-                    )
+        if (this.videoUrl[this.playerIdx]) {
+          await playStop({
+            streamId: this.channelId
+          }).then((res) => {
+            if (res.data.code === 0) {
+              getPlayBackUrlLists({
+                channelId: this.channelId,
+                startTime: row.startTime ? row.startTime : videoTime[0],
+                endTime: row.endTime ? row.endTime : videoTime[1]
+              })
+                .then((res) => {
+                  if (res.data.code === 0) {
+                    if (!this.isNext) {
+                      this.setTimeLists(videoTime, this.playerIdx)
+                      this.setPlayUrl(res.data.data.wsFlv, this.playerIdx)
+                      this.setRecordStreamId(
+                        res.data.data.streamId,
+                        this.playerIdx
+                      )
 
-                    this.setRecordCloudId(this.channelId, this.playerIdx)
-                  } else {
-                    this.setTimeLists(videoTime, this.playerIdx)
-                    this.setPlayUrl(res.data.data.wsFlv, this.playerIdx)
-                    this.setRecordStreamId(
-                      res.data.data.streamId,
-                      this.playerIdx
-                    )
+                      this.setRecordCloudId(this.channelId, this.playerIdx)
+                    } else {
+                      this.setTimeLists(videoTime, this.playerIdx)
+                      this.setPlayUrl(res.data.data.wsFlv, this.playerIdx)
+                      this.setRecordStreamId(
+                        res.data.data.streamId,
+                        this.playerIdx
+                      )
 
-                    this.setRecordCloudId(this.channelId, this.playerIdx)
+                      this.setRecordCloudId(this.channelId, this.playerIdx)
+                    }
+
+                    this.streamId = res.data.data.streamId
+
+                    this.play[this.playerIdx] = true
+
+                    this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
                   }
+                })
+                .catch((error) => {
+                  console.log(error)
+                })
+            }
+          })
+        } else {
+          getPlayBackUrlLists({
+            channelId: this.channelId,
+            startTime: row.startTime ? row.startTime : videoTime[0],
+            endTime: row.endTime ? row.endTime : videoTime[1]
+          })
+            .then((res) => {
+              if (res.data.code === 0) {
+                if (!this.isNext) {
+                  this.setTimeLists(videoTime, this.playerIdx)
+                  this.setPlayUrl(res.data.data.wsFlv, this.playerIdx)
+                  this.setRecordStreamId(res.data.data.streamId, this.playerIdx)
 
-                  this.streamId = res.data.data.streamId
+                  this.setRecordCloudId(this.channelId, this.playerIdx)
+                } else {
+                  this.setTimeLists(videoTime, this.playerIdx)
+                  this.setPlayUrl(res.data.data.wsFlv, this.playerIdx)
+                  this.setRecordStreamId(res.data.data.streamId, this.playerIdx)
 
-                  this.play[this.playerIdx] = true
-
-                  this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
+                  this.setRecordCloudId(this.channelId, this.playerIdx)
                 }
-              })
-              .catch((error) => {
-                console.log(error)
-              })
-          }
-        })
+
+                this.streamId = res.data.data.streamId
+
+                this.play[this.playerIdx] = true
+
+                this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
+              }
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        }
       }
     })(),
     setPlayUrl(url, idx) {
