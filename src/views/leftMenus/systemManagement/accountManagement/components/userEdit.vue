@@ -675,6 +675,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table::before {
+  height: 0 !important;
+}
 ::v-deep .el-table--border {
   border-bottom: 1px solid #eaeaea;
 }
