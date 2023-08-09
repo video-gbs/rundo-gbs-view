@@ -1,9 +1,9 @@
 import axios from 'axios'
-import { Message } from 'element-ui'
+// import { Message } from 'element-ui'
 import router from '@/router'
 import { Local } from '@/utils/storage'
 import { newLogout } from '@/api/method/user'
-// showMessage
+import { message } from './resetMessage'
 
 const requestTimeOut = 20 * 100000
 window.isReresh = false
@@ -44,7 +44,7 @@ const init = {
   // 是否调过refresh_token函数
   isRefresh: false,
   openMessage: function (msg) {
-    Message({
+    message({
       message: msg,
       type: 'error',
       showClose: true
