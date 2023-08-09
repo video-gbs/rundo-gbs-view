@@ -84,6 +84,7 @@ export default {
       getHomeFunc({ menuId: item.id }).then((res) => {
         if (res.data.code === 0) {
           Local.set('permissionData', res.data.data)
+          Local.set('permissionMenuId', item.id)
         }
       })
     },
