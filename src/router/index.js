@@ -315,11 +315,13 @@ router.beforeEach(async (to, from, next) => {
     // console.log('~~~~~~~~~~~~~~~~', init, dynamicRouters)
     if (!init && dynamicRouters) {
       // console.log('刷新了页面')
-      getHomeFunc({ menuId: Local.get('permissionMenuId') }).then((res) => {
-        if (res.data.code === 0) {
-          Local.set('permissionData', res.data.data)
-        }
-      })
+      if (Local.get('permissionMenuId')) {
+        getHomeFunc({ menuId: Local.get('permissionMenuId') }).then((res) => {
+          if (res.data.code === 0) {
+            Local.set('permissionData', res.data.data)
+          }
+        })
+      }
       let timestamp = Local.get('expires_in')
 
       clearInterval(window.interval)
@@ -333,6 +335,9 @@ router.beforeEach(async (to, from, next) => {
       next({ ...to, replace: true })
     } else {
       next()
+    }
+    if (to.path === '/login') {
+      next('/workTable')
     }
   } else {
     if (to.path !== '/login') {
