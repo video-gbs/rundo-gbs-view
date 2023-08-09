@@ -471,7 +471,7 @@ export default {
 
 <style lang="scss" scoped>
 ::v-deep .el-table::before {
-  height: 0;
+  height: 0 !important;
 }
 ::v-deep .el-dialog {
   margin-top: 4vh !important;

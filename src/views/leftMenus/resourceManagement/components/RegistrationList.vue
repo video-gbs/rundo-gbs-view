@@ -325,6 +325,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table::before {
+  height: 0 !important;
+}
 ::v-deep .table-content-bottom .el-table__fixed-right {
   height: 100% !important;
 }

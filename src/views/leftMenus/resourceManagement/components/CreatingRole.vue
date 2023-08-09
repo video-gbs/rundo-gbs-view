@@ -847,6 +847,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table::before {
+  height: 0 !important;
+}
 ::v-deep .top-pane {
   border: 0 none;
   box-shadow: none;

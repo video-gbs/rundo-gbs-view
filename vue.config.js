@@ -88,7 +88,7 @@ module.exports = {
   lintOnSave: false,
   productionSourceMap: false,
   devServer: {
-    public: '172.20.0.101',
+    public: '',
     port: port,
     open: true,
     overlay: {
