@@ -7,7 +7,7 @@
       <div class="securityArea_container">
         <div class="btn-lists">
           <el-button
-            v-permission="['/rabc/section/add', 1]"
+            v-permission="['/rbac/section/add', 1]"
             type="primary"
             @click="dialogShow"
           >
@@ -15,14 +15,14 @@
             <span class="btn-span">新增</span>
           </el-button>
           <el-button
-            v-permission="['/rabc/section/move/fs', 3]"
+            v-permission="['/rbac/section/move/fs', 3]"
             @click="dialogMoveShow"
           >
             <svg-icon class="svg-btn" icon-class="move" />
             <span class="btn-span">移动</span>
           </el-button>
           <div
-            v-permission="['/rabc/section/move/bt', 3]"
+            v-permission="['/rbac/section/move/bt', 3]"
             v-if="isClickTreeSort"
             @click="treeSort(1)"
             class="sort_div"
@@ -31,7 +31,7 @@
             <span class="btn-span">排序</span>
           </div>
           <div
-            v-permission="['/rabc/section/move/bt', 3]"
+            v-permission="['/rbac/section/move/bt', 3]"
             v-else
             @click="treeSort(2)"
             class="clicked-button sort_div"
@@ -40,7 +40,7 @@
             <span class="btn-span">排序</span>
           </div>
           <el-button
-            v-permission="['/rabc/section/delete', 4]"
+            v-permission="['/rbac/section/delete', 4]"
             @click="deleteAccount($event)"
           >
             <svg-icon class="svg-btn" icon-class="del" />
@@ -106,7 +106,7 @@
 
         <div class="dialog-footer">
           <el-button
-            v-permission="['/rabc/section/update', 3]"
+            v-permission="['/rbac/section/update', 3]"
             type="primary"
             :disabled="fatherName === '根节点'"
             @click="save('unitManagementForm')"
