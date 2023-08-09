@@ -99,6 +99,9 @@ const init = {
             })
           })
       })
+      .finally(() => {
+        init.isRefreshing = false
+      })
   }
 }
 //http request 拦截器
@@ -112,25 +115,6 @@ service.interceptors.request.use(
         Authorization: `Bearer ${Local.get('access_token')}`
       }
     }
-
-    // let permissionDataUrl = Local.get("permissionDataUrl") ? Local.get("permissionDataUrl") : []
-    // console.log('permissionDataUrlpermissionDataUrlpermissionDataUrl', permissionDataUrl,config)
-    // if (permissionDataUrl.length > 0) {
-
-    //   const result = permissionDataUrl.findIndex((v) => {
-    //     return v.method === methodObj[config.method] && v.path === config.url
-    //   })
-
-    //   console.log('resultresultresultresultresult', result)
-
-    //   if (result !== -1) {
-    //     return config
-    //   } else {
-    //     return Promise.reject(new Error('没有授权此接口'))
-    //   }
-    // } else {
-    //   return config
-    // }
     return config
   },
   (error) => {
@@ -142,13 +126,15 @@ service.interceptors.request.use(
 //响应拦截器即异常处理
 service.interceptors.response.use(
   (response) => {
+    console.log('response~~~~~~~', response)
     const code = response.data.code || 0
     if (code === 0) {
       let resetTime = Local.get('expires_in')
       if (Local.get('access_token')) {
         //有没有token
         // isRefreshTokenExpired(resetTime)
-        if (resetTime < 3000) {
+        if (resetTime < 3000 && !init.isRefresh) {
+          init.isRefresh = true
           let refresh_token = Local.get('refresh_token')
           init.updataTokenAPI(refresh_token)
         }
