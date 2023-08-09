@@ -13,21 +13,13 @@ const service = axios.create({
   timeout: requestTimeOut
 })
 
-const methodObj = {
-  get: 1,
-  post: 2,
-  put: 3,
-  delete: 4
-}
-
-//判空
-const isEmpty = function (obj) {
-  return (
-    obj == null ||
-    obj == 'undefined' ||
-    obj == 'null' ||
-    new String(obj).trim() == ''
-  )
+const isTokenExpired = () => {
+  // 验证当前token是否过期
+  let resetTime = Local.get('expires_in')
+  if (resetTime < 3000) {
+    return true
+  }
+  return false
 }
 
 const isRefreshTokenExpired = function (timestamp) {
@@ -38,82 +30,121 @@ const isRefreshTokenExpired = function (timestamp) {
   }, 1000)
 }
 
+// 是否正在刷新的标记 -- 防止重复发出刷新token接口--节流阀
+let isRefreshing = false
+
+// 失效后同时发送请求的容器 -- 缓存接口
+let subscribers = []
+
+// 刷新 token 后, 将缓存的接口重新请求一次
+function onAccessTokenFetched(newToken) {
+  subscribers.forEach((callback) => {
+    callback(newToken)
+  })
+  // 清空缓存接口
+  subscribers = []
+}
+
+// 添加缓存接口
+function addSubscriber(callback) {
+  subscribers.push(callback)
+}
+
 const init = {
   // 记录时间戳
   timer: null,
-  // 是否调过refresh_token函数
-  isRefresh: false,
   openMessage: function (msg) {
     message({
       message: msg,
       type: 'error',
       showClose: true
     })
-  },
-  updataTokenAPI: function (refreshToken) {
-    let that = this
-    axios({
-      method: 'post',
-      url: `http://xard-gbs-test.runjian.com:8080/api/oauth2/token?grant_type=refresh_token&refresh_token=${refreshToken}`,
-      headers: {
-        Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
-      }
-    })
-      .then(function (res) {
-        if (res.data.code === 0) {
-          // 防止重复调refresh_token接口
-          that.isRefresh = false
-          let result = res.data.data
-          Local.set('access_token', result.accessToken)
-          Local.set('refresh_token', result.refreshToken)
-          isRefreshTokenExpired(result.expiresIn)
-          Local.set('expires_in', result.expiresIn)
-        } else {
-          //刷新token失败只能跳转到登录页重新登录
-          Local.clear()
-          Local.remove('access_token')
-          Local.remove('utilTime')
-          Local.remove('expires_in')
-          Local.remove('refresh_token')
-          router.replace({
-            path: '/login',
-            query: { redirect: router.currentRoute.fullPath }
-          })
-        }
-      })
-      .catch(function (err) {
-        //刷新token失败只能跳转到登录页重新登录
-        newLogout()
-          .then((res) => {})
-          .catch(() => {})
-          .finally(() => {
-            Local.clear()
-            Local.remove('access_token')
-            Local.remove('utilTime')
-            Local.remove('expires_in')
-            Local.remove('refresh_token')
-            that.openMessage('登录失效')
-            router.replace({
-              path: '/login',
-              query: { redirect: router.currentRoute.fullPath }
-            })
-          })
-      })
-      .finally(() => {
-        init.isRefreshing = false
-      })
   }
 }
 //http request 拦截器
 service.interceptors.request.use(
   (config) => {
-    init.timer = new Date().getTime()
-
     if (Local.get('access_token')) {
       config.headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${Local.get('access_token')}`
       }
+    }
+    if (isTokenExpired()) {
+      // 如果token快过期了
+      if (!isRefreshing) {
+        // 控制重复获取token
+        isRefreshing = true
+        let refreshToken = Local.get('refresh_token')
+        axios({
+          method: 'post',
+          url: `http://xard-gbs-test.runjian.com:8080/api/oauth2/token?grant_type=refresh_token&refresh_token=${refreshToken}`,
+          headers: {
+            Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+          }
+        })
+          .then(function (res) {
+            if (res.data.code === 0) {
+              isRefreshing = false
+              let result = res.data.data
+              Local.set('access_token', result.accessToken)
+              Local.set('refresh_token', result.refreshToken)
+              isRefreshTokenExpired(result.expiresIn)
+              onAccessTokenFetched(result.access_token)
+              Local.set('expires_in', result.expiresIn)
+            } else {
+              //刷新token失败只能跳转到登录页重新登录
+              isRefreshing = false
+              Local.clear()
+              Local.remove('access_token')
+              Local.remove('utilTime')
+              Local.remove('expires_in')
+              Local.remove('refresh_token')
+              router.replace({
+                path: '/login',
+                query: { redirect: router.currentRoute.fullPath }
+              })
+            }
+          })
+          .catch(function (err) {
+            //刷新token失败只能跳转到登录页重新登录
+            isRefreshing = false
+            newLogout()
+              .then((res) => {})
+              .catch(() => {})
+              .finally(() => {
+                Local.clear()
+                Local.remove('access_token')
+                Local.remove('utilTime')
+                Local.remove('expires_in')
+                Local.remove('refresh_token')
+                that.openMessage('登录失效')
+                router.replace({
+                  path: '/login',
+                  query: { redirect: router.currentRoute.fullPath }
+                })
+              })
+          })
+          .finally(() => {
+            isRefreshing = false
+          })
+      }
+
+      // 将其他接口缓存起来 -- 这个Promise函数很关键
+      const retryRequest = new Promise((resolve) => {
+        // 这里是将其他接口缓存起来的关键, 返回Promise并且让其状态一直为等待状态,
+        // 只有当token刷新成功后, 就会调用通过addSubscriber函数添加的缓存接口,
+        // 此时, Promise的状态就会变成resolve
+        addSubscriber(() => {
+          // 表示用新的token去替换掉原来的token
+          config.headers.Authorization = `Bearer ${Local.get('access_token')}`
+          // 替换掉url -- 因为baseURL会扩展请求url
+          config.url = config.url.replace(config.baseURL, '')
+          // 返回重新封装的config, 就会将新配置去发送请求
+          resolve(config)
+        })
+      })
+      return retryRequest
     }
     return config
   },
@@ -126,26 +157,15 @@ service.interceptors.request.use(
 //响应拦截器即异常处理
 service.interceptors.response.use(
   (response) => {
-    console.log('response~~~~~~~', response)
     const code = response.data.code || 0
-    if (code === 0) {
-      let resetTime = Local.get('expires_in')
-      if (Local.get('access_token')) {
-        //有没有token
-        // isRefreshTokenExpired(resetTime)
-        if (resetTime < 3000 && !init.isRefresh) {
-          init.isRefresh = true
-          let refresh_token = Local.get('refresh_token')
-          init.updataTokenAPI(refresh_token)
-        }
-      }
-    } else {
+    if (code !== 0) {
       init.openMessage(response.data.msg)
       return Promise.resolve(response)
     }
     return response
   },
   async (err) => {
+    console.log('err.response', err.response)
     if (err && err.response) {
       switch (err.response.status) {
         case 400:

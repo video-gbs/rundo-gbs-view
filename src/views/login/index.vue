@@ -332,7 +332,6 @@ export default {
           Local.set('rj_deptType', 0)
           Local.set('access_token', accessToken)
           Local.set('refresh_token', refreshToken)
-          console.log('expiresIn~~~~~~~~~~~~~~', expiresIn)
           this.isRefreshTokenExpired(expiresIn)
           Local.set('expires_in', expiresIn)
           Local.set('token_type', tokenType)
