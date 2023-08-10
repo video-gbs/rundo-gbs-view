@@ -49,7 +49,7 @@ export function deleteDevice(id) {
 
 // 编码器同步
 export function syncChannel(id) {
-  return request.get(`${expansion}/channel/channelSync/?deviceId=${id}`)
+  return request.get(`${expansion}/channel/channelSync?deviceId=${id}`)
 }
 
 // 设备--安防设备列表
