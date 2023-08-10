@@ -350,13 +350,21 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then(function () {
+        .then(() => {
           userUpdateDisabled({
             userId: row.id,
             disabled: row.disabled
-          }).then((res) => {})
+          })
+            .then((res) => {
+              if (res.data.code !== 0) {
+                row.disabled = row.disabled === 0 ? 1 : 0
+              }
+            })
+            .catch(() => {
+              row.disabled = row.disabled === 0 ? 1 : 0
+            })
         })
-        .catch(function () {
+        .catch(() => {
           row.disabled = row.disabled === 0 ? 1 : 0
         })
     }
