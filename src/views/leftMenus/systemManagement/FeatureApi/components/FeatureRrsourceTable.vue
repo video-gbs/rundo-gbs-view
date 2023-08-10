@@ -385,7 +385,11 @@ export default {
           featureResourceUpdateDisabled({
             funcResourceId: row.id,
             disabled: row.disabled
-          }).then((res) => {})
+          }).then((res) => {
+            if (res.data.code !== 0) {
+              row.disabled = row.disabled === 0 ? 1 : 0
+            }
+          })
         })
         .catch(function () {
           row.disabled = row.disabled === 0 ? 1 : 0

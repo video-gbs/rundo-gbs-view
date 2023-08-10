@@ -415,7 +415,11 @@ export default {
           changeStatus({
             id: row.id,
             status: row.status
-          }).then((res) => {})
+          }).then((res) => {
+            if (res.data.code !== 0) {
+              row.status = row.status === 0 ? 1 : 0
+            }
+          })
         })
         .catch(function () {
           row.status = row.status === 0 ? 1 : 0

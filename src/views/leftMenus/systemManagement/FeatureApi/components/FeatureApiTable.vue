@@ -479,7 +479,9 @@ export default {
                   }
                 })
                 .catch(() => {
+                  console.log('this.resName', this.fatherName)
                   this.isClick = false
+                  this.dialogForm.params.menuId = this.fatherName
                 })
               break
             case '编辑':
@@ -496,6 +498,7 @@ export default {
                 })
                 .catch(() => {
                   this.isClick = false
+                  this.dialogForm.params.menuId = this.resName
                 })
               break
 
@@ -518,7 +521,11 @@ export default {
           featureUpdateDisabled({
             id: row.id,
             disabled: row.disabled
-          }).then((res) => {})
+          }).then((res) => {
+            if (res.data.code !== 0) {
+              row.disabled = row.disabled === 0 ? 1 : 0
+            }
+          })
         })
         .catch(function () {
           row.disabled = row.disabled === 0 ? 1 : 0

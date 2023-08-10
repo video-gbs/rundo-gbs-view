@@ -258,7 +258,11 @@ export default {
           roleDisable({
             roleId: row.id,
             disabled: row.disabled
-          }).then((res) => {})
+          }).then((res) => {
+            if (res.data.code !== 0) {
+              row.disabled = row.disabled === 0 ? 1 : 0
+            }
+          })
         })
         .catch(function () {
           row.disabled = row.disabled === 0 ? 1 : 0
@@ -400,10 +404,10 @@ export default {
       })
     },
     async getList() {
-      const createdTimeEnd = this.searchParams.time
+      const createTimeEnd = this.searchParams.time
         ? this.searchParams.time[1]
         : ''
-      const createdTimeStart = this.searchParams.time
+      const createTimeStart = this.searchParams.time
         ? this.searchParams.time[0]
         : ''
       const roleName = this.searchParams.roleName
@@ -412,8 +416,8 @@ export default {
         page: this.params.pageNum,
         num: this.params.pageSize,
         roleName,
-        createdTimeStart,
-        createdTimeEnd,
+        createTimeStart,
+        createTimeEnd,
         createBy
       }).then((res) => {
         if (res.data.code === 0) {
