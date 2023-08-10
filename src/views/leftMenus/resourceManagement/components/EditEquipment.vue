@@ -260,7 +260,7 @@
 
 <script>
 // import { getVideoAraeTree } from '@/api/method/role'
-import { editEncoder } from '@/api/method/encoder'
+import { editEncoder, editEncoder1 } from '@/api/method/encoder'
 import { getAllGatewayLists } from '@/api/method/moduleManagement'
 import { getGroupDictLists } from '@/api/method/dictionary'
 import { channelVideoAreaList } from '@/api/method/channel'
@@ -557,7 +557,7 @@ export default {
         this.form.deviceType = Number(this.form.deviceType)
 
         // const { videoAreaId, ...restObj } = this.form
-        editEncoder({
+        editEncoder1({
           deviceId:
             this.$props.resType === '1'
               ? this.$props.editEquipmentRow.deviceId
