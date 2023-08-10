@@ -32,6 +32,11 @@ export function editEncoder(params) {
   return request.put(`${expansion}/device/edit`, params)
 }
 
+// 编辑编码器1
+export function editEncoder1(params) {
+  return request.put(`${expansion}/device/resume`, params)
+}
+
 // 编辑通道
 export function editChannel(params) {
   return request.put(`${expansion}/channel/edit`, params)

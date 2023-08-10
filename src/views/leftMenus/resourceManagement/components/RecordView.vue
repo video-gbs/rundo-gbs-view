@@ -1514,6 +1514,7 @@ export default {
           this.$refs['cloudPlayer' + this.playerIdx][0].pause()
 
         this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+        this.gbPause()
         // if (cloudPlayerDom.length === 1) {
         //   this.$refs['cloudPlayer' + this.playerIdx][0].pause()
         // } else {
@@ -1542,6 +1543,7 @@ export default {
         // this.$refs.devicesPlayer && this.$refs.devicesPlayer.play()
         this.$refs['cloudPlayer' + this.playerIdx] &&
           this.$refs['cloudPlayer' + this.playerIdx][0].play()
+        this.gbPlay()
         // if (cloudPlayerDom.length === 1) {
         //   this.$refs['cloudPlayer' + this.playerIdx][0].play()
         // } else {
