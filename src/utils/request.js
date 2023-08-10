@@ -17,6 +17,10 @@ const isTokenExpired = () => {
   // 验证当前token是否过期
   let resetTime = Local.get('expires_in')
   if (resetTime < 2000) {
+    if (resetTime === 0) {
+      Local.set('expires_in', '')
+      return false
+    }
     return true
   }
   return false
@@ -108,7 +112,6 @@ service.interceptors.request.use(
           })
           .catch(function (err) {
             //刷新token失败只能跳转到登录页重新登录
-            isRefreshing = false
             newLogout()
               .then((res) => {})
               .catch(() => {})
@@ -123,6 +126,7 @@ service.interceptors.request.use(
                   path: '/login',
                   query: { redirect: router.currentRoute.fullPath }
                 })
+                isRefreshing = false
               })
           })
           .finally(() => {
