@@ -224,7 +224,7 @@ export default {
       await getHomeUser()
         .then((res) => {
           if (res.data.code === 0) {
-            Local.set('rj_userName', res.data.data.username)
+            Local.set('rj_userName', res.data.data.workName)
 
             this.$router.push({ path: '/workTable' })
           }

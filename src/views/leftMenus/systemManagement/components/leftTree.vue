@@ -43,10 +43,7 @@
               data.areaNames
             }}
 
-            <div
-              v-if="!isClickTreeSort && data.level !== '0'"
-              class="sort_btns"
-            >
+            <div v-if="!isClickTreeSort && data.id !== '0'" class="sort_btns">
               <svg-icon
                 icon-class="sortDown"
                 class="sort_down sort_btn"
