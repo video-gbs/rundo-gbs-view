@@ -35,7 +35,7 @@
           </el-row>
           <el-row>
             <el-col :span="12">
-              <el-form-item prop="workName" label="工作名称">
+              <el-form-item prop="workName" label="姓名">
                 <el-input
                   v-model="form.workName"
                   style="width: 436px"
@@ -383,6 +383,14 @@ export default {
           validator: checkUserAccount,
           // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
           // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){0,32}$/,
+          trigger: 'blur'
+        },
+        workName: {
+          required: true,
+          max: 32,
+          validator: checkUserAccount1,
+          // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
+          // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
           trigger: 'blur'
         },
         password: {

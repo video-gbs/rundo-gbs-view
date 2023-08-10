@@ -8,10 +8,10 @@
         :model="searchParams"
         label-width="100px"
       >
-        <el-form-item label="工作名称:">
+        <el-form-item label="姓名:">
           <el-input v-model="searchParams.workName" clearable :maxlength="15" />
         </el-form-item>
-        <el-form-item label="用户姓名:">
+        <el-form-item label="用户账号:">
           <el-input v-model="searchParams.username" clearable :maxlength="15" />
         </el-form-item>
         <el-form-item
@@ -75,12 +75,12 @@
         </el-table-column>
         <el-table-column
           prop="workName"
-          label="工作名称"
+          label="姓名"
           :show-overflow-tooltip="true"
         />
         <el-table-column
           prop="username"
-          label="用户姓名"
+          label="用户账号"
           :show-overflow-tooltip="true"
         />
         <el-table-column
@@ -122,7 +122,7 @@
         <el-table-column width="120" label="操作" align="center">
           <template slot-scope="scope">
             <el-button
-              v-permission="['/rbac/user/update', 2]"
+              v-permission="['/rbac/user/update', 3]"
               type="text"
               @click="editEquipment('edit', scope.row)"
               >编辑

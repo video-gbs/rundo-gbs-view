@@ -68,7 +68,7 @@
                 />
                 <el-table-column
                   prop="workName"
-                  label="用户名称"
+                  label="姓名"
                   :show-overflow-tooltip="true"
                 />
                 <el-table-column
@@ -170,7 +170,7 @@
                 />
                 <el-table-column
                   prop="workName"
-                  label="用户名称"
+                  label="姓名"
                   :show-overflow-tooltip="true"
                 />
                 <el-table-column
@@ -214,9 +214,9 @@
               v-model="dialog.params.username"
               placeholder="请输入"
               style="width: 436px"
-            />
-          </el-form-item>
-          <el-form-item label="用户姓名">
+            /> </el-form-item
+          >user-info
+          <el-form-item label="姓名">
             <el-input
               v-model="dialog.params.workName"
               placeholder="请输入"

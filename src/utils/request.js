@@ -16,7 +16,7 @@ const service = axios.create({
 const isTokenExpired = () => {
   // 验证当前token是否过期
   let resetTime = Local.get('expires_in')
-  if (resetTime < 2000) {
+  if (resetTime < 3580) {
     if (resetTime === 0) {
       Local.set('expires_in', '')
       return false
@@ -74,7 +74,7 @@ service.interceptors.request.use(
         Authorization: `Bearer ${Local.get('access_token')}`
       }
     }
-    if (isTokenExpired()) {
+    if (isTokenExpired() && !config.url.includes('/oauth2/token')) {
       // 如果token快过期了
       if (!isRefreshing) {
         // 控制重复获取token
@@ -87,15 +87,16 @@ service.interceptors.request.use(
             Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
           }
         })
-          .then(function (res) {
+          .then((res) => {
             if (res.data.code === 0) {
               isRefreshing = false
-              let result = res.data.data
-              Local.set('access_token', result.accessToken)
-              Local.set('refresh_token', result.refreshToken)
-              isRefreshTokenExpired(result.expiresIn)
-              onAccessTokenFetched(result.access_token)
-              Local.set('expires_in', result.expiresIn)
+              const { accessToken, refreshToken, expiresIn } = res.data.data
+              Local.set('access_token', accessToken)
+              Local.set('refresh_token', refreshToken)
+              Local.set('expires_in', expiresIn)
+
+              isRefreshTokenExpired(expiresIn)
+              onAccessTokenFetched(accessToken)
             } else {
               //刷新token失败只能跳转到登录页重新登录
               isRefreshing = false
@@ -111,25 +112,10 @@ service.interceptors.request.use(
             }
           })
           .catch(function (err) {
-            //刷新token失败只能跳转到登录页重新登录
-            newLogout()
-              .then((res) => {})
-              .catch(() => {})
-              .finally(() => {
-                Local.clear()
-                Local.remove('access_token')
-                Local.remove('utilTime')
-                Local.remove('expires_in')
-                Local.remove('refresh_token')
-                that.openMessage('登录失效')
-                router.replace({
-                  path: '/login',
-                  query: { redirect: router.currentRoute.fullPath }
-                })
-                isRefreshing = false
-              })
-          })
-          .finally(() => {
+            router.replace({
+              path: '/login',
+              query: { redirect: router.currentRoute.fullPath }
+            })
             isRefreshing = false
           })
       }
@@ -139,9 +125,10 @@ service.interceptors.request.use(
         // 这里是将其他接口缓存起来的关键, 返回Promise并且让其状态一直为等待状态,
         // 只有当token刷新成功后, 就会调用通过addSubscriber函数添加的缓存接口,
         // 此时, Promise的状态就会变成resolve
-        addSubscriber(() => {
+        addSubscriber((newToken) => {
           // 表示用新的token去替换掉原来的token
-          config.headers.Authorization = `Bearer ${Local.get('access_token')}`
+          // config.headers.Authorization = `Bearer ${Local.get('access_token')}`
+          config.headers.Authorization = `Bearer ${newToken}`
           // 替换掉url -- 因为baseURL会扩展请求url
           config.url = config.url.replace(config.baseURL, '')
           // 返回重新封装的config, 就会将新配置去发送请求

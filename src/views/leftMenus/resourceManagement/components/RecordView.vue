@@ -1174,7 +1174,8 @@ export default {
     },
     // 查询视频
     handleSearch() {
-      if (this.channelId && this.channelId.length > 0) {
+      // console.log('this.channelId',this.channelId)
+      if (this.channelId) {
         if (this.resOnlineState === 0) {
           this.$message({
             message: '设备离线',
