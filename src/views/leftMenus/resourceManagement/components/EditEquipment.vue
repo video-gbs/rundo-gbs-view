@@ -34,7 +34,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="设备类型">
+              <el-form-item label="设备类型" prop="deviceType">
                 <el-radio-group v-model="form.deviceType">
                   <el-radio label="1">DVR</el-radio>
                   <el-radio label="2">NVR</el-radio>
@@ -448,6 +448,9 @@ export default {
           { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         gatewayId: [
+          { required: true, message: '此为必填项。', trigger: 'change' }
+        ],
+        deviceType: [
           { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         transport: [

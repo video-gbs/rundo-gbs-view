@@ -123,7 +123,7 @@ import Code from '@/views/leftMenus/systemManagement//components/Code'
 import { validUsername } from '@/utils/validate'
 import { login, newLogin } from '@/api/method/user'
 import { getHomeUser } from '@/api/method/home'
-import { Local } from '@/utils/storage'
+import { Local, Session } from '@/utils/storage'
 import store from '@/store/index'
 
 import axios from 'axios'
@@ -217,7 +217,7 @@ export default {
     Local.set('permissionData', [])
     Local.set('permissionMenuId', '')
     Local.set('rj_userName', '')
-    Local.set('expires_in', '')
+    Session.set('expires_in', '')
   },
   methods: {
     async getHomeUser() {
@@ -309,12 +309,12 @@ export default {
       clearInterval(window.interval)
       window.interval = setInterval(() => {
         timestamp = timestamp - 1
-        Local.set('expires_in', timestamp)
+        Session.set('expires_in', timestamp)
       }, 1000)
     },
     handleLogin() {
       this.loading = true
-      Local.set('access_token', '')
+      Session.set('access_token', '')
 
       axios({
         method: 'post',
@@ -330,10 +330,10 @@ export default {
           this.getHomeUser()
 
           Local.set('rj_deptType', 0)
-          Local.set('access_token', accessToken)
-          Local.set('refresh_token', refreshToken)
+          Session.set('access_token', accessToken)
+          Session.set('refresh_token', refreshToken)
           this.isRefreshTokenExpired(expiresIn)
-          Local.set('expires_in', expiresIn)
+          Session.set('expires_in', expiresIn)
           Local.set('token_type', tokenType)
 
           this.loading = false

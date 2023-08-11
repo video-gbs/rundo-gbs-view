@@ -1,8 +1,7 @@
 import axios from 'axios'
 // import { Message } from 'element-ui'
 import router from '@/router'
-import { Local } from '@/utils/storage'
-import { newLogout } from '@/api/method/user'
+import { Local, Session } from '@/utils/storage'
 import { message } from './resetMessage'
 
 const requestTimeOut = 20 * 100000
@@ -15,10 +14,10 @@ const service = axios.create({
 
 const isTokenExpired = () => {
   // 验证当前token是否过期
-  let resetTime = Local.get('expires_in')
+  let resetTime = Session.get('expires_in')
   if (resetTime < 3580) {
     if (resetTime === 0) {
-      Local.set('expires_in', '')
+      Session.set('expires_in', '')
       return false
     }
     return true
@@ -30,7 +29,7 @@ const isRefreshTokenExpired = function (timestamp) {
   clearInterval(window.interval)
   window.interval = setInterval(() => {
     timestamp = timestamp - 1
-    Local.set('expires_in', timestamp)
+    Session.set('expires_in', timestamp)
   }, 1000)
 }
 
@@ -68,10 +67,10 @@ const init = {
 //http request 拦截器
 service.interceptors.request.use(
   (config) => {
-    if (Local.get('access_token')) {
+    if (Session.get('access_token')) {
       config.headers = {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${Local.get('access_token')}`
+        Authorization: `Bearer ${Session.get('access_token')}`
       }
     }
     if (isTokenExpired() && !config.url.includes('/oauth2/token')) {
@@ -79,7 +78,7 @@ service.interceptors.request.use(
       if (!isRefreshing) {
         // 控制重复获取token
         isRefreshing = true
-        let refreshToken = Local.get('refresh_token')
+        let refreshToken = Session.get('refresh_token')
         axios({
           method: 'post',
           url: `http://xard-gbs-test.runjian.com:8080/api/oauth2/token?grant_type=refresh_token&refresh_token=${refreshToken}`,
@@ -91,9 +90,9 @@ service.interceptors.request.use(
             if (res.data.code === 0) {
               isRefreshing = false
               const { accessToken, refreshToken, expiresIn } = res.data.data
-              Local.set('access_token', accessToken)
-              Local.set('refresh_token', refreshToken)
-              Local.set('expires_in', expiresIn)
+              Session.set('access_token', accessToken)
+              Session.set('refresh_token', refreshToken)
+              Session.set('expires_in', expiresIn)
 
               isRefreshTokenExpired(expiresIn)
               onAccessTokenFetched(accessToken)
@@ -101,10 +100,10 @@ service.interceptors.request.use(
               //刷新token失败只能跳转到登录页重新登录
               isRefreshing = false
               Local.clear()
-              Local.remove('access_token')
+              Session.remove('access_token')
               Local.remove('utilTime')
-              Local.remove('expires_in')
-              Local.remove('refresh_token')
+              Session.remove('expires_in')
+              Session.remove('refresh_token')
               router.replace({
                 path: '/login',
                 query: { redirect: router.currentRoute.fullPath }
@@ -140,7 +139,7 @@ service.interceptors.request.use(
     return config
   },
   (error) => {
-    console.log('拦截器', Local.get('access_token'))
+    console.log('拦截器', Session.get('access_token'))
     return Promise.reject(error)
   }
 )
@@ -166,10 +165,10 @@ service.interceptors.response.use(
         // break
         case 401:
           Local.clear()
-          Local.remove('access_token')
-          Local.remove('expires_in')
+          Session.remove('access_token')
+          Session.remove('expires_in')
           Local.remove('utilTime')
-          Local.remove('refresh_token')
+          Session.remove('refresh_token')
           init.openMessage(err.response.data.msg)
           clearInterval(window.interval)
           router.replace({
