@@ -318,7 +318,7 @@ export default {
 
       axios({
         method: 'post',
-        url: `http://xard-gbs-test.runjian.com:8080/api/oauth2/token?grant_type=password&scope=all&username=${this.loginForm.username}&password=${this.loginForm.password}`,
+        url: `http://xard-gbs-uat.runjian.com:8080/api/oauth2/token?grant_type=password&scope=all&username=${this.loginForm.username}&password=${this.loginForm.password}`,
         headers: {
           Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
         }
