@@ -641,6 +641,13 @@ export default {
                     this.dialog.show = false
                     this.editShow = false
                     this.isClick = false
+                    if (this.activeName !== '编码器') {
+                      this.init('通道')
+                      this.$refs.channel.getList()
+                    } else {
+                      this.init('编码器')
+                      this.$refs.encoder.getList()
+                    }
                   } else {
                     this.isClick = false
                   }
@@ -648,13 +655,6 @@ export default {
                 .catch((error) => {
                   this.isClick = false
                 })
-              if (this.activeName !== '编码器') {
-                this.init('通道')
-                this.$refs.channel.getList()
-              } else {
-                this.init('编码器')
-                this.$refs.encoder.getList()
-              }
 
               break
             default:
@@ -679,6 +679,13 @@ export default {
                     this.dialog1.show = false
                     this.editShow1 = false
                     this.isClick1 = false
+                    if (this.activeName !== '编码器') {
+                      this.init('通道')
+                      this.$refs.channel.getList()
+                    } else {
+                      this.init('编码器')
+                      this.$refs.encoder.getList()
+                    }
                   } else {
                     this.isClick1 = false
                   }
@@ -686,13 +693,6 @@ export default {
                 .catch((error) => {
                   this.isClick1 = false
                 })
-              if (this.activeName !== '编码器') {
-                this.init('通道')
-                this.$refs.channel.getList()
-              } else {
-                this.init('编码器')
-                this.$refs.encoder.getList()
-              }
 
               break
             default:
