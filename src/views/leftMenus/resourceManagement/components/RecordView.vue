@@ -1197,6 +1197,7 @@ export default {
         }
         Local.set('playbackRate', 1)
         this.currentSpeed[this.playerIdx] = [2]
+        this.isClickCx = true
 
         this.formData.loading = true
 
