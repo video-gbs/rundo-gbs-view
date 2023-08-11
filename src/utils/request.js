@@ -15,7 +15,7 @@ const service = axios.create({
 const isTokenExpired = () => {
   // 验证当前token是否过期
   let resetTime = Session.get('expires_in')
-  if (resetTime < 3580) {
+  if (resetTime < 2000) {
     if (resetTime === 0) {
       Session.set('expires_in', '')
       return false
