@@ -74,7 +74,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import { Local } from '@/utils/storage'
+import { Local, Session } from '@/utils/storage'
 import { logout, newLogout } from '@/api/method/user'
 import store from '@/store/index'
 
@@ -143,7 +143,7 @@ export default {
         .catch(() => {})
         .finally(() => {
           Local.setToken('')
-          Local.remove('access_token')
+          Session.remove('access_token')
           Local.remove('rj_deptType')
           clearInterval(window.interval)
           this.$router.push({ path: '/login' })
