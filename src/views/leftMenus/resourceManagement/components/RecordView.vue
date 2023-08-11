@@ -251,6 +251,7 @@
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
                   type="datetime"
+                  :clearable="false"
                   :disabled="isClickCx"
                   key="datetime1"
                   placeholder="选择日期时间"
