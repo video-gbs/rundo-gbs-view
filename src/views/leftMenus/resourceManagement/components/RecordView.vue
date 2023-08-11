@@ -1087,6 +1087,7 @@ export default {
         this.playRecord({}, [], [val, this.formData.date[1]])
         Local.set('playbackRate', 1)
         this.currentSpeed[this.playerIdx] = [2]
+        this.isClickCx = true
       } else {
         this.$message({
           message: '该时间段暂无录像',
