@@ -274,6 +274,7 @@ export default {
       })
     },
     goback() {
+      this.$emit('init', '编码器', true)
       this.$emit('changeIsShow', 'registrationList', false)
     },
 
