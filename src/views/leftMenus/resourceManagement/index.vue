@@ -218,6 +218,7 @@
       ref="registrationList"
       @changeIsShow="changeIsShow"
       @init="init"
+      @initEncoderList="initEncoderList"
     />
 
     <AddEquipment
