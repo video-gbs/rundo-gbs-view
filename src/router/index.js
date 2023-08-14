@@ -4,7 +4,7 @@ import store from '@/store/index'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import getPageTitle from '@/utils/get-page-title'
-import { Local, Session } from '@/utils/storage'
+import { Local } from '@/utils/storage'
 import { getHomeFunc } from '@/api/method/home'
 
 Vue.use(Router)
@@ -306,7 +306,7 @@ const getLastUrl = (str, yourStr) => str.slice(str.lastIndexOf(yourStr))
 
 router.beforeEach(async (to, from, next) => {
   // console.log('进入路由守卫', to)
-  const hasToken = Session.get('access_token')
+  const hasToken = Local.get('access_token')
   if (hasToken) {
     const init = store.state.user.init
     const dynamicRouters = JSON.parse(Local.get('dynamicRouters'))
@@ -321,13 +321,13 @@ router.beforeEach(async (to, from, next) => {
           }
         })
       }
-      let timestamp = Session.get('expires_in')
+      let timestamp = Local.get('expires_in')
 
       clearInterval(window.interval)
 
       window.interval = setInterval(() => {
         timestamp = timestamp - 1
-        Session.set('expires_in', timestamp)
+        Local.set('expires_in', timestamp)
       }, 1000)
       // 刷新页面且有route记录数据，可再次追加动态路由
       store.dispatch('user/changeDynamicRouters', dynamicRouters)

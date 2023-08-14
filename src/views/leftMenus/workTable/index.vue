@@ -75,7 +75,7 @@ import { getMenuLists } from '@/api/method/user'
 
 import store from '@/store/index'
 import router from '../../../router/index'
-import { Local, Session } from '@/utils/storage'
+import { Local } from '@/utils/storage'
 import Layout from '@/layout/index'
 
 import { antiShake } from '@/utils/index.js'
@@ -174,13 +174,13 @@ export default {
     this.initMenuLists()
     this.windowWidth = document.documentElement.clientWidth
     window.onresize = this.throttle(this.setScale, 500, 500)
-    let timestamp = Session.get('expires_in')
+    let timestamp = Local.get('expires_in')
 
     clearInterval(window.interval)
 
     window.interval = setInterval(() => {
       timestamp = timestamp - 1
-      Session.set('expires_in', timestamp)
+      Local.set('expires_in', timestamp)
     }, 1000)
   },
   methods: {
