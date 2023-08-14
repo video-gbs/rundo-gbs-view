@@ -317,7 +317,7 @@ export default {
 
       await newLoginN(this.loginForm)
         .then((res) => {
-          if (res.data.data.code === 0) {
+          if (res.data.code === 0) {
             const { accessToken, refreshToken, expiresIn, tokenType } =
               res.data.data
 
