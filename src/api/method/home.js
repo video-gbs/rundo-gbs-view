@@ -29,3 +29,18 @@ export function getHomeResource(data) {
   // 获取资源数据
   return request.post(`${rbac}/auth/user/resource`, data)
 }
+
+// 登录
+export function newLoginN(data) {
+  // 登录token
+  return request.get1(
+    `/oauth2/token?grant_type=password&scope=all&username=${data.username}&password=${data.password}`
+  )
+}
+
+export function newRefreshToken(refreshToken) {
+  // 登录refreshToken
+  return request.post1(
+    `/oauth2/token?grant_type=refresh_token&refresh_token=${refreshToken}`
+  )
+}

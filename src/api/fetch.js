@@ -22,12 +22,32 @@ const methods = {
       headers
     })
   },
+  get1(url, params) {
+    return request({
+      method: 'GET',
+      url,
+      params,
+      headers: {
+        Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+      }
+    })
+  },
   post(url, data, headers) {
     return request({
       method: 'POST',
       url,
       data,
       headers
+    })
+  },
+  post1(url, data) {
+    return request({
+      method: 'POST',
+      url,
+      data,
+      headers: {
+        Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+      }
     })
   },
   put(url, data, headers) {
