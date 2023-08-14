@@ -3,6 +3,7 @@ import axios from 'axios'
 import router from '@/router'
 import { Local } from '@/utils/storage'
 import { message } from './resetMessage'
+import { newRefreshToken } from '@/api/method/home'
 
 const requestTimeOut = 20 * 100000
 window.isReresh = false
@@ -79,13 +80,8 @@ service.interceptors.request.use(
         // 控制重复获取token
         isRefreshing = true
         let refreshToken = Local.get('refresh_token')
-        axios({
-          method: 'post',
-          url: `http://xard-gbs-uat.runjian.com:8080/api/oauth2/token?grant_type=refresh_token&refresh_token=${refreshToken}`,
-          headers: {
-            Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
-          }
-        })
+
+        newRefreshToken(refreshToken)
           .then((res) => {
             if (res.data.code === 0) {
               isRefreshing = false
