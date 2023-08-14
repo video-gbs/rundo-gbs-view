@@ -33,7 +33,7 @@ export function getHomeResource(data) {
 // 登录
 export function newLoginN(data) {
   // 登录token
-  return request.get1(
+  return request.post1(
     `/oauth2/token?grant_type=password&scope=all&username=${data.username}&password=${data.password}`
   )
 }
