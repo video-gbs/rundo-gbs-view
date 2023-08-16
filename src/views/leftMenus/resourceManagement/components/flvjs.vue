@@ -360,7 +360,6 @@ export default {
           that.timerId1 = null
           that.player && that.player.close()
           that.$emit('close', that.index)
-          return
         }
 
         if (!videoElement.buffered || !videoElement.buffered.length) return
