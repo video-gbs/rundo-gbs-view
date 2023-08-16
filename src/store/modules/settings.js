@@ -5,11 +5,11 @@ const { showSettings, fixedHeader, sidebarLogo } = defaultSettings
 const state = {
   showSettings: showSettings,
   fixedHeader: fixedHeader,
-  sidebarLogo: sidebarLogo,
-  baseURL:
-    process.env.NODE_ENV === 'development'
-      ? window.config.proxy
-      : process.env.VUE_APP_BASE_API
+  sidebarLogo: sidebarLogo
+  // baseURL:
+  //   process.env.NODE_ENV === 'development'
+  //     ? window.config.proxy
+  //     : process.env.VUE_APP_BASE_API
 }
 
 const mutations = {
