@@ -307,11 +307,11 @@ export default {
         } else {
           that.lastDecodedFrame = 0
           if (that.flvPlayer) {
-            this.player.pause()
-            this.player.unload()
-            this.player.detachMediaElement()
-            this.player.destroy()
-            this.player = null
+            that.player.pause()
+            that.player.unload()
+            that.player.detachMediaElement()
+            that.player.destroy()
+            that.player = null
             that.createVideo()
           }
         }
