@@ -82,7 +82,7 @@ function getProxys() {
   return proxys
 }
 module.exports = {
-  transpileDependencies:['@wanglin1994/video-timeline'],
+  transpileDependencies: ['@wanglin1994/video-timeline'],
   publicPath: './',
   outputDir: 'dist',
   assetsDir: 'static',
