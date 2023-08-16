@@ -242,12 +242,12 @@ export default {
       const videoElement = document.getElementById(that.idx)
       if (flvjs.isSupported()) {
         // 存在视频先销毁
-        if (that.player !== null) {
-          that.player.pause()
-          that.player.unload()
-          that.player.detachMediaElement()
-          that.player.destroy()
-          that.player = null
+        if (that.flvPlayer !== null) {
+          that.flvPlayer.pause()
+          that.flvPlayer.unload()
+          that.flvPlayer.detachMediaElement()
+          that.flvPlayer.destroy()
+          that.flvPlayer = null
         }
         that.flvPlayer = flvjs.createPlayer(
           {
@@ -286,12 +286,12 @@ export default {
           console.log('errorType:', errorType)
           console.log('errorDetail:', errorDetail)
           console.log('errorInfo:', errorInfo)
-          if (that.player) {
-            that.player.pause()
-            that.player.unload()
-            that.player.detachMediaElement()
-            that.player.destroy()
-            that.player = null
+          if (that.flvPlayer) {
+            that.flvPlayer.pause()
+            that.flvPlayer.unload()
+            that.flvPlayer.detachMediaElement()
+            that.flvPlayer.destroy()
+            that.flvPlayer = null
             that.createVideo()
           }
         }
@@ -307,11 +307,11 @@ export default {
         } else {
           that.lastDecodedFrame = 0
           if (that.flvPlayer) {
-            that.player.pause()
-            that.player.unload()
-            that.player.detachMediaElement()
-            that.player.destroy()
-            that.player = null
+            that.flvPlayer.pause()
+            that.flvPlayer.unload()
+            that.flvPlayer.detachMediaElement()
+            that.flvPlayer.destroy()
+            that.flvPlayer = null
             that.createVideo()
           }
         }
@@ -405,7 +405,7 @@ export default {
     if (that.flvPlayer) {
       that.flvPlayer.pause()
       that.flvPlayer.destroy()
-      that.player.detachMediaElement()
+      that.flvPlayer.detachMediaElement()
       that.flvPlayer = null
     }
   },
@@ -422,7 +422,7 @@ export default {
     if (that.flvPlayer) {
       that.flvPlayer.pause()
       that.flvPlayer.destroy()
-      that.player.detachMediaElement()
+      that.flvPlayer.detachMediaElement()
       that.flvPlayer = null
     }
   }
