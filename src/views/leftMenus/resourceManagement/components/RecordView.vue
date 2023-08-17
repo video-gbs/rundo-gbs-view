@@ -1659,9 +1659,14 @@ export default {
               })
                 .then((res) => {
                   if (res.data.code === 0) {
+                    var url = res.data.wsFlv
+                    if (res.data.playProtocalType == 1) {
+                      url = res.data.httpFlv
+                    } else if (res.data.playProtocalType == 2) {
+                      url = res.data.wssFlv
+                    }
                     if (!this.isNext) {
                       this.setTimeLists(videoTime, this.playerIdx)
-                      this.setPlayUrl(res.data.data.wsFlv, this.playerIdx)
                       this.setRecordStreamId(
                         res.data.data.streamId,
                         this.playerIdx
@@ -1670,7 +1675,7 @@ export default {
                       this.setRecordCloudId(this.channelId, this.playerIdx)
                     } else {
                       this.setTimeLists(videoTime, this.playerIdx)
-                      this.setPlayUrl(res.data.data.wsFlv, this.playerIdx)
+                      this.setPlayUrl(url, this.playerIdx)
                       this.setRecordStreamId(
                         res.data.data.streamId,
                         this.playerIdx
