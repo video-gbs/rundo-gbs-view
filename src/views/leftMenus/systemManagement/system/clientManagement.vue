@@ -3,6 +3,45 @@
     <div class="panel-header-box">
       <div class="panel-header-box-border">客户端管理</div>
     </div>
+    <div class="search">
+      <el-form
+        ref="query"
+        class="search-form"
+        :inline="true"
+        :model="searchParams"
+        label-width="100px"
+      >
+        <el-form-item label="客户端账号:">
+          <el-input
+            v-model="searchParams.clientId"
+            placeholder="请输入IP地址"
+            class="mr10"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="客户端名称:">
+          <el-input
+            v-model="searchParams.clientName"
+            placeholder="请输入IP地址"
+            class="mr10"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          style="float: right; margin-right: 20px"
+          class="form-btn-list"
+        >
+          <el-button @click="resetData($event)"
+            ><svg-icon class="svg-btn" icon-class="cz" />
+            <span class="btn-span">重置</span></el-button
+          >
+          <el-button type="primary" @click="cxData"
+            ><svg-icon class="svg-btn" icon-class="cx" />
+            <span class="btn-span">搜索</span></el-button
+          >
+        </el-form-item>
+      </el-form>
+    </div>
     <div class="main-content">
       <div class="p10 right-table">
         <div class="table-list">
@@ -336,6 +375,10 @@ export default {
         pageSize: 10,
         total: 0
       },
+      searchParams: {
+        clientId: '',
+        clientName: ''
+      },
       lineTitle: {
         title: '新建',
         notShowSmallTitle: false
@@ -479,7 +522,8 @@ export default {
     async init() {
       await getClientLists({
         num: this.params.pageSize,
-        page: this.params.pageNum
+        page: this.params.pageNum,
+        ...this.searchParams
       }).then((res) => {
         if (res.data.code === 0) {
           this.tableData = res.data.data.list
@@ -495,6 +539,27 @@ export default {
     },
     currentChange(proCount) {
       this.params.proCount = proCount
+      this.init()
+    },
+    resetData(e) {
+      this.searchParams = {
+        clientId: '',
+        iclientNamep: ''
+      }
+      let target = e.target
+
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
+      this.params.pageNum = 1
+      this.init()
+    },
+    cxData() {
       this.init()
     },
     addDialogShow() {
@@ -755,6 +820,7 @@ export default {
   .main-content {
     height: calc(100% - 50px);
     display: flex;
+    margin-right: 18px;
     justify-content: space-between;
     .gatewayModuleManagement_container {
       height: calc(100% - 50px);
@@ -845,5 +911,16 @@ export default {
   position: relative;
   top: 1px;
   left: -4px;
+}
+.search {
+  margin: 12px 20px 10px 20px;
+  width: 98%;
+  min-height: 80px;
+  background: #ffffff;
+  box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  .search-form {
+    padding-top: 25px;
+  }
 }
 </style>
