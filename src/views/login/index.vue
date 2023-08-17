@@ -244,6 +244,7 @@ export default {
       Local.set('refresh_token_url', refreshToken1)
       this.isRefreshTokenExpired(expiresIn1)
       Local.set('expires_in', expiresIn1)
+      Local.set('expires_in_old', expiresIn1)
       Local.set('token_type', tokenType1)
       this.$nextTick(() => {
         // setTimeout(() => {
@@ -372,6 +373,7 @@ export default {
             this.isRefreshTokenExpired(expiresIn)
             Local.set('expires_in', expiresIn)
             Local.set('token_type', tokenType)
+            Local.set('expires_in_old', expiresIn1)
 
             this.loading = false
           }

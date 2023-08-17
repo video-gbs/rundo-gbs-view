@@ -8,8 +8,10 @@
         <div class="table-list">
           <div class="securityArea_container">
             <div class="btn-lists">
-              <!-- v-permission="['/rbac/menu/add', 2]" -->
-              <el-button type="primary" @click="addDialogShow"
+              <el-button
+                v-permission="['/auth-client/add', 2]"
+                type="primary"
+                @click="addDialogShow"
                 ><svg-icon class="svg-btn" icon-class="add" /><span
                   class="btn-span"
                   >新建</span
@@ -141,10 +143,16 @@
                 fixed="right"
               >
                 <template slot-scope="scope">
-                  <el-button type="text" @click="editData(scope.row)"
+                  <el-button
+                    v-permission="['/auth-client/update', 3]"
+                    type="text"
+                    @click="editData(scope.row)"
                     >编辑
                   </el-button>
-                  <el-button type="text" @click="deleteRole(scope.row)"
+                  <el-button
+                    v-permission="['/auth-client/delete', 4]"
+                    type="text"
+                    @click="deleteRole(scope.row)"
                     ><span class="delete-button">删除</span></el-button
                   >
                 </template>
