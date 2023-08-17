@@ -1326,6 +1326,8 @@ export default {
             var url = res.data.wsFlv
             if (res.data.playProtocalType == 1) {
               url = res.data.httpFlv
+            } else if (res.data.playProtocalType == 2) {
+              url = res.data.wssFlv
             }
             this.setPlayUrl(url, idxTmp)
 
