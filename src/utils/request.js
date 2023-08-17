@@ -81,38 +81,79 @@ service.interceptors.request.use(
         isRefreshing = true
         let refreshToken = Local.get('refresh_token')
 
-        newRefreshToken(refreshToken)
-          .then((res) => {
-            if (res.data.code === 0) {
-              isRefreshing = false
-              const { accessToken, refreshToken, expiresIn } = res.data.data
-              Local.set('access_token', accessToken)
-              Local.set('refresh_token', refreshToken)
-              Local.set('expires_in', expiresIn)
+        if (Local.get('third_party_login')) {
+          axios({
+            method: 'post',
+            url: Local.get('refresh_token_url'),
+            headers: {
+              Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+            }
+          })
+            .then((res) => {
+              if (res.data.code === 0) {
+                isRefreshing = false
+                const { accessToken, refreshToken, expiresIn } = res.data.data
+                Local.set('access_token', accessToken)
+                Local.set('refresh_token', refreshToken)
+                Local.set('expires_in', expiresIn)
 
-              isRefreshTokenExpired(expiresIn)
-              onAccessTokenFetched(accessToken)
-            } else {
-              //刷新token失败只能跳转到登录页重新登录
-              isRefreshing = false
-              Local.clear()
-              Local.remove('access_token')
-              Local.remove('utilTime')
-              Local.remove('expires_in')
-              Local.remove('refresh_token')
+                isRefreshTokenExpired(expiresIn)
+                onAccessTokenFetched(accessToken)
+              } else {
+                //刷新token失败只能跳转到登录页重新登录
+                isRefreshing = false
+                Local.clear()
+                Local.remove('access_token')
+                Local.remove('utilTime')
+                Local.remove('expires_in')
+                Local.remove('refresh_token')
+                router.replace({
+                  path: '/login',
+                  query: { redirect: router.currentRoute.fullPath }
+                })
+              }
+            })
+            .catch(function (err) {
               router.replace({
                 path: '/login',
                 query: { redirect: router.currentRoute.fullPath }
               })
-            }
-          })
-          .catch(function (err) {
-            router.replace({
-              path: '/login',
-              query: { redirect: router.currentRoute.fullPath }
+              isRefreshing = false
             })
-            isRefreshing = false
-          })
+        } else {
+          newRefreshToken(refreshToken)
+            .then((res) => {
+              if (res.data.code === 0) {
+                isRefreshing = false
+                const { accessToken, refreshToken, expiresIn } = res.data.data
+                Local.set('access_token', accessToken)
+                Local.set('refresh_token', refreshToken)
+                Local.set('expires_in', expiresIn)
+
+                isRefreshTokenExpired(expiresIn)
+                onAccessTokenFetched(accessToken)
+              } else {
+                //刷新token失败只能跳转到登录页重新登录
+                isRefreshing = false
+                Local.clear()
+                Local.remove('access_token')
+                Local.remove('utilTime')
+                Local.remove('expires_in')
+                Local.remove('refresh_token')
+                router.replace({
+                  path: '/login',
+                  query: { redirect: router.currentRoute.fullPath }
+                })
+              }
+            })
+            .catch(function (err) {
+              router.replace({
+                path: '/login',
+                query: { redirect: router.currentRoute.fullPath }
+              })
+              isRefreshing = false
+            })
+        }
       }
 
       // 将其他接口缓存起来 -- 这个Promise函数很关键
