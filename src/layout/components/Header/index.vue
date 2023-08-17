@@ -113,27 +113,11 @@ export default {
     changeTypeRouter(newValue, oldValue) {},
     changeRouterLists(newValue, oldValue) {}
   },
-  created() {
-    // this.getHomeUser()
-  },
   mounted() {
     this.userName = Local.get('rj_userName') || '佚名用户'
     // this.userName = this.userName.replace('"', '').replace('"', '')
   },
   methods: {
-    async getHomeUser() {
-      await getHomeUser()
-        .then((res) => {
-          if (res.data.code === 0) {
-            this.userName = res.data.data.username
-              .replace('"', '')
-              .replace('"', '')
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
     /**
      * 退出登录
      */
