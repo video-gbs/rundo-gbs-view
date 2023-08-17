@@ -16,6 +16,7 @@ import { Local } from './utils/storage'
 import '@/icons'
 import '@/utils/extends'
 import '@/plugin'
+import 'babel-polyfill'
 import * as echarts from 'echarts'
 Vue.prototype.$echarts = echarts
 
