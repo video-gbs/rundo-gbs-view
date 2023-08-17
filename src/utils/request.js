@@ -16,7 +16,7 @@ const service = axios.create({
 const isTokenExpired = () => {
   // 验证当前token是否过期
   let resetTime = Local.get('expires_in')
-  if (resetTime < 2000) {
+  if (resetTime < Local.get('expires_in_old')) {
     if (resetTime === 0) {
       Local.set('expires_in', '')
       return false
@@ -82,12 +82,12 @@ service.interceptors.request.use(
         let refreshToken = Local.get('refresh_token')
 
         if (Local.get('third_party_login')) {
+          const resUrl = `${Local.get(
+            'refresh_token_url'
+          )}?accessToken=${Local.get('access_token')}`
           axios({
-            method: 'post',
-            url: Local.get('refresh_token_url'),
-            headers: {
-              Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
-            }
+            method: 'get',
+            url: resUrl
           })
             .then((res) => {
               if (res.data.code === 0) {

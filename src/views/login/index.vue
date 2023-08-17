@@ -217,6 +217,44 @@ export default {
     Local.set('permissionData', [])
     Local.set('permissionMenuId', '')
     Local.set('expires_in', '')
+
+    if (window.location.search.indexOf('access_token') !== -1) {
+      console.log(111111111)
+      const resUrl = decodeURIComponent(window.location.search)
+
+      const accessToken1 = resUrl.slice(
+        resUrl.lastIndexOf('access_token=') + 13,
+        resUrl.lastIndexOf('&token_type')
+      )
+      const refreshToken1 = resUrl.slice(
+        resUrl.lastIndexOf('refresh_token_url') + 18
+      )
+      const expiresIn1 = resUrl.slice(
+        resUrl.lastIndexOf('expires_in=') + 11,
+        resUrl.lastIndexOf('&refresh_token_url')
+      )
+      const tokenType1 = resUrl.slice(
+        resUrl.lastIndexOf('token_type') + 11,
+        resUrl.lastIndexOf('&expires_in')
+      )
+      Local.set('third_party_login', true)
+
+      Local.set('rj_deptType', 0)
+      Local.set('access_token', accessToken1)
+      Local.set('refresh_token_url', refreshToken1)
+      this.isRefreshTokenExpired(expiresIn1)
+      Local.set('expires_in', expiresIn1)
+      Local.set('expires_in_old', expiresIn1)
+      Local.set('token_type', tokenType1)
+      this.$nextTick(() => {
+        // setTimeout(() => {
+        console.log(22222)
+        this.getHomeUser()
+        // }, 500)
+      })
+
+      this.loading = false
+    }
   },
   methods: {
     async getHomeUser() {
@@ -319,111 +357,74 @@ export default {
     async handleLogin() {
       this.loading = true
       Local.set('access_token', '')
+      await newLoginN(this.loginForm)
+        .then((res) => {
+          if (res.data.code === 0) {
+            const { accessToken, refreshToken, expiresIn, tokenType } =
+              res.data.data
 
-      if (window.location.search.indexOf('access_token') !== -1) {
-        const resUrl = decodeURIComponent(window.location.search)
+            Local.set('third_party_login', false)
 
-        console.log(resUrl)
-        const accessToken1 = resUrl.slice(
-          resUrl.lastIndexOf('access_token=') + 13,
-          resUrl.lastIndexOf('&token_type')
-        )
-        const refreshToken1 = resUrl.slice(
-          resUrl.lastIndexOf('refresh_token_url') + 18
-        )
-        const expiresIn1 = resUrl.slice(
-          resUrl.lastIndexOf('expires_in=') + 11,
-          resUrl.lastIndexOf('&refresh_token_url')
-        )
-        const tokenType1 = resUrl.slice(
-          resUrl.lastIndexOf('token_type') + 11,
-          resUrl.lastIndexOf('&expires_in')
-        )
-        Local.set('third_party_login', true)
+            this.getHomeUser()
 
-        Local.set('rj_deptType', 0)
-        Local.set('access_token', accessToken1)
-        Local.set('refresh_token_url', refreshToken1)
-        this.isRefreshTokenExpired(expiresIn1)
-        Local.set('expires_in', expiresIn1)
-        Local.set('token_type', tokenType1)
-        console.log('accessToken1', accessToken1)
-        this.$nextTick(() => {
-          // setTimeout(() => {
-          this.getHomeUser()
-          // }, 500)
+            Local.set('rj_deptType', 0)
+            Local.set('access_token', accessToken)
+            Local.set('refresh_token', refreshToken)
+            this.isRefreshTokenExpired(expiresIn)
+            Local.set('expires_in', expiresIn)
+            Local.set('token_type', tokenType)
+            Local.set('expires_in_old', expiresIn1)
+
+            this.loading = false
+          }
+        })
+        .catch((error) => {
+          this.loading = false
+
+          // this.$message({
+          //   type: 'error',
+          //   message: error.response.data.data
+          // })
+        })
+        .finally(() => {
+          this.loading = false
         })
 
-        this.loading = false
-      } else {
-        await newLoginN(this.loginForm)
-          .then((res) => {
-            if (res.data.code === 0) {
-              const { accessToken, refreshToken, expiresIn, tokenType } =
-                res.data.data
+      // axios({
+      //   method: 'post',
+      //   url: `http://xard-gbs-test.runjian.com:8080/api/oauth2/token?grant_type=password&scope=all&username=${this.loginForm.username}&password=${this.loginForm.password}`,
+      //   headers: {
+      //     Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+      //   }
+      // })
+      //   .then((res) => {
+      //     const { accessToken, refreshToken, expiresIn, tokenType } =
+      //       res.data.data
 
-              Local.set('third_party_login', false)
+      //     this.getHomeUser()
 
-              this.getHomeUser()
+      //     Local.set('rj_deptType', 0)
+      //     Local.set('access_token', accessToken)
+      //     Local.set('refresh_token', refreshToken)
+      //     this.isRefreshTokenExpired(expiresIn)
+      //     Local.set('expires_in', expiresIn)
+      //     Local.set('token_type', tokenType)
 
-              Local.set('rj_deptType', 0)
-              Local.set('access_token', accessToken)
-              Local.set('refresh_token', refreshToken)
-              this.isRefreshTokenExpired(expiresIn)
-              Local.set('expires_in', expiresIn)
-              Local.set('token_type', tokenType)
+      //     this.loading = false
+      //   })
+      //   .catch((error) => {
+      //     console.log(1, error.response)
 
-              this.loading = false
-            }
-          })
-          .catch((error) => {
-            this.loading = false
+      //     this.loading = false
 
-            // this.$message({
-            //   type: 'error',
-            //   message: error.response.data.data
-            // })
-          })
-          .finally(() => {
-            this.loading = false
-          })
-
-        // axios({
-        //   method: 'post',
-        //   url: `http://xard-gbs-test.runjian.com:8080/api/oauth2/token?grant_type=password&scope=all&username=${this.loginForm.username}&password=${this.loginForm.password}`,
-        //   headers: {
-        //     Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
-        //   }
-        // })
-        //   .then((res) => {
-        //     const { accessToken, refreshToken, expiresIn, tokenType } =
-        //       res.data.data
-
-        //     this.getHomeUser()
-
-        //     Local.set('rj_deptType', 0)
-        //     Local.set('access_token', accessToken)
-        //     Local.set('refresh_token', refreshToken)
-        //     this.isRefreshTokenExpired(expiresIn)
-        //     Local.set('expires_in', expiresIn)
-        //     Local.set('token_type', tokenType)
-
-        //     this.loading = false
-        //   })
-        //   .catch((error) => {
-        //     console.log(1, error.response)
-
-        //     this.loading = false
-
-        //     this.$message({
-        //       type: 'error',
-        //       message: error.response.data.data
-        //     })
-        //   })
-        //   .finally(() => {
-        //     this.loading = false
-        //   })
-      }
+      //     this.$message({
+      //       type: 'error',
+      //       message: error.response.data.data
+      //     })
+      //   })
+      //   .finally(() => {
+      //     this.loading = false
+      //   })
     }
   }
 }
