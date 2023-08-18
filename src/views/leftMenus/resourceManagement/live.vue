@@ -1390,6 +1390,7 @@ export default {
         this.isClicked.length
       )
       this.playerIdx = i - 1
+      this.rectAreaNum = i - 1
     },
     // 放大缩小视频容器
     toogleVideo(i) {
