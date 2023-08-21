@@ -335,9 +335,9 @@ router.beforeEach(async (to, from, next) => {
     } else {
       next()
     }
-    // if (to.path === '/login') {
-    //   next('/workTable')
-    // }
+    if (to.path === '/login') {
+      next('/workTable')
+    }
   } else {
     if (to.path !== '/login') {
       // console.log('不在登录页跳转')
