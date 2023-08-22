@@ -296,6 +296,11 @@ export default {
             that.flvPlayer = null
             if (this.errorNum <= 10) {
               that.createVideo()
+            } else {
+              this.$message({
+                type: 'error',
+                message: '视频帧不支持的编解码器'
+              })
             }
           }
         }
