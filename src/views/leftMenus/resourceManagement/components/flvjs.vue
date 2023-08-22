@@ -125,7 +125,8 @@ export default {
       resVideoUrl: '',
       resChannelId: '',
       resPlayerIdx: 0,
-      showContentList: []
+      showContentList: [],
+      errorNum: 0
     }
   },
   props: [
@@ -286,13 +287,16 @@ export default {
           console.log('errorType:', errorType)
           console.log('errorDetail:', errorDetail)
           console.log('errorInfo:', errorInfo)
+          this.errorNum++
           if (that.flvPlayer) {
             that.flvPlayer.pause()
             that.flvPlayer.unload()
             that.flvPlayer.detachMediaElement()
             that.flvPlayer.destroy()
             that.flvPlayer = null
-            that.createVideo()
+            if (this.errorNum <= 10) {
+              that.createVideo()
+            }
           }
         }
       )
