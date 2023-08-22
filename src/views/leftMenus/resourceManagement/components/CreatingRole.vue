@@ -900,26 +900,28 @@ export default {
 }
 ::v-deep .el-textarea__inner {
   width: 436px;
-  height: 90px;
+  height: 40px;
 }
 
 ::v-deep .el-card__header {
   padding: 0 20px;
-  height: 62px;
+  height: 30px;
 }
 ::v-deep .el-card__body {
-  padding-bottom: 0;
-  height: calc(100% - 62px);
+  padding: 10px 20px;
+  height: calc(100% - 30px);
 }
 ::v-deep .top-pane > .el-tabs__content {
   height: calc(100% - 34px);
 }
 ::v-deep .role-pane {
-  max-height: calc(100% - 10px);
+  // max-height: calc(100% - 10px);
+  height: 100%;
   overflow-y: auto;
 }
 
 ::v-deep .el-menu-vertical-demo > .el-tabs__header {
+  max-height: 106px;
   border: 1px solid #eaeaea;
   box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   border-right: 0;
@@ -950,6 +952,43 @@ export default {
 ::v-deep .role_featureApiTable::-webkit-scrollbar-corner {
   background-color: #111;
 }
+
+// 滚动条大小设置
+::v-deep .typeTree-pane::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .typeTree-pane::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .typeTree-pane::-webkit-scrollbar-track {
+  background: none;
+}
+
+// 表格横向和纵向滚动条对顶角样式设置
+::v-deep .typeTree-pane::-webkit-scrollbar-corner {
+  background-color: #111;
+}
+::v-deep .el-table__row > td {
+  @media (max-width: 1920px) {
+    padding: 8px 0 !important;
+  }
+  @media (min-width: 1920px) {
+    padding: 3px 0 !important;
+  }
+}
+
+.typeTree-pane {
+  height: 100%;
+  overflow: auto;
+}
+
 .btn-lists-top {
   position: absolute;
   left: 110px;
@@ -1022,10 +1061,10 @@ export default {
         margin-left: 20px;
         .addRoleTree {
           @media (max-width: 1920px) {
-            max-height: 400px;
+            max-height: 500px;
           }
           @media (min-width: 1920px) {
-            max-height: 450px;
+            max-height: 430px;
           }
           width: 300px;
           margin-right: 20px;
@@ -1044,8 +1083,8 @@ export default {
     }
 
     .clearfix {
-      height: 80px;
-      line-height: 62px;
+      height: 30px;
+      line-height: 30px;
       span {
         font-size: 20px;
         font-family: Microsoft YaHei-Regular, Microsoft YaHei;
@@ -1063,11 +1102,11 @@ export default {
   }
   .box-card1 {
     margin: 0 -20px;
-    height: calc(100% - 196px);
+    height: calc(100% - 80px);
 
     .clearfix1 {
-      height: 62px;
-      line-height: 62px;
+      height: 45px;
+      line-height: 55px;
       padding-left: 20px;
 
       border-bottom: 1px solid #eaeaea;
@@ -1108,8 +1147,8 @@ export default {
       }
     }
     .tree-bottom {
-      margin-top: 20px;
-      height: calc(100% - 80px);
+      margin-top: 10px;
+      height: calc(100% - 55px);
       overflow: auto;
       position: relative;
     }
@@ -1145,7 +1184,7 @@ export default {
 }
 ::v-deep .el-menu-vertical-demo {
   .el-tabs__content {
-    height: 100%;
+    height: calc(100% - 40px);
   }
 }
 .dialog-footer {
