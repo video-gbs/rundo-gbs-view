@@ -363,9 +363,8 @@ export default {
       //   clearInterval(that.timerId1)
       // }
       that.timerId1 = setInterval(() => {
-        that.reconnectCount++
         if (that.reconnectCount > 3) {
-          console.info('重连大于10次，不再重连')
+          console.info('重连大于10次，不再重连', that.reconnectCount)
           clearTimeout(that.timerId1)
           that.timerId1 = null
           that.player && that.player.close()
@@ -374,8 +373,9 @@ export default {
 
         if (!videoElement.buffered || !videoElement.buffered.length) return
         const end1 = videoElement.buffered.end(0) // 视频结尾时间
-
+        console.info('end1', end1, that.prevEnd)
         if (end1 === that.prevEnd) {
+          that.reconnectCount++
           console.info('重连', that.reconnectCount)
           if (that.flvPlayer) {
             that.flvPlayer.pause()
