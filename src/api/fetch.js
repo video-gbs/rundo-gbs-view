@@ -40,7 +40,7 @@ const methods = {
       headers
     })
   },
-  post1(url, data) {
+  post2(url, data, headers) {
     return request({
       method: 'POST',
       url,
@@ -48,6 +48,14 @@ const methods = {
       headers: {
         Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
       }
+    })
+  },
+  post1(url, data, headers) {
+    return request({
+      method: 'POST',
+      url,
+      data,
+      headers
     })
   },
   put(url, data, headers) {

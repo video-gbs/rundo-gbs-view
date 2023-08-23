@@ -33,14 +33,16 @@ export function getHomeResource(data) {
 // 登录
 export function newLoginN(data) {
   // 登录token
-  return request.post1(
+  return request.post2(
     `/oauth2/token?grant_type=password&scope=all&username=${data.username}&password=${data.password}`
   )
 }
 
-export function newRefreshToken(refreshToken) {
+export function newRefreshToken(refreshToken, headers) {
   // 登录refreshToken
   return request.post1(
-    `/oauth2/token?grant_type=refresh_token&refresh_token=${refreshToken}`
+    `/oauth2/token?grant_type=refresh_token&refresh_token=${refreshToken}`,
+    refreshToken,
+    headers
   )
 }

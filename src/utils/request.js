@@ -68,10 +68,15 @@ const init = {
 //http request 拦截器
 service.interceptors.request.use(
   (config) => {
-    if (Local.get('access_token')) {
+    if (Local.get('access_token') && !config.url.includes('/oauth2/token')) {
       config.headers = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${Local.get('access_token')}`
+      }
+    } else {
+      config.headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg=`
       }
     }
     if (isTokenExpired() && !config.url.includes('/oauth2/token')) {
@@ -124,7 +129,12 @@ service.interceptors.request.use(
               isRefreshing = false
             })
         } else {
-          newRefreshToken(refreshToken)
+          console.log(1111)
+
+          newRefreshToken(
+            refreshToken,
+            'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+          )
             .then((res) => {
               if (res.data.code === 0) {
                 isRefreshing = false
