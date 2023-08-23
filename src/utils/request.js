@@ -87,7 +87,10 @@ service.interceptors.request.use(
           )}?accessToken=${Local.get('access_token')}`
           axios({
             method: 'get',
-            url: resUrl
+            url: resUrl,
+            headers: {
+              Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+            }
           })
             .then((res) => {
               if (res.data.code === 0) {
