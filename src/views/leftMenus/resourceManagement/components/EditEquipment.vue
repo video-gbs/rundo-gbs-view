@@ -342,7 +342,7 @@ export default {
       this.form.model = model
       this.form.username = username
       this.form.deviceType = deviceType + ''
-      this.form.gatewayId = String(gatewayId)
+      this.form.gatewayId = gatewayId
       this.editId = this.$props.editEquipmentRow.id
       this.form.videoAreaId = videoAreaId
       this.$nextTick(() => {

@@ -373,7 +373,7 @@ export default {
             this.isRefreshTokenExpired(expiresIn)
             Local.set('expires_in', expiresIn)
             Local.set('token_type', tokenType)
-            Local.set('expires_in_old', expiresIn1)
+            Local.set('expires_in_old', expiresIn)
 
             this.loading = false
           }
