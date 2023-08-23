@@ -159,7 +159,7 @@ export default {
   },
   mounted() {
     this.$on('closeAll', () => {
-      this.flvPlayer && this.flvPlayer.close()
+      this.player && this.player.close()
       this.$emit('close', this.index)
     })
 
@@ -368,7 +368,7 @@ export default {
           console.info('重连大于10次，不再重连')
           clearTimeout(that.timerId1)
           that.timerId1 = null
-          that.flvPlayer && that.flvPlayer.close()
+          that.player && that.player.close()
           that.$emit('close', that.index)
         }
 
@@ -404,7 +404,7 @@ export default {
     // 关闭视频
     closeVideo() {
       console.info('关闭视频', this.index)
-      this.flvPlayer && this.flvPlayer.close()
+      this.player && this.player.close()
       this.$emit('close', this.index)
     }
   },
