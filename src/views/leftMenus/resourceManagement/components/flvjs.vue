@@ -287,19 +287,19 @@ export default {
           console.log('errorType:', errorType)
           console.log('errorDetail:', errorDetail)
           console.log('errorInfo:', errorInfo)
-          this.errorNum++
+          that.errorNum++
           if (that.flvPlayer) {
             that.flvPlayer.pause()
             that.flvPlayer.unload()
             that.flvPlayer.detachMediaElement()
             that.flvPlayer.destroy()
             that.flvPlayer = null
-            if (this.errorNum <= 10) {
+            if (that.errorNum <= 10) {
               that.createVideo()
             } else {
-              this.$message({
+              that.$message({
                 type: 'error',
-                message: '视频帧不支持的编解码器'
+                message: '不支持h265格式的视频播放,请检查视频的码流格式'
               })
             }
           }

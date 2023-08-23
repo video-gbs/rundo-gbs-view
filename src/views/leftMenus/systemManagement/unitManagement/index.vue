@@ -634,19 +634,19 @@ export default {
                 })
               break
             case '编辑':
-              editApplication({ id: this.editId, ...this.dialog.params })
-                .then((res) => {
-                  if (res.data.code === 0) {
-                    this.isClick = false
-                    this.$message.success('编辑成功')
-                    this.$refs.unitTree.chooseId(this.dialog.params.sectionPid)
-                    this.dialog.show = false
-                    this.getList()
-                  }
-                })
-                .catch((error) => {
-                  this.isClick = false
-                })
+              // editApplication({ id: this.editId, ...this.dialog.params })
+              //   .then((res) => {
+              //     if (res.data.code === 0) {
+              //       this.isClick = false
+              //       this.$message.success('编辑成功')
+              //       this.$refs.unitTree.chooseId(this.dialog.params.sectionPid)
+              //       this.dialog.show = false
+              //       this.getList()
+              //     }
+              //   })
+              //   .catch((error) => {
+              //     this.isClick = false
+              //   })
               break
 
             default:

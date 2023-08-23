@@ -159,7 +159,6 @@ import { getVideoAraeTree } from '@/api/method/role'
 import {
   unitAdd,
   unitEdit,
-  unitList,
   unitDelete,
   getUnitDetails
 } from '@/api/method/securityArea'
