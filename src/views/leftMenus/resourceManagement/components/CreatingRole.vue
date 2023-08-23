@@ -847,8 +847,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep .el-table::before {
-  height: 0 !important;
+::v-deep .table-content-bottom::before {
+  height: 1px !important;
+}
+::v-deep .table-content-bottom {
+  height: inherit;
+  max-height: 600px !important;
+  overflow: auto !important;
 }
 ::v-deep .top-pane {
   border: 0 none;
@@ -937,42 +942,26 @@ export default {
   /*横向滚动条*/
   height: 5px;
 }
-// 滚动条滑块样式设置
-::v-deep .role_featureApiTable::-webkit-scrollbar-thumb {
-  background-color: #bfbfc0;
-  border-radius: 5px;
-}
-
-// 滚动条背景样式设置
-::v-deep .role_featureApiTable::-webkit-scrollbar-track {
-  background: none;
-}
-
-// 表格横向和纵向滚动条对顶角样式设置
-::v-deep .role_featureApiTable::-webkit-scrollbar-corner {
-  background-color: #111;
-}
-
-// 滚动条大小设置
-::v-deep .typeTree-pane::-webkit-scrollbar {
+::v-deep .el-table--enable-row-transition::-webkit-scrollbar {
   /*纵向滚动条*/
   width: 5px;
   /*横向滚动条*/
   height: 5px;
 }
+
 // 滚动条滑块样式设置
-::v-deep .typeTree-pane::-webkit-scrollbar-thumb {
+::v-deep .el-table--enable-row-transition::-webkit-scrollbar-thumb {
   background-color: #bfbfc0;
   border-radius: 5px;
 }
 
 // 滚动条背景样式设置
-::v-deep .typeTree-pane::-webkit-scrollbar-track {
+::v-deep .el-table--enable-row-transition::-webkit-scrollbar-track {
   background: none;
 }
 
 // 表格横向和纵向滚动条对顶角样式设置
-::v-deep .typeTree-pane::-webkit-scrollbar-corner {
+::v-deep .el-table--enable-row-transition::-webkit-scrollbar-corner {
   background-color: #111;
 }
 ::v-deep .el-table__row > td {
@@ -986,7 +975,7 @@ export default {
 
 .typeTree-pane {
   height: 100%;
-  overflow: auto;
+  // overflow: auto;
 }
 
 .btn-lists-top {
@@ -1076,8 +1065,9 @@ export default {
         // justify-content: flex-start;
         .role_featureApiTable {
           width: calc(100% - 300px);
+          max-height: 600px;
+          overflow-y: auto;
           height: 100%;
-          // overflow-y: auto;
         }
       }
     }

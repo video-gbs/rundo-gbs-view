@@ -159,7 +159,7 @@ export default {
   },
   mounted() {
     this.$on('closeAll', () => {
-      this.player && this.player.close()
+      this.flvPlayer && this.flvPlayer.close()
       this.$emit('close', this.index)
     })
 
@@ -363,11 +363,12 @@ export default {
       //   clearInterval(that.timerId1)
       // }
       that.timerId1 = setInterval(() => {
+        that.reconnectCount++
         if (that.reconnectCount > 3) {
           console.info('重连大于10次，不再重连')
           clearTimeout(that.timerId1)
           that.timerId1 = null
-          that.player && that.player.close()
+          that.flvPlayer && that.flvPlayer.close()
           that.$emit('close', that.index)
         }
 
@@ -375,7 +376,6 @@ export default {
         const end1 = videoElement.buffered.end(0) // 视频结尾时间
 
         if (end1 === that.prevEnd) {
-          that.reconnectCount++
           console.info('重连', that.reconnectCount)
           if (that.flvPlayer) {
             that.flvPlayer.pause()
@@ -404,7 +404,7 @@ export default {
     // 关闭视频
     closeVideo() {
       console.info('关闭视频', this.index)
-      this.player && this.player.close()
+      this.flvPlayer && this.flvPlayer.close()
       this.$emit('close', this.index)
     }
   },
