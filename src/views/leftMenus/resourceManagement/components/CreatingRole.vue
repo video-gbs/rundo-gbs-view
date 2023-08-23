@@ -852,7 +852,7 @@ export default {
 }
 ::v-deep .table-content-bottom {
   height: inherit;
-  max-height: 600px !important;
+  max-height: 360px !important;
   overflow: auto !important;
 }
 ::v-deep .top-pane {
