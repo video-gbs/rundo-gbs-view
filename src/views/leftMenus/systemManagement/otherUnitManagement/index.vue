@@ -318,7 +318,7 @@ import {
   otherUnitDelete,
   otherUnitEditPassword
 } from '@/api/method/otherUnitManagement'
-import { unitList } from '@/api/method/unitManagement'
+// import { unitList } from '@/api/method/unitManagement'
 // import { getRolesList } from "@/api/method/role";
 
 import { Local } from '@/utils/storage'
@@ -615,11 +615,11 @@ export default {
     },
     getDeptList() {
       // 获取部门
-      unitList({ current: 1, size: 399 }).then((res) => {
-        if (res.data.code === 10000) {
-          this.deptList = [...this.deptList, ...res.data?.records]
-        }
-      })
+      // unitList({ current: 1, size: 399 }).then((res) => {
+      //   if (res.data.code === 10000) {
+      //     this.deptList = [...this.deptList, ...res.data?.records]
+      //   }
+      // })
     },
     searchFn() {
       // 通过部门搜索

@@ -373,8 +373,8 @@ export default {
         width: this.width3d,
         lengthX,
         lengthY,
-        midPointX,
-        midPointY
+        midPointX: Math.abs(midPointX),
+        midPointY: Math.abs(midPointY)
       }).then((res) => {
         if (res.data.code === 0 && dragType === 2) {
           this.lengthX = 0

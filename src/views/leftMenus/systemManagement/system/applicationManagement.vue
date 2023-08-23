@@ -244,12 +244,12 @@
 
 <script>
 import {
-  getAddApplicationList,
-  addApplication,
-  getAddApplicationById,
-  deleteApplication,
-  editApplication,
-  changeStatus
+  // getAddApplicationList,
+  // addApplication,
+  getAddApplicationById
+  // deleteApplication,
+  // editApplication,
+  // changeStatus
 } from '@/api/method/user'
 import pagination from '@/components/Pagination/index.vue'
 
@@ -404,26 +404,25 @@ export default {
       this.getList()
     },
     changeSwitch(row) {
-      let text = row.status === 0 ? '启用' : '停用'
-
-      this.$confirm('确认要"' + text + '""' + row.appName + '"吗?', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(function () {
-          changeStatus({
-            id: row.id,
-            status: row.status
-          }).then((res) => {
-            if (res.data.code !== 0) {
-              row.status = row.status === 0 ? 1 : 0
-            }
-          })
-        })
-        .catch(function () {
-          row.status = row.status === 0 ? 1 : 0
-        })
+      // let text = row.status === 0 ? '启用' : '停用'
+      // this.$confirm('确认要"' + text + '""' + row.appName + '"吗?', '警告', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // })
+      //   .then(function () {
+      //     changeStatus({
+      //       id: row.id,
+      //       status: row.status
+      //     }).then((res) => {
+      //       if (res.data.code !== 0) {
+      //         row.status = row.status === 0 ? 1 : 0
+      //       }
+      //     })
+      //   })
+      //   .catch(function () {
+      //     row.status = row.status === 0 ? 1 : 0
+      //   })
     },
     goPage(path, query) {
       this.$router.push(path)
@@ -506,85 +505,85 @@ export default {
       this.buttonLoading = true
       // this.checkList = []
       this.buildTree('get')
-      editApplication({
-        roleId: this.roleId,
-        permissionIds: this.checkList
-      })
-        .then((res) => {
-          if (res.data.code === 10000) {
-            this.$message({
-              message: '保存成功！',
-              type: 'success'
-            })
+      // editApplication({
+      //   roleId: this.roleId,
+      //   permissionIds: this.checkList
+      // })
+      //   .then((res) => {
+      //     if (res.data.code === 10000) {
+      //       this.$message({
+      //         message: '保存成功！',
+      //         type: 'success'
+      //       })
 
-            this.buttonLoading = false
-            this.permissionDialog.show = !this.permissionDialog.show
-          } else {
-            this.buttonLoading = false
-          }
-        })
-        .catch(() => {
-          this.buttonLoading = false
-        })
+      //       this.buttonLoading = false
+      //       this.permissionDialog.show = !this.permissionDialog.show
+      //     } else {
+      //       this.buttonLoading = false
+      //     }
+      //   })
+      //   .catch(() => {
+      //     this.buttonLoading = false
+      //   })
     },
     getList() {
-      getAddApplicationList({
-        current: this.params.pageNum,
-        pageSize: this.params.pageSize,
-        ...this.searchParams
-      }).then((res) => {
-        if (res.data.code === 0) {
-          this.tableData = res.data.records
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
-        }
-      })
+      // getAddApplicationList({
+      //   current: this.params.pageNum,
+      //   pageSize: this.params.pageSize,
+      //   ...this.searchParams
+      // }).then((res) => {
+      //   if (res.data.code === 0) {
+      //     this.tableData = res.data.records
+      //     this.params.total = res.data.total
+      //     this.params.pages = res.data.pages
+      //     this.params.current = res.data.current
+      //   }
+      // })
     },
     deleteRole(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        deleteApplication(row.id).then((res) => {
-          if (res.data.code === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            })
-            this.params.pageNum = 1
-            this.getList()
-          }
-        })
-      })
+      // this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // }).then(() => {
+      //   deleteApplication(row.id).then((res) => {
+      //     if (res.data.code === 0) {
+      //       this.$message({
+      //         type: 'success',
+      //         message: '删除成功'
+      //       })
+      //       this.params.pageNum = 1
+      //       this.getList()
+      //     }
+      //   })
+      // })
     },
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
             case '新建':
-              addApplication(this.dialog.params).then((res) => {
-                if (res.data.code === 0) {
-                  this.$message({
-                    type: 'success',
-                    message: '新建成功'
-                  })
-                  this.dialog.show = false
-                  this.getList()
-                }
-              })
+              // addApplication(this.dialog.params).then((res) => {
+              //   if (res.data.code === 0) {
+              //     this.$message({
+              //       type: 'success',
+              //       message: '新建成功'
+              //     })
+              //     this.dialog.show = false
+              //     this.getList()
+              //   }
+              // })
               break
             case '编辑':
-              editApplication({ id: this.editId, ...this.dialog.params }).then(
-                (res) => {
-                  if (res.data.code === 0) {
-                    this.$message.success('编辑成功')
-                    this.dialog.show = false
-                    this.getList()
-                  }
-                }
-              )
+              // editApplication({ id: this.editId, ...this.dialog.params }).then(
+              //   (res) => {
+              //     if (res.data.code === 0) {
+              //       this.$message.success('编辑成功')
+              //       this.dialog.show = false
+              //       this.getList()
+              //     }
+              //   }
+              // )
               break
 
             default:
