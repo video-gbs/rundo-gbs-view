@@ -938,7 +938,7 @@ export default {
 // 滚动条大小设置
 ::v-deep .role_featureApiTable::-webkit-scrollbar {
   /*纵向滚动条*/
-  width: 0px;
+  width: 5px;
   /*横向滚动条*/
   height: 5px;
 }
@@ -1066,7 +1066,7 @@ export default {
         .role_featureApiTable {
           width: calc(100% - 300px);
           max-height: 600px;
-          overflow-y: auto;
+          // overflow-y: auto;
           height: 100%;
         }
       }
