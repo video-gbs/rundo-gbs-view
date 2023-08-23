@@ -1050,7 +1050,7 @@ export default {
         margin-left: 20px;
         .addRoleTree {
           @media (max-width: 1920px) {
-            max-height: 500px;
+            max-height: 400px;
           }
           @media (min-width: 1920px) {
             max-height: 430px;

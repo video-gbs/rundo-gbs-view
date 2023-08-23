@@ -357,7 +357,7 @@ export default {
   data() {
     const checkName = (rule, value, cb) => {
       const regName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
-      if (value.length === 0) {
+      if (value !== null && value.length === 0) {
         return cb(new Error('此为必填项。'))
       }
       setTimeout(() => {
@@ -391,7 +391,7 @@ export default {
       }, 500)
     }
     const checkModel = (rule, value, cb) => {
-      if (value.length === 0) {
+      if (value !== null && value.length === 0) {
         return cb(new Error('此为必填项。'))
       }
       setTimeout(() => {
