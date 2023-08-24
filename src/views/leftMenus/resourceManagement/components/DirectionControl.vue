@@ -336,20 +336,20 @@ export default {
       } else {
         this.type3d[index] = false
         this.$listeners.rectZoomInit(index, this.type3d[index], '3d')
-        if (
-          this.lengthX > 0 &&
-          this.lengthY > 0 &&
-          this.midPointX &&
-          this.midPointY
-        ) {
-          this.ptzEnlarge(
-            2,
-            this.lengthX,
-            this.lengthY,
-            this.midPointX,
-            this.midPointY
-          )
-        }
+        // if (
+        //   this.lengthX > 0 &&
+        //   this.lengthY > 0 &&
+        //   this.midPointX &&
+        //   this.midPointY
+        // ) {
+        //   this.ptzEnlarge(
+        //     2,
+        //     this.lengthX,
+        //     this.lengthY,
+        //     this.midPointX,
+        //     this.midPointY
+        //   )
+        // }
       }
       this.$forceUpdate()
     },
