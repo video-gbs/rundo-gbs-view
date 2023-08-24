@@ -906,6 +906,7 @@ export default {
 ::v-deep .el-textarea__inner {
   width: 436px;
   height: 40px;
+  resize: none;
 }
 
 ::v-deep .el-card__header {
