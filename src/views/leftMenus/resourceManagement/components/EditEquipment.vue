@@ -391,11 +391,11 @@ export default {
       }, 500)
     }
     const checkModel = (rule, value, cb) => {
-      if (value !== null && value.length === 0) {
+      if (value === null || value.length === 0) {
         return cb(new Error('此为必填项。'))
       }
       setTimeout(() => {
-        if (value.length <= 128) {
+        if (value !== null && value.length <= 128) {
           return cb()
         } else {
           return cb(new Error('1~128个字符。'))
@@ -560,36 +560,69 @@ export default {
         this.form.deviceType = Number(this.form.deviceType)
 
         // const { videoAreaId, ...restObj } = this.form
-        editEncoder1({
-          deviceId:
-            this.$props.resType === '1'
-              ? this.$props.editEquipmentRow.deviceId
-              : this.$props.editEquipmentRow.originId,
-          id:
-            this.$props.resType === '1'
-              ? this.$props.editEquipmentRow.id
-              : this.$props.editEquipmentRow.deviceId,
-          onlineState: this.$props.editEquipmentRow.onlineState,
-          pResourceValue: this.pResourceValue,
-          ...this.form,
-          ...this.form1,
-          pResourceValue: this.pResourceValue
-        })
-          .then((res) => {
-            if (res.data.code === 0) {
-              this.$message({
-                type: 'success',
-                message: '编辑成功'
-              })
-              this.goback()
-            }
+        if (this.$props.resType === '1') {
+          editEncoder({
+            deviceId:
+              this.$props.resType === '1'
+                ? this.$props.editEquipmentRow.deviceId
+                : this.$props.editEquipmentRow.originId,
+            id:
+              this.$props.resType === '1'
+                ? this.$props.editEquipmentRow.id
+                : this.$props.editEquipmentRow.deviceId,
+            onlineState: this.$props.editEquipmentRow.onlineState,
+            pResourceValue: this.pResourceValue,
+            ...this.form,
+            ...this.form1,
+            pResourceValue: this.pResourceValue
           })
-          .catch(() => {
-            this.form.videoAreaId = this.resName
+            .then((res) => {
+              if (res.data.code === 0) {
+                this.$message({
+                  type: 'success',
+                  message: '编辑成功'
+                })
+                this.goback()
+              }
+            })
+            .catch(() => {
+              this.form.videoAreaId = this.resName
+            })
+            .finally(() => {
+              this.form.videoAreaId = this.resName
+            })
+        } else {
+          editEncoder1({
+            deviceId:
+              this.$props.resType === '1'
+                ? this.$props.editEquipmentRow.deviceId
+                : this.$props.editEquipmentRow.originId,
+            id:
+              this.$props.resType === '1'
+                ? this.$props.editEquipmentRow.id
+                : this.$props.editEquipmentRow.deviceId,
+            onlineState: this.$props.editEquipmentRow.onlineState,
+            pResourceValue: this.pResourceValue,
+            ...this.form,
+            ...this.form1,
+            pResourceValue: this.pResourceValue
           })
-          .finally(() => {
-            this.form.videoAreaId = this.resName
-          })
+            .then((res) => {
+              if (res.data.code === 0) {
+                this.$message({
+                  type: 'success',
+                  message: '编辑成功'
+                })
+                this.goback()
+              }
+            })
+            .catch(() => {
+              this.form.videoAreaId = this.resName
+            })
+            .finally(() => {
+              this.form.videoAreaId = this.resName
+            })
+        }
       })
     },
 

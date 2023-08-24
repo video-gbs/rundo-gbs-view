@@ -277,7 +277,7 @@ export default {
       that.flvPlayer.load()
       setTimeout(function () {
         if (that.resVideoUrl !== '' && that.resVideoUrl !== null) {
-          that.flvPlayer.play()
+          that.flvPlayer && that.flvPlayer.play()
         }
       }, 300)
 
@@ -363,14 +363,6 @@ export default {
       //   clearInterval(that.timerId1)
       // }
       that.timerId1 = setInterval(() => {
-        if (that.reconnectCount > 3) {
-          console.info('重连大于10次，不再重连', that.reconnectCount)
-          clearTimeout(that.timerId1)
-          that.timerId1 = null
-          that.player && that.player.close()
-          that.$emit('close', that.index)
-        }
-
         if (!videoElement.buffered || !videoElement.buffered.length) return
         const end1 = videoElement.buffered.end(0) // 视频结尾时间
         console.info('end1', end1, that.prevEnd)
@@ -383,13 +375,21 @@ export default {
             that.flvPlayer.detachMediaElement()
             that.flvPlayer.destroy()
             that.flvPlayer = null
-            that.createVideo()
+            if (that.reconnectCount > 10) {
+              console.info('重连大于10次，不再重连', that.reconnectCount)
+              clearTimeout(that.timerId1)
+              that.timerId1 = null
+              that.player && that.player.close()
+              that.$emit('close', that.index)
+            } else {
+              that.createVideo()
+            }
           }
         }
 
         if (videoElement.paused) {
           console.info('重新播放')
-          that.flvPlayer.play()
+          that.flvPlayer && that.flvPlayer.play()
         }
 
         that.prevEnd = end1
