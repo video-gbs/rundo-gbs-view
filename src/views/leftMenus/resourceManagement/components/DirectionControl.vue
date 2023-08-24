@@ -817,6 +817,10 @@ export default {
 
 <style lang="scss">
 .direction-control {
+  .is-disabled {
+    cursor: not-allowed !important;
+    opacity: 0.1;
+  }
   .speed-control {
     width: 214px;
     height: 46px;
@@ -1276,9 +1280,5 @@ export default {
       }
     }
   }
-}
-.is-disabled {
-  cursor: not-allowed !important;
-  opacity: 0.1;
 }
 </style>

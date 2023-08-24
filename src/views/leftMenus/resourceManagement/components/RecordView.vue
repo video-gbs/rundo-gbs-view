@@ -2200,6 +2200,11 @@ export default {
     cursor: pointer;
   }
 
+  .is-disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
   .el-main {
     flex: 1;
   }
@@ -2771,9 +2776,5 @@ export default {
     font-weight: 400;
     color: rgba(0, 0, 0, 0.25);
   }
-}
-.is-disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
 }
 </style>
