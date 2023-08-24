@@ -365,7 +365,6 @@ export default {
       that.timerId1 = setInterval(() => {
         if (!videoElement.buffered || !videoElement.buffered.length) return
         const end1 = videoElement.buffered.end(0) // 视频结尾时间
-        console.info('end1', end1, that.prevEnd)
         if (end1 === that.prevEnd) {
           that.reconnectCount++
           console.info('重连', that.reconnectCount)

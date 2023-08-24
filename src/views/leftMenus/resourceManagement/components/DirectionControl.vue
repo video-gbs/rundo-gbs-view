@@ -335,6 +335,7 @@ export default {
         this.is3DHover = false
       } else {
         this.type3d[index] = false
+        this.$listeners.rectZoomInit(index, this.type3d[index], '3d')
         if (
           this.lengthX > 0 &&
           this.lengthY > 0 &&
