@@ -152,10 +152,10 @@ export default {
       clearInterval(this.timerId)
       this.timerId = null
     }
-    if (this.timerId1) {
-      clearInterval(this.timerId1)
-      this.timerId1 = null
-    }
+    // if (this.timerId1) {
+    //   clearInterval(this.timerId1)
+    //   this.timerId1 = null
+    // }
   },
   mounted() {
     this.$on('closeAll', () => {
@@ -279,7 +279,7 @@ export default {
         if (that.resVideoUrl !== '' && that.resVideoUrl !== null) {
           that.flvPlayer && that.flvPlayer.play()
         }
-      }, 300)
+      }, 1500)
 
       that.flvPlayer.on(
         flvjs.Events.ERROR,
@@ -287,22 +287,22 @@ export default {
           console.log('errorType:', errorType)
           console.log('errorDetail:', errorDetail)
           console.log('errorInfo:', errorInfo)
-          that.errorNum++
-          if (that.flvPlayer) {
-            that.flvPlayer.pause()
-            that.flvPlayer.unload()
-            that.flvPlayer.detachMediaElement()
-            that.flvPlayer.destroy()
-            that.flvPlayer = null
-            if (that.errorNum <= 10) {
-              that.createVideo()
-            } else {
-              that.$message({
-                type: 'error',
-                message: '不支持h265格式的视频播放,请检查视频的码流格式'
-              })
-            }
-          }
+          // that.errorNum++
+          // if (that.flvPlayer) {
+          //   that.flvPlayer.pause()
+          //   that.flvPlayer.unload()
+          //   that.flvPlayer.detachMediaElement()
+          //   that.flvPlayer.destroy()
+          //   that.flvPlayer = null
+          //   if (that.errorNum <= 10) {
+          //     that.createVideo()
+          //   } else {
+          //     // that.$message({
+          //     //   type: 'error',
+          //     //   message: '不支持h265格式的视频播放,请检查视频的码流格式'
+          //     // })
+          //   }
+          // }
         }
       )
       that.flvPlayer.on('statistics_info', function (res) {
@@ -362,37 +362,37 @@ export default {
       // if (that.timerId1 !== null) {
       //   clearInterval(that.timerId1)
       // }
-      that.timerId1 = setInterval(() => {
-        if (!videoElement.buffered || !videoElement.buffered.length) return
-        const end1 = videoElement.buffered.end(0) // 视频结尾时间
-        if (end1 === that.prevEnd) {
-          that.reconnectCount++
-          console.info('重连', that.reconnectCount)
-          if (that.flvPlayer) {
-            that.flvPlayer.pause()
-            that.flvPlayer.unload()
-            that.flvPlayer.detachMediaElement()
-            that.flvPlayer.destroy()
-            that.flvPlayer = null
-            if (that.reconnectCount > 10) {
-              console.info('重连大于10次，不再重连', that.reconnectCount)
-              clearTimeout(that.timerId1)
-              that.timerId1 = null
-              that.player && that.player.close()
-              that.$emit('close', that.index)
-            } else {
-              that.createVideo()
-            }
-          }
-        }
+      // that.timerId1 = setInterval(() => {
+      //   if (!videoElement.buffered || !videoElement.buffered.length) return
+      //   const end1 = videoElement.buffered.end(0) // 视频结尾时间
+      //   if (end1 === that.prevEnd) {
+      //     that.reconnectCount++
+      //     console.info('重连', that.reconnectCount)
+      //     if (that.flvPlayer) {
+      //       that.flvPlayer.pause()
+      //       that.flvPlayer.unload()
+      //       that.flvPlayer.detachMediaElement()
+      //       that.flvPlayer.destroy()
+      //       that.flvPlayer = null
+      //       if (that.reconnectCount > 10) {
+      //         console.info('重连大于10次，不再重连', that.reconnectCount)
+      //         clearTimeout(that.timerId1)
+      //         that.timerId1 = null
+      //         that.player && that.player.close()
+      //         that.$emit('close', that.index)
+      //       } else {
+      //         that.createVideo()
+      //       }
+      //     }
+      //   }
 
-        if (videoElement.paused) {
-          console.info('重新播放')
-          that.flvPlayer && that.flvPlayer.play()
-        }
+      //   if (videoElement.paused) {
+      //     console.info('重新播放')
+      //     that.flvPlayer && that.flvPlayer.play()
+      //   }
 
-        that.prevEnd = end1
-      }, 10000)
+      //   that.prevEnd = end1
+      // }, 10000)
     },
     setsrc() {
       console.info('开始播放')
@@ -422,10 +422,10 @@ export default {
       clearInterval(that.timerId)
       that.timerId = null
     }
-    if (that.timerId1) {
-      clearInterval(that.timerId1)
-      that.timerId = null
-    }
+    // if (that.timerId1) {
+    //   clearInterval(that.timerId1)
+    //   that.timerId = null
+    // }
     if (that.flvPlayer) {
       that.flvPlayer.pause()
       that.flvPlayer.destroy()
