@@ -721,6 +721,8 @@ export default {
             resIds.push(item.id)
           })
 
+          console.log('res1~~~~~~', res1)
+
           this.menuIds = resIds
           this.expandedList1 = resIds
           // this.checkedList1 = resIds
