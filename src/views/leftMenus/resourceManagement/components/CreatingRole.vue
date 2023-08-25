@@ -678,11 +678,14 @@ export default {
       }
     },
     handleCheckChange(data, checked, indeterminate) {
-      // console.log('data', data, this.activeIndex)
+      // console.log('data', data, indeterminate)
       // 获取所有选中的节点
+
       let resIds = []
       switch (this.activeIndex) {
         case '应用菜单权限':
+          let checkNode = this.$refs.addRoleTree1.getNode(data)
+          console.log('checkNode', checkNode)
           if (checked === false) {
             //如果当前节点有子集
             if (data.childList) {
@@ -698,6 +701,21 @@ export default {
               this.$refs.addRoleTree1.setChecked(data.menuPid, true)
             }
           }
+          if (
+            checkNode.parent &&
+            checkNode.parent.childNodes.some((ele) => ele.checked)
+          ) {
+            checkNode.parent.indeterminate = true
+          }
+          // 勾选全部子节点，父节点变为全选状态
+          if (
+            checkNode.parent &&
+            checkNode.parent.childNodes.every((ele) => ele.checked)
+          ) {
+            checkNode.parent.checked = true
+            checkNode.parent.indeterminate = false
+          }
+
           let res1 = this.$refs.addRoleTree1.getCheckedNodes()
           res1.forEach((item) => {
             resIds.push(item.id)
@@ -705,9 +723,12 @@ export default {
 
           this.menuIds = resIds
           this.expandedList1 = resIds
-          this.checkedList1 = resIds
+          // this.checkedList1 = resIds
+
           break
         case '资源功能权限':
+          let checkNodeArray =
+            this.$refs['addRoleTree2' + this.resourceKey].getNode(data)
           if (checked === false) {
             this.updateRoleResourceList = this.updateRoleResourceList.filter(
               (item) => item !== data.id
@@ -727,6 +748,20 @@ export default {
                 true
               )
             }
+          }
+          if (
+            checkNodeArray.parent &&
+            checkNodeArray.parent.childNodes.some((ele) => ele.checked)
+          ) {
+            checkNodeArray.parent.indeterminate = true
+          }
+          // 勾选全部子节点，父节点变为全选状态
+          if (
+            checkNodeArray.parent &&
+            checkNodeArray.parent.childNodes.every((ele) => ele.checked)
+          ) {
+            checkNodeArray.parent.checked = true
+            checkNodeArray.parent.indeterminate = false
           }
           this.resLists[this.resourceKey] =
             this.$refs['addRoleTree2' + this.resourceKey].getCheckedNodes()
@@ -764,7 +799,7 @@ export default {
           // )
 
           // this.updateRoleResourceList = this.resourceIds
-          // return
+          // 暂时注掉
           this.expandedList2[this.resourceKey] = resIds
           this.checkedList2[this.resourceKey] = resIds
           break

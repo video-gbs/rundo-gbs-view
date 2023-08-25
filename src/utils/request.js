@@ -209,8 +209,11 @@ service.interceptors.response.use(
     if (err && err.response) {
       switch (err.response.status) {
         case 400:
-          init.openMessage(err.response.data.data)
-          // console.log('4000000000000')
+          init.openMessage(
+            err.response.data.data
+              ? err.response.data.msg + ':' + err.response.data.data
+              : err.response.data.msg
+          )
           return Promise.resolve(err)
         // break
         case 401:
@@ -244,7 +247,11 @@ service.interceptors.response.use(
           init.openMessage('请求超时')
           break
         case 500:
-          init.openMessage('服务器端出错')
+          init.openMessage(
+            err.response.data.data
+              ? err.response.data.msg + ':' + err.response.data.data
+              : err.response.data.msg
+          )
           break
         case 501:
           init.openMessage('网络未实现')
