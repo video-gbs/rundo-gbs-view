@@ -442,7 +442,8 @@ export default {
           appId,
           menuPid,
           name,
-          menuType
+          menuType,
+          disabled
         } = row
         this.dialogForm.params.icon = icon
         this.dialogForm.params.title = title
@@ -453,7 +454,7 @@ export default {
         this.dialogForm.params.component = component
         this.dialogForm.params.appId = appId
         this.dialogForm.params.menuType = menuType
-        // this.dialogForm.params.menuPid = menuPid
+        this.dialogForm.params.disabled = disabled
         this.dialogForm.params.name = name
         this.editId = row.id
 
