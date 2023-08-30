@@ -121,10 +121,11 @@
 import Code from '@/views/leftMenus/systemManagement//components/Code'
 
 import { validUsername } from '@/utils/validate'
-import { login } from '@/api/method/user'
+import { login, getMenuLists } from '@/api/method/user'
 import { getHomeUser, newLoginN } from '@/api/method/home'
 import { Local } from '@/utils/storage'
 import store from '@/store/index'
+import Layout from '@/layout/index'
 
 import axios from 'axios'
 
@@ -190,7 +191,9 @@ export default {
       loading: false,
       passwordType: 'password',
       redirect: undefined,
-      windowWidth: null
+      windowWidth: null,
+      hasGoPath: '',
+      thirdPartyLogin: false
     }
   },
   watch: {
@@ -219,25 +222,22 @@ export default {
     Local.set('expires_in', '')
 
     if (window.location.search.indexOf('access_token') !== -1) {
-      console.log(111111111)
       const resUrl = decodeURIComponent(window.location.search)
+      console.log('resUrl', resUrl)
+      const resObj = this.getUrlParams(resUrl)
+      console.log('resObj', resObj)
 
-      const accessToken1 = resUrl.slice(
-        resUrl.lastIndexOf('access_token=') + 13,
-        resUrl.lastIndexOf('&token_type')
-      )
-      const refreshToken1 = resUrl.slice(
-        resUrl.lastIndexOf('refresh_token_url') + 18
-      )
-      const expiresIn1 = resUrl.slice(
-        resUrl.lastIndexOf('expires_in=') + 11,
-        resUrl.lastIndexOf('&refresh_token_url')
-      )
-      const tokenType1 = resUrl.slice(
-        resUrl.lastIndexOf('token_type') + 11,
-        resUrl.lastIndexOf('&expires_in')
-      )
+      const accessToken1 = resObj.access_token
+      const refreshToken1 = resObj.refresh_token_url
+      const expiresIn1 = Number(resObj.expires_in)
+      const tokenType1 = resObj.token_type
+      const goPath = resObj.redirect_route
+      this.thirdPartyLogin = true
+      this.hasGoPath = resObj.redirect_route
+
       Local.set('third_party_login', true)
+
+      Local.set('goPath', goPath)
 
       Local.set('rj_deptType', 0)
       Local.set('access_token', accessToken1)
@@ -257,18 +257,163 @@ export default {
     }
   },
   methods: {
+    routerChildren(data, arr) {
+      data.forEach((datas, index) => {
+        arr.push({
+          path: datas.path,
+          name: datas.name,
+          types: datas.types,
+          hidden: datas.disabled === 1 ? true : false,
+          component:
+            datas.component === 'Layout'
+              ? Layout
+              : (resolve) => require([`@/views${datas.component}`], resolve),
+          meta: {
+            title: datas.name,
+            icon: datas.icon
+          },
+          id: datas.id,
+          // 子路由
+          children: []
+        })
+
+        if (datas.childList) {
+          const childArr = this.routerChildren(datas.childList, [])
+          arr[index].children = childArr
+        }
+      })
+      return arr
+    },
+
+    routerChild(data) {
+      let resRouterChildren = []
+      let childTemp = {}
+      data.forEach((item, i) => {
+        // 组装路由配置
+        childTemp = {
+          name: item.name,
+          path: item.path,
+          id: item.id,
+          meta: { icon: item.icon, title: item.name },
+          component: item.component
+        }
+        if (item.childList) {
+          const childArr = this.routerChild(item.childList)
+          childTemp.children = childArr
+        }
+        resRouterChildren.push(childTemp)
+      })
+      return resRouterChildren
+    },
+    saveComponents(data, resName) {
+      const homeRouters = [
+        {
+          path: '/workTable',
+          name: 'workTable',
+          component: () => import('@/views/leftMenus/workTable/index'),
+          meta: { title: '首页', icon: 'sy' }
+        }
+      ]
+
+      if (data && data.length > 0) {
+        let typeRouter = []
+        let resData = []
+
+        data.map((item) => {
+          let params = {}
+          let params1 = {}
+          let params2 = {}
+          params = {
+            path: item.path,
+            meta: { icon: item.icon, title: item.name },
+            name: item.name,
+            id: item.id,
+            component: Layout,
+            children: this.routerChildren(item.childList, [])
+          }
+          params1 = {
+            path: item.path,
+            meta: { icon: item.icon, title: item.name },
+            name: item.name,
+            id: item.id
+          }
+          params2 = {
+            path: item.path,
+            meta: { icon: item.icon, title: item.name },
+            name: item.name,
+            icon: item.icon,
+            id: item.id,
+            component: item.component,
+            children: this.routerChild(item.childList)
+          }
+          typeRouter.push(params1)
+          // this.routerLists.push(params)
+          resData.push(params2)
+        })
+
+        store.dispatch('user/dynamicRouters', resData)
+
+        store.dispatch('user/changeDynamicRouters', resData)
+
+        // this.routerLists.map((item1) => {
+        //   if (item1.name === resName) {
+        //     store.dispatch('user/changeSidebarRouter', item1.children)
+        //   }
+        // })
+
+        store.dispatch('user/changeTypeRouter', homeRouters.concat(typeRouter))
+      }
+    },
     async getHomeUser() {
       await getHomeUser()
         .then((res) => {
           if (res.data.code === 0) {
             Local.set('rj_userName', res.data.data.workName)
-
-            this.$router.push({ path: '/workTable' })
+            if (
+              this.hasGoPath &&
+              this.hasGoPath !== '' &&
+              this.thirdPartyLogin
+            ) {
+              getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
+                .then((res) => {
+                  if (res.data.code === 0) {
+                    console.log('第三方请求')
+                    // this.allDataLists = res.data.data
+                    store.dispatch('user/changeThirdPartyLogin', true)
+                    this.saveComponents(res.data.data)
+                    this.$nextTick(() => {
+                      store.dispatch('user/changeRightWidth', false)
+                      store.dispatch('user/changeShowSidebar', false)
+                      this.$router.push({ path: `/${this.hasGoPath}` })
+                    })
+                  }
+                })
+                .catch((error) => {
+                  console.log(error)
+                })
+            } else {
+              store.dispatch('user/changeThirdPartyLogin', false)
+              this.$router.push({ path: '/workTable' })
+            }
           }
         })
         .catch((error) => {
           console.log(error)
         })
+    },
+    getUrlParams(url) {
+      let urlStr = url.split('?')[1] || ''
+      let obj = {}
+      let paramsArr = urlStr.split('&')
+      for (let i = 0, len = paramsArr.length; i < len; i++) {
+        const num = paramsArr[i].indexOf('=')
+        let arr = [
+          paramsArr[i].substring(0, num),
+          paramsArr[i].substring(num + 1)
+        ]
+        obj[arr[0]] = arr[1]
+      }
+      return obj
     },
     initMap() {
       AMapLoader.load({
@@ -364,6 +509,7 @@ export default {
               res.data.data
 
             Local.set('third_party_login', false)
+            this.thirdPartyLogin = false
 
             this.getHomeUser()
 

@@ -1,6 +1,10 @@
 <template>
   <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
-    <Header class="wrapper-header" :isShowTopMenus="isShowTopMenus" />
+    <Header
+      v-if="!thirdPartyLogin1"
+      class="wrapper-header"
+      :isShowTopMenus="isShowTopMenus"
+    />
     <div class="main-container f fd-c ai-s">
       <app-main />
     </div>
@@ -8,13 +12,14 @@
 
   <div class="app-wrapper" v-else>
     <Header
+      v-if="!thirdPartyLogin1"
       class="wrapper-header"
       :isShowTopMenus="!isShowTopMenus"
       @changeSidebarLists="changeSidebarLists"
     />
     <sidebar
       class="sidebar-container"
-      v-if="showSidebar"
+      v-if="showSidebar && !thirdPartyLogin1"
       :sidebarLists="sidebarLists"
     />
     <div
@@ -32,6 +37,7 @@ import { Header, Sidebar, AppMain, Navbar } from './components'
 import Breadcrumb from '../components/Breadcrumb'
 import store from '@/store/index'
 import { mapGetters } from 'vuex'
+import { Local } from '@/utils/storage'
 
 export default {
   name: 'Layout',
@@ -54,9 +60,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['showSidebar']),
+    ...mapGetters(['showSidebar', 'thirdPartyLogin1']),
     changeShowSidebar() {
       return this.showSidebar
+    },
+    changeThirdPartyLogin() {
+      console.log('this.thirdPartyLogin~~~~~~', this.thirdPartyLogin1)
+      return this.thirdPartyLogin1
     },
     sidebar() {
       return store.state.app.sidebar
@@ -96,6 +106,7 @@ export default {
     }
   },
   created() {
+    console.log('thirdPartyLogin99999', this.thirdPartyLogin)
     this.nowRouter = this.$route.matched.filter((item) => item.name)
 
     this.setScale()

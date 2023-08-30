@@ -15,6 +15,7 @@ const getDefaultState = () => {
     activeIndex: '',
     rightWidth: false,
     showSidebar: false,
+    thirdPartyLogin1: false,
     // 类型路由
     typeRouter: [],
     // 运维系统类型路由
@@ -69,6 +70,9 @@ const mutations = {
   },
   SET_SHOWSIDEBAR: (state, showSidebar) => {
     state.showSidebar = showSidebar
+  },
+  SET_THIRDPARTYLOGIN: (state, thirdPartyLogin1) => {
+    state.thirdPartyLogin1 = thirdPartyLogin1
   },
   SET_TYPEROUTER: (state, typeRouter) => {
     state.typeRouter = []
@@ -171,6 +175,10 @@ const actions = {
 
   changeShowSidebar({ commit }, val) {
     commit('SET_SHOWSIDEBAR', val)
+  },
+
+  changeThirdPartyLogin({ commit }, val) {
+    commit('SET_THIRDPARTYLOGIN', val)
   },
 
   // 更新类型路由
