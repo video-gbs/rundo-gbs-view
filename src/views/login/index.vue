@@ -1,5 +1,5 @@
 <template>
-  <div class="login" id="login">
+  <div class="login" id="login" v-if="showHome">
     <div class="wrap-top">
       <div class="wrap-middle">
         <div class="wrap-middle-left">
@@ -193,12 +193,14 @@ export default {
       redirect: undefined,
       windowWidth: null,
       hasGoPath: '',
-      thirdPartyLogin: false
+      thirdPartyLogin: false,
+      showHome: false
     }
   },
   watch: {
     $route: {
       handler: function (route) {
+        console.log('routerouterouterouteroute', route)
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
@@ -227,6 +229,7 @@ export default {
     Local.remove('refresh_token')
 
     if (window.location.search.indexOf('access_token') !== -1) {
+      this.showHome = false
       const resUrl = decodeURIComponent(window.location.search)
       console.log('resUrl', resUrl)
       const resObj = this.getUrlParams(resUrl)
@@ -259,6 +262,8 @@ export default {
       })
 
       this.loading = false
+    } else {
+      this.showHome = true
     }
   },
   methods: {
@@ -399,6 +404,7 @@ export default {
                   console.log(error)
                 })
             } else {
+              this.showHome = true
               store.dispatch('user/changeThirdPartyLogin', false)
               this.$router.push({ path: '/workTable' })
             }
