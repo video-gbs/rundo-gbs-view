@@ -333,9 +333,11 @@ router.beforeEach(async (to, from, next) => {
       store.dispatch('user/changeDynamicRouters', dynamicRouters)
       next({ ...to, replace: true })
     } else {
+      // console.log(888888)
       next()
     }
-    if (to.path === '/login') {
+    if (to.path === '/login' && !Local.get('third_party_login')) {
+      // console.log(9999999)
       next('/workTable')
     }
   } else {
