@@ -51,7 +51,6 @@ Vue.use(ElementUI)
 Vue.config.productionTip = false
 
 //设置定时器，更新token
-console.log('Local.get/ 4', Local.get('expires_in_old'))
 if (Local.get('expires_in_old') && Local.get('refresh_token')) {
   setInterval(function () {
     if (Local.get('third_party_login')) {

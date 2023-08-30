@@ -220,6 +220,11 @@ export default {
     Local.set('permissionData', [])
     Local.set('permissionMenuId', '')
     Local.set('expires_in', '')
+    Local.clear()
+    Local.remove('access_token')
+    Local.remove('utilTime')
+    Local.remove('expires_in')
+    Local.remove('refresh_token')
 
     if (window.location.search.indexOf('access_token') !== -1) {
       const resUrl = decodeURIComponent(window.location.search)
@@ -385,6 +390,8 @@ export default {
                       store.dispatch('user/changeRightWidth', false)
                       store.dispatch('user/changeShowSidebar', false)
                       this.$router.push({ path: `/${this.hasGoPath}` })
+                      this.hasGoPath = ''
+                      this.thirdPartyLogin = false
                     })
                   }
                 })
