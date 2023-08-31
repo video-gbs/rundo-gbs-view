@@ -141,15 +141,15 @@ module.exports = {
     }
   },
   chainWebpack(config) {
-    if (process.env.NODE_ENV === 'production') {
-      config
-        .plugin('html')
-        .use(HtmlWebpackPlugin)
-        .tap((args) => {
-          args[0].cdn = assetsCDN.assets
-          return args
-        })
-    }
+    // if (process.env.NODE_ENV === 'production') {
+    config
+      .plugin('html')
+      .use(HtmlWebpackPlugin)
+      .tap((args) => {
+        args[0].cdn = assetsCDN.assets
+        return args
+      })
+    // }
     config.plugin('preload').tap(() => [
       {
         rel: 'preload',
