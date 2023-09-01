@@ -133,9 +133,15 @@ export default {
       this.init()
       const dom = document.getElementsByClassName('player-box')
       if (dom.length > 1) {
-        dom[this.$props.playerIdx].style.height = this.$props.stretch
-          ? '100%'
-          : ''
+        dom.forEach((item, index) => {
+          // if (index === this.$props.playerIdx) {
+          //   dom[this.$props.playerIdx].style.height = this.$props.stretch
+          //     ? '100%'
+          //     : ''
+          // }else{
+          dom[index].style.height = this.$props.stretch ? '100%' : ''
+          // }
+        })
       } else {
         dom[0].style.height = this.$props.stretch ? '100%' : ''
       }

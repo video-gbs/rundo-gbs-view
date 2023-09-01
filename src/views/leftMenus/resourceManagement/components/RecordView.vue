@@ -1078,7 +1078,7 @@ export default {
       }
     },
     handleChangeTimePicker(val) {
-      console.log('handleChangeTimePicker', val)
+      console.log('handleChangeTimePicker', val, this.formData.date)
 
       if (
         new Date(this.formData.date[0]).getTime() < new Date(val).getTime() &&
@@ -1094,11 +1094,11 @@ export default {
           type: 'warning'
         })
         this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
-        // this.handleCloseVideo(this.playerIdx)
+        this.closeVideo(this.playerIdx)
         this.play[this.playerIdx] = false
         this.hasStreamId[this.playerIdx] = false
         this.stopPlayRecord()
-        this.videoUrl = ['']
+        this.videoUrl[this.playerIdx] = ''
       }
       if (this.play[this.playerIdx]) this.handlePauseOrPlay()
     },
