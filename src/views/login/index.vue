@@ -122,7 +122,7 @@ import Code from '@/views/leftMenus/systemManagement//components/Code'
 
 import { validUsername } from '@/utils/validate'
 import { login, getMenuLists } from '@/api/method/user'
-import { getHomeUser, newLoginN } from '@/api/method/home'
+import { getHomeUser, newLoginN, newRefreshToken } from '@/api/method/home'
 import { Local } from '@/utils/storage'
 import store from '@/store/index'
 import Layout from '@/layout/index'
@@ -407,6 +407,44 @@ export default {
               this.showHome = true
               store.dispatch('user/changeThirdPartyLogin', false)
               this.$router.push({ path: '/workTable' })
+            }
+            //设置定时器，更新token
+            if (Local.get('expires_in_old') && Local.get('refresh_token')) {
+              setInterval(function () {
+                if (Local.get('third_party_login')) {
+                  const resUrl = `${Local.get(
+                    'refresh_token_url'
+                  )}?accessToken=${Local.get('access_token')}`
+                  axios({
+                    method: 'get',
+                    url: resUrl,
+                    headers: {
+                      Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+                    }
+                  }).then((res) => {
+                    if (res.data.code === 0) {
+                      const { accessToken, refreshToken, expiresIn } =
+                        res.data.data
+                      Local.set('access_token', accessToken)
+                      Local.set('refresh_token', refreshToken)
+                      Local.set('expires_in', expiresIn)
+                    }
+                  })
+                } else {
+                  newRefreshToken(
+                    Local.get('refresh_token'),
+                    'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+                  ).then((res) => {
+                    if (res.data.code === 0) {
+                      const { accessToken, refreshToken, expiresIn } =
+                        res.data.data
+                      Local.set('access_token', accessToken)
+                      Local.set('refresh_token', refreshToken)
+                      Local.set('expires_in', expiresIn)
+                    }
+                  })
+                }
+              }, (Local.get('expires_in_old') * 1000) / 4)
             }
           }
         })

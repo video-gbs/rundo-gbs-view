@@ -50,43 +50,6 @@ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
-//设置定时器，更新token
-if (Local.get('expires_in_old') && Local.get('refresh_token')) {
-  setInterval(function () {
-    if (Local.get('third_party_login')) {
-      const resUrl = `${Local.get('refresh_token_url')}?accessToken=${Local.get(
-        'access_token'
-      )}`
-      axios({
-        method: 'get',
-        url: resUrl,
-        headers: {
-          Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
-        }
-      }).then((res) => {
-        if (res.data.code === 0) {
-          const { accessToken, refreshToken, expiresIn } = res.data.data
-          Local.set('access_token', accessToken)
-          Local.set('refresh_token', refreshToken)
-          Local.set('expires_in', expiresIn)
-        }
-      })
-    } else {
-      newRefreshToken(
-        Local.get('refresh_token'),
-        'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
-      ).then((res) => {
-        if (res.data.code === 0) {
-          const { accessToken, refreshToken, expiresIn } = res.data.data
-          Local.set('access_token', accessToken)
-          Local.set('refresh_token', refreshToken)
-          Local.set('expires_in', expiresIn)
-        }
-      })
-    }
-  }, (Local.get('expires_in_old') * 1000) / 4)
-}
-
 new Vue({
   el: '#app',
   store,

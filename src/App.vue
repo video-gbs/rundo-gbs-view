@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import { Local } from './utils/storage'
+import { newRefreshToken } from '@/api/method/home'
 export default {
   name: 'App',
   mounted() {}
