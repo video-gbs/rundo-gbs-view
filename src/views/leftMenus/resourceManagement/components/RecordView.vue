@@ -614,8 +614,10 @@ export default {
         date: '',
         searchHistoryResult: [] //媒体流历史记录搜索结果
       },
-      speedArr: [0.25, 0.5, 1.0, 2.0, 4.0],
-      currentSpeed: [2],
+      // speedArr: [0.25, 0.5, 1.0, 2.0, 4.0],
+      speedArr: [1.0, 2.0, 4.0],
+      //  currentSpeed: [2],
+      currentSpeed: [0],
       isFullScreen: false,
       cloudPlayerUrl: [''],
       resOnlineState: '',
@@ -657,12 +659,14 @@ export default {
     this.play = []
     this.isShowStream = []
     this.videoUrl = []
-    this.currentSpeed = [2]
+    // this.currentSpeed = [2]
+    this.currentSpeed = [0]
     this.hasStreamId = []
     for (let i = 0; i < this.spilt; i++) {
       this.videoUrl[i] = ''
       this.play[i] = false
-      this.currentSpeed[i] = 2
+      // this.currentSpeed[i] = 2
+      this.currentSpeed[i] = 0
       this.hasStreamId[i] = false
       this.isShowStream[i] = false
       this.timeSegments[i] = [
@@ -1086,7 +1090,8 @@ export default {
       ) {
         this.playRecord({}, [], [val, this.formData.date[1]])
         Local.set('playbackRate', 1)
-        this.currentSpeed[this.playerIdx] = [2]
+        // this.currentSpeed[this.playerIdx] = [2]
+        this.currentSpeed[this.playerIdx] = [0]
         this.isClickCx = true
       } else {
         this.$message({
@@ -1145,7 +1150,8 @@ export default {
         this.timeLists = [...this.timeLists]
         this.currentList = ''
         for (let i = 0; i < this.spilt; i++) {
-          this.currentSpeed[i] = [2]
+          // this.currentSpeed[i] = [2]
+          this.currentSpeed[i] = [0]
         }
       } else {
         this.cloudPlayerUrl = ['']
@@ -1198,7 +1204,8 @@ export default {
           return
         }
         Local.set('playbackRate', 1)
-        this.currentSpeed[this.playerIdx] = [2]
+        // this.currentSpeed[this.playerIdx] = [2]
+        this.currentSpeed[this.playerIdx] = [0]
         this.isClickCx = true
 
         this.formData.loading = true
@@ -1574,9 +1581,16 @@ export default {
           this.gbScale(this.speedArr[this.currentSpeed[this.playerIdx]])
       } else if (type === 'sub' && this.currentSpeed[this.playerIdx]) {
         //减速
-        this.currentSpeed[this.playerIdx]--
-        if (this.tabsActiveName === 'device')
+        console.log(this.currentSpeed)
+        console.log(this.playerIdx)
+        console.log(this.currentSpeed[this.playerIdx])
+        if (
+          this.tabsActiveName === 'device' &&
+          this.currentSpeed[this.playerIdx] > 0
+        ) {
+          this.currentSpeed[this.playerIdx]--
           this.gbScale(this.speedArr[this.currentSpeed[this.playerIdx]])
+        }
       }
     },
     toogleFullScreen() {

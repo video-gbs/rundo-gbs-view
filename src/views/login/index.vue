@@ -28,10 +28,7 @@
                   label-position="left"
                 >
                   <el-form-item prop="username">
-                    <div
-                      class="login-middle-input"
-                      data-validate="Valid email is: a@b.c"
-                    >
+                    <div class="login-middle-input">
                       <svg-icon class="svg-btn" icon-class="zhanghao" />
                       <input
                         ref="username"
@@ -49,10 +46,7 @@
                   </el-form-item>
 
                   <el-form-item prop="password">
-                    <div
-                      class="login-middle-input"
-                      data-validate="Enter password"
-                    >
+                    <div class="login-middle-input">
                       <svg-icon class="svg-btn" icon-class="mima" />
                       <input
                         ref="password"
@@ -102,7 +96,9 @@
                   </el-form-item> -->
                 </el-form>
                 <div class="login-footer-button">
-                  <el-button @click="handleLogin" :loading="loading"
+                  <el-button
+                    @click="handleLogin('loginForm')"
+                    :loading="loading"
                     >登录</el-button
                   >
                 </div>
@@ -140,25 +136,17 @@ export default {
   components: { Code },
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      if (value === '' || value === null || value.length === 0) {
         callback(new Error('请输入账号'))
       } else {
-        if (value.length < 6 || value.length > 20) {
-          callback(new Error('账号长度6到20个字符'))
-        } else {
-          callback()
-        }
+        callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      if (value === '' || value === null || value.length === 0) {
         callback(new Error('请输入密码'))
       } else {
-        if (value.length < 6 || value.length > 20) {
-          callback(new Error('密码长度6到20个字符'))
-        } else {
-          callback()
-        }
+        callback()
       }
     }
 
@@ -550,78 +538,41 @@ export default {
       str.slice(str.lastIndexOf(starStr), str.lastIndexOf(lastStr))
     },
 
-    async handleLogin() {
-      this.loading = true
-      Local.set('access_token', '')
-      await newLoginN(this.loginForm)
-        .then((res) => {
-          if (res.data.code === 0) {
-            const { accessToken, refreshToken, expiresIn, tokenType } =
-              res.data.data
+    handleLogin(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.loading = true
+          Local.set('access_token', '')
+          newLoginN(this.loginForm)
+            .then((res) => {
+              if (res.data.code === 0) {
+                const { accessToken, refreshToken, expiresIn, tokenType } =
+                  res.data.data
 
-            Local.set('third_party_login', false)
-            this.thirdPartyLogin = false
+                Local.set('third_party_login', false)
+                this.thirdPartyLogin = false
 
-            this.getHomeUser()
+                this.getHomeUser()
 
-            Local.set('rj_deptType', 0)
-            Local.set('access_token', accessToken)
-            Local.set('refresh_token', refreshToken)
-            this.isRefreshTokenExpired(expiresIn)
-            Local.set('expires_in', expiresIn)
-            Local.set('token_type', tokenType)
-            Local.set('expires_in_old', expiresIn)
+                Local.set('rj_deptType', 0)
+                Local.set('access_token', accessToken)
+                Local.set('refresh_token', refreshToken)
+                this.isRefreshTokenExpired(expiresIn)
+                Local.set('expires_in', expiresIn)
+                Local.set('token_type', tokenType)
+                Local.set('expires_in_old', expiresIn)
 
-            this.loading = false
-          }
-        })
-        .catch((error) => {
-          this.loading = false
-
-          // this.$message({
-          //   type: 'error',
-          //   message: error.response.data.data
-          // })
-        })
-        .finally(() => {
-          this.loading = false
-        })
-
-      // axios({
-      //   method: 'post',
-      //   url: `http://xard-gbs-test.runjian.com:8080/api/oauth2/token?grant_type=password&scope=all&username=${this.loginForm.username}&password=${this.loginForm.password}`,
-      //   headers: {
-      //     Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
-      //   }
-      // })
-      //   .then((res) => {
-      //     const { accessToken, refreshToken, expiresIn, tokenType } =
-      //       res.data.data
-
-      //     this.getHomeUser()
-
-      //     Local.set('rj_deptType', 0)
-      //     Local.set('access_token', accessToken)
-      //     Local.set('refresh_token', refreshToken)
-      //     this.isRefreshTokenExpired(expiresIn)
-      //     Local.set('expires_in', expiresIn)
-      //     Local.set('token_type', tokenType)
-
-      //     this.loading = false
-      //   })
-      //   .catch((error) => {
-      //     console.log(1, error.response)
-
-      //     this.loading = false
-
-      //     this.$message({
-      //       type: 'error',
-      //       message: error.response.data.data
-      //     })
-      //   })
-      //   .finally(() => {
-      //     this.loading = false
-      //   })
+                this.loading = false
+              }
+            })
+            .catch((error) => {
+              this.loading = false
+            })
+            .finally(() => {
+              this.loading = false
+            })
+        }
+      })
     }
   }
 }
