@@ -7,11 +7,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const productionGzipExtensions = ['js', 'css', 'less', 'sacc']
 
+// const AutoImport = require('unplugin-auto-import/webpack')
+// const Components = require('unplugin-vue-components/webpack')
+// const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+
+
 const assetsCDN = {
   externals: {
     vue: 'Vue',
     'vue-router': 'VueRouter',
     vuex: 'Vuex',
+    'ElementUI': 'ELEMENT',
     axios: 'axios'
   },
   css: [],
@@ -33,16 +39,16 @@ const port = process.env.port || process.env.npm_config_port || 8080
 // 转发配置数组
 const urls = [
   // uat 测试
-  {
-    target: 'http://xard-gbs-uat.runjian.com:8080',
-    proxy: '/api'
-
-  },
-  // dev  本地
   // {
-  //   target: 'http://xard-gbs-test.runjian.com:8080',
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
   //   proxy: '/api'
-  // }
+
+  // },
+  // dev  本地
+  {
+    target: 'http://xard-gbs-test.runjian.com:8080',
+    proxy: '/api'
+  }
   // {
   //   target: 'http://xard-gbs-dev.runjian.com:8080',
   //   proxy: '/api'

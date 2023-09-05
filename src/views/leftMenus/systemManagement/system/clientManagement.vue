@@ -236,7 +236,7 @@
                 clearable
               ></el-input>
             </el-form-item>
-            <el-form-item label="客户端密码：" prop="clientSecret">
+            <el-form-item label="客户端密码：">
               <el-input
                 v-model="dialogForm.clientSecret"
                 style="width: 436px"
