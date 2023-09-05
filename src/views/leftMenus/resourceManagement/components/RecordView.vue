@@ -1104,6 +1104,7 @@ export default {
         this.hasStreamId[this.playerIdx] = false
         this.stopPlayRecord()
         this.videoUrl[this.playerIdx] = ''
+        this.isClickCx = true
       }
       if (this.play[this.playerIdx]) this.handlePauseOrPlay()
     },
@@ -1142,6 +1143,8 @@ export default {
     handleCloseVideo() {
       this.play = []
       this.hasStreamId = []
+
+      this.isClickCx = true
       if (this.tabsActiveName === 'device') {
         this.stopPlayRecord()
         this.videoUrl = ['']
@@ -1876,10 +1879,16 @@ export default {
               type: 'warning'
             })
             this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+            // this.play[this.playerIdx] = false
+            // this.hasStreamId[this.playerIdx] = false
+            // this.stopPlayRecord()
+            // this.videoUrl = ['']
+            this.closeVideo(this.playerIdx)
             this.play[this.playerIdx] = false
             this.hasStreamId[this.playerIdx] = false
             this.stopPlayRecord()
-            this.videoUrl = ['']
+            this.videoUrl[this.playerIdx] = ''
+            this.isClickCx = true
             return
           })
         }

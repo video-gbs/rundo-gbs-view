@@ -432,7 +432,7 @@ export default {
                       Local.get('refresh_token'),
                       'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
                     ).then((res) => {
-                      if (res.data.code === 0) {
+                      if (res.data && res.data.code === 0) {
                         const { accessToken, refreshToken, expiresIn } =
                           res.data.data
                         Local.set('access_token', accessToken)
