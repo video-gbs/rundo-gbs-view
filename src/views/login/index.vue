@@ -207,6 +207,7 @@ export default {
     this.windowWidth = document.documentElement.clientWidth
     window.onresize = this.throttle(this.setScale, 500, 500)
     // this.initMap()
+    clearInterval(window.interval)
     Local.set('permissionData', [])
     Local.set('permissionMenuId', '')
     Local.set('expires_in', '')
@@ -416,21 +417,38 @@ export default {
                       Local.set('access_token', accessToken)
                       Local.set('refresh_token', refreshToken)
                       Local.set('expires_in', expiresIn)
+                      let timestamp = expiresIn
+                      clearInterval(window.interval)
+
+                      window.interval = setInterval(() => {
+                        timestamp = timestamp - 1
+                        Local.set('expires_in', timestamp)
+                      }, 1000)
                     }
                   })
                 } else {
-                  newRefreshToken(
-                    Local.get('refresh_token'),
-                    'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
-                  ).then((res) => {
-                    if (res.data.code === 0) {
-                      const { accessToken, refreshToken, expiresIn } =
-                        res.data.data
-                      Local.set('access_token', accessToken)
-                      Local.set('refresh_token', refreshToken)
-                      Local.set('expires_in', expiresIn)
-                    }
-                  })
+                  if (Local.get('access_token') && Local.get('expires_in')) {
+                    newRefreshToken(
+                      Local.get('refresh_token'),
+                      'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+                    ).then((res) => {
+                      if (res.data.code === 0) {
+                        const { accessToken, refreshToken, expiresIn } =
+                          res.data.data
+                        Local.set('access_token', accessToken)
+                        Local.set('refresh_token', refreshToken)
+                        Local.set('expires_in', expiresIn)
+
+                        let timestamp = expiresIn
+                        clearInterval(window.interval)
+
+                        window.interval = setInterval(() => {
+                          timestamp = timestamp - 1
+                          Local.set('expires_in', timestamp)
+                        }, 1000)
+                      }
+                    })
+                  }
                 }
               }, (Local.get('expires_in_old') * 1000) / 4)
             }

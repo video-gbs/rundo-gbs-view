@@ -16,6 +16,7 @@ const service = axios.create({
 const isTokenExpired = () => {
   // 验证当前token是否过期
   let resetTime = Local.get('expires_in')
+  console.log('resetTimeresetTime', resetTime)
   if (resetTime < Local.get('expires_in_old') / 4) {
     if (resetTime === 0) {
       Local.set('expires_in', '')
