@@ -187,7 +187,8 @@ export default {
       windowWidth: null,
       hasGoPath: '',
       thirdPartyLogin: false,
-      showHome: false
+      showHome: false,
+      resFuncId: ''
     }
   },
   watch: {
@@ -291,18 +292,15 @@ export default {
     },
 
     findFuncId(data) {
-      let resId = ''
       data.forEach((datas, index) => {
         if (datas.path === `/${Local.get('goPath')}`) {
-          resId = datas.id
+          this.resFuncId = datas.id
         }
-        if (datas.childList) {
+        if (datas.childList && datas.childList.length > 0) {
           this.findFuncId(datas.childList)
         }
       })
-
-      console.log('resId', resId)
-      return resId
+      console.log('resFuncId', this.resFuncId)
     },
 
     routerChild(data) {
@@ -402,12 +400,12 @@ export default {
                     store.dispatch('user/changeThirdPartyLogin', true)
                     this.saveComponents(res.data.data)
 
-                    const resFuncId = this.findFuncId(res.data.data)
+                    this.findFuncId(res.data.data)
 
                     Local.set('permissionData', [])
                     Local.set('permissionMenuId', '')
                     getHomeFunc({
-                      menuId: resFuncId
+                      menuId: this.resFuncId
                     }).then((res) => {
                       if (res.data.code === 0) {
                         Local.set('permissionData', res.data.data)
