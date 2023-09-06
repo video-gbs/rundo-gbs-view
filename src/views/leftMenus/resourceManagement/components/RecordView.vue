@@ -726,13 +726,13 @@ export default {
 
       // 转化为日期时间格式
       const dateFormat = 'YYYY-MM-DD HH:mm:ss'
-      console.log(
-        '最终时间',
-        merged.map((range) => ({
-          startTime: dayjs(range.startTime).format(dateFormat),
-          endTime: dayjs(range.endTime).format(dateFormat)
-        }))
-      )
+      // console.log(
+      //   '最终时间',
+      //   merged.map((range) => ({
+      //     startTime: dayjs(range.startTime).format(dateFormat),
+      //     endTime: dayjs(range.endTime).format(dateFormat)
+      //   }))
+      // )
       return merged.map((range) => ({
         startTime: dayjs(range.startTime).format(dateFormat),
         endTime: dayjs(range.endTime).format(dateFormat)
@@ -846,32 +846,14 @@ export default {
               })
 
               // 处理时间聚合
-              // const testTime = [
-              //   {
-              //     startTime: '2023-06-06 00:00:00',
-              //     endTime: '2023-06-06 00:30:00'
-              //   },
-              //   {
-              //     startTime: '2023-06-06 01:00:00',
-              //     endTime: '2023-06-06 01:30:00'
-              //   },
-              //   {
-              //     startTime: '2023-06-06 01:00:00',
-              //     endTime: '2023-06-06 02:30:00'
-              //   },
-              //   {
-              //     startTime: '2023-06-06 04:00:00',
-              //     endTime: '2023-06-06 05:30:00'
-              //   }
-              // ]
-              // this.resTimeLists = []
+
               this.resTimeLists[this.playerIdx] =
                 this.mergeDatetimeRanges(listData)
 
-              console.log(
-                'this.resTimeListsthis.resTimeLists',
-                this.resTimeLists
-              )
+              // console.log(
+              //   'this.resTimeListsthis.resTimeLists',
+              //   this.resTimeLists
+              // )
               // 查询初始化时间
               Local.set(
                 `showTime${this.playerIdx}`,
@@ -904,10 +886,10 @@ export default {
 
               this.timeSegments[this.playerIdx] = array1
 
-              console.log(
-                ' this.timeSegments~~~~~~~~~~~~~~~~~~~',
-                this.timeSegments
-              )
+              // console.log(
+              //   ' this.timeSegments~~~~~~~~~~~~~~~~~~~',
+              //   this.timeSegments
+              // )
               this.hasStreamId[this.playerIdx] = true
 
               this.playRecord(1, date, [
@@ -1082,7 +1064,7 @@ export default {
       }
     },
     handleChangeTimePicker(val) {
-      console.log('handleChangeTimePicker', val, this.formData.date)
+      // console.log('handleChangeTimePicker', val, this.formData.date)
 
       if (
         new Date(this.formData.date[0]).getTime() < new Date(val).getTime() &&
@@ -1112,7 +1094,6 @@ export default {
       this.videoUrl.splice(i, 1, '')
       this.timeLists.splice(i, 1, [])
 
-      console.log('this.videoUrl~~~~~~~~~~~~~~', this.videoUrl)
       this.play[i] = false
       this.$nextTick(() => {
         this.timeSegments[i] = [
@@ -1185,7 +1166,6 @@ export default {
     },
     // 查询视频
     handleSearch() {
-      // console.log('this.channelId',this.channelId)
       if (this.channelId) {
         if (this.resOnlineState === 0) {
           this.$message({
@@ -1225,8 +1205,6 @@ export default {
 
     setTimeLists(date, idx) {
       this.$set(this.timeLists, idx, date)
-
-      console.log('this.timeLists------------------', this.timeLists)
 
       this.$refs.TimePlayer.changePlayerTimes(this.timeLists[idx], idx)
 
@@ -1405,7 +1383,7 @@ export default {
           return
           // console.log('时间只有一段,拖拽的时间在中间')
         } else {
-          console.log('时间只有一段,拖拽的时间不在中间')
+          // console.log('时间只有一段,拖拽的时间不在中间')
           this.$message({
             message: '该时间段暂无录像',
             type: 'warning'
@@ -1438,7 +1416,7 @@ export default {
               'milliseconds'
             )
             if (lastPlayTime === currentTime) {
-              console.log('播放结束')
+              // console.log('播放结束')
               this.handleDevicesPlayEnded()
             }
             lastPlayTime = currentTime
@@ -1453,15 +1431,15 @@ export default {
     })(),
     //监听设备播放完毕,自动播放下一个视频
     handleDevicesPlayEnded(ref, event) {
-      console.log('监听设备播放完毕,自动播放下一个视频', this.playTime)
+      // console.log('监听设备播放完毕,自动播放下一个视频', this.playTime)
       let minDateRecord,
         maxDiff = -99999999999
       if (this.tabsActiveName === 'device') {
         const date = this.playTime.format('YYYY-MM-DD')
-        console.log(
-          '播放结束或者报错停止设备播放' +
-            this.playTime.format('YYYY-MM-DD HH:mm:ss')
-        )
+        // console.log(
+        //   '播放结束或者报错停止设备播放' +
+        //     this.playTime.format('YYYY-MM-DD HH:mm:ss')
+        // )
         // this.closeVideo(this.playerIdx)
         const [startTime, endTime] = this.currentList.split('_')
         if (this.playTime.isBetween(startTime, endTime)) {
@@ -1520,7 +1498,7 @@ export default {
       if (this.play[this.playerIdx]) {
         //暂停
 
-        console.log('点击暂停', this.$refs)
+        // console.log('点击暂停', this.$refs)
         this.play[this.playerIdx] = false
         // this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
         this.$refs['cloudPlayer' + this.playerIdx] &&
@@ -1549,7 +1527,7 @@ export default {
         this.tabsActiveName === 'device' ? this.videoUrl : this.cloudPlayerUrl
       ) {
         //播放
-        console.log('点击播放按钮', this.$refs)
+        // console.log('点击播放按钮', this.$refs)
         this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
         this.play[this.playerIdx] = true
         this.hasStreamId[this.playerIdx] = true
@@ -1584,9 +1562,9 @@ export default {
           this.gbScale(this.speedArr[this.currentSpeed[this.playerIdx]])
       } else if (type === 'sub' && this.currentSpeed[this.playerIdx]) {
         //减速
-        console.log(this.currentSpeed)
-        console.log(this.playerIdx)
-        console.log(this.currentSpeed[this.playerIdx])
+        // console.log(this.currentSpeed)
+        // console.log(this.playerIdx)
+        // console.log(this.currentSpeed[this.playerIdx])
         if (
           this.tabsActiveName === 'device' &&
           this.currentSpeed[this.playerIdx] > 0
@@ -1760,7 +1738,7 @@ export default {
       this.isNext = true
     },
     async gbPlay() {
-      console.log('前端控制：播放')
+      // console.log('前端控制：播放')
 
       await resumeRecordView({
         channelId: this.channelId,
@@ -1776,7 +1754,7 @@ export default {
     },
 
     async gbPause() {
-      console.log('前端控制：暂停', this.$refs.TimePlayer)
+      // console.log('前端控制：暂停', this.$refs.TimePlayer)
 
       await pauseRecordView({
         channelId: this.channelId,
@@ -1792,7 +1770,7 @@ export default {
     },
 
     async gbScale(command) {
-      console.log('前端控制：倍速 ' + command)
+      // console.log('前端控制：倍速 ' + command)
       this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
       await speedRecordView({
         channelId: this.channelId,
@@ -1838,7 +1816,7 @@ export default {
         ].endTime
       ).getTime()
 
-      if (this.resTimeLists[this.playerIdx].length > 1) {
+      if (this.resTimeLists.length > 1) {
         for (let i = 0; i < this.resTimeLists[this.playerIdx].length; i++) {
           const range1 = this.resTimeLists[this.playerIdx][i]
           const start1 = new Date(range1.startTime).getTime() // 转换时间段开始时间
@@ -1873,7 +1851,7 @@ export default {
         ) {
         } else {
           this.$nextTick(() => {
-            console.log('1111111111', newVal, this.resTimeLists, this.playerIdx)
+            // console.log('1111111111', newVal, this.resTimeLists, this.playerIdx)
             this.$message({
               message: '该时间段暂无录像',
               type: 'warning'
@@ -1938,7 +1916,7 @@ export default {
         this.hasStreamId = this.hasStreamId.concat(resHasStreamId)
 
         this.timeSegments = this.timeSegments.concat(resTimeSegments)
-        console.log('this.$refs', this.$refs)
+        // console.log('this.$refs', this.$refs)
         // this.$refs.TimePlayer.spiltChangePlayerTimes(
         //   [this.timeSegments[this.playerIdx]],
         //   this.playerIdx

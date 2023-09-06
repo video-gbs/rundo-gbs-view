@@ -68,7 +68,6 @@ const init = {
 //http request 拦截器
 service.interceptors.request.use(
   (config) => {
-    console.log('configconfig', config)
     if (Local.get('access_token') && !config.url.includes('/oauth2/token')) {
       config.headers = {
         'Content-Type': 'application/json',
@@ -205,7 +204,6 @@ service.interceptors.response.use(
     return response
   },
   async (err) => {
-    console.log('err.response', err.response)
     if (err && err.response) {
       switch (err.response.status) {
         case 400:
@@ -228,11 +226,6 @@ service.interceptors.response.use(
               query: { redirect: router.currentRoute.fullPath }
             })
           }
-          console.log(
-            '400~~~~~~~~~~~~',
-            err,
-            err.response.config.url.includes('/oauth2/token')
-          )
           return Promise.resolve(err)
         // break
         case 401:
