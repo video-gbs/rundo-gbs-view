@@ -290,9 +290,8 @@ export default {
       return arr
     },
 
-    findFuncId(data, resId) {
-      console.log(data)
-      console.log('findFuncId', Local.get('goPath'))
+    findFuncId(data) {
+      let resId = ''
       data.forEach((datas, index) => {
         if (datas.path === `/${Local.get('goPath')}`) {
           resId = datas.id
@@ -301,6 +300,8 @@ export default {
           this.findFuncId(datas.childList)
         }
       })
+
+      console.log('resId', resId)
       return resId
     },
 
