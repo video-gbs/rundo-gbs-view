@@ -155,15 +155,14 @@ export default {
     }
   },
   watch: {
-    windowWidth: {
-      handler: function (val, oldVal) {
-        const h = document.getElementsByTagName('HTML')[0]
-        h.style.setProperty('--web-zoom', this.windowWidth / 1920)
-
-        this.$forceUpdate()
-      },
-      immediate: true
-    }
+    // windowWidth: {
+    //   handler: function (val, oldVal) {
+    //     const h = document.getElementsByTagName('HTML')[0]
+    //     h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+    //     this.$forceUpdate()
+    //   },
+    //   immediate: true
+    // }
   },
   created() {
     Local.set('permissionData', [])
@@ -172,8 +171,8 @@ export default {
   },
   mounted() {
     this.initMenuLists()
-    this.windowWidth = document.documentElement.clientWidth
-    window.onresize = this.throttle(this.setScale, 500, 500)
+    // this.windowWidth = document.documentElement.clientWidth
+    // window.onresize = this.throttle(this.setScale, 500, 500)
     let timestamp = Local.get('expires_in')
 
     clearInterval(window.interval)
@@ -224,10 +223,10 @@ export default {
         }
       }
     },
-    setScale() {
-      // 以1920px为标准宽度
-      this.windowWidth = document.documentElement.clientWidth
-    },
+    // setScale() {
+    //   // 以1920px为标准宽度
+    //   this.windowWidth = document.documentElement.clientWidth
+    // },
     getBackground(item) {
       let result = false
       let url = './' + item.icon + '.png'

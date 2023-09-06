@@ -118,7 +118,12 @@ import Code from '@/views/leftMenus/systemManagement//components/Code'
 
 import { validUsername } from '@/utils/validate'
 import { login, getMenuLists } from '@/api/method/user'
-import { getHomeUser, newLoginN, newRefreshToken } from '@/api/method/home'
+import {
+  getHomeUser,
+  newLoginN,
+  newRefreshToken,
+  getHomeFunc
+} from '@/api/method/home'
 import { Local } from '@/utils/storage'
 import store from '@/store/index'
 import Layout from '@/layout/index'
@@ -192,21 +197,22 @@ export default {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
-    },
-    windowWidth: {
-      handler: function (val, oldVal) {
-        const h = document.getElementsByTagName('HTML')[0]
-        h.style.setProperty('--web-zoom', this.windowWidth / 1920)
-
-        this.$forceUpdate()
-      },
-      immediate: true
     }
+    // windowWidth: {
+    //   handler: function (val, oldVal) {
+    //     const h = document.getElementsByTagName('HTML')[0]
+    //     h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+
+    //     this.$forceUpdate()
+    //   },
+    //   immediate: true
+    // }
   },
   mounted() {
-    this.windowWidth = document.documentElement.clientWidth
-    window.onresize = this.throttle(this.setScale, 500, 500)
+    // this.windowWidth = document.documentElement.clientWidth
+    // window.onresize = this.throttle(this.setScale, 500, 500)
     // this.initMap()
+    store.dispatch('user/changeThirdPartyLogin', false)
     clearInterval(window.interval)
     Local.set('permissionData', [])
     Local.set('permissionMenuId', '')
@@ -282,6 +288,20 @@ export default {
         }
       })
       return arr
+    },
+
+    findFuncId(data, resId) {
+      console.log(data)
+      console.log('findFuncId', Local.get('goPath'))
+      data.forEach((datas, index) => {
+        if (datas.path === Local.get('goPath')) {
+          resId = datas.id
+        }
+        if (datas.childList) {
+          this.findFuncId(datas.childList)
+        }
+      })
+      return resId
     },
 
     routerChild(data) {
@@ -363,8 +383,8 @@ export default {
         store.dispatch('user/changeTypeRouter', homeRouters.concat(typeRouter))
       }
     },
-    async getHomeUser() {
-      await getHomeUser()
+    getHomeUser() {
+      getHomeUser()
         .then((res) => {
           if (res.data.code === 0) {
             Local.set('rj_userName', res.data.data.workName)
@@ -380,6 +400,20 @@ export default {
                     // this.allDataLists = res.data.data
                     store.dispatch('user/changeThirdPartyLogin', true)
                     this.saveComponents(res.data.data)
+
+                    const resFuncId = this.findFuncId(res.data.data)
+
+                    Local.set('permissionData', [])
+                    Local.set('permissionMenuId', '')
+                    getHomeFunc({
+                      menuId: resFuncId
+                    }).then((res) => {
+                      if (res.data.code === 0) {
+                        Local.set('permissionData', res.data.data)
+                        Local.set('permissionMenuId', resFuncId)
+                      }
+                    })
+
                     this.$nextTick(() => {
                       store.dispatch('user/changeRightWidth', false)
                       store.dispatch('user/changeShowSidebar', false)

@@ -94,27 +94,26 @@ export default {
     }
   },
   watch: {
-    changeShowSidebar() {},
-    windowWidth: {
-      handler: function (val, oldVal) {
-        const h = document.getElementsByTagName('HTML')[0]
-        h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+    changeShowSidebar() {}
+    // windowWidth: {
+    //   handler: function (val, oldVal) {
+    //     const h = document.getElementsByTagName('HTML')[0]
+    //     h.style.setProperty('--web-zoom', this.windowWidth / 1920)
 
-        this.$forceUpdate()
-      },
-      immediate: true
-    }
+    //     this.$forceUpdate()
+    //   },
+    //   immediate: true
+    // }
   },
   created() {
-    console.log('thirdPartyLogin99999', this.thirdPartyLogin)
     this.nowRouter = this.$route.matched.filter((item) => item.name)
 
-    this.setScale()
+    // this.setScale()
     this.initTabList()
   },
   mounted() {
-    this.windowWidth = document.documentElement.clientWidth
-    window.onresize = this.throttle(this.setScale, 500, 500)
+    // this.windowWidth = document.documentElement.clientWidth
+    // window.onresize = this.throttle(this.setScale, 500, 500)
   },
   methods: {
     // changeSidebarHiddenStatus(val) {
@@ -145,11 +144,11 @@ export default {
           }, delay)
         }
       }
-    },
-    setScale() {
-      // 以1920px为标准宽度
-      this.windowWidth = document.documentElement.clientWidth
     }
+    // setScale() {
+    //   // 以1920px为标准宽度
+    //   this.windowWidth = document.documentElement.clientWidth
+    // }
   }
 }
 </script>
