@@ -578,7 +578,7 @@ export default {
   height: 100% !important;
 }
 ::v-deep .el-table--enable-row-transition {
-  height: 100% !important;
+  // height: 100% !important;
 }
 ::v-deep .menuManagement-table::-webkit-scrollbar {
   /*纵向滚动条*/
