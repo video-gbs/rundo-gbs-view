@@ -772,7 +772,7 @@ export default {
   height: 100% !important;
 }
 ::v-deep .el-table--enable-row-transition {
-  height: 100% !important;
+  // height: 100% !important;
 }
 // 滚动条大小设置
 ::v-deep .table-content-bottom::-webkit-scrollbar {
@@ -915,7 +915,7 @@ export default {
 .search {
   margin: 12px 20px 10px 20px;
   width: 98%;
-  min-height: 80px;
+  // min-height: 80px;
   background: #ffffff;
   box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   border-radius: 2px;

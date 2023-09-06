@@ -517,7 +517,7 @@ export default {
   height: 100% !important;
 }
 ::v-deep .el-table--enable-row-transition {
-  height: 100% !important;
+  // height: 100% !important;
 }
 // 滚动条大小设置
 ::v-deep .role-table::-webkit-scrollbar {
@@ -570,7 +570,7 @@ export default {
   .search {
     width: calc(100% - 40px);
     // height: 80px;
-    min-height: 80px;
+    // min-height: 80px;
     margin: 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);

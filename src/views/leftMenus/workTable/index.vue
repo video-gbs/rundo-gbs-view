@@ -168,6 +168,7 @@ export default {
     Local.set('permissionData', [])
     Local.set('permissionMenuId', '')
     Local.set('equipmentActiveName', '编码器')
+    store.dispatch('user/changeThirdPartyLogin', false)
   },
   mounted() {
     this.initMenuLists()

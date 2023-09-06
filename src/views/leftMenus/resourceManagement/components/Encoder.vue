@@ -464,6 +464,9 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.tableData = res.data.data.records
+            // if(this.tableData&&this.tableData.length===0){
+            //   this.$refs.encoderTable.style
+            // }
             this.params.total = res.data.data.total
             this.params.pages = res.data.data.pages
             this.params.current = res.data.data.current
@@ -666,6 +669,9 @@ export default {
 ::v-deep .el-table::before {
   height: 0 !important;
 }
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 ::v-deep .el-dialog__body {
   padding-bottom: 0;
 }
@@ -678,7 +684,7 @@ export default {
 //   height: 100% !important;
 // }
 ::v-deep .el-table--enable-row-transition {
-  height: 100% !important;
+  // height: 100% !important;
 }
 // ::v-deep .el-table::before {
 //   height: 0;
@@ -717,7 +723,7 @@ export default {
   padding: 12px 20px 26px 20px;
   .search {
     width: 100%;
-    min-height: 80px;
+    // min-height: 80px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
