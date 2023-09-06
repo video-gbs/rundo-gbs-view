@@ -294,7 +294,7 @@ export default {
       console.log(data)
       console.log('findFuncId', Local.get('goPath'))
       data.forEach((datas, index) => {
-        if (datas.path === Local.get('goPath')) {
+        if (datas.path === `/${Local.get('goPath')}`) {
           resId = datas.id
         }
         if (datas.childList) {
