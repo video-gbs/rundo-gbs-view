@@ -409,7 +409,7 @@ export default {
                     }).then((res) => {
                       if (res.data.code === 0) {
                         Local.set('permissionData', res.data.data)
-                        Local.set('permissionMenuId', resFuncId)
+                        Local.set('permissionMenuId', this.resFuncId)
                       }
                     })
 
