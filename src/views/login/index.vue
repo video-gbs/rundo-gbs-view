@@ -300,7 +300,6 @@ export default {
           this.findFuncId(datas.childList)
         }
       })
-      console.log('resFuncId', this.resFuncId)
     },
 
     routerChild(data) {
@@ -427,6 +426,7 @@ export default {
                 })
             } else {
               this.showHome = true
+              console.log(11111111)
               store.dispatch('user/changeThirdPartyLogin', false)
               this.$router.push({ path: '/workTable' })
             }
@@ -602,6 +602,8 @@ export default {
 
                 Local.set('third_party_login', false)
                 this.thirdPartyLogin = false
+
+                store.dispatch('user/changeThirdPartyLogin', false)
 
                 this.getHomeUser()
 
