@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="main" v-if="isShow">
     <div class="panel-header-box">
       <div class="panel-header-box-border">客户端管理</div>
     </div>
@@ -375,6 +375,7 @@ export default {
         pageSize: 10,
         total: 0
       },
+      isShow: false,
       searchParams: {
         clientId: '',
         clientName: ''
@@ -530,6 +531,9 @@ export default {
           this.params.total = res.data.data.total
           this.params.pages = res.data.data.pages
           this.params.current = res.data.data.current
+          setTimeout(() => {
+            this.isShow = true
+          }, 100)
         }
       })
     },
