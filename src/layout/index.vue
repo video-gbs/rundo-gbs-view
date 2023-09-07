@@ -1,7 +1,7 @@
 <template>
   <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
     <Header
-      v-if="!thirdPartyLogin1"
+      v-if="!resThirdPartyLogin"
       class="wrapper-header"
       :isShowTopMenus="isShowTopMenus"
     />
@@ -12,14 +12,14 @@
 
   <div class="app-wrapper" v-else>
     <Header
-      v-if="!thirdPartyLogin1"
+      v-if="!resThirdPartyLogin"
       class="wrapper-header"
       :isShowTopMenus="!isShowTopMenus"
       @changeSidebarLists="changeSidebarLists"
     />
     <sidebar
       class="sidebar-container"
-      v-if="showSidebar && !thirdPartyLogin1"
+      v-if="showSidebar && !resThirdPartyLogin"
       :sidebarLists="sidebarLists"
     />
     <div
@@ -56,7 +56,8 @@ export default {
       isShowTopMenus: false,
       sidebarClass: true,
       sidebarLists: [],
-      windowWidth: null
+      windowWidth: null,
+      resThirdPartyLogin: false
     }
   },
   computed: {
@@ -65,7 +66,6 @@ export default {
       return this.showSidebar
     },
     changeThirdPartyLogin() {
-      console.log('this.thirdPartyLogin~~~~~~', this.thirdPartyLogin1)
       return this.thirdPartyLogin1
     },
     sidebar() {
@@ -94,7 +94,10 @@ export default {
     }
   },
   watch: {
-    changeShowSidebar() {}
+    changeShowSidebar() {},
+    changeThirdPartyLogin(oldValue, newValue) {
+      console.log('this.thirdPartyLogin~~~~~~111', oldValue, newValue)
+    }
     // windowWidth: {
     //   handler: function (val, oldVal) {
     //     const h = document.getElementsByTagName('HTML')[0]
@@ -106,6 +109,12 @@ export default {
     // }
   },
   created() {
+    console.log(
+      'this.thirdPartyLogin1this.thirdPartyLogin1',
+      this.thirdPartyLogin1,
+      Local.get('third_party_login')
+    )
+    this.resThirdPartyLogin = Local.get('third_party_login')
     this.nowRouter = this.$route.matched.filter((item) => item.name)
 
     // this.setScale()
