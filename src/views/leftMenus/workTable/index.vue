@@ -315,7 +315,7 @@ export default {
         let typeRouter = []
         let resData = []
 
-        data.map((item) => {
+        data.forEach((item) => {
           let params = {}
           let params1 = {}
           let params2 = {}
@@ -351,7 +351,7 @@ export default {
 
         store.dispatch('user/changeDynamicRouters', resData)
 
-        this.routerLists.map((item1) => {
+        this.routerLists.forEach((item1) => {
           if (item1.name === resName) {
             store.dispatch('user/changeSidebarRouter', item1.children)
           }
@@ -361,7 +361,7 @@ export default {
       }
     },
     goContentList: antiShake(function (val, data, child) {
-      console.log('goContentList', val, data, child)
+      // console.log('goContentList', val, data, child)
       Local.set('resRouterName', child.name)
       Local.set('isShowSideRouter', val)
 
