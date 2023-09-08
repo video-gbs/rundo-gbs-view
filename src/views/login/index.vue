@@ -215,6 +215,7 @@ export default {
     // this.initMap()
     store.dispatch('user/changeThirdPartyLogin', false)
     clearInterval(window.interval)
+    clearInterval(window.interval1)
     Local.set('permissionData', [])
     Local.set('permissionMenuId', '')
     Local.set('expires_in', '')
@@ -432,7 +433,8 @@ export default {
             }
             //设置定时器，更新token
             if (Local.get('expires_in_old') && Local.get('refresh_token')) {
-              setInterval(function () {
+              clearInterval(window.interval1)
+              window.interval1 = setInterval(function () {
                 if (Local.get('third_party_login')) {
                   const resUrl = `${Local.get(
                     'refresh_token_url'
@@ -450,6 +452,7 @@ export default {
                       Local.set('access_token', accessToken)
                       Local.set('refresh_token', refreshToken)
                       Local.set('expires_in', expiresIn)
+                      Local.set('expires_in_old', expiresIn)
                       let timestamp = expiresIn
                       clearInterval(window.interval)
 
@@ -471,6 +474,8 @@ export default {
                         Local.set('access_token', accessToken)
                         Local.set('refresh_token', refreshToken)
                         Local.set('expires_in', expiresIn)
+
+                        Local.set('expires_in_old', expiresIn)
 
                         let timestamp = expiresIn
                         clearInterval(window.interval)
