@@ -114,7 +114,11 @@ export default {
       this.thirdPartyLogin1,
       Session.get('third_party_login')
     )
-    this.resThirdPartyLogin = Session.get('third_party_login')
+    this.resThirdPartyLogin =
+      Session.get('third_party_login') !== null &&
+      Session.get('third_party_login')
+        ? true
+        : false
     this.nowRouter = this.$route.matched.filter((item) => item.name)
     console.log(this.nowRouter)
 
