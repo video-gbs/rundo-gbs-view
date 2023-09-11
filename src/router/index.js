@@ -336,7 +336,11 @@ router.beforeEach(async (to, from, next) => {
       // console.log(888888)
       next()
     }
-    if (to.path === '/login' && !Session.get('third_party_login')) {
+    if (
+      to.path === '/login' &&
+      Session.get('third_party_login') !== null &&
+      !Session.get('third_party_login')
+    ) {
       // console.log(9999999)
       next('/workTable')
     }
