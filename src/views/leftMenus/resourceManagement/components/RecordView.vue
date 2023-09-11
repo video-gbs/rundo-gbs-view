@@ -1793,8 +1793,21 @@ export default {
 
     videoClick(i) {
       this.playerIdx = i - 1
-      this.channelId = Local.get('recordCloudId')[this.playerIdx]
-      this.streamId = Local.get('recordStreamId')[this.playerIdx]
+
+      if (
+        this.play[this.playerIdx] === false &&
+        this.videoUrl[this.playerIdx]
+      ) {
+        this.isClickCx = false
+      } else {
+        this.isClickCx = true
+      }
+      this.channelId = Local.get('recordCloudId')
+        ? Local.get('recordCloudId')[this.playerIdx]
+        : ''
+      this.streamId = Local.get('recordStreamId')
+        ? Local.get('recordStreamId')[this.playerIdx]
+        : ''
       // if (!this.clickedPbPause) {
       //   this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
       //   // this.play = true
@@ -1902,7 +1915,8 @@ export default {
       } else if (newValue > this.videoUrl.length) {
         for (let i = 0; i < newValue; i++) {
           if (i >= this.videoUrl.length) {
-            resCurrentSpeed.push(2)
+            // resCurrentSpeed.push(2)
+            resCurrentSpeed.push(0)
             resHasStreamId.push(false)
             resVideoUrl.push('')
             resTimeSegments.push([
