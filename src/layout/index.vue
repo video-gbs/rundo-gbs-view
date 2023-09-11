@@ -124,14 +124,14 @@ export default {
       this.thirdPartyLogin1,
       Session.get('third_party_login')
     )
-    this.$nextTick(() => {
-      this.resThirdPartyLogin =
-        Session.get('third_party_login') !== null &&
-        Session.get('third_party_login')
-          ? true
-          : false
-      this.$forceUpdate()
-    })
+    // this.$nextTick(() => {
+    this.resThirdPartyLogin =
+      Session.get('third_party_login') !== null &&
+      Session.get('third_party_login')
+        ? true
+        : false
+    //   this.$forceUpdate()
+    // })
   },
   methods: {
     // changeSidebarHiddenStatus(val) {
