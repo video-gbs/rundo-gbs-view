@@ -6,6 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const productionGzipExtensions = ['js', 'css', 'less', 'sacc']
+// const run3dPlugin = require('@rjgf/run3d-plugin')
 
 // const AutoImport = require('unplugin-auto-import/webpack')
 // const Components = require('unplugin-vue-components/webpack')
@@ -107,6 +108,7 @@ module.exports = {
   configureWebpack: {
     name: name,
     plugins: [
+      // new run3dPlugin(),
       // AutoImport({
       //   resolvers: [ElementPlusResolver()]
       // }),
