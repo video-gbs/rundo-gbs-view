@@ -28,6 +28,7 @@ export default {
   watch: {
     $route: {
       handler: function (val, oldVal) {
+        console.log(val, 999)
         if (val.path === '/workTable') {
           this.changeRouter = false
         } else {

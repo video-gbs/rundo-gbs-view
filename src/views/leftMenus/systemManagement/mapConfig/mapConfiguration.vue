@@ -390,10 +390,9 @@ export default {
   watch: {},
   methods: {
     async init() {
-      await getClientLists({
+      await findOneStatusOnGis({
         num: this.params.pageSize,
-        page: this.params.pageNum,
-        ...this.searchParams
+        page: this.params.pageNum
       }).then((res) => {
         if (res.data.code === 0) {
           this.tableData = res.data.data.list
