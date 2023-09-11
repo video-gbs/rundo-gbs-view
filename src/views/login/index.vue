@@ -611,6 +611,8 @@ export default {
                 Session.set('third_party_login', false)
                 this.thirdPartyLogin = false
 
+                this.hasGoPath = ''
+
                 store.dispatch('user/changeThirdPartyLogin', false)
 
                 this.getHomeUser()
