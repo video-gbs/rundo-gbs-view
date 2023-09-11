@@ -220,7 +220,13 @@ import pagination from '@/components/Pagination/index.vue'
 import LineFont from '@/components/LineFont'
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
-import { addGis } from '@/api/method/mapConfig'
+import {
+  addGis,
+  findOneStatusOnGis,
+  findVideoAreaOneGis,
+  gisVideoAreaSaveGis,
+  statusChangeGis
+} from '@/api/method/mapConfig'
 import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 import {
   getClientLists,

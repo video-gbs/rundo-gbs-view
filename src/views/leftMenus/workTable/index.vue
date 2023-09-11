@@ -1,6 +1,6 @@
 <template>
   <div class="home-page-content">
-    <Header class="wrapper-header" />
+    <Header v-if="!resThirdPartyLogin" class="wrapper-header" />
     <div class="page-container">
       <div class="container-top">
         <LineFont
@@ -133,7 +133,7 @@ export default {
         title: '常用',
         notShowSmallTitle: false
       },
-      // resThirdPartyLogin: false,
+      resThirdPartyLogin: false,
       textStyle: {
         fontSize: '24px',
         fontFamily: 'Microsoft YaHei-Regular, Microsoft YaHei',
@@ -169,7 +169,13 @@ export default {
     Local.set('permissionMenuId', '')
     Local.set('equipmentActiveName', '编码器')
     store.dispatch('user/changeThirdPartyLogin', false)
+
     // this.resThirdPartyLogin = Session.get('third_party_login')
+    this.resThirdPartyLogin =
+      Session.get('third_party_login') !== null &&
+      Session.get('third_party_login')
+        ? true
+        : false
   },
   mounted() {
     this.initMenuLists()
