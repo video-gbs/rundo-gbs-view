@@ -61,13 +61,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['showSidebar', 'thirdPartyLogin1']),
+    ...mapGetters(['showSidebar']),
     changeShowSidebar() {
       return this.showSidebar
     },
-    changeThirdPartyLogin() {
-      return this.thirdPartyLogin1
-    },
+    // changeThirdPartyLogin() {
+    //   return this.thirdPartyLogin1
+    // },
     sidebar() {
       return store.state.app.sidebar
     },
@@ -94,10 +94,10 @@ export default {
     }
   },
   watch: {
-    changeShowSidebar() {},
-    changeThirdPartyLogin(oldValue, newValue) {
-      console.log('this.thirdPartyLogin~~~~~~111', oldValue, newValue)
-    }
+    changeShowSidebar() {}
+    // changeThirdPartyLogin(oldValue, newValue) {
+    //   console.log('this.thirdPartyLogin~~~~~~111', oldValue, newValue)
+    // }
     // windowWidth: {
     //   handler: function (val, oldVal) {
     //     const h = document.getElementsByTagName('HTML')[0]

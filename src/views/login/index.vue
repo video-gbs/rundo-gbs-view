@@ -430,7 +430,7 @@ export default {
             } else {
               this.showHome = true
               console.log(11111111)
-              store.dispatch('user/changeThirdPartyLogin', true)
+              // store.dispatch('user/changeThirdPartyLogin', false)
               this.$router.push({ path: '/workTable' })
             }
             //设置定时器，更新token
