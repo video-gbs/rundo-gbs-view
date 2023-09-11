@@ -75,7 +75,7 @@ import { getMenuLists } from '@/api/method/user'
 
 import store from '@/store/index'
 import router from '../../../router/index'
-import { Local } from '@/utils/storage'
+import { Local, Session } from '@/utils/storage'
 import Layout from '@/layout/index'
 
 import { antiShake } from '@/utils/index.js'
