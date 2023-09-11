@@ -13,7 +13,7 @@
       >
         <el-form-item label="客户端账号:">
           <el-input
-            v-model="searchParams.clientId"
+            v-model="searchParams.dictId"
             placeholder="请输入IP地址"
             class="mr10"
             clearable
@@ -21,7 +21,7 @@
         </el-form-item>
         <el-form-item label="客户端名称:">
           <el-input
-            v-model="searchParams.clientName"
+            v-model="searchParams.latitude"
             placeholder="请输入IP地址"
             class="mr10"
             clearable
@@ -78,12 +78,12 @@
               >
               </el-table-column>
               <el-table-column
-                prop="clientId"
+                prop="dictId"
                 label="地图"
                 :show-overflow-tooltip="true"
               />
               <el-table-column
-                prop="clientName"
+                prop="latitude"
                 label="经度"
                 :show-overflow-tooltip="true"
               />
@@ -158,29 +158,36 @@
             :model="dialogForm"
             :rules="rules"
           >
-            <el-form-item label="地图类型：" prop="clientId">
-              <el-input
-                v-model="dialogForm.clientId"
+            <el-form-item label="地图类型：" prop="dictId">
+              <el-select
+                v-model="dialogForm.dictId"
+                placeholder="请选择"
                 style="width: 436px"
-                clearable
-              ></el-input>
+              >
+                <el-option
+                  v-for="o in dictIdOption"
+                  :label="o.label"
+                  :value="o.value"
+                  :key="o.label"
+                />
+              </el-select>
             </el-form-item>
             <el-form-item label="经度：">
               <el-input
-                v-model="dialogForm.clientSecret"
+                v-model="dialogForm.longitude"
                 style="width: 436px"
                 clearable
               ></el-input>
             </el-form-item>
-            <el-form-item label="纬度：" prop="clientName">
+            <el-form-item label="纬度：" prop="latitude">
               <el-input
-                v-model="dialogForm.clientName"
+                v-model="dialogForm.latitude"
                 style="width: 436px"
               ></el-input>
             </el-form-item>
-            <el-form-item label="高度：" prop="scopes">
+            <el-form-item label="高度：" prop="height">
               <el-input
-                v-model="dialogForm.scopes"
+                v-model="dialogForm.height"
                 style="width: 436px"
               ></el-input>
             </el-form-item>
@@ -213,6 +220,8 @@ import pagination from '@/components/Pagination/index.vue'
 import LineFont from '@/components/LineFont'
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
+import { addGis } from '@/api/method/mapConfig'
+import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 import {
   getClientLists,
   clientDelete,
@@ -231,8 +240,8 @@ export default {
       },
       isShow: false,
       searchParams: {
-        clientId: '',
-        clientName: ''
+        dictId: '',
+        latitude: ''
       },
       lineTitle: {
         title: '新建',
@@ -322,7 +331,7 @@ export default {
         requireAuthorizationConsent: [
           { required: true, message: '此为必填项。', trigger: 'change' }
         ],
-        clientSecret: [
+        longitude: [
           { required: true, message: '此为必填项。', trigger: 'blur' }
         ],
         accessTokenTimeToLiveSecond: {
@@ -340,21 +349,20 @@ export default {
           pattern: /^[0-9]*$/,
           trigger: 'blur'
         },
-        clientId: [
+        dictId: [{ required: true, message: '此为必填项。', trigger: 'blur' }],
+        latitude: [
           { required: true, message: '此为必填项。', trigger: 'blur' }
         ],
-        clientName: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
-        ],
-        scopes: [{ required: true, message: '此为必填项。', trigger: 'blur' }]
+        height: [{ required: true, message: '此为必填项。', trigger: 'blur' }]
       },
+      dictIdOption: [],
       title1: '新建',
       dialogForm: {
-        clientId: '',
-        clientName: '',
+        dictId: '',
+        latitude: '',
         authorizationGrantTypes: [],
         clientAuthenticationMethods: [],
-        scopes: null,
+        height: null,
         redirectUris: null,
         requireAuthorizationConsent: true,
         accessTokenTimeToLiveSecond: '',
@@ -370,6 +378,7 @@ export default {
   created() {},
   mounted() {
     this.init()
+    this.getManufacturerDictionaryList()
   },
   computed: {},
   watch: {},
@@ -391,6 +400,18 @@ export default {
         }
       })
     },
+    async getManufacturerDictionaryList() {
+      await getManufacturerDictionaryList('MapConfig').then((res) => {
+        if (res.data.code === 0) {
+          res.data.map((item) => {
+            let obj = {}
+            obj.label = item.itemName
+            obj.value = item.itemValue
+            this.dictIdOption.push(obj)
+          })
+        }
+      })
+    },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
       this.init()
@@ -401,7 +422,7 @@ export default {
     },
     resetData(e) {
       this.searchParams = {
-        clientId: '',
+        dictId: '',
         iclientNamep: ''
       }
       let target = e.target
@@ -424,11 +445,11 @@ export default {
       this.dialogShow = true
       this.title1 = '新建'
       this.dialogForm = {
-        clientId: '',
-        clientName: '',
+        dictId: '',
+        latitude: '',
         authorizationGrantTypes: [],
         clientAuthenticationMethods: [],
-        scopes: null,
+        height: null,
         redirectUris: null,
         requireAuthorizationConsent: true,
         accessTokenTimeToLiveSecond: '',
@@ -463,11 +484,11 @@ export default {
       this.dialogShow = true
       this.title1 = '编辑'
       const {
-        clientId,
-        clientName,
+        dictId,
+        latitude,
         authorizationGrantTypes,
         clientAuthenticationMethods,
-        scopes,
+        height,
         redirectUris,
         requireAuthorizationConsent,
         accessTokenTimeToLiveSecond,
@@ -476,11 +497,11 @@ export default {
         clientSecretExpiresAt
       } = row
       console.log(1111, row)
-      this.dialogForm.clientId = clientId
-      this.dialogForm.clientName = clientName
+      this.dialogForm.dictId = dictId
+      this.dialogForm.latitude = latitude
       this.dialogForm.authorizationGrantTypes = authorizationGrantTypes
       this.dialogForm.clientAuthenticationMethods = clientAuthenticationMethods
-      this.dialogForm.scopes = scopes
+      this.dialogForm.height = height
       this.dialogForm.redirectUris = redirectUris
       this.dialogForm.requireAuthorizationConsent = requireAuthorizationConsent
       this.dialogForm.accessTokenTimeToLiveSecond = accessTokenTimeToLiveSecond
@@ -493,19 +514,10 @@ export default {
     save(formName, val) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogForm.redirectUris = !Array.isArray(
-            this.dialogForm.redirectUris
-          )
-            ? this.dialogForm.redirectUris.split(',')
-            : this.dialogForm.redirectUris
-          this.dialogForm.scopes = !Array.isArray(this.dialogForm.scopes)
-            ? this.dialogForm.scopes.split(',')
-            : this.dialogForm.scopes
-
           if (val === '新建') {
             console.log('this.dialogForm', this.dialogForm)
 
-            addClient(this.dialogForm).then((res) => {
+            addGis(this.dialogForm).then((res) => {
               if (res.data.code === 0) {
                 this.$message({
                   type: 'success',
