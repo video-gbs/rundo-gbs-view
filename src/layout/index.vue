@@ -1,10 +1,6 @@
 <template>
   <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
-    <Header
-      v-if="!resThirdPartyLogin"
-      class="wrapper-header"
-      :isShowTopMenus="isShowTopMenus"
-    />
+    <Header class="wrapper-header" :isShowTopMenus="isShowTopMenus" />
     <div class="main-container f fd-c ai-s">
       <app-main />
     </div>
@@ -116,6 +112,7 @@ export default {
     )
     this.resThirdPartyLogin = Local.get('third_party_login')
     this.nowRouter = this.$route.matched.filter((item) => item.name)
+    console.log(this.nowRouter)
 
     // this.setScale()
     this.initTabList()
