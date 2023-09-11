@@ -224,7 +224,9 @@ export default {
     Local.remove('utilTime')
     Local.remove('expires_in')
     Local.remove('refresh_token')
+
     Session.set('third_party_login', false)
+    this.thirdPartyLogin = false
 
     if (window.location.search.indexOf('access_token') !== -1) {
       this.showHome = false
