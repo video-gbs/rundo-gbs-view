@@ -1,6 +1,6 @@
 <template>
   <div class="home-page-content">
-    <Header v-if="!resThirdPartyLogin" class="wrapper-header" />
+    <Header v-if="!resThirdPartyLogin" class="wrapper-header header3" />
     <div class="page-container">
       <div class="container-top">
         <LineFont

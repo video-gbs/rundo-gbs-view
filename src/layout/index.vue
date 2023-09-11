@@ -2,7 +2,7 @@
   <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
     <Header
       v-if="!resThirdPartyLogin"
-      class="wrapper-header"
+      class="wrapper-header header1"
       :isShowTopMenus="isShowTopMenus"
     />
     <div class="main-container f fd-c ai-s">
@@ -13,7 +13,7 @@
   <div class="app-wrapper" v-else>
     <Header
       v-if="!resThirdPartyLogin"
-      class="wrapper-header"
+      class="wrapper-header header2"
       :isShowTopMenus="!isShowTopMenus"
       @changeSidebarLists="changeSidebarLists"
     />
