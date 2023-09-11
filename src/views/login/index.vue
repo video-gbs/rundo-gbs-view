@@ -605,7 +605,7 @@ export default {
                 const { accessToken, refreshToken, expiresIn, tokenType } =
                   res.data.data
 
-                Local.set('third_party_login', false)
+                Session.set('third_party_login', false)
                 this.thirdPartyLogin = false
 
                 store.dispatch('user/changeThirdPartyLogin', false)
