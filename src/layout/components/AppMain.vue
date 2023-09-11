@@ -2,9 +2,9 @@
   <section class="app-main f1 fd-c ai-s" v-if="changeRouter">
     <div style="height: 100%" class="app-main-c f1 f">
       <transition name="fade-transform1" mode="out-in">
-        <keep-alive>
-          <router-view v-if="$route.path" :key="key" />
-        </keep-alive>
+        <!-- <keep-alive> -->
+        <router-view v-if="$route.path" :key="key" />
+        <!-- </keep-alive> -->
       </transition>
       <transition name="fade-transform2" mode="out-in">
         <router-view v-if="!$route.path" :key="key" />
