@@ -1,5 +1,5 @@
 <template>
-  <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
+  <!-- <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
     <Header
       v-if="!resThirdPartyLogin"
       class="wrapper-header header1"
@@ -8,9 +8,9 @@
     <div class="main-container f fd-c ai-s">
       <app-main />
     </div>
-  </div>
+  </div> -->
 
-  <div class="app-wrapper" v-else>
+  <div class="app-wrapper">
     <Header
       v-if="!resThirdPartyLogin"
       class="wrapper-header header2"
@@ -110,7 +110,7 @@ export default {
   },
   created() {
     this.nowRouter = this.$route.matched.filter((item) => item.name)
-    console.log(this.nowRouter)
+    console.log(this.nowRouter, this.nowRouter[0].name)
 
     // this.setScale()
     this.initTabList()
@@ -124,11 +124,14 @@ export default {
       this.thirdPartyLogin1,
       Session.get('third_party_login')
     )
-    this.resThirdPartyLogin =
-      Session.get('third_party_login') !== null &&
-      Session.get('third_party_login')
-        ? true
-        : false
+    this.$nextTick(() => {
+      this.resThirdPartyLogin =
+        Session.get('third_party_login') !== null &&
+        Session.get('third_party_login')
+          ? true
+          : false
+      this.$forceUpdate()
+    })
   },
   methods: {
     // changeSidebarHiddenStatus(val) {
