@@ -1,6 +1,10 @@
 <template>
   <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
-    <Header class="wrapper-header" :isShowTopMenus="isShowTopMenus" />
+    <Header
+      v-if="!resThirdPartyLogin"
+      class="wrapper-header"
+      :isShowTopMenus="isShowTopMenus"
+    />
     <div class="main-container f fd-c ai-s">
       <app-main />
     </div>
