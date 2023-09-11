@@ -355,6 +355,10 @@ export default {
           resData.push(params2)
         })
 
+        store.dispatch('user/dynamicRouters', [])
+
+        store.dispatch('user/changeDynamicRouters', [])
+
         store.dispatch('user/dynamicRouters', resData)
 
         store.dispatch('user/changeDynamicRouters', resData)
@@ -364,6 +368,8 @@ export default {
             store.dispatch('user/changeSidebarRouter', item1.children)
           }
         })
+
+        store.dispatch('user/changeTypeRouter', [])
 
         store.dispatch('user/changeTypeRouter', homeRouters.concat(typeRouter))
       }
