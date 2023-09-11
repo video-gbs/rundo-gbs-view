@@ -322,10 +322,11 @@ export default {
         let typeRouter = []
         let resData = []
 
+        let params = {}
+        let params1 = {}
+        let params2 = {}
+
         data.forEach((item) => {
-          let params = {}
-          let params1 = {}
-          let params2 = {}
           params = {
             path: item.path,
             meta: { icon: item.icon, title: item.name },
@@ -385,6 +386,7 @@ export default {
       }
 
       store.dispatch('user/changeActiveIndex', child.path)
+      this.routerLists = []
 
       this.saveComponents(data, child.name)
       if (child.childList[0]) {

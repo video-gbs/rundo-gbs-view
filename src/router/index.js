@@ -359,4 +359,11 @@ router.afterEach(() => {
   NProgress.done()
 })
 
+// const newRouter = router
+
+// export function resetRouter() {
+//   const resNewRouter = router
+//   newRouter.matcher = resNewRouter.matcher
+// }
+
 export default router

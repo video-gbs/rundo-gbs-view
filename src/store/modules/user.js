@@ -96,6 +96,7 @@ const mutations = {
     const restypeRouter = []
     state.init = true
     let routerMaps = filterRouter(routers)
+    state.routerLists = []
     state.routerLists = routerMaps
     routerMaps.map((item) => {
       if (item.name === Local.get('resRouterName')) {
@@ -126,6 +127,7 @@ const mutations = {
   },
 
   SET_ROUTERLISTS: (state, dynamicRouters) => {
+    state.routerLists = []
     state.routerLists = dynamicRouters
 
     Local.set('dynamicRouters', JSON.stringify(dynamicRouters))

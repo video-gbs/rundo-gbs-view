@@ -109,6 +109,16 @@ export default {
     // }
   },
   created() {
+    this.nowRouter = this.$route.matched.filter((item) => item.name)
+    console.log(this.nowRouter)
+
+    // this.setScale()
+    this.initTabList()
+  },
+  mounted() {
+    // this.windowWidth = document.documentElement.clientWidth
+    // window.onresize = this.throttle(this.setScale, 500, 500)
+
     console.log(
       'this.thirdPartyLogin1this.thirdPartyLogin1',
       this.thirdPartyLogin1,
@@ -119,15 +129,6 @@ export default {
       Session.get('third_party_login')
         ? true
         : false
-    this.nowRouter = this.$route.matched.filter((item) => item.name)
-    console.log(this.nowRouter)
-
-    // this.setScale()
-    this.initTabList()
-  },
-  mounted() {
-    // this.windowWidth = document.documentElement.clientWidth
-    // window.onresize = this.throttle(this.setScale, 500, 500)
   },
   methods: {
     // changeSidebarHiddenStatus(val) {
