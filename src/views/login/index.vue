@@ -124,7 +124,7 @@ import {
   newRefreshToken,
   getHomeFunc
 } from '@/api/method/home'
-import { Local } from '@/utils/storage'
+import { Local, Session } from '@/utils/storage'
 import store from '@/store/index'
 import Layout from '@/layout/index'
 
@@ -240,7 +240,7 @@ export default {
       this.thirdPartyLogin = true
       this.hasGoPath = resObj.redirect_route
 
-      Local.set('third_party_login', true)
+      Session.set('third_party_login', true)
 
       Local.set('goPath', goPath)
 
@@ -435,7 +435,7 @@ export default {
             if (Local.get('expires_in_old') && Local.get('refresh_token')) {
               clearInterval(window.interval1)
               window.interval1 = setInterval(function () {
-                if (Local.get('third_party_login')) {
+                if (Session.get('third_party_login')) {
                   const resUrl = `${Local.get(
                     'refresh_token_url'
                   )}?accessToken=${Local.get('access_token')}`

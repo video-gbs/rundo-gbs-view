@@ -33,7 +33,7 @@ import { Header, Sidebar, AppMain, Navbar } from './components'
 import Breadcrumb from '../components/Breadcrumb'
 import store from '@/store/index'
 import { mapGetters } from 'vuex'
-import { Local } from '@/utils/storage'
+import { Local, Session } from '@/utils/storage'
 
 export default {
   name: 'Layout',
@@ -108,9 +108,9 @@ export default {
     console.log(
       'this.thirdPartyLogin1this.thirdPartyLogin1',
       this.thirdPartyLogin1,
-      Local.get('third_party_login')
+      Session.get('third_party_login')
     )
-    this.resThirdPartyLogin = Local.get('third_party_login')
+    this.resThirdPartyLogin = Session.get('third_party_login')
     this.nowRouter = this.$route.matched.filter((item) => item.name)
     console.log(this.nowRouter)
 

@@ -11,7 +11,7 @@ import '../static/fonts/iconfont/iconfont.css'
 import App from './App'
 import store from './store'
 import router from './router'
-import { Local } from './utils/storage'
+import { Local, Session } from './utils/storage'
 import { newRefreshToken } from '@/api/method/home'
 
 import '@/icons'
@@ -54,7 +54,7 @@ Vue.config.productionTip = false
 if (Local.get('expires_in_old') && Local.get('refresh_token')) {
   clearInterval(window.interval1)
   window.interval1 = setInterval(function () {
-    if (Local.get('third_party_login')) {
+    if (Session.get('third_party_login')) {
       const resUrl = `${Local.get('refresh_token_url')}?accessToken=${Local.get(
         'access_token'
       )}`

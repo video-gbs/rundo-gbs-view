@@ -4,7 +4,7 @@ import store from '@/store/index'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import getPageTitle from '@/utils/get-page-title'
-import { Local } from '@/utils/storage'
+import { Local, Session } from '@/utils/storage'
 import { getHomeFunc } from '@/api/method/home'
 
 Vue.use(Router)
@@ -336,7 +336,7 @@ router.beforeEach(async (to, from, next) => {
       // console.log(888888)
       next()
     }
-    if (to.path === '/login' && !Local.get('third_party_login')) {
+    if (to.path === '/login' && !Session.get('third_party_login')) {
       // console.log(9999999)
       next('/workTable')
     }
