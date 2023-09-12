@@ -31,6 +31,13 @@ Vue.prototype.$moment = moment
 import VideoTimeline from '@wanglin1994/video-timeline'
 Vue.use(VideoTimeline)
 
+// import Run3D from '@rjgf/run3d'
+// const Run3D = require('@rjgf/run3d')
+// const widgets= require('@rjgf/run3d-engine/Build/Cesium/Widgets/widgets.css')
+
+// Vue.prototype.Run3D = Run3D
+// Vue.prototype.widgets = widgets
+
 // import { Base64 } from 'js-base64'
 // Vue.use(Base64)
 

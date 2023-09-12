@@ -79,6 +79,7 @@ import { Local, Session } from '@/utils/storage'
 import Layout from '@/layout/index'
 
 import { antiShake } from '@/utils/index.js'
+// import { resetRouter, router } from '../../../router/index'
 
 export default {
   components: {
@@ -169,6 +170,7 @@ export default {
     Local.set('permissionMenuId', '')
     Local.set('equipmentActiveName', '编码器')
     store.dispatch('user/changeThirdPartyLogin', false)
+    this.routerLists = []
 
     // this.resThirdPartyLogin = Session.get('third_party_login')
     this.resThirdPartyLogin =
@@ -309,6 +311,7 @@ export default {
      */
 
     saveComponents(data, resName) {
+      // resetRouter()
       const homeRouters = [
         {
           path: '/workTable',

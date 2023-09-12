@@ -13,6 +13,10 @@ export function findOneStatusOnGis(params) {
   return request.get(`${expansion}/gis/findOneStatusOn`, params)
 }
 
+export function configGisList(params) {
+  return request.get(`${expansion}/gis/configList`, params)
+}
+
 // 新增
 export function findVideoAreaOneGis(params) {
   return request.get(`${expansion}/gis/findVideoAreaOne`, params)
