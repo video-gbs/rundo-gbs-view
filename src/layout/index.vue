@@ -10,7 +10,7 @@
     </div>
   </div> -->
 
-  <div class="app-wrapper">
+  <div class="app-wrapper" v-if="!resThirdPartyLogin">
     <Header
       v-if="!resThirdPartyLogin"
       class="wrapper-header header2"
@@ -109,11 +109,10 @@ export default {
     // }
   },
   created() {
-    this.nowRouter = this.$route.matched.filter((item) => item.name)
-    console.log(this.nowRouter, this.nowRouter[0].name)
-
+    // this.nowRouter = this.$route.matched.filter((item) => item.name)
+    // console.log(this.nowRouter, this.nowRouter[0].name)
     // this.setScale()
-    this.initTabList()
+    // this.initTabList()
   },
   mounted() {
     // this.windowWidth = document.documentElement.clientWidth
