@@ -10,7 +10,7 @@
     </div>
   </div> -->
 
-  <div class="app-wrapper" v-if="!resThirdPartyLogin">
+  <div class="app-wrapper">
     <Header
       v-if="!resThirdPartyLogin"
       class="wrapper-header header2"
