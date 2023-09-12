@@ -1,4 +1,6 @@
 'use strict'
+const Run3DSource = './node_modules/@rjgf/run3d-engine/Source'
+const Run3DWorkers = '../Build/Cesium/Workers'
 const path = require('path')
 const webpack = require('webpack')
 const defaultSettings = require('./src/settings.js')
@@ -6,12 +8,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const productionGzipExtensions = ['js', 'css', 'less', 'sacc']
-// const run3dPlugin = require('@rjgf/run3d-plugin')
-
-// const AutoImport = require('unplugin-auto-import/webpack')
-// const Components = require('unplugin-vue-components/webpack')
-// const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
-
 
 const assetsCDN = {
   externals: {
@@ -107,14 +103,51 @@ module.exports = {
   },
   configureWebpack: {
     name: name,
+    output: {
+      sourcePrefix: " ",
+    },
+    amd: {
+      toUrlUndefined: true,
+    },
+    module: {
+      rules: [
+        {
+          test: /\.mjs$/,
+          include: /node_modules/,
+          type: "javascript/auto"
+        },
+        {
+          test: /\.cjs$/,
+          include: /node_modules/,
+          type: "javascript/auto"
+        }
+      ]
+    },
+    resolve: {
+      alias: {
+        '@': resolve('src'),
+        cesium: path.resolve(__dirname, Run3DSource)
+      }
+    },
     plugins: [
-      // new run3dPlugin(),
-      // AutoImport({
-      //   resolvers: [ElementPlusResolver()]
-      // }),
-      // Components({
-      //   resolvers: [ElementPlusResolver()]
-      // }),
+      new CopyWebpackPlugin([
+        { from: path.join(Run3DSource, Run3DWorkers), to: "Workers" },
+      ]
+      ),
+      new CopyWebpackPlugin([{ from: path.join(Run3DSource, "Assets"), to: "Assets" }],
+      ),
+      new CopyWebpackPlugin([{ from: path.join(Run3DSource, "Widgets"), to: "Widgets" }],
+      ),
+      new CopyWebpackPlugin([
+        {
+          from: path.join(Run3DSource, "ThirdParty/Workers"),
+          to: "ThirdParty/Workers",
+        },
+      ],
+      ),
+      new webpack.DefinePlugin({
+        CESIUM_BASE_URL: JSON.stringify("./"),
+      }),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
       // 配置compression-webpack-plugin压缩
@@ -129,8 +162,9 @@ module.exports = {
         maxChunks: 5,
         minChunkSize: 100
       }),
-      new CopyWebpackPlugin([
-        {
+
+      new CopyWebpackPlugin(
+        [{
           from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml'
         },
         {
@@ -140,13 +174,9 @@ module.exports = {
           from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer-lib.min.js',
           to: 'js/'
         }
-      ])
-    ],
-    resolve: {
-      alias: {
-        '@': resolve('src')
-      }
-    }
+        ]
+      )
+    ]
   },
   chainWebpack(config) {
     if (process.env.NODE_ENV === 'production') {

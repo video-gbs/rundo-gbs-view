@@ -225,9 +225,10 @@ import {
   findOneStatusOnGis,
   findVideoAreaOneGis,
   gisVideoAreaSaveGis,
-  statusChangeGis
+  statusChangeGis,
+  configGisList
 } from '@/api/method/mapConfig'
-import { getManufacturerDictionaryList } from '@/api/method/dictionary'
+import { getGroupDictLists } from '@/api/method/dictionary'
 import {
   getClientLists,
   clientDelete,
@@ -390,7 +391,7 @@ export default {
   watch: {},
   methods: {
     async init() {
-      await findOneStatusOnGis({
+      await configGisList({
         num: this.params.pageSize,
         page: this.params.pageNum
       }).then((res) => {
@@ -406,7 +407,7 @@ export default {
       })
     },
     async getManufacturerDictionaryList() {
-      await getManufacturerDictionaryList('MapConfig').then((res) => {
+      await getGroupDictLists('MapConfig').then((res) => {
         if (res.data.code === 0) {
           res.data.map((item) => {
             let obj = {}

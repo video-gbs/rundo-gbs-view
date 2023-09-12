@@ -109,14 +109,11 @@
       </div>
     </div>
 
-    <!-- <div id="map_container"></div> -->
+    <div id="map_container"></div>
   </div>
 </template>
 
 <script>
-import Code from '@/views/leftMenus/systemManagement//components/Code'
-
-import { validUsername } from '@/utils/validate'
 import { login, getMenuLists } from '@/api/method/user'
 import {
   getHomeUser,
@@ -130,7 +127,9 @@ import Layout from '@/layout/index'
 
 import axios from 'axios'
 
-import AMapLoader from '@amap/amap-jsapi-loader'
+// import { Run3D } from '../../../node_modules/@rjgf/run3d'
+// import * as Run3D from "@rjgf/run3d"
+// import '@rjgf/run3d-engine/Build/Cesium/Widgets/widgets.css'
 window._AMapSecurityConfig = {
   // 设置安全密钥
   securityJsCode: '53f79308351ca5147392f915cfc133d5'
@@ -138,7 +137,7 @@ window._AMapSecurityConfig = {
 
 export default {
   name: 'Login',
-  components: { Code },
+  components: {},
   data() {
     const validateUsername = (rule, value, callback) => {
       if (value === '' || value === null || value.length === 0) {
@@ -400,6 +399,7 @@ export default {
                     console.log('第三方请求')
                     // this.allDataLists = res.data.data
                     store.dispatch('user/changeThirdPartyLogin', true)
+
                     this.saveComponents(res.data.data)
 
                     this.findFuncId(res.data.data)
@@ -513,35 +513,15 @@ export default {
       return obj
     },
     initMap() {
-      AMapLoader.load({
-        key: '60e29aaeb21c23592a0396a255db259e', // 申请好的Web端开发者Key，首次调用 load 时必填
-        version: '2.0', // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-        plugins: ['AMap.AutoComplete', 'AMap.PlaceSearch'] // 需要使用的的插件列表，如比例尺'AMap.Scale'等
-        // "plugins": [],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+      map = new Run3D.map()
+      map.createMap('', 'map_container', {})
+      //创建高德在线地图图层
+      let gdOnlineMap = new Run3D.UrlTemplateImageLayer({
+        url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', //高德地图
+        minimumLevel: 0,
+        maximumLevel: 23
       })
-        .then((AMap) => {
-          this.map = new AMap.Map('map_container', {
-            viewMode: '2D', //  是否为3D地图模式
-            zoom: 13, // 初始化地图级别
-            center: [113.459, 23.1064], //中心点坐标
-            resizeEnable: true
-          })
-
-          this.auto = new AMap.AutoComplete({
-            input: this.iptId // 搜索框的id
-          })
-          this.placeSearch = new AMap.PlaceSearch({
-            map: this.map,
-            panel: 'panel', // 结果列表将在此容器中进行展示。
-            // city: "010", // 兴趣点城市
-            autoFitView: true, // 是否自动调整地图视野使绘制的 Marker点都处于视口的可见范围
-            extensions: 'base' //返回基本地址信息
-          })
-          this.auto.on('select', this.select) //注册监听，当选中某条记录时会触发
-        })
-        .catch((e) => {
-          console.log(e)
-        })
+      map.layers.addRaster(gdOnlineMap)
     },
 
     select(e) {
