@@ -111,8 +111,9 @@ export default {
   created() {
     // this.nowRouter = this.$route.matched.filter((item) => item.name)
     // console.log(this.nowRouter, this.nowRouter[0].name)
+
     // this.setScale()
-    // this.initTabList()
+    this.initTabList()
   },
   mounted() {
     // this.windowWidth = document.documentElement.clientWidth
@@ -120,7 +121,6 @@ export default {
 
     console.log(
       'this.thirdPartyLogin1this.thirdPartyLogin1',
-      this.thirdPartyLogin1,
       Session.get('third_party_login')
     )
     // this.$nextTick(() => {

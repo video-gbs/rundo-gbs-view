@@ -1,14 +1,12 @@
 <template>
   <section class="app-main f1 fd-c ai-s" v-if="changeRouter">
     <div style="height: 100%" class="app-main-c f1 f">
-      <transition name="fade-transform1" mode="out-in">
-        <!-- <keep-alive> -->
-        <router-view v-if="$route.path" :key="key" />
-        <!-- </keep-alive> -->
-      </transition>
-      <transition name="fade-transform2" mode="out-in">
-        <router-view v-if="!$route.path" :key="key" />
-      </transition>
+      <!-- <transition name="fade-transform1" mode="out-in"> -->
+      <router-view :key="$route.path" />
+      <!-- </transition> -->
+      <!-- <transition name="fade-transform2" mode="out-in">
+        <router-view v-if="!$route.path" :key="$route.path" />
+      </transition> -->
     </div>
     <h2 v-if="showSidebar" class="company-title f jc-c ai-c">
       ©2023 润建股份有限公司 版权所有
