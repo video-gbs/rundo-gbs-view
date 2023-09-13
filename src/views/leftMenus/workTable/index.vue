@@ -354,6 +354,7 @@ export default {
             component: item.component,
             children: this.routerChild(item.childList)
           }
+
           typeRouter.push(params1)
           this.routerLists.push(params)
           resData.push(params2)
