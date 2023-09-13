@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import { login, getMenuLists } from '@/api/method/user'
+import { getMenuLists } from '@/api/method/user'
 import {
   getHomeUser,
   newLoginN,
@@ -267,6 +267,7 @@ export default {
   },
   methods: {
     routerChildren(data, arr) {
+      let childArr = []
       data.forEach((datas, index) => {
         arr.push({
           path: datas.path,
@@ -287,7 +288,7 @@ export default {
         })
 
         if (datas.childList && datas.childList.length > 0) {
-          const childArr = this.routerChildren(datas.childList, [])
+          childArr = this.routerChildren(datas.childList, [])
           arr[index].children = childArr
         }
       })
@@ -326,7 +327,7 @@ export default {
       })
       return resRouterChildren
     },
-    saveComponents(data, resName) {
+    saveComponents(data) {
       const homeRouters = [
         {
           path: '/workTable',
@@ -394,7 +395,7 @@ export default {
               this.hasGoPath !== '' &&
               this.thirdPartyLogin
             ) {
-              getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
+              getMenuLists({ levelNumStart: 2, levelNumEnd: 3 })
                 .then((res) => {
                   if (res.data.code === 0) {
                     console.log('第三方请求')

@@ -116,21 +116,17 @@ export default {
     this.initTabList()
   },
   mounted() {
-    // this.windowWidth = document.documentElement.clientWidth
-    // window.onresize = this.throttle(this.setScale, 500, 500)
-
+    // if (Session.get('isLoadingNum') > 1) return
     console.log(
       'this.thirdPartyLogin1this.thirdPartyLogin1',
       Session.get('third_party_login')
     )
-    // this.$nextTick(() => {
     this.resThirdPartyLogin =
       Session.get('third_party_login') !== null &&
       Session.get('third_party_login')
         ? true
         : false
-    //   this.$forceUpdate()
-    // })
+    // Session.set('isLoadingNum', 2)
   },
   methods: {
     // changeSidebarHiddenStatus(val) {
