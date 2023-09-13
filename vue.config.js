@@ -211,7 +211,7 @@ module.exports = {
       }
     ])
 
-    config.resolve.symlinks(true)
+    // config.resolve.symlinks(true)
 
     config.plugins.delete('prefetch')
 
