@@ -41,7 +41,6 @@
     "wangeditor": "^4.7.12"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.22.15",
     "@easydarwin/easyplayer": "^4.1.0",
     "@easydarwin/easywasmplayer": "^4.0.13",
     "@vue/cli-plugin-babel": "4.4.4",
@@ -76,7 +75,6 @@
     "svg-sprite-loader": "4.1.3",
     "svgo": "1.2.2",
     "vue-template-compiler": "2.6.14",
-    "webpack": "^4.4.1",
     "webpack-bundle-analyzer": "^4.9.0"
   },
   "gitHooks": {
