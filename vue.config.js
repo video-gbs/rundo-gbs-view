@@ -1,5 +1,6 @@
 'use strict'
-const Run3DSource = './node_modules/@rjgf/run3d-engine/Source'
+const Run3DDist = 'node_modules/@rjgf/run3d'
+const Run3DSource = 'node_modules/@rjgf/run3d-engine/Source'
 const Run3DWorkers = '../Build/Cesium/Workers'
 const path = require('path')
 const webpack = require('webpack')
@@ -120,33 +121,47 @@ module.exports = {
           test: /\.cjs$/,
           include: /node_modules/,
           type: "javascript/auto"
+        },
+        {
+          test: /\.js$/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                presets: ['@babel/preset-typescript'],
+              },
+            },
+          ],
         }
       ]
     },
     resolve: {
       alias: {
-        '@': resolve('src'),
-        cesium: path.resolve(__dirname, Run3DSource)
+        '@': resolve('src')
       }
     },
     plugins: [
+      // new CopyWebpackPlugin([
+      //   { from: path.join(Run3DDist,'dist'), to: "/dist" },
+      // ]
+      // ),
       new CopyWebpackPlugin([
-        { from: path.join(Run3DSource, Run3DWorkers), to: "Workers" },
-      ]
+          { from: path.join(Run3DSource, Run3DWorkers), to: "Workers" },
+        ]
       ),
-      new CopyWebpackPlugin([{ from: path.join(Run3DSource, "Assets"), to: "Assets" }],
+      new CopyWebpackPlugin( [{ from: path.join(Run3DSource, "Assets"), to: "Assets" }],
       ),
       new CopyWebpackPlugin([{ from: path.join(Run3DSource, "Widgets"), to: "Widgets" }],
       ),
-      new CopyWebpackPlugin([
-        {
-          from: path.join(Run3DSource, "ThirdParty/Workers"),
-          to: "ThirdParty/Workers",
-        },
-      ],
+      new CopyWebpackPlugin( [
+          {
+            from: path.join(Run3DSource, "ThirdParty/Workers"),
+            to: "ThirdParty/Workers",
+          },
+        ],
       ),
       new webpack.DefinePlugin({
-        CESIUM_BASE_URL: JSON.stringify("./"),
+        CESIUM_BASE_URL: JSON.stringify(""),
       }),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
@@ -164,17 +179,17 @@ module.exports = {
       }),
 
       new CopyWebpackPlugin(
-        [{
-          from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml'
-        },
-        {
-          from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer.swf'
-        },
-        {
-          from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer-lib.min.js',
-          to: 'js/'
-        }
-        ]
+          [{
+            from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml'
+          },
+          {
+            from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer.swf'
+          },
+          {
+            from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer-lib.min.js',
+            to: 'js/'
+          }
+          ]
       )
     ]
   },
@@ -195,6 +210,8 @@ module.exports = {
         include: 'initial'
       }
     ])
+
+    config.resolve.symlinks(true)
 
     config.plugins.delete('prefetch')
 

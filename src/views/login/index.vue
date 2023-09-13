@@ -128,7 +128,7 @@ import Layout from '@/layout/index'
 import axios from 'axios'
 
 // import { Run3D } from '../../../node_modules/@rjgf/run3d'
-// import * as Run3D from "@rjgf/run3d"
+// import * as Run3D from '@rjgf/run3d'
 // import '@rjgf/run3d-engine/Build/Cesium/Widgets/widgets.css'
 window._AMapSecurityConfig = {
   // 设置安全密钥
@@ -404,26 +404,34 @@ export default {
 
                     this.saveComponents(res.data.data)
 
-                    this.findFuncId(res.data.data)
+                    getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
+                      .then((res) => {
+                        if (res.data.code === 0) {
+                          this.findFuncId(res.data.data)
 
-                    Local.set('permissionData', [])
-                    Local.set('permissionMenuId', '')
-                    getHomeFunc({
-                      menuId: this.resFuncId
-                    }).then((res) => {
-                      if (res.data.code === 0) {
-                        Local.set('permissionData', res.data.data)
-                        Local.set('permissionMenuId', this.resFuncId)
-                      }
-                    })
+                          Local.set('permissionData', [])
+                          Local.set('permissionMenuId', '')
+                          getHomeFunc({
+                            menuId: this.resFuncId
+                          }).then((res) => {
+                            if (res.data.code === 0) {
+                              Local.set('permissionData', res.data.data)
+                              Local.set('permissionMenuId', this.resFuncId)
+                            }
+                          })
 
-                    this.$nextTick(() => {
-                      store.dispatch('user/changeRightWidth', false)
-                      store.dispatch('user/changeShowSidebar', false)
-                      this.$router.push({ path: `/${this.hasGoPath}` })
-                      this.hasGoPath = ''
-                      this.thirdPartyLogin = false
-                    })
+                          this.$nextTick(() => {
+                            store.dispatch('user/changeRightWidth', false)
+                            store.dispatch('user/changeShowSidebar', false)
+                            this.$router.push({ path: `/${this.hasGoPath}` })
+                            this.hasGoPath = ''
+                            this.thirdPartyLogin = false
+                          })
+                        }
+                      })
+                      .catch((error) => {
+                        console.log(error)
+                      })
                   }
                 })
                 .catch((error) => {
