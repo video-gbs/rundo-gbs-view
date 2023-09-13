@@ -269,7 +269,7 @@ export default {
           meta: { icon: item.icon, title: item.name },
           component: item.component
         }
-        if (item.childList) {
+        if (item.childList && item.childList.length > 0) {
           const childArr = this.routerChild(item.childList)
           childTemp.children = childArr
         }
@@ -279,6 +279,7 @@ export default {
     },
 
     routerChildren(data, arr) {
+      let childArr = []
       data.forEach((datas, index) => {
         arr.push({
           path: datas.path,
@@ -298,8 +299,8 @@ export default {
           children: []
         })
 
-        if (datas.childList) {
-          const childArr = this.routerChildren(datas.childList, [])
+        if (datas.childList && datas.childList.length > 0) {
+          childArr = this.routerChildren(datas.childList, [])
           arr[index].children = childArr
         }
       })

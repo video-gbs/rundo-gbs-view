@@ -286,7 +286,7 @@ export default {
           children: []
         })
 
-        if (datas.childList) {
+        if (datas.childList && datas.childList.length > 0) {
           const childArr = this.routerChildren(datas.childList, [])
           arr[index].children = childArr
         }
@@ -308,6 +308,7 @@ export default {
     routerChild(data) {
       let resRouterChildren = []
       let childTemp = {}
+      let childArr = []
       data.forEach((item, i) => {
         // 组装路由配置
         childTemp = {
@@ -317,8 +318,8 @@ export default {
           meta: { icon: item.icon, title: item.name },
           component: item.component
         }
-        if (item.childList) {
-          const childArr = this.routerChild(item.childList)
+        if (item.childList && item.childList.length > 0) {
+          childArr = this.routerChild(item.childList)
           childTemp.children = childArr
         }
         resRouterChildren.push(childTemp)
