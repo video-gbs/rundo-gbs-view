@@ -109,7 +109,7 @@
       </div>
     </div>
 
-    <div id="map_container"></div>
+    <!-- <div id="map_container"></div> -->
   </div>
 </template>
 
@@ -129,6 +129,7 @@ import axios from 'axios'
 
 // import { Run3D } from '../../../node_modules/@rjgf/run3d'
 // import * as Run3D from '@rjgf/run3d'
+// let {Map} = require('@rjgf/run3d/dist/index')
 // import '@rjgf/run3d-engine/Build/Cesium/Widgets/widgets.css'
 window._AMapSecurityConfig = {
   // 设置安全密钥
@@ -523,10 +524,10 @@ export default {
       return obj
     },
     initMap() {
-      map = new Run3D.map()
+      map = new Map()
       map.createMap('', 'map_container', {})
       //创建高德在线地图图层
-      let gdOnlineMap = new Run3D.UrlTemplateImageLayer({
+      let gdOnlineMap = new UrlTemplateImageLayer({
         url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', //高德地图
         minimumLevel: 0,
         maximumLevel: 23
