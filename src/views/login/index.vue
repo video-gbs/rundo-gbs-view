@@ -426,7 +426,6 @@ export default {
                             store.dispatch('user/changeShowSidebar', false)
                             this.$router.push({ path: `/${this.hasGoPath}` })
                             this.hasGoPath = ''
-                            this.thirdPartyLogin = false
                           })
                         }
                       })

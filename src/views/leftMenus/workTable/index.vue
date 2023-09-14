@@ -1,6 +1,6 @@
 <template>
   <div class="home-page-content">
-    <Header v-if="!resThirdPartyLogin" class="wrapper-header header3" />
+    <Header class="wrapper-header header3" />
     <div class="page-container">
       <div class="container-top">
         <LineFont
@@ -134,7 +134,7 @@ export default {
         title: '常用',
         notShowSmallTitle: false
       },
-      resThirdPartyLogin: false,
+      // resThirdPartyLogin: false,
       textStyle: {
         fontSize: '24px',
         fontFamily: 'Microsoft YaHei-Regular, Microsoft YaHei',
@@ -172,12 +172,12 @@ export default {
     store.dispatch('user/changeThirdPartyLogin', false)
     this.routerLists = []
 
-    // this.resThirdPartyLogin = Session.get('third_party_login')
-    this.resThirdPartyLogin =
-      Session.get('third_party_login') !== null &&
-      Session.get('third_party_login')
-        ? true
-        : false
+    Session.set('third_party_login', false)
+    // this.resThirdPartyLogin =
+    //   Session.get('third_party_login') !== null &&
+    //   Session.get('third_party_login')
+    //     ? true
+    //     : false
   },
   mounted() {
     this.initMenuLists()
@@ -381,6 +381,7 @@ export default {
     },
     goContentList: antiShake(function (val, data, child) {
       console.log('goContentList', val, data, child)
+      Session.set('third_party_login', false)
       Local.set('resRouterName', child.name)
       Local.set('isShowSideRouter', val)
 

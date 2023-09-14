@@ -120,21 +120,7 @@ module.exports = {
           test: /\.cjs$/,
           include: /node_modules/,
           type: "javascript/auto"
-        },
-      //   {
-      //     test: /\.ts$/,
-      //     exclude: /node_modules/,
-      //     enforce: 'pre',
-      //     loader: 'tslint-loader'
-      // },
-      // {
-      //     test: /\.tsx?$/,
-      //     loader: 'ts-loader',
-      //     exclude: /node_modules/,
-      //     options: {
-      //         appendTsSuffixTo: [/\.vue$/],
-      //     }
-      // }
+        }
       ]
     },
     resolve: {
@@ -212,6 +198,16 @@ module.exports = {
     ])
 
     config.plugins.delete('prefetch')
+    config.module
+      .rule('ignore')
+      .test(/\.cjs$/)
+      .exclude
+      .add(/node_modules/)
+      .end()
+      .use('ignore-loader')
+      .loader('ignore-loader')
+      .options({})
+      .end();
 
     config.module.rule('svg').exclude.add(resolve('src/icons')).end()
     config.module
