@@ -342,35 +342,37 @@ export default {
         let typeRouter = []
         let resData = []
 
-        data.childList.map((item) => {
-          // let params = {}
-          let params1 = {}
-          let params2 = {}
-          // params = {
-          //   path: item.path,
-          //   meta: { icon: item.icon, title: item.name },
-          //   name: item.name,
-          //   id: item.id,
-          //   component: Layout,
-          //   children: this.routerChildren(item.childList, [])
-          // }
-          params1 = {
-            path: item.path,
-            meta: { icon: item.icon, title: item.name },
-            name: item.name,
-            id: item.id
-          }
-          params2 = {
-            path: item.path,
-            meta: { icon: item.icon, title: item.name },
-            name: item.name,
-            icon: item.icon,
-            id: item.id,
-            component: item.component,
-            children: this.routerChild(item.childList)
-          }
-          typeRouter.push(params1)
-          resData.push(params2)
+        data.map((datas) => {
+          item.childList.map((item) => {
+            // let params = {}
+            let params1 = {}
+            let params2 = {}
+            // params = {
+            //   path: item.path,
+            //   meta: { icon: item.icon, title: item.name },
+            //   name: item.name,
+            //   id: item.id,
+            //   component: Layout,
+            //   children: this.routerChildren(item.childList, [])
+            // }
+            params1 = {
+              path: item.path,
+              meta: { icon: item.icon, title: item.name },
+              name: item.name,
+              id: item.id
+            }
+            params2 = {
+              path: item.path,
+              meta: { icon: item.icon, title: item.name },
+              name: item.name,
+              icon: item.icon,
+              id: item.id,
+              component: item.component,
+              children: this.routerChild(item.childList)
+            }
+            typeRouter.push(params1)
+            resData.push(params2)
+          })
         })
 
         store.dispatch('user/dynamicRouters', [])
