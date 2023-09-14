@@ -94,19 +94,19 @@ export default {
     }
   },
   watch: {
-    changeShowSidebar() {}
+    changeShowSidebar() {},
     // changeThirdPartyLogin(oldValue, newValue) {
     //   console.log('this.thirdPartyLogin~~~~~~111', oldValue, newValue)
     // }
-    // windowWidth: {
-    //   handler: function (val, oldVal) {
-    //     const h = document.getElementsByTagName('HTML')[0]
-    //     h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+    resThirdPartyLogin: {
+      handler: function (newVal, oldVal) {
+        console.log('newVal, oldVal', newVal, oldVal)
+        this.resThirdPartyLogin = newVal
 
-    //     this.$forceUpdate()
-    //   },
-    //   immediate: true
-    // }
+        this.$forceUpdate()
+      },
+      immediate: true
+    }
   },
   created() {
     // this.nowRouter = this.$route.matched.filter((item) => item.name)
