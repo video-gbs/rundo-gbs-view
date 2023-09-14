@@ -155,6 +155,8 @@ export default {
           getHomeFunc({ menuId: item.children[0].id }).then((res) => {
             if (res.data.code === 0) {
               console.log('data~~~~~~', data, resArray)
+              Local.set('permissionData', [])
+              Local.set('permissionMenuId', '')
               Local.set('permissionData', res.data.data)
               Local.set('permissionMenuId', item.children[0].id)
 

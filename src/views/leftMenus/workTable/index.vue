@@ -405,7 +405,9 @@ export default {
           menuId: child.childList[0] ? child.childList[0].id : ''
         }).then((res) => {
           if (res.data.code === 0) {
+            Local.set('permissionData', [])
             Local.set('permissionData', res.data.data)
+            Local.set('permissionMenuId', '')
             Local.set(
               'permissionMenuId',
               child.childList[0] ? child.childList[0].id : ''

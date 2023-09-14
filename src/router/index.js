@@ -317,6 +317,7 @@ router.beforeEach(async (to, from, next) => {
       if (Local.get('permissionMenuId')) {
         getHomeFunc({ menuId: Local.get('permissionMenuId') }).then((res) => {
           if (res.data.code === 0) {
+            Local.set('permissionData', [])
             Local.set('permissionData', res.data.data)
           }
         })
