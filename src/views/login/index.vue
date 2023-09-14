@@ -396,7 +396,7 @@ export default {
               this.hasGoPath !== '' &&
               this.thirdPartyLogin
             ) {
-              getMenuLists({ levelNumStart: 2, levelNumEnd: 3 })
+              getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
                 .then((res) => {
                   if (res.data.code === 0) {
                     console.log('第三方请求')
@@ -405,33 +405,33 @@ export default {
 
                     this.saveComponents(res.data.data)
 
-                    getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
-                      .then((res) => {
-                        if (res.data.code === 0) {
-                          this.findFuncId(res.data.data)
+                    // getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
+                    //   .then((res) => {
+                    //     if (res.data.code === 0) {
+                    this.findFuncId(res.data.data)
 
-                          Local.set('permissionData', [])
-                          Local.set('permissionMenuId', '')
-                          getHomeFunc({
-                            menuId: this.resFuncId
-                          }).then((res) => {
-                            if (res.data.code === 0) {
-                              Local.set('permissionData', res.data.data)
-                              Local.set('permissionMenuId', this.resFuncId)
-                            }
-                          })
+                    Local.set('permissionData', [])
+                    Local.set('permissionMenuId', '')
+                    getHomeFunc({
+                      menuId: this.resFuncId
+                    }).then((res) => {
+                      if (res.data.code === 0) {
+                        Local.set('permissionData', res.data.data)
+                        Local.set('permissionMenuId', this.resFuncId)
+                      }
+                    })
 
-                          this.$nextTick(() => {
-                            store.dispatch('user/changeRightWidth', false)
-                            store.dispatch('user/changeShowSidebar', false)
-                            this.$router.push({ path: `/${this.hasGoPath}` })
-                            this.hasGoPath = ''
-                          })
-                        }
-                      })
-                      .catch((error) => {
-                        console.log(error)
-                      })
+                    this.$nextTick(() => {
+                      store.dispatch('user/changeRightWidth', false)
+                      store.dispatch('user/changeShowSidebar', false)
+                      this.$router.push({ path: `/${this.hasGoPath}` })
+                      this.hasGoPath = ''
+                    })
+                    //   }
+                    // })
+                    // .catch((error) => {
+                    //   console.log(error)
+                    // })
                   }
                 })
                 .catch((error) => {
