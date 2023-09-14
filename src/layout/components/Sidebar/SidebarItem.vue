@@ -83,6 +83,8 @@ export default {
     routerClick(item) {
       getHomeFunc({ menuId: item.id }).then((res) => {
         if (res.data.code === 0) {
+          Local.set('permissionData', [])
+          Local.set('permissionMenuId', '')
           Local.set('permissionData', res.data.data)
           Local.set('permissionMenuId', item.id)
         }

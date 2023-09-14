@@ -120,10 +120,25 @@ module.exports = {
           test: /\.cjs$/,
           include: /node_modules/,
           type: "javascript/auto"
-        }
+        },
+      //   {
+      //     test: /\.ts$/,
+      //     exclude: /node_modules/,
+      //     enforce: 'pre',
+      //     loader: 'tslint-loader'
+      // },
+      // {
+      //     test: /\.tsx?$/,
+      //     loader: 'ts-loader',
+      //     exclude: /node_modules/,
+      //     options: {
+      //         appendTsSuffixTo: [/\.vue$/],
+      //     }
+      // }
       ]
     },
     resolve: {
+      // extensions: [".ts", ".tsx", ".js", ".json",'cjs','mjs'],
       alias: {
         '@': resolve('src'),
         cesium: path.resolve(__dirname, Run3DSource)

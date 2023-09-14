@@ -128,8 +128,8 @@ import Layout from '@/layout/index'
 import axios from 'axios'
 
 // import { Run3D } from '../../../node_modules/@rjgf/run3d'
-// import * as Run3D from '@rjgf/run3d'
-// let {Map} = require('@rjgf/run3d/dist/index')
+// import * as Run3D from '@rjgf/run3d/dist'
+// let Map = require('@rjgf/run3d')
 // import '@rjgf/run3d-engine/Build/Cesium/Widgets/widgets.css'
 window._AMapSecurityConfig = {
   // 设置安全密钥
