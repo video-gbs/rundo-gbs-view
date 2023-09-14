@@ -314,7 +314,9 @@ router.beforeEach(async (to, from, next) => {
     // console.log('~~~~~~~~~~~~~~~~', init, dynamicRouters)
     if (!init && dynamicRouters) {
       // console.log('刷新了页面')
-      if (Local.get('permissionMenuId')) {
+      if (Local.get('permissionMenuId') &&
+        Session.get('third_party_login') !== null &&
+        !Session.get('third_party_login')) {
         getHomeFunc({ menuId: Local.get('permissionMenuId') }).then((res) => {
           if (res.data.code === 0) {
             Local.set('permissionData', [])
