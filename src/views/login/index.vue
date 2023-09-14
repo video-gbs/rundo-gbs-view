@@ -267,34 +267,34 @@ export default {
     }
   },
   methods: {
-    routerChildren(data, arr) {
-      let childArr = []
-      data.forEach((datas, index) => {
-        arr.push({
-          path: datas.path,
-          name: datas.name,
-          types: datas.types,
-          hidden: datas.disabled === 1 ? true : false,
-          component:
-            datas.component === 'Layout'
-              ? Layout
-              : (resolve) => require([`@/views${datas.component}`], resolve),
-          meta: {
-            title: datas.name,
-            icon: datas.icon
-          },
-          id: datas.id,
-          // 子路由
-          children: []
-        })
+    // routerChildren(data, arr) {
+    //   let childArr = []
+    //   data.forEach((datas, index) => {
+    //     arr.push({
+    //       path: datas.path,
+    //       name: datas.name,
+    //       types: datas.types,
+    //       hidden: datas.disabled === 1 ? true : false,
+    //       component:
+    //         datas.component === 'Layout'
+    //           ? Layout
+    //           : (resolve) => require([`@/views${datas.component}`], resolve),
+    //       meta: {
+    //         title: datas.name,
+    //         icon: datas.icon
+    //       },
+    //       id: datas.id,
+    //       // 子路由
+    //       children: []
+    //     })
 
-        if (datas.childList && datas.childList.length > 0) {
-          childArr = this.routerChildren(datas.childList, [])
-          arr[index].children = childArr
-        }
-      })
-      return arr
-    },
+    //     if (datas.childList && datas.childList.length > 0) {
+    //       childArr = this.routerChildren(datas.childList, [])
+    //       arr[index].children = childArr
+    //     }
+    //   })
+    //   return arr
+    // },
 
     findFuncId(data) {
       data.forEach((datas, index) => {
@@ -343,17 +343,17 @@ export default {
         let resData = []
 
         data.map((item) => {
-          let params = {}
+          // let params = {}
           let params1 = {}
           let params2 = {}
-          params = {
-            path: item.path,
-            meta: { icon: item.icon, title: item.name },
-            name: item.name,
-            id: item.id,
-            component: Layout,
-            children: this.routerChildren(item.childList, [])
-          }
+          // params = {
+          //   path: item.path,
+          //   meta: { icon: item.icon, title: item.name },
+          //   name: item.name,
+          //   id: item.id,
+          //   component: Layout,
+          //   children: this.routerChildren(item.childList, [])
+          // }
           params1 = {
             path: item.path,
             meta: { icon: item.icon, title: item.name },
