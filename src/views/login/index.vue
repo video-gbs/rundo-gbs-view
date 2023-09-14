@@ -343,7 +343,7 @@ export default {
         let resData = []
 
         data.map((datas) => {
-          item.childList.map((item) => {
+          datas.childList.map((item) => {
             // let params = {}
             let params1 = {}
             let params2 = {}
