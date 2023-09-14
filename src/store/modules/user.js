@@ -1,6 +1,6 @@
 import { login, logout } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { Local, Session } from '@/utils/storage'
+import { Session } from '@/utils/storage'
 import router from '../../router'
 import Layout from '@/layout/index'
 const getDefaultState = () => {
@@ -106,10 +106,12 @@ const mutations = {
       restypeRouter.push(item)
     })
     state.typeRouter = homeRouters.concat(restypeRouter)
-    if (Local.get('isShowSideRouter') === 0) {
+    if (Session.get('isShowSideRouter') === 0) {
+      console.log('isShowSideRouter111')
       state.rightWidth = true
       state.showSidebar = true
     } else {
+      console.log('isShowSideRouter222')
       state.rightWidth = false
       state.showSidebar = false
     }

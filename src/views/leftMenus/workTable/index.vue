@@ -168,6 +168,7 @@ export default {
   created() {
     Session.set('permissionData', [])
     Session.set('permissionMenuId', '')
+    // Session.set('isShowSideRouter', 0)
     Local.set('equipmentActiveName', '编码器')
     store.dispatch('user/changeThirdPartyLogin', false)
     this.routerLists = []
@@ -383,7 +384,7 @@ export default {
       console.log('goContentList', val, data, child)
       Session.set('third_party_login', false)
       Session.set('resRouterName', child.name)
-      Local.set('isShowSideRouter', val)
+      Session.set('isShowSideRouter', val)
 
       this.isGoContentListClicked = true
 
