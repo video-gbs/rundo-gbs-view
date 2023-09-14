@@ -414,6 +414,7 @@ export default {
 
                     Session.set('permissionData', [])
                     Session.set('permissionMenuId', '')
+                    Session.set('isShowSideRouter', 1)
                     getHomeFunc({
                       menuId: this.resFuncId
                     }).then((res) => {
