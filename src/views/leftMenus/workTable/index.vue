@@ -380,7 +380,7 @@ export default {
       }
     },
     goContentList: antiShake(function (val, data, child) {
-      // console.log('goContentList', val, data, child)
+      console.log('goContentList', val, data, child)
       Local.set('resRouterName', child.name)
       Local.set('isShowSideRouter', val)
 
