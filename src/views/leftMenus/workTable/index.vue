@@ -166,8 +166,8 @@ export default {
     // }
   },
   created() {
-    Local.set('permissionData', [])
-    Local.set('permissionMenuId', '')
+    Session.set('permissionData', [])
+    Session.set('permissionMenuId', '')
     Local.set('equipmentActiveName', '编码器')
     store.dispatch('user/changeThirdPartyLogin', false)
     this.routerLists = []
@@ -382,7 +382,7 @@ export default {
     goContentList: antiShake(function (val, data, child) {
       console.log('goContentList', val, data, child)
       Session.set('third_party_login', false)
-      Local.set('resRouterName', child.name)
+      Session.set('resRouterName', child.name)
       Local.set('isShowSideRouter', val)
 
       this.isGoContentListClicked = true
@@ -406,10 +406,10 @@ export default {
           menuId: child.childList[0] ? child.childList[0].id : ''
         }).then((res) => {
           if (res.data.code === 0) {
-            Local.set('permissionData', [])
-            Local.set('permissionData', res.data.data)
-            Local.set('permissionMenuId', '')
-            Local.set(
+            Session.set('permissionData', [])
+            Session.set('permissionData', res.data.data)
+            Session.set('permissionMenuId', '')
+            Session.set(
               'permissionMenuId',
               child.childList[0] ? child.childList[0].id : ''
             )

@@ -1,12 +1,12 @@
 import Vue from 'vue'
-import { Local } from '@/utils/storage'
+import { Session } from '@/utils/storage'
 
 // 检测传入的元素key是否可以显示
 function checkKey(currentTag, resMethod) {
   // 获取权限数组
 
-  let permissionData = Local.get('permissionData')
-    ? Local.get('permissionData')
+  let permissionData = Session.get('permissionData')
+    ? Session.get('permissionData')
     : []
 
   //如果传入的元素key不在权限数组里，则不可显示

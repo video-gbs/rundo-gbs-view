@@ -52,7 +52,7 @@ import { isExternal } from '@/utils/validate'
 import Item from './Item'
 import AppLink from './Link'
 import FixiOSBug from './FixiOSBug'
-import { Local } from '@/utils/storage'
+import { Session } from '@/utils/storage'
 import { getHomeFunc } from '@/api/method/home'
 
 export default {
@@ -83,10 +83,10 @@ export default {
     routerClick(item) {
       getHomeFunc({ menuId: item.id }).then((res) => {
         if (res.data.code === 0) {
-          Local.set('permissionData', [])
-          Local.set('permissionMenuId', '')
-          Local.set('permissionData', res.data.data)
-          Local.set('permissionMenuId', item.id)
+          Session.set('permissionData', [])
+          Session.set('permissionMenuId', '')
+          Session.set('permissionData', res.data.data)
+          Session.set('permissionMenuId', item.id)
         }
       })
     },

@@ -216,8 +216,8 @@ export default {
     store.dispatch('user/changeThirdPartyLogin', false)
     clearInterval(window.interval)
     clearInterval(window.interval1)
-    Local.set('permissionData', [])
-    Local.set('permissionMenuId', '')
+    Session.set('permissionData', [])
+    Session.set('permissionMenuId', '')
     Local.set('expires_in', '')
     Local.clear()
     Local.remove('access_token')
@@ -412,14 +412,14 @@ export default {
                     //     if (res.data.code === 0) {
                     this.findFuncId(res.data.data)
 
-                    Local.set('permissionData', [])
-                    Local.set('permissionMenuId', '')
+                    Session.set('permissionData', [])
+                    Session.set('permissionMenuId', '')
                     getHomeFunc({
                       menuId: this.resFuncId
                     }).then((res) => {
                       if (res.data.code === 0) {
-                        Local.set('permissionData', res.data.data)
-                        Local.set('permissionMenuId', this.resFuncId)
+                        Session.set('permissionData', res.data.data)
+                        Session.set('permissionMenuId', this.resFuncId)
                       }
                     })
 
