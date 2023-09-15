@@ -78,7 +78,7 @@ export default {
               : res.data.data.id
             setTimeout(() => {
               this.isShow = true
-            }, 100)
+            }, 500)
             setTimeout(() => {
               this.$nextTick(() => {
                 this.$refs.encoder.getList(resId)

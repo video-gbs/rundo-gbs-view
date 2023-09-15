@@ -577,7 +577,7 @@ export default {
             this.initTreeList(res.data.data[0].resourceKey)
             setTimeout(() => {
               this.isShow = true
-            }, 100)
+            }, 500)
           }
         })
         .catch((error) => {

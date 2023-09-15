@@ -519,7 +519,7 @@ export default {
             this.getUnitDetailsData(resData)
             setTimeout(() => {
               this.isShow = true
-            }, 100)
+            }, 500)
           }
         })
         .catch((error) => {
