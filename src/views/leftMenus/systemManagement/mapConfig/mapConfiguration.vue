@@ -402,7 +402,7 @@ export default {
           this.params.current = res.data.data.current
           setTimeout(() => {
             this.isShow = true
-          }, 100)
+          }, 500)
         }
       })
     },

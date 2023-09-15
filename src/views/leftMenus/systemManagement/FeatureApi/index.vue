@@ -71,7 +71,7 @@ export default {
           if (res.data.code === 0) {
             setTimeout(() => {
               this.isShow = true
-            }, 100)
+            }, 500)
             setTimeout(() => {
               this.$nextTick(() => {
                 this.treeData = [res.data.data]
