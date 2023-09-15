@@ -124,6 +124,7 @@ module.exports = {
       ]
     },
     resolve: {
+      // extensions: [".ts", ".tsx", ".js", ".json",'cjs','mjs'],
       alias: {
         '@': resolve('src'),
         cesium: path.resolve(__dirname, Run3DSource)
@@ -197,6 +198,16 @@ module.exports = {
     ])
 
     config.plugins.delete('prefetch')
+    config.module
+      .rule('ignore')
+      .test(/\.cjs$/)
+      .exclude
+      .add(/node_modules/)
+      .end()
+      .use('ignore-loader')
+      .loader('ignore-loader')
+      .options({})
+      .end();
 
     config.module.rule('svg').exclude.add(resolve('src/icons')).end()
     config.module

@@ -3,7 +3,7 @@
     <div style="height: 100%" class="app-main-c f1 f">
       <transition name="fade-transform1" mode="out-in">
         <keep-alive>
-          <router-view />
+          <router-view/>
         </keep-alive>
       </transition>
       <!-- <transition name="fade-transform2" mode="out-in">

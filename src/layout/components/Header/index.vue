@@ -74,7 +74,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import { Local } from '@/utils/storage'
+import { Local, Session } from '@/utils/storage'
 import { logout, newLogout } from '@/api/method/user'
 import store from '@/store/index'
 
@@ -134,11 +134,11 @@ export default {
         })
     },
     clickRouter(data) {
-      Local.set('resRouterName', data.name)
+      Session.set('resRouterName', data.name)
       const resArray =
         this.routerLists && this.routerLists.length > 0
           ? this.routerLists
-          : JSON.parse(Local.get('dynamicRouters'))
+          : JSON.parse(Session.get('dynamicRouters'))
       if (data.path === '/workTable') {
         this.$router.push({ path: data.path })
         // resetRouter()
@@ -155,8 +155,10 @@ export default {
           getHomeFunc({ menuId: item.children[0].id }).then((res) => {
             if (res.data.code === 0) {
               console.log('data~~~~~~', data, resArray)
-              Local.set('permissionData', res.data.data)
-              Local.set('permissionMenuId', item.children[0].id)
+              Session.set('permissionData', [])
+              Session.set('permissionMenuId', '')
+              Session.set('permissionData', res.data.data)
+              Session.set('permissionMenuId', item.children[0].id)
 
               this.$router.push({ path: item.children[0].path })
             }

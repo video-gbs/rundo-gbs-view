@@ -1,6 +1,6 @@
 import { login, logout } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { Local } from '@/utils/storage'
+import { Session } from '@/utils/storage'
 import router from '../../router'
 import Layout from '@/layout/index'
 const getDefaultState = () => {
@@ -99,17 +99,19 @@ const mutations = {
     state.routerLists = []
     state.routerLists = routerMaps
     routerMaps.map((item) => {
-      if (item.name === Local.get('resRouterName')) {
+      if (item.name === Session.get('resRouterName')) {
         state.sidebarRouter = item.children
         state.activeIndex = item.path
       }
       restypeRouter.push(item)
     })
     state.typeRouter = homeRouters.concat(restypeRouter)
-    if (Local.get('isShowSideRouter') === 0) {
+    if (Session.get('isShowSideRouter') === 0) {
+      console.log('isShowSideRouter111')
       state.rightWidth = true
       state.showSidebar = true
     } else {
+      console.log('isShowSideRouter222')
       state.rightWidth = false
       state.showSidebar = false
     }
@@ -130,7 +132,7 @@ const mutations = {
     state.routerLists = []
     state.routerLists = dynamicRouters
 
-    Local.set('dynamicRouters', JSON.stringify(dynamicRouters))
+    Session.set('dynamicRouters', JSON.stringify(dynamicRouters))
   },
   SET_INIT: (state, init) => {
     state.init = init

@@ -309,15 +309,18 @@ router.beforeEach(async (to, from, next) => {
   const hasToken = Local.get('access_token')
   if (hasToken) {
     const init = store.state.user.init
-    const dynamicRouters = JSON.parse(Local.get('dynamicRouters'))
+    const dynamicRouters = JSON.parse(Session.get('dynamicRouters'))
 
     // console.log('~~~~~~~~~~~~~~~~', init, dynamicRouters)
     if (!init && dynamicRouters) {
       // console.log('刷新了页面')
-      if (Local.get('permissionMenuId')) {
-        getHomeFunc({ menuId: Local.get('permissionMenuId') }).then((res) => {
+      if (Session.get('permissionMenuId') &&
+        Session.get('third_party_login') !== null &&
+        !Session.get('third_party_login')) {
+        getHomeFunc({ menuId: Session.get('permissionMenuId') }).then((res) => {
           if (res.data.code === 0) {
-            Local.set('permissionData', res.data.data)
+            Session.set('permissionData', [])
+            Session.set('permissionData', res.data.data)
           }
         })
       }

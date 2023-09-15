@@ -239,7 +239,6 @@ import {
   updateDict,
   deleteDict
 } from '@/api/method/dictionary'
-import { getHomeFunc } from '@/api/method/home'
 import pagination from '@/components/Pagination/index.vue'
 import store from '@/store/index'
 import { Local } from '@/utils/storage'

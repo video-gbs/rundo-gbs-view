@@ -128,8 +128,8 @@ import Layout from '@/layout/index'
 import axios from 'axios'
 
 // import { Run3D } from '../../../node_modules/@rjgf/run3d'
-// import * as Run3D from '@rjgf/run3d'
-// let {Map} = require('@rjgf/run3d/dist/index')
+// import * as Run3D from '@rjgf/run3d/dist'
+// let Map = require('@rjgf/run3d')
 // import '@rjgf/run3d-engine/Build/Cesium/Widgets/widgets.css'
 window._AMapSecurityConfig = {
   // 设置安全密钥
@@ -216,8 +216,8 @@ export default {
     store.dispatch('user/changeThirdPartyLogin', false)
     clearInterval(window.interval)
     clearInterval(window.interval1)
-    Local.set('permissionData', [])
-    Local.set('permissionMenuId', '')
+    Session.set('permissionData', [])
+    Session.set('permissionMenuId', '')
     Local.set('expires_in', '')
     Local.clear()
     Local.remove('access_token')
@@ -267,34 +267,34 @@ export default {
     }
   },
   methods: {
-    routerChildren(data, arr) {
-      let childArr = []
-      data.forEach((datas, index) => {
-        arr.push({
-          path: datas.path,
-          name: datas.name,
-          types: datas.types,
-          hidden: datas.disabled === 1 ? true : false,
-          component:
-            datas.component === 'Layout'
-              ? Layout
-              : (resolve) => require([`@/views${datas.component}`], resolve),
-          meta: {
-            title: datas.name,
-            icon: datas.icon
-          },
-          id: datas.id,
-          // 子路由
-          children: []
-        })
+    // routerChildren(data, arr) {
+    //   let childArr = []
+    //   data.forEach((datas, index) => {
+    //     arr.push({
+    //       path: datas.path,
+    //       name: datas.name,
+    //       types: datas.types,
+    //       hidden: datas.disabled === 1 ? true : false,
+    //       component:
+    //         datas.component === 'Layout'
+    //           ? Layout
+    //           : (resolve) => require([`@/views${datas.component}`], resolve),
+    //       meta: {
+    //         title: datas.name,
+    //         icon: datas.icon
+    //       },
+    //       id: datas.id,
+    //       // 子路由
+    //       children: []
+    //     })
 
-        if (datas.childList && datas.childList.length > 0) {
-          childArr = this.routerChildren(datas.childList, [])
-          arr[index].children = childArr
-        }
-      })
-      return arr
-    },
+    //     if (datas.childList && datas.childList.length > 0) {
+    //       childArr = this.routerChildren(datas.childList, [])
+    //       arr[index].children = childArr
+    //     }
+    //   })
+    //   return arr
+    // },
 
     findFuncId(data) {
       data.forEach((datas, index) => {
@@ -342,35 +342,37 @@ export default {
         let typeRouter = []
         let resData = []
 
-        data.map((item) => {
-          let params = {}
-          let params1 = {}
-          let params2 = {}
-          params = {
-            path: item.path,
-            meta: { icon: item.icon, title: item.name },
-            name: item.name,
-            id: item.id,
-            component: Layout,
-            children: this.routerChildren(item.childList, [])
-          }
-          params1 = {
-            path: item.path,
-            meta: { icon: item.icon, title: item.name },
-            name: item.name,
-            id: item.id
-          }
-          params2 = {
-            path: item.path,
-            meta: { icon: item.icon, title: item.name },
-            name: item.name,
-            icon: item.icon,
-            id: item.id,
-            component: item.component,
-            children: this.routerChild(item.childList)
-          }
-          typeRouter.push(params1)
-          resData.push(params2)
+        data.map((datas) => {
+          datas.childList.map((item) => {
+            // let params = {}
+            let params1 = {}
+            let params2 = {}
+            // params = {
+            //   path: item.path,
+            //   meta: { icon: item.icon, title: item.name },
+            //   name: item.name,
+            //   id: item.id,
+            //   component: Layout,
+            //   children: this.routerChildren(item.childList, [])
+            // }
+            params1 = {
+              path: item.path,
+              meta: { icon: item.icon, title: item.name },
+              name: item.name,
+              id: item.id
+            }
+            params2 = {
+              path: item.path,
+              meta: { icon: item.icon, title: item.name },
+              name: item.name,
+              icon: item.icon,
+              id: item.id,
+              component: item.component,
+              children: this.routerChild(item.childList)
+            }
+            typeRouter.push(params1)
+            resData.push(params2)
+          })
         })
 
         store.dispatch('user/dynamicRouters', [])
@@ -396,7 +398,7 @@ export default {
               this.hasGoPath !== '' &&
               this.thirdPartyLogin
             ) {
-              getMenuLists({ levelNumStart: 2, levelNumEnd: 3 })
+              getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
                 .then((res) => {
                   if (res.data.code === 0) {
                     console.log('第三方请求')
@@ -405,34 +407,34 @@ export default {
 
                     this.saveComponents(res.data.data)
 
-                    getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
-                      .then((res) => {
-                        if (res.data.code === 0) {
-                          this.findFuncId(res.data.data)
+                    // getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
+                    //   .then((res) => {
+                    //     if (res.data.code === 0) {
+                    this.findFuncId(res.data.data)
 
-                          Local.set('permissionData', [])
-                          Local.set('permissionMenuId', '')
-                          getHomeFunc({
-                            menuId: this.resFuncId
-                          }).then((res) => {
-                            if (res.data.code === 0) {
-                              Local.set('permissionData', res.data.data)
-                              Local.set('permissionMenuId', this.resFuncId)
-                            }
-                          })
+                    Session.set('permissionData', [])
+                    Session.set('permissionMenuId', '')
+                    Session.set('isShowSideRouter', 1)
+                    getHomeFunc({
+                      menuId: this.resFuncId
+                    }).then((res) => {
+                      if (res.data.code === 0) {
+                        Session.set('permissionData', res.data.data)
+                        Session.set('permissionMenuId', this.resFuncId)
+                      }
+                    })
 
-                          this.$nextTick(() => {
-                            store.dispatch('user/changeRightWidth', false)
-                            store.dispatch('user/changeShowSidebar', false)
-                            this.$router.push({ path: `/${this.hasGoPath}` })
-                            this.hasGoPath = ''
-                            this.thirdPartyLogin = false
-                          })
-                        }
-                      })
-                      .catch((error) => {
-                        console.log(error)
-                      })
+                    this.$nextTick(() => {
+                      store.dispatch('user/changeRightWidth', false)
+                      store.dispatch('user/changeShowSidebar', false)
+                      this.$router.push({ path: `/${this.hasGoPath}` })
+                      this.hasGoPath = ''
+                    })
+                    //   }
+                    // })
+                    // .catch((error) => {
+                    //   console.log(error)
+                    // })
                   }
                 })
                 .catch((error) => {

@@ -1,6 +1,6 @@
 <template>
   <div class="home-page-content">
-    <Header v-if="!resThirdPartyLogin" class="wrapper-header header3" />
+    <Header class="wrapper-header header3" />
     <div class="page-container">
       <div class="container-top">
         <LineFont
@@ -134,7 +134,7 @@ export default {
         title: '常用',
         notShowSmallTitle: false
       },
-      resThirdPartyLogin: false,
+      // resThirdPartyLogin: false,
       textStyle: {
         fontSize: '24px',
         fontFamily: 'Microsoft YaHei-Regular, Microsoft YaHei',
@@ -166,18 +166,19 @@ export default {
     // }
   },
   created() {
-    Local.set('permissionData', [])
-    Local.set('permissionMenuId', '')
+    Session.set('permissionData', [])
+    Session.set('permissionMenuId', '')
+    // Session.set('isShowSideRouter', 0)
     Local.set('equipmentActiveName', '编码器')
     store.dispatch('user/changeThirdPartyLogin', false)
     this.routerLists = []
 
-    // this.resThirdPartyLogin = Session.get('third_party_login')
-    this.resThirdPartyLogin =
-      Session.get('third_party_login') !== null &&
-      Session.get('third_party_login')
-        ? true
-        : false
+    Session.set('third_party_login', false)
+    // this.resThirdPartyLogin =
+    //   Session.get('third_party_login') !== null &&
+    //   Session.get('third_party_login')
+    //     ? true
+    //     : false
   },
   mounted() {
     this.initMenuLists()
@@ -380,9 +381,10 @@ export default {
       }
     },
     goContentList: antiShake(function (val, data, child) {
-      // console.log('goContentList', val, data, child)
-      Local.set('resRouterName', child.name)
-      Local.set('isShowSideRouter', val)
+      console.log('goContentList', val, data, child)
+      Session.set('third_party_login', false)
+      Session.set('resRouterName', child.name)
+      Session.set('isShowSideRouter', val)
 
       this.isGoContentListClicked = true
 
@@ -405,8 +407,10 @@ export default {
           menuId: child.childList[0] ? child.childList[0].id : ''
         }).then((res) => {
           if (res.data.code === 0) {
-            Local.set('permissionData', res.data.data)
-            Local.set(
+            Session.set('permissionData', [])
+            Session.set('permissionData', res.data.data)
+            Session.set('permissionMenuId', '')
+            Session.set(
               'permissionMenuId',
               child.childList[0] ? child.childList[0].id : ''
             )
