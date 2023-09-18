@@ -81,37 +81,42 @@
                 prop="dictId"
                 label="地图"
                 :show-overflow-tooltip="true"
-              />
+              >
+                <template slot-scope="scope">
+                  <span v-for="item in dictIdOption" :key="item.value">{{
+                    Number(item.value) === scope.row.dictId ? item.label : ''
+                  }}</span>
+                </template>
+              </el-table-column>
               <el-table-column
-                prop="latitude"
+                prop="longitude"
                 label="经度"
                 :show-overflow-tooltip="true"
               />
               <el-table-column
-                prop="authorizationGrantTypes"
+                prop="latitude"
                 label="纬度"
                 :show-overflow-tooltip="true"
               >
               </el-table-column>
               <el-table-column
-                prop="clientAuthenticationMethods"
+                prop="height"
                 label="高度"
                 :show-overflow-tooltip="true"
               >
               </el-table-column>
               <el-table-column
-                prop="requireAuthorizationConsent"
+                prop="onStatus"
                 label="状态"
                 :show-overflow-tooltip="true"
               >
                 <template slot-scope="scope">
                   <el-switch
-                    v-if="scope.row.id !== '0'"
-                    v-model="scope.row.disabled"
+                    v-model="scope.row.onStatus"
                     active-color="#13ce66"
                     inactive-color="#ff4949"
-                    :active-value="0"
-                    :inactive-value="1"
+                    :active-value="1"
+                    :inactive-value="0"
                     @change="changeSwitch(scope.row)"
                   >
                   </el-switch>
@@ -126,11 +131,11 @@
                 </template>
               </el-table-column>
             </el-table>
-            <pagination
+            <!-- <pagination
               :pages-data="params"
               @size-change="sizeChange"
               @current-change="currentChange"
-            />
+            /> -->
           </div>
         </div>
       </div>
@@ -172,7 +177,7 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="经度：">
+            <el-form-item label="经度：" prop="longitude">
               <el-input
                 v-model="dialogForm.longitude"
                 style="width: 436px"
@@ -329,53 +334,32 @@ export default {
       },
       dialogShow: false,
       rules: {
-        clientAuthenticationMethods: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
-        ],
-        authorizationGrantTypes: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
-        ],
-        requireAuthorizationConsent: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
-        ],
-        longitude: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
-        ],
-        accessTokenTimeToLiveSecond: {
-          message: '此为数字。',
-          pattern: /^[0-9]*$/,
-          trigger: 'blur'
-        },
-        accessTokenTimeToLiveSecond: {
-          message: '此为数字。',
-          pattern: /^[0-9]*$/,
-          trigger: 'blur'
-        },
-        authCodeTimeToLiveSecond: {
-          message: '此为数字。',
-          pattern: /^[0-9]*$/,
+        latitude: {
+          message: '范围从-180~180的数字，支持小数点后6位。',
+          pattern:
+            /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180)$/,
           trigger: 'blur'
         },
         dictId: [{ required: true, message: '此为必填项。', trigger: 'blur' }],
-        latitude: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
-        ],
-        height: [{ required: true, message: '此为必填项。', trigger: 'blur' }]
+        longitude: {
+          message: '范围从-180~180的数字，支持小数点后6位。',
+          pattern:
+            /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180)$/,
+          trigger: 'blur'
+        },
+        height: {
+          message: '此为数字。',
+          pattern: /^[0-9]*$/,
+          trigger: 'blur'
+        }
       },
       dictIdOption: [],
       title1: '新建',
       dialogForm: {
         dictId: '',
         latitude: '',
-        authorizationGrantTypes: [],
-        clientAuthenticationMethods: [],
-        height: null,
-        redirectUris: null,
-        requireAuthorizationConsent: true,
-        accessTokenTimeToLiveSecond: '',
-        refreshTokenTimeToLiveSecond: '',
-        authCodeTimeToLiveSecond: '',
-        clientSecretExpiresAt: ''
+        height: '',
+        longitude: ''
       },
       dialogShowDetails: false,
       tableData: [],
@@ -391,15 +375,9 @@ export default {
   watch: {},
   methods: {
     async init() {
-      await configGisList({
-        num: this.params.pageSize,
-        page: this.params.pageNum
-      }).then((res) => {
+      await configGisList().then((res) => {
         if (res.data.code === 0) {
-          this.tableData = res.data.data.list
-          this.params.total = res.data.data.total
-          this.params.pages = res.data.data.pages
-          this.params.current = res.data.data.current
+          this.tableData = res.data.data
           setTimeout(() => {
             this.isShow = true
           }, 100)
@@ -409,7 +387,7 @@ export default {
     async getManufacturerDictionaryList() {
       await getGroupDictLists('MapConfig').then((res) => {
         if (res.data.code === 0) {
-          res.data.map((item) => {
+          res.data.data.map((item) => {
             let obj = {}
             obj.label = item.itemName
             obj.value = item.itemValue
@@ -418,103 +396,67 @@ export default {
         }
       })
     },
-    sizeChange(pageSize) {
-      this.params.pageSize = pageSize
-      this.init()
-    },
-    currentChange(proCount) {
-      this.params.proCount = proCount
-      this.init()
-    },
-    resetData(e) {
-      this.searchParams = {
-        dictId: '',
-        iclientNamep: ''
-      }
-      let target = e.target
-
-      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
-        target = e.target.parentNode.parentNode
-      } else if (target.nodeName === 'user') {
-        target = e.target.parentNode.parentNode.parentNode
-      } else {
-        target = e.target
-      }
-      target.blur()
-      this.params.pageNum = 1
-      this.init()
-    },
-    cxData() {
-      this.init()
-    },
     addDialogShow() {
       this.dialogShow = true
       this.title1 = '新建'
       this.dialogForm = {
         dictId: '',
         latitude: '',
-        authorizationGrantTypes: [],
-        clientAuthenticationMethods: [],
-        height: null,
-        redirectUris: null,
-        requireAuthorizationConsent: true,
-        accessTokenTimeToLiveSecond: '',
-        refreshTokenTimeToLiveSecond: '',
-        authCodeTimeToLiveSecond: '',
-        clientSecretExpiresAt: ''
+        longitude: '',
+        height: ''
       }
     },
     changeSwitch(row) {
-      let text = row.disabled === 0 ? '启用' : '停用'
 
-      this.$confirm('确认要"' + text + '""' + row.name + '"吗?', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      let result = this.tableData.some((data, index) => {
+        if (data.onStatus === 1 && row.id !== data.id) {
+          return true
+        }
       })
-        .then(() => {
-          menuDisabled({
-            menuId: row.id,
-            disabled: row.disabled
-          }).then((res) => {
-            if (res.data.code !== 0) {
-              row.disabled = row.disabled === 0 ? 1 : 0
-            }
+      if (result) {
+        this.$message({
+          type: 'warning',
+          message: '仅允许开启一个地图'
+        })
+        row.onStatus = row.onStatus === 0 ? 1 : 0
+      } else {
+        let resName = ''
+        this.dictIdOption.map((item) => {
+          if (Number(item.value) === row.dictId) {
+            resName = item.label
+          }
+        })
+        let text = row.onStatus === 1 ? '启用' : '停用'
+
+        this.$confirm('确认要"' + text + '""' + resName + '"吗?', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(() => {
+            statusChangeGis({
+              id: row.id,
+              onStatus: row.onStatus
+            }).then((res) => {
+              if (res.data.code !== 0) {
+                row.onStatus = row.onStatus === 0 ? 1 : 0
+              }
+            })
           })
-        })
-        .catch(() => {
-          row.disabled = row.disabled === 0 ? 1 : 0
-        })
+          .catch(() => {
+            row.onStatus = row.onStatus === 0 ? 1 : 0
+          })
+      }
     },
     editData(row) {
       this.dialogShow = true
       this.title1 = '编辑'
-      const {
-        dictId,
-        latitude,
-        authorizationGrantTypes,
-        clientAuthenticationMethods,
-        height,
-        redirectUris,
-        requireAuthorizationConsent,
-        accessTokenTimeToLiveSecond,
-        refreshTokenTimeToLiveSecond,
-        authCodeTimeToLiveSecond,
-        clientSecretExpiresAt
-      } = row
+      const { dictId, latitude, longitude, height } = row
       console.log(1111, row)
-      this.dialogForm.dictId = dictId
+      this.dialogForm.dictId = String(dictId)
       this.dialogForm.latitude = latitude
-      this.dialogForm.authorizationGrantTypes = authorizationGrantTypes
-      this.dialogForm.clientAuthenticationMethods = clientAuthenticationMethods
+      this.dialogForm.longitude = longitude
       this.dialogForm.height = height
-      this.dialogForm.redirectUris = redirectUris
-      this.dialogForm.requireAuthorizationConsent = requireAuthorizationConsent
-      this.dialogForm.accessTokenTimeToLiveSecond = accessTokenTimeToLiveSecond
-      this.dialogForm.refreshTokenTimeToLiveSecond =
-        refreshTokenTimeToLiveSecond
-      this.dialogForm.authCodeTimeToLiveSecond = authCodeTimeToLiveSecond
-      this.dialogForm.clientSecretExpiresAt = clientSecretExpiresAt
       this.editId = row.id
     },
     save(formName, val) {
@@ -534,7 +476,7 @@ export default {
               }
             })
           } else {
-            updateClient({
+            addGis({
               id: this.editId,
               ...this.dialogForm
             }).then((res) => {
@@ -549,24 +491,6 @@ export default {
             })
           }
         }
-      })
-    },
-    deleteRole(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        clientDelete(row.id).then((res) => {
-          if (res.data.code === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            })
-            this.params.pageNum = 1
-            this.init()
-          }
-        })
       })
     }
   }
