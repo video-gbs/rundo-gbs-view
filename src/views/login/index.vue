@@ -212,7 +212,7 @@ export default {
   },
   created() {},
   mounted() {
-    // this.initMap()
+    this.initMap()
     // this.windowWidth = document.documentElement.clientWidth
     // window.onresize = this.throttle(this.setScale, 500, 500)
 

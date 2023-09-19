@@ -28,31 +28,9 @@
             </div>
           </transition>
         </div>
-        <div class="resourceDiagram_container equipment-group-wrapper-bottom">
-          <div class="wrapper-bottom-header" @click="controlColla(2)">
-            <div class="bottom-header-name">配置视频资源点</div>
-            <transition name="el-zoom-in-center">
-              <i class="el-icon-arrow-up" v-if="showContent1"></i>
-              <i class="el-icon-arrow-down" v-else></i>
-            </transition>
-          </div>
-          <transition name="el-fade-in-linear">
-            <div
-              class="wrapper-bottom-content"
-              v-show="showContent1"
-              ref="wrapperBottomContent"
-            >
-              <leftTree
-                ref="deviceTree"
-                class="equipmentTree tree_test"
-                :treeData="treeList1"
-                :defaultPropsName="areaNames"
-              />
-            </div>
-          </transition>
-        </div>
       </div>
     </div>
+    <MapTest/>
   </div>
 </template>
 

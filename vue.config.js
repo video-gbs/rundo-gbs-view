@@ -9,6 +9,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const productionGzipExtensions = ['js', 'css', 'less', 'sacc']
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+// const TextReplacePlugin = require('./src/utils/textReplacePlugin')
+// const TextReplacePlugin1 = require('./src/utils/textReplacePlugin')
 
 const assetsCDN = {
   externals: {
@@ -110,6 +112,8 @@ module.exports = {
     name: '',
     output: {
       sourcePrefix: "",
+      path: path.resolve(__dirname, 'dist'),
+      filename: '[name].bundle.js'
     },
     amd: {
       toUrlUndefined: true,
@@ -120,12 +124,9 @@ module.exports = {
         use: {
           loader: "url-loader",
           options: {
-            name: 'image/[name][hash:9].[ext]', // 对打包之后的图片名称进行加密
-            esModule: false,
-            limit: 8 * 1024, // 将小于8kb的图片用based64处理
+            limit: 10240, // 设置限制文件大小为 10KB
           }
-        },
-        type: 'javascript/auto' //转换 json 为 js
+        }
 
       }]
     },
@@ -146,6 +147,8 @@ module.exports = {
       mainFiles: ['index', 'Cesium']
     },
     plugins: [
+      // new TextReplacePlugin1(),
+      // new TextReplacePlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',
         chunkFilename: '[id].css',
