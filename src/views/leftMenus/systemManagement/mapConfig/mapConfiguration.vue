@@ -177,6 +177,20 @@
                 />
               </el-select>
             </el-form-item>
+            <el-form-item label="瓦片格式：" prop="imgType">
+              <el-select
+                v-model="dialogForm.imgType"
+                placeholder="请选择"
+                style="width: 436px"
+              >
+                <el-option
+                  v-for="o in imgTypeOption"
+                  :label="o.label"
+                  :value="o.value"
+                  :key="o.label"
+                />
+              </el-select>
+            </el-form-item>
             <el-form-item label="经度：" prop="longitude">
               <el-input
                 v-model="dialogForm.longitude"
@@ -193,6 +207,13 @@
             <el-form-item label="高度：" prop="height">
               <el-input
                 v-model="dialogForm.height"
+                style="width: 436px"
+              ></el-input>
+            </el-form-item>
+
+            <el-form-item label="地图地址：" prop="url">
+              <el-input
+                v-model="dialogForm.url"
                 style="width: 436px"
               ></el-input>
             </el-form-item>
@@ -225,14 +246,7 @@ import pagination from '@/components/Pagination/index.vue'
 import LineFont from '@/components/LineFont'
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
-import {
-  addGis,
-  findOneStatusOnGis,
-  findVideoAreaOneGis,
-  gisVideoAreaSaveGis,
-  statusChangeGis,
-  configGisList
-} from '@/api/method/mapConfig'
+import { addGis, statusChangeGis, configGisList } from '@/api/method/mapConfig'
 import { getGroupDictLists } from '@/api/method/dictionary'
 import {
   getClientLists,
@@ -299,26 +313,14 @@ export default {
         4: '私有密钥JWT模式',
         5: 'NONE模式'
       },
-      clientAuthenticationMethodsOption: [
+      imgTypeOption: [
         {
-          label: 'BASIC模式',
-          value: 1
+          label: 'png',
+          value: 'png'
         },
         {
-          label: 'POST模式',
-          value: 2
-        },
-        {
-          label: 'JWT模式',
-          value: 3
-        },
-        {
-          label: '私有密钥JWT模式',
-          value: 4
-        },
-        {
-          label: 'NONE模式',
-          value: 5
+          label: 'jpg',
+          value: 'jpg'
         }
       ],
       textStyle: {
@@ -334,7 +336,10 @@ export default {
       },
       dialogShow: false,
       rules: {
+        imgType: [{ required: true, message: '请选择', trigger: 'change' }],
+        url: [{ required: true, message: '1~128个字符。', trigger: 'blur' }],
         latitude: {
+          required: true,
           message: '范围从-180~180的数字，支持小数点后6位。',
           pattern:
             /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180)$/,
@@ -342,12 +347,14 @@ export default {
         },
         dictId: [{ required: true, message: '此为必填项。', trigger: 'blur' }],
         longitude: {
+          required: true,
           message: '范围从-180~180的数字，支持小数点后6位。',
           pattern:
             /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180)$/,
           trigger: 'blur'
         },
         height: {
+          required: true,
           message: '此为数字。',
           pattern: /^[0-9]*$/,
           trigger: 'blur'
@@ -359,7 +366,9 @@ export default {
         dictId: '',
         latitude: '',
         height: '',
-        longitude: ''
+        longitude: '',
+        url: '',
+        imgType: 'png'
       },
       dialogShowDetails: false,
       tableData: [],
@@ -403,11 +412,12 @@ export default {
         dictId: '',
         latitude: '',
         longitude: '',
-        height: ''
+        height: '',
+        url: '',
+        imgType: 'png'
       }
     },
     changeSwitch(row) {
-
       let result = this.tableData.some((data, index) => {
         if (data.onStatus === 1 && row.id !== data.id) {
           return true
@@ -451,12 +461,14 @@ export default {
     editData(row) {
       this.dialogShow = true
       this.title1 = '编辑'
-      const { dictId, latitude, longitude, height } = row
+      const { dictId, latitude, longitude, height, url, imgType } = row
       console.log(1111, row)
       this.dialogForm.dictId = String(dictId)
       this.dialogForm.latitude = latitude
       this.dialogForm.longitude = longitude
       this.dialogForm.height = height
+      this.dialogForm.url = url
+      this.dialogForm.imgType = imgType
       this.editId = row.id
     },
     save(formName, val) {

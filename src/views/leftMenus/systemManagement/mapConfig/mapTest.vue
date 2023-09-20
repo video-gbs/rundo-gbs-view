@@ -28,7 +28,7 @@ export default {
 
 <style lang="scss" scoped>
 #mapContainerTest{
-  height: 100%;
+  height: 500px;
   width: 100%;
 }
 </style>

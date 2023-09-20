@@ -19,29 +19,78 @@
               v-show="showContent"
               ref="wrapperBottomContent"
             >
-              <leftTree
-                ref="deviceTree"
-                class="equipmentTree tree_test"
-                :treeData="treeList"
-                :defaultPropsName="areaNames"
-              />
+              <div class="securityArea_container">
+                <div class="tree-content">
+                  <el-input
+                    placeholder="请输入搜索关键字"
+                    suffix-icon="el-icon-search"
+                    class="search-input"
+                    v-model="filterText"
+                    clearable
+                  ></el-input>
+                  <div class="operation_box">
+                    <el-tree
+                      ref="liveTree"
+                      :data="treeList"
+                      class="tree"
+                      :props="{
+                        children: 'childList',
+                        label: 'resourceName'
+                      }"
+                      default-expand-all
+                      :default-expanded-keys="['根节点']"
+                      :expand-on-click-node="false"
+                      node-key="id"
+                      highlight-current
+                      @node-click="handleNodeClick"
+                      :filter-node-method="filterNode"
+                    >
+                      <span
+                        slot-scope="{ node, data }"
+                        class="custom-tree-node"
+                      >
+                        <span>
+                          <svg-icon
+                            v-if="data.resourceType === 1"
+                            icon-class="tree1"
+                            class="tree1"
+                          />
+                          <svg-icon
+                            v-else
+                            :icon-class="getIconType(data)"
+                            class="tree2"
+                          />
+                          {{ data.resourceName }}
+                        </span>
+                      </span>
+                    </el-tree>
+                  </div>
+                </div>
+              </div>
             </div>
           </transition>
         </div>
+
+        <div id="mapContainer"></div>
       </div>
     </div>
-    <MapTest/>
   </div>
 </template>
 
 <script>
-import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
+import leftTree from '@/views/leftMenus/systemManagement/components/leftTree'
 import LineFont from '@/components/LineFont'
 import MapTest from './mapTest'
 import { channelVideoAreaList } from '@/api/method/channel'
-import { playVideoAreaList } from '@/api/method/live'
+import { playVideoAreaList, getChannelPlayList } from '@/api/method/live'
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
+import * as Run3D from '@rjgf/run3d'
+import {
+  findOneStatusOnGis,
+  findVideoAreaOneGis,
+  gisVideoAreaSaveGis
+} from '@/api/method/mapConfig'
 export default {
   name: '',
   components: {
@@ -51,37 +100,251 @@ export default {
   },
   data() {
     return {
+      mapDom: null,
+      gdOnlineMap: null,
       treeList: [],
       treeList1: [],
       areaNames: 'resourceName',
-      showContent: false, // 展示面板内容
-      showContent1: false // 展示面板内容
+      showContent: true, // 展示面板内容
+      channelDetailsId: '',
+      fatherId: '',
+      common: null,
+      latitude: 0,
+      longitude: 0,
+      url: '',
+      mapId: 0,
+      imgType: 'png',
+      editId: '',
+      filterText: '',
+      detailsId: []
     }
   },
   created() {},
+  activated() {
+    this.mapDom && this.mapDom.destroy()
+    this.gdOnlineMap = null
+    this.mapDom = null
+
+    this.$nextTick(() => {
+      setTimeout(() => {
+        this.findGis()
+      }, 1000)
+    })
+  },
   mounted() {
     this.init()
-    this.init1()
-    // this.initMap()
   },
+
   computed: {},
-  watch: {},
+
+  watch: {
+    filterText(val) {
+      this.$refs.liveTree.filter(val)
+    }
+  },
   methods: {
     async init() {
-      this.resTree1 = await channelVideoAreaList()
-      this.treeList = this.resTree1.data.data ? [this.resTree1.data.data] : []
-    },
-    async init1() {
+      // this.resTree1 = await getChannelPlayList()
+      // this.treeList = this.resTree1.data.data ? [this.resTree1.data.data] : []
+
       await playVideoAreaList()
         .then((res) => {
           if (res.data.code === 0) {
-            this.treeList1 = [res.data.data]
+            this.treeList = [res.data.data]
+            this.channelDetailsId = this.resTree1.data.data
+              ? this.resTree1.data.data.id
+              : ''
+
+            // this.$refs.deviceTree.chooseId(this.channelDetailsId)
           }
         })
         .catch((error) => {
           console.log(error)
         })
     },
+    filterNode(value, data) {
+      if (!value) return true
+      return data.resourceName && data.resourceName.indexOf(value) !== -1
+    },
+    async handleNodeClick(data, node, self) {
+      if (!data.onlineState) {
+        this.resArray = []
+        if (this.detailsId.indexOf(data.id) !== -1) {
+          return
+        } else {
+          await getChannelPlayList(data.id)
+            .then((res) => {
+              if (res.data.code === 0) {
+                if (res.data.data && res.data.data.length > 0) {
+                  res.data.data.map((item) => {
+                    this.resArray.push({
+                      onlineState: item.onlineState,
+                      resourceName: item.channelName,
+                      resourceNames: item.channelName,
+                      areaPid: item.id,
+                      id: item.id,
+                      ptzType: item.ptzType,
+                      childList: []
+                    })
+                  })
+
+                  this.detailsId.push(data.id)
+                  let arr = []
+                  if (data.id === '1') {
+                    arr = this.resArray.concat(this.initData[0].childList)
+                  } else {
+                    arr = data.childList
+                      ? this.resArray.concat(data.childList)
+                      : this.resArray
+
+                    const obj = {}
+                    arr = arr.reduce((item, next) => {
+                      obj[next.id]
+                        ? ''
+                        : (obj[next.id] = true && item.push(next))
+                      return item
+                    }, [])
+                  }
+                  this.$refs.liveTree.updateKeyChildren(data.id, arr)
+                  this.defaultExpandedKeys = [data.id]
+                }
+              }
+            })
+            .catch((error) => {})
+        }
+      }
+    },
+    async findGis() {
+      await findOneStatusOnGis()
+        .then((res) => {
+          if (res.data.code === 0) {
+            const resData = res.data.data
+            this.latitude = resData.latitude
+            this.longitude = resData.longitude
+            this.url = resData.url
+            this.mapId = resData.id
+            this.imgType = resData.imgType
+            console.log('this.channelDetailsId', this.channelDetailsId)
+
+            this.initMap()
+
+            this.findVideoAreaOneGis(this.channelDetailsId)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    //查询节点得地图信息
+    async findVideoAreaOneGis(id) {
+      await findVideoAreaOneGis({ videoAreaId: id })
+        .then((res) => {
+          if (res.data.code === 0) {
+            const resData = res.data.data
+            this.latitude = resData.latitude
+            this.longitude = resData.longitude
+            this.url = resData.url
+            console.log('urlurlurl', url)
+            this.mapId = resData.gisConfigId
+            this.editId = resData.id
+            this.imgType = resData.imgType
+
+            this.initMap()
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    getIconType(data) {
+      if (data.level) {
+        // if (data.level === 2) {
+        //   return 'tree2'
+        // } else {
+        return 'tree2'
+        // }
+      } else {
+        switch (data.ptzType) {
+          case 1:
+            if (data.onlineState === 0) {
+              return 'qiangjilx'
+            } else {
+              return 'qiangjizx'
+            }
+            break
+          case 2:
+            if (data.onlineState === 0) {
+              return 'qjlx'
+            } else {
+              return 'qjzx'
+            }
+            break
+          case 3:
+            if (data.onlineState === 0) {
+              return 'bqlx'
+            } else {
+              return 'bqzx'
+            }
+            break
+          case 4:
+            if (data.onlineState === 0) {
+              return 'ytqjlx'
+            } else {
+              return 'ytqjzx'
+            }
+            break
+          case 5:
+            if (data.onlineState === 0) {
+              return 'arqjlx'
+            } else {
+              return 'arqjzx'
+            }
+            break
+          case 6:
+            if (data.onlineState === 0) {
+              return 'quanjinglx'
+            } else {
+              return 'quanjingzx'
+            }
+            break
+          case 7:
+          case 0:
+            if (data.onlineState === 0) {
+              return 'qitalx'
+            } else {
+              return 'qitazx'
+            }
+            break
+          default:
+            break
+        }
+      }
+    },
+
+    //保存节点与配置的信息
+    async gisVideoAreaSaveGis(res) {
+      const params = {}
+      params.latitude = res.latitude
+      params.longitude = res.latitude
+      params.videoAreaId = this.channelDetailsId
+      params.gisConfigId = this.mapId
+      params.height = res.height
+      params.id = this.editId
+      await gisVideoAreaSaveGis(params)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '地图底图保存成功'
+            })
+            this.editId = res.data.data.id
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
     // 控制面板展开收起
     controlColla(val) {
       if (val === 1) {
@@ -90,23 +353,74 @@ export default {
         this.showContent1 = !this.showContent1
       }
     },
+    childClickHandle(data) {
+      this.channelDetailsId = data.id
+      this.findVideoAreaOneGis(data.id)
+      this.findGis()
+    },
     initMap() {
-      console.log('Run3DRun3DRun3DRun3DRun3D', Run3D)
-      let map = new Run3D.Map()
-      map.createMap('', 'mapContainerTest', {})
+      this.mapDom = new Run3D.Map()
+      this.mapDom.createMap('', 'mapContainer', {})
+      // const url
       //创建高德在线地图图层
-      let gdOnlineMap = new Run3D.UrlTemplateImageLayer({
-        url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', //高德地图
+      console.log('this.url', this.url)
+      this.gdOnlineMap = new Run3D.UrlTemplateImageLayer({
+        // url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', //高德地图
+        url: this.url,
+        fileExtension: this.imgType,
         minimumLevel: 0,
-        maximumLevel: 23
+        maximumLevel: 20
       })
-      map.layers.addRaster(gdOnlineMap)
+
+      this.mapDom.layers.addRaster(this.gdOnlineMap)
+      this.common = new Run3D.Common(this.mapDom.viewer)
+      this.mapDom.scene.on(Run3D.EventTypeEnum.LEFT_CLICK, (res) => {
+        //返回地图上的屏幕坐标
+        console.log(res)
+        this.common.pickerHelper.on(res).then((result) => {
+          //返回点击的笛卡尔坐标
+          console.log(result)
+          this.gisVideoAreaSaveGis(
+            Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
+          )
+          //返回WGS84坐标
+          console.log(
+            Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
+          )
+        })
+      })
+      this.mapDom.initView({
+        longitude: this.longitude,
+        latitude: this.latitude,
+        height: this.height
+      })
     }
+  },
+  destroyed() {
+    this.mapDom && this.mapDom.destroy()
+    this.gdOnlineMap = null
+    this.mapDom = null
   }
 }
 </script>
 
 <style lang="scss" scoped>
+::v-deep .cesium-viewer,
+.cesium-viewer-cesiumWidgetContainer,
+.cesium-widget {
+  height: 100%;
+}
+::v-deep .cesium-viewer-cesiumWidgetContainer {
+  height: 100%;
+}
+::v-deep .cesium-widget {
+  height: 100%;
+}
+
+::v-deep canvas {
+  width: 100%;
+  height: 100%;
+}
 .resourceDiagram_main {
   .panel-header-box {
     margin: 0;
@@ -127,17 +441,15 @@ export default {
   .resourceDiagram_main_content {
     height: calc(100% - 60px);
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     .resourceDiagram_container {
-      width: 310px;
+      max-height: 42px;
+      width: 360px;
       margin: 20px;
       background: #ffffff;
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
       .tree_test {
         overflow-y: auto;
-
-        height: 40%;
+        height: 100%;
       }
     }
     .right-container {
@@ -326,5 +638,21 @@ export default {
 // 表格横向和纵向滚动条对顶角样式设置
 .tree::-webkit-scrollbar-corner {
   background-color: #111;
+}
+#mapContainer {
+  height: 100%;
+  width: 100%;
+  padding: 20px 20px 20px 0;
+}
+.operation_box {
+  height: 100%;
+}
+.securityArea_container {
+  padding-bottom: 20px;
+  background: #ffffff;
+  .tree {
+    max-height: calc(100% - 90px);
+    overflow-y: auto;
+  }
 }
 </style>
