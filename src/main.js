@@ -8,7 +8,7 @@ Vue.use(ElementUI, { size: 'small' })
 import '@/styles/index.scss'
 import '../static/fonts/iconfont/iconfont.css'
 
-import App from './App'
+import App from './App.vue'
 import store from './store'
 import router from './router'
 import { Local, Session } from './utils/storage'
@@ -21,7 +21,7 @@ import 'babel-polyfill'
 import * as echarts from 'echarts'
 Vue.prototype.$echarts = echarts
 
-import API from '@/api'
+import API from './api'
 Vue.prototype.$api = API
 
 import * as moment from 'moment'

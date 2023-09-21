@@ -1,6 +1,6 @@
 <template>
-  <div class="login" id="login" v-if="showHome">
-    <div class="wrap-top">
+  <div class="login" id="login">
+    <div class="wrap-top" v-if="showHome">
       <div class="wrap-middle">
         <div class="wrap-middle-left">
           <div class="left-img"></div>
@@ -109,7 +109,7 @@
       </div>
     </div>
 
-    <!-- <div id="map_container"></div> -->
+    <!-- <div id="mapContainerTest"></div> -->
   </div>
 </template>
 
@@ -128,7 +128,8 @@ import Layout from '@/layout/index'
 import axios from 'axios'
 
 // import { Run3D } from '../../../node_modules/@rjgf/run3d'
-// import * as Run3D from '@rjgf/run3d/dist'
+import * as Run3D from '@rjgf/run3d'
+import '@rjgf/run3d-engine/Build/Cesium/Widgets/widgets.css'
 // let Map = require('@rjgf/run3d')
 // import '@rjgf/run3d-engine/Build/Cesium/Widgets/widgets.css'
 window._AMapSecurityConfig = {
@@ -209,10 +210,12 @@ export default {
     //   immediate: true
     // }
   },
+  created() {},
   mounted() {
+    // this.initMap()
     // this.windowWidth = document.documentElement.clientWidth
     // window.onresize = this.throttle(this.setScale, 500, 500)
-    // this.initMap()
+
     store.dispatch('user/changeThirdPartyLogin', false)
     clearInterval(window.interval)
     clearInterval(window.interval1)
@@ -526,10 +529,11 @@ export default {
       return obj
     },
     initMap() {
-      map = new Map()
-      map.createMap('', 'map_container', {})
+      console.log('Run3DRun3DRun3DRun3DRun3D', Run3D)
+      let map = new Run3D.Map()
+      map.createMap('', 'mapContainerTest', {})
       //创建高德在线地图图层
-      let gdOnlineMap = new UrlTemplateImageLayer({
+      let gdOnlineMap = new Run3D.UrlTemplateImageLayer({
         url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', //高德地图
         minimumLevel: 0,
         maximumLevel: 23
@@ -920,7 +924,7 @@ body {
   }
 }
 
-#map_container {
+#mapContainerTest {
   height: 100%;
   width: 100%;
 }

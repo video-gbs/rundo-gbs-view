@@ -8,6 +8,9 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const productionGzipExtensions = ['js', 'css', 'less', 'sacc']
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+// const TextReplacePlugin = require('./src/utils/textReplacePlugin')
+// const TextReplacePlugin1 = require('./src/utils/textReplacePlugin')
 
 const assetsCDN = {
   externals: {
@@ -25,6 +28,7 @@ const assetsCDN = {
     '//cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js'
   ]
 }
+
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
@@ -92,45 +96,65 @@ module.exports = {
   lintOnSave: false,
   productionSourceMap: false,
   devServer: {
-    public: '',
+    // public: '',
     port: port,
     open: true,
-    overlay: {
-      warnings: false,
-      errors: true
+    // overlay: {
+    //   warnings: false,
+    //   errors: true
+    // },
+    historyApiFallback: {
+      index: '/index.html' //与output的publicPath
     },
     proxy: getProxys()
   },
   configureWebpack: {
-    name: name,
+    name: '',
     output: {
-      sourcePrefix: " ",
+      sourcePrefix: "",
+      path: path.resolve(__dirname, 'dist'),
+      filename: '[name].bundle.js'
     },
     amd: {
       toUrlUndefined: true,
     },
     module: {
       rules: [
-        {
-          test: /\.mjs$/,
-          include: /node_modules/,
-          type: "javascript/auto"
-        },
-        {
-          test: /\.cjs$/,
-          include: /node_modules/,
-          type: "javascript/auto"
-        }
+      //   {
+      //   test: /\.(jpg|png|gif|bmp|jpeg)$/,
+      //   use: {
+      //     loader: "url-loader",
+      //     options: {
+      //       limit: 10240, // 设置限制文件大小为 10KB
+      //     }
+      //   }
+
+      // }
       ]
     },
     resolve: {
+      fallback: { "https": false, "zlib": false, "http": false, "url": false, "path": require.resolve("path-browserify"), },
+      // fallback: {
+
+      //   "https": require.resolve("https-browserify"),
+      //   "zlib": require.resolve("browserify-zlib"),
+      //   "path": require.resolve("path-browserify"),
+      //   "url": require.resolve("url/")
+      // },
       // extensions: [".ts", ".tsx", ".js", ".json",'cjs','mjs'],
       alias: {
+        // '@': path.resolve(__dirname, 'src/')
         '@': resolve('src'),
-        cesium: path.resolve(__dirname, Run3DSource)
-      }
+      },
+      mainFiles: ['index', 'Cesium']
     },
     plugins: [
+      // new TextReplacePlugin1(),
+      // new TextReplacePlugin(),
+      new MiniCssExtractPlugin({
+        filename: '[name].css',
+        chunkFilename: '[id].css',
+      }),
       new CopyWebpackPlugin([
         { from: path.join(Run3DSource, Run3DWorkers), to: "Workers" },
       ]
@@ -149,7 +173,7 @@ module.exports = {
       new webpack.DefinePlugin({
         CESIUM_BASE_URL: JSON.stringify(""),
       }),
-      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+      // new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
       // 配置compression-webpack-plugin压缩
       new CompressionWebpackPlugin({
@@ -161,7 +185,7 @@ module.exports = {
       }),
       new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 5,
-        minChunkSize: 100
+        // minChunkSize: 100
       }),
 
       new CopyWebpackPlugin(
@@ -180,22 +204,14 @@ module.exports = {
     ]
   },
   chainWebpack(config) {
-    if (process.env.NODE_ENV === 'production') {
-      config
-        .plugin('html')
-        .use(HtmlWebpackPlugin)
-        .tap((args) => {
-          args[0].cdn = assetsCDN.assets
-          return args
-        })
-    }
-    config.plugin('preload').tap(() => [
-      {
-        rel: 'preload',
-        fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-        include: 'initial'
-      }
-    ])
+
+    // config.plugin('preload').tap(() => [
+    //   {
+    //     rel: 'preload',
+    //     fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
+    //     include: 'initial'
+    //   }
+    // ])
 
     config.plugins.delete('prefetch')
     config.module
