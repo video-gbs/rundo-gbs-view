@@ -32,14 +32,12 @@
 import leftTree from '@/views/leftMenus/systemManagement/components/leftTree'
 import LineFont from '@/components/LineFont'
 import { channelVideoAreaList } from '@/api/method/channel'
-import { playVideoAreaList } from '@/api/method/live'
+import { getChannelPlayList } from '@/api/method/live'
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
 import * as Run3D from '@rjgf/run3d'
-import {
-  findOneStatusOnGis,
-  findVideoAreaOneGis
-} from '@/api/method/mapConfig'
+import { findOneStatusOnGis, findVideoAreaOneGis } from '@/api/method/mapConfig'
+import testImgUrl from '../../../../assets/imgs/videotest.png'
 export default {
   name: '',
   components: {
@@ -51,28 +49,79 @@ export default {
       mapDom: null,
       gdOnlineMap: null,
       treeList: [],
-      treeList1: [],
       areaNames: 'resourceName',
       showContent: false, // 展示面板内容
       channelDetailsId: '',
-      fatherId: '',
       common: null,
       latitude: 0,
       longitude: 0,
       url: '',
-      mapId: 0,
       imgType: 'png',
-      editId: ''
+      // 设备集合
+      videoList: [],
+      points: [
+        {
+          longitude: 113.43382617519103,
+          latitude: 23.17137637150239,
+          height: -0.0031337435708891142
+        },
+        {
+          longitude: 113.43480618227244,
+          latitude: 23.171403702573247,
+          height: -0.0045297945171596165
+        },
+        {
+          longitude: 113.43609844598411,
+          latitude: 23.171550631938253,
+          height: -0.00403549375133705
+        },
+        {
+          longitude: 113.43711685915169,
+          latitude: 23.170817865830944,
+          height: -0.003598416409380728
+        },
+        {
+          longitude: 113.43669462962943,
+          latitude: 23.169535950790152,
+          height: -0.00283775641862629
+        },
+        {
+          longitude: 113.43517820097665,
+          latitude: 23.169377184527953,
+          height: -0.004351280965329057
+        },
+        {
+          longitude: 113.43510709813498,
+          latitude: 23.170295603338648,
+          height: -0.0031785083901879493
+        },
+        {
+          longitude: 113.43417921526454,
+          latitude: 23.169988065929655,
+          height: -0.0024265558534264714
+        },
+        {
+          longitude: 113.43443281136263,
+          latitude: 23.17074042550585,
+          height: -0.0035678127606356795
+        },
+        {
+          longitude: 113.43432875843396,
+          latitude: 23.16913274428291,
+          height: -0.003930897180341542
+        }
+      ]
     }
   },
   created() {},
   activated() {
+    console.log(999)
     this.mapDom && this.mapDom.destroy()
     this.gdOnlineMap = null
     this.mapDom = null
 
     // this.findGis()
-        this.$nextTick(() => {
+    this.$nextTick(() => {
       setTimeout(() => {
         this.findGis()
       }, 1000)
@@ -92,7 +141,33 @@ export default {
         ? this.resTree1.data.data.id
         : ''
       this.$refs.deviceTree.chooseId(this.channelDetailsId)
-      // this.findVideoAreaOneGis(this.channelDetailsId)
+      this.getChannelPlayList(this.channelDetailsId)
+    },
+    async getChannelPlayList(id) {
+      await getChannelPlayList(id)
+        .then((res) => {
+          if (res.data.code === 0) {
+            const resData = res.data.data
+
+            let obj = {}
+            this.videoList = []
+            resData.map((item) => {
+              obj = {
+                height: item.height,
+                latitude: Number(item.latitude),
+                longitude: Number(item.longitude)
+              }
+              this.videoList.push(obj)
+            })
+            console.log('this.videoList', this.videoList)
+            this.findVideoAreaOneGis(id)
+            this.findGis()
+            // this.initMap()
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
     async findGis() {
       await findOneStatusOnGis()
@@ -102,8 +177,10 @@ export default {
             this.latitude = resData.latitude
             this.longitude = resData.longitude
             this.url = resData.url
-            this.mapId = resData.id
             this.imgType = resData.imgType
+            this.mapDom && this.mapDom.destroy()
+            this.gdOnlineMap = null
+            this.mapDom = null
             this.initMap()
             this.findVideoAreaOneGis(this.channelDetailsId)
           }
@@ -120,11 +197,8 @@ export default {
             const resData = res.data.data
             this.latitude = resData.latitude
             this.longitude = resData.longitude
-            this.url = resData.url
-            this.mapId = resData.gisConfigId
-            this.editId = resData.id
             this.imgType = resData.imgType
-            this.initMap()
+            // this.initMap()
           }
         })
         .catch((error) => {
@@ -141,9 +215,8 @@ export default {
       }
     },
     childClickHandle(data) {
+      this.getChannelPlayList(data.id)
       this.channelDetailsId = data.id
-      this.findVideoAreaOneGis(data.id)
-      this.findGis()
     },
     initMap() {
       this.mapDom = new Run3D.Map()
@@ -164,18 +237,22 @@ export default {
       })
       this.mapDom.layers.addRaster(this.gdOnlineMap)
       this.common = new Run3D.Common(this.mapDom.viewer)
-      this.mapDom.scene.on(Run3D.EventTypeEnum.LEFT_CLICK, (res) => {
-        //返回地图上的屏幕坐标
-        console.log(res)
-        this.common.pickerHelper.on(res).then((result) => {
-          //返回点击的笛卡尔坐标
-          console.log(result)
-          //返回WGS84坐标
-          console.log(
-            Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
-          )
+      //创建图层并加入到地图中
+      let graphicsLayer = new Run3D.GraphicLayer('test')
+      this.mapDom.layers.addGraphicLayer(graphicsLayer)
+      let graphic = {}
+      this.videoList.map((item) => {
+        graphic = new Run3D.BillboadrdGraphic({
+          position: [item.longitude, item.latitude, item.height],
+          imageUrl: testImgUrl,
+          scale: 1,
+          offset: [0, 0],
+          scaleByDistance: [1, 0.6],
+          distanceDisplayCondition: [0, 30000] //显示标签范围
         })
+        graphicsLayer.add(graphic)
       })
+      console.log(2222)
     }
   },
   destroyed() {
@@ -210,176 +287,175 @@ export default {
 }
 .electronicMap_main {
   position: relative;
- .resourceDiagram_container {
-
+  .resourceDiagram_container {
     position: absolute;
     top: 10px;
     right: 20px;
-      width: 310px;
-      margin: 20px;
-      background: #ffffff;
-      box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
-      .tree_test {
-        overflow-y: auto;
-        height: 100%;
+    width: 310px;
+    margin: 20px;
+    background: #ffffff;
+    box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+    .tree_test {
+      overflow-y: auto;
+      height: 100%;
+    }
+  }
+  .equipment-group-wrapper-bottom {
+    // height: 50%;
+    .wrapper-bottom-header {
+      padding: 7px 24px 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(0, 0, 0, 0.15);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+
+      .bottom-header-name {
+        color: rgba(0, 0, 0, 0.85);
+        line-height: 22px;
+        font-weight: 500;
+        font-size: 14px;
       }
     }
-        .equipment-group-wrapper-bottom {
-      // height: 50%;
-      .wrapper-bottom-header {
-        padding: 7px 24px 11px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-top: 1px solid rgba(0, 0, 0, 0.15);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.15);
-        cursor: pointer;
 
-        .bottom-header-name {
-          color: rgba(0, 0, 0, 0.85);
-          line-height: 22px;
-          font-weight: 500;
-          font-size: 14px;
-        }
-      }
+    .wrapper-bottom-content {
+      .control-circle-box {
+        padding: 24px;
+        box-sizing: border-box;
 
-      .wrapper-bottom-content {
-        .control-circle-box {
-          padding: 24px;
-          box-sizing: border-box;
+        .control-circle-box-circle {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 16px;
 
-          .control-circle-box-circle {
+          .circle-big {
             display: flex;
             justify-content: center;
-            margin-bottom: 16px;
+            align-items: center;
+            width: 200px;
+            height: 200px;
+            border-radius: 100px;
+            background-color: #e8f4ff;
 
-            .circle-big {
+            .circle-small {
+              position: relative;
               display: flex;
               justify-content: center;
               align-items: center;
-              width: 200px;
-              height: 200px;
+              width: 178px;
+              height: 178px;
               border-radius: 100px;
-              background-color: #e8f4ff;
+              background-color: #1055bd;
 
-              .circle-small {
-                position: relative;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                width: 178px;
-                height: 178px;
-                border-radius: 100px;
-                background-color: #1055bd;
-
-                .circle-center {
-                  width: 96px;
-                  height: 96px;
-                  background: url('../../../../assets/imgs/control_center.png')
-                    center no-repeat;
-                  background-size: contain;
-                }
-
-                .circle-direction {
-                  position: absolute;
-                  width: 32px;
-                  height: 32px;
-                  background-size: contain;
-                  background-repeat: no-repeat;
-                  cursor: pointer;
-                }
-
-                .circle-top {
-                  background-image: url('../../../../assets/imgs/control_top.png');
-                  top: 0;
-                }
-                .circle-right {
-                  background-image: url('../../../../assets/imgs/control_right.png');
-                  right: 0;
-                }
-                .circle-bottom {
-                  background-image: url('../../../../assets/imgs/control_bottom.png');
-                  bottom: 0;
-                }
-                .circle-left {
-                  background-image: url('../../../../assets/imgs/control_left.png');
-                  left: 0;
-                }
-              }
-            }
-          }
-
-          .control-circle-box-progress {
-            /*padding-left: 55px;*/
-            justify-content: center;
-            height: 20px;
-            display: flex;
-            align-items: center;
-
-            .progress-description {
-              margin-right: 17px;
-              font-size: 14px;
-              color: rgba(0, 0, 0, 0.85);
-            }
-
-            .slider-component {
-              width: 82px;
-              height: 6px;
-
-              .el-slider__runway {
-                margin: 0;
+              .circle-center {
+                width: 96px;
+                height: 96px;
+                background: url('../../../../assets/imgs/control_center.png')
+                  center no-repeat;
+                background-size: contain;
               }
 
-              .el-slider__button {
-                width: 6px;
-                height: 6px;
+              .circle-direction {
+                position: absolute;
+                width: 32px;
+                height: 32px;
+                background-size: contain;
+                background-repeat: no-repeat;
+                cursor: pointer;
               }
-            }
 
-            .slider-value {
-              margin-left: 7px;
-              font-size: 14px;
-              color: rgba(0, 0, 0, 0.45);
+              .circle-top {
+                background-image: url('../../../../assets/imgs/control_top.png');
+                top: 0;
+              }
+              .circle-right {
+                background-image: url('../../../../assets/imgs/control_right.png');
+                right: 0;
+              }
+              .circle-bottom {
+                background-image: url('../../../../assets/imgs/control_bottom.png');
+                bottom: 0;
+              }
+              .circle-left {
+                background-image: url('../../../../assets/imgs/control_left.png');
+                left: 0;
+              }
             }
           }
         }
 
-        .control-operate-box {
-          box-sizing: border-box;
-          padding: 0 24px;
-          .preliminary-position {
-            .position-title {
-              margin-bottom: 16px;
-              color: rgba(0, 0, 0, 0.85);
-              font-size: 14px;
-              text-align: left;
+        .control-circle-box-progress {
+          /*padding-left: 55px;*/
+          justify-content: center;
+          height: 20px;
+          display: flex;
+          align-items: center;
+
+          .progress-description {
+            margin-right: 17px;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.85);
+          }
+
+          .slider-component {
+            width: 82px;
+            height: 6px;
+
+            .el-slider__runway {
+              margin: 0;
             }
-            .position-control-panel {
+
+            .el-slider__button {
+              width: 6px;
+              height: 6px;
+            }
+          }
+
+          .slider-value {
+            margin-left: 7px;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.45);
+          }
+        }
+      }
+
+      .control-operate-box {
+        box-sizing: border-box;
+        padding: 0 24px;
+        .preliminary-position {
+          .position-title {
+            margin-bottom: 16px;
+            color: rgba(0, 0, 0, 0.85);
+            font-size: 14px;
+            text-align: left;
+          }
+          .position-control-panel {
+            display: flex;
+            margin-bottom: 16px;
+
+            .input-number {
+              margin-right: 24px;
+            }
+
+            .el-button--primary.is-plain {
+              color: #ffffff;
+              background: #ecf5ff;
+            }
+          }
+          .position-record {
+            .position-record-item {
               display: flex;
-              margin-bottom: 16px;
-
-              .input-number {
-                margin-right: 24px;
-              }
-
-              .el-button--primary.is-plain {
-                color: #ffffff;
-                background: #ecf5ff;
-              }
-            }
-            .position-record {
-              .position-record-item {
-                display: flex;
-                justify-content: space-between;
-                font-size: 14px;
-                color: rgba(0, 0, 0, 0.65);
-                line-height: 40px;
-                border-bottom: 1px solid #f0f0f0;
-              }
+              justify-content: space-between;
+              font-size: 14px;
+              color: rgba(0, 0, 0, 0.65);
+              line-height: 40px;
+              border-bottom: 1px solid #f0f0f0;
             }
           }
         }
       }
     }
+  }
 }
 </style>

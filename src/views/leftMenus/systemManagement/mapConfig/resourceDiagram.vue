@@ -6,67 +6,25 @@
       </div>
       <div class="resourceDiagram_main_content">
         <div class="resourceDiagram_container equipment-group-wrapper-bottom">
-          <div class="wrapper-bottom-header" @click="controlColla(1)">
+          <div class="wrapper-bottom-header">
             <div class="bottom-header-name">安防区域</div>
-            <transition name="el-zoom-in-center">
+            <!-- <transition name="el-zoom-in-center">
               <i class="el-icon-arrow-up" v-if="showContent"></i>
               <i class="el-icon-arrow-down" v-else></i>
-            </transition>
+            </transition> -->
           </div>
           <transition name="el-fade-in-linear">
             <div
               class="wrapper-bottom-content"
-              v-show="showContent"
               ref="wrapperBottomContent"
             >
-              <div class="securityArea_container">
-                <div class="tree-content">
-                  <el-input
-                    placeholder="请输入搜索关键字"
-                    suffix-icon="el-icon-search"
-                    class="search-input"
-                    v-model="filterText"
-                    clearable
-                  ></el-input>
-                  <div class="operation_box">
-                    <el-tree
-                      ref="liveTree"
-                      :data="treeList"
-                      class="tree"
-                      :props="{
-                        children: 'childList',
-                        label: 'resourceName'
-                      }"
-                      default-expand-all
-                      :default-expanded-keys="['根节点']"
-                      :expand-on-click-node="false"
-                      node-key="id"
-                      highlight-current
-                      @node-click="handleNodeClick"
-                      :filter-node-method="filterNode"
-                    >
-                      <span
-                        slot-scope="{ node, data }"
-                        class="custom-tree-node"
-                      >
-                        <span>
-                          <svg-icon
-                            v-if="data.resourceType === 1"
-                            icon-class="tree1"
-                            class="tree1"
-                          />
-                          <svg-icon
-                            v-else
-                            :icon-class="getIconType(data)"
-                            class="tree2"
-                          />
-                          {{ data.resourceName }}
-                        </span>
-                      </span>
-                    </el-tree>
-                  </div>
-                </div>
-              </div>
+              <leftTree
+                ref="deviceTree"
+                class="electronicMaTree tree_test"
+                :treeData="treeList"
+                @childClickHandle="childClickHandle"
+                :defaultPropsName="areaNames"
+              />
             </div>
           </transition>
         </div>
@@ -116,7 +74,8 @@ export default {
       imgType: 'png',
       editId: '',
       filterText: '',
-      detailsId: []
+      detailsId: [],
+      isVideo: false
     }
   },
   created() {},
@@ -137,11 +96,7 @@ export default {
 
   computed: {},
 
-  watch: {
-    filterText(val) {
-      this.$refs.liveTree.filter(val)
-    }
-  },
+  watch: {},
   methods: {
     async init() {
       // this.resTree1 = await getChannelPlayList()
@@ -151,69 +106,17 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.treeList = [res.data.data]
-            this.channelDetailsId = this.resTree1.data.data
-              ? this.resTree1.data.data.id
+            this.channelDetailsId = res.data.data
+              ? res.data.data.id
               : ''
-
-            // this.$refs.deviceTree.chooseId(this.channelDetailsId)
+            this.$refs.deviceTree.chooseId(this.channelDetailsId)
           }
         })
         .catch((error) => {
           console.log(error)
         })
     },
-    filterNode(value, data) {
-      if (!value) return true
-      return data.resourceName && data.resourceName.indexOf(value) !== -1
-    },
-    async handleNodeClick(data, node, self) {
-      if (!data.onlineState) {
-        this.resArray = []
-        if (this.detailsId.indexOf(data.id) !== -1) {
-          return
-        } else {
-          await getChannelPlayList(data.id)
-            .then((res) => {
-              if (res.data.code === 0) {
-                if (res.data.data && res.data.data.length > 0) {
-                  res.data.data.map((item) => {
-                    this.resArray.push({
-                      onlineState: item.onlineState,
-                      resourceName: item.channelName,
-                      resourceNames: item.channelName,
-                      areaPid: item.id,
-                      id: item.id,
-                      ptzType: item.ptzType,
-                      childList: []
-                    })
-                  })
 
-                  this.detailsId.push(data.id)
-                  let arr = []
-                  if (data.id === '1') {
-                    arr = this.resArray.concat(this.initData[0].childList)
-                  } else {
-                    arr = data.childList
-                      ? this.resArray.concat(data.childList)
-                      : this.resArray
-
-                    const obj = {}
-                    arr = arr.reduce((item, next) => {
-                      obj[next.id]
-                        ? ''
-                        : (obj[next.id] = true && item.push(next))
-                      return item
-                    }, [])
-                  }
-                  this.$refs.liveTree.updateKeyChildren(data.id, arr)
-                  this.defaultExpandedKeys = [data.id]
-                }
-              }
-            })
-            .catch((error) => {})
-        }
-      }
-    },
     async findGis() {
       await findOneStatusOnGis()
         .then((res) => {
@@ -243,8 +146,6 @@ export default {
             const resData = res.data.data
             this.latitude = resData.latitude
             this.longitude = resData.longitude
-            this.url = resData.url
-            console.log('urlurlurl', url)
             this.mapId = resData.gisConfigId
             this.editId = resData.id
             this.imgType = resData.imgType
@@ -255,70 +156,6 @@ export default {
         .catch((error) => {
           console.log(error)
         })
-    },
-    getIconType(data) {
-      if (data.level) {
-        // if (data.level === 2) {
-        //   return 'tree2'
-        // } else {
-        return 'tree2'
-        // }
-      } else {
-        switch (data.ptzType) {
-          case 1:
-            if (data.onlineState === 0) {
-              return 'qiangjilx'
-            } else {
-              return 'qiangjizx'
-            }
-            break
-          case 2:
-            if (data.onlineState === 0) {
-              return 'qjlx'
-            } else {
-              return 'qjzx'
-            }
-            break
-          case 3:
-            if (data.onlineState === 0) {
-              return 'bqlx'
-            } else {
-              return 'bqzx'
-            }
-            break
-          case 4:
-            if (data.onlineState === 0) {
-              return 'ytqjlx'
-            } else {
-              return 'ytqjzx'
-            }
-            break
-          case 5:
-            if (data.onlineState === 0) {
-              return 'arqjlx'
-            } else {
-              return 'arqjzx'
-            }
-            break
-          case 6:
-            if (data.onlineState === 0) {
-              return 'quanjinglx'
-            } else {
-              return 'quanjingzx'
-            }
-            break
-          case 7:
-          case 0:
-            if (data.onlineState === 0) {
-              return 'qitalx'
-            } else {
-              return 'qitazx'
-            }
-            break
-          default:
-            break
-        }
-      }
     },
 
     //保存节点与配置的信息
@@ -346,13 +183,13 @@ export default {
     },
 
     // 控制面板展开收起
-    controlColla(val) {
-      if (val === 1) {
-        this.showContent = !this.showContent
-      } else {
-        this.showContent1 = !this.showContent1
-      }
-    },
+    // controlColla(val) {
+    //   if (val === 1) {
+    //     this.showContent = !this.showContent
+    //   } else {
+    //     this.showContent1 = !this.showContent1
+    //   }
+    // },
     childClickHandle(data) {
       this.channelDetailsId = data.id
       this.findVideoAreaOneGis(data.id)
@@ -376,19 +213,33 @@ export default {
       this.common = new Run3D.Common(this.mapDom.viewer)
       this.mapDom.scene.on(Run3D.EventTypeEnum.LEFT_CLICK, (res) => {
         //返回地图上的屏幕坐标
-        console.log(res)
+        // console.log(res)
         this.common.pickerHelper.on(res).then((result) => {
           //返回点击的笛卡尔坐标
-          console.log(result)
+          // console.log(result)
           this.gisVideoAreaSaveGis(
             Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
           )
           //返回WGS84坐标
-          console.log(
-            Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
-          )
+          // console.log(
+          //   Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
+          // )
         })
       })
+      // //创建图层并加入到地图中
+      // let graphicsLayer = new Run3D.GraphicLayer('test')
+      // this.map.layers.addGraphicLayer(graphicsLayer)
+      // //创建一个Graphic
+      // let graphic = new Run3D.BillboadrdGraphic({
+      //   position: [113.440906, 23.17047, , 18.208],
+      //   imageUrl: 'static/layers/graphic/video.png',
+      //   scale: 1,
+      //   offset: [0, 0],
+      //   scaleByDistance: [1, 0.6],
+      //   distanceDisplayCondition: [0, 3000] //显示标签范围
+      // })
+
+      // graphicsLayer.add(graphic)
       this.mapDom.initView({
         longitude: this.longitude,
         latitude: this.latitude,
@@ -442,8 +293,7 @@ export default {
     height: calc(100% - 60px);
     display: flex;
     .resourceDiagram_container {
-      max-height: 42px;
-      width: 360px;
+      min-width: 310px;
       margin: 20px;
       background: #ffffff;
       box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
@@ -643,16 +493,5 @@ export default {
   height: 100%;
   width: 100%;
   padding: 20px 20px 20px 0;
-}
-.operation_box {
-  height: 100%;
-}
-.securityArea_container {
-  padding-bottom: 20px;
-  background: #ffffff;
-  .tree {
-    max-height: calc(100% - 90px);
-    overflow-y: auto;
-  }
 }
 </style>

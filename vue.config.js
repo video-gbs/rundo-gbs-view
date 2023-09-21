@@ -119,7 +119,18 @@ module.exports = {
       toUrlUndefined: true,
     },
     module: {
-      rules: []
+      rules: [
+      //   {
+      //   test: /\.(jpg|png|gif|bmp|jpeg)$/,
+      //   use: {
+      //     loader: "url-loader",
+      //     options: {
+      //       limit: 10240, // 设置限制文件大小为 10KB
+      //     }
+      //   }
+
+      // }
+      ]
     },
     resolve: {
       fallback: { "https": false, "zlib": false, "http": false, "url": false, "path": require.resolve("path-browserify"), },

@@ -6,7 +6,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI, { size: 'small' })
 import '@/styles/index.scss'
-// import '../static/fonts/iconfont/iconfont.css'
+import '../static/fonts/iconfont/iconfont.css'
 
 import App from './App.vue'
 import store from './store'
