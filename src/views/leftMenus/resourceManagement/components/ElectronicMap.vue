@@ -25,6 +25,41 @@
         </div>
       </transition>
     </div>
+
+    <el-dialog
+      class="el-dialog-electronicMap"
+      title="视频播放"
+      top="0"
+      width="700"
+      :close-on-click-modal="false"
+      :visible.sync="showVideoDialog"
+      @close="close()"
+    >
+      <!-- <JPlayer
+        ref="videoPlayer"
+        :videoUrl="videoUrl"
+        :hasAudio="hasAudio"
+        fluent
+        autoplay
+        live
+      /> -->
+      <!-- <EasyPlayer
+        ref="videoPlayer"
+        :videoUrl="videoUrl"
+        :hasAudio="hasAudio"
+        fluent
+        autoplay
+        live
+      /> -->
+      <LivePlayer
+        ref="videoPlayer"
+        :videoUrl="videoUrl"
+        :hasAudio="hasAudio"
+        fluent
+        autoplay
+        live
+      />
+    </el-dialog>
   </div>
 </template>
 
@@ -32,27 +67,37 @@
 import leftTree from '@/views/leftMenus/systemManagement/components/leftTree'
 import LineFont from '@/components/LineFont'
 import { channelVideoAreaList } from '@/api/method/channel'
-import { getChannelPlayList } from '@/api/method/live'
+import { getChannelPlayList, getPlayLists } from '@/api/method/live'
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
 import * as Run3D from '@rjgf/run3d'
 import { findOneStatusOnGis, findVideoAreaOneGis } from '@/api/method/mapConfig'
 import testImgUrl from '../../../../assets/imgs/videotest.png'
+import JPlayer from './jessibuca.vue'
+import EasyPlayer from './easyPlay.vue'
+import LivePlayer from './livePlay'
+
 export default {
   name: '',
   components: {
     leftTree,
-    LineFont
+    LineFont,
+    JPlayer,
+    EasyPlayer,
+    LivePlayer
   },
   data() {
     return {
       mapDom: null,
       gdOnlineMap: null,
       treeList: [],
+      showVideoDialog: false,
       areaNames: 'resourceName',
       showContent: false, // 展示面板内容
       channelDetailsId: '',
       common: null,
+      videoUrl: '',
+      hasAudio: false,
       latitude: 0,
       longitude: 0,
       url: '',
@@ -143,6 +188,30 @@ export default {
       this.$refs.deviceTree.chooseId(this.channelDetailsId)
       this.getChannelPlayList(this.channelDetailsId)
     },
+    async getPlayLists(id) {
+      await getPlayLists({ channelId: id })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.videoUrl = res.data.data.wsFlv
+            if (res.data.data.playProtocalType == 1) {
+              this.videoUrl = res.data.data.httpFlv
+            } else if (res.data.data.playProtocalType == 2) {
+              this.videoUrl = res.data.data.wssFlv
+            }
+            this.showVideoDialog = true
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    close() {
+      console.log('关闭视频')
+      if (!!this.$refs.videoPlayer) {
+        this.$refs.videoPlayer.pause()
+      }
+      this.videoUrl = ''
+    },
     async getChannelPlayList(id) {
       await getChannelPlayList(id)
         .then((res) => {
@@ -155,7 +224,8 @@ export default {
               obj = {
                 height: item.height,
                 latitude: Number(item.latitude),
-                longitude: Number(item.longitude)
+                longitude: Number(item.longitude),
+                id: item.id
               }
               this.videoList.push(obj)
             })
@@ -178,10 +248,16 @@ export default {
             this.longitude = resData.longitude
             this.url = resData.url
             this.imgType = resData.imgType
-            this.mapDom && this.mapDom.destroy()
-            this.gdOnlineMap = null
-            this.mapDom = null
-            this.initMap()
+            // this.mapDom && this.mapDom.destroy()
+            console.log('this.gdOnlineMap', this.gdOnlineMap)
+            if (this.gdOnlineMap && this.gdOnlineMap !== null) {
+              this.mapDom.layers.removeLayer(this.gdOnlineMap)
+              this.gdOnlineMap = null
+              this.initMap(1)
+            } else {
+              this.initMap()
+            }
+
             this.findVideoAreaOneGis(this.channelDetailsId)
           }
         })
@@ -218,9 +294,11 @@ export default {
       this.getChannelPlayList(data.id)
       this.channelDetailsId = data.id
     },
-    initMap() {
-      this.mapDom = new Run3D.Map()
-      this.mapDom.createMap('', 'mapContainer', {})
+    initMap(val) {
+      if (val !== 1) {
+        this.mapDom = new Run3D.Map()
+        this.mapDom.createMap('', 'mapContainer', {})
+      }
       // const url
       //创建高德在线地图图层
       this.gdOnlineMap = new Run3D.UrlTemplateImageLayer({
@@ -248,11 +326,23 @@ export default {
           scale: 1,
           offset: [0, 0],
           scaleByDistance: [1, 0.6],
-          distanceDisplayCondition: [0, 30000] //显示标签范围
+          distanceDisplayCondition: [0, 30000], //显示标签范围
+          properties: {
+            id: item.id
+          }
         })
         graphicsLayer.add(graphic)
       })
-      console.log(2222)
+
+      this.mapDom.scene.on(Run3D.EventTypeEnum.LEFT_CLICK, (res) => {
+        this.common.pickerHelper.pick(res).then((result) => {
+          console.log('result', result.results.id._properties._id._value)
+          let resId = result.results
+            ? result.results.id._properties._id._value
+            : ''
+          this.getPlayLists(resId)
+        })
+      })
     }
   },
   destroyed() {
@@ -264,6 +354,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-dialog {
+  width: 700px;
+  height: 500px;
+}
+::v-deep .el-dialog__header {
+  border-bottom: 1px solid rgba(234, 234, 234, 1);
+  position: relative;
+  z-index: 9999999999;
+}
 ::v-deep .cesium-viewer,
 .cesium-viewer-cesiumWidgetContainer,
 .cesium-widget {
@@ -279,6 +378,16 @@ export default {
 ::v-deep canvas {
   width: 100%;
   height: 100%;
+}
+.el-dialog-electronicMap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+  > .el-dialog {
+    width: 700px !important;
+  }
 }
 #mapContainer {
   height: 100%;
