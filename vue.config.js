@@ -112,9 +112,8 @@ module.exports = {
   configureWebpack: {
     name: '',
     output: {
-      library: 'myLibrary',
-      libraryTarget: 'umd',
-      globalObject: 'this',
+      sourcePrefix: "",
+      path: path.resolve(__dirname, 'dist'),
       filename: `[name].${timeStamp}.js`
     },
     amd: {
@@ -122,16 +121,16 @@ module.exports = {
     },
     module: {
       rules: [
-        //   {
-        //   test: /\.(jpg|png|gif|bmp|jpeg)$/,
-        //   use: {
-        //     loader: "url-loader",
-        //     options: {
-        //       limit: 10240, // 设置限制文件大小为 10KB
-        //     }
-        //   }
+      //   {
+      //   test: /\.(jpg|png|gif|bmp|jpeg)$/,
+      //   use: {
+      //     loader: "url-loader",
+      //     options: {
+      //       limit: 10240, // 设置限制文件大小为 10KB
+      //     }
+      //   }
 
-        // }
+      // }
       ]
     },
     resolve: {
