@@ -24,7 +24,7 @@
     "@ffmpeg/ffmpeg": "^0.11.6",
     "@liveqing/liveplayer": "^2.6.4",
     "@originjs/vite-plugin-commonjs": "^1.0.3",
-    "@rjgf/run3d": "1.0.11",
+    "@rjgf/run3d": "1.0.12",
     "@rjgf/run3d-plugin": "^1.0.1",
     "@wanglin1994/video-timeline": "^0.1.10",
     "axios": "0.18.1",
@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
-    "@rjgf/run3d": "1.0.11",
+    "@rjgf/run3d": "1.0.12",
     "@babel/eslint-parser": "^7.12.16",
     "@easydarwin/easywasmplayer": "^4.0.13",
     "@vue/cli-plugin-babel": "^5.0.8",
