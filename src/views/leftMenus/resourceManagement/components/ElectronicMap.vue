@@ -104,6 +104,8 @@ export default {
       imgType: 'png',
       // 设备集合
       videoList: [],
+      graphic:{},
+      graphicsLayer:null,
       points: [
         {
           longitude: 113.43382617519103,
@@ -252,6 +254,8 @@ export default {
             console.log('this.gdOnlineMap', this.gdOnlineMap)
             if (this.gdOnlineMap && this.gdOnlineMap !== null) {
               this.mapDom.layers.removeLayer(this.gdOnlineMap)
+
+              this.graphicsLayer.removeAll()
               this.gdOnlineMap = null
               this.initMap(1)
             } else {
@@ -316,11 +320,11 @@ export default {
       this.mapDom.layers.addRaster(this.gdOnlineMap)
       this.common = new Run3D.Common(this.mapDom.viewer)
       //创建图层并加入到地图中
-      let graphicsLayer = new Run3D.GraphicLayer('test')
-      this.mapDom.layers.addGraphicLayer(graphicsLayer)
-      let graphic = {}
+      this.graphicsLayer = new Run3D.GraphicLayer('test')
+      this.mapDom.layers.addGraphicLayer(this.graphicsLayer)
+      this.graphic = {}
       this.videoList.map((item) => {
-        graphic = new Run3D.BillboadrdGraphic({
+        this.graphic = new Run3D.BillboadrdGraphic({
           position: [item.longitude, item.latitude, item.height],
           imageUrl: testImgUrl,
           scale: 1,
@@ -331,7 +335,7 @@ export default {
             id: item.id
           }
         })
-        graphicsLayer.add(graphic)
+        this.graphicsLayer.add(this.graphic)
       })
 
       this.mapDom.scene.on(Run3D.EventTypeEnum.LEFT_CLICK, (res) => {
