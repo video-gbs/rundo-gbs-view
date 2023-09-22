@@ -200,7 +200,19 @@ module.exports = {
           to: 'js/'
         }
         ]
-      )
+      ),
+      // new CopyWebpackPlugin([
+      //   {
+      //     from: 'node_modules/@easydarwin/easyplayer/dist/component/EasyPlayer.swf',
+      //   },
+      //   {
+      //     from: 'node_modules/@easydarwin/easyplayer/dist/component/crossdomain.xml',
+      //   },
+      //   {
+      //     from: 'node_modules/@easydarwin/easyplayer/dist/component/EasyPlayer-lib.min.js',
+      //     to: 'js/'
+      //   }
+      // ])
     ]
   },
   chainWebpack(config) {

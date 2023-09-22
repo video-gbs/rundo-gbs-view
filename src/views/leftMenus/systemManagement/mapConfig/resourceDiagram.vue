@@ -128,6 +128,9 @@ export default {
             this.mapId = resData.id
             this.imgType = resData.imgType
             console.log('this.channelDetailsId', this.channelDetailsId)
+               this.mapDom && this.mapDom.destroy()
+    this.gdOnlineMap = null
+    this.mapDom = null
 
             this.initMap()
 
@@ -150,7 +153,7 @@ export default {
             this.editId = resData.id
             this.imgType = resData.imgType
 
-            this.initMap()
+            // this.initMap()
           }
         })
         .catch((error) => {
