@@ -11,6 +11,7 @@ const productionGzipExtensions = ['js', 'css', 'less', 'sacc']
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 // const TextReplacePlugin = require('./src/utils/textReplacePlugin')
 // const TextReplacePlugin1 = require('./src/utils/textReplacePlugin')
+const timeStamp = new Date().getTime()
 
 const assetsCDN = {
   externals: {
@@ -111,25 +112,26 @@ module.exports = {
   configureWebpack: {
     name: '',
     output: {
-      sourcePrefix: "",
-      path: path.resolve(__dirname, 'dist'),
-      filename: '[name].bundle.js'
+      library: 'myLibrary',
+      libraryTarget: 'umd',
+      globalObject: 'this',
+      filename: `[name].${timeStamp}.js`
     },
     amd: {
       toUrlUndefined: true,
     },
     module: {
       rules: [
-      //   {
-      //   test: /\.(jpg|png|gif|bmp|jpeg)$/,
-      //   use: {
-      //     loader: "url-loader",
-      //     options: {
-      //       limit: 10240, // 设置限制文件大小为 10KB
-      //     }
-      //   }
+        //   {
+        //   test: /\.(jpg|png|gif|bmp|jpeg)$/,
+        //   use: {
+        //     loader: "url-loader",
+        //     options: {
+        //       limit: 10240, // 设置限制文件大小为 10KB
+        //     }
+        //   }
 
-      // }
+        // }
       ]
     },
     resolve: {
