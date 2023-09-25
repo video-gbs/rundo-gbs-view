@@ -184,7 +184,7 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined,
+      // redirect: undefined,
       windowWidth: null,
       hasGoPath: '',
       thirdPartyLogin: false,
@@ -196,7 +196,7 @@ export default {
     $route: {
       handler: function (route) {
         console.log('routerouterouterouteroute', route)
-        this.redirect = route.query && route.query.redirect
+        // this.redirect = route.query && route.query.redirect
       },
       immediate: true
     }
