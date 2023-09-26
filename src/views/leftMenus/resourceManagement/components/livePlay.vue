@@ -2,8 +2,7 @@
   <div class="livePlayer">
     <LivePlayer
       ref="videoPlayer"
-      class="live-player-container"
-      :aspect="stretch ? 'fullscreen' : ''"
+      class="live-player-container-test"
       id="livePlayerDevice"
       :videoUrl="videoUrl"
       :controls="controls"
@@ -131,20 +130,20 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.init()
-      const dom =Array.from(document.getElementsByClassName('player-box')) 
-      if (dom.length > 1) {
-        dom?.forEach((item, index) => {
-          // if (index === this.$props.playerIdx) {
-          //   dom[this.$props.playerIdx].style.height = this.$props.stretch
-          //     ? '100%'
-          //     : ''
-          // }else{
-          dom[index].style.height = this.$props.stretch ? '100%' : ''
-          // }
-        })
-      } else {
-        dom[0].style.height = this.$props.stretch ? '100%' : ''
-      }
+      // const dom = document.getElementsByClassName('player-box')
+      // if (dom.length > 1) {
+      //   dom.forEach((item, index) => {
+      //     // if (index === this.$props.playerIdx) {
+      //     //   dom[this.$props.playerIdx].style.height = this.$props.stretch
+      //     //     ? '100%'
+      //     //     : ''
+      //     // }else{
+      //     dom[index].style.height = this.$props.stretch ? '100%' : ''
+      //     // }
+      //   })
+      // } else {
+      //   dom[0].style.height = this.$props.stretch ? '100%' : ''
+      // }
     })
   },
   methods: {
@@ -337,6 +336,11 @@ export default {
   position: static !important;
   padding-bottom: 0 !important;
   height: 100%;
+}
+::v-deep .live-player-container-test{
+  .video-js{
+    background-color: #fff !important;
+  }
 }
 .live-player-container {
   width: 100%;

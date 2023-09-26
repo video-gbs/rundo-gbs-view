@@ -528,6 +528,7 @@ export default {
   },
   watch: {
     filterText(val) {
+      console.log(111,val)
       this.$refs.liveTree.filter(val)
     },
     videoActiveArr(n) {

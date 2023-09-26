@@ -9,7 +9,7 @@ const requestTimeOut = 20 * 100000
 window.isReresh = false
 
 const service = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? 'api/' : 'api/',
+  baseURL: process.env.NODE_ENV === 'production' ? '/api/' : '/api/',
   timeout: requestTimeOut
 })
 
