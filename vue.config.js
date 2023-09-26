@@ -50,6 +50,11 @@ const urls = [
   {
     target: 'https://xard-gbs-test.runjian.com:8080',
     proxy: '/api'
+  },
+  // dev  本地
+  {
+    target: 'http://116.205.143.13/tiles/gdhpjd',
+    proxy: 'map/api'
   }
   // {
   //   target: 'http://xard-gbs-dev.runjian.com:8080',
@@ -121,16 +126,16 @@ module.exports = {
     },
     module: {
       rules: [
-      //   {
-      //   test: /\.(jpg|png|gif|bmp|jpeg)$/,
-      //   use: {
-      //     loader: "url-loader",
-      //     options: {
-      //       limit: 10240, // 设置限制文件大小为 10KB
-      //     }
-      //   }
+        //   {
+        //   test: /\.(jpg|png|gif|bmp|jpeg)$/,
+        //   use: {
+        //     loader: "url-loader",
+        //     options: {
+        //       limit: 10240, // 设置限制文件大小为 10KB
+        //     }
+        //   }
 
-      // }
+        // }
       ]
     },
     resolve: {
