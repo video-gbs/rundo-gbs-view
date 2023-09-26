@@ -160,7 +160,7 @@ export default {
     async gisVideoAreaSaveGis(res) {
       const params = {}
       params.latitude = res.latitude
-      params.longitude = res.latitude
+      params.longitude = res.longitude
       params.videoAreaId = this.channelDetailsId
       params.gisConfigId = this.mapId
       params.height = res.height
