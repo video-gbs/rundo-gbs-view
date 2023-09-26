@@ -275,6 +275,20 @@ export default {
       that.flvPlayer.attachMediaElement(videoElement)
 
       that.flvPlayer.load()
+      let controller = this.player._transmuxer._controller
+      let wsLoader = controller._ioctl._loader
+      let oldWsOnCompleteFunc = wsLoader._onComplete
+      wsLoader._onComplete = function () {
+        if (!controller._remuxer) {
+          controller._remuxer = {
+            flushStashedSamples: function () {
+              console.log('flushStashedSamples')
+            }
+          }
+        }
+        oldWsOnCompleteFunc()
+      }
+
       setTimeout(function () {
         if (that.resVideoUrl !== '' && that.resVideoUrl !== null) {
           that.flvPlayer && that.flvPlayer.play()

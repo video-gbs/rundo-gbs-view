@@ -48,7 +48,7 @@ const urls = [
   // },
   // dev  本地
   {
-    target: 'https://xard-gbs-test.runjian.com:8080',
+    target: 'http://xard-gbs-uat.runjian.com:8080',
     proxy: '/api'
   }
   // {
