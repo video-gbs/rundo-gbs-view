@@ -14,10 +14,7 @@
             </transition> -->
           </div>
           <transition name="el-fade-in-linear">
-            <div
-              class="wrapper-bottom-content"
-              ref="wrapperBottomContent"
-            >
+            <div class="wrapper-bottom-content" ref="wrapperBottomContent">
               <leftTree
                 ref="deviceTree"
                 class="electronicMaTree tree_test"
@@ -106,9 +103,7 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.treeList = [res.data.data]
-            this.channelDetailsId = res.data.data
-              ? res.data.data.id
-              : ''
+            this.channelDetailsId = res.data.data ? res.data.data.id : ''
             this.$refs.deviceTree.chooseId(this.channelDetailsId)
           }
         })
@@ -128,9 +123,9 @@ export default {
             this.mapId = resData.id
             this.imgType = resData.imgType
             console.log('this.channelDetailsId', this.channelDetailsId)
-               this.mapDom && this.mapDom.destroy()
-    this.gdOnlineMap = null
-    this.mapDom = null
+            this.mapDom && this.mapDom.destroy()
+            this.gdOnlineMap = null
+            this.mapDom = null
 
             this.initMap()
 
@@ -177,7 +172,7 @@ export default {
               type: 'success',
               message: '地图底图保存成功'
             })
-            this.editId = res.data.data.id
+            // this.editId = res.data.data.id
           }
         })
         .catch((error) => {
