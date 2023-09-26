@@ -471,7 +471,7 @@ export default {
             this.params.current = res.data.data.pageSize
             setTimeout(() => {
               this.isShow = true
-            }, 100)
+            }, 500)
           }
         })
         .catch((error) => console.log(error))

@@ -389,7 +389,7 @@ export default {
           this.tableData = res.data.data
           setTimeout(() => {
             this.isShow = true
-          }, 100)
+          }, 500)
         }
       })
     },

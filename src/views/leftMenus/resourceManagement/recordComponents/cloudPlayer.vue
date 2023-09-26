@@ -131,9 +131,9 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.init()
-      const dom = document.getElementsByClassName('player-box')
+      const dom =Array.from(document.getElementsByClassName('player-box')) 
       if (dom.length > 1) {
-        dom.forEach((item, index) => {
+        dom?.forEach((item, index) => {
           // if (index === this.$props.playerIdx) {
           //   dom[this.$props.playerIdx].style.height = this.$props.stretch
           //     ? '100%'
