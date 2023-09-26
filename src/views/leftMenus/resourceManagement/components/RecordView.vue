@@ -139,7 +139,7 @@
                     <cloud-player
                       :ref="'cloudPlayer' + [i - 1]"
                       :stretch="isFill"
-                      :tracks="tracks"
+                      :tracks="tracks[i-1]"
                       :isShowStream="isShowStream[i - 1]"
                       :onChangePlayTime="handleChangeCurrentTime"
                       :onPlayEnded="handleDevicesPlayEnded"
@@ -1247,13 +1247,12 @@ export default {
 
     //获取码流信息
     async getStreamInfo() {
-      this.tracks = []
       await getStreamInfo({
         channelExpansionId: Local.get('recordCloudId')[this.playerIdx],
         streamId: Local.get('recordStreamId')[this.playerIdx]
       }).then((res) => {
         if (res.data.code === 0) {
-          this.tracks = res.data.data.tracks
+          this.tracks[this.playerIdx] = res.data.data.tracks
         } else {
           this.$message({
             showClose: true,
@@ -1344,7 +1343,7 @@ export default {
           } else {
             if (
               curTime >= new Date(range.endTime).getTime() &&
-              curTime <= new Date(this.resTimeLists[i + 1].startTime).getTime()
+              curTime <= new Date(this.resTimeLists[this.playerIdx][i + 1]?.startTime).getTime()
             ) {
               // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
               this.playRecord(
