@@ -184,7 +184,7 @@ export default {
           dom.playbackRate = this.playbackRate
           dom.defaultPlaybackRate = this.playbackRate
           dom.style = this.videoStyle
-          dom.style['object-fit'] = this.stretch ? 'fill' : ''
+          dom.style['object-fit'] = this.stretch ? '' : ''
         }, 100)
       }
 
@@ -309,7 +309,7 @@ export default {
       const videoDom = document.getElementsByClassName('vjs-tech')
       // console.log('videoDom', videoDom)
       videoDom.forEach((item1) => {
-        item1.style['object-fit'] = newVal ? 'fill' : ''
+        item1.style['object-fit'] = newVal ? '100%' : '100%'
       })
       // if (dom.length > 1) {
 
@@ -325,7 +325,7 @@ export default {
       const videoDom = this.$refs.videoPlayer.$el.querySelector('video')
       console.log('videoStyle', videoStyle)
       videoDom.style = newVal
-      videoDom.style['object-fit'] = this.stretch ? 'fill' : ''
+      videoDom.style['object-fit'] = this.stretch ? '' : ''
     }
   }
 }

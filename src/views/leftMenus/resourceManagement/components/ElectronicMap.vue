@@ -387,6 +387,7 @@ export default {
   position: absolute;
   top: 50%;
   left: 50%;
+  overflow: hidden;
 
   transform: translate(-50%, -50%);
   > .el-dialog {

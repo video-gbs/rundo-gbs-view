@@ -130,7 +130,7 @@ export default {
           Local.remove('access_token')
           Local.remove('rj_deptType')
           clearInterval(window.interval)
-          this.$router.push({ path: '/login/' })
+          this.$router.push({ path: '/login' })
         })
     },
     clickRouter(data) {
@@ -139,7 +139,7 @@ export default {
         this.routerLists && this.routerLists.length > 0
           ? this.routerLists
           : JSON.parse(Session.get('dynamicRouters'))
-      if (data.path === '/workTable/') {
+      if (data.path === '/workTable') {
         this.$router.push({ path: data.path })
         // resetRouter()
         store.dispatch('user/changeRightWidth', false)
