@@ -446,7 +446,7 @@ export default {
       Local.set('channelPageNum', this.params.pageNum)
       Local.set('equipmentActiveName', '通道')
       this.$emit('changeIsShow', 'editChannel', true, row)
-      // this.$router.push({
+      // this.$router.replace({
       //   path: `/editChannel`,
       //   query: {
       //     row: row

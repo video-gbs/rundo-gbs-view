@@ -430,7 +430,7 @@ export default {
                     this.$nextTick(() => {
                       store.dispatch('user/changeRightWidth', false)
                       store.dispatch('user/changeShowSidebar', false)
-                      this.$router.push({ path: `/${this.hasGoPath}` })
+                      this.$router.replace({ path: `/${this.hasGoPath}` })
                       this.hasGoPath = ''
                     })
                     //   }

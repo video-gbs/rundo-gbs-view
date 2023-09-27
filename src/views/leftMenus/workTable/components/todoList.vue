@@ -168,7 +168,7 @@ export default {
       })
     },
     goPage(v) {
-      this.$router.push({ path: v.path, query: { t: v.params } })
+      this.$router.replace({ path: v.path, query: { t: v.params } })
     }
   }
 }
