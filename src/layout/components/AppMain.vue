@@ -29,7 +29,7 @@ export default {
     $route: {
       handler: function (val, oldVal) {
         console.log(val, 999)
-        if (val.path === '/workTable') {
+        if (val.path === '/workTable/') {
           this.changeRouter = false
         } else {
           this.changeRouter = true
