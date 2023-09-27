@@ -42,20 +42,20 @@ const port = process.env.port || process.env.npm_config_port || 8080
 const urls = [
   // uat 测试
   // {
-  //   target: 'https://xard-gbs-uat.runjian.com:8080',
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
   //   proxy: '/api'
 
   // },
   // dev  本地
   {
-    target: 'http://xard-gbs-uat.runjian.com:8080',
+    target: 'https://xard-gbs-test.runjian.com:8080',
     proxy: '/api'
   },
   // dev  本地
-  {
-    target: 'http://116.205.143.13/tiles/gdhpjd',
-    proxy: 'map/api'
-  }
+  // {
+  //   target: 'http://116.205.143.13/tiles/gdhpjd',
+  //   proxy: 'map/api'
+  // }
   // {
   //   target: 'http://xard-gbs-dev.runjian.com:8080',
   //   proxy: '/api'

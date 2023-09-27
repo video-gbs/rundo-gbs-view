@@ -13,16 +13,16 @@ NProgress.configure({ showSpinner: false })
 
 export const staticRouters = [
   {
-    path: '/login',
+    path: '/login/',
     name: 'login',
     component: () => import('@/views/login/index')
   },
   {
     path: '/',
-    redirect: '/login'
+    redirect: '/login/'
   },
   {
-    path: '/workTable',
+    path: '/workTable/',
     name: 'workTable',
     component: () => import('@/views/leftMenus/workTable/index'),
     meta: { title: '首页', icon: 'zhgzt' }
@@ -340,17 +340,17 @@ router.beforeEach(async (to, from, next) => {
       next()
     }
     if (
-      to.path === '/login' &&
+      to.path === '/login/' &&
       Session.get('third_party_login') !== null &&
       !Session.get('third_party_login')
     ) {
       // console.log(9999999)
-      next('/workTable')
+      next('/workTable/')
     }
   } else {
-    if (to.path !== '/login') {
+    if (to.path !== '/login/') {
       // console.log('不在登录页跳转')
-      next('/login')
+      next('/login/')
     } else {
       // console.log('在登录页跳转')
       next()

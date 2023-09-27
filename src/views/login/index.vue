@@ -334,7 +334,7 @@ export default {
     saveComponents(data) {
       const homeRouters = [
         {
-          path: '/workTable',
+          path: '/workTable/',
           name: 'workTable',
           component: () => import('@/views/leftMenus/workTable/index'),
           meta: { title: '首页', icon: 'sy' }
@@ -447,7 +447,7 @@ export default {
               this.showHome = true
               console.log(11111111)
               // store.dispatch('user/changeThirdPartyLogin', false)
-              this.$router.push({ path: '/workTable' })
+              this.$router.push({ path: '/workTable/' })
             }
             //设置定时器，更新token
             if (Local.get('expires_in_old') && Local.get('refresh_token')) {

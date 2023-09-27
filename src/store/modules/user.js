@@ -87,7 +87,7 @@ const mutations = {
   SET_DYNAMICROUTERSMAP(state, routers) {
     const homeRouters = [
       {
-        path: '/workTable',
+        path: '/workTable/',
         name: 'workTable',
         component: () => import('@/views/leftMenus/workTable/index'),
         meta: { title: '首页', icon: 'sy' }
