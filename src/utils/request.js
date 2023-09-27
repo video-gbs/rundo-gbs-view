@@ -222,7 +222,7 @@ service.interceptors.response.use(
             init.openMessage('token过期,请重新登录')
             clearInterval(window.interval)
             router.replace({
-              path: '/login/',
+              path: '/login',
               // query: { redirect: router.currentRoute.fullPath }
             })
           }
@@ -237,7 +237,7 @@ service.interceptors.response.use(
           init.openMessage(err.response.data.msg)
           clearInterval(window.interval)
           router.replace({
-            path: '/login/',
+            path: '/login',
             // query: { redirect: router.currentRoute.fullPath }
           })
           return Promise.resolve(err)

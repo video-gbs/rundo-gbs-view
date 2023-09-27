@@ -316,7 +316,7 @@ export default {
       // resetRouter()
       const homeRouters = [
         {
-          path: '/workTable/',
+          path: '/workTable',
           name: 'workTable',
           component: () => import('@/views/leftMenus/workTable/index'),
           meta: { title: '首页', icon: 'sy' }
