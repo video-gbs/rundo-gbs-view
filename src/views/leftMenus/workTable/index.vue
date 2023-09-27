@@ -414,7 +414,7 @@ export default {
               'permissionMenuId',
               child.childList[0] ? child.childList[0].id : ''
             )
-            this.$router.push({ path: child.childList[0].path })
+            this.$router.replace({ path: child.childList[0].path })
           }
         })
       } else {
