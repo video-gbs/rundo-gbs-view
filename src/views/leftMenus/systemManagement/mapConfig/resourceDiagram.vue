@@ -127,9 +127,9 @@ export default {
             this.gdOnlineMap = null
             this.mapDom = null
 
-            this.initMap()
-
             this.findVideoAreaOneGis(this.channelDetailsId)
+
+            // this.initMap()
           }
         })
         .catch((error) => {
@@ -148,7 +148,10 @@ export default {
             this.editId = resData.id
             this.imgType = resData.imgType
 
-            // this.initMap()
+            this.mapDom && this.mapDom.destroy()
+            this.gdOnlineMap = null
+            this.mapDom = null
+            this.initMap()
           }
         })
         .catch((error) => {
@@ -158,6 +161,7 @@ export default {
 
     //保存节点与配置的信息
     async gisVideoAreaSaveGis(res) {
+      console.log('~~~~~~~~~~~~', res)
       const params = {}
       params.latitude = res.latitude
       params.longitude = res.longitude
@@ -190,7 +194,8 @@ export default {
     // },
     childClickHandle(data) {
       this.channelDetailsId = data.id
-      this.findVideoAreaOneGis(data.id)
+      // this.findVideoAreaOneGis(data.id)
+      this.editId = ''
       this.findGis()
     },
     initMap() {
@@ -219,9 +224,10 @@ export default {
             Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
           )
           //返回WGS84坐标
-          // console.log(
-          //   Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
-          // )
+          console.log(
+            '返回WGS84坐标',
+            Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
+          )
         })
       })
       // //创建图层并加入到地图中
@@ -238,6 +244,8 @@ export default {
       // })
 
       // graphicsLayer.add(graphic)
+      console.log('this.longitude', this.longitude)
+      console.log('this.latitude', this.latitude)
       this.mapDom.initView({
         longitude: this.longitude,
         latitude: this.latitude,
