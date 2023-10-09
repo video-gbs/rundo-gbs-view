@@ -219,6 +219,7 @@ export default {
     //   }
     // },
     childClickHandle(data) {
+      this.isShowPic = false
       this.channelDetailsId = data.id
       // this.findVideoAreaOneGis(data.id)
       this.editId = ''
