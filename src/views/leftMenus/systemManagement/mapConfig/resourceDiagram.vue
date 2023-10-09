@@ -8,10 +8,6 @@
         <div class="resourceDiagram_container equipment-group-wrapper-bottom">
           <div class="wrapper-bottom-header">
             <div class="bottom-header-name">安防区域</div>
-            <!-- <transition name="el-zoom-in-center">
-              <i class="el-icon-arrow-up" v-if="showContent"></i>
-              <i class="el-icon-arrow-down" v-else></i>
-            </transition> -->
           </div>
           <transition name="el-fade-in-linear">
             <div class="wrapper-bottom-content" ref="wrapperBottomContent">
@@ -28,6 +24,15 @@
 
         <div id="mapContainer"></div>
       </div>
+      <img
+        v-show="isShowPic"
+        class="pic_mid"
+        src="../../../../../static/images/gis/shiyechuang.png"
+        alt=""
+      />
+      <el-button type="primary" @click="save()" class="save-button"
+        ><svg-icon class="svg-btn" icon-class="save" />保存</el-button
+      >
     </div>
   </div>
 </template>
@@ -57,6 +62,7 @@ export default {
     return {
       mapDom: null,
       gdOnlineMap: null,
+      isShowPic: false,
       treeList: [],
       treeList1: [],
       areaNames: 'resourceName',
@@ -66,6 +72,9 @@ export default {
       common: null,
       latitude: 0,
       longitude: 0,
+      pitch: 0,
+      roll: 0,
+      heading: 0,
       url: '',
       mapId: 0,
       imgType: 'png',
@@ -75,7 +84,10 @@ export default {
       isVideo: false
     }
   },
-  created() {},
+  created() {
+    this.mapDom && this.mapDom.destroy()
+    this.mapDom = null
+  },
   activated() {
     this.mapDom && this.mapDom.destroy()
     this.gdOnlineMap = null
@@ -113,12 +125,17 @@ export default {
     },
 
     async findGis() {
+      this.isShowPic = false
       await findOneStatusOnGis()
         .then((res) => {
           if (res.data.code === 0) {
             const resData = res.data.data
             this.latitude = resData.latitude
             this.longitude = resData.longitude
+            this.height = resData.height
+            this.pitch = resData.pitch
+            this.roll = resData.roll
+            this.heading = resData.heading
             this.url = resData.url
             this.mapId = resData.id
             this.imgType = resData.imgType
@@ -141,12 +158,18 @@ export default {
       await findVideoAreaOneGis({ videoAreaId: id })
         .then((res) => {
           if (res.data.code === 0) {
-            const resData = res.data.data
-            this.latitude = resData.latitude
-            this.longitude = resData.longitude
-            this.mapId = resData.gisConfigId
-            this.editId = resData.id
-            this.imgType = resData.imgType
+            if (res.data.data && res.data.data !== null) {
+              const resData = res.data.data
+              this.latitude = resData.latitude
+              this.longitude = resData.longitude
+              this.pitch = resData.pitch
+              this.roll = resData.roll
+              this.heading = resData.heading
+              this.height = resData.height
+              this.mapId = resData.gisConfigId
+              this.editId = resData.id
+              this.imgType = resData.imgType
+            }
 
             this.mapDom && this.mapDom.destroy()
             this.gdOnlineMap = null
@@ -165,6 +188,9 @@ export default {
       const params = {}
       params.latitude = res.latitude
       params.longitude = res.longitude
+      params.pitch = res.pitch
+      params.roll = res.roll
+      params.heading = res.heading
       params.videoAreaId = this.channelDetailsId
       params.gisConfigId = this.mapId
       params.height = res.height
@@ -220,9 +246,9 @@ export default {
         this.common.pickerHelper.on(res).then((result) => {
           //返回点击的笛卡尔坐标
           // console.log(result)
-          this.gisVideoAreaSaveGis(
-            Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
-          )
+          // this.gisVideoAreaSaveGis(
+          //   Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
+          // )
           //返回WGS84坐标
           console.log(
             '返回WGS84坐标',
@@ -246,17 +272,33 @@ export default {
       // graphicsLayer.add(graphic)
       console.log('this.longitude', this.longitude)
       console.log('this.latitude', this.latitude)
+      console.log('this.heading', this.heading)
+      console.log('this.roll', this.roll)
+      console.log('this.pitch', this.pitch)
       this.mapDom.initView({
         longitude: this.longitude,
         latitude: this.latitude,
-        height: this.height
+        height: this.height,
+        heading: this.heading,
+        pitch: this.pitch,
+        roll: this.roll
       })
+      setTimeout(() => {
+        this.isShowPic = true
+      }, 2000)
+    },
+
+    save() {
+      console.log('save', this.mapDom.getCameraInfo())
+      this.gisVideoAreaSaveGis(this.mapDom.getCameraInfo())
     }
   },
+
   destroyed() {
     this.mapDom && this.mapDom.destroy()
     this.gdOnlineMap = null
     this.mapDom = null
+    this.isShowPic = false
   }
 }
 </script>
@@ -499,5 +541,22 @@ export default {
   height: 100%;
   width: 100%;
   padding: 20px 20px 20px 0;
+}
+.pic_mid {
+  width: 208px;
+  height: 208px;
+  position: absolute;
+  right: 30%;
+  top: 30%;
+}
+.save-button {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  .svg-btn {
+    position: relative;
+    top: 1px;
+    left: -4px;
+  }
 }
 </style>
