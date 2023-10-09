@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
-    "@rjgf/run3d": "1.0.12",
+    "@rjgf/run3d": "1.0.13",
     "@babel/eslint-parser": "^7.12.16",
     "@easydarwin/easywasmplayer": "^4.0.13",
     "@vue/cli-plugin-babel": "^5.0.8",
