@@ -42,7 +42,7 @@ import leftTree from '@/views/leftMenus/systemManagement/components/leftTree'
 import LineFont from '@/components/LineFont'
 import MapTest from './mapTest'
 import { channelVideoAreaList } from '@/api/method/channel'
-import { playVideoAreaList, getChannelPlayList } from '@/api/method/live'
+import { playVideoAreaList } from '@/api/method/live'
 import { Local } from '@/utils/storage'
 import { mapGetters } from 'vuex'
 import * as Run3D from '@rjgf/run3d'
@@ -85,6 +85,7 @@ export default {
     }
   },
   created() {
+    this.isShowPic = false
     this.mapDom && this.mapDom.destroy()
     this.mapDom = null
   },
@@ -108,7 +109,6 @@ export default {
   watch: {},
   methods: {
     async init() {
-      // this.resTree1 = await getChannelPlayList()
       // this.treeList = this.resTree1.data.data ? [this.resTree1.data.data] : []
 
       await playVideoAreaList()
