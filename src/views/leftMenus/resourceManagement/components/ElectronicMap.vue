@@ -360,10 +360,12 @@ export default {
       this.mapDom.scene.on(Run3D.EventTypeEnum.LEFT_CLICK, (res) => {
         this.common.pickerHelper.pick(res).then((result) => {
           console.log('result', result.results.id._properties._id._value)
-          let resId = result.results
-            ? result.results.id._properties._id._value
-            : ''
-          this.getPlayLists(resId)
+          if (result.results.id && result.results.id._properties._id._value) {
+            let resId = result.results
+              ? result.results.id._properties._id._value
+              : ''
+            this.getPlayLists(resId)
+          }
         })
       })
     }
