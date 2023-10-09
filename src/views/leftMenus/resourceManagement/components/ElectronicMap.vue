@@ -100,12 +100,15 @@ export default {
       hasAudio: false,
       latitude: 0,
       longitude: 0,
+      pitch: 0,
+      roll: 0,
+      heading: 0,
       url: '',
       imgType: 'png',
       // 设备集合
       videoList: [],
-      graphic:{},
-      graphicsLayer:null,
+      graphic: {},
+      graphicsLayer: null,
       points: [
         {
           longitude: 113.43382617519103,
@@ -232,7 +235,7 @@ export default {
               this.videoList.push(obj)
             })
             console.log('this.videoList', this.videoList)
-            this.findVideoAreaOneGis(id)
+            // this.findVideoAreaOneGis(id)
             this.findGis()
             // this.initMap()
           }
@@ -248,19 +251,13 @@ export default {
             const resData = res.data.data
             this.latitude = resData.latitude
             this.longitude = resData.longitude
+            this.pitch = resData.pitch
+            this.roll = resData.roll
+            this.heading = resData.heading
             this.url = resData.url
             this.imgType = resData.imgType
             // this.mapDom && this.mapDom.destroy()
             console.log('this.gdOnlineMap', this.gdOnlineMap)
-            if (this.gdOnlineMap && this.gdOnlineMap !== null) {
-              this.mapDom.layers.removeLayer(this.gdOnlineMap)
-
-              this.graphicsLayer.removeAll()
-              this.gdOnlineMap = null
-              this.initMap(1)
-            } else {
-              this.initMap()
-            }
 
             this.findVideoAreaOneGis(this.channelDetailsId)
           }
@@ -274,11 +271,25 @@ export default {
       await findVideoAreaOneGis({ videoAreaId: id })
         .then((res) => {
           if (res.data.code === 0) {
-            const resData = res.data.data
-            this.latitude = resData.latitude
-            this.longitude = resData.longitude
-            this.imgType = resData.imgType
-            // this.initMap()
+            if (res.data.data && res.data.data !== null) {
+              const resData = res.data.data
+              this.latitude = resData.latitude
+              this.longitude = resData.longitude
+              this.pitch = resData.pitch
+              this.roll = resData.roll
+              this.heading = resData.heading
+              this.imgType = resData.imgType
+              // this.initMap()
+            }
+            if (this.gdOnlineMap && this.gdOnlineMap !== null) {
+              this.mapDom.layers.removeLayer(this.gdOnlineMap)
+
+              this.graphicsLayer.removeAll()
+              this.gdOnlineMap = null
+              this.initMap(1)
+            } else {
+              this.initMap()
+            }
           }
         })
         .catch((error) => {
@@ -312,10 +323,18 @@ export default {
         minimumLevel: 0,
         maximumLevel: 20
       })
+      console.log('this.longitude', this.longitude)
+      console.log('this.latitude', this.latitude)
+      console.log('this.heading', this.heading)
+      console.log('this.roll', this.roll)
+      console.log('this.pitch', this.pitch)
       this.mapDom.initView({
         longitude: this.longitude,
         latitude: this.latitude,
-        height: this.height
+        height: this.height,
+        heading: this.heading,
+        pitch: this.pitch,
+        roll: this.roll
       })
       this.mapDom.layers.addRaster(this.gdOnlineMap)
       this.common = new Run3D.Common(this.mapDom.viewer)
