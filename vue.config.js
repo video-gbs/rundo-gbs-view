@@ -72,6 +72,10 @@ const urls = [
    {
     target: 'http://172.20.0.75:9090',
     proxy: '/alarm'
+  },
+     {
+    target: 'http://172.20.0.111:8093',
+    proxy: '/template'
   }
 ]
 

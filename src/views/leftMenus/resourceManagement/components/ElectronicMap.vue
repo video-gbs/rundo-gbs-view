@@ -324,7 +324,7 @@ export default {
         url: this.url,
         fileExtension: this.imgType,
         minimumLevel: 0,
-        maximumLevel: 20
+        maximumLevel: 18
       })
       console.log('this.longitude', this.longitude)
       console.log('this.latitude', this.latitude)
