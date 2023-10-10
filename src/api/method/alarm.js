@@ -2,6 +2,7 @@
 import request from '@/api/fetch'
 
 const alarm = '/alarm'
+const template = '/utils-template'
 
 export function initAlarmEventLists(data) {
   // 分页获取事件
@@ -79,29 +80,29 @@ export function getSchemeAlarmEventDefense(params) {
 // 时间模板接口
 // 分页获取时间模板
 export function getTemplateAlarmEventLists(params) {
-  return request.get(`${alarm}/template/page`, params)
+  return request.get(`${template}/template/page`, params)
 }
 // 检测时间是否可用
 export function checkTemplateAlarmEvent(params) {
-  return request.get(`${alarm}/template/check/time-in`, params)
+  return request.get(`${template}/template/check/time-in`, params)
 }
 // 添加时间模板
 export function addTemplateAlarmEvent(params) {
-  return request.post(`${alarm}/template/add`, params)
+  return request.post(`${template}/template/add`, params)
 }
 // 修改时间模板
 export function editTemplateAlarmEvent(params) {
-  return request.put(`${alarm}/template/update`, params)
+  return request.put(`${template}/template/update`, params)
 }
 // 删除时间模板
 export function deleteTemplateAlarmEvent(params) {
-  return request.delete(`${alarm}/template/page`, params)
+  return request.delete(`${template}/template/page`, params)
 }
 // 使用模板
 export function useTemplateAlarmEvent(params) {
-  return request.post(`${alarm}/template/use`, params)
+  return request.post(`${template}/template/use`, params)
 }
 // 解除模板使用
 export function unuseTemplateAlarmEvent(params) {
-  return request.put(`${alarm}/template/unuse`, params)
+  return request.put(`${template}/template/unuse`, params)
 }

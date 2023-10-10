@@ -61,18 +61,12 @@
     <div class="table-list">
       <div class="securityArea_container">
         <div class="btn-lists">
-          <el-button
-            type="primary"
-            @click="dialogShow(1)"
+          <el-button type="primary" @click="dialogShow(1)"
             ><svg-icon class="svg-btn" icon-class="add" /><span class="btn-span"
               >新建</span
             ></el-button
           >
-           <el-button
-            @click="deteleAll($event)"
-            style="width: 100px"
-            plain
-          >
+          <el-button @click="deteleAll($event)" style="width: 100px" plain>
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span>
           </el-button>
@@ -116,19 +110,13 @@
         </el-table-column>
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
-            <el-button
-              type="text"
-              @click="dialogShow(0, scope.row)"
+            <el-button type="text" @click="dialogShow(0, scope.row)"
               >布防通道</el-button
             >
-            <el-button
-              type="text"
-              @click="dialogShow(0, scope.row)"
+            <el-button type="text" @click="dialogShow(0, scope.row)"
               >编辑</el-button
             >
-            <el-button
-              type="text"
-              @click="deleteRole(scope.row)"
+            <el-button type="text" @click="deleteRole(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -163,35 +151,6 @@
               v-model="dialog.params.groupName"
               clearable
               :maxlength="20"
-            />
-          </el-form-item>
-          <el-form-item label="分组编码" prop="groupCode">
-            <el-input
-              v-model="dialog.params.groupCode"
-              clearable
-              :maxlength="20"
-            />
-          </el-form-item>
-          <el-form-item label="字典项名称" prop="itemName">
-            <el-input
-              v-model="dialog.params.itemName"
-              clearable
-              :maxlength="20"
-            />
-          </el-form-item>
-          <el-form-item label="字典项Value" prop="itemValue">
-            <el-input
-              v-model="dialog.params.itemValue"
-              clearable
-              :maxlength="20"
-            />
-          </el-form-item>
-          <el-form-item label="字典项描述">
-            <el-input
-              v-model="dialog.params.description"
-              type="textarea"
-              :rows="2"
-              :maxlength="50"
             />
           </el-form-item>
         </el-form>
