@@ -72,6 +72,7 @@ export default {
       common: null,
       latitude: 0,
       longitude: 0,
+      height:0,
       pitch: 0,
       roll: 0,
       heading: 0,
@@ -276,6 +277,7 @@ export default {
       console.log('this.heading', this.heading)
       console.log('this.roll', this.roll)
       console.log('this.pitch', this.pitch)
+      console.log('this.height', this.height)
       this.mapDom.initView({
         longitude: this.longitude,
         latitude: this.latitude,

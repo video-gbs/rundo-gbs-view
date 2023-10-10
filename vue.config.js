@@ -69,6 +69,10 @@ const urls = [
   //   target: 'http://172.20.0.75:9090',
   //   proxy: '/expansion'
   // }
+   {
+    target: 'http://172.20.0.75:9090',
+    proxy: '/alarm'
+  }
 ]
 
 
