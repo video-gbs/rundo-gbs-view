@@ -237,7 +237,7 @@ export default {
         url: this.url,
         fileExtension: this.imgType,
         minimumLevel: 0,
-        maximumLevel: 20
+        maximumLevel: 18
       })
 
       this.mapDom.layers.addRaster(this.gdOnlineMap)
@@ -549,8 +549,9 @@ export default {
   width: 208px;
   height: 208px;
   position: absolute;
-  right: 30%;
-  top: 30%;
+  left:  calc(50% + 175px);
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 .save-button {
   position: absolute;
