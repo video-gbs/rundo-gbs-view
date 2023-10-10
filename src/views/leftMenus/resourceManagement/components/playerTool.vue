@@ -219,7 +219,7 @@ export default {
   },
   destroyed() {
     if (this.jessibuca) {
-      this.jessibuca.destroy()
+      // this.jessibuca.destroy()
     }
     this.playing = false
     this.loaded = false

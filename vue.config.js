@@ -40,22 +40,23 @@ const port = process.env.port || process.env.npm_config_port || 8080
 
 // 转发配置数组
 const urls = [
-  // uat 测试
-  // {
-  //   target: 'http://xard-gbs-uat.runjian.com:8080',
-  //   proxy: '/api'
 
-  // },
   // dev  本地
 
   {
     target: 'http://172.20.0.111:8093',
     proxy: '/api/utils-template'
   },
+  // uat
   {
-    target: 'https://xard-gbs-test.runjian.com:8080',
+    target: 'http://xard-gbs-uat.runjian.com:8080',
     proxy: '/api'
+
   },
+  // {
+  //   target: 'https://xard-gbs-test.runjian.com:8080',
+  //   proxy: '/api'
+  // },
   // dev  本地
   // {
   //   target: 'http://116.205.143.13/tiles/gdhpjd',
@@ -101,7 +102,7 @@ function getProxys() {
       }
     }
   })
-  console.log('proxys',proxys)
+  console.log('proxys', proxys)
   return proxys
 }
 module.exports = {

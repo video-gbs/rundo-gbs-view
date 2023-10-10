@@ -73,7 +73,7 @@ import { mapGetters } from 'vuex'
 import * as Run3D from '@rjgf/run3d'
 import { findOneStatusOnGis, findVideoAreaOneGis } from '@/api/method/mapConfig'
 import testImgUrl from '../../../../assets/imgs/videotest.png'
-import JPlayer from './jessibuca.vue'
+// import JPlayer from './jessibuca.vue'
 import EasyPlayer from './easyPlay.vue'
 import LivePlayer from './livePlay'
 
@@ -82,7 +82,7 @@ export default {
   components: {
     leftTree,
     LineFont,
-    JPlayer,
+    // JPlayer,
     EasyPlayer,
     LivePlayer
   },
