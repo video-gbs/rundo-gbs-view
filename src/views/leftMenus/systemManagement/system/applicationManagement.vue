@@ -425,7 +425,7 @@ export default {
       //   })
     },
     goPage(path, query) {
-      this.$router.push(path)
+      this.$router.replace(path)
     },
     isShowChildren(data) {
       return data.find((res) => {

@@ -223,7 +223,7 @@ service.interceptors.response.use(
             clearInterval(window.interval)
             router.replace({
               path: '/login',
-              query: { redirect: router.currentRoute.fullPath }
+              // query: { redirect: router.currentRoute.fullPath }
             })
           }
           return Promise.resolve(err)
@@ -238,7 +238,7 @@ service.interceptors.response.use(
           clearInterval(window.interval)
           router.replace({
             path: '/login',
-            query: { redirect: router.currentRoute.fullPath }
+            // query: { redirect: router.currentRoute.fullPath }
           })
           return Promise.resolve(err)
         case 403:

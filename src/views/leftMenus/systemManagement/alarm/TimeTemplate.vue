@@ -1,7 +1,7 @@
 <template>
   <div class="dataDictionary_container" v-if="isShow">
     <div class="panel-header-box">
-      <div class="panel-header-box-border">字典管理</div>
+      <div class="panel-header-box-border">时间模板</div>
     </div>
 
     <div class="search">
@@ -12,17 +12,9 @@
         :model="searchParams"
         label-width="120px"
       >
-        <el-form-item label="字典名称:">
+        <el-form-item label="模板名称:">
           <el-input
             v-model="searchParams.itemName"
-            placeholder="请输入"
-            clearable
-            style="width: 240px"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="分组名称:">
-          <el-input
-            v-model="searchParams.groupName"
             placeholder="请输入"
             clearable
             style="width: 240px"
@@ -48,13 +40,20 @@
       <div class="securityArea_container">
         <div class="btn-lists">
           <el-button
-            v-permission="['/rbac/dict/add', 2]"
             type="primary"
             @click="dialogShow(1)"
             ><svg-icon class="svg-btn" icon-class="add" /><span class="btn-span"
               >新建</span
             ></el-button
           >
+          <el-button
+            @click="deteleAll($event)"
+            style="width: 100px"
+            plain
+          >
+            <svg-icon class="svg-btn" icon-class="del" />
+            <span class="btn-span">批量删除</span>
+          </el-button>
         </div>
       </div>
       <el-table
@@ -72,21 +71,20 @@
       >
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
-        <el-table-column prop="groupName" label="分组名称" />
-        <el-table-column prop="groupCode" label="分组编码" />
-        <el-table-column prop="itemName" label="字典项名称" />
-        <el-table-column prop="itemValue" label="字典值Value" />
-        <el-table-column prop="description" label="字典值描述" />
+        <el-table-column prop="groupName" label="模板名称" />
+        <el-table-column prop="groupName" label="模板详情" width="350" />
+        <el-table-column prop="groupCode" label="创建时间" />
+        <el-table-column prop="itemName" label="修改时间" />
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
+
+              <!-- v-permission="['/rbac/dict/update', 3]" -->
             <el-button
-              v-permission="['/rbac/dict/update', 3]"
               type="text"
               @click="dialogShow(0, scope.row)"
               >编辑</el-button
             >
             <el-button
-              v-permission="['/rbac/dict/delete', 4]"
               type="text"
               @click="deleteRole(scope.row)"
               ><span class="delete-button">删除</span></el-button

@@ -106,6 +106,24 @@
               >
               </el-table-column>
               <el-table-column
+                prop="heading"
+                label="偏航角"
+                :show-overflow-tooltip="true"
+              >
+              </el-table-column>
+              <el-table-column
+                prop="pitch"
+                label="俯仰角"
+                :show-overflow-tooltip="true"
+              >
+              </el-table-column>
+              <el-table-column
+                prop="roll"
+                label="翻滚角"
+                :show-overflow-tooltip="true"
+              >
+              </el-table-column>
+              <el-table-column
                 prop="onStatus"
                 label="状态"
                 :show-overflow-tooltip="true"
@@ -207,6 +225,25 @@
             <el-form-item label="高度：" prop="height">
               <el-input
                 v-model="dialogForm.height"
+                style="width: 436px"
+              ></el-input>
+            </el-form-item>
+
+            <el-form-item label="偏航角：" prop="heading">
+              <el-input
+                v-model="dialogForm.heading"
+                style="width: 436px"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="俯仰角：" prop="pitch">
+              <el-input
+                v-model="dialogForm.pitch"
+                style="width: 436px"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="翻滚角：" prop="roll">
+              <el-input
+                v-model="dialogForm.roll"
                 style="width: 436px"
               ></el-input>
             </el-form-item>
@@ -337,6 +374,11 @@ export default {
       dialogShow: false,
       rules: {
         imgType: [{ required: true, message: '请选择', trigger: 'change' }],
+        heading: [
+          { required: true, message: '1~128个字符。', trigger: 'blur' }
+        ],
+        pitch: [{ required: true, message: '1~128个字符。', trigger: 'blur' }],
+        roll: [{ required: true, message: '1~128个字符。', trigger: 'blur' }],
         url: [{ required: true, message: '1~128个字符。', trigger: 'blur' }],
         latitude: {
           required: true,
@@ -366,6 +408,9 @@ export default {
         dictId: '',
         latitude: '',
         height: '',
+        heading: '',
+        pitch: '',
+        roll: '',
         longitude: '',
         url: '',
         imgType: 'png'
@@ -413,6 +458,9 @@ export default {
         latitude: '',
         longitude: '',
         height: '',
+        heading: '',
+        pitch: '',
+        roll: '',
         url: '',
         imgType: 'png'
       }
@@ -461,13 +509,27 @@ export default {
     editData(row) {
       this.dialogShow = true
       this.title1 = '编辑'
-      const { dictId, latitude, longitude, height, url, imgType } = row
+      const {
+        dictId,
+        latitude,
+        longitude,
+        height,
+        url,
+        imgType,
+        heading,
+        pitch,
+        roll
+      } = row
       console.log(1111, row)
       this.dialogForm.dictId = String(dictId)
       this.dialogForm.latitude = latitude
       this.dialogForm.longitude = longitude
       this.dialogForm.height = height
-      this.dialogForm.url = url
+
+      this.dialogForm.heading = heading
+      ;(this.dialogForm.pitch = pitch),
+        (this.dialogForm.roll = roll),
+        (this.dialogForm.url = url)
       this.dialogForm.imgType = imgType
       this.editId = row.id
     },
