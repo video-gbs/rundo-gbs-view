@@ -101,6 +101,7 @@ export default {
       latitude: 0,
       longitude: 0,
       pitch: 0,
+      height:0,
       roll: 0,
       heading: 0,
       url: '',
@@ -251,6 +252,7 @@ export default {
             const resData = res.data.data
             this.latitude = resData.latitude
             this.longitude = resData.longitude
+            this.height = resData.height
             this.pitch = resData.pitch
             this.roll = resData.roll
             this.heading = resData.heading
@@ -276,6 +278,7 @@ export default {
               this.latitude = resData.latitude
               this.longitude = resData.longitude
               this.pitch = resData.pitch
+              this.height = resData.height
               this.roll = resData.roll
               this.heading = resData.heading
               this.imgType = resData.imgType
@@ -328,6 +331,7 @@ export default {
       console.log('this.heading', this.heading)
       console.log('this.roll', this.roll)
       console.log('this.pitch', this.pitch)
+      console.log('this.height', this.height)
       this.mapDom.initView({
         longitude: this.longitude,
         latitude: this.latitude,
