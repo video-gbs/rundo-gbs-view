@@ -420,7 +420,7 @@
 import moment from 'moment'
 import { Local } from '@/utils/storage'
 import dayjs from 'dayjs'
-import jPlayer from '../recordComponents/jessibuca.vue'
+// import jPlayer from '../recordComponents/jessibuca.vue'
 import cloudPlayer from '../recordComponents/cloudPlayer.vue'
 import TimePlayer from '../recordComponents/TimePlayer.vue'
 import TimePlayer1 from '../recordComponents/TimePlayer1.vue'
@@ -446,7 +446,7 @@ const ZOOM_TYPE = {
 export default {
   name: 'recordView',
   components: {
-    jPlayer,
+    // jPlayer,
     cloudPlayer,
     TimePlayer,
     TimePlayer1,
