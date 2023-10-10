@@ -72,7 +72,7 @@ export default {
       common: null,
       latitude: 0,
       longitude: 0,
-      height:0,
+      height: 0,
       pitch: 0,
       roll: 0,
       heading: 0,
@@ -203,7 +203,9 @@ export default {
               type: 'success',
               message: '地图底图保存成功'
             })
-            // this.editId = res.data.data.id
+            // if (res.data.data) {
+            this.editId = res.data.data
+            // }
           }
         })
         .catch((error) => {
@@ -549,7 +551,7 @@ export default {
   width: 208px;
   height: 208px;
   position: absolute;
-  left:  calc(50% + 175px);
+  left: calc(50% + 175px);
   top: 50%;
   transform: translate(-50%, -50%);
 }

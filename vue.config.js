@@ -47,6 +47,11 @@ const urls = [
 
   // },
   // dev  本地
+
+  {
+    target: 'http://172.20.0.111:8093',
+    proxy: '/api/utils-template'
+  },
   {
     target: 'https://xard-gbs-test.runjian.com:8080',
     proxy: '/api'
@@ -69,14 +74,10 @@ const urls = [
   //   target: 'http://172.20.0.75:9090',
   //   proxy: '/expansion'
   // }
-   {
+  {
     target: 'http://172.20.0.75:9090',
     proxy: '/alarm'
   },
-     {
-    target: 'http://172.20.0.111:8093',
-    proxy: '/template'
-  }
 ]
 
 
@@ -100,6 +101,7 @@ function getProxys() {
       }
     }
   })
+  console.log('proxys',proxys)
   return proxys
 }
 module.exports = {
