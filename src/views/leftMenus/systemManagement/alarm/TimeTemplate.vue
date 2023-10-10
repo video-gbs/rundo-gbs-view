@@ -14,7 +14,7 @@
       >
         <el-form-item label="模板名称:">
           <el-input
-            v-model="searchParams.itemName"
+            v-model="searchParams.templateName"
             placeholder="请输入"
             clearable
             style="width: 240px"
@@ -39,18 +39,12 @@
     <div class="table-list">
       <div class="securityArea_container">
         <div class="btn-lists">
-          <el-button
-            type="primary"
-            @click="dialogShow(1)"
+          <el-button type="primary" @click="dialogShow(1)"
             ><svg-icon class="svg-btn" icon-class="add" /><span class="btn-span"
               >新建</span
             ></el-button
           >
-          <el-button
-            @click="deteleAll($event)"
-            style="width: 100px"
-            plain
-          >
+          <el-button @click="deteleAll($event)" style="width: 100px" plain>
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span>
           </el-button>
@@ -77,16 +71,11 @@
         <el-table-column prop="itemName" label="修改时间" />
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
-
-              <!-- v-permission="['/rbac/dict/update', 3]" -->
-            <el-button
-              type="text"
-              @click="dialogShow(0, scope.row)"
+            <!-- v-permission="['/rbac/dict/update', 3]" -->
+            <el-button type="text" @click="dialogShow(0, scope.row)"
               >编辑</el-button
             >
-            <el-button
-              type="text"
-              @click="deleteRole(scope.row)"
+            <el-button type="text" @click="deleteRole(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -102,58 +91,105 @@
       v-if="dialog.show"
       :title="dialog.title"
       :visible.sync="dialog.show"
-      width="600px"
+      width="950px"
       :before-close="handleClose"
     >
-      <div>
-        <el-form
-          ref="roleForm"
-          class="params-form"
-          size="mini"
-          :rules="rules"
-          label-position="left"
-          label-width="120px"
-          :model="dialog.params"
-          @keyup.enter="submit('roleForm')"
-        >
-          <el-form-item label="分组名称" prop="groupName">
+      <!-- <div slot="title">
+        <div style="display: flex; justify-content: space-between">
+          <div style="font-weight: bold">
+            {{ isEdit ? '编辑录像计划' : '新建录像计划' }}
+          </div>
+          <div style="cursor: pointer" @click="handleRelationCancel"></div>
+        </div>
+      </div> -->
+      <el-form :model="formData" ref="addForm" style="overflow-x: auto">
+        <!-- <div style="max-width: 900px;"> -->
+        <!-- <div class="add-plan-item">
+          <el-form-item
+            label="计划名称"
+            :label-width="formLabelWidth"
+            prop="planName"
+            :rules="[
+              { required: true, message: '计划名称不能为空', trigger: 'blur' }
+            ]"
+          >
             <el-input
-              v-model="dialog.params.groupName"
-              clearable
-              :maxlength="20"
-            />
+              maxlength="32"
+              class="item-input"
+              v-model="formData.planName"
+              autocomplete="off"
+            ></el-input>
           </el-form-item>
-          <el-form-item label="分组编码" prop="groupCode">
-            <el-input
-              v-model="dialog.params.groupCode"
-              clearable
-              :maxlength="20"
-            />
+        </div> -->
+
+        <!-- <div class="add-plan-item mb-0">
+          <el-form-item
+            label="录像计划详情"
+            :label-width="formLabelWidth"
+            prop="planName"
+          >
+            <span class="describe-text">录像计划 配置云端录像开启时段</span>
           </el-form-item>
-          <el-form-item label="字典项名称" prop="itemName">
-            <el-input
-              v-model="dialog.params.itemName"
-              clearable
-              :maxlength="20"
-            />
-          </el-form-item>
-          <el-form-item label="字典项Value" prop="itemValue">
-            <el-input
-              v-model="dialog.params.itemValue"
-              clearable
-              :maxlength="20"
-            />
-          </el-form-item>
-          <el-form-item label="字典项描述">
-            <el-input
-              v-model="dialog.params.description"
-              type="textarea"
-              :rows="2"
-              :maxlength="50"
-            />
-          </el-form-item>
-        </el-form>
-      </div>
+        </div> -->
+
+        <div class="timeSlider-container">
+          <div
+            class="timeslider-box"
+            id="timeSlider1"
+            onselectstart="return false;"
+          >
+            <label class="label-week">星期一</label>
+          </div>
+
+          <div
+            class="timeslider-box"
+            id="timeSlider2"
+            onselectstart="return false;"
+          >
+            <label class="label-week">星期二</label>
+          </div>
+
+          <div
+            class="timeslider-box"
+            id="timeSlider3"
+            onselectstart="return false;"
+          >
+            <label class="label-week">星期三</label>
+          </div>
+
+          <div
+            class="timeslider-box"
+            id="timeSlider4"
+            onselectstart="return false;"
+          >
+            <label class="label-week">星期四</label>
+          </div>
+
+          <div
+            class="timeslider-box"
+            id="timeSlider5"
+            onselectstart="return false;"
+          >
+            <label class="label-week">星期五</label>
+          </div>
+
+          <div
+            class="timeslider-box"
+            id="timeSlider6"
+            onselectstart="return false;"
+          >
+            <label class="label-week">星期六</label>
+          </div>
+
+          <div
+            class="timeslider-box"
+            id="timeSlider7"
+            onselectstart="return false;"
+          >
+            <label class="label-week">星期日</label>
+          </div>
+        </div>
+      </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
         <el-button type="primary" @click="submit('roleForm')">确 定</el-button>
@@ -230,16 +266,13 @@
 </template>
 
 <script>
-import {
-  getDictLists,
-  getGroupDictLists,
-  addDict,
-  updateDict,
-  deleteDict
-} from '@/api/method/dictionary'
+import { getTemplateAlarmEventLists } from '@/api/method/alarm'
 import pagination from '@/components/Pagination/index.vue'
 import store from '@/store/index'
 import { Local } from '@/utils/storage'
+import '../../../../../static/js/timeSlider/timeSlider'
+import '../../../../../static/css/timeSlider.css'
+import '../../../../../static/css/normalize.css'
 export default {
   name: '',
   components: { pagination },
@@ -280,8 +313,7 @@ export default {
         }
       },
       searchParams: {
-        itemValue: '',
-        itemName: ''
+        templateName: ''
       },
       rules: {
         groupName: [
@@ -324,7 +356,17 @@ export default {
       roleId: '',
       checkList: [],
       buttonLoading: false,
-      treeData: []
+      treeData: [],
+      timeSliderList: {
+        initState: false,
+        timeS1: null,
+        timeS2: null,
+        timeS3: null,
+        timeS4: null,
+        timeS5: null,
+        timeS6: null,
+        timeS7: null
+      }
     }
   },
   created() {},
@@ -345,8 +387,7 @@ export default {
     },
     resetData(e) {
       this.searchParams = {
-        itemName: '',
-        itemValue: ''
+        templateName: ''
       }
       let target = e.target
       if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
@@ -387,6 +428,9 @@ export default {
       }
       this.dialog.title = act ? '新建' : '编辑'
       this.dialog.show = !this.dialog.show
+      this.$nextTick(() => {
+        this.initTimeSlider()
+      })
     },
     handleClose(done) {
       done()
@@ -456,7 +500,7 @@ export default {
         })
     },
     async getList() {
-      await getDictLists({
+      await getTemplateAlarmEventLists({
         num: this.params.pageSize,
         page: this.params.pageNum,
         ...this.searchParams
@@ -524,6 +568,61 @@ export default {
               break
           }
         }
+      })
+    },
+    /**
+     * 初始化时间段选择工具
+     */
+    initTimeSlider() {
+      this.timeSliderList.initState = true
+      this.timeSliderList.timeS1 = new TimeSlider({
+        mountedId: 'timeSlider1',
+        language: 'cn',
+        defaultOneTimeBlockTime: 30,
+        minBlockTime: 1,
+        allInit: true
+      })
+
+      this.timeSliderList.timeS2 = new TimeSlider({
+        mountedId: 'timeSlider2',
+        language: 'cn',
+        defaultOneTimeBlockTime: 30,
+        minBlockTime: 1
+      })
+
+      this.timeSliderList.timeS3 = new TimeSlider({
+        mountedId: 'timeSlider3',
+        language: 'cn',
+        defaultOneTimeBlockTime: 30,
+        minBlockTime: 1
+      })
+
+      this.timeSliderList.timeS4 = new TimeSlider({
+        mountedId: 'timeSlider4',
+        language: 'cn',
+        defaultOneTimeBlockTime: 30,
+        minBlockTime: 1
+      })
+
+      this.timeSliderList.timeS5 = new TimeSlider({
+        mountedId: 'timeSlider5',
+        language: 'cn',
+        defaultOneTimeBlockTime: 30,
+        minBlockTime: 1
+      })
+
+      this.timeSliderList.timeS6 = new TimeSlider({
+        mountedId: 'timeSlider6',
+        language: 'cn',
+        defaultOneTimeBlockTime: 30,
+        minBlockTime: 1
+      })
+
+      this.timeSliderList.timeS7 = new TimeSlider({
+        mountedId: 'timeSlider7',
+        language: 'cn',
+        defaultOneTimeBlockTime: 30,
+        minBlockTime: 1
       })
     }
   }
@@ -771,5 +870,15 @@ export default {
 }
 ::v-deep .el-table::before {
   height: 0;
+}
+::v-deep div {
+  box-sizing: unset;
+}
+.dialogRelation {
+  display: flex;
+  flex-wrap: wrap;
+}
+.marginR {
+  margin: 0 16px 16px 0;
 }
 </style>
