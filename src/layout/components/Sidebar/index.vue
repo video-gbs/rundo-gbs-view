@@ -9,9 +9,9 @@
         router
         :default-active="activeMenu"
         background-color="#fff"
-        text-color="#333333"
+        :text-color="variables.menuText"
         :unique-opened="false"
-        active-text-color="#1e56a0"
+        :active-text-color="variables.menuActiveText"
         :collapse-transition="false"
         mode="vertical"
       >

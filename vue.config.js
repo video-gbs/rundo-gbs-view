@@ -5,12 +5,9 @@ const path = require('path')
 const webpack = require('webpack')
 const defaultSettings = require('./src/settings.js')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
-const productionGzipExtensions = ['js', 'css', 'less', 'sacc']
+const productionGzipExtensions = ['js', 'css']
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-// const TextReplacePlugin = require('./src/utils/textReplacePlugin')
-// const TextReplacePlugin1 = require('./src/utils/textReplacePlugin')
 const timeStamp = new Date().getTime()
 
 const assetsCDN = {
@@ -47,7 +44,7 @@ const urls = [
     target: 'http://172.20.0.111:8093',
     proxy: '/api/utils-template'
   },
-  // uat
+  // uat 测试
   {
     target: 'http://xard-gbs-uat.runjian.com:8080',
     proxy: '/api'
@@ -102,7 +99,6 @@ function getProxys() {
       }
     }
   })
-  console.log('proxys', proxys)
   return proxys
 }
 module.exports = {
@@ -166,8 +162,6 @@ module.exports = {
       mainFiles: ['index', 'Cesium']
     },
     plugins: [
-      // new TextReplacePlugin1(),
-      // new TextReplacePlugin(),
       new MiniCssExtractPlugin({
         filename: '[name].css',
         chunkFilename: '[id].css',
@@ -201,7 +195,7 @@ module.exports = {
         deleteOriginalAssets: false
       }),
       new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 5,
+        maxChunks: 15,
         // minChunkSize: 100
       }),
 
@@ -283,12 +277,16 @@ module.exports = {
         libs: {
           name: 'chunk-libs',
           test: /[\\/]node_modules[\\/]/,
-          priority: 10,
-          chunks: 'initial'
+          priority: 2,
+          chunks: 'initial',
+          reuseExistingChunk: true,
+          enforce: true
         },
         elementUI: {
           name: 'chunk-elementUI',
-          priority: 20,
+          priority: 3,
+          reuseExistingChunk: true,
+          enforce: true,
           test: /[\\/]node_modules[\\/]_?element-ui(.*)/
         },
         commons: {
@@ -311,7 +309,7 @@ module.exports = {
     loaderOptions: {
 
       scss: {
-        prependData: `@import "~@/styles/variables.scss";@import "~@/styles/dom.scss";`
+        prependData: `@import "@/styles/variables.scss";@import "@/styles/dom.scss";`
       }
     }
   }

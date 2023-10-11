@@ -268,8 +268,6 @@
 <script>
 import { getTemplateAlarmEventLists } from '@/api/method/alarm'
 import pagination from '@/components/Pagination/index.vue'
-import store from '@/store/index'
-import { Local } from '@/utils/storage'
 import '../../../../../static/js/timeSlider/timeSlider'
 import '../../../../../static/css/timeSlider.css'
 import '../../../../../static/css/normalize.css'
