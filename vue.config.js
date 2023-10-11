@@ -3,11 +3,11 @@ const Run3DSource = 'node_modules/@rjgf/run3d-engine/Source'
 const Run3DWorkers = '../Build/Cesium/Workers'
 const path = require('path')
 const webpack = require('webpack')
-const defaultSettings = require('./src/settings.js')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const productionGzipExtensions = ['js', 'css']
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const TerserPlugin = require("terser-webpack-plugin")
 const timeStamp = new Date().getTime()
 
 const assetsCDN = {
@@ -31,7 +31,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || '后台管理系统'
+// const name = defaultSettings.title || '后台管理系统'
 
 const port = process.env.port || process.env.npm_config_port || 8080
 
@@ -125,25 +125,13 @@ module.exports = {
     name: '',
     output: {
       sourcePrefix: "",
-      // path: path.resolve(__dirname, 'dist'),
-      // filename: `[name].${timeStamp}.js`
+      path: path.resolve(__dirname, 'dist'),
+      filename: `[name].${timeStamp}.js`
     },
     amd: {
       toUrlUndefined: true,
     },
     module: {
-      rules: [
-        //   {
-        //   test: /\.(jpg|png|gif|bmp|jpeg)$/,
-        //   use: {
-        //     loader: "url-loader",
-        //     options: {
-        //       limit: 10240, // 设置限制文件大小为 10KB
-        //     }
-        //   }
-
-        // }
-      ]
     },
     resolve: {
       fallback: { "https": false, "zlib": false, "http": false, "url": false, "path": require.resolve("path-browserify"), },
@@ -195,7 +183,7 @@ module.exports = {
         deleteOriginalAssets: false
       }),
       new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 15,
+        maxChunks: 20,
         // minChunkSize: 100
       }),
 
@@ -235,6 +223,13 @@ module.exports = {
     //     include: 'initial'
     //   }
     // ])
+    config.optimization.minimizer('terser').tap((args) => {
+      args[0].parallel = 4
+      args[0].terserOptions.compress.warnings = true
+      args[0].terserOptions.compress.drop_debugger = true
+      args[0].terserOptions.compress.drop_console = true
+      return args
+    })
 
     config.plugins.delete('prefetch')
     config.module
@@ -272,12 +267,12 @@ module.exports = {
       ])
       .end()
     config.optimization.splitChunks({
-      chunks: 'async',
-      minSize: 20000,
+      chunks: 'all',
+      minSize: 10000,
       minRemainingSize: 0,
       minChunks: 1,
-      maxAsyncRequests: 30,
-      maxInitialRequests: 30,
+      maxAsyncRequests: 50,
+      maxInitialRequests: 50,
       enforceSizeThreshold: 50000,
       cacheGroups: {
         libs: {
