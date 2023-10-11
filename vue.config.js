@@ -125,8 +125,8 @@ module.exports = {
     name: '',
     output: {
       sourcePrefix: "",
-      path: path.resolve(__dirname, 'dist'),
-      filename: `[name].${timeStamp}.js`
+      // path: path.resolve(__dirname, 'dist'),
+      // filename: `[name].${timeStamp}.js`
     },
     amd: {
       toUrlUndefined: true,
@@ -272,13 +272,18 @@ module.exports = {
       ])
       .end()
     config.optimization.splitChunks({
-      chunks: 'all',
+      chunks: 'async',
+      minSize: 20000,
+      minRemainingSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 30,
+      maxInitialRequests: 30,
+      enforceSizeThreshold: 50000,
       cacheGroups: {
         libs: {
           name: 'chunk-libs',
           test: /[\\/]node_modules[\\/]/,
-          priority: 2,
-          chunks: 'initial',
+          priority: -10,
           reuseExistingChunk: true,
           enforce: true
         },
@@ -309,7 +314,7 @@ module.exports = {
     loaderOptions: {
 
       scss: {
-        prependData: `@import "@/styles/variables.scss";@import "@/styles/dom.scss";`
+        prependData: `@import "~@/styles/variables.scss";@import "~@/styles/dom.scss";`
       }
     }
   }
