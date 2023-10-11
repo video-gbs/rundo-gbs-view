@@ -287,10 +287,10 @@ export const staticRouters = [
   // }
 ]
 
-const originalPush = Router.prototype.push
-Router.prototype.push = function push(location) {
-  return originalPush.call(this, location).catch((err) => err)
-}
+// const originalPush = Router.prototype.push
+// Router.prototype.push = function push(location) {
+//   return originalPush.call(this, location).catch((err) => err)
+// }
 
 const router = new Router({
   mode: 'hash',
@@ -302,7 +302,7 @@ router.afterEach((to, from) => {
   document.title = getPageTitle(to.meta.title)
 })
 // 取到浏览器出现网址的最后"/"出现的后边的字符
-const getLastUrl = (str, yourStr) => str.slice(str.lastIndexOf(yourStr))
+// const getLastUrl = (str, yourStr) => str.slice(str.lastIndexOf(yourStr))
 
 router.beforeEach(async (to, from, next) => {
   // console.log('进入路由守卫', to)
