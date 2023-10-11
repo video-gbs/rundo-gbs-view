@@ -8,7 +8,7 @@
         ref="toptNavigation"
         router
         :default-active="activeMenu"
-        :background-color="variables.menuBg"
+        background-color="#fff"
         :text-color="variables.menuText"
         :unique-opened="false"
         :active-text-color="variables.menuActiveText"

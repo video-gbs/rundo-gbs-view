@@ -66,20 +66,16 @@
 import { Header } from '@/layout/components'
 import LineFont from '@/components/LineFont'
 import {
-  getTypeTreeMenus,
-  getHomeResource,
   getHomeFunc
 } from '@/api/method/home'
 
 import { getMenuLists } from '@/api/method/user'
 
 import store from '@/store/index'
-import router from '../../../router/index'
 import { Local, Session } from '@/utils/storage'
 import Layout from '@/layout/index'
 
 import { antiShake } from '@/utils/index.js'
-// import { resetRouter, router } from '../../../router/index'
 
 export default {
   components: {
