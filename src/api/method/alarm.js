@@ -1,7 +1,7 @@
 // 告警管理
 import request from '@/api/fetch'
 
-const alarm = '/alarm'
+const alarm = '/alarm-manage'
 const template = '/utils-template'
 
 export function initAlarmEventLists(data) {
@@ -20,8 +20,8 @@ export function editAlarmEvent(params) {
 }
 
 // 删除
-export function deleteAlarmEvent(params) {
-  return request.delete(`${alarm}/event/delete`, params)
+export function deleteAlarmEvent(id) {
+  return request.delete(`${alarm}/event/delete?id=${id}`)
 }
 
 // 获取事件名称
@@ -95,8 +95,8 @@ export function editTemplateAlarmEvent(params) {
   return request.put(`${template}/template/update`, params)
 }
 // 删除时间模板
-export function deleteTemplateAlarmEvent(params) {
-  return request.delete(`${template}/template/page`, params)
+export function deleteTemplateAlarmEvent(data) {
+  return request.delete2(`${template}/template/delete?`, data)
 }
 // 使用模板
 export function useTemplateAlarmEvent(params) {

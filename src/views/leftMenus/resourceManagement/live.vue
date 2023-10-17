@@ -1092,6 +1092,9 @@ export default {
                         ? this.resArray.concat(data.childList)
                         : this.resArray
 
+
+                        console.log('arr11111~~~~~~',arr)
+
                       const obj = {}
                       arr = arr.reduce((item, next) => {
                         obj[next.id]
@@ -1100,6 +1103,7 @@ export default {
                         return item
                       }, [])
                     }
+                    console.log('arr~~~~~~',arr)
                     this.$refs.liveTree.updateKeyChildren(data.id, arr)
                     this.defaultExpandedKeys = [data.id]
                   }

@@ -41,19 +41,23 @@ const urls = [
   // dev  本地
 
   {
-    target: 'http://172.20.0.111:8093',
+    target: 'http://172.20.0.62:8093',
     proxy: '/api/utils-template'
   },
-  // uat 测试
   {
-    target: 'http://xard-gbs-uat.runjian.com:8080',
-    proxy: '/api'
-
+    target: 'http://172.20.0.62:8094',
+    proxy: '/api/alarm-manage'
   },
+  // uat 测试
   // {
-  //   target: 'https://xard-gbs-test.runjian.com:8080',
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
   //   proxy: '/api'
+
   // },
+  {
+    target: 'https://xard-gbs-test.runjian.com:8080',
+    proxy: '/api'
+  },
   // dev  本地
   // {
   //   target: 'http://116.205.143.13/tiles/gdhpjd',
@@ -72,10 +76,6 @@ const urls = [
   //   target: 'http://172.20.0.75:9090',
   //   proxy: '/expansion'
   // }
-  {
-    target: 'http://172.20.0.75:9090',
-    proxy: '/alarm'
-  },
 ]
 
 

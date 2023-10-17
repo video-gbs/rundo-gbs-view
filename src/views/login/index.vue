@@ -447,7 +447,7 @@ export default {
               this.showHome = true
               console.log(11111111)
               // store.dispatch('user/changeThirdPartyLogin', false)
-              this.$router.push({ path: '/workTable/' })
+              this.$router.push({ path: '/workTable' })
             }
             //设置定时器，更新token
             if (Local.get('expires_in_old') && Local.get('refresh_token')) {
