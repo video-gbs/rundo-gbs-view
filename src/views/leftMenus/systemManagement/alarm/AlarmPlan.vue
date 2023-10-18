@@ -1,6 +1,6 @@
 <template>
   <div class="dataDictionary_container" v-if="isShow">
-    <div v-show="!isAddAlarmPlanShow">
+    <div v-show="!isAddAlarmPlanShow" style="height: 100%">
       <div class="panel-header-box">
         <div class="panel-header-box-border">告警预案</div>
       </div>
@@ -15,19 +15,26 @@
         >
           <el-form-item label="预案名称:">
             <el-input
-              v-model="searchParams.itemName"
+              v-model="searchParams.schemeName"
               placeholder="请输入"
               clearable
               style="width: 240px"
             ></el-input>
           </el-form-item>
           <el-form-item label="状态:">
-            <el-input
-              v-model="searchParams.groupName"
-              placeholder="请输入"
+            <el-select
+              v-model="searchParams.disabled"
+              class="mr10"
               clearable
-              style="width: 240px"
-            ></el-input>
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="obj in disabledOptionsList"
+                :key="obj.value"
+                :label="obj.label"
+                :value="obj.value"
+              />
+            </el-select>
           </el-form-item>
 
           <el-form-item label="创建日期:">
@@ -240,13 +247,7 @@
 </template>
 
 <script>
-import {
-  getDictLists,
-  getGroupDictLists,
-  addDict,
-  updateDict,
-  deleteDict
-} from '@/api/method/dictionary'
+import { getSchemeAlarmEventLists } from '@/api/method/alarm'
 import pagination from '@/components/Pagination/index.vue'
 import AddAlarmPlan from './components/AddAlarmPlan.vue'
 import store from '@/store/index'
@@ -257,7 +258,8 @@ export default {
   data() {
     return {
       isAddAlarmPlanShow: false,
-      isShow: false,
+      disabledOptionsList: [],
+      isShow: true,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -292,8 +294,9 @@ export default {
         }
       },
       searchParams: {
-        itemValue: '',
-        itemName: ''
+        schemeName: '',
+        disabled: '',
+        time: ''
       },
       rules: {
         groupName: [
@@ -357,8 +360,9 @@ export default {
     },
     resetData(e) {
       this.searchParams = {
-        itemName: '',
-        itemValue: ''
+        schemeName: '',
+        disabled: '',
+        time: ''
       }
       let target = e.target
       if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
@@ -382,24 +386,24 @@ export default {
     },
     dialogShow(act, data) {
       this.isAddAlarmPlanShow = true
-      this.dialog.params = {
-        itemValue: '',
-        itemName: '',
-        description: '',
-        groupName: '',
-        groupCode: ''
-      }
-      if (act === 0) {
-        const { groupName, groupCode, description, itemName, itemValue } = data
-        this.dialog.params.groupCode = groupCode
-        this.dialog.params.groupName = groupName
-        this.dialog.params.description = description
-        this.dialog.params.itemName = itemName
-        this.dialog.params.itemValue = itemValue
-        this.editId = data.id
-      }
-      this.dialog.title = act ? '新建' : '编辑'
-      this.dialog.show = !this.dialog.show
+      // this.dialog.params = {
+      //   itemValue: '',
+      //   itemName: '',
+      //   description: '',
+      //   groupName: '',
+      //   groupCode: ''
+      // }
+      // if (act === 0) {
+      //   const { groupName, groupCode, description, itemName, itemValue } = data
+      //   this.dialog.params.groupCode = groupCode
+      //   this.dialog.params.groupName = groupName
+      //   this.dialog.params.description = description
+      //   this.dialog.params.itemName = itemName
+      //   this.dialog.params.itemValue = itemValue
+      //   this.editId = data.id
+      // }
+      // this.dialog.title = act ? '新建' : '编辑'
+      // this.dialog.show = !this.dialog.show
     },
     changeIsShow(val) {
       this.isAddAlarmPlanShow = val
@@ -472,10 +476,23 @@ export default {
         })
     },
     async getList() {
-      await getDictLists({
+      const createStartTime = this.searchParams.time
+        ? this.searchParams.time[0]
+        : ''
+      const createEndTime = this.searchParams.time
+        ? this.searchParams.time[1]
+        : ''
+      // const params = {}
+      // if (disabled !== '' || disabled !== undefined || disabled !== null) {
+      //   params.disabled= this.searchParams.disabled
+      // }
+      await getSchemeAlarmEventLists({
         num: this.params.pageSize,
         page: this.params.pageNum,
-        ...this.searchParams
+        schemeName: this.searchParams.disabled,
+        disabled: this.searchParams.disabled,
+        createStartTime,
+        createEndTime
       })
         .then((res) => {
           if (res && res.data.code === 0) {
@@ -631,7 +648,7 @@ export default {
     margin: 20px;
     padding: 20px;
     background: #ffffff;
-    height: calc(100% - 200px);
+    height: calc(100% - 195px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;

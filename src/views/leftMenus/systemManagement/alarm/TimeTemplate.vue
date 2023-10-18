@@ -72,7 +72,12 @@
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
         <el-table-column prop="templateName" label="模板名称" />
-        <el-table-column prop="dateTypeStrList" label="模板详情" width="350" :formatter="planDetailFormatter"/>
+        <el-table-column
+          prop="dateTypeStrList"
+          label="模板详情"
+          width="350"
+          :formatter="planDetailFormatter"
+        />
         <el-table-column prop="createTime" label="创建时间" />
         <el-table-column prop="updateTime" label="修改时间" />
         <el-table-column width="200" label="操作">
@@ -266,36 +271,36 @@ export default {
       this.getList()
     },
     planDetailFormatter(row) {
-      if (row.dateTypeStrList.length > 0) {
-        let result = "";
-        row.dateTypeStrList.forEach((type,index) => {
-          switch (index+1) {
+      if (row.dateTypeStrList && row.dateTypeStrList.length > 0) {
+        let result = ''
+        row.dateTypeStrList.forEach((type, index) => {
+          switch (index + 1) {
             case 1:
-              result += "星期一、";
-              break;
+              result += '星期一、'
+              break
             case 2:
-              result += "星期二、";
-              break;
+              result += '星期二、'
+              break
             case 3:
-              result += "星期三、";
-              break;
+              result += '星期三、'
+              break
             case 4:
-              result += "星期四、";
-              break;
+              result += '星期四、'
+              break
             case 5:
-              result += "星期五、";
-              break;
+              result += '星期五、'
+              break
             case 6:
-              result += "星期六、";
-              break;
+              result += '星期六、'
+              break
             case 7:
-              result += "星期日、";
-              break;
+              result += '星期日、'
+              break
             default:
-              break;
+              break
           }
-        });
-        return result.substring(0, result.length - 1);
+        })
+        return result.substring(0, result.length - 1)
       }
     },
     resetData(e) {
@@ -337,8 +342,8 @@ export default {
       this.dialog.show = !this.dialog.show
       this.$nextTick(() => {
         this.initTimeSlider()
-        if(data.timePeriodDtoList){
-        this.planTimeListToTimeSlider(data.timePeriodDtoList)
+        if (data.timePeriodDtoList) {
+          this.planTimeListToTimeSlider(data.timePeriodDtoList)
         }
       })
     },
@@ -786,7 +791,7 @@ export default {
     margin: 20px;
     padding: 20px;
     background: #ffffff;
-    height: calc(100% - 200px);
+    height: calc(100% - 240px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;

@@ -1,57 +1,61 @@
 <template>
   <div class="step1-content">
-    <div class="table-list">
-      <el-table
-        ref="timeTemTable"
-        :data="tableData"
-        style="width: 100%"
-        class="dataDictionary-table"
-        border
-        :header-cell-style="{
-          background: 'rgba(0, 75, 173, 0.06)',
-          fontSize: '14px',
-          fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
-          fontWeight: 'bold',
-          color: '#333333'
-        }"
-      >
-        <el-table-column
-          type="selection"
-          width="80"
-          align="center"
-        ></el-table-column>
-        <el-table-column type="index" width="50" align="center" label="序号">
-        </el-table-column>
-        <el-table-column prop="templateName" label="模板名称" />
-        <el-table-column
-          prop="dateTypeStrList"
-          label="模板详情"
-          width="350"
-          :formatter="planDetailFormatter"
-        />
-        <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column prop="updateTime" label="修改时间" />
-        <el-table-column width="200" label="操作">
-          <template slot-scope="scope">
-            <!-- v-permission="['/rbac/dict/update', 3]" -->
-            <el-button type="text" @click="dialogShow(scope.row)"
-              >查看</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-      <pagination
-        :pages-data="params"
-        @size-change="sizeChange"
-        @current-change="currentChange"
+    <!-- <div class="step-table-list"> -->
+    <el-table
+      ref="timeTemTable"
+      :data="tableData"
+      style="width: 100%"
+      class="dataDictionary-table"
+      border
+      row-key="id"
+      @selection-change="handleSelectChange"
+      @select="handleSelect"
+      :header-cell-style="{
+        background: 'rgba(0, 75, 173, 0.06)',
+        fontSize: '14px',
+        fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+        fontWeight: 'bold',
+        color: '#333333'
+      }"
+    >
+      <el-table-column
+        type="selection"
+        width="80"
+        align="center"
+      ></el-table-column>
+      <el-table-column type="index" width="50" align="center" label="序号">
+      </el-table-column>
+      <el-table-column prop="templateName" label="模板名称" width="240" />
+      <el-table-column
+        prop="dateTypeStrList"
+        label="模板详情"
+        width="350"
+        :formatter="planDetailFormatter"
       />
-      <div class="btn-lists">
-        <!-- <div style="float: right"> -->
-        <el-button @click="goback">返回</el-button>
-        <el-button type="primary" @click="clickNext">下一步</el-button>
-        <!-- </div> -->
-      </div>
+      <el-table-column prop="createTime" label="创建时间" />
+      <el-table-column prop="updateTime" label="修改时间" />
+      <el-table-column width="200" label="操作">
+        <template slot-scope="scope">
+          <!-- v-permission="['/rbac/dict/update', 3]" -->
+          <el-button type="text" @click="dialogShow(scope.row)">查看</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <pagination
+      :pages-data="params"
+      @size-change="sizeChange"
+      @current-change="currentChange"
+    />
+
+    <div class="btn-lists">
+      <el-button @click="goback()"
+        ><svg-icon class="svg-btn" icon-class="back-svg" />返回</el-button
+      >
+      <el-button type="primary" @click="clickNext" class="step-btn"
+        >下一步</el-button
+      >
     </div>
+    <!-- </div> -->
 
     <el-dialog
       v-if="dialog.show"
@@ -160,6 +164,10 @@ export default {
     return {
       templateName: '',
       tableData: [],
+      selectedObj: {},
+      selectedData: [],
+      allList: [],
+      resIds: [],
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -199,9 +207,18 @@ export default {
         .then((res) => {
           if (res && res.data.code === 0) {
             this.tableData = res.data.data.list
+
             this.params.total = res.data.data.total
             this.params.pages = res.data.data.pages
             this.params.current = res.data.data.pageSize
+            this.tableData.map((item) => {
+              this.allList.forEach((item1) => {
+                if (item.id === item1) {
+                  this.selectedObj[item1] = item
+                }
+              })
+            })
+            this.handleRowSelection(this.tableData)
           }
         })
         .catch((error) => console.log(error))
@@ -221,6 +238,54 @@ export default {
         this.initTimeSlider()
         if (data.timePeriodDtoList) {
           this.planTimeListToTimeSlider(data.timePeriodDtoList)
+        }
+      })
+    },
+    handleSelectChange(selection) {
+      console.log('selectionselectionselection', selection)
+      // 全选取消，删除当前页所有数据
+      if (selection.length === 0) {
+        this.tableData.forEach((item) => {
+          delete this.selectedObj[item.id]
+        })
+        this.tableData.forEach((item) => {
+          // console.log('~~~~~~~~~~~~~~', item)
+          this.allList = this.allList.filter((item1) => {
+            return item1 !== item.id
+          })
+        })
+      }
+      // 勾选数据 添加
+      selection.forEach((item) => {
+        this.selectedObj[item.id] = item
+      })
+      // 获取所有分页勾选的数据
+      this.selectedData = []
+      for (const key in this.selectedObj) {
+        this.selectedData.push(this.selectedObj[key])
+      }
+    },
+
+    handleSelect(selection, row) {
+      // 取消单个勾选时，删除对应属性
+      if (!selection.some((item) => item.id === row.id)) {
+        delete this.selectedObj[row.id]
+        this.allList = this.allList.filter((item1) => {
+          return item1 !== row.id
+        })
+      } else {
+        this.allList.push(row.id)
+      }
+    },
+    // 处理当前列表选中状态
+    handleRowSelection(data) {
+      console.log('处理当前列表选中状态', data, this.selectedObj)
+      data.forEach((item) => {
+        if (this.selectedObj[item.id]) {
+          this.$nextTick(() => {
+            this.$refs.timeTemTable.toggleRowSelection(item)
+            this.$forceUpdate()
+          })
         }
       })
     },
@@ -383,10 +448,49 @@ export default {
       this.getList()
     },
     clickNext() {
-      this.$emit('next')
+      this.resIds = []
+      this.selectedData.map((item) => {
+        this.resIds.push(item.id)
+      })
+      this.$emit('saveAll', this.resIds)
+
+      // this.$emit('next')
     },
     goback() {
       this.$emit('goback')
+    },
+    planDetailFormatter(row) {
+      if (row.dateTypeStrList && row.dateTypeStrList.length > 0) {
+        let result = ''
+        row.dateTypeStrList.forEach((type, index) => {
+          switch (index + 1) {
+            case 1:
+              result += '星期一、'
+              break
+            case 2:
+              result += '星期二、'
+              break
+            case 3:
+              result += '星期三、'
+              break
+            case 4:
+              result += '星期四、'
+              break
+            case 5:
+              result += '星期五、'
+              break
+            case 6:
+              result += '星期六、'
+              break
+            case 7:
+              result += '星期日、'
+              break
+            default:
+              break
+          }
+        })
+        return result.substring(0, result.length - 1)
+      }
     },
     /**
      * 初始化时间段选择工具
@@ -451,18 +555,34 @@ export default {
 ::v-deep div {
   box-sizing: unset;
 }
-.table-list {
+// .step-table-list {
+// margin: 20px;
+// background: #ffffff;
+.dataDictionary-table {
+  max-height: calc(100% - 100px);
+  width: calc(100% - 40px) !important;
   margin: 20px;
-  padding: 20px;
+  overflow-y: auto;
+}
+// }
+.btn-lists {
+  text-align: right;
+  margin-top: 10px;
+  padding-right: 24px;
+  height: 64px;
+  line-height: 64px;
   background: #ffffff;
-  height: calc(100% - 200px);
-  .dataDictionary-table {
-    max-height: calc(100% - 100px);
-    overflow-y: auto;
+  box-shadow: 0px -2px 4px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 0px 0px 0px 0px;
+  .svg-btn {
+    position: relative;
+    top: 1px;
+    left: -4px;
   }
-  .btn-lists {
-    text-align: right;
-    margin-top: 10px;
+  .step-btn {
+    height: 36px;
+    position: relative;
+    top: -1px;
   }
 }
 .disabled-div {

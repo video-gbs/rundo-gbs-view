@@ -17,11 +17,20 @@
       <!-- <el-button style="margin-top: 12px" @click="next">下一步</el-button> -->
     </div>
     <div class="search" v-show="active === 0">
-      <el-form ref="query" class="search-form" :inline="true">
+      <el-form
+        ref="alarmAccountForm"
+        class="search-form"
+        :inline="true"
+        :model="dialogParams.params"
+        :rules="rules"
+      >
         <span class="alarm-span">基本信息</span>
-        <el-form-item label="预案名称:">
+        <el-form-item
+          label="预案名称:"
+          prop="schemeName"
+        >
           <el-input
-            v-model="templateName"
+            v-model="dialogParams.params.schemeName"
             placeholder="请输入"
             clearable
             style="width: 240px"
@@ -29,21 +38,21 @@
         </el-form-item>
       </el-form>
     </div>
-    <div class="step-bottom">
-      <Step1 v-show="active === 0" @next="next" @goback="goback"/>
-      <Step2 v-show="active === 1" @next="next" @goback="goback" @last="last"/>
-      <Step3 v-show="active === 2" @next="next" />
+    <div :class="active === 0?'step-bottom':'step-bottom1'">
+      <Step1
+        v-show="active === 0"
+        @next="next"
+        @goback="goback"
+        @saveAll="saveAll"
+      />
+      <Step2 v-show="active === 1" @next="next" @goback="goback" @last="last" />
+      <Step3 v-show="active === 2" @next="next" @lastClickAll="lastClickAll" />
     </div>
   </div>
 </template>
 
 <script>
-import {
-  getTemplateAlarmEventLists,
-  addTemplateAlarmEvent,
-  editTemplateAlarmEvent,
-  deleteTemplateAlarmEvent
-} from '@/api/method/alarm'
+import { addSchemeAlarmEvent } from '@/api/method/alarm'
 import Step1 from './Step1.vue'
 import Step2 from './Step2.vue'
 import Step3 from './Step3.vue'
@@ -107,6 +116,12 @@ export default {
       active: 0,
       isShow: true,
       treeValue: '',
+      dialogParams: {
+        params: {
+          schemeName: ''
+        }
+      },
+      step1DataId: [],
       form: {
         model: '',
         username: '',
@@ -136,62 +151,7 @@ export default {
       },
       allNorthTypeOptions: [],
       rules: {
-        name: {
-          required: true,
-          max: 32,
-          validator: checkName,
-          // message: `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `,
-          // pattern: /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/,
-          trigger: 'blur'
-        },
-        manufacturer: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
-        ],
-        gatewayId: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
-        ],
-        deviceType: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
-        ],
-        transport: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
-        ],
-        videoAreaId: [
-          { required: true, message: '此为必填项。', trigger: 'change' }
-        ],
-        model: [{ required: true, trigger: 'blur', validator: checkModel }],
-        ip: [{ required: true, message: '此为必填项。', trigger: 'blur' }],
-        username: [
-          { required: true, message: '此为必填项。', trigger: 'blur' }
-        ],
-        password: [
-          {
-            required: true,
-            max: 20,
-            min: 8,
-            validator: checkPassword,
-            trigger: 'blur'
-          }
-        ],
-        port: {
-          required: true,
-          message: '此为数字。',
-          pattern: /^[0-9]*$/,
-          trigger: 'blur'
-        },
-        longitude: {
-          message: '范围从-180~180的数字，支持小数点后6位。',
-          pattern:
-            /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180)$/,
-          trigger: 'blur'
-        },
-        latitude: {
-          message: '范围从-180~180的数字，支持小数点后6位。',
-          pattern:
-            /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,6})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,6}|180)$/,
-          trigger: 'blur'
-        },
-        deviceId: [{ required: true, message: '此为必填项。', trigger: 'blur' }]
+        schemeName: { required: true, message: '预案名称不能为空', trigger: 'blur' }
       }
     }
   },
@@ -218,6 +178,16 @@ export default {
     last() {
       if (this.active-- > 0) this.active = 0
     },
+    saveAll(val) {
+      this.$refs['alarmAccountForm'].validate((valid) => {
+        console.log('valid', valid)
+        if (valid) {
+          this.step1DataId = val
+          if (this.active++ > 2) this.active = 0
+        }
+      })
+    },
+    lastClickAll() {},
     goback() {
       this.$emit('changeIsShow', false)
     }
@@ -226,6 +196,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-step__main {
+  margin-left: -15px;
+}
+::v-deep .is-process {
+  font-size: 16px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #333333;
+}
+// ::v-deep .el-step__icon {
+//   border-color: #004bad;
+// }
+// ::v-deep .el-step__icon-inner {
+//   font-size: 14px;
+//   font-family: Segoe UI-Regular, Segoe UI;
+//   font-weight: 400;
+//   color: #004bad;
+// }
 .selectTree {
   .el-select-dropdown__item {
     height: 200px !important;
@@ -242,20 +230,37 @@ export default {
   padding-bottom: 0;
 }
 // 滚动条大小设置
-::v-deep .box-card::-webkit-scrollbar {
+::v-deep .step-bottom::-webkit-scrollbar {
   /*纵向滚动条*/
   width: 5px;
   /*横向滚动条*/
   height: 5px;
 }
 // 滚动条滑块样式设置
-::v-deep .box-card::-webkit-scrollbar-thumb {
+::v-deep .step-bottom::-webkit-scrollbar-thumb {
   background-color: #bfbfc0;
   border-radius: 5px;
 }
 
 // 滚动条背景样式设置
-::v-deep .box-card::-webkit-scrollbar-track {
+::v-deep .step-bottom::-webkit-scrollbar-track {
+  background: none;
+}
+// 滚动条大小设置
+::v-deep .step-bottom1::-webkit-scrollbar {
+  /*纵向滚动条*/
+  width: 5px;
+  /*横向滚动条*/
+  height: 5px;
+}
+// 滚动条滑块样式设置
+::v-deep .step-bottom1::-webkit-scrollbar-thumb {
+  background-color: #bfbfc0;
+  border-radius: 5px;
+}
+
+// 滚动条背景样式设置
+::v-deep .step-bottom1::-webkit-scrollbar-track {
   background: none;
 }
 
@@ -359,7 +364,17 @@ export default {
   }
   .step-bottom {
     // height: calc(100% - 200px);
+    height: calc(100% - 315px);
     width: calc(100% - 40px);
+    overflow-y: auto;
+    margin: 20px;
+    background: #ffffff;
+    box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+  }
+  .step-bottom1{
+    height: calc(100% - 215px);
+    width: calc(100% - 40px);
+    overflow-y: auto;
     margin: 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);

@@ -1073,10 +1073,10 @@ export default {
                         onlineState: item.onlineState,
                         resourceName: item.channelName,
                         resourceNames: item.channelName,
-                        areaPid: item.id,
+                        areaPid: item.videoAreaId,
                         id: item.id,
                         ptzType: item.ptzType,
-                        childList: []
+                        // childList: []
                       })
                     })
 
@@ -1103,7 +1103,7 @@ export default {
                         return item
                       }, [])
                     }
-                    console.log('arr~~~~~~',arr)
+                    console.log('arr~~~~~~',arr,data.id)
                     this.$refs.liveTree.updateKeyChildren(data.id, arr)
                     this.defaultExpandedKeys = [data.id]
                   }

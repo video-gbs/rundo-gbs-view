@@ -12,29 +12,28 @@
       <div class="right-table"></div>
     </div>
     <div class="btn-lists">
-      <el-button @click="goback">返回</el-button>
-      <el-button type="primary" @click="clickLast">上一步</el-button>
-      <el-button type="primary" @click="clickNext">下一步</el-button>
+      <el-button @click="goback"
+        ><svg-icon class="svg-btn" icon-class="back-svg" />返回</el-button
+      >
+      <el-button type="primary" @click="clickLast" class="step-btn"
+        >上一步</el-button
+      >
+      <el-button type="primary" @click="clickNext" class="step-btn"
+        >下一步</el-button
+      >
     </div>
   </div>
 </template>
 
 <script>
 import {
-  getTemplateAlarmEventLists,
-  addTemplateAlarmEvent,
-  editTemplateAlarmEvent,
-  deleteTemplateAlarmEvent
+  getAlarmVideoAreaList,
+  getAlarmSchemeChannel
 } from '@/api/method/alarm'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 export default {
   name: '',
   components: { leftTree },
-  props: [
-    'treeList',
-    'manufacturerTypeOptions',
-    'transportProtocolTypeOptions'
-  ],
   data() {
     return {
       templateName: '',
@@ -43,9 +42,20 @@ export default {
     }
   },
   mounted() {
-    // this.getAllGatewayLists()
+    this.initTree()
   },
   methods: {
+    async initTree() {
+      await getAlarmVideoAreaList()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.treeList = res.data.data
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     async getAllGatewayLists() {
       await getAllGatewayLists().then((res) => {
         if (res.data.code === 0) {
@@ -154,7 +164,22 @@ export default {
   }
   .btn-lists {
     text-align: right;
-    margin-top: 10px;
+    padding-right: 24px;
+    height: 64px;
+    line-height: 64px;
+    background: #ffffff;
+    box-shadow: 0px -2px 4px 1px rgba(0, 0, 0, 0.1);
+    border-radius: 0px 0px 0px 0px;
+    .svg-btn {
+      position: relative;
+      top: 1px;
+      left: -4px;
+    }
+    .step-btn {
+      height: 36px;
+      position: relative;
+      top: -1px;
+    }
   }
 }
 </style>

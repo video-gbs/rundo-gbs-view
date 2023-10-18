@@ -106,3 +106,21 @@ export function useTemplateAlarmEvent(params) {
 export function unuseTemplateAlarmEvent(params) {
   return request.put(`${template}/template/unuse`, params)
 }
+
+//告警扩展信息接口
+//获取通道列表
+export function getAlarmVideoAreaList(params) {
+  return request.get(`${template}/alarm/videoAreaList`, params)
+}
+//获取预案通道
+export function getAlarmSchemeChannel(params) {
+  return request.get(`${template}/alarm/scheme/channel`, params)
+}
+//获取预案下布防的通道
+export function getAlarmDeploy(params) {
+  return request.get(`${template}/alarm/deploy/channel`, params)
+}
+//获取告警信息
+export function getAlarmMsg(params) {
+  return request.get(`${template}/alarm/msg/channel`, params)
+}
