@@ -1,252 +1,265 @@
 <template>
   <div class="dataDictionary_container" v-if="isShow">
-    <div class="panel-header-box">
-      <div class="panel-header-box-border">告警预案</div>
-    </div>
-
-    <div class="search">
-      <el-form
-        ref="query"
-        class="search-form"
-        :inline="true"
-        :model="searchParams"
-        label-width="120px"
-      >
-        <el-form-item label="预案名称:">
-          <el-input
-            v-model="searchParams.itemName"
-            placeholder="请输入"
-            clearable
-            style="width: 240px"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="状态:">
-          <el-input
-            v-model="searchParams.groupName"
-            placeholder="请输入"
-            clearable
-            style="width: 240px"
-          ></el-input>
-        </el-form-item>
-
-        <el-form-item label="创建日期:">
-          <el-date-picker
-            v-model="searchParams.time"
-            type="datetimerange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            format="yyyy-MM-dd HH:mm:ss"
-            value-format="yyyy-MM-dd HH:mm:ss"
-            :default-time="['00:00:00', '23:59:59']"
-          >
-          </el-date-picker>
-        </el-form-item>
-
-        <el-form-item
-          style="float: right; margin-right: 20px"
-          class="form-btn-list"
-        >
-          <el-button @click="resetData($event)"
-            ><svg-icon class="svg-btn" icon-class="cz" />
-            <span class="btn-span">重置</span></el-button
-          >
-          <el-button type="primary" @click="cxData"
-            ><svg-icon class="svg-btn" icon-class="cx" />
-            <span class="btn-span">搜索</span></el-button
-          >
-        </el-form-item>
-      </el-form>
-    </div>
-    <div class="table-list">
-      <div class="securityArea_container">
-        <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow(1)"
-            ><svg-icon class="svg-btn" icon-class="add" /><span class="btn-span"
-              >新建</span
-            ></el-button
-          >
-          <el-button @click="deteleAll($event)" style="width: 100px" plain>
-            <svg-icon class="svg-btn" icon-class="del" />
-            <span class="btn-span">批量删除</span>
-          </el-button>
-        </div>
+    <div v-show="!isAddAlarmPlanShow" style="height: 100%">
+      <div class="panel-header-box">
+        <div class="panel-header-box-border">告警预案</div>
       </div>
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-        class="dataDictionary-table"
-        border
-        :header-cell-style="{
-          background: 'rgba(0, 75, 173, 0.06)',
-          fontSize: '14px',
-          fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
-          fontWeight: 'bold',
-          color: '#333333'
-        }"
-      >
-        <el-table-column type="index" width="50" align="center" label="序号">
-        </el-table-column>
-        <el-table-column prop="groupName" label="预案名称" />
-        <el-table-column prop="groupCode" label="告警事件" />
-        <el-table-column prop="itemName" label="创建时间" />
-        <el-table-column prop="itemValue" label="修改时间" />
-        <el-table-column
-          prop="onStatus"
-          label="状态"
-          :show-overflow-tooltip="true"
-        >
-          <template slot-scope="scope">
-            <el-switch
-              v-model="scope.row.onStatus"
-              active-color="#13ce66"
-              inactive-color="#ff4949"
-              :active-value="1"
-              :inactive-value="0"
-              @change="changeSwitch(scope.row)"
-            >
-            </el-switch>
-          </template>
-        </el-table-column>
-        <el-table-column width="200" label="操作">
-          <template slot-scope="scope">
-            <el-button type="text" @click="dialogShow(0, scope.row)"
-              >布防通道</el-button
-            >
-            <el-button type="text" @click="dialogShow(0, scope.row)"
-              >编辑</el-button
-            >
-            <el-button type="text" @click="deleteRole(scope.row)"
-              ><span class="delete-button">删除</span></el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-      <pagination
-        :pages-data="params"
-        @size-change="sizeChange"
-        @current-change="currentChange"
-      />
-    </div>
-    <el-dialog
-      v-if="dialog.show"
-      :title="dialog.title"
-      :visible.sync="dialog.show"
-      width="600px"
-      :before-close="handleClose"
-    >
-      <div>
+
+      <div class="search">
         <el-form
-          ref="roleForm"
-          class="params-form"
-          size="mini"
-          :rules="rules"
-          label-position="left"
+          ref="query"
+          class="search-form"
+          :inline="true"
+          :model="searchParams"
           label-width="120px"
-          :model="dialog.params"
-          @keyup.enter="submit('roleForm')"
         >
-          <el-form-item label="分组名称" prop="groupName">
+          <el-form-item label="预案名称:">
             <el-input
-              v-model="dialog.params.groupName"
+              v-model="searchParams.schemeName"
+              placeholder="请输入"
               clearable
-              :maxlength="20"
-            />
+              style="width: 240px"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="状态:">
+            <el-select
+              v-model="searchParams.disabled"
+              class="mr10"
+              clearable
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="obj in disabledOptionsList"
+                :key="obj.value"
+                :label="obj.label"
+                :value="obj.value"
+              />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="创建日期:">
+            <el-date-picker
+              v-model="searchParams.time"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              format="yyyy-MM-dd HH:mm:ss"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              :default-time="['00:00:00', '23:59:59']"
+            >
+            </el-date-picker>
+          </el-form-item>
+
+          <el-form-item
+            style="float: right; margin-right: 20px"
+            class="form-btn-list"
+          >
+            <el-button @click="resetData($event)"
+              ><svg-icon class="svg-btn" icon-class="cz" />
+              <span class="btn-span">重置</span></el-button
+            >
+            <el-button type="primary" @click="cxData"
+              ><svg-icon class="svg-btn" icon-class="cx" />
+              <span class="btn-span">搜索</span></el-button
+            >
           </el-form-item>
         </el-form>
       </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="submit('roleForm')">确 定</el-button>
-      </span>
-    </el-dialog>
-
-    <el-dialog
-      :title="permissionDialog.title"
-      :visible.sync="permissionDialog.show"
-      width="1200px"
-      :before-close="permissionHandleClose"
-    >
-      <div class="page-main">
-        <div class="main-operation">
-          <div class="title">
-            <span>功能权限</span>
-          </div>
-          <div style="display: flex">
-            <div class="perms-operation">
-              <el-button
-                type="primary"
-                :loading="buttonLoading"
-                @click="savePermission()"
-                >保存设置</el-button
-              >
-            </div>
-            <el-button
-              class="button-back"
-              @click="permissionDialog.show = false"
-              >返回</el-button
+      <div class="table-list">
+        <div class="securityArea_container">
+          <div class="btn-lists">
+            <el-button type="primary" @click="dialogShow(1)"
+              ><svg-icon class="svg-btn" icon-class="add" /><span
+                class="btn-span"
+                >新建</span
+              ></el-button
             >
+            <el-button @click="deteleAll($event)" style="width: 100px" plain>
+              <svg-icon class="svg-btn" icon-class="del" />
+              <span class="btn-span">批量删除</span>
+            </el-button>
           </div>
         </div>
-        <div class="main-content">
-          <div class="perms-tree">
-            <div class="tree-title">
-              <div class="title">一级功能</div>
-              <div class="title">二级功能</div>
-              <div class="title">操作权限</div>
-            </div>
-            <div v-if="permissionTableData && permissionTableData.length > 0">
-              <div
-                v-for="item in permissionTableData"
-                :key="item.id"
-                class="tree-item item-border"
+        <el-table
+          :data="tableData"
+          style="width: 100%"
+          class="dataDictionary-table"
+          border
+          :header-cell-style="{
+            background: 'rgba(0, 75, 173, 0.06)',
+            fontSize: '14px',
+            fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+            fontWeight: 'bold',
+            color: '#333333'
+          }"
+        >
+          <el-table-column type="index" width="50" align="center" label="序号">
+          </el-table-column>
+          <el-table-column prop="groupName" label="预案名称" />
+          <el-table-column prop="groupCode" label="告警事件" />
+          <el-table-column prop="itemName" label="创建时间" />
+          <el-table-column prop="itemValue" label="修改时间" />
+          <el-table-column
+            prop="onStatus"
+            label="状态"
+            :show-overflow-tooltip="true"
+          >
+            <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.onStatus"
+                active-color="#13ce66"
+                inactive-color="#ff4949"
+                :active-value="1"
+                :inactive-value="0"
+                @change="changeSwitch(scope.row)"
               >
-                <div class="item-title">{{ item.title }}</div>
-                <div class="item-children">
-                  <template>
-                    <div
-                      v-for="child in item.childs"
-                      :key="child.id"
-                      class="tree-item"
-                    >
-                      <div class="item-title">{{ child.title }}</div>
-                      <div class="tree-operation">
-                        <template v-for="op in child.childs">
-                          <el-checkbox :key="op.id" v-model="op.hasAuthorize">{{
-                            op.title
-                          }}</el-checkbox>
-                        </template>
+              </el-switch>
+            </template>
+          </el-table-column>
+          <el-table-column width="200" label="操作">
+            <template slot-scope="scope">
+              <el-button type="text" @click="dialogShow(0, scope.row)"
+                >布防通道</el-button
+              >
+              <el-button type="text" @click="dialogShow(0, scope.row)"
+                >编辑</el-button
+              >
+              <el-button type="text" @click="deleteRole(scope.row)"
+                ><span class="delete-button">删除</span></el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination
+          :pages-data="params"
+          @size-change="sizeChange"
+          @current-change="currentChange"
+        />
+      </div>
+      <el-dialog
+        v-if="dialog.show"
+        :title="dialog.title"
+        :visible.sync="dialog.show"
+        width="600px"
+        :before-close="handleClose"
+      >
+        <div>
+          <el-form
+            ref="roleForm"
+            class="params-form"
+            size="mini"
+            :rules="rules"
+            label-position="left"
+            label-width="120px"
+            :model="dialog.params"
+            @keyup.enter="submit('roleForm')"
+          >
+            <el-form-item label="分组名称" prop="groupName">
+              <el-input
+                v-model="dialog.params.groupName"
+                clearable
+                :maxlength="20"
+              />
+            </el-form-item>
+          </el-form>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialog.show = false">取 消</el-button>
+          <el-button type="primary" @click="submit('roleForm')"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
+
+      <el-dialog
+        :title="permissionDialog.title"
+        :visible.sync="permissionDialog.show"
+        width="1200px"
+        :before-close="permissionHandleClose"
+      >
+        <div class="page-main">
+          <div class="main-operation">
+            <div class="title">
+              <span>功能权限</span>
+            </div>
+            <div style="display: flex">
+              <div class="perms-operation">
+                <el-button
+                  type="primary"
+                  :loading="buttonLoading"
+                  @click="savePermission()"
+                  >保存设置</el-button
+                >
+              </div>
+              <el-button
+                class="button-back"
+                @click="permissionDialog.show = false"
+                >返回</el-button
+              >
+            </div>
+          </div>
+          <div class="main-content">
+            <div class="perms-tree">
+              <div class="tree-title">
+                <div class="title">一级功能</div>
+                <div class="title">二级功能</div>
+                <div class="title">操作权限</div>
+              </div>
+              <div v-if="permissionTableData && permissionTableData.length > 0">
+                <div
+                  v-for="item in permissionTableData"
+                  :key="item.id"
+                  class="tree-item item-border"
+                >
+                  <div class="item-title">{{ item.title }}</div>
+                  <div class="item-children">
+                    <template>
+                      <div
+                        v-for="child in item.childs"
+                        :key="child.id"
+                        class="tree-item"
+                      >
+                        <div class="item-title">{{ child.title }}</div>
+                        <div class="tree-operation">
+                          <template v-for="op in child.childs">
+                            <el-checkbox
+                              :key="op.id"
+                              v-model="op.hasAuthorize"
+                              >{{ op.title }}</el-checkbox
+                            >
+                          </template>
+                        </div>
                       </div>
-                    </div>
-                  </template>
+                    </template>
+                  </div>
                 </div>
               </div>
+              <div v-else class="tree-empty item-border">暂无数据</div>
             </div>
-            <div v-else class="tree-empty item-border">暂无数据</div>
           </div>
         </div>
-      </div>
-    </el-dialog>
+      </el-dialog>
+    </div>
+
+    <AddAlarmPlan v-if="isAddAlarmPlanShow" @changeIsShow="changeIsShow" @getList="getList"/>
   </div>
 </template>
 
 <script>
-import {
-  getDictLists,
-  getGroupDictLists,
-  addDict,
-  updateDict,
-  deleteDict
-} from '@/api/method/dictionary'
+import { getSchemeAlarmEventLists } from '@/api/method/alarm'
 import pagination from '@/components/Pagination/index.vue'
+import AddAlarmPlan from './components/AddAlarmPlan.vue'
 import store from '@/store/index'
 import { Local } from '@/utils/storage'
 export default {
   name: '',
-  components: { pagination },
+  components: { pagination, AddAlarmPlan },
   data() {
     return {
-      isShow: false,
+      isAddAlarmPlanShow: false,
+      disabledOptionsList: [],
+      isShow: true,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -281,8 +294,9 @@ export default {
         }
       },
       searchParams: {
-        itemValue: '',
-        itemName: ''
+        schemeName: '',
+        disabled: '',
+        time: ''
       },
       rules: {
         groupName: [
@@ -346,8 +360,9 @@ export default {
     },
     resetData(e) {
       this.searchParams = {
-        itemName: '',
-        itemValue: ''
+        schemeName: '',
+        disabled: '',
+        time: ''
       }
       let target = e.target
       if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
@@ -362,7 +377,7 @@ export default {
       this.getList()
     },
     goPage(path, query) {
-      this.$router.replace(path)
+      this.$router.push(path)
     },
     isShowChildren(data) {
       return data.find((res) => {
@@ -370,24 +385,28 @@ export default {
       })
     },
     dialogShow(act, data) {
-      this.dialog.params = {
-        itemValue: '',
-        itemName: '',
-        description: '',
-        groupName: '',
-        groupCode: ''
-      }
-      if (act === 0) {
-        const { groupName, groupCode, description, itemName, itemValue } = data
-        this.dialog.params.groupCode = groupCode
-        this.dialog.params.groupName = groupName
-        this.dialog.params.description = description
-        this.dialog.params.itemName = itemName
-        this.dialog.params.itemValue = itemValue
-        this.editId = data.id
-      }
-      this.dialog.title = act ? '新建' : '编辑'
-      this.dialog.show = !this.dialog.show
+      this.isAddAlarmPlanShow = true
+      // this.dialog.params = {
+      //   itemValue: '',
+      //   itemName: '',
+      //   description: '',
+      //   groupName: '',
+      //   groupCode: ''
+      // }
+      // if (act === 0) {
+      //   const { groupName, groupCode, description, itemName, itemValue } = data
+      //   this.dialog.params.groupCode = groupCode
+      //   this.dialog.params.groupName = groupName
+      //   this.dialog.params.description = description
+      //   this.dialog.params.itemName = itemName
+      //   this.dialog.params.itemValue = itemValue
+      //   this.editId = data.id
+      // }
+      // this.dialog.title = act ? '新建' : '编辑'
+      // this.dialog.show = !this.dialog.show
+    },
+    changeIsShow(val) {
+      this.isAddAlarmPlanShow = val
     },
     handleClose(done) {
       done()
@@ -457,10 +476,23 @@ export default {
         })
     },
     async getList() {
-      await getDictLists({
+      const createStartTime = this.searchParams.time
+        ? this.searchParams.time[0]
+        : ''
+      const createEndTime = this.searchParams.time
+        ? this.searchParams.time[1]
+        : ''
+      // const params = {}
+      // if (disabled !== '' || disabled !== undefined || disabled !== null) {
+      //   params.disabled= this.searchParams.disabled
+      // }
+      await getSchemeAlarmEventLists({
         num: this.params.pageSize,
         page: this.params.pageNum,
-        ...this.searchParams
+        schemeName: this.searchParams.disabled,
+        disabled: this.searchParams.disabled,
+        createStartTime,
+        createEndTime
       })
         .then((res) => {
           if (res && res.data.code === 0) {
@@ -616,7 +648,7 @@ export default {
     margin: 20px;
     padding: 20px;
     background: #ffffff;
-    height: calc(100% - 200px);
+    height: calc(100% - 195px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;

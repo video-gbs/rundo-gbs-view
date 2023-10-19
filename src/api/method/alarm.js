@@ -1,8 +1,9 @@
 // 告警管理
 import request from '@/api/fetch'
 
-const alarm = '/alarm'
-const template = '/utils-template'
+const alarm = '/alarm-manage'
+const template = '/timer-utils'
+const expansion = '/expansion'
 
 export function initAlarmEventLists(data) {
   // 分页获取事件
@@ -20,8 +21,8 @@ export function editAlarmEvent(params) {
 }
 
 // 删除
-export function deleteAlarmEvent(params) {
-  return request.delete(`${alarm}/event/delete`, params)
+export function deleteAlarmEvent(id) {
+  return request.delete3(`${alarm}/event/delete?`)
 }
 
 // 获取事件名称
@@ -95,8 +96,8 @@ export function editTemplateAlarmEvent(params) {
   return request.put(`${template}/template/update`, params)
 }
 // 删除时间模板
-export function deleteTemplateAlarmEvent(params) {
-  return request.delete(`${template}/template/page`, params)
+export function deleteTemplateAlarmEvent(data) {
+  return request.delete2(`${template}/template/delete?`, data)
 }
 // 使用模板
 export function useTemplateAlarmEvent(params) {
@@ -105,4 +106,22 @@ export function useTemplateAlarmEvent(params) {
 // 解除模板使用
 export function unuseTemplateAlarmEvent(params) {
   return request.put(`${template}/template/unuse`, params)
+}
+
+//告警扩展信息接口
+//获取通道列表
+export function getAlarmVideoAreaList(params) {
+  return request.get(`${expansion}/alarm/channel/tree`, params)
+}
+//获取预案通道
+export function getAlarmSchemeChannel(params) {
+  return request.get(`${expansion}/alarm/scheme/channel`, params)
+}
+//获取预案下布防的通道
+export function getAlarmDeploy(params) {
+  return request.get(`${expansion}/alarm/deploy/channel`, params)
+}
+//获取告警信息
+export function getAlarmMsg(params) {
+  return request.get(`${expansion}/alarm/msg/channel`, params)
 }

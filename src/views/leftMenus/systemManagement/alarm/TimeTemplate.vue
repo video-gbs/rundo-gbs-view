@@ -51,6 +51,7 @@
         </div>
       </div>
       <el-table
+        ref="timeTemTable"
         :data="tableData"
         style="width: 100%"
         class="dataDictionary-table"
@@ -63,12 +64,22 @@
           color: '#333333'
         }"
       >
+        <el-table-column
+          type="selection"
+          width="80"
+          align="center"
+        ></el-table-column>
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
-        <el-table-column prop="groupName" label="模板名称" />
-        <el-table-column prop="groupName" label="模板详情" width="350" />
-        <el-table-column prop="groupCode" label="创建时间" />
-        <el-table-column prop="itemName" label="修改时间" />
+        <el-table-column prop="templateName" label="模板名称" />
+        <el-table-column
+          prop="dateTypeStrList"
+          label="模板详情"
+          width="350"
+          :formatter="planDetailFormatter"
+        />
+        <el-table-column prop="createTime" label="创建时间" />
+        <el-table-column prop="updateTime" label="修改时间" />
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
             <!-- v-permission="['/rbac/dict/update', 3]" -->
@@ -94,43 +105,32 @@
       width="950px"
       :before-close="handleClose"
     >
-      <!-- <div slot="title">
+      <div slot="title">
         <div style="display: flex; justify-content: space-between">
           <div style="font-weight: bold">
-            {{ isEdit ? '编辑录像计划' : '新建录像计划' }}
+            {{ isEdit ? '编辑时间模板' : '新建时间模板' }}
           </div>
-          <div style="cursor: pointer" @click="handleRelationCancel"></div>
         </div>
-      </div> -->
-      <el-form :model="formData" ref="addForm" style="overflow-x: auto">
-        <!-- <div style="max-width: 900px;"> -->
-        <!-- <div class="add-plan-item">
-          <el-form-item
-            label="计划名称"
-            :label-width="formLabelWidth"
-            prop="planName"
-            :rules="[
-              { required: true, message: '计划名称不能为空', trigger: 'blur' }
-            ]"
-          >
-            <el-input
-              maxlength="32"
-              class="item-input"
-              v-model="formData.planName"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-        </div> -->
+      </div>
+      <el-form
+        :model="dialog.params"
+        ref="accountForm"
+        style="overflow-x: auto"
+      >
+        <el-form-item
+          label="模板名称"
+          :rules="[
+            { required: true, message: '模板名称不能为空', trigger: 'blur' }
+          ]"
+        >
+          <el-input
+            class="item-input"
+            v-model="dialog.params.templateName"
+            clearable
+          ></el-input>
+        </el-form-item>
 
-        <!-- <div class="add-plan-item mb-0">
-          <el-form-item
-            label="录像计划详情"
-            :label-width="formLabelWidth"
-            prop="planName"
-          >
-            <span class="describe-text">录像计划 配置云端录像开启时段</span>
-          </el-form-item>
-        </div> -->
+        <el-form-item label="配置预案开启时段"> </el-form-item>
 
         <div class="timeSlider-container">
           <div
@@ -192,81 +192,21 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="submit('roleForm')">确 定</el-button>
+        <el-button type="primary" @click="submit('accountForm')"
+          >确 定</el-button
+        >
       </span>
-    </el-dialog>
-
-    <el-dialog
-      :title="permissionDialog.title"
-      :visible.sync="permissionDialog.show"
-      width="1200px"
-      :before-close="permissionHandleClose"
-    >
-      <div class="page-main">
-        <div class="main-operation">
-          <div class="title">
-            <span>功能权限</span>
-          </div>
-          <div style="display: flex">
-            <div class="perms-operation">
-              <el-button
-                type="primary"
-                :loading="buttonLoading"
-                @click="savePermission()"
-                >保存设置</el-button
-              >
-            </div>
-            <el-button
-              class="button-back"
-              @click="permissionDialog.show = false"
-              >返回</el-button
-            >
-          </div>
-        </div>
-        <div class="main-content">
-          <div class="perms-tree">
-            <div class="tree-title">
-              <div class="title">一级功能</div>
-              <div class="title">二级功能</div>
-              <div class="title">操作权限</div>
-            </div>
-            <div v-if="permissionTableData && permissionTableData.length > 0">
-              <div
-                v-for="item in permissionTableData"
-                :key="item.id"
-                class="tree-item item-border"
-              >
-                <div class="item-title">{{ item.title }}</div>
-                <div class="item-children">
-                  <template>
-                    <div
-                      v-for="child in item.childs"
-                      :key="child.id"
-                      class="tree-item"
-                    >
-                      <div class="item-title">{{ child.title }}</div>
-                      <div class="tree-operation">
-                        <template v-for="op in child.childs">
-                          <el-checkbox :key="op.id" v-model="op.hasAuthorize">{{
-                            op.title
-                          }}</el-checkbox>
-                        </template>
-                      </div>
-                    </div>
-                  </template>
-                </div>
-              </div>
-            </div>
-            <div v-else class="tree-empty item-border">暂无数据</div>
-          </div>
-        </div>
-      </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getTemplateAlarmEventLists } from '@/api/method/alarm'
+import {
+  getTemplateAlarmEventLists,
+  addTemplateAlarmEvent,
+  editTemplateAlarmEvent,
+  deleteTemplateAlarmEvent
+} from '@/api/method/alarm'
 import pagination from '@/components/Pagination/index.vue'
 import '../../../../../static/js/timeSlider/timeSlider'
 import '../../../../../static/css/timeSlider.css'
@@ -276,83 +216,29 @@ export default {
   components: { pagination },
   data() {
     return {
-      isShow: false,
+      isShow: true,
       params: {
         pageNum: 1,
         pageSize: 10,
         total: 0
       },
-      optionsList: [
-        {
-          label: 'ces',
-          value: 'ces'
-        }
-      ],
+      isEdit: false,
+      formData: {
+        templateName: null
+      },
       tableData: [],
-      permissionTableData: [],
       dialog: {
         show: false,
         title: '新建',
         params: {
-          itemValue: '',
-          itemName: '',
-          description: '',
-          groupName: '',
-          groupCode: ''
-        }
-      },
-      permissionDialog: {
-        show: false,
-        title: '编辑权限',
-        params: {
-          detail: '',
-          name: '',
-          status: 1
+          templateName: '',
+          timePeriodList: []
         }
       },
       searchParams: {
         templateName: ''
       },
-      rules: {
-        groupName: [
-          { required: true, message: '请输入字典名称', trigger: 'change' },
-          {
-            min: 0,
-            max: 20,
-            message: '长度在 3 到 20 个字符',
-            trigger: 'change'
-          }
-        ],
-        itemValue: [
-          { required: true, message: '请输入字典项Value', trigger: 'change' },
-          {
-            min: 0,
-            max: 20,
-            message: '长度在 3 到 20 个字符',
-            trigger: 'change'
-          }
-        ],
-        groupCode: [
-          { required: true, message: '请输入字典编码', trigger: 'change' },
-          {
-            min: 0,
-            max: 20,
-            message: '长度在 3 到 20 个字符',
-            trigger: 'change'
-          }
-        ],
-        itemName: [
-          { required: true, message: '请输入字典项名称', trigger: 'change' },
-          {
-            min: 0,
-            max: 20,
-            message: '长度在 3 到 20 个字符',
-            trigger: 'change'
-          }
-        ]
-      },
       roleId: '',
-      checkList: [],
       buttonLoading: false,
       treeData: [],
       timeSliderList: {
@@ -364,7 +250,8 @@ export default {
         timeS5: null,
         timeS6: null,
         timeS7: null
-      }
+      },
+      timeMergeList: []
     }
   },
   created() {},
@@ -383,6 +270,39 @@ export default {
     cxData() {
       this.getList()
     },
+    planDetailFormatter(row) {
+      if (row.dateTypeStrList && row.dateTypeStrList.length > 0) {
+        let result = ''
+        row.dateTypeStrList.forEach((type, index) => {
+          switch (index + 1) {
+            case 1:
+              result += '星期一、'
+              break
+            case 2:
+              result += '星期二、'
+              break
+            case 3:
+              result += '星期三、'
+              break
+            case 4:
+              result += '星期四、'
+              break
+            case 5:
+              result += '星期五、'
+              break
+            case 6:
+              result += '星期六、'
+              break
+            case 7:
+              result += '星期日、'
+              break
+            default:
+              break
+          }
+        })
+        return result.substring(0, result.length - 1)
+      }
+    },
     resetData(e) {
       this.searchParams = {
         templateName: ''
@@ -399,9 +319,6 @@ export default {
       this.params.pageNum = 1
       this.getList()
     },
-    goPage(path, query) {
-      this.$router.replace(path)
-    },
     isShowChildren(data) {
       return data.find((res) => {
         return res.childs.length !== 0
@@ -409,93 +326,182 @@ export default {
     },
     dialogShow(act, data) {
       this.dialog.params = {
-        itemValue: '',
-        itemName: '',
-        description: '',
-        groupName: '',
-        groupCode: ''
+        templateName: null,
+        timePeriodList: []
       }
       if (act === 0) {
-        const { groupName, groupCode, description, itemName, itemValue } = data
-        this.dialog.params.groupCode = groupCode
-        this.dialog.params.groupName = groupName
-        this.dialog.params.description = description
-        this.dialog.params.itemName = itemName
-        this.dialog.params.itemValue = itemValue
+        this.isEdit = true
         this.editId = data.id
+        this.dialog.params = Object.assign({}, data, {
+          templateName: data.templateName,
+          timePeriodList: data.timePeriodDtoList
+        })
+        console.log('this.dialog.params', this.dialog.params)
       }
       this.dialog.title = act ? '新建' : '编辑'
       this.dialog.show = !this.dialog.show
       this.$nextTick(() => {
         this.initTimeSlider()
+        if (data.timePeriodDtoList) {
+          this.planTimeListToTimeSlider(data.timePeriodDtoList)
+        }
       })
+    },
+    /**
+     * 将计划时间段转化为时间滑块时间
+     * @param timePeriodDtoList
+     */
+    planTimeListToTimeSlider(timePeriodDtoList) {
+      let time1Array = []
+      let time2Array = []
+      let time3Array = []
+      let time4Array = []
+      let time5Array = []
+      let time6Array = []
+      let time7Array = []
+      timePeriodDtoList.forEach((planTime) => {
+        let endTimeSplit = planTime.endTime.split(':')
+        let startTimeSplit = planTime.startTime.split(':')
+        let endTime = endTimeSplit[0] + ':' + endTimeSplit[1]
+        let startTime = startTimeSplit[0] + ':' + startTimeSplit[1]
+        if (planTime.isNextDay === 1) {
+          endTime = '24:00'
+        }
+        let scopeTime = startTime + '-' + endTime
+        switch (planTime.dateType) {
+          case 1:
+            time1Array.push(scopeTime)
+            break
+          case 2:
+            time2Array.push(scopeTime)
+            break
+          case 3:
+            time3Array.push(scopeTime)
+            break
+          case 4:
+            time4Array.push(scopeTime)
+            break
+          case 5:
+            time5Array.push(scopeTime)
+            break
+          case 6:
+            time6Array.push(scopeTime)
+            break
+          case 7:
+            time7Array.push(scopeTime)
+            break
+          default:
+            break
+        }
+      })
+      this.timeSliderList.timeS1.set({ setTimeArray: time1Array })
+      this.timeSliderList.timeS2.set({ setTimeArray: time2Array })
+      this.timeSliderList.timeS3.set({ setTimeArray: time3Array })
+      this.timeSliderList.timeS4.set({ setTimeArray: time4Array })
+      this.timeSliderList.timeS5.set({ setTimeArray: time5Array })
+      this.timeSliderList.timeS6.set({ setTimeArray: time6Array })
+      this.timeSliderList.timeS7.set({ setTimeArray: time7Array })
+    },
+
+    /**
+     * 将时间滑块时间转化为计划时间
+     */
+    timeSliderToPlanTimeList() {
+      this.dialog.params.timePeriodList = []
+
+      this.timeSliderList.timeS1.get().times.forEach((item) => {
+        this.createPlanTime(item)
+      })
+      this.convertPlanTime(1)
+
+      this.timeSliderList.timeS2.get().times.forEach((item) => {
+        this.createPlanTime(item)
+      })
+      this.convertPlanTime(2)
+
+      this.timeSliderList.timeS3.get().times.forEach((item) => {
+        this.createPlanTime(item)
+      })
+      this.convertPlanTime(3)
+
+      this.timeSliderList.timeS4.get().times.forEach((item) => {
+        this.createPlanTime(item)
+      })
+      this.convertPlanTime(4)
+
+      this.timeSliderList.timeS5.get().times.forEach((item) => {
+        this.createPlanTime(item)
+      })
+      this.convertPlanTime(5)
+
+      this.timeSliderList.timeS6.get().times.forEach((item) => {
+        this.createPlanTime(item)
+      })
+      this.convertPlanTime(6)
+
+      this.timeSliderList.timeS7.get().times.forEach((item) => {
+        this.createPlanTime(item)
+      })
+      this.convertPlanTime(7)
+    },
+    /**
+     * 创建录像计划时间
+     * @param time
+     */
+    createPlanTime(time) {
+      let startTimeAndEndTime = time.split('-')
+      let newStartTime = startTimeAndEndTime[0]
+      if (newStartTime.length < 6) {
+        newStartTime += ':00'
+      }
+
+      let newEndTime = startTimeAndEndTime[1]
+      if (newEndTime.length < 6) {
+        newEndTime += ':00'
+      }
+      let isNextDay = 0
+      if (newEndTime.split(':')[0] === '24') {
+        newEndTime = '23:59:00'
+        isNextDay = 1
+      }
+
+      let isNeedMerge = false
+      this.timeMergeList.forEach((item) => {
+        if (item.endTime === newStartTime) {
+          item.endTime = newEndTime
+          isNeedMerge = true
+        } else if (item.startTime === newEndTime) {
+          item.startTime = newStartTime
+          isNeedMerge = true
+        }
+      })
+      if (!isNeedMerge) {
+        this.timeMergeList.push({
+          startTime: newStartTime,
+          endTime: newEndTime,
+          isNextDay: isNextDay
+        })
+      }
+    },
+    /**
+     * 将时间段添加到传输List
+     */
+    convertPlanTime(type) {
+      this.timeMergeList.forEach((item) => {
+        this.dialog.params.timePeriodList.push({
+          dateType: type,
+          startTime: item.startTime,
+          endTime: item.endTime,
+          isNextDay: item.isNextDay
+        })
+      })
+      this.timeMergeList = []
     },
     handleClose(done) {
       done()
     },
     permissionHandleClose(done) {
       done()
-    },
-    buildTree(v) {
-      // v==get ,set
-      this.checkList = []
-      this.permissionTableData.forEach((i) => {
-        if (i.childs && i.childs.length) {
-          v === 'get' && i.hasAuthorize && this.checkList.push(i.id)
-          i.childs.forEach((l) => {
-            v === 'get' && l.hasAuthorize && this.checkList.push(l.id)
-            if (l.childs && l.childs.length) {
-              l.childs.forEach((m) => {
-                v === 'get' && m.hasAuthorize && this.checkList.push(m.id)
-              })
-            }
-          })
-        }
-      })
-    },
-    getPermissionTableData(id) {
-      this.permissionDialog.show = !this.permissionDialog.show
-      this.roleId = id
-      permissionTree(id).then((res) => {
-        if (res.data.code === 0) {
-          this.permissionTableData = res.data
-        }
-      })
-    },
-    checkMenu(list) {
-      list.forEach((item) => {
-        if (item.permissionType === 1) {
-          item.ifPublic = this.checkList.indexOf(String(item.id)) !== -1
-        } else {
-          item.children && this.checkMenu(item.children)
-        }
-      })
-    },
-    getCkeckList() {},
-    savePermission() {
-      this.buttonLoading = true
-      // this.checkList = []
-      this.buildTree('get')
-      updateDict({
-        roleId: this.roleId,
-        permissionIds: this.checkList
-      })
-        .then((res) => {
-          if (res.data.code === 0) {
-            this.$message({
-              message: '保存成功！',
-              type: 'success'
-            })
-
-            this.buttonLoading = false
-            this.permissionDialog.show = !this.permissionDialog.show
-          } else {
-            this.buttonLoading = false
-          }
-        })
-        .catch(() => {
-          this.buttonLoading = false
-        })
     },
     async getList() {
       await getTemplateAlarmEventLists({
@@ -516,13 +522,44 @@ export default {
         })
         .catch((error) => console.log(error))
     },
+    deteleAll(e) {
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
+      this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const roleIds = []
+        this.$refs.timeTemTable.selection.map((item) => {
+          roleIds.push(item.id)
+        })
+        deleteTemplateAlarmEvent(roleIds).then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.params.pageNum = 1
+            this.getList()
+          }
+        })
+      })
+    },
     deleteRole(row) {
       this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteDict(row.id).then((res) => {
+        deleteTemplateAlarmEvent([row.id]).then((res) => {
           if (res.data.code === 0) {
             this.$message({
               type: 'success',
@@ -539,7 +576,42 @@ export default {
         if (valid) {
           switch (this.dialog.title) {
             case '新建':
-              addDict(this.dialog.params).then((res) => {
+              console.log(
+                'this.timeSliderListthis.timeSliderList',
+                this.timeSliderList,
+                this.dialog.params
+              )
+              const resData = []
+              const resTimePeriodList = []
+
+              let params1 = {}
+              Object.values(this.timeSliderList).map((item, index) => {
+                if (index !== 0) {
+                  resData.push(item)
+                }
+              })
+              console.log('resData', resData)
+              resData.forEach((item1) => {
+                console.log('item1', item1.timeSliderNums, item1.startTimeArray)
+
+                if (item1.startTimeArray.length > 0) {
+                  item1.startTimeArray.map((child, index) => {
+                    params1 = {
+                      startTime: `${child}:00`,
+                      dateType: item1.timeSliderNums,
+                      endTime: `${item1.stopTimeArray[index]}:59`
+                    }
+
+                    resTimePeriodList.push(params1)
+                  })
+                }
+              })
+              console.log('resTimePeriodList', resTimePeriodList)
+
+              addTemplateAlarmEvent({
+                timePeriodList: resTimePeriodList,
+                templateName: this.dialog.params.templateName
+              }).then((res) => {
                 if (res.data.code === 0) {
                   this.$message({
                     type: 'success',
@@ -551,15 +623,18 @@ export default {
               })
               break
             case '编辑':
-              updateDict({ dictId: this.editId, ...this.dialog.params }).then(
-                (res) => {
-                  if (res.data.code === 0) {
-                    this.$message.success('编辑成功')
-                    this.dialog.show = false
-                    this.getList()
-                  }
+              this.timeSliderToPlanTimeList()
+              editTemplateAlarmEvent({
+                templateId: this.editId,
+                templateName: this.dialog.params.templateName,
+                timePeriodList: this.dialog.params.timePeriodList
+              }).then((res) => {
+                if (res.data.code === 0) {
+                  this.$message.success('编辑成功')
+                  this.dialog.show = false
+                  this.getList()
                 }
-              )
+              })
               break
 
             default:
@@ -580,6 +655,8 @@ export default {
         minBlockTime: 1,
         allInit: true
       })
+
+      console.log('this.timeSliderListthis.timeSliderList', this.timeSliderList)
 
       this.timeSliderList.timeS2 = new TimeSlider({
         mountedId: 'timeSlider2',
@@ -622,6 +699,8 @@ export default {
         defaultOneTimeBlockTime: 30,
         minBlockTime: 1
       })
+
+      console.log('this.timeSliderListthis.timeSliderList', this.timeSliderList)
     }
   }
 }
@@ -712,7 +791,7 @@ export default {
     margin: 20px;
     padding: 20px;
     background: #ffffff;
-    height: calc(100% - 200px);
+    height: calc(100% - 240px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;

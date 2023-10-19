@@ -74,6 +74,22 @@ const methods = {
       headers
     })
   },
+  delete2(url, data, headers) {
+    const resUrl = url + data.map((item) => 'templateIds=' + item).join('&')
+    return request({
+      method: 'DELETE',
+      url: resUrl,
+      headers
+    })
+  },
+  delete3(url, data, headers) {
+    const resUrl = url + data.map((item) => 'id=' + item).join('&')
+    return request({
+      method: 'DELETE',
+      url: resUrl,
+      headers
+    })
+  },
   delete(url, params, headers) {
     let _params
     if (Object.is(params, undefined)) {

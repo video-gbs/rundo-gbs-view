@@ -1008,7 +1008,7 @@ export default {
                         onlineState: item.onlineState,
                         resourceName: item.channelName,
                         resourceNames: item.channelName,
-                        areaPid: item.id,
+                        areaPid: item.channelId,
                         id: item.id,
                         ptzType: item.ptzType,
                         childList: []

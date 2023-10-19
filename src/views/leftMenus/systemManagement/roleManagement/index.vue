@@ -318,7 +318,7 @@ export default {
       this.getList()
     },
     goPage(path, query) {
-      this.$router.replace(path)
+      this.$router.push(path)
     },
     isShowChildren(data) {
       return data.find((res) => {
@@ -361,17 +361,17 @@ export default {
     },
     goActiveDiscovery(id) {
       Local.set('rolePageNum', this.params.pageNum)
-      this.$router.replace({ path: '/userDiscovery', query: { key: id } })
+      this.$router.push({ path: '/userDiscovery', query: { key: id } })
     },
     goEditRole(row) {
       Local.set('rolePageNum', this.params.pageNum)
-      this.$router.replace({
+      this.$router.push({
         path: '/creatingRole',
         query: { key: 'edit', row: row }
       })
     },
     goCreatingRole() {
-      this.$router.replace({ path: '/creatingRole', query: { key: 'add' } })
+      this.$router.push({ path: '/creatingRole', query: { key: 'add' } })
     },
 
     checkMenu(list) {
