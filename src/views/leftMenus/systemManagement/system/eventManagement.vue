@@ -114,11 +114,19 @@
               :maxlength="20"
             />
           </el-form-item>
-          <el-form-item label="事件编码" prop="eventCode">
+          <el-form-item v-if="isEdited" label="事件编码" prop="eventCode">
             <el-input
               v-model="dialog.params.eventCode"
               clearable
               :maxlength="20"
+            />
+          </el-form-item>
+          <el-form-item v-else label="事件编码" prop="eventCode">
+            <el-input
+              v-model="dialog.params.eventCode"
+              clearable
+              :maxlength="20"
+              :disabled="true"
             />
           </el-form-item>
           <el-form-item label="排序" prop="eventSort">
@@ -158,6 +166,7 @@ export default {
         pageSize: 10,
         total: 0
       },
+      isEdited: true,
       tableData: [],
       dialog: {
         show: false,
@@ -238,7 +247,7 @@ export default {
       this.getList()
     },
     goPage(path, query) {
-      this.$router.replace(path)
+      this.$router.push(path)
     },
     isShowChildren(data) {
       return data.find((res) => {
@@ -251,12 +260,14 @@ export default {
         eventCode: '',
         eventSort: ''
       }
+      this.isEdited = true
       if (act === 0) {
         const { eventName, eventCode, eventSort } = data
         this.dialog.params.eventName = eventName
         this.dialog.params.eventCode = eventCode
         this.dialog.params.eventSort = eventSort
         this.editId = data.id
+        this.isEdited = false
       }
       this.dialog.title = act ? '新建' : '编辑'
       this.dialog.show = !this.dialog.show

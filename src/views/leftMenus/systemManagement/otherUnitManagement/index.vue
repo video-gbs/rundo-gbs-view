@@ -562,7 +562,7 @@ export default {
       this.getOtherUnitList()
     },
     goPage(path, query) {
-      this.$router.replace(path)
+      this.$router.push(path)
     },
     dialogShow(act, data) {
       this.dialog.params = {

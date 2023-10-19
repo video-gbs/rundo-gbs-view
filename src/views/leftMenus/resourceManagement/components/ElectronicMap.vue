@@ -231,7 +231,7 @@ export default {
                 height: item.height,
                 latitude: Number(item.latitude),
                 longitude: Number(item.longitude),
-                id: item.id
+                id: item.channelId
               }
               this.videoList.push(obj)
             })

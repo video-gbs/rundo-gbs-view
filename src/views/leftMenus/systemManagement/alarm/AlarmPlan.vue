@@ -242,7 +242,7 @@
       </el-dialog>
     </div>
 
-    <AddAlarmPlan v-show="isAddAlarmPlanShow" @changeIsShow="changeIsShow" />
+    <AddAlarmPlan v-if="isAddAlarmPlanShow" @changeIsShow="changeIsShow" @getList="getList"/>
   </div>
 </template>
 
@@ -377,7 +377,7 @@ export default {
       this.getList()
     },
     goPage(path, query) {
-      this.$router.replace(path)
+      this.$router.push(path)
     },
     isShowChildren(data) {
       return data.find((res) => {

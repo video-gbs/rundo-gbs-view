@@ -427,9 +427,9 @@ export default {
     childClickHandle(data) {
       console.log(data, 'childClickHandle')
       if (data.areaName === '网关模块') {
-        this.$router.replace({ path: '/gatewayModuleManagement' })
+        this.$router.push({ path: '/gatewayModuleManagement' })
       } else {
-        this.$router.replace({ path: '/ModuleManagement' })
+        this.$router.push({ path: '/ModuleManagement' })
       }
     },
     editData(row) {

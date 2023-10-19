@@ -288,9 +288,9 @@ export default {
     },
     childClickHandle(data) {
       if (data.areaName === '网关模块') {
-        this.$router.replace({ path: '/gatewayModuleManagement' })
+        this.$router.push({ path: '/gatewayModuleManagement' })
       } else {
-        this.$router.replace({ path: '/ModuleManagement' })
+        this.$router.push({ path: '/ModuleManagement' })
       }
     },
     editData(row) {
@@ -307,7 +307,7 @@ export default {
     showCorrelationPage(row) {
       this.isStreamMediaAssociatedShow = true
       this.streamMediaAssociatedRow = row
-      // this.$router.replace({
+      // this.$router.push({
       //   path: '/streamMediaAssociated',
       //   query: { key: row.id }
       // })

@@ -40,14 +40,18 @@ const urls = [
 
   // dev  本地
 
-  {
-    target: 'http://172.20.0.62:8093',
-    proxy: '/api/utils-template'
-  },
-  {
-    target: 'http://172.20.0.62:8094',
-    proxy: '/api/alarm-manage'
-  },
+  // {
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
+  //   proxy: '/api/utils-template'
+  // },
+  // {
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
+  //   proxy: '/api/alarm-manage'
+  // },
+  // {
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
+  //   proxy: '/api/expansion'
+  // },
   // uat 测试
   // {
   //   target: 'http://xard-gbs-uat.runjian.com:8080',

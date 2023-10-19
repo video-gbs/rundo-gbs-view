@@ -25,10 +25,7 @@
         :rules="rules"
       >
         <span class="alarm-span">基本信息</span>
-        <el-form-item
-          label="预案名称:"
-          prop="schemeName"
-        >
+        <el-form-item label="预案名称:" prop="schemeName">
           <el-input
             v-model="dialogParams.params.schemeName"
             placeholder="请输入"
@@ -38,15 +35,29 @@
         </el-form-item>
       </el-form>
     </div>
-    <div :class="active === 0?'step-bottom':'step-bottom1'">
+    <div :class="active === 0 ? 'step-bottom' : 'step-bottom1'">
       <Step1
         v-show="active === 0"
         @next="next"
         @goback="goback"
         @saveAll="saveAll"
       />
-      <Step2 v-show="active === 1" @next="next" @goback="goback" @last="last" />
-      <Step3 v-show="active === 2" @next="next" @lastClickAll="lastClickAll" />
+      <Step2
+        v-show="active === 1"
+        @next="next"
+        @goback="goback"
+        @last="last"
+        @stepParams2="stepParams2"
+      />
+      <Step3
+        v-show="active === 2"
+        @lastClickAll="lastClickAll"
+        @next="next"
+        @goback="goback"
+        @last="last"
+        @submitStep="submitStep"
+        @stepParams3="stepParams3"
+      />
     </div>
   </div>
 </template>
@@ -59,11 +70,6 @@ import Step3 from './Step3.vue'
 export default {
   name: '',
   components: { Step1, Step2, Step3 },
-  props: [
-    'treeList',
-    'manufacturerTypeOptions',
-    'transportProtocolTypeOptions'
-  ],
   data() {
     const checkName = (rule, value, cb) => {
       const regName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
@@ -122,6 +128,8 @@ export default {
         }
       },
       step1DataId: [],
+      step2Data: [],
+      step3Data: [],
       form: {
         model: '',
         username: '',
@@ -151,7 +159,11 @@ export default {
       },
       allNorthTypeOptions: [],
       rules: {
-        schemeName: { required: true, message: '预案名称不能为空', trigger: 'blur' }
+        schemeName: {
+          required: true,
+          message: '预案名称不能为空',
+          trigger: 'blur'
+        }
       }
     }
   },
@@ -176,7 +188,12 @@ export default {
       if (this.active++ > 2) this.active = 0
     },
     last() {
-      if (this.active-- > 0) this.active = 0
+      this.active--
+      // if ( > 0) this.active = 0
+    },
+    submitStep() {
+      this.active = 0
+      this.goback()
     },
     saveAll(val) {
       this.$refs['alarmAccountForm'].validate((valid) => {
@@ -187,7 +204,27 @@ export default {
         }
       })
     },
-    lastClickAll() {},
+    stepParams2(val) {
+      this.step2Data = val
+      console.log('this.step2Data', this.step2Data)
+    },
+    stepParams3(val) {
+      this.step3Data = val
+      this.lastClickAll()
+    },
+    async lastClickAll() {
+      await addSchemeAlarmEvent({
+        schemeName: this.dialogParams.params.schemeName,
+        templateId: this.step1DataId,
+        channelIds: this.step2Data,
+        alarmSchemeEventReqList: this.step3Data
+      }).then((res) => {
+        if (res.data.code === 0) {
+          this.goback()
+          this.$emit('getList')
+        }
+      })
+    },
     goback() {
       this.$emit('changeIsShow', false)
     }
@@ -371,7 +408,7 @@ export default {
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }
-  .step-bottom1{
+  .step-bottom1 {
     height: calc(100% - 215px);
     width: calc(100% - 40px);
     overflow-y: auto;

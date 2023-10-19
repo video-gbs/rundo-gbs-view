@@ -130,7 +130,7 @@ export default {
           Local.remove('access_token')
           Local.remove('rj_deptType')
           clearInterval(window.interval)
-          this.$router.replace({ path: '/login' })
+          this.$router.push({ path: '/login' })
         })
     },
     clickRouter(data) {
@@ -140,7 +140,7 @@ export default {
           ? this.routerLists
           : JSON.parse(Session.get('dynamicRouters'))
       if (data.path === '/workTable') {
-        this.$router.replace({ path: data.path })
+        this.$router.push({ path: data.path })
         // resetRouter()
         store.dispatch('user/changeRightWidth', false)
         store.dispatch('user/changeShowSidebar', false)
@@ -160,7 +160,7 @@ export default {
               Session.set('permissionData', res.data.data)
               Session.set('permissionMenuId', item.children[0].id)
 
-              this.$router.replace({ path: item.children[0].path })
+              this.$router.push({ path: item.children[0].path })
             }
           })
         }

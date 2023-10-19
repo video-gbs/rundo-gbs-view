@@ -155,11 +155,6 @@ import '../../../../../../static/css/normalize.css'
 export default {
   name: '',
   components: { pagination },
-  props: [
-    'treeList',
-    'manufacturerTypeOptions',
-    'transportProtocolTypeOptions'
-  ],
   data() {
     return {
       templateName: '',
@@ -242,7 +237,6 @@ export default {
       })
     },
     handleSelectChange(selection) {
-      console.log('selectionselectionselection', selection)
       // 全选取消，删除当前页所有数据
       if (selection.length === 0) {
         this.tableData.forEach((item) => {

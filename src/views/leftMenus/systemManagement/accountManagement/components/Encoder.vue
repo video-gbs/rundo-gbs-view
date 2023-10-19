@@ -326,7 +326,7 @@ export default {
       this.getList(this.newUserId)
     },
     synchronizationData() {
-      this.$router.replace(`/activeDiscovery/transfer`)
+      this.$router.push(`/activeDiscovery/transfer`)
     },
     deploymentData() {
       this.dialogShow1 = true
@@ -336,7 +336,7 @@ export default {
     },
     addEquipment(name) {
       this.$emit('changeIsShow', true, name, {})
-      // this.$router.replace(`/user`)
+      // this.$router.push(`/user`)
     },
     editEquipment(name, row) {
       Local.set('accountManagementPageNum', this.params.pageNum)

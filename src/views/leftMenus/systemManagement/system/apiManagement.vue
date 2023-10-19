@@ -357,7 +357,7 @@ export default {
       this.getList()
     },
     goPage(path, query) {
-      this.$router.replace(path)
+      this.$router.push(path)
     },
     isShowChildren(data) {
       return data.find((res) => {

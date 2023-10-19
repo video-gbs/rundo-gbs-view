@@ -21,7 +21,7 @@ export default {
     },
     async logout() {
       await this.$store.dispatch('user/logout')
-      this.$router.replace(`/login`)
+      this.$router.push(`/login`)
     }
   }
 }
