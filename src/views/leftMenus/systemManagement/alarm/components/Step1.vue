@@ -4,7 +4,6 @@
     <el-table
       ref="timeTemTable"
       :data="tableData"
-      style="width: 100%"
       class="dataDictionary-table"
       border
       row-key="id"
@@ -152,6 +151,7 @@ import pagination from '@/components/Pagination/index.vue'
 import '../../../../../../static/js/timeSlider/timeSlider'
 import '../../../../../../static/css/timeSlider.css'
 import '../../../../../../static/css/normalize.css'
+import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { pagination },
@@ -162,7 +162,7 @@ export default {
       selectedObj: {},
       selectedData: [],
       allList: [],
-      resIds: [],
+      resIds: '',
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -190,6 +190,7 @@ export default {
       editId: ''
     }
   },
+  created() {},
   mounted() {
     this.getList()
   },
@@ -207,6 +208,13 @@ export default {
             this.params.pages = res.data.data.pages
             this.params.current = res.data.data.pageSize
             this.tableData.map((item) => {
+              if (
+                Local.get('detailsData') &&
+                Local.get('detailsData').templateId === item.id
+              ) {
+                this.$refs.timeTemTable.toggleRowSelection(item)
+                this.$forceUpdate()
+              }
               this.allList.forEach((item1) => {
                 if (item.id === item1) {
                   this.selectedObj[item1] = item
@@ -442,11 +450,19 @@ export default {
       this.getList()
     },
     clickNext() {
-      this.resIds = []
-      this.selectedData.map((item) => {
-        this.resIds.push(item.id)
-      })
-      this.$emit('saveAll', this.resIds)
+      this.resIds = ''
+      if (this.selectedData.length > 1) {
+        this.$message({
+          type: 'warning',
+          message: '模板只能选择一个'
+        })
+      } else {
+        this.selectedData.map((item) => {
+          this.resIds = item.id
+        })
+
+        this.$emit('saveAll', this.resIds)
+      }
 
       // this.$emit('next')
     },

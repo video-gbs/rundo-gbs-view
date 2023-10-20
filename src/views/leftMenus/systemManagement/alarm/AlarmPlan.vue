@@ -1,6 +1,9 @@
 <template>
   <div class="dataDictionary_container" v-if="isShow">
-    <div v-show="!isAddAlarmPlanShow" style="height: 100%">
+    <div
+      v-show="!isAddAlarmPlanShow && !isEditAlarmPlanShow"
+      style="height: 100%"
+    >
       <div class="panel-header-box">
         <div class="panel-header-box-border">告警预案</div>
       </div>
@@ -29,7 +32,7 @@
               placeholder="请选择"
             >
               <el-option
-                v-for="obj in disabledOptionsList"
+                v-for="obj in optionsList"
                 :key="obj.value"
                 :label="obj.label"
                 :value="obj.value"
@@ -82,6 +85,7 @@
           </div>
         </div>
         <el-table
+          ref="timeTemTable"
           :data="tableData"
           style="width: 100%"
           class="dataDictionary-table"
@@ -94,12 +98,14 @@
             color: '#333333'
           }"
         >
+          <el-table-column type="selection" width="80" align="center">
+          </el-table-column>
           <el-table-column type="index" width="50" align="center" label="序号">
           </el-table-column>
-          <el-table-column prop="groupName" label="预案名称" />
-          <el-table-column prop="groupCode" label="告警事件" />
-          <el-table-column prop="itemName" label="创建时间" />
-          <el-table-column prop="itemValue" label="修改时间" />
+          <el-table-column prop="schemeName" label="预案名称" />
+          <el-table-column prop="eventNameList" label="告警事件" />
+          <el-table-column prop="createTime" label="创建时间" />
+          <el-table-column prop="updateTime" label="修改时间" />
           <el-table-column
             prop="onStatus"
             label="状态"
@@ -107,7 +113,7 @@
           >
             <template slot-scope="scope">
               <el-switch
-                v-model="scope.row.onStatus"
+                v-model="scope.row.disabled"
                 active-color="#13ce66"
                 inactive-color="#ff4949"
                 :active-value="1"
@@ -119,7 +125,7 @@
           </el-table-column>
           <el-table-column width="200" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" @click="dialogShow(0, scope.row)"
+              <el-button type="text" @click="dialogShowPassage(scope.row)"
                 >布防通道</el-button
               >
               <el-button type="text" @click="dialogShow(0, scope.row)"
@@ -141,123 +147,116 @@
         v-if="dialog.show"
         :title="dialog.title"
         :visible.sync="dialog.show"
-        width="600px"
+        width="1200px"
         :before-close="handleClose"
       >
         <div>
-          <el-form
-            ref="roleForm"
-            class="params-form"
-            size="mini"
-            :rules="rules"
-            label-position="left"
-            label-width="120px"
-            :model="dialog.params"
-            @keyup.enter="submit('roleForm')"
-          >
-            <el-form-item label="分组名称" prop="groupName">
-              <el-input
-                v-model="dialog.params.groupName"
-                clearable
-                :maxlength="20"
-              />
-            </el-form-item>
-          </el-form>
-        </div>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialog.show = false">取 消</el-button>
-          <el-button type="primary" @click="submit('roleForm')"
-            >确 定</el-button
-          >
-        </span>
-      </el-dialog>
-
-      <el-dialog
-        :title="permissionDialog.title"
-        :visible.sync="permissionDialog.show"
-        width="1200px"
-        :before-close="permissionHandleClose"
-      >
-        <div class="page-main">
-          <div class="main-operation">
-            <div class="title">
-              <span>功能权限</span>
-            </div>
-            <div style="display: flex">
-              <div class="perms-operation">
+          <div class="table-list" style="margin: 0px">
+            <div class="securityArea_container">
+              <div class="btn-lists" style="float: right">
                 <el-button
                   type="primary"
-                  :loading="buttonLoading"
-                  @click="savePermission()"
-                  >保存设置</el-button
+                  style="width: 100px; margin-bottom: 10px"
+                  @click="defenceAll"
+                  >批量布防</el-button
                 >
               </div>
-              <el-button
-                class="button-back"
-                @click="permissionDialog.show = false"
-                >返回</el-button
+            </div>
+            <el-table
+              ref="passageTableData"
+              :data="passageTableData"
+              style="width: 100%"
+              class="dataDictionary-table"
+              border
+              @selection-change="handleSelectChange"
+              @select="handleSelect"
+              :header-cell-style="{
+                background: 'rgba(0, 75, 173, 0.06)',
+                fontSize: '14px',
+                fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
+                fontWeight: 'bold',
+                color: '#333333'
+              }"
+            >
+              <el-table-column type="selection" width="80" align="center">
+              </el-table-column>
+              <el-table-column
+                type="index"
+                width="50"
+                align="center"
+                label="序号"
               >
-            </div>
-          </div>
-          <div class="main-content">
-            <div class="perms-tree">
-              <div class="tree-title">
-                <div class="title">一级功能</div>
-                <div class="title">二级功能</div>
-                <div class="title">操作权限</div>
-              </div>
-              <div v-if="permissionTableData && permissionTableData.length > 0">
-                <div
-                  v-for="item in permissionTableData"
-                  :key="item.id"
-                  class="tree-item item-border"
-                >
-                  <div class="item-title">{{ item.title }}</div>
-                  <div class="item-children">
-                    <template>
-                      <div
-                        v-for="child in item.childs"
-                        :key="child.id"
-                        class="tree-item"
-                      >
-                        <div class="item-title">{{ child.title }}</div>
-                        <div class="tree-operation">
-                          <template v-for="op in child.childs">
-                            <el-checkbox
-                              :key="op.id"
-                              v-model="op.hasAuthorize"
-                              >{{ op.title }}</el-checkbox
-                            >
-                          </template>
-                        </div>
-                      </div>
-                    </template>
-                  </div>
-                </div>
-              </div>
-              <div v-else class="tree-empty item-border">暂无数据</div>
-            </div>
+              </el-table-column>
+              <el-table-column prop="channelName" label="通道名称" />
+              <el-table-column prop="channelId" label="通道编号" />
+              <el-table-column prop="deployState" label="布防状态" width="80">
+                <template slot-scope="scope">
+                  <span
+                    v-if="scope.row.deployState === 1"
+                    style="margin-left: 10px; color: #1FAD8C"
+                    >成功</span
+                  >
+                  <span
+                    v-else
+                    style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
+                    >失败</span
+                  >
+                </template>
+              </el-table-column>
+              <el-table-column width="200" label="操作">
+                <template slot-scope="scope">
+                  <el-button type="text" @click="defence(scope.row)"
+                    >布防</el-button
+                  >
+                </template>
+              </el-table-column>
+            </el-table>
+            <pagination
+              :pages-data="params1"
+              @size-change="sizeChange1"
+              @current-change="currentChange1"
+            />
           </div>
         </div>
       </el-dialog>
     </div>
 
-    <AddAlarmPlan v-if="isAddAlarmPlanShow" @changeIsShow="changeIsShow" @getList="getList"/>
+    <AddAlarmPlan
+      v-if="isAddAlarmPlanShow"
+      @changeIsShow="changeIsShow"
+      @getList="getList"
+    />
+
+    <EditAlarmPlan
+      v-if="isEditAlarmPlanShow"
+      @changeEditIsShow="changeEditIsShow"
+      :detailsData="detailsData"
+      :editAlarmId="editAlarmId"
+      @getList="getList"
+    />
   </div>
 </template>
 
 <script>
-import { getSchemeAlarmEventLists } from '@/api/method/alarm'
+import {
+  getSchemeAlarmEventLists,
+  editSchemeAlarmEventDisabled,
+  getAlarmDeployChannel,
+  getSchemeAlarmEventDefense,
+  getSchemeAlarmEventDetails,
+  deleteSchemeAlarmEvent
+} from '@/api/method/alarm'
 import pagination from '@/components/Pagination/index.vue'
 import AddAlarmPlan from './components/AddAlarmPlan.vue'
-import store from '@/store/index'
+import EditAlarmPlan from './components/EditAlarmPlan.vue'
 import { Local } from '@/utils/storage'
 export default {
   name: '',
-  components: { pagination, AddAlarmPlan },
+  components: { pagination, AddAlarmPlan, EditAlarmPlan },
   data() {
     return {
       isAddAlarmPlanShow: false,
+      isEditAlarmPlanShow: false,
       disabledOptionsList: [],
       isShow: true,
       params: {
@@ -265,24 +264,20 @@ export default {
         pageSize: 10,
         total: 0
       },
-      optionsList: [
-        {
-          label: 'ces',
-          value: 'ces'
-        }
-      ],
+      params1: {
+        pageNum: 1,
+        pageSize: 10,
+        total: 0
+      },
       tableData: [],
+      selectedObj: {},
+      selectedData: [],
+      allList: [],
+      resIds: [],
       permissionTableData: [],
       dialog: {
         show: false,
-        title: '新建',
-        params: {
-          itemValue: '',
-          itemName: '',
-          description: '',
-          groupName: '',
-          groupCode: ''
-        }
+        title: '布防通道'
       },
       permissionDialog: {
         show: false,
@@ -293,53 +288,28 @@ export default {
           status: 1
         }
       },
+      optionsList: [
+        {
+          label: '离线',
+          value: 0
+        },
+        {
+          label: '在线',
+          value: 1
+        }
+      ],
       searchParams: {
         schemeName: '',
         disabled: '',
         time: ''
       },
-      rules: {
-        groupName: [
-          { required: true, message: '请输入字典名称', trigger: 'change' },
-          {
-            min: 0,
-            max: 20,
-            message: '长度在 3 到 20 个字符',
-            trigger: 'change'
-          }
-        ],
-        itemValue: [
-          { required: true, message: '请输入字典项Value', trigger: 'change' },
-          {
-            min: 0,
-            max: 20,
-            message: '长度在 3 到 20 个字符',
-            trigger: 'change'
-          }
-        ],
-        groupCode: [
-          { required: true, message: '请输入字典编码', trigger: 'change' },
-          {
-            min: 0,
-            max: 20,
-            message: '长度在 3 到 20 个字符',
-            trigger: 'change'
-          }
-        ],
-        itemName: [
-          { required: true, message: '请输入字典项名称', trigger: 'change' },
-          {
-            min: 0,
-            max: 20,
-            message: '长度在 3 到 20 个字符',
-            trigger: 'change'
-          }
-        ]
-      },
+      passageTableData: [],
       roleId: '',
       checkList: [],
       buttonLoading: false,
-      treeData: []
+      treeData: [],
+      detailsData: [],
+      editAlarmId: ''
     }
   },
   created() {},
@@ -355,9 +325,18 @@ export default {
       this.params.proCount = proCount
       this.getList()
     },
+    sizeChange1(pageSize) {
+      this.params.pageSize = pageSize
+      this.getChanneList()
+    },
+    currentChange1(proCount) {
+      this.params.proCount = proCount
+      this.getList()
+    },
     cxData() {
       this.getList()
     },
+
     resetData(e) {
       this.searchParams = {
         schemeName: '',
@@ -379,57 +358,157 @@ export default {
     goPage(path, query) {
       this.$router.push(path)
     },
+    changeSwitch(row) {
+      console.log(row)
+      let text = row.disabled === 0 ? '启用' : '停用'
+
+      this.$confirm('确认要"' + text + '""' + row.schemeName + '"吗?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(function () {
+          editSchemeAlarmEventDisabled({
+            id: row.id,
+            disabled: row.disabled
+          }).then((res) => {
+            if (res.data.code !== 0) {
+              row.disabled = row.disabled === 0 ? 1 : 0
+            }
+          })
+        })
+        .catch(function () {
+          row.disabled = row.disabled === 0 ? 1 : 0
+        })
+    },
     isShowChildren(data) {
       return data.find((res) => {
         return res.childs.length !== 0
       })
     },
+    dialogShowPassage(row) {
+      getAlarmDeployChannel({
+        num: this.params1.pageSize,
+        page: this.params1.pageNum,
+        schemeId: row.id
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.passageTableData = res.data.data.list
+            this.params1.total = res.data.data.total
+            this.params1.pages = res.data.data.pages
+            this.params1.current = res.data.data.pageSize
+            this.handleRowSelection(this.passageTableData)
+          }
+        })
+        .catch(() => {})
+      this.dialog.show = !this.dialog.show
+    },
+    defenceAll() {
+      this.resIds = []
+      this.selectedData.map((item) => {
+        this.resIds.push(item.channelId)
+      })
+      getSchemeAlarmEventDefense({
+        channelIds: this.resIds
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              message: '布防成功！',
+              type: 'success'
+            })
+          }
+        })
+        .catch(() => {})
+    },
+    defence(row) {
+      getSchemeAlarmEventDefense({
+        channelIds: [row.channelId]
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              message: '布防成功！',
+              type: 'success'
+            })
+          }
+        })
+        .catch(() => {})
+    },
+
+    handleSelectChange(selection) {
+      // 全选取消，删除当前页所有数据
+      if (selection.length === 0) {
+        this.passageTableData.forEach((item) => {
+          delete this.selectedObj[item.channelId]
+        })
+        this.passageTableData.forEach((item) => {
+          this.allList = this.allList.filter((item1) => {
+            return item1 !== item.channelId
+          })
+        })
+      }
+      // 勾选数据 添加
+      selection.forEach((item) => {
+        this.selectedObj[item.channelId] = item
+      })
+      // 获取所有分页勾选的数据
+      this.selectedData = []
+      for (const key in this.selectedObj) {
+        this.selectedData.push(this.selectedObj[key])
+      }
+    },
+
+    handleSelect(selection, row) {
+      // 取消单个勾选时，删除对应属性
+      if (!selection.some((item) => item.channelId === row.channelId)) {
+        delete this.selectedObj[row.channelId]
+        this.allList = this.allList.filter((item1) => {
+          return item1 !== row.channelId
+        })
+      } else {
+        this.allList.push(row.channelId)
+      }
+    },
+    // 处理当前列表选中状态
+    handleRowSelection(data) {
+      console.log('处理当前列表选中状态', data, this.selectedObj)
+      data.forEach((item) => {
+        if (this.selectedObj[item.channelId]) {
+          this.$nextTick(() => {
+            this.$refs.passageTableData.toggleRowSelection(item)
+            this.$forceUpdate()
+          })
+        }
+      })
+    },
     dialogShow(act, data) {
-      this.isAddAlarmPlanShow = true
-      // this.dialog.params = {
-      //   itemValue: '',
-      //   itemName: '',
-      //   description: '',
-      //   groupName: '',
-      //   groupCode: ''
-      // }
-      // if (act === 0) {
-      //   const { groupName, groupCode, description, itemName, itemValue } = data
-      //   this.dialog.params.groupCode = groupCode
-      //   this.dialog.params.groupName = groupName
-      //   this.dialog.params.description = description
-      //   this.dialog.params.itemName = itemName
-      //   this.dialog.params.itemValue = itemValue
-      //   this.editId = data.id
-      // }
-      // this.dialog.title = act ? '新建' : '编辑'
-      // this.dialog.show = !this.dialog.show
+      if (act === 0) {
+        getSchemeAlarmEventDetails(data.id).then((res) => {
+          if (res.data.code === 0) {
+            this.detailsData = res.data.data
+            this.editAlarmId = data.id
+            Local.set('editAlarmId', this.editAlarmId)
+            Local.set('detailsData', this.detailsData)
+            setTimeout(() => {
+              this.isEditAlarmPlanShow = true
+            }, 500)
+          }
+        })
+      } else {
+        Local.set('detailsData', [])
+        this.isAddAlarmPlanShow = true
+      }
     },
     changeIsShow(val) {
       this.isAddAlarmPlanShow = val
     },
+    changeEditIsShow(val) {
+      this.isEditAlarmPlanShow = val
+    },
     handleClose(done) {
       done()
-    },
-    permissionHandleClose(done) {
-      done()
-    },
-    buildTree(v) {
-      // v==get ,set
-      this.checkList = []
-      this.permissionTableData.forEach((i) => {
-        if (i.childs && i.childs.length) {
-          v === 'get' && i.hasAuthorize && this.checkList.push(i.id)
-          i.childs.forEach((l) => {
-            v === 'get' && l.hasAuthorize && this.checkList.push(l.id)
-            if (l.childs && l.childs.length) {
-              l.childs.forEach((m) => {
-                v === 'get' && m.hasAuthorize && this.checkList.push(m.id)
-              })
-            }
-          })
-        }
-      })
     },
     getPermissionTableData(id) {
       this.permissionDialog.show = !this.permissionDialog.show
@@ -449,32 +528,6 @@ export default {
         }
       })
     },
-    getCkeckList() {},
-    savePermission() {
-      this.buttonLoading = true
-      // this.checkList = []
-      this.buildTree('get')
-      updateDict({
-        roleId: this.roleId,
-        permissionIds: this.checkList
-      })
-        .then((res) => {
-          if (res.data.code === 0) {
-            this.$message({
-              message: '保存成功！',
-              type: 'success'
-            })
-
-            this.buttonLoading = false
-            this.permissionDialog.show = !this.permissionDialog.show
-          } else {
-            this.buttonLoading = false
-          }
-        })
-        .catch(() => {
-          this.buttonLoading = false
-        })
-    },
     async getList() {
       const createStartTime = this.searchParams.time
         ? this.searchParams.time[0]
@@ -482,14 +535,10 @@ export default {
       const createEndTime = this.searchParams.time
         ? this.searchParams.time[1]
         : ''
-      // const params = {}
-      // if (disabled !== '' || disabled !== undefined || disabled !== null) {
-      //   params.disabled= this.searchParams.disabled
-      // }
       await getSchemeAlarmEventLists({
         num: this.params.pageSize,
         page: this.params.pageNum,
-        schemeName: this.searchParams.disabled,
+        schemeName: this.searchParams.schemeName,
         disabled: this.searchParams.disabled,
         createStartTime,
         createEndTime
@@ -507,13 +556,28 @@ export default {
         })
         .catch((error) => console.log(error))
     },
-    deleteRole(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+    deteleAll(e) {
+      let target = e.target
+      if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
+        target = e.target.parentNode.parentNode
+      } else if (target.nodeName === 'user') {
+        target = e.target.parentNode.parentNode.parentNode
+      } else {
+        target = e.target
+      }
+      target.blur()
+      this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteDict(row.id).then((res) => {
+        const roleIds = []
+        this.$refs.timeTemTable.selection.map((item) => {
+          roleIds.push(item.id)
+        })
+        console.log(roleIds)
+        // return
+        deleteSchemeAlarmEvent(roleIds).then((res) => {
           if (res.data.code === 0) {
             this.$message({
               type: 'success',
@@ -525,38 +589,22 @@ export default {
         })
       })
     },
-    submit(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          switch (this.dialog.title) {
-            case '新建':
-              addDict(this.dialog.params).then((res) => {
-                if (res.data.code === 0) {
-                  this.$message({
-                    type: 'success',
-                    message: '新建成功'
-                  })
-                  this.dialog.show = false
-                  this.getList()
-                }
-              })
-              break
-            case '编辑':
-              updateDict({ dictId: this.editId, ...this.dialog.params }).then(
-                (res) => {
-                  if (res.data.code === 0) {
-                    this.$message.success('编辑成功')
-                    this.dialog.show = false
-                    this.getList()
-                  }
-                }
-              )
-              break
-
-            default:
-              break
+    deleteRole(row) {
+      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteSchemeAlarmEvent([row.id]).then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.params.pageNum = 1
+            this.getList()
           }
-        }
+        })
       })
     }
   }

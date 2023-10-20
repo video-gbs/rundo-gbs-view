@@ -67,10 +67,10 @@
                   placeholder="请选择"
                 >
                   <el-option
-                    v-for="obj in optionsList"
-                    :key="obj.value"
-                    :label="obj.label"
-                    :value="obj.value"
+                    v-for="obj in allIncident"
+                    :key="obj.id"
+                    :label="obj.eventName"
+                    :value="obj.id"
                   />
                 </el-select>
               </el-form-item>
@@ -150,7 +150,7 @@
                 :show-overflow-tooltip="true"
               />
               <el-table-column
-                prop="areaNames"
+                prop="deviceName"
                 label="设备名称"
                 :show-overflow-tooltip="true"
               />
@@ -158,27 +158,27 @@
               <el-table-column prop="alarmLevel" label="告警级别" width="120">
                 <template slot-scope="scope">
                   <span
-                    v-if="scope.row.alarmLevel === 1"
-                    style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+                    v-if="scope.row.alarmLevel === '1'"
+                    class="font-span1"
+                    style="margin-left: 10px"
                   >
                     <span class="yuan yuan1"></span>轻微</span
                   >
                   <span
-                    v-else-if="scope.row.alarmLevel === 2"
-                    style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+                    v-else-if="scope.row.alarmLevel === '2'"
+                    class="font-span2"
+                    style="margin-left: 10px"
                   >
                     <span class="yuan yuan2"></span>中等</span
                   >
                   <span
-                    v-else-if="scope.row.alarmLevel === 3"
-                    style="margin-left: 10px; color: rgba(53, 144, 0, 1)"
+                    v-else-if="scope.row.alarmLevel === '3'"
+                    class="font-span3"
+                    style="margin-left: 10px"
                   >
                     <span class="yuan yuan3"></span>严重</span
                   >
-                  <span
-                    v-else
-                    style="margin-left: 10px; color: rgba(177, 177, 177, 1)"
-                  >
+                  <span v-else style="margin-left: 10px" class="font-span4">
                     <span class="yuan yuan4"></span>非常严重</span
                   >
                 </template>
@@ -191,7 +191,7 @@
               />
 
               <el-table-column
-                prop="alarmTime"
+                prop="alarmStartTime"
                 label="告警时间"
                 width="140"
                 :show-overflow-tooltip="true"
@@ -209,12 +209,17 @@
                   <el-button
                     type="text"
                     @click="playAlarm(scope.row)"
-                    v-if="scope.row.signState === 1"
+                    v-if="scope.row.videoState === 3"
                     >播放
                   </el-button>
 
                   <!-- @click="register(scope.row)" -->
-                  <el-button type="text" v-else>重新录制 </el-button>
+                  <el-button
+                    type="text"
+                    v-else-if="scope.row.videoState === -1"
+                    @click="playAlarm(scope.row)"
+                    >重新录制
+                  </el-button>
                   <el-button
                     type="text"
                     @click="downAlarm(scope.row, scope.$index)"
@@ -253,7 +258,8 @@
 import {
   getAlarmVideoAreaList,
   getAlarmMsg,
-  deleteAlarmEvent
+  deleteNorthAlarmEvent,
+  getAlarmEventLists
 } from '@/api/method/alarm'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import pagination from '@/components/Pagination/index.vue'
@@ -279,24 +285,24 @@ export default {
         pageSize: 10,
         total: 0
       },
-      optionsList: [
-        {
-          label: '轻微',
-          value: 1
-        },
-        {
-          label: '中等',
-          value: 2
-        },
-        {
-          label: '严重',
-          value: 3
-        },
-        {
-          label: '非常严重',
-          value: 4
-        }
-      ],
+      // optionsList: [
+      //   {
+      //     label: '轻微',
+      //     value: 1
+      //   },
+      //   {
+      //     label: '中等',
+      //     value: 2
+      //   },
+      //   {
+      //     label: '严重',
+      //     value: 3
+      //   },
+      //   {
+      //     label: '非常严重',
+      //     value: 4
+      //   }
+      // ],
       lineTitle: {
         title: '移动位置',
         notShowSmallTitle: false
@@ -324,14 +330,17 @@ export default {
       deviceTypesOptionsList: [],
       checked: false,
       dialogTableData: [],
-      tableData: [{}],
+      tableData: [],
       areaNames: 'resourceName',
       idList: [],
       dialogResourceValue: '',
       resId: '',
       resArray: [],
       filterText: '',
-      detailsId: []
+      detailsId: [],
+      playVideoVisible: false,
+      videoUrl: '',
+      allIncident:[]
     }
   },
   watch: {
@@ -344,6 +353,8 @@ export default {
   },
   mounted() {
     this.initTree()
+    this.initAlarmEventLists()
+    this.initList()
   },
   methods: {
     async initTree() {
@@ -358,20 +369,31 @@ export default {
           console.log(error)
         })
     },
+    async initAlarmEventLists() {
+      await getAlarmEventLists()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.allIncident = res.data.data
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
     async initList(id) {
       const startTime = this.searchParams.time ? this.searchParams.time[0] : ''
       const endTime = this.searchParams.time ? this.searchParams.time[1] : ''
       await getAlarmMsg({
         num: this.params.pageSize,
         page: this.params.pageNum,
-        videoAreaId: id,
+        channelId: id,
         eventCode: this.searchParams.eventCode,
         startTime,
         endTime
       })
         .then((res) => {
           if (res.data.code === 0) {
-            this.tableData = res.data.data.records
+            this.tableData = res.data.data.list
             this.params.total = res.data.data.total
             this.params.pages = res.data.data.pages
             this.params.current = res.data.data.current
@@ -437,8 +459,8 @@ export default {
         }
       } else {
         if (!data.childList) {
-          this.resId = data.id
-          this.initList(data.id)
+          this.resId = data.areaPid
+          this.initList(data.areaPid)
         }
       }
     },
@@ -503,6 +525,7 @@ export default {
       }
     },
     downAlarm(row, index) {
+      console.log(row, index)
       const newList = JSON.parse(JSON.stringify(this.tableData))
       Object.assign(newList[index], { isDownLoad: true })
       this.tableData = newList
@@ -537,7 +560,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteAlarmEvent([row.id]).then((res) => {
+        deleteNorthAlarmEvent([row.id]).then((res) => {
           if (res.data.code === 0) {
             this.$message({
               type: 'success',
@@ -569,7 +592,7 @@ export default {
         this.$refs.alarmTable.selection.map((item) => {
           roleIds.push(item.id)
         })
-        deleteAlarmEvent(roleIds).then((res) => {
+        deleteNorthAlarmEvent(roleIds).then((res) => {
           if (res.data.code === 0) {
             this.$message({
               type: 'success',
@@ -582,13 +605,17 @@ export default {
       })
     },
     alarmVideoStateFormatter(row) {
-      switch (+row.videoState) {
+      switch (row.videoState) {
+        case -1:
+          return '异常'
         case 0:
-          return '等待中'
+          return '初始化'
         case 1:
-          return '录制中'
+          return '等待中'
         case 2:
-          return '已就绪'
+          return '生成中'
+        case 3:
+          return '生成成功'
         default:
           return '异常'
       }
@@ -866,17 +893,29 @@ export default {
     height: 6px;
     border-radius: 50%;
   }
+  .font-span1 {
+    color: #0092e0;
+  }
   .yuan1 {
     background: #0092e0;
     margin-right: 12px;
+  }
+  .font-span2 {
+    color: #1fad8c;
   }
   .yuan2 {
     background: #1fad8c;
     margin-right: 12px;
   }
+  .font-span3 {
+    color: #cd9500;
+  }
   .yuan3 {
     background: #cd9500;
     margin-right: 12px;
+  }
+  .font-span4 {
+    color: #b30000;
   }
   .yuan4 {
     background: #b30000;
@@ -930,5 +969,22 @@ export default {
 
 .alarmHandling_container {
   width: 100%;
+}
+::v-deep .nowPlayVideo {
+  .el-dialog__title {
+    font-size: 16px;
+    font-weight: bolder;
+  }
+}
+::v-deep .nowPlayVideo {
+  .el-dialog__header {
+    padding: 16px 24px;
+  }
+}
+::v-deep .nowPlayVideo {
+  .el-dialog__body {
+    padding: 24px 24px 22px;
+    /*border: #e4e7ed solid 1px;*/
+  }
 }
 </style>
