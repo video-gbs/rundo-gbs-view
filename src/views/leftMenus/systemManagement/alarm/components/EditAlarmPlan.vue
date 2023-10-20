@@ -1,10 +1,10 @@
 <template>
-  <div class="addAlarmPlan-content" v-if="isShow">
+  <div class="addAlarmPlan-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
           class="back-title"
-          >新建预案</span
+          >编辑预案</span
         >
       </div>
     </div>
@@ -62,10 +62,11 @@
 </template>
 
 <script>
-import { addSchemeAlarmEvent } from '@/api/method/alarm'
+import { editSchemeAlarmEvent } from '@/api/method/alarm'
 import Step1 from './Step1.vue'
 import Step2 from './Step2.vue'
 import Step3 from './Step3.vue'
+import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { Step1, Step2, Step3 },
@@ -166,8 +167,12 @@ export default {
       }
     }
   },
+  props: ['editAlarmId'],
+  created() {},
   mounted() {
     // this.getAllGatewayLists()
+
+    this.dialogParams.params.schemeName = Local.get('detailsData').schemeName
   },
   methods: {
     async getAllGatewayLists() {
@@ -196,7 +201,6 @@ export default {
     },
     saveAll(val) {
       this.$refs['alarmAccountForm'].validate((valid) => {
-        console.log('valid', valid)
         if (valid) {
           this.step1DataId = val
           if (this.active++ > 2) this.active = 0
@@ -212,7 +216,8 @@ export default {
       this.lastClickAll()
     },
     async lastClickAll() {
-      await addSchemeAlarmEvent({
+      await editSchemeAlarmEvent({
+        id: Local.get('editAlarmId') || this.$props.editAlarmId,
         schemeName: this.dialogParams.params.schemeName,
         templateId: this.step1DataId,
         channelIds: this.step2Data,
@@ -225,7 +230,7 @@ export default {
       })
     },
     goback() {
-      this.$emit('changeIsShow', false)
+      this.$emit('changeEditIsShow', false)
     }
   }
 }

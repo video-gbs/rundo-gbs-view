@@ -195,7 +195,6 @@ import {
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import pagination from '@/components/Pagination/index.vue'
 import LineFont from '@/components/LineFont'
-import { getEncoderById } from '@/api/method/encoder'
 
 import { getGroupDictLists } from '@/api/method/dictionary'
 import { Local } from '@/utils/storage'
@@ -295,6 +294,25 @@ export default {
             this.params.pages = res.data.data.pages
             this.params.current = res.data.data.current
             this.tableLoading = false
+
+            this.tableData.map((item) => {
+              console.log('item',item,Local.get('detailsData'))
+              if (Local.get('detailsData')) {
+                Local.get('detailsData').channelIdList.map((item1) => {
+                  if (Number(item1) === item.channelId) {
+                    console.log('item1',item1)
+                    this.$refs.timeTemTable2.toggleRowSelection(item)
+                    this.$forceUpdate()
+                  }
+                })
+              }
+              this.allList.forEach((item2) => {
+                if (item.channelId === item2) {
+                  this.selectedObj[item2] = item
+                }
+              })
+            })
+            this.handleRowSelection(this.tableData)
           } else {
             this.tableLoading = false
           }
@@ -312,18 +330,18 @@ export default {
       // 全选取消，删除当前页所有数据
       if (selection.length === 0) {
         this.tableData.forEach((item) => {
-          delete this.selectedObj[item.id]
+          delete this.selectedObj[item.channelId]
         })
         this.tableData.forEach((item) => {
           // console.log('~~~~~~~~~~~~~~', item)
           this.allList = this.allList.filter((item1) => {
-            return item1 !== item.id
+            return item1 !== item.channelId
           })
         })
       }
       // 勾选数据 添加
       selection.forEach((item) => {
-        this.selectedObj[item.id] = item
+        this.selectedObj[item.channelId] = item
       })
       // 获取所有分页勾选的数据
       this.selectedData = []
@@ -333,20 +351,20 @@ export default {
     },
     handleSelect(selection, row) {
       // 取消单个勾选时，删除对应属性
-      if (!selection.some((item) => item.id === row.id)) {
-        delete this.selectedObj[row.id]
+      if (!selection.some((item) => item.channelId === row.channelId)) {
+        delete this.selectedObj[row.channelId]
         this.allList = this.allList.filter((item1) => {
-          return item1 !== row.id
+          return item1 !== row.channelId
         })
       } else {
-        this.allList.push(row.id)
+        this.allList.push(row.channelId)
       }
     },
     // 处理当前列表选中状态
     handleRowSelection(data) {
       console.log('处理当前列表选中状态', data, this.selectedObj)
       data.forEach((item) => {
-        if (this.selectedObj[item.id]) {
+        if (this.selectedObj[item.channelId]) {
           this.$nextTick(() => {
             this.$refs.timeTemTable2.toggleRowSelection(item)
             this.$forceUpdate()
@@ -373,11 +391,11 @@ export default {
     },
     clickNext() {
       this.resIds2 = []
-      console.log('this.selectedData',this.selectedData)
+      console.log('this.selectedData', this.selectedData)
       this.selectedData.map((item) => {
-        this.resIds2.push(item.id)
+        this.resIds2.push(item.channelId)
       })
-      this.$emit('stepParams2', [177])
+      this.$emit('stepParams2', this.resIds2)
       this.$emit('next')
     },
     goback() {
@@ -429,7 +447,7 @@ export default {
       }
       target.blur()
       this.params.pageNum = 1
-      this.initList(this.$props.detailsId)
+      this.initList(this.resId)
     },
     cxData() {
       this.initList(this.resId)

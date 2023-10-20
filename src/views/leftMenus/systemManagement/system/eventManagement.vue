@@ -364,7 +364,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteAlarmEvent(row.id).then((res) => {
+        deleteAlarmEvent([row.id]).then((res) => {
           if (res.data.code === 0) {
             this.$message({
               type: 'success',

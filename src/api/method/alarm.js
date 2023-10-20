@@ -21,8 +21,8 @@ export function editAlarmEvent(params) {
 }
 
 // 删除
-export function deleteAlarmEvent(id) {
-  return request.delete3(`${alarm}/event/delete?`)
+export function deleteAlarmEvent(data) {
+  return request.delete3(`${alarm}/event/delete?`,data)
 }
 
 // 获取事件名称
@@ -37,7 +37,7 @@ export function getNorthAlarmEventLists(params) {
 }
 // 删除告警信息
 export function deleteNorthAlarmEvent(params) {
-  return request.delete(`${alarm}/msg/north/delete`, params)
+  return request.delete5(`${alarm}/msg/north/delete?`, params)
 }
 
 // 告警预案接口
@@ -46,8 +46,8 @@ export function getSchemeAlarmEventLists(params) {
   return request.get(`${alarm}/scheme/page`, params)
 }
 // 获取告警预案详情
-export function getSchemeAlarmEventDetails(params) {
-  return request.get(`${alarm}/scheme/data`, params)
+export function getSchemeAlarmEventDetails(id) {
+  return request.get(`${alarm}/scheme/data?id=${id}`)
 }
 // 获取通道绑定的告警预案
 export function getSchemeAlarmEventChannel(params) {
@@ -67,7 +67,7 @@ export function editSchemeAlarmEvent(params) {
 }
 // 删除告警预案
 export function deleteSchemeAlarmEvent(params) {
-  return request.delete(`${alarm}/scheme/delete`, params)
+  return request.delete4(`${alarm}/scheme/delete?`, params)
 }
 // 获取预案下的设备布撤防状态
 export function getSchemeAlarmEventDeploy(params) {
@@ -124,4 +124,9 @@ export function getAlarmDeploy(params) {
 //获取告警信息
 export function getAlarmMsg(params) {
   return request.get(`${expansion}/alarm/msg/channel`, params)
+}
+
+//获取预案下布防的通道
+export function getAlarmDeployChannel(params) {
+  return request.get(`${expansion}/alarm/deploy/channel`, params)
 }

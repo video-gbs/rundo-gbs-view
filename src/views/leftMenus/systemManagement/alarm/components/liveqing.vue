@@ -17,13 +17,13 @@ export default {
   mounted() {
     let paramUrl = decodeURIComponent(this.$route.params.url)
     this.$nextTick(() => {
-      let dom = document.getElementById('webRtcPlayerBox')
-      dom.style.height = (9 / 16) * dom.clientWidth + 'px'
+      // let dom = document.getElementById('webRtcPlayerBox')
+      // dom.style.height = (9 / 16) * dom.clientWidth + 'px'
       if (typeof this.videoUrl == 'undefined') {
         this.videoUrl = paramUrl
       }
       console.log('q初始化时的地址为: ' + this.videoUrl)
-      this.play(this.videoUrl)
+      // this.play(this.videoUrl)
     })
   },
   watch: {},

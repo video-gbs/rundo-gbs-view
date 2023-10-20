@@ -1,6 +1,6 @@
 <template>
   <div class="step3-content">
-    <div class="init-img-div" v-show="isShowImg">
+    <div class="init-img-div" v-if="checkeLists.length === 0">
       <img
         class="init-img"
         src="../../../../../assets/imgs/addgjsj.png"
@@ -9,7 +9,7 @@
       />
     </div>
 
-    <div class="init-main" v-show="!isShowImg">
+    <div class="init-main" v-else>
       <div class="tag-group">
         <span class="tag-group__title">选择事件</span>
         <el-tag
@@ -124,17 +124,6 @@
         </el-card>
       </div>
     </div>
-    <div class="btn-lists">
-      <el-button @click="goback"
-        ><svg-icon class="svg-btn" icon-class="back-svg" />返回</el-button
-      >
-      <el-button type="primary" @click="clickLast" class="step-btn"
-        >上一步</el-button
-      >
-      <el-button type="primary" @click="submitStep3" class="step-btn"
-        >提交</el-button
-      >
-    </div>
 
     <el-dialog
       v-if="dialog.show"
@@ -170,12 +159,25 @@
         <el-button type="primary" @click="dialog.show = false">确 定</el-button>
       </span>
     </el-dialog>
+
+    <div class="btn-lists">
+      <el-button @click="goback"
+        ><svg-icon class="svg-btn" icon-class="back-svg" />返回</el-button
+      >
+      <el-button type="primary" @click="clickLast" class="step-btn"
+        >上一步</el-button
+      >
+      <el-button type="primary" @click="submitStep3" class="step-btn"
+        >提交</el-button
+      >
+    </div>
   </div>
 </template>
 
 <script>
 import { getAlarmEventLists } from '@/api/method/alarm'
 import LineFont from '@/components/LineFont'
+import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { LineFont },
@@ -264,6 +266,29 @@ export default {
       }
     },
     deep: true
+  },
+  created() {
+    let params = {}
+    Local.get('detailsData').alarmSchemeEventRelList.map((item) => {
+      this.checkeLists.push(item.eventName)
+      params = {
+        eventCode: item.eventName,
+        eventLevel: item.eventLevel,
+
+        eventInterval: item.eventInterval,
+
+        videoLength: item.videoLength,
+
+        videoHasAudio: item.videoHasAudio === 1 ? true : false,
+        enablePhoto: item.enablePhoto === 1 ? true : false,
+
+        enableVideo: item.enableVideo === 1 ? true : false
+      }
+      this.stepform3.push({ isactive: item.eventLevel, ...params })
+      this.intrusionLevel.push(['轻微', '中等', '严重', '非常严重'])
+      this.$forceUpdate()
+    })
+    console.log('this.checkeLists', this.checkeLists, this.stepform3)
   },
   mounted() {
     this.initAlarmEventLists()
@@ -363,7 +388,7 @@ export default {
 }
 .step3-content {
   position: relative;
-  height: 100%;
+  min-height: 100%;
   .init-img-div {
     height: 100%;
     .init-img {
@@ -431,6 +456,29 @@ export default {
       }
     }
   }
+
+  .btn-lists {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: right;
+    padding-right: 24px;
+    height: 64px;
+    line-height: 64px;
+    background: #ffffff;
+    box-shadow: 0px -2px 4px 1px rgba(0, 0, 0, 0.1);
+    border-radius: 0px 0px 0px 0px;
+    .svg-btn {
+      position: relative;
+      top: 1px;
+      left: -4px;
+    }
+    .step-btn {
+      height: 36px;
+      position: relative;
+      top: -1px;
+    }
+  }
 }
 .el-tag + .el-tag {
   margin-left: 10px;
@@ -446,28 +494,6 @@ export default {
   width: 90px;
   margin-left: 10px;
   vertical-align: bottom;
-}
-.btn-lists {
-  position: relative;
-  bottom: 0;
-  width: 100%;
-  text-align: right;
-  padding-right: 24px;
-  height: 64px;
-  line-height: 64px;
-  background: #ffffff;
-  box-shadow: 0px -2px 4px 1px rgba(0, 0, 0, 0.1);
-  border-radius: 0px 0px 0px 0px;
-  .svg-btn {
-    position: relative;
-    top: 1px;
-    left: -4px;
-  }
-  .step-btn {
-    height: 36px;
-    position: relative;
-    top: -1px;
-  }
 }
 .intrusionLevel-span {
   position: relative;

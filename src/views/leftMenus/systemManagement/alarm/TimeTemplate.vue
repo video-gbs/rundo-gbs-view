@@ -342,7 +342,7 @@ export default {
       this.dialog.show = !this.dialog.show
       this.$nextTick(() => {
         this.initTimeSlider()
-        if (data.timePeriodDtoList) {
+        if (data && data.timePeriodDtoList) {
           this.planTimeListToTimeSlider(data.timePeriodDtoList)
         }
       })
