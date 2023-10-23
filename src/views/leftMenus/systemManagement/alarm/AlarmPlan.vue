@@ -701,7 +701,7 @@ export default {
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
     .dataDictionary-table {
-      max-height: calc(100% - 100px);
+      height: calc(100% - 100px);
       overflow-y: auto;
     }
     .securityArea_container {

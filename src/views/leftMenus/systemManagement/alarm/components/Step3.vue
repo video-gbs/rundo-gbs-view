@@ -268,27 +268,29 @@ export default {
     deep: true
   },
   created() {
-    let params = {}
-    Local.get('detailsData').alarmSchemeEventRelList.map((item) => {
-      this.checkeLists.push(item.eventName)
-      params = {
-        eventCode: item.eventName,
-        eventLevel: item.eventLevel,
+    if (Object.keys(Local.get('detailsData')).length > 0) {
+      let params = {}
+      Local.get('detailsData').alarmSchemeEventRelList.map((item) => {
+        this.checkeLists.push(item.eventName)
+        params = {
+          eventCode: item.eventName,
+          eventLevel: item.eventLevel,
 
-        eventInterval: item.eventInterval,
+          eventInterval: item.eventInterval,
 
-        videoLength: item.videoLength,
+          videoLength: item.videoLength,
 
-        videoHasAudio: item.videoHasAudio === 1 ? true : false,
-        enablePhoto: item.enablePhoto === 1 ? true : false,
+          videoHasAudio: item.videoHasAudio === 1 ? true : false,
+          enablePhoto: item.enablePhoto === 1 ? true : false,
 
-        enableVideo: item.enableVideo === 1 ? true : false
-      }
-      this.stepform3.push({ isactive: item.eventLevel, ...params })
-      this.intrusionLevel.push(['轻微', '中等', '严重', '非常严重'])
-      this.$forceUpdate()
-    })
-    console.log('this.checkeLists', this.checkeLists, this.stepform3)
+          enableVideo: item.enableVideo === 1 ? true : false
+        }
+        this.stepform3.push({ isactive: item.eventLevel, ...params })
+        this.intrusionLevel.push(['轻微', '中等', '严重', '非常严重'])
+        this.$forceUpdate()
+      })
+      console.log('this.checkeLists', this.checkeLists, this.stepform3)
+    }
   },
   mounted() {
     this.initAlarmEventLists()

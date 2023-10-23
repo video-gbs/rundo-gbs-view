@@ -881,7 +881,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep .table-content-bottom::before {
+::v-deep .el-table::before {
   height: 1px !important;
 }
 ::v-deep .table-content-bottom {

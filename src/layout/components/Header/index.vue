@@ -154,7 +154,6 @@ export default {
           store.dispatch('user/changeActiveIndex', item.path)
           getHomeFunc({ menuId: item.children[0].id }).then((res) => {
             if (res.data.code === 0) {
-              console.log('data~~~~~~', data, resArray)
               Session.set('permissionData', [])
               Session.set('permissionMenuId', '')
               Session.set('permissionData', res.data.data)

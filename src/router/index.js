@@ -293,7 +293,7 @@ Router.prototype.push = function push(location) {
 }
 
 const router = new Router({
-  mode: 'hash',
+  mode: '',
   scrollBehavior: () => ({ y: 0 }),
   routes: staticRouters
 })
@@ -305,7 +305,7 @@ router.afterEach((to, from) => {
 // const getLastUrl = (str, yourStr) => str.slice(str.lastIndexOf(yourStr))
 
 router.beforeEach(async (to, from, next) => {
-  // console.log('进入路由守卫', to)
+  // console.log('进入路由守卫', to,from)
   const hasToken = Local.get('access_token')
   if (hasToken) {
     const init = store.state.user.init
