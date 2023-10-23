@@ -1,5 +1,5 @@
 'use strict'
-const Run3DSource = 'node_modules/@rjgf/run3d-engine/Source'
+const Run3DSource = './node_modules/@rjgf/run3d-engine/Source'
 const Run3DWorkers = '../Build/Cesium/Workers'
 const path = require('path')
 const webpack = require('webpack')
@@ -53,15 +53,15 @@ const urls = [
   //   proxy: '/api/expansion'
   // },
   // uat 测试
-  // {
-  //   target: 'http://xard-gbs-uat.runjian.com:8080',
-  //   proxy: '/api'
-
-  // },
   {
-    target: 'https://xard-gbs-test.runjian.com:8080',
+    target: 'http://xard-gbs-uat.runjian.com:8080',
     proxy: '/api'
+
   },
+  // {
+  //   target: 'https://xard-gbs-test.runjian.com:8080',
+  //   proxy: '/api'
+  // },
   // dev  本地
   // {
   //   target: 'http://116.205.143.13/tiles/gdhpjd',

@@ -131,7 +131,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.init()
-      const dom =Array.from(document.getElementsByClassName('player-box')) 
+      const dom = Array.from(document.getElementsByClassName('player-box'))
       if (dom.length > 1) {
         dom?.forEach((item, index) => {
           // if (index === this.$props.playerIdx) {
@@ -181,11 +181,13 @@ export default {
       //设置变速
       if (this.playbackRate) {
         setTimeout(() => {
-          const dom = this.$refs.videoPlayer.$el.querySelector('video')
-          dom.playbackRate = this.playbackRate
-          dom.defaultPlaybackRate = this.playbackRate
-          dom.style = this.videoStyle
-          dom.style['object-fit'] = this.stretch ? 'fill' : ''
+          if (this.$refs.videoPlayer) {
+            const dom = this.$refs.videoPlayer.$el.querySelector('video')
+            dom.playbackRate = this.playbackRate
+            dom.defaultPlaybackRate = this.playbackRate
+            dom.style = this.videoStyle
+            dom.style['object-fit'] = this.stretch ? 'fill' : ''
+          }
         }, 100)
       }
 

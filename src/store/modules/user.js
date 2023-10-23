@@ -107,11 +107,9 @@ const mutations = {
     })
     state.typeRouter = homeRouters.concat(restypeRouter)
     if (Session.get('isShowSideRouter') === 0) {
-      console.log('isShowSideRouter111')
       state.rightWidth = true
       state.showSidebar = true
     } else {
-      console.log('isShowSideRouter222')
       state.rightWidth = false
       state.showSidebar = false
     }

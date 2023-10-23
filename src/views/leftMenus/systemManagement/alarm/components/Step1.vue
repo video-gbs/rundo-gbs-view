@@ -281,7 +281,6 @@ export default {
     },
     // 处理当前列表选中状态
     handleRowSelection(data) {
-      console.log('处理当前列表选中状态', data, this.selectedObj)
       data.forEach((item) => {
         if (this.selectedObj[item.id]) {
           this.$nextTick(() => {
@@ -569,7 +568,7 @@ export default {
 // margin: 20px;
 // background: #ffffff;
 .dataDictionary-table {
-  max-height: calc(100% - 100px);
+  height: calc(100% - 100px);
   width: calc(100% - 40px) !important;
   margin: 20px;
   overflow-y: auto;

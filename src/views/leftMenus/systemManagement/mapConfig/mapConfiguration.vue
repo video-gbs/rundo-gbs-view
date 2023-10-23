@@ -426,7 +426,15 @@ export default {
     this.getManufacturerDictionaryList()
   },
   computed: {},
-  watch: {},
+  watch: {
+        $route: {
+      handler: function (newVal, oldVal) {
+        console.log('routerouterouterouteroute', newVal, oldVal)
+        // this.redirect = route.query && route.query.redirect
+      },
+      immediate: true
+    }
+  },
   methods: {
     async init() {
       await configGisList().then((res) => {

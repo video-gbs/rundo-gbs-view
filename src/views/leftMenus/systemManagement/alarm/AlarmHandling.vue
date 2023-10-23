@@ -880,7 +880,7 @@ export default {
       }
     }
     .encoder-table {
-      max-height: calc(100% - 145px);
+      height: calc(100% - 145px);
       overflow-y: auto;
     }
   }

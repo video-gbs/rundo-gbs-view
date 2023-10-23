@@ -203,6 +203,7 @@ export default {
   components: { pagination, leftTree, LineFont },
   data() {
     return {
+      // isShowStep2:false,
       templateName: '',
       areaNames: 'resourceName',
       treeList: [],
@@ -261,6 +262,7 @@ export default {
       resId: ''
     }
   },
+  created() {},
   mounted() {
     this.initTree()
   },
@@ -296,22 +298,17 @@ export default {
             this.tableLoading = false
 
             this.tableData.map((item) => {
-              console.log('item',item,Local.get('detailsData'))
-              if (Local.get('detailsData')) {
-                Local.get('detailsData').channelIdList.map((item1) => {
+              if (Object.keys(Local.get('detailsData')).length > 0) {
+                this.allList = Local.get('detailsData').channelIdList
+
+                this.allList.map((item1) => {
                   if (Number(item1) === item.channelId) {
-                    console.log('item1',item1)
-                    this.$refs.timeTemTable2.toggleRowSelection(item)
-                    this.$forceUpdate()
+                    this.selectedObj[item1] = item
                   }
                 })
               }
-              this.allList.forEach((item2) => {
-                if (item.channelId === item2) {
-                  this.selectedObj[item2] = item
-                }
-              })
             })
+
             this.handleRowSelection(this.tableData)
           } else {
             this.tableLoading = false
@@ -660,7 +657,7 @@ export default {
       }
     }
     .encoder-table {
-      max-height: calc(100% - 145px);
+      height: calc(100% - 145px);
       overflow-y: auto;
     }
   }

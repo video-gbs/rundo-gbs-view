@@ -41,10 +41,7 @@
 import leftTree from '@/views/leftMenus/systemManagement/components/leftTree'
 import LineFont from '@/components/LineFont'
 import MapTest from './mapTest'
-import { channelVideoAreaList } from '@/api/method/channel'
 import { playVideoAreaList } from '@/api/method/live'
-import { Local } from '@/utils/storage'
-import { mapGetters } from 'vuex'
 import * as Run3D from '@rjgf/run3d'
 import {
   findOneStatusOnGis,
@@ -107,7 +104,15 @@ export default {
 
   computed: {},
 
-  watch: {},
+  watch: {
+    $route: {
+      handler: function (newVal, oldVal) {
+        console.log('routerouterouterouteroute', newVal, oldVal)
+        // this.redirect = route.query && route.query.redirect
+      },
+      immediate: true
+    }
+  },
   methods: {
     async init() {
       // this.treeList = this.resTree1.data.data ? [this.resTree1.data.data] : []
@@ -185,7 +190,6 @@ export default {
 
     //保存节点与配置的信息
     async gisVideoAreaSaveGis(res) {
-      console.log('~~~~~~~~~~~~', res)
       const params = {}
       params.latitude = res.latitude
       params.longitude = res.longitude
@@ -254,10 +258,10 @@ export default {
           //   Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
           // )
           //返回WGS84坐标
-          console.log(
-            '返回WGS84坐标',
-            Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
-          )
+          // console.log(
+          //   '返回WGS84坐标',
+          //   Run3D.Calculate.getWGS84FromCartesian3(result.coordinates)
+          // )
         })
       })
       // //创建图层并加入到地图中
@@ -274,12 +278,6 @@ export default {
       // })
 
       // graphicsLayer.add(graphic)
-      console.log('this.longitude', this.longitude)
-      console.log('this.latitude', this.latitude)
-      console.log('this.heading', this.heading)
-      console.log('this.roll', this.roll)
-      console.log('this.pitch', this.pitch)
-      console.log('this.height', this.height)
       this.mapDom.initView({
         longitude: this.longitude,
         latitude: this.latitude,
@@ -294,7 +292,6 @@ export default {
     },
 
     save() {
-      console.log('save', this.mapDom.getCameraInfo())
       this.gisVideoAreaSaveGis(this.mapDom.getCameraInfo())
     }
   },
