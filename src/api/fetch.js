@@ -1,7 +1,11 @@
 import request from '@/utils/request'
 import NProgress from 'nprogress'
-import { Message } from 'element-ui'
-import { authorizationValue } from '@/settings'
+import {
+  Message
+} from 'element-ui'
+import {
+  authorizationValue
+} from '@/settings'
 
 const methods = {
   login(url, params) {
@@ -74,6 +78,38 @@ const methods = {
       headers
     })
   },
+  delete2(url, data, headers) {
+    const resUrl = url + data.map((item) => 'templateIds=' + item).join('&')
+    return request({
+      method: 'DELETE',
+      url: resUrl,
+      headers
+    })
+  },
+  delete3(url, data, headers) {
+    const resUrl = url + data.map((item) => 'id=' + item).join('&')
+    return request({
+      method: 'DELETE',
+      url: resUrl,
+      headers
+    })
+  },
+  delete4(url, data, headers) {
+    const resUrl = url + data.map((item) => 'ids=' + item).join('&')
+    return request({
+      method: 'DELETE',
+      url: resUrl,
+      headers
+    })
+  },
+  delete5(url, data, headers) {
+    const resUrl = url + data.map((item) => 'idList=' + item).join('&')
+    return request({
+      method: 'DELETE',
+      url: resUrl,
+      headers
+    })
+  },
   delete(url, params, headers) {
     let _params
     if (Object.is(params, undefined)) {
@@ -98,13 +134,13 @@ const methods = {
   download(url, params, filename) {
     NProgress.start()
     return request({
-      method: 'POST',
-      url,
-      params,
-      headers: {
-        responseType: 'blob'
-      }
-    })
+        method: 'POST',
+        url,
+        params,
+        headers: {
+          responseType: 'blob'
+        }
+      })
       .then((r) => {
         const content = r.data
         const blob = new Blob([content])

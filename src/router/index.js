@@ -287,10 +287,10 @@ export const staticRouters = [
   // }
 ]
 
-// const originalPush = Router.prototype.push
-// Router.prototype.push = function push(location) {
-//   return originalPush.call(this, location).catch((err) => err)
-// }
+const originalPush = Router.prototype.push
+Router.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch((err) => err)
+}
 
 const router = new Router({
   mode: 'hash',
@@ -305,7 +305,7 @@ router.afterEach((to, from) => {
 // const getLastUrl = (str, yourStr) => str.slice(str.lastIndexOf(yourStr))
 
 router.beforeEach(async (to, from, next) => {
-  // console.log('进入路由守卫', to)
+  // console.log('进入路由守卫', to,from)
   const hasToken = Local.get('access_token')
   if (hasToken) {
     const init = store.state.user.init

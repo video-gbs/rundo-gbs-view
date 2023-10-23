@@ -528,7 +528,7 @@ export default {
   },
   watch: {
     filterText(val) {
-      console.log(111,val)
+      console.log(111, val)
       this.$refs.liveTree.filter(val)
     },
     videoActiveArr(n) {
@@ -1073,10 +1073,10 @@ export default {
                         onlineState: item.onlineState,
                         resourceName: item.channelName,
                         resourceNames: item.channelName,
-                        areaPid: item.id,
+                        areaPid: item.channelId,
                         id: item.id,
-                        ptzType: item.ptzType,
-                        childList: []
+                        ptzType: item.ptzType
+                        // childList: []
                       })
                     })
 
@@ -1092,6 +1092,8 @@ export default {
                         ? this.resArray.concat(data.childList)
                         : this.resArray
 
+                      console.log('arr11111~~~~~~', arr)
+
                       const obj = {}
                       arr = arr.reduce((item, next) => {
                         obj[next.id]
@@ -1100,6 +1102,7 @@ export default {
                         return item
                       }, [])
                     }
+                    console.log('arr~~~~~~', arr, data.id)
                     this.$refs.liveTree.updateKeyChildren(data.id, arr)
                     this.defaultExpandedKeys = [data.id]
                   }

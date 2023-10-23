@@ -310,7 +310,8 @@ export default {
         'changePlayerTimes-----------------',
         val,
         index,
-        this.childTimeSegments
+        this.childTimeSegments,
+        this.$props.timeSegments
       )
       this.$nextTick(() => {
         this.time2[index] = val ? new Date(val[0]).getTime() : 0

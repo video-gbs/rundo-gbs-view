@@ -93,7 +93,7 @@ export default {
       })
     },
     select(index) {
-      if (this.$route.path !== index) this.$router.replace(index)
+      if (this.$route.path !== index) this.$router.push(index)
       if (
         this.$store.state.tabs.tabList.every(
           (item) => item.path !== this.$route.path

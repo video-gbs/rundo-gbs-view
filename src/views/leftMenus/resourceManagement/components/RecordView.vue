@@ -139,7 +139,7 @@
                     <cloud-player
                       :ref="'cloudPlayer' + [i - 1]"
                       :stretch="isFill"
-                      :tracks="tracks[i-1]"
+                      :tracks="tracks[i - 1]"
                       :isShowStream="isShowStream[i - 1]"
                       :onChangePlayTime="handleChangeCurrentTime"
                       :onPlayEnded="handleDevicesPlayEnded"
@@ -457,6 +457,7 @@ export default {
   data() {
     return {
       // isChildChange:false,
+      stopWatching: true,
       isClickCx: true,
       spilt: 1, //分屏
       recordLeftTopName: [],
@@ -850,10 +851,11 @@ export default {
               this.resTimeLists[this.playerIdx] =
                 this.mergeDatetimeRanges(listData)
 
-              // console.log(
-              //   'this.resTimeListsthis.resTimeLists',
-              //   this.resTimeLists
-              // )
+              console.log(
+                'this.resTimeListsthis.resTimeLists',
+                this.resTimeLists,
+                this.timeSegments
+              )
               // 查询初始化时间
               Local.set(
                 `showTime${this.playerIdx}`,
@@ -872,7 +874,8 @@ export default {
 
               let params = {}
 
-              this.resTimeLists[this.playerIdx].forEach((item, index) => {
+              this.resTimeLists[this.playerIdx].forEach((item) => {
+                console.log(1111111111111, item)
                 params = {
                   name: '',
                   beginTime: new Date(item.startTime).getTime(),
@@ -883,14 +886,22 @@ export default {
                 }
                 array1.push(params)
               })
+              this.$nextTick(() => {
+                setTimeout(() => {
+                  this.timeSegments[this.playerIdx] = array1
+                }, 500)
+              })
 
-              this.timeSegments[this.playerIdx] = array1
-
-              // console.log(
-              //   ' this.timeSegments~~~~~~~~~~~~~~~~~~~',
-              //   this.timeSegments
-              // )
+              console.log(
+                ' this.timeSegments~~~~~~~~~~~~~~~~~~~',
+                this.timeSegments
+              )
               this.hasStreamId[this.playerIdx] = true
+
+              console.log(
+                'this.resTimeLists~~~~~~~~~~~~~~~~~~~',
+                this.resTimeLists
+              )
 
               this.playRecord(1, date, [
                 this.resTimeLists[this.playerIdx][0].startTime,
@@ -1008,7 +1019,7 @@ export default {
                         onlineState: item.onlineState,
                         resourceName: item.channelName,
                         resourceNames: item.channelName,
-                        areaPid: item.id,
+                        areaPid: item.channelId,
                         id: item.id,
                         ptzType: item.ptzType,
                         childList: []
@@ -1064,8 +1075,6 @@ export default {
       }
     },
     handleChangeTimePicker(val) {
-      // console.log('handleChangeTimePicker', val, this.formData.date)
-
       if (
         new Date(this.formData.date[0]).getTime() < new Date(val).getTime() &&
         new Date(val).getTime() < new Date(this.formData.date[1]).getTime()
@@ -1185,6 +1194,11 @@ export default {
             type: 'warning'
           })
           return
+        }
+        if (this.videoUrl[this.playerIdx]) {
+          this.stopWatching = false
+          // this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
+          this.closeVideo(this.playerIdx)
         }
         Local.set('playbackRate', 1)
         // this.currentSpeed[this.playerIdx] = [2]
@@ -1343,7 +1357,10 @@ export default {
           } else {
             if (
               curTime >= new Date(range.endTime).getTime() &&
-              curTime <= new Date(this.resTimeLists[this.playerIdx][i + 1]?.startTime).getTime()
+              curTime <=
+                new Date(
+                  this.resTimeLists[this.playerIdx][i + 1]?.startTime
+                ).getTime()
             ) {
               // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
               this.playRecord(
@@ -1641,10 +1658,13 @@ export default {
 
     playRecord: (function () {
       return async function (row, playTime, videoTime) {
+        this.stopWatching = true
         if (this.videoUrl[this.playerIdx]) {
           await playStop({
             streamId: this.channelId
           }).then((res) => {
+            // console.log(2222, row, videoTime)
+            // this.selectTime = row.startTime ? row.startTime : videoTime[0]
             if (res.data.code === 0) {
               getPlayBackUrlLists({
                 channelId: this.channelId,
@@ -1833,60 +1853,58 @@ export default {
           this.resTimeLists[this.playerIdx].length - 1
         ].endTime
       ).getTime()
-
-      if (this.resTimeLists.length > 1) {
-        for (let i = 0; i < this.resTimeLists[this.playerIdx].length; i++) {
-          const range1 = this.resTimeLists[this.playerIdx][i]
-          const start1 = new Date(range1.startTime).getTime() // 转换时间段开始时间
-          const end1 = new Date(range1.endTime).getTime() // 转换时间段结束时间
-          if (selectNowTime > start1 && selectNowTime < end1) {
-          } else {
-            if (selectNowTime === new Date(range1.endTime).getTime()) {
-              // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
-              this.playRecord(
-                {},
-                [
-                  this.resTimeLists[this.playerIdx][i + 1].startTime,
-                  this.resTimeLists[this.playerIdx][
-                    this.resTimeLists[this.playerIdx].length - 1
-                  ].endTime
-                ],
-                [
-                  this.resTimeLists[this.playerIdx][i + 1].startTime,
-                  this.resTimeLists[this.playerIdx][
-                    this.resTimeLists[this.playerIdx].length - 1
-                  ].endTime
-                ]
-              )
-              return
+      if (this.stopWatching) {
+        if (this.resTimeLists.length > 1) {
+          for (let i = 0; i < this.resTimeLists[this.playerIdx].length; i++) {
+            const range1 = this.resTimeLists[this.playerIdx][i]
+            const start1 = new Date(range1.startTime).getTime() // 转换时间段开始时间
+            const end1 = new Date(range1.endTime).getTime() // 转换时间段结束时间
+            if (selectNowTime > start1 && selectNowTime < end1) {
+            } else {
+              if (selectNowTime === new Date(range1.endTime).getTime()) {
+                // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
+                this.playRecord(
+                  {},
+                  [
+                    this.resTimeLists[this.playerIdx][i + 1].startTime,
+                    this.resTimeLists[this.playerIdx][
+                      this.resTimeLists[this.playerIdx].length - 1
+                    ].endTime
+                  ],
+                  [
+                    this.resTimeLists[this.playerIdx][i + 1].startTime,
+                    this.resTimeLists[this.playerIdx][
+                      this.resTimeLists[this.playerIdx].length - 1
+                    ].endTime
+                  ]
+                )
+                return
+              }
             }
           }
-        }
-      } else {
-        if (
-          selectNowTime >= selectStartTime &&
-          selectNowTime <= selectEndTime
-        ) {
         } else {
-          this.$nextTick(() => {
-            // console.log('1111111111', newVal, this.resTimeLists, this.playerIdx)
-            this.$message({
-              message: '该时间段暂无录像',
-              type: 'warning'
-            })
-            this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
-            // this.play[this.playerIdx] = false
-            // this.hasStreamId[this.playerIdx] = false
-            // this.stopPlayRecord()
-            // this.videoUrl = ['']
-            this.closeVideo(this.playerIdx)
-            this.play[this.playerIdx] = false
-            this.hasStreamId[this.playerIdx] = false
-            this.stopPlayRecord()
-            this.videoUrl[this.playerIdx] = ''
-            this.isClickCx = true
+          if (
+            selectNowTime >= selectStartTime &&
+            selectNowTime <= selectEndTime
+          ) {
             return
-          })
+          } else {
+            this.$nextTick(() => {
+              // console.log('1111111111', newVal, this.resTimeLists, this.playerIdx)
+              this.$message({
+                message: '该时间段暂无录像',
+                type: 'warning'
+              })
+              this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+              this.closeVideo(this.playerIdx)
+              this.play[this.playerIdx] = false
+              this.hasStreamId[this.playerIdx] = false
+              this.stopPlayRecord()
+              this.videoUrl[this.playerIdx] = ''
+              this.isClickCx = true
+              return
+            })
+          }
         }
       }
     },

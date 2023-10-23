@@ -377,7 +377,6 @@ export default {
       }
     },
     goContentList: antiShake(function (val, data, child) {
-      console.log('goContentList', val, data, child)
       Session.set('third_party_login', false)
       Session.set('resRouterName', child.name)
       Session.set('isShowSideRouter', val)
@@ -410,7 +409,7 @@ export default {
               'permissionMenuId',
               child.childList[0] ? child.childList[0].id : ''
             )
-            this.$router.replace({ path: child.childList[0].path })
+            this.$router.push({ path: child.childList[0].path })
           }
         })
       } else {

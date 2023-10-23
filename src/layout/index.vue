@@ -100,7 +100,7 @@ export default {
     // }
     resThirdPartyLogin: {
       handler: function (newVal, oldVal) {
-        console.log('newVal, oldVal', newVal, oldVal)
+
         this.resThirdPartyLogin = newVal
 
         this.$forceUpdate()
@@ -117,10 +117,6 @@ export default {
   },
   mounted() {
     // if (Session.get('isLoadingNum') > 1) return
-    console.log(
-      'this.thirdPartyLogin1this.thirdPartyLogin1',
-      Session.get('third_party_login')
-    )
     this.resThirdPartyLogin =
       Session.get('third_party_login') !== null &&
       Session.get('third_party_login')

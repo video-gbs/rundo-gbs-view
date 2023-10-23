@@ -231,9 +231,6 @@
 import pagination from '@/components/Pagination/index.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import {
-  getVideoAraeTree,
-  getAppMenuApiTree,
-  getDepartmentTree,
   roleUpdate,
   roleAdd,
   getRoleMenuList,
@@ -884,7 +881,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep .table-content-bottom::before {
+::v-deep .el-table::before {
   height: 1px !important;
 }
 ::v-deep .table-content-bottom {

@@ -1,7 +1,7 @@
 <template>
-  <div class="dataDictionary_container">
+  <div class="dataDictionary_container" v-if="isShow">
     <div class="panel-header-box">
-      <div class="panel-header-box-border">接口管理</div>
+      <div class="panel-header-box-border">事件管理</div>
     </div>
 
     <div class="search">
@@ -12,17 +12,17 @@
         :model="searchParams"
         label-width="120px"
       >
-        <el-form-item label="字典名称:">
+        <el-form-item label="事件名称:">
           <el-input
-            v-model="searchParams.itemName"
+            v-model="searchParams.eventName"
             placeholder="请输入"
             clearable
             style="width: 240px"
           ></el-input>
         </el-form-item>
-        <el-form-item label="字典值:">
+        <el-form-item label="事件编码:">
           <el-input
-            v-model="searchParams.itemValue"
+            v-model="searchParams.eventCode"
             placeholder="请输入"
             clearable
             style="width: 240px"
@@ -57,7 +57,7 @@
       <el-table
         :data="tableData"
         style="width: 100%"
-        class="api-table"
+        class="dataDictionary-table"
         border
         :header-cell-style="{
           background: 'rgba(0, 75, 173, 0.06)',
@@ -69,11 +69,9 @@
       >
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
-        <el-table-column prop="groupName" label="分组名称" />
-        <el-table-column prop="groupCode" label="分组编码" />
-        <el-table-column prop="itemName" label="字典项名称" />
-        <el-table-column prop="itemValue" label="字典值Value" />
-        <el-table-column prop="itemDesc" label="字典值描述" />
+        <el-table-column prop="eventName" label="事件名称" />
+        <el-table-column prop="eventCode" label="事件编码" />
+        <el-table-column prop="eventSort" label="排序" />
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
             <el-button type="text" @click="dialogShow(0, scope.row)"
@@ -92,6 +90,7 @@
       />
     </div>
     <el-dialog
+      v-if="dialog.show"
       :title="dialog.title"
       :visible.sync="dialog.show"
       width="600px"
@@ -104,44 +103,37 @@
           size="mini"
           :rules="rules"
           label-position="left"
-          label-width="120px"
+          label-width="100px"
           :model="dialog.params"
           @keyup.enter="submit('roleForm')"
         >
-          <el-form-item label="分组名称" prop="groupName">
+          <el-form-item label="事件名称" prop="eventName">
             <el-input
-              v-model="dialog.params.groupName"
+              v-model="dialog.params.eventName"
               clearable
-              :maxlength="15"
+              :maxlength="20"
             />
           </el-form-item>
-          <el-form-item label="分组编码" prop="groupCode">
+          <el-form-item v-if="isEdited" label="事件编码" prop="eventCode">
             <el-input
-              v-model="dialog.params.groupCode"
+              v-model="dialog.params.eventCode"
               clearable
-              :maxlength="15"
+              :maxlength="20"
             />
           </el-form-item>
-          <el-form-item label="字典项名称" prop="itemName">
+          <el-form-item v-else label="事件编码" prop="eventCode">
             <el-input
-              v-model="dialog.params.itemName"
+              v-model="dialog.params.eventCode"
               clearable
-              :maxlength="15"
+              :maxlength="20"
+              :disabled="true"
             />
           </el-form-item>
-          <el-form-item label="字典项Value" prop="itemValue">
+          <el-form-item label="排序" prop="eventSort">
             <el-input
-              v-model="dialog.params.itemValue"
+              v-model="dialog.params.eventSort"
               clearable
-              :maxlength="15"
-            />
-          </el-form-item>
-          <el-form-item label="字典项描述">
-            <el-input
-              v-model="dialog.params.itemDesc"
-              type="textarea"
-              :rows="2"
-              :maxlength="50"
+              :maxlength="20"
             />
           </el-form-item>
         </el-form>
@@ -151,164 +143,69 @@
         <el-button type="primary" @click="submit('roleForm')">确 定</el-button>
       </span>
     </el-dialog>
-
-    <el-dialog
-      :title="permissionDialog.title"
-      :visible.sync="permissionDialog.show"
-      width="1200px"
-      :before-close="permissionHandleClose"
-    >
-      <div class="page-main">
-        <div class="main-operation">
-          <div class="title">
-            <span>功能权限</span>
-          </div>
-          <div style="display: flex">
-            <div class="perms-operation">
-              <el-button
-                type="primary"
-                :loading="buttonLoading"
-                @click="savePermission()"
-                >保存设置</el-button
-              >
-            </div>
-            <el-button
-              class="button-back"
-              @click="permissionDialog.show = false"
-              >返回</el-button
-            >
-          </div>
-        </div>
-        <div class="main-content">
-          <div class="perms-tree">
-            <div class="tree-title">
-              <div class="title">一级功能</div>
-              <div class="title">二级功能</div>
-              <div class="title">操作权限</div>
-            </div>
-            <div v-if="permissionTableData && permissionTableData.length > 0">
-              <div
-                v-for="item in permissionTableData"
-                :key="item.id"
-                class="tree-item item-border"
-              >
-                <div class="item-title">{{ item.title }}</div>
-                <div class="item-children">
-                  <template>
-                    <div
-                      v-for="child in item.childs"
-                      :key="child.id"
-                      class="tree-item"
-                    >
-                      <div class="item-title">{{ child.title }}</div>
-                      <div class="tree-operation">
-                        <template v-for="op in child.childs">
-                          <el-checkbox :key="op.id" v-model="op.hasAuthorize">{{
-                            op.title
-                          }}</el-checkbox>
-                        </template>
-                      </div>
-                    </div>
-                  </template>
-                </div>
-              </div>
-            </div>
-            <div v-else class="tree-empty item-border">暂无数据</div>
-          </div>
-        </div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import {
-  // getDictionaryList,
-  // addDictionary,
-  getDictionaryById
-  // deleteDictionary,
-  // editDictionary
-} from '@/api/method/user'
+  initAlarmEventLists,
+  addAlarmEvent,
+  editAlarmEvent,
+  deleteAlarmEvent
+} from '@/api/method/alarm'
 import pagination from '@/components/Pagination/index.vue'
+import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { pagination },
   data() {
     return {
+      isShow: true,
       params: {
         pageNum: 1,
         pageSize: 10,
         total: 0
       },
-      optionsList: [
-        {
-          label: 'ces',
-          value: 'ces'
-        }
-      ],
+      isEdited: true,
       tableData: [],
-      permissionTableData: [],
       dialog: {
         show: false,
         title: '新建',
         params: {
-          itemValue: '',
-          itemName: '',
-          itemDesc: '',
-          groupName: '',
-          groupCode: ''
-        }
-      },
-      permissionDialog: {
-        show: false,
-        title: '编辑权限',
-        params: {
-          detail: '',
-          name: '',
-          status: 1
+          eventName: '',
+          eventCode: '',
+          eventSort: ''
         }
       },
       searchParams: {
-        itemValue: '',
-        itemName: ''
+        eventName: '',
+        eventCode: ''
       },
       rules: {
-        groupName: [
+        eventName: [
           { required: true, message: '请输入字典名称', trigger: 'change' },
           {
             min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
+            max: 20,
+            message: '长度在 3 到 20 个字符',
             trigger: 'change'
           }
         ],
-        itemValue: [
+        eventCode: [
           { required: true, message: '请输入字典项Value', trigger: 'change' },
           {
             min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
+            max: 20,
+            message: '长度在 3 到 20 个字符',
             trigger: 'change'
           }
         ],
-        groupCode: [
-          { required: true, message: '请输入字典编码', trigger: 'change' },
-          {
-            min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
-            trigger: 'change'
-          }
-        ],
-        itemName: [
-          { required: true, message: '请输入字典项名称', trigger: 'change' },
-          {
-            min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
-            trigger: 'change'
-          }
-        ]
+        eventSort: {
+          required: true,
+          message: '此为数字。',
+          pattern: /^[0-9]*$/,
+          trigger: 'blur'
+        }
       },
       roleId: '',
       checkList: [],
@@ -316,18 +213,11 @@ export default {
       treeData: []
     }
   },
+  created() {},
   mounted() {
     this.getList()
-    // this.init()
   },
   methods: {
-    init() {
-      getSysOrgTree({ id: 1 }).then((res) => {
-        if (res.data.code === 0) {
-          this.treeData = res.data
-        }
-      })
-    },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
       this.getList()
@@ -341,8 +231,8 @@ export default {
     },
     resetData(e) {
       this.searchParams = {
-        itemName: '',
-        itemValue: ''
+        eventName: '',
+        eventCode: ''
       }
       let target = e.target
       if (target.nodeName === 'SPAN' || target.nodeName === 'svg') {
@@ -365,14 +255,19 @@ export default {
       })
     },
     dialogShow(act, data) {
+      this.dialog.params = {
+        eventName: '',
+        eventCode: '',
+        eventSort: ''
+      }
+      this.isEdited = true
       if (act === 0) {
-        const { groupName, groupCode, itemDesc, itemName, itemValue } = data
-        this.dialog.params.groupCode = groupCode
-        this.dialog.params.groupName = groupName
-        this.dialog.params.itemDesc = itemDesc
-        this.dialog.params.itemName = itemName
-        this.dialog.params.itemValue = itemValue
+        const { eventName, eventCode, eventSort } = data
+        this.dialog.params.eventName = eventName
+        this.dialog.params.eventCode = eventCode
+        this.dialog.params.eventSort = eventSort
         this.editId = data.id
+        this.isEdited = false
       }
       this.dialog.title = act ? '新建' : '编辑'
       this.dialog.show = !this.dialog.show
@@ -404,7 +299,7 @@ export default {
       this.permissionDialog.show = !this.permissionDialog.show
       this.roleId = id
       permissionTree(id).then((res) => {
-        if (res.data.code === 10000) {
+        if (res.data.code === 0) {
           this.permissionTableData = res.data
         }
       })
@@ -423,84 +318,90 @@ export default {
       this.buttonLoading = true
       // this.checkList = []
       this.buildTree('get')
-      // editDictionary({
-      //   roleId: this.roleId,
-      //   permissionIds: this.checkList
-      // })
-      //   .then((res) => {
-      //     if (res.data.code === 10000) {
-      //       this.$message({
-      //         message: '保存成功！',
-      //         type: 'success'
-      //       })
-      //       this.buttonLoading = false
-      //       this.permissionDialog.show = !this.permissionDialog.show
-      //     } else {
-      //       this.buttonLoading = false
-      //     }
-      //   })
-      //   .catch(() => {
-      //     this.buttonLoading = false
-      //   })
+      updateDict({
+        roleId: this.roleId,
+        permissionIds: this.checkList
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              message: '保存成功！',
+              type: 'success'
+            })
+
+            this.buttonLoading = false
+            this.permissionDialog.show = !this.permissionDialog.show
+          } else {
+            this.buttonLoading = false
+          }
+        })
+        .catch(() => {
+          this.buttonLoading = false
+        })
     },
-    getList() {
-      // getDictionaryList({
-      //   current: this.params.pageNum,
-      //   pageSize: this.params.pageSize,
-      //   ...this.searchParams
-      // }).then((res) => {
-      //   if (res.data.code === 0) {
-      //     this.tableData = res.data.records
-      //     this.params.total = res.data.total
-      //     this.params.pages = res.data.pages
-      //     this.params.current = res.data.current
-      //   }
-      // })
+    async getList() {
+      await initAlarmEventLists({
+        num: this.params.pageSize,
+        page: this.params.pageNum,
+        ...this.searchParams
+      })
+        .then((res) => {
+          if (res && res.data.code === 0) {
+            this.tableData = res.data.data.list
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.pageSize
+            setTimeout(() => {
+              this.isShow = true
+            }, 500)
+          }
+        })
+        .catch((error) => console.log(error))
     },
     deleteRole(row) {
-      // this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
-      //   confirmButtonText: '确定',
-      //   cancelButtonText: '取消',
-      //   type: 'warning'
-      // }).then(() => {
-      //   deleteDictionary(row.id).then((res) => {
-      //     if (res.data.code === 10000) {
-      //       this.$message({
-      //         type: 'success',
-      //         message: '删除成功'
-      //       })
-      //       this.params.pageNum = 1
-      //       this.getList()
-      //     }
-      //   })
-      // })
+      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteAlarmEvent([row.id]).then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.params.pageNum = 1
+            this.getList()
+          }
+        })
+      })
     },
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
             case '新建':
-              // addDictionary(this.dialog.params).then((res) => {
-              //   if (res.data.code === 0) {
-              //     this.$message({
-              //       type: 'success',
-              //       message: '新建成功'
-              //     })
-              //     this.dialog.show = false
-              //     this.getList()
-              //   }
-              // })
+              addAlarmEvent(this.dialog.params).then((res) => {
+                if (res.data.code === 0) {
+                  this.$message({
+                    type: 'success',
+                    message: '新建成功'
+                  })
+                  this.dialog.show = false
+                  this.getList()
+                }
+              })
               break
             case '编辑':
-              // editDictionary({ id: this.editId, ...this.dialog.params }).then(
-              //   (res) => {
-              //     if (res.data.code === 0) {
-              //       this.$message.success('编辑成功')
-              //       this.dialog.show = false
-              //       this.getList()
-              //     }
-              //   }
-              // )
+              editAlarmEvent({ id: this.editId, ...this.dialog.params }).then(
+                (res) => {
+                  if (res.data.code === 0) {
+                    this.$message.success('编辑成功')
+                    this.dialog.show = false
+                    this.getList()
+                  }
+                }
+              )
               break
 
             default:
@@ -517,6 +418,9 @@ export default {
 ::v-deep .el-table::before {
   height: 0 !important;
 }
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid #eaeaea;
 }
@@ -524,36 +428,35 @@ export default {
   border-top: 1px solid #eaeaea;
 }
 
-// ::v-deep .api-table .el-table__fixed-right {
-//   height: 100% !important;
-// }
+::v-deep .dataDictionary-table .el-table__fixed-right {
+  height: 100% !important;
+}
 // ::v-deep .el-table--enable-row-transition {
 //   height: 100% !important;
 // }
-::v-deep .el-table::before {
-  height: 0;
-}
+// ::v-deep .el-table::before {
+//   height: 0;
+// }
 // 滚动条大小设置
-::v-deep .api-table::-webkit-scrollbar {
+::v-deep .dataDictionary-table::-webkit-scrollbar {
   /*纵向滚动条*/
   width: 5px;
   /*横向滚动条*/
   height: 5px;
 }
-
 // 滚动条滑块样式设置
-::v-deep .api-table::-webkit-scrollbar-thumb {
+::v-deep .dataDictionary-table::-webkit-scrollbar-thumb {
   background-color: #bfbfc0;
   border-radius: 5px;
 }
 
 // 滚动条背景样式设置
-::v-deep .api-table::-webkit-scrollbar-track {
+::v-deep .dataDictionary-table::-webkit-scrollbar-track {
   background: none;
 }
 
 // 表格横向和纵向滚动条对顶角样式设置
-::v-deep .api-table::-webkit-scrollbar-corner {
+::v-deep .dataDictionary-table::-webkit-scrollbar-corner {
   background-color: #111;
 }
 // 去除滚动条上方多余显示
@@ -595,18 +498,17 @@ export default {
   .table-list {
     margin: 20px;
     padding: 20px;
-    height: calc(100% - 200px);
     background: #ffffff;
+    height: calc(100% - 200px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
-    .api-table {
+    .dataDictionary-table {
       max-height: calc(100% - 100px);
       overflow-y: auto;
     }
     .securityArea_container {
       margin-bottom: 20px;
-
       .btn-lists {
         .btn-span {
           position: relative;
@@ -750,5 +652,8 @@ export default {
 }
 .button-back {
   margin-right: 20px;
+}
+::v-deep .el-table::before {
+  height: 0;
 }
 </style>
