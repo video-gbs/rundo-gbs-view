@@ -113,15 +113,10 @@ module.exports = {
   lintOnSave: false,
   productionSourceMap: false,
   devServer: {
-    // public: '',
     port: port,
     open: true,
-    // overlay: {
-    //   warnings: false,
-    //   errors: true
-    // },
     historyApiFallback: {
-      index: '/index.html' //与output的publicPath
+      index: '/index.html'
     },
     proxy: getProxys()
   },
@@ -135,10 +130,15 @@ module.exports = {
     amd: {
       toUrlUndefined: true,
     },
-    module: {
-    },
+    module: {},
     resolve: {
-      fallback: { "https": false, "zlib": false, "http": false, "url": false, "path": require.resolve("path-browserify"), },
+      fallback: {
+        "https": false,
+        "zlib": false,
+        "http": false,
+        "url": false,
+        "path": require.resolve("path-browserify"),
+      },
       // fallback: {
 
       //   "https": require.resolve("https-browserify"),
@@ -158,21 +158,22 @@ module.exports = {
         filename: '[name].css',
         chunkFilename: '[id].css',
       }),
-      new CopyWebpackPlugin([
-        { from: path.join(Run3DSource, Run3DWorkers), to: "Workers" },
-      ]
-      ),
-      new CopyWebpackPlugin([{ from: path.join(Run3DSource, "Assets"), to: "Assets" }],
-      ),
-      new CopyWebpackPlugin([{ from: path.join(Run3DSource, "Widgets"), to: "Widgets" }],
-      ),
-      new CopyWebpackPlugin([
-        {
-          from: path.join(Run3DSource, "ThirdParty/Workers"),
-          to: "ThirdParty/Workers",
-        },
-      ],
-      ),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, Run3DWorkers),
+        to: "Workers"
+      }, ]),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, "Assets"),
+        to: "Assets"
+      }], ),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, "Widgets"),
+        to: "Widgets"
+      }], ),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, "ThirdParty/Workers"),
+        to: "ThirdParty/Workers",
+      }, ], ),
       new webpack.DefinePlugin({
         CESIUM_BASE_URL: JSON.stringify(""),
       }),
@@ -193,15 +194,15 @@ module.exports = {
 
       new CopyWebpackPlugin(
         [{
-          from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml'
-        },
-        {
-          from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer.swf'
-        },
-        {
-          from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer-lib.min.js',
-          to: 'js/'
-        }
+            from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml'
+          },
+          {
+            from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer.swf'
+          },
+          {
+            from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer-lib.min.js',
+            to: 'js/'
+          }
         ]
       ),
       // new CopyWebpackPlugin([
@@ -264,11 +265,9 @@ module.exports = {
     config
       .plugin('ScriptExtHtmlWebpackPlugin')
       .after('html')
-      .use('script-ext-html-webpack-plugin', [
-        {
-          inline: /runtime\..*\.js$/
-        }
-      ])
+      .use('script-ext-html-webpack-plugin', [{
+        inline: /runtime\..*\.js$/
+      }])
       .end()
     config.optimization.splitChunks({
       chunks: 'all',

@@ -4,15 +4,21 @@ import store from '@/store/index'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import getPageTitle from '@/utils/get-page-title'
-import { Local, Session } from '@/utils/storage'
-import { getHomeFunc } from '@/api/method/home'
+import {
+  Local,
+  Session
+} from '@/utils/storage'
+import {
+  getHomeFunc
+} from '@/api/method/home'
 
 Vue.use(Router)
 
-NProgress.configure({ showSpinner: false })
+NProgress.configure({
+  showSpinner: false
+})
 
-export const staticRouters = [
-  {
+export const staticRouters = [{
     path: '/login',
     name: 'login',
     component: () => import('@/views/login/index')
@@ -25,7 +31,10 @@ export const staticRouters = [
     path: '/workTable',
     name: 'workTable',
     component: () => import('@/views/leftMenus/workTable/index'),
-    meta: { title: '首页', icon: 'zhgzt' }
+    meta: {
+      title: '首页',
+      icon: 'zhgzt'
+    }
   }
   // {
   //   path: '/redirect',
@@ -293,8 +302,10 @@ Router.prototype.push = function push(location) {
 }
 
 const router = new Router({
-  mode: 'hash',
-  scrollBehavior: () => ({ y: 0 }),
+  mode: 'history',
+  scrollBehavior: () => ({
+    y: 0
+  }),
   routes: staticRouters
 })
 
@@ -317,7 +328,9 @@ router.beforeEach(async (to, from, next) => {
       if (Session.get('permissionMenuId') &&
         Session.get('third_party_login') !== null &&
         !Session.get('third_party_login')) {
-        getHomeFunc({ menuId: Session.get('permissionMenuId') }).then((res) => {
+        getHomeFunc({
+          menuId: Session.get('permissionMenuId')
+        }).then((res) => {
           if (res.data.code === 0) {
             Session.set('permissionData', [])
             Session.set('permissionData', res.data.data)
@@ -334,7 +347,10 @@ router.beforeEach(async (to, from, next) => {
       }, 1000)
       // 刷新页面且有route记录数据，可再次追加动态路由
       store.dispatch('user/changeDynamicRouters', dynamicRouters)
-      next({ ...to, replace: true })
+      next({
+        ...to,
+        replace: true
+      })
     } else {
       // console.log(888888)
       next()
