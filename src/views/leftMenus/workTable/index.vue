@@ -407,10 +407,9 @@ export default {
             Session.set('permissionMenuId', '')
             Session.set(
               'permissionMenuId',
-              child.childList[0] ? child.childList[0].id : ''
+              child.childList[0] ? child.childList[0].id : '0'
             )
-            console.log('child.childList[0].path',child.childList[0].path)
-            this.$router.replace({ path: child.childList[0].path })
+            this.$router.push({ path: child.childList[0].path })
           }
         })
       } else {

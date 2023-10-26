@@ -57,7 +57,7 @@ const urls = [
     target: 'http://xard-gbs-uat.runjian.com:8080',
     proxy: '/api'
 
-  },
+  }
   // {
   //   target: 'https://xard-gbs-test.runjian.com:8080',
   //   proxy: '/api'
@@ -107,7 +107,7 @@ function getProxys() {
 }
 module.exports = {
   transpileDependencies: ['@wanglin1994/video-timeline'],
-  publicPath: './',
+  publicPath: '/',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: false,
