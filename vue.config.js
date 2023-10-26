@@ -1,5 +1,5 @@
 'use strict'
-const Run3DSource = './node_modules/@rjgf/run3d-engine/Source'
+const Run3DSource = 'node_modules/@rjgf/run3d-engine/Source'
 const Run3DWorkers = '../Build/Cesium/Workers'
 const path = require('path')
 const webpack = require('webpack')
@@ -107,7 +107,7 @@ function getProxys() {
 }
 module.exports = {
   transpileDependencies: ['@wanglin1994/video-timeline'],
-  publicPath: '/',
+  publicPath: './',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: false,
