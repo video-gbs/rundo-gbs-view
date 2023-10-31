@@ -449,6 +449,7 @@ export default {
      * @param time
      */
     createPlanTime(time) {
+      console.log('time~~~~~~~', time)
       let startTimeAndEndTime = time.split('-')
       let newStartTime = startTimeAndEndTime[0]
       if (newStartTime.length < 6) {
@@ -592,14 +593,16 @@ export default {
               })
               console.log('resData', resData)
               resData.forEach((item1) => {
-                console.log('item1', item1.timeSliderNums, item1.startTimeArray)
-
                 if (item1.startTimeArray.length > 0) {
                   item1.startTimeArray.map((child, index) => {
+                    console.log('child~~~~~', item1.stopTimeArray)
                     params1 = {
                       startTime: `${child}:00`,
                       dateType: item1.timeSliderNums,
-                      endTime: `${item1.stopTimeArray[index]}:59`
+                      endTime:
+                        item1.stopTimeArray[index] === '24:00'
+                          ? '23:59:59'
+                          : `${item1.stopTimeArray[index]}:59`
                     }
 
                     resTimePeriodList.push(params1)

@@ -53,15 +53,15 @@ const urls = [
   //   proxy: '/api/expansion'
   // },
   // uat 测试
-  {
-    target: 'http://xard-gbs-uat.runjian.com:8080',
-    proxy: '/api'
-
-  }
   // {
-  //   target: 'https://xard-gbs-test.runjian.com:8080',
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
   //   proxy: '/api'
-  // },
+
+  // }
+  {
+    target: 'https://xard-gbs-test.runjian.com:8080',
+    proxy: '/api'
+  },
   // dev  本地
   // {
   //   target: 'http://116.205.143.13/tiles/gdhpjd',
