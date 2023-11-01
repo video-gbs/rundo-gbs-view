@@ -339,6 +339,8 @@ import {
 import { Local } from '@/utils/storage'
 import { ptzPresetLists } from '@/api/method/live'
 
+import { convertG711ToAAC } from '@/utils/index'
+
 export default {
   name: 'live',
   components: {

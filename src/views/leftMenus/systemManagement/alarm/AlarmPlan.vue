@@ -193,7 +193,7 @@
                 <template slot-scope="scope">
                   <span
                     v-if="scope.row.deployState === 1"
-                    style="margin-left: 10px; color: #1FAD8C"
+                    style="margin-left: 10px; color: #1fad8c"
                     >成功</span
                   >
                   <span
@@ -258,7 +258,7 @@ export default {
       isAddAlarmPlanShow: false,
       isEditAlarmPlanShow: false,
       disabledOptionsList: [],
-      isShow: true,
+      isShow: false,
       params: {
         pageNum: 1,
         pageSize: 10,
