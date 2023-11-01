@@ -13,15 +13,15 @@
       <div class="tag-group">
         <span class="tag-group__title">选择事件</span>
         <el-tag
-          :key="tag"
           v-for="tag in checkeLists"
+          :key="tag.eventName"
           closable
           :disable-transitions="false"
           @close="handleClose(tag)"
           size="medium"
           class="tag-btn"
         >
-          {{ tag }}
+          {{ tag.eventName }}
         </el-tag>
         <div class="button-new-tag" @click="showContent">+ 添加事件</div>
       </div>
@@ -29,13 +29,13 @@
       <div class="tag-group-content">
         <el-card
           v-for="(tag, index) in checkeLists"
-          :key="tag"
+          :key="tag.id"
           class="box-card"
         >
           <div slot="header" class="clearfix">
             <LineFont
               :line-title="{
-                title: tag,
+                title: tag.eventName,
                 notShowSmallTitle: false
               }"
               :text-style="textStyle"
@@ -130,7 +130,7 @@
       :title="dialog.title"
       :visible.sync="dialog.show"
       width="720px"
-      :before-close="handleClose"
+      :before-close="handleClose1"
     >
       <el-input
         placeholder="请输入搜索关键字"
@@ -147,7 +147,7 @@
         >
           <el-checkbox
             v-for="incident in allIncident"
-            :label="incident.id"
+            :label="incident"
             :key="incident.id"
             class="allIncident-checkbox"
             >{{ incident.eventName }}</el-checkbox
@@ -238,9 +238,10 @@ export default {
       this.initAlarmEventLists(val)
     },
     checkeLists(newValue) {
+      console.log('newValue', newValue)
       let resStepform3 = []
       let resStepform3Obj = {
-        eventCode: '',
+        eventCode: {},
         eventLevel: 0,
         eventInterval: '',
         enableVideo: 0,
@@ -256,7 +257,6 @@ export default {
         for (let i = 0; i < newValue.length; i++) {
           if (i >= this.stepform3.length) {
             resStepform3Obj.eventCode = newValue[i]
-            // resStepform3Obj.isactive ='轻微'
             resStepform3.push(resStepform3Obj)
             this.intrusionLevel.push(array)
           }
@@ -314,6 +314,9 @@ export default {
     handleClose(tag) {
       this.checkeLists.splice(this.checkeLists.indexOf(tag), 1)
     },
+    handleClose1() {
+      this.dialog.show = false
+    },
 
     showInput() {
       this.inputVisible = true
@@ -338,18 +341,19 @@ export default {
       this.$emit('goback')
     },
     submitStep3() {
-      console.log('this.$refs', this.$refs)
+      console.log('this.$refs', this.$refs, this.checkeLists)
+
+      const alarmSchemeEventReqList = []
       this.checkeLists.map((item1, i) => {
         if (this.stepform3[i].isactive && this.stepform3[i].isactive !== '') {
           // this.$refs.stepForm[i].resetFields()
 
           // this.isHas = false
 
-          const alarmSchemeEventReqList = []
           let params = {}
           this.$refs.stepForm.map((item) => {
             params = {
-              eventCode: item.model.eventCode,
+              eventCode: item.model.eventCode.id,
 
               eventLevel: item.model.isactive,
 
@@ -365,7 +369,6 @@ export default {
             alarmSchemeEventReqList.push(params)
           })
           // console.log(1111111111, alarmSchemeEventReqList)
-          this.$emit('stepParams3', alarmSchemeEventReqList)
         } else {
           // this.isHas = true
 
@@ -379,6 +382,8 @@ export default {
           })
         }
       })
+
+      this.$emit('stepParams3', alarmSchemeEventReqList)
     }
   }
 }
@@ -410,6 +415,9 @@ export default {
         flex-basis: calc(25% - 10px); /* 每个元素占据容器的25%宽度，减去间距 */
         margin-right: 10px;
         margin-bottom: 10px;
+        text-align: left;
+        margin-left: 50px;
+
       }
     }
   }

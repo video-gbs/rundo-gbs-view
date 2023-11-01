@@ -120,6 +120,16 @@ module.exports = {
     },
     proxy: getProxys()
   },
+  css: {
+    loaderOptions: {
+      sass: {
+        sassOptions: {
+          outputStyle: 'expanded'
+        }
+      }
+    }
+  },
+
   configureWebpack: {
     name: '',
     output: {
