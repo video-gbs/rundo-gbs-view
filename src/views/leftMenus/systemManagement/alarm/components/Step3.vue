@@ -29,7 +29,7 @@
       <div class="tag-group-content">
         <el-card
           v-for="(tag, index) in checkeLists"
-          :key="tag.id"
+          :key="tag.eventCode"
           class="box-card"
         >
           <div slot="header" class="clearfix">
@@ -270,8 +270,8 @@ export default {
   created() {
     if (Object.keys(Local.get('detailsData')).length > 0) {
       let params = {}
+      let params1 = {}
       Local.get('detailsData').alarmSchemeEventRelList.map((item) => {
-        this.checkeLists.push(item.eventName)
         params = {
           eventCode: item.eventName,
           eventLevel: item.eventLevel,
@@ -285,6 +285,11 @@ export default {
 
           enableVideo: item.enableVideo === 1 ? true : false
         }
+        params1 = {
+          eventName: item.eventName,
+          eventCode: item.eventCode
+        }
+        this.checkeLists.push(params1)
         this.stepform3.push({ isactive: item.eventLevel, ...params })
         this.intrusionLevel.push(['轻微', '中等', '严重', '非常严重'])
         this.$forceUpdate()
@@ -344,6 +349,7 @@ export default {
       console.log('this.$refs', this.$refs, this.checkeLists)
 
       const alarmSchemeEventReqList = []
+
       this.checkeLists.map((item1, i) => {
         if (this.stepform3[i].isactive && this.stepform3[i].isactive !== '') {
           // this.$refs.stepForm[i].resetFields()
@@ -351,9 +357,10 @@ export default {
           // this.isHas = false
 
           let params = {}
+
           this.$refs.stepForm.map((item) => {
             params = {
-              eventCode: item.model.eventCode.id,
+              eventCode: item.model.eventCode.eventCode,
 
               eventLevel: item.model.isactive,
 
@@ -383,7 +390,12 @@ export default {
         }
       })
 
-      this.$emit('stepParams3', alarmSchemeEventReqList)
+      const uniqueArr = alarmSchemeEventReqList.filter(
+        (item3, index) =>
+          alarmSchemeEventReqList.findIndex((i) => i.eventCode === item3.eventCode) === index
+      )
+
+      this.$emit('stepParams3', uniqueArr)
     }
   }
 }
@@ -417,7 +429,6 @@ export default {
         margin-bottom: 10px;
         text-align: left;
         margin-left: 50px;
-
       }
     }
   }
