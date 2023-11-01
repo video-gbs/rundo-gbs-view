@@ -414,15 +414,15 @@ export default {
       })
     },
     changeOrganization() {
-      this.initList()
+      this.initList(this.resId)
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
-      this.initList()
+      this.initList(this.resId)
     },
     currentChange(proCount) {
       this.params.proCount = proCount
-      this.initList()
+      this.initList(this.resId)
     },
     deploymentData() {
       this.dialogShow1 = true
