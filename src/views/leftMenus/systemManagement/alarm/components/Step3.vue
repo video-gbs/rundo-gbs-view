@@ -144,11 +144,12 @@
         <el-checkbox-group
           v-model="checkeLists"
           class="allIncident-checkbox-group"
+          @change="testChange"
         >
           <el-checkbox
             v-for="incident in allIncident"
             :label="incident"
-            :key="incident.id"
+            :key="incident.eventCode"
             class="allIncident-checkbox"
             >{{ incident.eventName }}</el-checkbox
           >
@@ -211,7 +212,7 @@ export default {
         width: '3px',
         height: '18px'
       },
-      isHas: true,
+      isHas: false,
       rules: {
         eventLevel: [
           {
@@ -239,6 +240,7 @@ export default {
     },
     checkeLists(newValue) {
       console.log('newValue', newValue)
+      console.log('newValue1', newValue)
       let resStepform3 = []
       let resStepform3Obj = {
         eventCode: {},
@@ -290,10 +292,12 @@ export default {
           eventCode: item.eventCode
         }
         this.checkeLists.push(params1)
+
         this.stepform3.push({ isactive: item.eventLevel, ...params })
         this.intrusionLevel.push(['轻微', '中等', '严重', '非常严重'])
         this.$forceUpdate()
       })
+
       console.log('this.checkeLists', this.checkeLists, this.stepform3)
     }
   },
@@ -306,15 +310,81 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.allIncident = res.data.data
+            // let resParams = {}
+            // res.data.data.map((item) => {
+            //     resParams = {
+            //       eventCode: item.eventCode,
+            //       eventName: item.eventName
+            //     }
+
+            //     this.allIncident.push(resParams)
+            //   })
           }
         })
         .catch((error) => {
           console.log(error)
         })
     },
+
+    compareObjectProperties(obj1, obj2) {
+      if (Object.keys(obj1).length !== Object.keys(obj2).length) {
+        return Object.keys(obj1).length > Object.keys(obj2).length ? obj1 : obj2
+      }
+      return obj1
+    },
+    testChange(val) {
+      console.log(val)
+      // this.checkeLists=[]
+      this.checkeLists = this.removeDuplicates(val)
+    },
+
+    removeDuplicates(arr) {
+      this.checkeLists = []
+      var idSet = {}
+      var result = []
+
+      for (var i = 0; i < arr.length; i++) {
+        var obj = arr[i]
+        var eventCode = obj.eventCode
+
+        if (!idSet[eventCode]) {
+          idSet[eventCode] = true
+          result.push(obj)
+        } else {
+          var prevObj = result.find(function (item) {
+            return item.eventCode === eventCode
+          })
+
+          if (Object.keys(obj).length > Object.keys(prevObj).length) {
+            var index = result.indexOf(prevObj)
+            result[index] = obj
+          }
+        }
+      }
+      console.log('resultresultresultresultresultresultresult', result)
+      return result
+    },
+
     showContent() {
       this.isShowImg = false
       this.dialog.show = !this.dialog.show
+      if (Object.keys(Local.get('detailsData')).length > 0) {
+        this.$nextTick(() => {
+          const myDiv = document.getElementsByClassName('allIncident-checkbox')
+
+          this.allIncident.forEach((item1, index) => {
+            this.checkeLists.map((item) => {
+              if (item.eventCode === item1.eventCode) {
+                this.checkeLists = []
+                this.checkeLists.push(item1)
+                myDiv[index].classList.add('is-checked')
+                myDiv[index].firstChild.classList.add('is-checked')
+              }
+            })
+          })
+          this.$forceUpdate()
+        })
+      }
     },
     handleClose(tag) {
       this.checkeLists.splice(this.checkeLists.indexOf(tag), 1)
@@ -354,7 +424,7 @@ export default {
         if (this.stepform3[i].isactive && this.stepform3[i].isactive !== '') {
           // this.$refs.stepForm[i].resetFields()
 
-          // this.isHas = false
+          this.isHas = true
 
           let params = {}
 
@@ -377,7 +447,7 @@ export default {
           })
           // console.log(1111111111, alarmSchemeEventReqList)
         } else {
-          // this.isHas = true
+          this.isHas = false
 
           // this.$refs.stepForm[i].resetFields()
           this.$refs.stepForm[i].validate((valid) => {
@@ -392,10 +462,13 @@ export default {
 
       const uniqueArr = alarmSchemeEventReqList.filter(
         (item3, index) =>
-          alarmSchemeEventReqList.findIndex((i) => i.eventCode === item3.eventCode) === index
+          alarmSchemeEventReqList.findIndex(
+            (i) => i.eventCode === item3.eventCode
+          ) === index
       )
-
-      this.$emit('stepParams3', uniqueArr)
+      if (this.isHas) {
+        this.$emit('stepParams3', uniqueArr)
+      }
     }
   }
 }
