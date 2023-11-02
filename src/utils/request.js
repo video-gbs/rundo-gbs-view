@@ -1,9 +1,15 @@
 import axios from 'axios'
 // import { Message } from 'element-ui'
 import router from '@/router'
-import { Local } from '@/utils/storage'
-import { message } from './resetMessage'
-import { newRefreshToken } from '@/api/method/home'
+import {
+  Local
+} from '@/utils/storage'
+import {
+  message
+} from './resetMessage'
+import {
+  newRefreshToken
+} from '@/api/method/home'
 
 const requestTimeOut = 20 * 100000
 window.isReresh = false
@@ -79,112 +85,14 @@ service.interceptors.request.use(
         Authorization: `Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg=`
       }
     }
-    // if (isTokenExpired() && !config.url.includes('/oauth2/token')) {
-    //   // 如果token快过期了
-    //   if (!isRefreshing) {
-    //     // 控制重复获取token
-    //     isRefreshing = true
-    //     let refreshToken = Local.get('refresh_token')
-
-    //     if (Local.get('third_party_login')) {
-    //       const resUrl = `${Local.get(
-    //         'refresh_token_url'
-    //       )}?accessToken=${Local.get('access_token')}`
-    //       axios({
-    //         method: 'get',
-    //         url: resUrl,
-    //         headers: {
-    //           Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
-    //         }
-    //       })
-    //         .then((res) => {
-    //           if (res.data.code === 0) {
-    //             isRefreshing = false
-    //             const { accessToken, refreshToken, expiresIn } = res.data.data
-    //             Local.set('access_token', accessToken)
-    //             Local.set('refresh_token', refreshToken)
-    //             Local.set('expires_in', expiresIn)
-
-    //             isRefreshTokenExpired(expiresIn)
-    //             onAccessTokenFetched(accessToken)
-    //           } else {
-    //             //刷新token失败只能跳转到登录页重新登录
-    //             isRefreshing = false
-    //             Local.clear()
-    //             Local.remove('access_token')
-    //             Local.remove('utilTime')
-    //             Local.remove('expires_in')
-    //             Local.remove('refresh_token')
-    //             router.replace({
-    //               path: '/login',
-    //               query: { redirect: router.currentRoute.fullPath }
-    //             })
-    //           }
-    //         })
-    //         .catch(function (err) {
-    //           router.replace({
-    //             path: '/login',
-    //             query: { redirect: router.currentRoute.fullPath }
-    //           })
-    //           isRefreshing = false
-    //         })
-    //     } else {
-    //       console.log(1111)
-
-    //       newRefreshToken(
-    //         refreshToken,
-    //         'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
-    //       )
-    //         .then((res) => {
-    //           if (res.data.code === 0) {
-    //             isRefreshing = false
-    //             const { accessToken, refreshToken, expiresIn } = res.data.data
-    //             Local.set('access_token', accessToken)
-    //             Local.set('refresh_token', refreshToken)
-    //             Local.set('expires_in', expiresIn)
-
-    //             isRefreshTokenExpired(expiresIn)
-    //             onAccessTokenFetched(accessToken)
-    //           } else {
-    //             //刷新token失败只能跳转到登录页重新登录
-    //             isRefreshing = false
-    //             Local.clear()
-    //             Local.remove('access_token')
-    //             Local.remove('utilTime')
-    //             Local.remove('expires_in')
-    //             Local.remove('refresh_token')
-    //             router.replace({
-    //               path: '/login',
-    //               query: { redirect: router.currentRoute.fullPath }
-    //             })
-    //           }
-    //         })
-    //         .catch(function (err) {
-    //           router.replace({
-    //             path: '/login',
-    //             query: { redirect: router.currentRoute.fullPath }
-    //           })
-    //           isRefreshing = false
-    //         })
-    //     }
-    //   }
-
-    //   // 将其他接口缓存起来
-    //   const retryRequest = new Promise((resolve) => {
-    //     // 这里是将其他接口缓存起来的关键, 返回Promise并且让其状态一直为等待状态,
-    //     // 只有当token刷新成功后, 就会调用通过addSubscriber函数添加的缓存接口,
-    //     // 此时, Promise的状态就会变成resolve
-    //     addSubscriber((newToken) => {
-    //       // 表示用新的token去替换掉原来的token
-    //       config.headers.Authorization = `Bearer ${newToken}`
-    //       // 替换掉url -- 因为baseURL会扩展请求url
-    //       config.url = config.url.replace(config.baseURL, '')
-    //       // 返回重新封装的config, 就会将新配置去发送请求
-    //       resolve(config)
-    //     })
-    //   })
-    //   return retryRequest
-    // }
+    // 处理数组类型的查询参数
+    if (config.params) {
+      Object.keys(config.params).forEach((key) => {
+        if (Array.isArray(config.params[key])) {
+          config.params[key] = config.params[key].join(',');
+        }
+      })
+    }
     return config
   },
   (error) => {
@@ -209,9 +117,9 @@ service.interceptors.response.use(
         case 400:
           if (!err.response.config.url.includes('/oauth2/token')) {
             init.openMessage(
-              err.response.data.data
-                ? err.response.data.msg + ':' + err.response.data.data
-                : err.response.data.msg
+              err.response.data.data ?
+              err.response.data.msg + ':' + err.response.data.data :
+              err.response.data.msg
             )
           } else {
             Local.clear()
@@ -227,7 +135,7 @@ service.interceptors.response.use(
             })
           }
           return Promise.resolve(err)
-        // break
+          // break
         case 401:
           Local.clear()
           Local.remove('access_token')
@@ -243,9 +151,9 @@ service.interceptors.response.use(
           return Promise.resolve(err)
         case 403:
           init.openMessage(
-            err.response.data.data
-              ? err.response.data.msg + ':' + err.response.data.data
-              : err.response.data.msg
+            err.response.data.data ?
+            err.response.data.msg + ':' + err.response.data.data :
+            err.response.data.msg
           )
 
           return Promise.resolve(err)
@@ -260,9 +168,9 @@ service.interceptors.response.use(
           break
         case 500:
           init.openMessage(
-            err.response.data.data
-              ? err.response.data.msg + ':' + err.response.data.data
-              : err.response.data.msg
+            err.response.data.data ?
+            err.response.data.msg + ':' + err.response.data.data :
+            err.response.data.msg
           )
           break
         case 501:

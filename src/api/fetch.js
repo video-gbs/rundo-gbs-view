@@ -36,6 +36,25 @@ const methods = {
       }
     })
   },
+  get2(url, params, headers) {
+    console.log('params',params)
+    const resParams = Object.entries(params)
+      .map(([key, value]) => {
+        if (Array.isArray(value)) {
+          return value.map(item => `${key}=${item}`).join('&');
+        } else {
+          return `${key}=${value}`;
+        }
+      })
+      .join('&')
+      console.log('resParams',resParams)
+    return request({
+      method: 'GET',
+      url,
+      resParams,
+      headers
+    })
+  },
   post(url, data, headers) {
     return request({
       method: 'POST',

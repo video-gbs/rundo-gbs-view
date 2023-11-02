@@ -188,7 +188,11 @@
                 label="告警类型"
                 width="100"
                 :show-overflow-tooltip="true"
-              />
+              >
+                <template slot-scope="scope">
+                  <span>{{ getStatusText(scope.row.alarmType) }}</span>
+                </template>
+              </el-table-column>
 
               <el-table-column
                 prop="alarmStartTime"
@@ -197,8 +201,15 @@
                 :show-overflow-tooltip="true"
               />
               <el-table-column
+                prop="imageState"
+                label="图片生成状态"
+                width="160"
+                :formatter="alarmImageStateStateFormatter"
+              >
+              </el-table-column>
+              <el-table-column
                 prop="videoState"
-                label="分段视频生成状态"
+                label="视频生成状态"
                 width="160"
                 :formatter="alarmVideoStateFormatter"
               >
@@ -222,8 +233,21 @@
                   </el-button>
                   <el-button
                     type="text"
+                    v-if="scope.row.videoState === 3"
                     @click="downAlarm(scope.row, scope.$index)"
-                    >下载</el-button
+                    >下载视频</el-button
+                  >
+                  <el-button
+                    type="text"
+                    v-if="scope.row.imageState === 3"
+                    @click="downAlarm(scope.row, scope.$index)"
+                    >下载图片</el-button
+                  >
+                  <el-button
+                    type="text"
+                    v-if="scope.row.videoState === -1"
+                    @click="downAlarm(scope.row, scope.$index)"
+                    >恢复</el-button
                   >
                   <el-button type="text" @click="deleteRole(scope.row)"
                     ><span class="delete-button">删除</span></el-button
@@ -340,7 +364,7 @@ export default {
       detailsId: [],
       playVideoVisible: false,
       videoUrl: '',
-      allIncident:[]
+      allIncident: []
     }
   },
   watch: {
@@ -379,6 +403,12 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    getStatusText(status) {
+      const option = this.allIncident.find(
+        (option) => option.eventCode === status
+      )
+      return option ? option.eventName : ''
     },
     async initList(id) {
       const startTime = this.searchParams.time ? this.searchParams.time[0] : ''
@@ -603,6 +633,22 @@ export default {
           }
         })
       })
+    },
+    alarmImageStateStateFormatter(row) {
+      switch (row.imageState) {
+        case -1:
+          return '异常'
+        case 0:
+          return '初始化'
+        case 1:
+          return '等待中'
+        case 2:
+          return '生成中'
+        case 3:
+          return '生成成功'
+        default:
+          return '异常'
+      }
     },
     alarmVideoStateFormatter(row) {
       switch (row.videoState) {

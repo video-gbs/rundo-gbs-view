@@ -259,10 +259,13 @@ export default {
       allList: [],
       areaNames: 'resourceName',
       dialogResourceValue: '',
-      resId: ''
+      resId: '',
+      priChannelIds: []
     }
   },
-  created() {},
+  created() {
+    this.priChannelIds = Local.get('priChannelIds') || []
+  },
   mounted() {
     this.initTree()
   },
@@ -282,12 +285,16 @@ export default {
         })
     },
     async initList(id) {
-      await getAlarmSchemeChannel({
+      let params = {
         num: this.params.pageSize,
         page: this.params.pageNum,
+        priChannelIds: this.priChannelIds,
         videoAreaId: id,
         includeEquipment: this.includeEquipment ? 1 : 0,
         ...this.searchParams
+      }
+      await getAlarmSchemeChannel({
+        ...params
       })
         .then((res) => {
           if (res.data.code === 0) {

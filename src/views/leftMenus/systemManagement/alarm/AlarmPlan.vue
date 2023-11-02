@@ -232,6 +232,7 @@
       @changeEditIsShow="changeEditIsShow"
       :detailsData="detailsData"
       :editAlarmId="editAlarmId"
+      :priChannelIds="priChannelIds"
       @getList="getList"
     />
   </div>
@@ -309,7 +310,8 @@ export default {
       buttonLoading: false,
       treeData: [],
       detailsData: [],
-      editAlarmId: ''
+      editAlarmId: '',
+      priChannelIds: ''
     }
   },
   created() {},
@@ -489,8 +491,10 @@ export default {
           if (res.data.code === 0) {
             this.detailsData = res.data.data
             this.editAlarmId = data.id
+            this.priChannelIds = res.data.data.channelIdList
             Local.set('editAlarmId', this.editAlarmId)
             Local.set('detailsData', this.detailsData)
+            Local.set('priChannelIds', this.priChannelIds)
             setTimeout(() => {
               this.isEditAlarmPlanShow = true
             }, 500)
