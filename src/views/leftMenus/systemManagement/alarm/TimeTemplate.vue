@@ -575,42 +575,33 @@ export default {
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          const resData = []
+          const resTimePeriodList = []
+
+          let params1 = {}
+          Object.values(this.timeSliderList).map((item, index) => {
+            if (index !== 0) {
+              resData.push(item)
+            }
+          })
+          resData.forEach((item1) => {
+            if (item1.startTimeArray.length > 0) {
+              item1.startTimeArray.map((child, index) => {
+                params1 = {
+                  startTime: `${child}:00`,
+                  dateType: item1.timeSliderNums,
+                  endTime:
+                    item1.stopTimeArray[index] === '24:00'
+                      ? '23:59:59'
+                      : `${item1.stopTimeArray[index]}:59`
+                }
+
+                resTimePeriodList.push(params1)
+              })
+            }
+          })
           switch (this.dialog.title) {
             case '新建':
-              console.log(
-                'this.timeSliderListthis.timeSliderList',
-                this.timeSliderList,
-                this.dialog.params
-              )
-              const resData = []
-              const resTimePeriodList = []
-
-              let params1 = {}
-              Object.values(this.timeSliderList).map((item, index) => {
-                if (index !== 0) {
-                  resData.push(item)
-                }
-              })
-              console.log('resData', resData)
-              resData.forEach((item1) => {
-                if (item1.startTimeArray.length > 0) {
-                  item1.startTimeArray.map((child, index) => {
-                    console.log('child~~~~~', item1.stopTimeArray)
-                    params1 = {
-                      startTime: `${child}:00`,
-                      dateType: item1.timeSliderNums,
-                      endTime:
-                        item1.stopTimeArray[index] === '24:00'
-                          ? '23:59:59'
-                          : `${item1.stopTimeArray[index]}:59`
-                    }
-
-                    resTimePeriodList.push(params1)
-                  })
-                }
-              })
-              console.log('resTimePeriodList', resTimePeriodList)
-
               addTemplateAlarmEvent({
                 timePeriodList: resTimePeriodList,
                 templateName: this.dialog.params.templateName
@@ -630,7 +621,7 @@ export default {
               editTemplateAlarmEvent({
                 templateId: this.editId,
                 templateName: this.dialog.params.templateName,
-                timePeriodList: this.dialog.params.timePeriodList
+                timePeriodList: resTimePeriodList
               }).then((res) => {
                 if (res.data.code === 0) {
                   this.$message.success('编辑成功')
