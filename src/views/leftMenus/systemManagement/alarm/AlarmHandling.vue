@@ -184,13 +184,13 @@
                 </template>
               </el-table-column>
               <el-table-column
-                prop="alarmType"
+                prop="alarmCode"
                 label="告警类型"
                 width="100"
                 :show-overflow-tooltip="true"
               >
                 <template slot-scope="scope">
-                  <span>{{ getStatusText(scope.row.alarmType) }}</span>
+                  <span>{{ getStatusText(scope.row.alarmCode) }}</span>
                 </template>
               </el-table-column>
 
@@ -647,7 +647,7 @@ export default {
         case 3:
           return '生成成功'
         default:
-          return '异常'
+          return '无'
       }
     },
     alarmVideoStateFormatter(row) {
@@ -663,7 +663,7 @@ export default {
         case 3:
           return '生成成功'
         default:
-          return '异常'
+          return '无'
       }
     },
 
