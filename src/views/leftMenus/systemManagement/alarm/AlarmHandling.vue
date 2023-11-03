@@ -234,20 +234,25 @@
                   <el-button
                     type="text"
                     v-if="scope.row.videoState === 3"
-                    @click="downAlarm(scope.row, scope.$index)"
+                    @click="down(scope.row, scope.$index, '视频')"
                     >下载视频</el-button
+                  >
+                  <el-button type="text" v-if="scope.row.imageState === 3"
+                    ><a :href="scope.row.imageUrl" download target="_blank"
+                      >下载图片</a
+                    ></el-button
                   >
                   <el-button
                     type="text"
-                    v-if="scope.row.imageState === 3"
-                    @click="downAlarm(scope.row, scope.$index)"
-                    >下载图片</el-button
+                    v-if="scope.row.imageState === -1"
+                    @click="alarmRecover(scope.row, 1)"
+                    >恢复图片</el-button
                   >
                   <el-button
                     type="text"
                     v-if="scope.row.videoState === -1"
-                    @click="downAlarm(scope.row, scope.$index)"
-                    >恢复</el-button
+                    @click="alarmRecover(scope.row, 2)"
+                    >恢复视频</el-button
                   >
                   <el-button type="text" @click="deleteRole(scope.row)"
                     ><span class="delete-button">删除</span></el-button
@@ -283,7 +288,8 @@ import {
   getAlarmVideoAreaList,
   getAlarmMsg,
   deleteNorthAlarmEvent,
-  getAlarmEventLists
+  getAlarmEventLists,
+  getAlarmRecover
 } from '@/api/method/alarm'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import pagination from '@/components/Pagination/index.vue'
@@ -554,36 +560,68 @@ export default {
         }
       }
     },
-    downAlarm(row, index) {
-      console.log(row, index)
-      const newList = JSON.parse(JSON.stringify(this.tableData))
-      Object.assign(newList[index], { isDownLoad: true })
-      this.tableData = newList
-      const this_ = this
-      const xhr = new XMLHttpRequest()
-      xhr.open('GET', row.videoUrl, true)
-      xhr.responseType = 'arraybuffer'
+    down(row, index, type) {
+      var xhr = new XMLHttpRequest()
+      let url = ''
+      if (type === '视频') {
+        url = row.videoUrl
+      } else if (type === '图片') {
+        url = row.imageUrl
+      }
+      xhr.open('GET', url, true)
+      xhr.responseType = 'arraybuffer' // 返回类型blob
       xhr.onload = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
           let blob = this.response
-          let u = window.URL.createObjectURL(
-            new Blob([blob], { type: 'video/mp4' })
-          )
+          // 转换一个blob链接
+          // 注: URL.createObjectURL() 静态方法会创建一个 DOMString(DOMString 是一个UTF-16字符串)，
+          // 其中包含一个表示参数中给出的对象的URL。这个URL的生命周期和创建它的窗口中的document绑定
+          let downLoadUrl = ''
+          if (type === '视频') {
+            downLoadUrl = window.URL.createObjectURL(
+              new Blob([blob], {
+                type: 'video/mp4'
+              })
+            )
+          } else if (type === '图片') {
+            downLoadUrl = url
+          }
+          // 视频的type是video/mp4，图片是image/jpeg
+          // 01.创建a标签
           let a = document.createElement('a')
-          a.download = '告警视频'
-          a.href = u
+          // 02.给a标签的属性download设定名称
+          a.download = row.channelName
+          // 03.设置下载的文件名
+          a.href = downLoadUrl
+          // 04.对a标签做一个隐藏处理
           a.style.display = 'none'
+          // 05.向文档中添加a标签
           document.body.appendChild(a)
+          // 06.启动点击事件
           a.click()
+          // 07.下载完毕删除此标签
           a.remove()
-          window.URL.revokeObjectURL(u)
         }
       }
+      xhr.send()
     },
     playAlarm(row) {
       this.playVideoVisible = true
       this.videoUrl = row.videoUrl
     },
+    async alarmRecover(row, type) {
+      await getAlarmRecover({
+        alarmMsgId: row.id,
+        alarmFileType: type
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.initList(this.resId)
+          }
+        })
+        .catch(() => {})
+    },
+
     deleteRole(row) {
       this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
         confirmButtonText: '确定',
