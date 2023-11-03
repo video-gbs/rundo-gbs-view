@@ -130,3 +130,8 @@ export function getAlarmMsg(params) {
 export function getAlarmDeployChannel(params) {
   return request.get(`${expansion}/alarm/deploy/channel`, params)
 }
+
+//告警恢复操作
+export function getAlarmRecover(params) {
+  return request.put(`${alarm}/msg/north/recover`, params)
+}

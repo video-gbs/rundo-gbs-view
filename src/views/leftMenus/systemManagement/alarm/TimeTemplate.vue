@@ -276,25 +276,25 @@ export default {
         row.dateTypeStrList.forEach((type, index) => {
           switch (index + 1) {
             case 1:
-              result += '星期一、'
+              result += `${type}、`
               break
             case 2:
-              result += '星期二、'
+              result += `${type}、`
               break
             case 3:
-              result += '星期三、'
+              result += `${type}、`
               break
             case 4:
-              result += '星期四、'
+              result += `${type}、`
               break
             case 5:
-              result += '星期五、'
+              result += `${type}、`
               break
             case 6:
-              result += '星期六、'
+              result += `${type}、`
               break
             case 7:
-              result += '星期日、'
+              result += `${type}、`
               break
             default:
               break
