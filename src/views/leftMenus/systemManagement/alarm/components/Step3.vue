@@ -420,32 +420,31 @@ export default {
 
       const alarmSchemeEventReqList = []
 
+      let params = {}
+
+      this.$refs.stepForm.map((item) => {
+        params = {
+          eventCode: item.model.eventCode,
+
+          eventLevel: item.model.isactive,
+
+          eventInterval: item.model.eventInterval,
+
+          videoLength: item.model.videoLength,
+
+          videoHasAudio: item.model.videoHasAudio ? 1 : 0,
+          enablePhoto: item.model.enablePhoto ? 1 : 0,
+
+          enableVideo: item.model.enableVideo ? 1 : 0
+        }
+        alarmSchemeEventReqList.push(params)
+      })
+
       this.checkeLists.map((item1, i) => {
         if (this.stepform3[i].isactive && this.stepform3[i].isactive !== '') {
           // this.$refs.stepForm[i].resetFields()
 
           this.isHas = true
-
-          let params = {}
-
-          this.$refs.stepForm.map((item) => {
-            params = {
-              eventCode: item.model.eventCode.eventCode,
-
-              eventLevel: item.model.isactive,
-
-              eventInterval: item.model.eventInterval,
-
-              videoLength: item.model.videoLength,
-
-              videoHasAudio: item.model.videoHasAudio ? 1 : 0,
-              enablePhoto: item.model.enablePhoto ? 1 : 0,
-
-              enableVideo: item.model.enableVideo ? 1 : 0
-            }
-            alarmSchemeEventReqList.push(params)
-          })
-          // console.log(1111111111, alarmSchemeEventReqList)
         } else {
           this.isHas = false
 
@@ -453,6 +452,7 @@ export default {
           this.$refs.stepForm[i].validate((valid) => {
             if (valid) {
               console.log('stepform3~~~~~~~~', stepform3)
+              this.isHas = true
 
               this.$emit('submitStep')
             }
