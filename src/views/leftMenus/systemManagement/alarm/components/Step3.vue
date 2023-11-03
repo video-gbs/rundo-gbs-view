@@ -275,7 +275,7 @@ export default {
       let params1 = {}
       Local.get('detailsData').alarmSchemeEventRelList.map((item) => {
         params = {
-          eventCode: item.eventName,
+          eventCode: item.eventCode,
           eventLevel: item.eventLevel,
 
           eventInterval: item.eventInterval,
