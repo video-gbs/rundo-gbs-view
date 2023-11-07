@@ -30,6 +30,11 @@ export function getAlarmEventLists(params) {
   return request.get(`${alarm}/event/data/name`, params)
 }
 
+// 获取事件名称
+export function getAlarmEventLists1(params) {
+  return request.get(`${alarm}/event/data`, params)
+}
+
 // 告警消息北向接口
 // 分页获取告警信息
 export function getNorthAlarmEventLists(params) {

@@ -61,7 +61,7 @@
             >
               <el-form-item label="告警类型:">
                 <el-select
-                  v-model="searchParams.eventCode"
+                  v-model="searchParams.alarmDesc"
                   class="mr10"
                   clearable
                   placeholder="请选择"
@@ -69,8 +69,8 @@
                   <el-option
                     v-for="obj in allIncident"
                     :key="obj.id"
-                    :label="obj.eventName"
-                    :value="obj.id"
+                    :label="obj"
+                    :value="obj"
                   />
                 </el-select>
               </el-form-item>
@@ -184,14 +184,14 @@
                 </template>
               </el-table-column>
               <el-table-column
-                prop="alarmCode"
-                label="告警类型"
+                prop="alarmDesc"
+                label="告警描述"
                 width="100"
                 :show-overflow-tooltip="true"
               >
-                <template slot-scope="scope">
-                  <span>{{ getStatusText(scope.row.alarmCode) }}</span>
-                </template>
+                <!-- <template slot-scope="scope">
+                  <span>{{ getStatusText(scope.row.alarmDesc) }}</span>
+                </template> -->
               </el-table-column>
 
               <el-table-column
@@ -358,7 +358,7 @@ export default {
         height: '18px'
       },
       searchParams: {
-        eventCode: '',
+        alarmDesc: '',
         time: ''
       },
       query: {},
@@ -420,9 +420,9 @@ export default {
     },
     getStatusText(status) {
       const option = this.allIncident.find(
-        (option) => option.eventCode === status
+        (option) => option === status
       )
-      return option ? option.eventName : ''
+      return option ? option : ''
     },
     async initList(id) {
       const startTime = this.searchParams.time ? this.searchParams.time[0] : ''
@@ -431,7 +431,7 @@ export default {
         num: this.params.pageSize,
         page: this.params.pageNum,
         channelId: id,
-        eventCode: this.searchParams.eventCode,
+        alarmDesc: this.searchParams.alarmDesc,
         startTime,
         endTime
       })
@@ -775,7 +775,7 @@ export default {
     },
     resetData(e) {
       this.searchParams = {
-        eventCode: '',
+        alarmDesc: '',
         time: ''
       }
       let target = e.target
