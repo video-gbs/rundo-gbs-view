@@ -72,13 +72,21 @@
       <div class="table-list">
         <div class="securityArea_container">
           <div class="btn-lists">
-            <el-button v-permission="['/alarm-manage/scheme/add', 2]" type="primary" @click="dialogShow(1)"
+            <el-button
+              v-permission="['/alarm-manage/scheme/add', 2]"
+              type="primary"
+              @click="dialogShow(1)"
               ><svg-icon class="svg-btn" icon-class="add" /><span
                 class="btn-span"
                 >新建</span
               ></el-button
             >
-            <el-button v-permission="['/alarm-manage/scheme/delete', 4]" @click="deteleAll($event)" style="width: 100px" plain>
+            <el-button
+              v-permission="['/alarm-manage/scheme/delete', 4]"
+              @click="deteleAll($event)"
+              style="width: 100px"
+              plain
+            >
               <svg-icon class="svg-btn" icon-class="del" />
               <span class="btn-span">批量删除</span>
             </el-button>
@@ -126,13 +134,22 @@
           </el-table-column>
           <el-table-column width="200" label="操作">
             <template slot-scope="scope">
-              <el-button v-permission="['/alarm-manage/scheme/channel/defense', 3]" type="text" @click="dialogShowPassage(scope.row)"
+              <el-button
+                v-permission="['/alarm-manage/scheme/channel/defense', 3]"
+                type="text"
+                @click="dialogShowPassage(scope.row)"
                 >布防通道</el-button
               >
-              <el-button v-permission="['/alarm-manage/scheme/update', 3]" type="text" @click="dialogShow(0, scope.row)"
+              <el-button
+                v-permission="['/alarm-manage/scheme/update', 3]"
+                type="text"
+                @click="dialogShow(0, scope.row)"
                 >编辑</el-button
               >
-              <el-button v-permission="['/alarm-manage/scheme/delete', 4]" type="text" @click="deleteRole(scope.row)"
+              <el-button
+                v-permission="['/alarm-manage/scheme/delete', 4]"
+                type="text"
+                @click="deleteRole(scope.row)"
                 ><span class="delete-button">删除</span></el-button
               >
             </template>
@@ -312,7 +329,7 @@ export default {
       treeData: [],
       detailsData: [],
       editAlarmId: '',
-      priChannelIds: ''
+      priChannelIds: []
     }
   },
   created() {},
@@ -502,6 +519,8 @@ export default {
           }
         })
       } else {
+        this.priChannelIds = []
+        Local.set('priChannelIds', [])
         Local.set('detailsData', [])
         this.isAddAlarmPlanShow = true
       }
