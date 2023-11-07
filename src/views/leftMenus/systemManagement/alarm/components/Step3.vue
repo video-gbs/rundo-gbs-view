@@ -176,7 +176,7 @@
 </template>
 
 <script>
-import { getAlarmEventLists } from '@/api/method/alarm'
+import { getAlarmEventLists1 } from '@/api/method/alarm'
 import LineFont from '@/components/LineFont'
 import { Local } from '@/utils/storage'
 export default {
@@ -306,7 +306,7 @@ export default {
   },
   methods: {
     async initAlarmEventLists(val) {
-      await getAlarmEventLists({ eventName: val })
+      await getAlarmEventLists1({ eventName: val })
         .then((res) => {
           if (res.data.code === 0) {
             this.allIncident = res.data.data
