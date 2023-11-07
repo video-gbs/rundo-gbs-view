@@ -285,13 +285,24 @@ export default {
         })
     },
     async initList(id) {
-      let params = {
-        num: this.params.pageSize,
-        page: this.params.pageNum,
-        priChannelIds: this.priChannelIds,
-        videoAreaId: id,
-        includeEquipment: this.includeEquipment ? 1 : 0,
-        ...this.searchParams
+      let params = {}
+      if (this.priChannelIds.length > 0) {
+        params = {
+          num: this.params.pageSize,
+          page: this.params.pageNum,
+          priChannelIds: this.priChannelIds,
+          videoAreaId: id,
+          includeEquipment: this.includeEquipment ? 1 : 0,
+          ...this.searchParams
+        }
+      } else {
+        params = {
+          num: this.params.pageSize,
+          page: this.params.pageNum,
+          videoAreaId: id,
+          includeEquipment: this.includeEquipment ? 1 : 0,
+          ...this.searchParams
+        }
       }
       await getAlarmSchemeChannel({
         ...params

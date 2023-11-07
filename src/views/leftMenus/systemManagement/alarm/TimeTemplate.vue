@@ -39,12 +39,12 @@
     <div class="table-list">
       <div class="securityArea_container">
         <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow(1)"
+          <el-button v-permission="['/timer-utils/template/add', 2]" type="primary" @click="dialogShow(1)"
             ><svg-icon class="svg-btn" icon-class="add" /><span class="btn-span"
               >新建</span
             ></el-button
           >
-          <el-button @click="deteleAll($event)" style="width: 100px" plain>
+          <el-button v-permission="['/timer-utils/template/delete', 4]" @click="deteleAll($event)" style="width: 100px" plain>
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span>
           </el-button>
@@ -83,10 +83,10 @@
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
             <!-- v-permission="['/rbac/dict/update', 3]" -->
-            <el-button type="text" @click="dialogShow(0, scope.row)"
+            <el-button v-permission="['/timer-utils/template/update', 3]" type="text" @click="dialogShow(0, scope.row)"
               >编辑</el-button
             >
-            <el-button type="text" @click="deleteRole(scope.row)"
+            <el-button v-permission="['/timer-utils/template/delete', 4]" type="text" @click="deleteRole(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
