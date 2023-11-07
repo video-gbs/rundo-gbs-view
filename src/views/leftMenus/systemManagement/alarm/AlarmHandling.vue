@@ -225,12 +225,12 @@
                   </el-button>
 
                   <!-- @click="register(scope.row)" -->
-                  <el-button
+                  <!-- <el-button
                     type="text"
                     v-else-if="scope.row.videoState === -1"
                     @click="playAlarm(scope.row)"
                     >重新录制
-                  </el-button>
+                  </el-button> -->
                   <el-button
                     type="text"
                     v-if="scope.row.videoState === 3"
@@ -240,6 +240,11 @@
                   <el-button type="text" v-if="scope.row.imageState === 3"
                     ><a :href="scope.row.imageUrl" download target="_blank"
                       >下载图片</a
+                    ></el-button
+                  >
+                  <el-button type="text" v-if="scope.row.imageState === 3"
+                    ><a @click="handlePreView(scope.row)"
+                      >预览图片</a
                     ></el-button
                   >
                   <el-button
@@ -409,6 +414,9 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    handlePreView(row) {
+      window.open(row.imageUrl, '_blank')
     },
     getStatusText(status) {
       const option = this.allIncident.find(
