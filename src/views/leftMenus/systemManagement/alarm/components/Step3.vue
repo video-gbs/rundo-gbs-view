@@ -424,7 +424,11 @@ export default {
 
       this.$refs.stepForm.map((item) => {
         params = {
-          eventCode: item.model.eventCode,
+          eventCode:
+            Object.prototype.toString.call(item.model.eventCode) ===
+            '[object Object]'
+              ? item.model.eventCode.eventCode
+              : item.model.eventCode,
 
           eventLevel: item.model.isactive,
 
