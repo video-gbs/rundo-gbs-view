@@ -72,13 +72,13 @@
       <div class="table-list">
         <div class="securityArea_container">
           <div class="btn-lists">
-            <el-button type="primary" @click="dialogShow(1)"
+            <el-button v-permission="['/alarm-manage/scheme/add', 2]" type="primary" @click="dialogShow(1)"
               ><svg-icon class="svg-btn" icon-class="add" /><span
                 class="btn-span"
                 >新建</span
               ></el-button
             >
-            <el-button @click="deteleAll($event)" style="width: 100px" plain>
+            <el-button v-permission="['/alarm-manage/scheme/delete', 4]" @click="deteleAll($event)" style="width: 100px" plain>
               <svg-icon class="svg-btn" icon-class="del" />
               <span class="btn-span">批量删除</span>
             </el-button>
@@ -113,6 +113,7 @@
           >
             <template slot-scope="scope">
               <el-switch
+                v-permission="['/alarm-manage/scheme/update/disabled', 3]"
                 v-model="scope.row.disabled"
                 active-color="#13ce66"
                 inactive-color="#ff4949"
@@ -125,13 +126,13 @@
           </el-table-column>
           <el-table-column width="200" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" @click="dialogShowPassage(scope.row)"
+              <el-button v-permission="['/alarm-manage/scheme/channel/defense', 3]" type="text" @click="dialogShowPassage(scope.row)"
                 >布防通道</el-button
               >
-              <el-button type="text" @click="dialogShow(0, scope.row)"
+              <el-button v-permission="['/alarm-manage/scheme/update', 3]" type="text" @click="dialogShow(0, scope.row)"
                 >编辑</el-button
               >
-              <el-button type="text" @click="deleteRole(scope.row)"
+              <el-button v-permission="['/alarm-manage/scheme/delete', 4]" type="text" @click="deleteRole(scope.row)"
                 ><span class="delete-button">删除</span></el-button
               >
             </template>
