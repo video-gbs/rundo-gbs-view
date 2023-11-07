@@ -30,7 +30,7 @@
               @node-click="handleNodeClick"
               :filter-node-method="filterNode"
             >
-              <span slot-scope="{ data }" class="custom-tree-node">
+              <span slot-scope="{ node, data }" class="custom-tree-node">
                 <span>
                   <svg-icon
                     v-if="data.resourceType === 1"
@@ -419,9 +419,7 @@ export default {
       window.open(row.imageUrl, '_blank')
     },
     getStatusText(status) {
-      const option = this.allIncident.find(
-        (option) => option === status
-      )
+      const option = this.allIncident.find((option) => option === status)
       return option ? option : ''
     },
     async initList(id) {
@@ -453,8 +451,7 @@ export default {
       // }
     },
     async handleNodeClick(data, node, self) {
-      console.log(data, 111)
-      if (!data.onlineState) {
+      if (!data.hasOwnProperty('onlineState')) {
         this.resArray = []
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
@@ -497,12 +494,10 @@ export default {
                 }
               }
             })
-            .catch((error) => {
-              // console.log(1111111,error)
-            })
+            .catch((error) => {})
         }
       } else {
-        if (!data.childList) {
+        if (!data.hasOwnProperty('childList')) {
           this.resId = data.areaPid
           this.initList(data.areaPid)
         }

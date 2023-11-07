@@ -1056,6 +1056,7 @@ export default {
       console.log(data, 111)
       if (!data.onlineState) {
         this.resArray = []
+         console.log(this.detailsId)
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
         } else {
