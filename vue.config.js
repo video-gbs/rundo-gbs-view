@@ -120,15 +120,6 @@ module.exports = {
     },
     proxy: getProxys()
   },
-  css: {
-    loaderOptions: {
-      sass: {
-        sassOptions: {
-          outputStyle: 'expanded'
-        }
-      }
-    }
-  },
 
   configureWebpack: {
     name: '',
@@ -322,8 +313,12 @@ module.exports = {
     loaderOptions: {
 
       scss: {
-        prependData: `@import "~@/styles/variables.scss";@import "~@/styles/dom.scss";`
-      }
+        prependData: `@import "~@/styles/variables.scss";@import "~@/styles/dom.scss";`,
+        sassOptions: {
+          outputStyle: 'expanded'
+        } // fix: 解决 element-ui 图标 icon 偶现乱码问题
+      },
+
     }
   }
 }
