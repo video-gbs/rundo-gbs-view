@@ -55,13 +55,13 @@ export default {
       rotate: 0,
       recordType: 'webm',
       scale: 0,
-      url: '',
+      url: 'wss://xard-gbs-test.runjian.com:2280/rtp/LIVE_193.live.flv',
       data: null,
       isNotMute: false
     };
   },
   mounted() {
-    // this.create();
+    this.create();
     // window.onerror = (msg) => (this.err = msg);
     // this.create();
 
@@ -72,7 +72,7 @@ export default {
   methods: {
     load(src,data) {
       this.data = data
-      this.url = '';
+      this.url = 'wss://xard-gbs-test.runjian.com:2280/rtp/LIVE_193.live.flv';
       this.create()
     },
     create(options) {
