@@ -1148,7 +1148,7 @@ time2[1]为结束时间
     ]
     var obj = {
       'context': context,
-      'editHeaderTitle': ["Copy To", "复制到"][lan],
+      'editHeaderTitle': ["Copy To", "将该预案复制到:"][lan],
       'editTextObj': editTextObj,
       'checkAllName': ["Check All", "全选"][lan],
       'saveName': ["Save", "保存"][lan],
