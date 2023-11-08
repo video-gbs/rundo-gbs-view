@@ -146,7 +146,7 @@ export default {
     },
     play(url, data) {
       // this.dataList[this.active] = data;
-      this.currPlayer.load('');
+      this.currPlayer.load('http://xard-gbs-test.runjian.com:2280/rtp/LIVE_193.live.flv');
       var n = (this.active + 1) % (this.splitNum + 1);
       this.active = n == 0 ? 1 : n;
     },
@@ -154,7 +154,7 @@ export default {
       this.dataList[index] = data;
       let players = this.$refs["player" + index];
       if (players && players.length > 0) {
-        players[0].load('', data);
+        players[0].load('http://xard-gbs-test.runjian.com:2280/rtp/LIVE_193.live.flv', data);
       }
     },
     capture() {

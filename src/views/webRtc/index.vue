@@ -20,7 +20,7 @@ export default {
   data() {
     return {
       videoUrl:
-        'wss://xard-gbs-test.runjian.com:2280/rtp/LIVE_193.live.flv'
+        'https://xard-gbs-test.runjian.com:2280/index/api/webrtc?app=rtp&stream=LIVE_193&type=play'
     }
   },
   mounted() {},
