@@ -8,8 +8,13 @@
         >
       </div>
     </div>
-    <div class="step">
-      <el-steps :active="active" finish-status="success" class="setp-content">
+    <div :class="active === 0 ? 'step1' : 'step'">
+      <el-steps
+        :active="active"
+        finish-status="success"
+        class="setp-content"
+        align-center
+      >
         <el-step title="时间模板"> </el-step>
         <el-step title="告警源"> </el-step>
         <el-step title="告警事件"> </el-step>
@@ -23,7 +28,7 @@
         :model="dialogParams.params"
         :rules="rules"
       >
-        <span class="alarm-span">基本信息</span>
+        <!-- <span class="alarm-span">基本信息</span> -->
         <el-form-item label="预案名称:" prop="schemeName">
           <el-input
             v-model="dialogParams.params.schemeName"
@@ -232,8 +237,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-step__title.is-success {
+  color: #333333 !important;
+}
+
+::v-deep .el-step__head.is-success {
+  // color: #60be2a;
+  border-color: #4b8afe !important;
+}
+// ::v-deep .el-step__icon
+::v-deep .el-icon-check:before {
+  color: #ffffff;
+}
 ::v-deep .el-step__main {
-  margin-left: -15px;
+  // margin-left: -15px;
 }
 ::v-deep .is-process {
   font-size: 16px;
@@ -241,15 +258,11 @@ export default {
   font-weight: 400;
   color: #333333;
 }
-// ::v-deep .el-step__icon {
-//   border-color: #004bad;
-// }
-// ::v-deep .el-step__icon-inner {
-//   font-size: 14px;
-//   font-family: Segoe UI-Regular, Segoe UI;
-//   font-weight: 400;
-//   color: #004bad;
-// }
+::v-deep .is-success > .el-step__icon {
+  // ::v-deep  {
+  background: #4b8afe !important;
+  // }
+}
 .selectTree {
   .el-select-dropdown__item {
     height: 200px !important;
@@ -367,51 +380,66 @@ export default {
 
   .search {
     width: calc(100% - 40px);
-    height: 100px;
-    margin: 20px;
+    height: 80px;
+    margin: 0 20px;
     background: #ffffff;
-    box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
+    border-bottom: 1px solid #eaeaea;
     .search-form {
-      padding-top: 45px;
-      margin-left: -40px;
+      padding-top: 25px;
+      margin-left: 30px;
     }
-    .alarm-span {
-      position: relative;
-      font-size: 14px;
-      color: #606266;
-      top: -30px;
-      left: 57px;
-    }
+    // .alarm-span {
+    //   position: relative;
+    //   font-size: 14px;
+    //   color: #606266;
+    //   top: -30px;
+    //   left: 57px;
+    // }
   }
 
   .step {
     width: calc(100% - 40px);
-    height: 80px;
-    margin: 20px;
+    height: 100px;
+    margin: 20px 20px 0 20px;
+    background: #ffffff;
+    box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #eaeaea;
+    border-radius: 2px;
+    .setp-content {
+      width: 50%;
+      margin: 0 auto;
+      padding: 30px 10px 20px 40px;
+    }
+  }
+  .step1 {
+    width: calc(100% - 40px);
+    height: 100px;
+    margin: 20px 20px 0 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     .setp-content {
       width: 50%;
       margin: 0 auto;
-      padding: 20px 10px 20px 40px;
+      padding: 30px 10px 20px 40px;
     }
   }
   .step-bottom {
     // height: calc(100% - 200px);
-    height: calc(100% - 315px);
+    height: calc(100% - 285px);
     width: calc(100% - 40px);
     overflow-y: auto;
-    margin: 20px;
+    margin: 0 20px 20px 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }
   .step-bottom1 {
-    height: calc(100% - 215px);
+    height: calc(100% - 205px);
+
     width: calc(100% - 40px);
     overflow-y: auto;
-    margin: 20px;
+    margin: 0 20px 20px 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);
   }
