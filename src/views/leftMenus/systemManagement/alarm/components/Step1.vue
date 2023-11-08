@@ -564,9 +564,9 @@ export default {
 ::v-deep div {
   box-sizing: unset;
 }
-// .step-table-list {
-// margin: 20px;
-// background: #ffffff;
+.step1-content {
+  height: calc(100% - 50px);
+}
 .dataDictionary-table {
   height: calc(100% - 100px);
   width: calc(100% - 40px) !important;

@@ -311,11 +311,11 @@ export default {
       },
       optionsList: [
         {
-          label: '离线',
+          label: '停用',
           value: 0
         },
         {
-          label: '在线',
+          label: '启用',
           value: 1
         }
       ],
