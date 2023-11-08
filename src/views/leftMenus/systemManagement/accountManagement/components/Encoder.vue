@@ -62,7 +62,7 @@
         :data="userTableData"
         border
         :header-cell-style="{
-          background: 'rgba(0, 75, 173, 0.06)',
+          background: '#F4F9FF',
           fontSize: '14px',
           fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
           fontWeight: 'bold',

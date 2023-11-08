@@ -65,7 +65,7 @@
         class="dataDictionary-table"
         border
         :header-cell-style="{
-          background: 'rgba(0, 75, 173, 0.06)',
+          background: '#F4F9FF',
           fontSize: '14px',
           fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
           fontWeight: 'bold',
@@ -79,15 +79,19 @@
         ></el-table-column>
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
-        <el-table-column prop="templateName" label="模板名称" />
+        <el-table-column
+          prop="templateName"
+          label="模板名称"
+          width="450"
+          :show-overflow-tooltip="true"
+        />
         <el-table-column
           prop="dateTypeStrList"
           label="模板详情"
-          width="350"
           :formatter="planDetailFormatter"
         />
-        <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column prop="updateTime" label="修改时间" />
+        <el-table-column prop="createTime" label="创建时间" width="180" />
+        <el-table-column prop="updateTime" label="修改时间" width="180" />
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
             <!-- v-permission="['/rbac/dict/update', 3]" -->
@@ -95,13 +99,15 @@
               v-permission="['/timer-utils/template/update', 3]"
               type="text"
               @click="dialogShow(0, scope.row)"
-              >编辑</el-button
+              ><span class="table-button-span">编辑</span></el-button
             >
             <el-button
               v-permission="['/timer-utils/template/delete', 4]"
               type="text"
               @click="deleteRole(scope.row)"
-              ><span class="delete-button">删除</span></el-button
+              ><span class="table-button-span delete-button"
+                >删除</span
+              ></el-button
             >
           </template>
         </el-table-column>
@@ -814,7 +820,7 @@ export default {
   }
   .table-list {
     margin: 20px;
-    padding: 20px;
+    padding: 16px 20px 20px 20px;
     background: #ffffff;
     height: calc(100% - 240px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
@@ -823,10 +829,16 @@ export default {
     .dataDictionary-table {
       height: calc(100% - 100px);
       overflow-y: auto;
+      font-size: 14px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #333333;
     }
     .securityArea_container {
       margin-bottom: 20px;
       .btn-lists {
+        float: right;
+        margin-bottom: 17px;
         .btn-span {
           position: relative;
           top: -2px;
@@ -892,6 +904,11 @@ export default {
     top: -1px;
     left: -6px;
   }
+}
+.table-button-span {
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
 }
 .delete-button {
   color: red !important;

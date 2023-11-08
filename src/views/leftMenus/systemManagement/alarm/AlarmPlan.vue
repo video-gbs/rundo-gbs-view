@@ -123,8 +123,8 @@
               <el-switch
                 v-permission="['/alarm-manage/scheme/update/disabled', 3]"
                 v-model="scope.row.disabled"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
+                inactive-color="#DCDFE6"
+                active-color="#004BAD"
                 :active-value="1"
                 :inactive-value="0"
                 @change="changeSwitch(scope.row)"
@@ -138,19 +138,21 @@
                 v-permission="['/alarm-manage/scheme/channel/defense', 3]"
                 type="text"
                 @click="dialogShowPassage(scope.row)"
-                >布防通道</el-button
+                ><span class="table-button-span">布防通道</span></el-button
               >
               <el-button
                 v-permission="['/alarm-manage/scheme/update', 3]"
                 type="text"
                 @click="dialogShow(0, scope.row)"
-                >编辑</el-button
+                ><span class="table-button-span">编辑</span></el-button
               >
               <el-button
                 v-permission="['/alarm-manage/scheme/delete', 4]"
                 type="text"
                 @click="deleteRole(scope.row)"
-                ><span class="delete-button">删除</span></el-button
+                ><span class="table-button-span delete-button"
+                  >删除</span
+                ></el-button
               >
             </template>
           </el-table-column>
@@ -718,7 +720,7 @@ export default {
   }
   .table-list {
     margin: 20px;
-    padding: 20px;
+    padding: 16px 20px 20px 20px;
     background: #ffffff;
     height: calc(100% - 195px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
@@ -727,10 +729,16 @@ export default {
     .dataDictionary-table {
       height: calc(100% - 100px);
       overflow-y: auto;
+      font-size: 14px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #333333;
     }
     .securityArea_container {
       margin-bottom: 20px;
       .btn-lists {
+        float: right;
+        margin-bottom: 17px;
         .btn-span {
           position: relative;
           top: -2px;
@@ -796,6 +804,11 @@ export default {
     top: -1px;
     left: -6px;
   }
+}
+.table-button-span {
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
 }
 .delete-button {
   color: red !important;
