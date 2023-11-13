@@ -58,13 +58,16 @@
                 @click="onclick(index, i + 1)"
               >
                 {{ level }}
-                <!-- <el-input v-model="stepform3[index].isactive" type="hidden"></el-input> -->
                 <svg-icon
                   v-if="stepform3[index].isactive === i + 1"
                   :icon-class="`intrusionLevel${i + 1}`"
                   class="intrusionLevel_svg"
                 />
               </span>
+
+              <span v-if="isSpanRequire[index]" class="span-require"
+                >此为必填项</span
+              >
             </el-form-item>
             <el-form-item label="间隔时间(秒)" prop="eventInterval">
               <el-select
@@ -185,6 +188,7 @@ export default {
   props: [],
   data() {
     return {
+      isSpanRequire: [],
       isShowImg: true,
       dialog: {
         show: false,
@@ -255,14 +259,17 @@ export default {
       if (newValue.length < this.stepform3.length) {
         this.stepform3 = this.stepform3.slice(0, newValue.length)
         this.intrusionLevel = this.intrusionLevel.slice(0, newValue.length)
+        this.isSpanRequire = this.isSpanRequire.slice(0, newValue.length)
       } else if (newValue.length > this.stepform3.length) {
         for (let i = 0; i < newValue.length; i++) {
           if (i >= this.stepform3.length) {
             resStepform3Obj.eventCode = newValue[i]
             resStepform3.push(resStepform3Obj)
             this.intrusionLevel.push(array)
+            this.isSpanRequire.push(false)
           }
         }
+        console.log('this.isSpanRequire', this.isSpanRequire)
         this.stepform3 = this.stepform3.concat(resStepform3)
       } else {
       }
@@ -404,6 +411,8 @@ export default {
     },
     onclick(index, i) {
       this.stepform3[index].isactive = i
+
+      this.isSpanRequire[i - 1] = false
       this.$forceUpdate()
     },
     clickLast() {
@@ -417,61 +426,86 @@ export default {
     },
     submitStep3() {
       console.log('this.$refs', this.$refs, this.checkeLists)
+      if (this.$refs.stepForm) {
+        const alarmSchemeEventReqList = []
 
-      const alarmSchemeEventReqList = []
+        let params = {}
 
-      let params = {}
+        this.$refs.stepForm.map((item) => {
+          params = {
+            eventCode:
+              Object.prototype.toString.call(item.model.eventCode) ===
+              '[object Object]'
+                ? item.model.eventCode.eventCode
+                : item.model.eventCode,
 
-      this.$refs.stepForm.map((item) => {
-        params = {
-          eventCode:
-            Object.prototype.toString.call(item.model.eventCode) ===
-            '[object Object]'
-              ? item.model.eventCode.eventCode
-              : item.model.eventCode,
+            eventLevel: item.model.isactive,
 
-          eventLevel: item.model.isactive,
+            eventInterval: item.model.eventInterval,
 
-          eventInterval: item.model.eventInterval,
+            videoLength: item.model.videoLength,
 
-          videoLength: item.model.videoLength,
+            videoHasAudio: item.model.videoHasAudio ? 1 : 0,
+            enablePhoto: item.model.enablePhoto ? 1 : 0,
 
-          videoHasAudio: item.model.videoHasAudio ? 1 : 0,
-          enablePhoto: item.model.enablePhoto ? 1 : 0,
+            enableVideo: item.model.enableVideo ? 1 : 0
+          }
+          alarmSchemeEventReqList.push(params)
+        })
 
-          enableVideo: item.model.enableVideo ? 1 : 0
+        this.checkeLists.map((item1, i) => {
+          console.log('this.stepform3~~~~~~~~~~', this.stepform3[i].isactive)
+          if (
+            item1.isactive === '' ||
+            item1.isactive === null ||
+            item1.isactive === undefined
+          ) {
+            this.isSpanRequire[i] = true
+
+            console.log('this.isSpanRequire~~~~~~~~~~~~', this.isSpanRequire)
+
+            this.$forceUpdate()
+          }
+          if (
+            this.stepform3[i].isactive !== '' &&
+            this.stepform3[i].isactive !== null &&
+            this.stepform3[i].isactive !== undefined
+          ) {
+            // this.$refs.stepForm[i].resetFields()
+
+            this.isHas = true
+          } else {
+            this.isHas = true
+
+            // this.isSpanRequire[i] = false
+            // this.isSpanRequire = false
+
+            // this.$refs.stepForm[i].resetFields()
+            this.$refs.stepForm[i].validate((valid) => {
+              if (valid) {
+                console.log('stepform3~~~~~~~~', stepform3)
+                // this.isHas = true
+
+                this.$emit('submitStep')
+              }
+            })
+          }
+        })
+
+        const uniqueArr = alarmSchemeEventReqList.filter(
+          (item3, index) =>
+            alarmSchemeEventReqList.findIndex(
+              (i) => i.eventCode === item3.eventCode
+            ) === index
+        )
+        if (this.isHas) {
+          this.$emit('stepParams3', uniqueArr)
         }
-        alarmSchemeEventReqList.push(params)
-      })
-
-      this.checkeLists.map((item1, i) => {
-        if (this.stepform3[i].isactive && this.stepform3[i].isactive !== '') {
-          // this.$refs.stepForm[i].resetFields()
-
-          this.isHas = true
-        } else {
-          this.isHas = false
-
-          // this.$refs.stepForm[i].resetFields()
-          this.$refs.stepForm[i].validate((valid) => {
-            if (valid) {
-              console.log('stepform3~~~~~~~~', stepform3)
-              this.isHas = true
-
-              this.$emit('submitStep')
-            }
-          })
-        }
-      })
-
-      const uniqueArr = alarmSchemeEventReqList.filter(
-        (item3, index) =>
-          alarmSchemeEventReqList.findIndex(
-            (i) => i.eventCode === item3.eventCode
-          ) === index
-      )
-      if (this.isHas) {
-        this.$emit('stepParams3', uniqueArr)
+      } else {
+        this.$message({
+          message: '请选择告警事件',
+          type: 'warning'
+        })
       }
     }
   }
@@ -543,7 +577,7 @@ export default {
       margin-top: 20px;
       .box-card {
         flex-basis: calc(33% - 52px);
-        // min-width: 504px;
+        min-width: 504px;
         height: 450px;
         background: #fefefe;
         box-shadow: 0px 3px 6px 1px rgba(0, 0, 0, 0.1);
@@ -638,5 +672,13 @@ export default {
 }
 .demo-ruleForm {
   // margin-left: -20px;
+  position: relative;
+  .span-require {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    color: #e02016;
+    font-size: 12px;
+  }
 }
 </style>

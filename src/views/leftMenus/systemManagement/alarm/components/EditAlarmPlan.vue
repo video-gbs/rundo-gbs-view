@@ -9,7 +9,12 @@
       </div>
     </div>
     <div :class="active === 0 ? 'step1' : 'step'">
-      <el-steps :active="active" finish-status="success" class="setp-content" align-center>
+      <el-steps
+        :active="active"
+        finish-status="success"
+        class="setp-content"
+        align-center
+      >
         <el-step title="时间模板"> </el-step>
         <el-step title="告警源"> </el-step>
         <el-step title="告警事件"> </el-step>
@@ -224,6 +229,10 @@ export default {
         alarmSchemeEventReqList: this.step3Data
       }).then((res) => {
         if (res.data.code === 0) {
+          this.$message({
+            message: '编辑成功！',
+            type: 'success'
+          })
           this.goback()
           this.$emit('getList')
         }

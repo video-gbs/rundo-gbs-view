@@ -111,7 +111,13 @@
           <el-table-column type="index" width="50" align="center" label="序号">
           </el-table-column>
           <el-table-column prop="schemeName" label="已关联预案" />
-          <el-table-column prop="eventNameList" label="告警事件" />
+          <el-table-column
+            prop="eventNameList"
+            label="告警事件"
+            width="240"
+            :formatter="alarmsFormatter"
+            :show-overflow-tooltip="true"
+          />
           <el-table-column prop="createTime" label="创建时间" />
           <el-table-column prop="updateTime" label="修改时间" />
           <el-table-column
@@ -125,8 +131,8 @@
                 v-model="scope.row.disabled"
                 inactive-color="#DCDFE6"
                 active-color="#004BAD"
-                :active-value="1"
-                :inactive-value="0"
+                :active-value="0"
+                :inactive-value="1"
                 @change="changeSwitch(scope.row)"
               >
               </el-switch>
@@ -357,6 +363,39 @@ export default {
     },
     cxData() {
       this.getList()
+    },
+    alarmsFormatter(row) {
+      if (row.eventNameList && row.eventNameList.length > 0) {
+        let result = ''
+        row.eventNameList.forEach((type, index) => {
+          switch (index + 1) {
+            case 1:
+              result += `${type}、`
+              break
+            case 2:
+              result += `${type}、`
+              break
+            case 3:
+              result += `${type}、`
+              break
+            case 4:
+              result += `${type}、`
+              break
+            case 5:
+              result += `${type}、`
+              break
+            case 6:
+              result += `${type}、`
+              break
+            case 7:
+              result += `${type}、`
+              break
+            default:
+              break
+          }
+        })
+        return result.substring(0, result.length - 1)
+      }
     },
 
     resetData(e) {
@@ -592,7 +631,11 @@ export default {
         target = e.target
       }
       target.blur()
-      this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
+      this.$confirm(`确认删除${
+          this.$refs.timeTemTable.selection.length > 0
+            ? this.$refs.timeTemTable.selection.length
+            : 0
+        }个预案？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -616,7 +659,7 @@ export default {
       })
     },
     deleteRole(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+      this.$confirm(`确认删除预案${row.schemeName}？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
