@@ -416,7 +416,7 @@ export default {
         })
     },
     handlePreView(row) {
-      window.open(row.imageUrl, '_blank')
+      window.open(row.imageUrl)
     },
     getStatusText(status) {
       const option = this.allIncident.find((option) => option === status)
@@ -626,7 +626,7 @@ export default {
     },
 
     deleteRole(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+      this.$confirm('删除后不可恢复，确认删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

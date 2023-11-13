@@ -123,7 +123,9 @@
       :title="dialog.title"
       :visible.sync="dialog.show"
       width="950px"
+      top="100px"
       :before-close="handleClose"
+      :close-on-click-modal="false"
     >
       <div slot="title">
         <div style="display: flex; justify-content: space-between">
@@ -133,20 +135,17 @@
         </div>
       </div>
       <el-form
-        :model="dialog.params"
         ref="accountForm"
-        style="overflow-x: auto"
+        label-width="140px"
+        :rules="rules"
+        :model="dialog.params"
       >
-        <el-form-item
-          label="模板名称"
-          :rules="[
-            { required: true, message: '模板名称不能为空', trigger: 'blur' }
-          ]"
-        >
+        <el-form-item label="模板名称" prop="templateName" class="time-template">
           <el-input
             class="item-input"
             v-model="dialog.params.templateName"
             clearable
+            style="width: 340px"
           ></el-input>
         </el-form-item>
 
@@ -235,6 +234,23 @@ export default {
   name: '',
   components: { pagination },
   data() {
+    const checkName = (rule, value, cb) => {
+      const regName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
+      if (value.length === 0) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (regName.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
+            )
+          )
+        }
+      }, 500)
+    }
     return {
       isShow: true,
       params: {
@@ -257,6 +273,14 @@ export default {
       },
       searchParams: {
         templateName: ''
+      },
+      rules: {
+        templateName: {
+          required: true,
+          max: 32,
+          validator: checkName,
+          trigger: 'blur'
+        }
       },
       roleId: '',
       buttonLoading: false,
@@ -575,7 +599,7 @@ export default {
       })
     },
     deleteRole(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+      this.$confirm(` 是否删除模板"${row.templateName}" ？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -740,6 +764,9 @@ export default {
 <style lang="scss" scoped>
 ::v-deep .el-table::before {
   height: 0 !important;
+}
+::v-deep .time-template {
+  margin-left: -60px;
 }
 ::v-deep .el-table--border {
   border-bottom: 1px solid #eaeaea;

@@ -224,6 +224,10 @@ export default {
         alarmSchemeEventReqList: this.step3Data
       }).then((res) => {
         if (res.data.code === 0) {
+          this.$message({
+            message: '新建成功！',
+            type: 'success'
+          })
           this.goback()
           this.$emit('getList')
         }
