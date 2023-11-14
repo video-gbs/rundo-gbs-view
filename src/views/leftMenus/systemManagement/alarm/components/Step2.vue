@@ -129,7 +129,7 @@
               />
               <el-table-column
                 prop="schemeName"
-                label="预案名称"
+                label="已关联预案"
                 :show-overflow-tooltip="true"
               />
               <!-- <el-table-column prop="schemeName" label="预案名称" width="100">
@@ -675,7 +675,7 @@ export default {
       }
     }
     .encoder-table {
-      height: calc(100% - 145px);
+      max-height: calc(100% - 145px);
       overflow-y: auto;
     }
   }

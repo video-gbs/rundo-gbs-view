@@ -110,7 +110,7 @@
           </el-table-column>
           <el-table-column type="index" width="50" align="center" label="序号">
           </el-table-column>
-          <el-table-column prop="schemeName" label="已关联预案" />
+          <el-table-column prop="schemeName" label="预案名称" />
           <el-table-column
             prop="eventNameList"
             label="告警事件"
@@ -318,11 +318,11 @@ export default {
       optionsList: [
         {
           label: '停用',
-          value: 0
+          value: 1
         },
         {
           label: '启用',
-          value: 1
+          value: 0
         }
       ],
       searchParams: {
