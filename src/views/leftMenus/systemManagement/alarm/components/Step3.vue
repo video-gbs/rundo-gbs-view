@@ -410,9 +410,10 @@ export default {
       console.log(this.checkeLists)
     },
     onclick(index, i) {
+      // console.log(2222,index,i)
       this.stepform3[index].isactive = i
 
-      this.isSpanRequire[i - 1] = false
+      this.isSpanRequire[index] = false
       this.$forceUpdate()
     },
     clickLast() {
