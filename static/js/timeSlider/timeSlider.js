@@ -882,6 +882,7 @@ time2[1]为结束时间
                                <input type="text" maxlength="2" id="startH" class="time-input"> :\
                                <input type="text" maxlength="2" id="startM" class="time-input">\
                             </div>\
+                            <span class="time-start-div-span">至</span>\
                             <div class="time-stop-div">\
                                <label class="time-lab"><%=timeStopLab%></label>\
                                <input type="text" maxlength="2" id="stopH" class="time-input"> :\
@@ -898,9 +899,9 @@ time2[1]为结束时间
                           </div>\
                         </div>\
                         <div class="modal-footer">\
-                          <button class="btnModal" id="calBtn"><%=calBtnName%></button>\
-                          <button class="btnModal btnDel" id="delBtn"><%=delBtnName%></button>\
-                          <button class="btnModal btnSave" id="setBtn"><%=setBtnName%></button>\
+                          <span class="btnModal" id="calBtn"><%=calBtnName%></span>\
+                          <span class="btnModal btnDel" id="delBtn"><%=delBtnName%></span>\
+                          <span class="btnModal btnSave" id="setBtn"><%=setBtnName%></span>\
                         </div>\
                      </div>\
                  </div>\
@@ -908,9 +909,9 @@ time2[1]为结束时间
 
     var lan = g_language;
     var obj = {
-      'modalHeaderTitile': ["Edit", "编辑"][lan],
-      'timeStartLab': ["Start Time", "开始时间"][lan],
-      'timeStopLab': ["Stop Time", "结束时间"][lan],
+      'modalHeaderTitile': ["Edit", "配置预案时间"][lan],
+      'timeStartLab': ["Start Time", ""][lan],
+      'timeStopLab': ["Stop Time", ""][lan],
       'eventLab': ["Event Type", "事件类型"][lan],
       'eventArray': [
         ["Event1", "事件1"][lan],
@@ -919,7 +920,7 @@ time2[1]为结束时间
         ["Event4", "事件4"][lan],
         ["Event5", "事件5"][lan]
       ],
-      'setBtnName': ["Set", "设置"][lan],
+      'setBtnName': ["Set", "保存"][lan],
       'delBtnName': ["Delete", "删除"][lan],
       'calBtnName': ["Cancel", "取消"][lan]
     }
@@ -1115,21 +1116,24 @@ time2[1]为结束时间
                         <label class="editHeaderTitle"><%=editHeaderTitle%></label>\
                     </div>\
                     <div class="editBody">\
+
+                        <div class="editUnit" style="width:100px;">\
+                          <input class=<%="editCheckAll"+context.timeSliderNums%> type="checkbox"></input>\
+                          <label class="editUnit-label"><%=checkAllName%></label>\
+                         </div>\
+
                       <%_.forEach(editTextObj,function(item,index){%>\
                       <%index+=1;%>\
-                          <div class="editUnit">\
-                             <input class=<%="editCBox"+context.timeSliderNums%> id=<%="editCBox"+context.timeSliderNums+"_"+index%> type="checkbox"></input>\
-                             <label><%=item%></label>\
-                          </div>\
+                        <div class="editUnit">\
+                          <input class=<%="editCBox"+context.timeSliderNums%> id=<%="editCBox"+context.timeSliderNums+"_"+index%> type="checkbox"></input>\
+                          <label class="editUnit-label"><%=item%></label>\
+                        </div>\
+
                       <%})%>\
-                           <div class="editUnit" style="width:100px;">\
-                              <input class=<%="editCheckAll"+context.timeSliderNums%> type="checkbox"></input>\
-                              <label><%=checkAllName%></label>\
-                           </div>\
                     </div>\
                     <div class="editFotter">\
-                      <button type="button" class="editBtn cancel"><%=cancelName%></button>\
-                      <button type="button" class="editBtn save"><%=saveName%></button>\
+                      <span  class="editBtn cancel"><%=cancelName%></span>\
+                      <span  class="editBtn save"><%=saveName%></span>\
                     </div>\
                 </div>\
             </div>`;
