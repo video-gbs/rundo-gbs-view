@@ -258,7 +258,7 @@ export default {
       }, 500)
     }
     return {
-      isShow: true,
+      isShow: false,
       params: {
         pageNum: 1,
         pageSize: 10,
