@@ -140,7 +140,11 @@
         :rules="rules"
         :model="dialog.params"
       >
-        <el-form-item label="模板名称" prop="templateName" class="time-template">
+        <el-form-item
+          label="模板名称"
+          prop="templateName"
+          class="time-template"
+        >
           <el-input
             class="item-input"
             v-model="dialog.params.templateName"
@@ -216,6 +220,7 @@
         >
       </span>
     </el-dialog>
+    <!-- <TimeTest /> -->
   </div>
 </template>
 
@@ -230,9 +235,10 @@ import pagination from '@/components/Pagination/index.vue'
 import '../../../../../static/js/timeSlider/timeSlider'
 import '../../../../../static/css/timeSlider.css'
 import '../../../../../static/css/normalize.css'
+import TimeTest from './components/TimeTest.vue'
 export default {
   name: '',
-  components: { pagination },
+  components: { pagination, TimeTest },
   data() {
     const checkName = (rule, value, cb) => {
       const regName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/

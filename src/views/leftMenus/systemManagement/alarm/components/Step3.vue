@@ -66,7 +66,7 @@
               </span>
 
               <span v-if="isSpanRequire[index]" class="span-require"
-                >此为必填项</span
+                >请选择入侵等级。</span
               >
             </el-form-item>
             <el-form-item label="间隔时间(秒)" prop="eventInterval">
@@ -216,7 +216,6 @@ export default {
         width: '3px',
         height: '18px'
       },
-      isHas: false,
       rules: {
         eventLevel: [
           {
@@ -232,7 +231,7 @@ export default {
         },
         eventInterval: {
           required: true,
-          message: '此为必填项。',
+          message: '请选择时间间隔。',
           trigger: 'change'
         }
       }
@@ -454,54 +453,41 @@ export default {
           alarmSchemeEventReqList.push(params)
         })
 
-        this.checkeLists.map((item1, i) => {
-          console.log('this.stepform3~~~~~~~~~~', this.stepform3[i].isactive)
-          if (
-            item1.isactive === '' ||
-            item1.isactive === null ||
-            item1.isactive === undefined
-          ) {
-            this.isSpanRequire[i] = true
-
-            console.log('this.isSpanRequire~~~~~~~~~~~~', this.isSpanRequire)
-
-            this.$forceUpdate()
-          }
-          if (
-            this.stepform3[i].isactive !== '' &&
-            this.stepform3[i].isactive !== null &&
-            this.stepform3[i].isactive !== undefined
-          ) {
-            // this.$refs.stepForm[i].resetFields()
-
-            this.isHas = true
-          } else {
-            this.isHas = true
-
-            // this.isSpanRequire[i] = false
-            // this.isSpanRequire = false
-
-            // this.$refs.stepForm[i].resetFields()
-            this.$refs.stepForm[i].validate((valid) => {
-              if (valid) {
-                console.log('stepform3~~~~~~~~', stepform3)
-                // this.isHas = true
-
-                this.$emit('submitStep')
-              }
-            })
-          }
-        })
-
         const uniqueArr = alarmSchemeEventReqList.filter(
           (item3, index) =>
             alarmSchemeEventReqList.findIndex(
               (i) => i.eventCode === item3.eventCode
             ) === index
         )
-        if (this.isHas) {
-          this.$emit('stepParams3', uniqueArr)
-        }
+        let resValidate = []
+
+        this.checkeLists.map((item1, i) => {
+          if (
+            this.stepform3[i].isactive === '' ||
+            this.stepform3[i].isactive === null ||
+            this.stepform3[i].isactive === undefined
+          ) {
+            this.isSpanRequire[i] = true
+            this.$forceUpdate()
+          } else {
+            this.isSpanRequire[i] = false
+            this.$forceUpdate()
+          }
+
+          resValidate.push(this.$refs.stepForm[i].validate())
+        })
+        Promise.all(resValidate).then(() => {
+          console.log('this.isSpanRequire',this.isSpanRequire,this.isSpanRequire.every((itme) => !itme))
+          if (this.isSpanRequire.every((item) => !item)) {
+            console.log('验证通过')
+
+            this.$emit('submitStep')
+
+            this.$emit('stepParams3', uniqueArr)
+          } else {
+            console.log('验证不通过')
+          }
+        })
       } else {
         this.$message({
           message: '请选择告警事件',

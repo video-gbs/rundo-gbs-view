@@ -214,6 +214,7 @@ export default {
                 Local.get('detailsData') &&
                 Local.get('detailsData').templateId === item.id
               ) {
+                this.resData = [item]
                 if (!this.select) {
                   this.selectedObj[item.id] = item
                 }
@@ -465,9 +466,19 @@ export default {
       this.resData.map((item) => {
         this.resIds = item.id
       })
+      if (this.resIds === '') {
+        this.$confirm('没有勾选模板,是否继续下一步？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$emit('saveAll', this.resIds)
+        })
+      } else {
+        this.$emit('saveAll', this.resIds)
+      }
 
       console.log('this.resIds', this.resIds)
-      this.$emit('saveAll', this.resIds)
     },
     goback() {
       this.$emit('goback')
