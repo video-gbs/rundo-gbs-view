@@ -280,6 +280,7 @@
         title="正在预览图片"
         :visible.sync="showImagePreview"
         width="70%"
+        top="100px"
         custom-class="formDialog"
         style="text-align: left"
       >
@@ -292,6 +293,7 @@
         title="正在播放视频"
         :visible.sync="playVideoVisible"
         width="70%"
+        top="100px"
         custom-class="formDialog"
         style="text-align: left"
       >
