@@ -4,7 +4,7 @@
       v-if="dialog.show"
       :title="dialog.title"
       :visible.sync="dialog.show"
-      width="950px"
+      width="1060px"
       top="100px"
       :before-close="handleClose"
       :close-on-click-modal="false"
@@ -46,6 +46,13 @@
             :id="`timeSlider${index + 1}`"
           >
             <label class="label-week">{{ item }}</label>
+            <div class="time-scale-main">
+              <div class="time-scale-main-div">
+                <span v-for="t in timeArr" :key="t" class="time-scale-font">
+                  <span class="time-scale-line"></span>{{ t }}</span
+                >
+              </div>
+            </div>
           </div>
         </div>
       </el-form>
@@ -103,6 +110,7 @@ export default {
         '星期六',
         '星期日'
       ],
+      timeArr: [],
       rules: {
         templateName: {
           required: true,
@@ -113,7 +121,9 @@ export default {
       }
     }
   },
-  created() {},
+  created() {
+    this.timeArr = this.createTimeArr(25)
+  },
   mounted() {},
   methods: {
     dialogShow(act, data) {
@@ -134,6 +144,9 @@ export default {
     },
     handleClose(done) {
       done()
+    },
+    createTimeArr(len) {
+      return Array.from(Array(len)).map((ret, id) => id)
     }
   }
 }
@@ -157,6 +170,32 @@ export default {
       margin-bottom: 4px;
       .label-week {
         margin-left: 16px;
+        font-size: 14px;
+        font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+        font-weight: 400;
+        color: #606266;
+      }
+      .time-scale-main {
+        margin-top: 24px;
+        .time-scale-main-div {
+          .time-scale-line {
+            display: inline-block;
+            width: 1px;
+            height: 5px;
+            background: #cccccc;
+            position: relative;
+            top: -12px;
+            left: 8px;
+          }
+          .time-scale-font {
+            display: inline-block;
+            margin-left: 24px;
+            font-size: 12px;
+            font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+            font-weight: 400;
+            color: #b1b1b1;
+          }
+        }
       }
     }
   }

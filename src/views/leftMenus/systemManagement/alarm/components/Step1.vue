@@ -268,18 +268,26 @@ export default {
 
     handleSelect(selection, row) {
       this.select = true
-      console.log('selectionselection2222222', selection, row)
-      this.resData = [selection[selection.length - 1]] || []
-      this.selectedObj = {}
-      this.resData.forEach((item) => {
-        this.selectedObj[item.id] = item
-      })
-      console.log('selectedObj', this.selectedObj)
+      // console.log('selectionselection2222222', selection, row)
+      // 取消单个勾选时，删除对应属性
+      if (!selection.some((item) => item.id === row.id)) {
+        delete this.selectedObj[row.id]
+        this.resData = []
+      }
+      if (selection.length > 0) {
+        this.resData = [selection[selection.length - 1]] || []
+        this.selectedObj = {}
+        // console.log('this.resData', this.resData)
+        this.resData.forEach((item) => {
+          this.selectedObj[item.id] = item
+        })
 
-      // 清除 所有勾选项
-      this.$refs.timeTemTable.clearSelection()
+        // 清除 所有勾选项
+        this.$refs.timeTemTable.clearSelection()
 
-      this.$refs.timeTemTable.toggleRowSelection(row, true)
+        this.$refs.timeTemTable.toggleRowSelection(row, true)
+      }
+      // console.log('selectedObj', this.selectedObj)
     },
     handleSelectAll(selection) {
       this.select = true
