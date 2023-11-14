@@ -1,6 +1,6 @@
 <template>
   <div class="login" id="login">
-    <div class="wrap-top">
+    <div class="wrap-top" v-if="showHome">
       <div class="wrap-middle">
         <div class="wrap-middle-left">
           <div class="left-img"></div>
@@ -28,10 +28,7 @@
                   label-position="left"
                 >
                   <el-form-item prop="username">
-                    <div
-                      class="login-middle-input"
-                      data-validate="Valid email is: a@b.c"
-                    >
+                    <div class="login-middle-input">
                       <svg-icon class="svg-btn" icon-class="zhanghao" />
                       <input
                         ref="username"
@@ -49,10 +46,7 @@
                   </el-form-item>
 
                   <el-form-item prop="password">
-                    <div
-                      class="login-middle-input"
-                      data-validate="Enter password"
-                    >
+                    <div class="login-middle-input">
                       <svg-icon class="svg-btn" icon-class="mima" />
                       <input
                         ref="password"
@@ -102,7 +96,9 @@
                   </el-form-item> -->
                 </el-form>
                 <div class="login-footer-button">
-                  <el-button @click="handleLogin" :loading="loading"
+                  <el-button
+                    @click="handleLogin('loginForm')"
+                    :loading="loading"
                     >登录</el-button
                   >
                 </div>
@@ -112,45 +108,60 @@
         </div>
       </div>
     </div>
+
+    <!-- <div id="mapContainerTest"></div> -->
   </div>
 </template>
 
 <script>
-import Code from '@/views/leftMenus/systemManagement//components/Code'
-
-import { validUsername } from '@/utils/validate'
-import { login } from '@/api/method/user'
-import { Local } from '@/utils/storage'
+import { getMenuLists } from '@/api/method/user'
+import {
+  getHomeUser,
+  newLoginN,
+  newRefreshToken,
+  getHomeFunc
+} from '@/api/method/home'
+import { Local, Session } from '@/utils/storage'
 import store from '@/store/index'
-import { getRouters } from '@/api/method/menus'
+import Layout from '@/layout/index'
+
+import axios from 'axios'
+
+// import { Run3D } from '../../../node_modules/@rjgf/run3d'
+import * as Run3D from '@rjgf/run3d'
+import '@rjgf/run3d-engine/Build/Cesium/Widgets/widgets.css'
+// let Map = require('@rjgf/run3d')
+// import '@rjgf/run3d-engine/Build/Cesium/Widgets/widgets.css'
+window._AMapSecurityConfig = {
+  // 设置安全密钥
+  securityJsCode: '53f79308351ca5147392f915cfc133d5'
+}
+
 export default {
   name: 'Login',
-  components: { Code },
+  components: {},
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      if (value === '' || value === null || value.length === 0) {
         callback(new Error('请输入账号'))
       } else {
-        if (value.length < 6 || value.length > 20) {
-          callback(new Error('账号长度6到20个字符'))
-        } else {
-          callback()
-        }
+        callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      if (value === '' || value === null || value.length === 0) {
         callback(new Error('请输入密码'))
       } else {
-        if (value.length < 6 || value.length > 20) {
-          callback(new Error('密码长度6到20个字符'))
-        } else {
-          callback()
-        }
+        callback()
       }
     }
 
     return {
+      map: null,
+      mouseTool: null,
+      overlays: [],
+      auto: null,
+      placeSearch: null,
       identifyCode: '',
       // identifyCodes: ['0','1','2','3'...'a','b','c'...'z'],
       loginForm: {
@@ -173,32 +184,367 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined,
-      windowWidth: null
+      // redirect: undefined,
+      windowWidth: null,
+      hasGoPath: '',
+      thirdPartyLogin: false,
+      showHome: false,
+      resFuncId: ''
     }
   },
   watch: {
     $route: {
       handler: function (route) {
-        this.redirect = route.query && route.query.redirect
-      },
-      immediate: true
-    },
-    windowWidth: {
-      handler: function (val, oldVal) {
-        const h = document.getElementsByTagName('HTML')[0]
-        h.style.setProperty('--web-zoom', this.windowWidth / 1920)
-
-        this.$forceUpdate()
+        console.log('routerouterouterouteroute', route)
+        // this.redirect = route.query && route.query.redirect
       },
       immediate: true
     }
+    // windowWidth: {
+    //   handler: function (val, oldVal) {
+    //     const h = document.getElementsByTagName('HTML')[0]
+    //     h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+
+    //     this.$forceUpdate()
+    //   },
+    //   immediate: true
+    // }
   },
+  created() {},
   mounted() {
-    this.windowWidth = document.documentElement.clientWidth
-    window.onresize = this.throttle(this.setScale, 500, 500)
+    // this.initMap()
+    // this.windowWidth = document.documentElement.clientWidth
+    // window.onresize = this.throttle(this.setScale, 500, 500)
+
+    store.dispatch('user/changeThirdPartyLogin', false)
+    clearInterval(window.interval)
+    clearInterval(window.interval1)
+    Session.set('permissionData', [])
+    Session.set('permissionMenuId', '')
+    Local.set('expires_in', '')
+    Local.clear()
+    Local.remove('access_token')
+    Local.remove('utilTime')
+    Local.remove('expires_in')
+    Local.remove('refresh_token')
+
+    Session.set('third_party_login', false)
+    this.thirdPartyLogin = false
+
+    if (window.location.search.indexOf('access_token') !== -1) {
+      this.showHome = false
+      const resUrl = decodeURIComponent(window.location.search)
+      console.log('resUrl', resUrl)
+      const resObj = this.getUrlParams(resUrl)
+      console.log('resObj', resObj)
+
+      const accessToken1 = resObj.access_token
+      const refreshToken1 = resObj.refresh_token_url
+      const expiresIn1 = Number(resObj.expires_in)
+      const tokenType1 = resObj.token_type
+      const goPath = resObj.redirect_route
+      this.thirdPartyLogin = true
+      this.hasGoPath = resObj.redirect_route
+
+      Session.set('third_party_login', true)
+
+      Local.set('goPath', goPath)
+
+      Local.set('rj_deptType', 0)
+      Local.set('access_token', accessToken1)
+      Local.set('refresh_token_url', refreshToken1)
+      this.isRefreshTokenExpired(expiresIn1)
+      Local.set('expires_in', expiresIn1)
+      Local.set('expires_in_old', expiresIn1)
+      Local.set('token_type', tokenType1)
+      this.$nextTick(() => {
+        // setTimeout(() => {
+        console.log(22222)
+        this.getHomeUser()
+        // }, 500)
+      })
+
+      this.loading = false
+    } else {
+      this.showHome = true
+    }
   },
   methods: {
+    // routerChildren(data, arr) {
+    //   let childArr = []
+    //   data.forEach((datas, index) => {
+    //     arr.push({
+    //       path: datas.path,
+    //       name: datas.name,
+    //       types: datas.types,
+    //       hidden: datas.disabled === 1 ? true : false,
+    //       component:
+    //         datas.component === 'Layout'
+    //           ? Layout
+    //           : (resolve) => require([`@/views${datas.component}`], resolve),
+    //       meta: {
+    //         title: datas.name,
+    //         icon: datas.icon
+    //       },
+    //       id: datas.id,
+    //       // 子路由
+    //       children: []
+    //     })
+
+    //     if (datas.childList && datas.childList.length > 0) {
+    //       childArr = this.routerChildren(datas.childList, [])
+    //       arr[index].children = childArr
+    //     }
+    //   })
+    //   return arr
+    // },
+
+    findFuncId(data) {
+      data.forEach((datas, index) => {
+        if (datas.path === `/${Local.get('goPath')}`) {
+          this.resFuncId = datas.id
+        }
+        if (datas.childList && datas.childList.length > 0) {
+          this.findFuncId(datas.childList)
+        }
+      })
+    },
+
+    routerChild(data) {
+      let resRouterChildren = []
+      let childTemp = {}
+      let childArr = []
+      data.forEach((item, i) => {
+        // 组装路由配置
+        childTemp = {
+          name: item.name,
+          path: item.path,
+          id: item.id,
+          meta: { icon: item.icon, title: item.name },
+          component: item.component
+        }
+        if (item.childList && item.childList.length > 0) {
+          childArr = this.routerChild(item.childList)
+          childTemp.children = childArr
+        }
+        resRouterChildren.push(childTemp)
+      })
+      return resRouterChildren
+    },
+    saveComponents(data) {
+      const homeRouters = [
+        {
+          path: '/workTable',
+          name: 'workTable',
+          component: () => import('@/views/leftMenus/workTable/index'),
+          meta: { title: '首页', icon: 'sy' }
+        }
+      ]
+
+      if (data && data.length > 0) {
+        let typeRouter = []
+        let resData = []
+
+        data.map((datas) => {
+          datas.childList.map((item) => {
+            // let params = {}
+            let params1 = {}
+            let params2 = {}
+            // params = {
+            //   path: item.path,
+            //   meta: { icon: item.icon, title: item.name },
+            //   name: item.name,
+            //   id: item.id,
+            //   component: Layout,
+            //   children: this.routerChildren(item.childList, [])
+            // }
+            params1 = {
+              path: item.path,
+              meta: { icon: item.icon, title: item.name },
+              name: item.name,
+              id: item.id
+            }
+            params2 = {
+              path: item.path,
+              meta: { icon: item.icon, title: item.name },
+              name: item.name,
+              icon: item.icon,
+              id: item.id,
+              component: item.component,
+              children: this.routerChild(item.childList)
+            }
+            typeRouter.push(params1)
+            resData.push(params2)
+          })
+        })
+
+        store.dispatch('user/dynamicRouters', [])
+
+        store.dispatch('user/changeDynamicRouters', [])
+
+        store.dispatch('user/dynamicRouters', resData)
+
+        store.dispatch('user/changeDynamicRouters', resData)
+
+        store.dispatch('user/changeTypeRouter', [])
+
+        store.dispatch('user/changeTypeRouter', homeRouters.concat(typeRouter))
+      }
+    },
+    getHomeUser() {
+      getHomeUser()
+        .then((res) => {
+          if (res.data.code === 0) {
+            Local.set('rj_userName', res.data.data.workName)
+            if (
+              this.hasGoPath &&
+              this.hasGoPath !== '' &&
+              this.thirdPartyLogin
+            ) {
+              getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
+                .then((res) => {
+                  if (res.data.code === 0) {
+                    console.log('第三方请求')
+                    // this.allDataLists = res.data.data
+                    store.dispatch('user/changeThirdPartyLogin', true)
+
+                    this.saveComponents(res.data.data)
+
+                    // getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
+                    //   .then((res) => {
+                    //     if (res.data.code === 0) {
+                    this.findFuncId(res.data.data)
+
+                    Session.set('permissionData', [])
+                    Session.set('permissionMenuId', '')
+                    Session.set('isShowSideRouter', 1)
+                    getHomeFunc({
+                      menuId: this.resFuncId
+                    }).then((res) => {
+                      if (res.data.code === 0) {
+                        Session.set('permissionData', res.data.data)
+                        Session.set('permissionMenuId', this.resFuncId)
+                      }
+                    })
+
+                    this.$nextTick(() => {
+                      store.dispatch('user/changeRightWidth', false)
+                      store.dispatch('user/changeShowSidebar', false)
+                      this.$router.push({ path: `/${this.hasGoPath}` })
+                      this.hasGoPath = ''
+                    })
+                    //   }
+                    // })
+                    // .catch((error) => {
+                    //   console.log(error)
+                    // })
+                  }
+                })
+                .catch((error) => {
+                  console.log(error)
+                })
+            } else {
+              this.showHome = true
+              // store.dispatch('user/changeThirdPartyLogin', false)
+              this.$router.push({ path: '/workTable' })
+            }
+            //设置定时器，更新token
+            if (Local.get('expires_in_old') && Local.get('refresh_token')) {
+              clearInterval(window.interval1)
+              window.interval1 = setInterval(function () {
+                if (Session.get('third_party_login')) {
+                  const resUrl = `${Local.get(
+                    'refresh_token_url'
+                  )}?accessToken=${Local.get('access_token')}`
+                  axios({
+                    method: 'get',
+                    url: resUrl,
+                    headers: {
+                      Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+                    }
+                  }).then((res) => {
+                    if (res.data.code === 0) {
+                      const { accessToken, refreshToken, expiresIn } =
+                        res.data.data
+                      Local.set('access_token', accessToken)
+                      Local.set('refresh_token', refreshToken)
+                      Local.set('expires_in', expiresIn)
+                      Local.set('expires_in_old', expiresIn)
+                      let timestamp = expiresIn
+                      clearInterval(window.interval)
+
+                      window.interval = setInterval(() => {
+                        timestamp = timestamp - 1
+                        Local.set('expires_in', timestamp)
+                      }, 1000)
+                    }
+                  })
+                } else {
+                  if (Local.get('access_token') && Local.get('expires_in')) {
+                    newRefreshToken(
+                      Local.get('refresh_token'),
+                      'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+                    ).then((res) => {
+                      if (res.data && res.data.code === 0) {
+                        const { accessToken, refreshToken, expiresIn } =
+                          res.data.data
+                        Local.set('access_token', accessToken)
+                        Local.set('refresh_token', refreshToken)
+                        Local.set('expires_in', expiresIn)
+
+                        Local.set('expires_in_old', expiresIn)
+
+                        let timestamp = expiresIn
+                        clearInterval(window.interval)
+
+                        window.interval = setInterval(() => {
+                          timestamp = timestamp - 1
+                          Local.set('expires_in', timestamp)
+                        }, 1000)
+                      }
+                    })
+                  }
+                }
+              }, (Local.get('expires_in_old') * 1000) / 4)
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    getUrlParams(url) {
+      let urlStr = url.split('?')[1] || ''
+      let obj = {}
+      let paramsArr = urlStr.split('&')
+      for (let i = 0, len = paramsArr.length; i < len; i++) {
+        const num = paramsArr[i].indexOf('=')
+        let arr = [
+          paramsArr[i].substring(0, num),
+          paramsArr[i].substring(num + 1)
+        ]
+        obj[arr[0]] = arr[1]
+      }
+      return obj
+    },
+    initMap() {
+      console.log('Run3DRun3DRun3DRun3DRun3D', Run3D)
+      let map = new Run3D.Map()
+      map.createMap('', 'mapContainerTest', {})
+      //创建高德在线地图图层
+      let gdOnlineMap = new Run3D.UrlTemplateImageLayer({
+        url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', //高德地图
+        minimumLevel: 0,
+        maximumLevel: 23
+      })
+      map.layers.addRaster(gdOnlineMap)
+    },
+
+    select(e) {
+      this.placeSearch.setCity(e.poi.adcode)
+      this.placeSearch.search(e.poi.name) //关键字查询查询
+    },
+
     pwdShowChange() {
       this.passwordType = this.passwordType === 'password' ? 'type' : 'password'
     },
@@ -234,35 +580,57 @@ export default {
         this.$refs.password.focus()
       })
     },
-    handleLogin() {
-      // this.$refs.loginForm.validate((valid) => {
-      // if (valid) {
-      this.loading = true
-      Local.setToken('')
-      Local.set('rj_token', '')
-      login(this.loginForm)
-        .then((res) => {
-          if (res.code === 0 || res.code === 200) {
-            const { deptType, username, token } = res.data
-            Local.set('rj_deptType', 0)
-            Local.set('rj_userName', username)
-            Local.setToken(token)
-            Local.set('rj_token', token)
-            // getRouters().then((res) => {
-            //   store.dispatch('user/dynamicRouters', res)
-            this.$router.push({ path: '/workTable' })
-            // })
-            this.loading = false
-          }
-        })
-        .catch(() => {
-          this.loading = false
-        })
-      //   } else {
-      //     console.log("error submit!!");
-      //     return false;
-      //   }
-      // });
+    isRefreshTokenExpired(timestamp) {
+      clearInterval(window.interval)
+      window.interval = setInterval(() => {
+        timestamp = timestamp - 1
+        Local.set('expires_in', timestamp)
+      }, 1000)
+    },
+    // 取到浏览器出现网址的最后"/"出现的后边的字符
+    getLastUrl(str, starStr, lastStr) {
+      str.slice(str.lastIndexOf(starStr), str.lastIndexOf(lastStr))
+    },
+
+    handleLogin(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.loading = true
+          Local.set('access_token', '')
+          newLoginN(this.loginForm)
+            .then((res) => {
+              if (res.data.code === 0) {
+                const { accessToken, refreshToken, expiresIn, tokenType } =
+                  res.data.data
+
+                Session.set('third_party_login', false)
+                this.thirdPartyLogin = false
+
+                this.hasGoPath = ''
+
+                store.dispatch('user/changeThirdPartyLogin', false)
+
+                this.getHomeUser()
+
+                Local.set('rj_deptType', 0)
+                Local.set('access_token', accessToken)
+                Local.set('refresh_token', refreshToken)
+                this.isRefreshTokenExpired(expiresIn)
+                Local.set('expires_in', expiresIn)
+                Local.set('token_type', tokenType)
+                Local.set('expires_in_old', expiresIn)
+
+                this.loading = false
+              }
+            })
+            .catch((error) => {
+              this.loading = false
+            })
+            .finally(() => {
+              this.loading = false
+            })
+        }
+      })
     }
   }
 }
@@ -554,5 +922,9 @@ body {
     }
   }
 }
-/* end 媒体查询 */
+
+#mapContainerTest {
+  height: 100%;
+  width: 100%;
+}
 </style>

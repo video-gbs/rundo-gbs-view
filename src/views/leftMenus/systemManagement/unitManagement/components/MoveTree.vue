@@ -44,13 +44,15 @@
                 />
                 <svg-icon
                   v-else-if="
-                    data.level === 2 || data.level === 3 || data.level === 4
+                    data.level === '2' ||
+                    data.level === '3' ||
+                    data.level === '4'
                   "
                   icon-class="tree2"
                   class="tree2"
                 />
                 <svg-icon v-else icon-class="tree3" class="tree3" />
-                {{ data.orgName || data.areaName }}
+                {{ data.orgName || data.areaName || data.sectionName }}
               </span>
             </span>
           </el-tree>
@@ -68,7 +70,7 @@
 
 <script>
 import LineFont from '@/components/LineFont'
-import { moveDepart } from '@/api/method/unitManagement'
+import { moveUnitFz } from '@/api/method/unitManagement'
 export default {
   name: '',
   components: { LineFont },
@@ -89,8 +91,8 @@ export default {
       moveTreeShow: false,
       defaultProps: {
         // 用于修改节点指定标签的属性值
-        children: 'children',
-        label: 'orgName'
+        children: 'childList',
+        label: 'sectionName'
       },
       lineTitle: {
         title: '移动位置',
@@ -126,19 +128,23 @@ export default {
     moveTree() {
       this.isLoading = true
       // console.log('this.$props.fatherId', this.$props.fatherId)
-      moveDepart({ id: this.$props.fatherId, orgPid: this.childId }).then(
-        (res) => {
-          if (res.code === 0) {
+      moveUnitFz({ id: this.$props.fatherId, sectionPid: this.childId })
+        .then((res) => {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '移动成功'
             })
+            this.$emit('init')
+            this.isLoading = false
+            this.moveTreeShow = false
+          } else {
+            this.isLoading = false
           }
-          this.$emit('init')
+        })
+        .catch(() => {
           this.isLoading = false
-          this.moveTreeShow = false
-        }
-      )
+        })
     },
     handleNodeClick(data, index) {
       this.childId = data.id
@@ -155,7 +161,7 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true
-      return data.orgName.indexOf(value) !== -1
+      return data.resourceName.indexOf(value) !== -1
     },
 
     // 拖拽事件 参数依次为：被拖拽节点对应的 Node、结束拖拽时最后进入的节点、被拖拽节点的放置位置（before、after、inner）、event
@@ -187,7 +193,7 @@ export default {
       let id = draggingNode.data.id
       let orgPid = dropNode.data.id
       moveDepart({ id, orgPid }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.$message({
             type: 'success',
             message: '移动成功'

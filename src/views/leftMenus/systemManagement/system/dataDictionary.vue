@@ -1,5 +1,5 @@
 <template>
-  <div class="dataDictionary_container">
+  <div class="dataDictionary_container" v-if="isShow">
     <div class="panel-header-box">
       <div class="panel-header-box-border">字典管理</div>
     </div>
@@ -20,9 +20,9 @@
             style="width: 240px"
           ></el-input>
         </el-form-item>
-        <el-form-item label="字典值:">
+        <el-form-item label="分组名称:">
           <el-input
-            v-model="searchParams.itemValue"
+            v-model="searchParams.groupName"
             placeholder="请输入"
             clearable
             style="width: 240px"
@@ -47,7 +47,10 @@
     <div class="table-list">
       <div class="securityArea_container">
         <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow(1)"
+          <el-button
+            v-permission="['/rbac/dict/add', 2]"
+            type="primary"
+            @click="dialogShow(1)"
             ><svg-icon class="svg-btn" icon-class="add" /><span class="btn-span"
               >新建</span
             ></el-button
@@ -60,7 +63,7 @@
         class="dataDictionary-table"
         border
         :header-cell-style="{
-          background: 'rgba(0, 75, 173, 0.06)',
+          background: '#F4F9FF',
           fontSize: '14px',
           fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
           fontWeight: 'bold',
@@ -73,13 +76,19 @@
         <el-table-column prop="groupCode" label="分组编码" />
         <el-table-column prop="itemName" label="字典项名称" />
         <el-table-column prop="itemValue" label="字典值Value" />
-        <el-table-column prop="itemDesc" label="字典值描述" />
+        <el-table-column prop="description" label="字典值描述" />
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" @click="dialogShow(0, scope.row)"
+            <el-button
+              v-permission="['/rbac/dict/update', 3]"
+              type="text"
+              @click="dialogShow(0, scope.row)"
               >编辑</el-button
             >
-            <el-button type="text" @click="deleteRole(scope.row)"
+            <el-button
+              v-permission="['/rbac/dict/delete', 4]"
+              type="text"
+              @click="deleteRole(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -92,6 +101,7 @@
       />
     </div>
     <el-dialog
+      v-if="dialog.show"
       :title="dialog.title"
       :visible.sync="dialog.show"
       width="600px"
@@ -112,33 +122,33 @@
             <el-input
               v-model="dialog.params.groupName"
               clearable
-              :maxlength="15"
+              :maxlength="20"
             />
           </el-form-item>
           <el-form-item label="分组编码" prop="groupCode">
             <el-input
               v-model="dialog.params.groupCode"
               clearable
-              :maxlength="15"
+              :maxlength="20"
             />
           </el-form-item>
           <el-form-item label="字典项名称" prop="itemName">
             <el-input
               v-model="dialog.params.itemName"
               clearable
-              :maxlength="15"
+              :maxlength="20"
             />
           </el-form-item>
           <el-form-item label="字典项Value" prop="itemValue">
             <el-input
               v-model="dialog.params.itemValue"
               clearable
-              :maxlength="15"
+              :maxlength="20"
             />
           </el-form-item>
           <el-form-item label="字典项描述">
             <el-input
-              v-model="dialog.params.itemDesc"
+              v-model="dialog.params.description"
               type="textarea"
               :rows="2"
               :maxlength="50"
@@ -223,18 +233,21 @@
 
 <script>
 import {
-  getDictionaryList,
-  addDictionary,
-  getDictionaryById,
-  deleteDictionary,
-  editDictionary
-} from '@/api/method/user'
+  getDictLists,
+  getGroupDictLists,
+  addDict,
+  updateDict,
+  deleteDict
+} from '@/api/method/dictionary'
 import pagination from '@/components/Pagination/index.vue'
+import store from '@/store/index'
+import { Local } from '@/utils/storage'
 export default {
   name: '',
   components: { pagination },
   data() {
     return {
+      isShow: false,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -254,7 +267,7 @@ export default {
         params: {
           itemValue: '',
           itemName: '',
-          itemDesc: '',
+          description: '',
           groupName: '',
           groupCode: ''
         }
@@ -277,8 +290,8 @@ export default {
           { required: true, message: '请输入字典名称', trigger: 'change' },
           {
             min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
+            max: 20,
+            message: '长度在 3 到 20 个字符',
             trigger: 'change'
           }
         ],
@@ -286,8 +299,8 @@ export default {
           { required: true, message: '请输入字典项Value', trigger: 'change' },
           {
             min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
+            max: 20,
+            message: '长度在 3 到 20 个字符',
             trigger: 'change'
           }
         ],
@@ -295,8 +308,8 @@ export default {
           { required: true, message: '请输入字典编码', trigger: 'change' },
           {
             min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
+            max: 20,
+            message: '长度在 3 到 20 个字符',
             trigger: 'change'
           }
         ],
@@ -304,8 +317,8 @@ export default {
           { required: true, message: '请输入字典项名称', trigger: 'change' },
           {
             min: 0,
-            max: 15,
-            message: '长度在 3 到 15 个字符',
+            max: 20,
+            message: '长度在 3 到 20 个字符',
             trigger: 'change'
           }
         ]
@@ -316,18 +329,11 @@ export default {
       treeData: []
     }
   },
+  created() {},
   mounted() {
     this.getList()
-    // this.init()
   },
   methods: {
-    init() {
-      getSysOrgTree({ id: 1 }).then((res) => {
-        if (res.code === 0) {
-          this.treeData = res.data
-        }
-      })
-    },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
       this.getList()
@@ -365,11 +371,18 @@ export default {
       })
     },
     dialogShow(act, data) {
+      this.dialog.params = {
+        itemValue: '',
+        itemName: '',
+        description: '',
+        groupName: '',
+        groupCode: ''
+      }
       if (act === 0) {
-        const { groupName, groupCode, itemDesc, itemName, itemValue } = data
+        const { groupName, groupCode, description, itemName, itemValue } = data
         this.dialog.params.groupCode = groupCode
         this.dialog.params.groupName = groupName
-        this.dialog.params.itemDesc = itemDesc
+        this.dialog.params.description = description
         this.dialog.params.itemName = itemName
         this.dialog.params.itemValue = itemValue
         this.editId = data.id
@@ -404,7 +417,7 @@ export default {
       this.permissionDialog.show = !this.permissionDialog.show
       this.roleId = id
       permissionTree(id).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.permissionTableData = res.data
         }
       })
@@ -423,34 +436,45 @@ export default {
       this.buttonLoading = true
       // this.checkList = []
       this.buildTree('get')
-      editDictionary({
+      updateDict({
         roleId: this.roleId,
         permissionIds: this.checkList
-      }).then((res) => {
-        this.buttonLoading = false
-        if (res.code === 0) {
-          this.$message({
-            message: '保存成功！',
-            type: 'success'
-          })
-          this.permissionDialog.show = !this.permissionDialog.show
-          // this.$router.go(-1)
-        }
       })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              message: '保存成功！',
+              type: 'success'
+            })
+
+            this.buttonLoading = false
+            this.permissionDialog.show = !this.permissionDialog.show
+          } else {
+            this.buttonLoading = false
+          }
+        })
+        .catch(() => {
+          this.buttonLoading = false
+        })
     },
-    getList() {
-      getDictionaryList({
-        current: this.params.pageNum,
-        pageSize: this.params.pageSize,
+    async getList() {
+      await getDictLists({
+        num: this.params.pageSize,
+        page: this.params.pageNum,
         ...this.searchParams
-      }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data.records
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
-        }
       })
+        .then((res) => {
+          if (res && res.data.code === 0) {
+            this.tableData = res.data.data.list
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.pageSize
+            setTimeout(() => {
+              this.isShow = true
+            }, 500)
+          }
+        })
+        .catch((error) => console.log(error))
     },
     deleteRole(row) {
       this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
@@ -458,8 +482,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteDictionary(row.id).then((res) => {
-          if (res.code === 0) {
+        deleteDict(row.id).then((res) => {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -475,8 +499,8 @@ export default {
         if (valid) {
           switch (this.dialog.title) {
             case '新建':
-              addDictionary(this.dialog.params).then((res) => {
-                if (res.code === 0) {
+              addDict(this.dialog.params).then((res) => {
+                if (res.data.code === 0) {
                   this.$message({
                     type: 'success',
                     message: '新建成功'
@@ -487,9 +511,9 @@ export default {
               })
               break
             case '编辑':
-              editDictionary({ id: this.editId, ...this.dialog.params }).then(
+              updateDict({ dictId: this.editId, ...this.dialog.params }).then(
                 (res) => {
-                  if (res.code === 0) {
+                  if (res.data.code === 0) {
                     this.$message.success('编辑成功')
                     this.dialog.show = false
                     this.getList()
@@ -509,6 +533,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table::before {
+  height: 0 !important;
+}
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid #eaeaea;
 }

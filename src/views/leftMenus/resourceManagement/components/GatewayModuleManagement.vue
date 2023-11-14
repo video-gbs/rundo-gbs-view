@@ -4,14 +4,14 @@
       <div class="panel-header-box-border">网关管理</div>
     </div>
     <div class="main-content">
-      <div class="gatewayModuleManagement_container">
+      <!-- <div class="gatewayModuleManagement_container">
         <leftTree
           :treeData="treeList"
           @childClickHandle="childClickHandle"
           :defaultPropsName="areaNames"
           class="gatewayModuleManagementTree"
         />
-      </div>
+      </div> -->
       <div class="p10 right-table">
         <div class="table-list">
           <div class="table-content">
@@ -90,7 +90,12 @@
                   >
                 </template>
               </el-table-column>
-              <el-table-column prop="protocol" label="协议" width="80" />
+              <el-table-column
+                prop="protocol"
+                label="协议"
+                width="120"
+                :show-overflow-tooltip="true"
+              />
               <el-table-column
                 prop="ip"
                 label="IP"
@@ -282,7 +287,8 @@ import {
   getModuleLists,
   updateModuleLists,
   getAllNorthLists,
-  gatewayCorrelation
+  gatewayCorrelation,
+  getGatewayId
 } from '@/api/method/moduleManagement'
 export default {
   name: '',
@@ -348,31 +354,22 @@ export default {
       },
       treeList: [
         {
-          areaName: '中央管理服务器',
+          name: '中央管理服务器',
           areaNames: '中央管理服务器',
           id: '1',
           level: 1,
-          children: [
+          childList: [
             {
-              areaName: '网关模块',
+              name: '网关模块',
               areaNames: '网关模块',
               id: '1-1',
               level: 2
-              // children: [
-              //   {
-              //     areaName: '',
-              //     areaNames: '',
-              //     id: '1-1-1',
-              //     level: 3
-              //   }
-              // ]
             },
             {
-              areaName: '流媒体调度服务模块',
+              name: '流媒体调度服务模块',
               areaNames: '流媒体调度服务模块',
               id: '1-2',
               level: 2
-              // children: [{ areaName: '', areaNames: '', id: '1-2-1', level: 3 }]
             }
           ]
         }
@@ -411,11 +408,11 @@ export default {
         num: this.params.pageSize,
         page: this.params.pageNum
       }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data.list
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
+        if (res.data.code === 0) {
+          this.tableData = res.data.data.list
+          this.params.total = res.data.data.total
+          this.params.pages = res.data.data.pages
+          this.params.current = res.data.data.current
         }
       })
     },
@@ -428,6 +425,7 @@ export default {
       this.init()
     },
     childClickHandle(data) {
+      console.log(data, 'childClickHandle')
       if (data.areaName === '网关模块') {
         this.$router.push({ path: '/gatewayModuleManagement' })
       } else {
@@ -436,9 +434,18 @@ export default {
     },
     editData(row) {
       this.dialogShow = true
-      const { protocol, name, port, ip, serialNum, signType, gatewayType } = row
+      const {
+        protocol,
+        name,
+        port,
+        ip,
+        serialNum,
+        signType,
+        dispatchId,
+        gatewayType
+      } = row
       this.dialogForm.signType = signType
-      this.dialogForm.gatewayType = gatewayType
+      this.dialogForm.gatewayType = String(gatewayType)
       this.dialogForm.protocol = protocol
       this.dialogForm.name = name
       this.dialogForm.port = port
@@ -447,7 +454,14 @@ export default {
       this.editId = row.id
     },
     async showCorrelationPage(row) {
+      console.log('row~~~~~~~', row)
       this.dialogShowDetailsForm.name = row.name
+
+      await getGatewayId(row.id).then((res) => {
+        if (res.data.code === 0) {
+          this.dialogShowDetailsForm.gatewayType = res.data.data
+        }
+      })
       this.allNorthTypeOptions = [
         {
           label: '',
@@ -455,10 +469,10 @@ export default {
         }
       ]
       await getAllNorthLists().then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.correlationId = row.id
           this.dialogShowDetails = true
-          res.data.map((item) => {
+          res.data.data.map((item) => {
             let obj = {}
             obj.label = item.name
             obj.value = item.dispatchId
@@ -473,7 +487,7 @@ export default {
           gatewayId: this.editId,
           name: this.dialogForm.name
         }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '编辑成功'
@@ -487,7 +501,7 @@ export default {
           gatewayId: this.correlationId,
           dispatchId: this.dialogShowDetailsForm.gatewayType
         }).then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '关联成功'
@@ -506,6 +520,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table::before {
+  height: 0 !important;
+}
+::v-deep .el-table--border {
+  border-bottom: 1px solid #eaeaea;
+}
 ::v-deep .gatewayModuleManagementTree .el-tree-node__expand-icon.expanded {
   -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
@@ -596,7 +616,7 @@ export default {
   height: 100% !important;
 }
 ::v-deep .el-table--enable-row-transition {
-  height: 100% !important;
+  // height: 100% !important;
 }
 // 滚动条大小设置
 ::v-deep .table-content-bottom::-webkit-scrollbar {
@@ -654,7 +674,7 @@ export default {
     }
     .right-table {
       width: 100%;
-      margin: 6px 0 0 -10px;
+      margin: 10px;
       position: relative;
       .table-list {
         width: calc(100% - 0px);

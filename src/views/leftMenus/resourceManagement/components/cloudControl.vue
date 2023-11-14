@@ -31,7 +31,12 @@
             </div>
 
             <div class="yuzhiwei-control-content">
-              <el-tooltip effect="dark" content="预置位播放" placement="top">
+              <el-tooltip
+                v-permission="['/expansion/ptz/preset/invoke', 3]"
+                effect="dark"
+                content="预置位播放"
+                placement="top"
+              >
                 <svg-icon
                   @click="ptzPlay"
                   :class="
@@ -50,6 +55,7 @@
               </el-tooltip>
 
               <el-tooltip
+                v-permission="['/expansion/ptz/preset/edit', 3]"
                 effect="dark"
                 content="预置位名称修改"
                 placement="top"
@@ -72,7 +78,12 @@
                 />
               </el-tooltip>
 
-              <el-tooltip effect="dark" content="预置位删除" placement="top">
+              <el-tooltip
+                v-permission="['/expansion/ptz/preset/delete', 4]"
+                effect="dark"
+                content="预置位删除"
+                placement="top"
+              >
                 <svg-icon
                   class="cloudBtn-right"
                   @click="
@@ -252,7 +263,7 @@ export default {
         channelExpansionId: this.resChannelId,
         presetId: this.nowPreset
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
         }
       })
     },
@@ -311,7 +322,7 @@ export default {
         presetId: this.nowPreset,
         presetName
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           if (this.nowPreset !== '') {
             this.nowPreset = presetName
           }
@@ -359,7 +370,7 @@ export default {
         presetId: this.nowPreset
       })
         .then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.optionLists = this.optionLists.filter((item) => {
               return item.presetId !== this.nowPreset
             })

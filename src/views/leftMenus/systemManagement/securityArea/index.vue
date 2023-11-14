@@ -159,7 +159,6 @@ import { getVideoAraeTree } from '@/api/method/role'
 import {
   unitAdd,
   unitEdit,
-  unitList,
   unitDelete,
   getUnitDetails
 } from '@/api/method/securityArea'
@@ -285,7 +284,7 @@ export default {
     },
     getUnitDetailsData() {
       getUnitDetails(this.detailsId).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           // Object.keys(res.data).forEach((key) => {
           //   this.form[key] = res.data[key] || this.form[key]
           // })
@@ -297,7 +296,7 @@ export default {
     async init(id) {
       await getVideoAraeTree()
         .then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             this.treeList = res.data
             this.detailsId = id ? id : res.data[0].id
             this.getUnitDetailsData()
@@ -332,7 +331,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           unitEdit({ id: this.detailsId, ...this.form }).then((res) => {
-            if (res.code === 0) {
+            if (res.data.code === 0) {
               this.$message({
                 type: 'success',
                 message: '编辑成功'
@@ -372,7 +371,7 @@ export default {
       }).then(() => {
         unitDelete(this.detailsId)
           .then((res) => {
-            if (res.code === 0) {
+            if (res.data.code === 0) {
               this.$message({
                 type: 'success',
                 message: '删除成功'
@@ -404,22 +403,28 @@ export default {
             case '新建部门':
               this.dialog.params.areaPid = this.Id ? this.Id : this.fatherId
               this.isLoading = true
-              unitAdd(this.dialog.params).then((res) => {
-                if (res.code === 0) {
-                  this.$message({
-                    type: 'success',
-                    message: '新建成功'
-                  })
-                  this.isLoading = false
-                  this.dialog.show = false
-                  this.detailsId = res.data.id
-                  this.init(this.detailsId)
+              unitAdd(this.dialog.params)
+                .then((res) => {
+                  if (res.data.code === 0) {
+                    this.$message({
+                      type: 'success',
+                      message: '新建成功'
+                    })
+                    this.isLoading = false
+                    this.dialog.show = false
+                    this.detailsId = res.data.id
+                    this.init(this.detailsId)
 
-                  this.$refs.securityAreaTree.chooseId(
-                    this.Id ? this.Id : this.fatherId
-                  )
-                }
-              })
+                    this.$refs.securityAreaTree.chooseId(
+                      this.Id ? this.Id : this.fatherId
+                    )
+                  } else {
+                    this.isLoading = false
+                  }
+                })
+                .catch(() => {
+                  this.isLoading = false
+                })
               break
             default:
               break

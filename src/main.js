@@ -8,20 +8,17 @@ Vue.use(ElementUI, { size: 'small' })
 import '@/styles/index.scss'
 import '../static/fonts/iconfont/iconfont.css'
 
-import App from './App'
+import App from './App.vue'
 import store from './store'
 import router from './router'
-import { Local } from './utils/storage'
+import { Local, Session } from './utils/storage'
+import { newRefreshToken } from '@/api/method/home'
 
 import '@/icons'
-import '@/permission'
 import '@/utils/extends'
-// import '@/utils/flexible'
-import '@/plugin'
-import * as echarts from 'echarts'
-Vue.prototype.$echarts = echarts
+import 'babel-polyfill'
 
-import API from '@/api'
+import API from './api'
 Vue.prototype.$api = API
 
 import * as moment from 'moment'
@@ -31,16 +28,12 @@ Vue.prototype.$moment = moment
 import VideoTimeline from '@wanglin1994/video-timeline'
 Vue.use(VideoTimeline)
 
-// 引入字典
-import _dict from '@/dict/index'
-
-Vue.prototype.$dict = _dict
-
 import config from '@/config/index'
 Vue.prototype.$_config = config
 Vue.prototype.$photoUrl = config.photoUrlApi
 Vue.prototype.$filePreview = config.filePreview
 
+import {} from './permission'
 // 退出登录
 Vue.prototype.$logout = () => {
   Local.logout()
@@ -50,6 +43,62 @@ Vue.prototype.$logout = () => {
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false
+
+//设置定时器，更新token
+if (Local.get('expires_in_old') && Local.get('refresh_token')) {
+  clearInterval(window.interval1)
+  window.interval1 = setInterval(function () {
+    if (Session.get('third_party_login')) {
+      const resUrl = `${Local.get('refresh_token_url')}?accessToken=${Local.get(
+        'access_token'
+      )}`
+      axios({
+        method: 'get',
+        url: resUrl,
+        headers: {
+          Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+        }
+      }).then((res) => {
+        if (res.data && res.data.code === 0) {
+          const { accessToken, refreshToken, expiresIn } = res.data.data
+          Local.set('access_token', accessToken)
+          Local.set('refresh_token', refreshToken)
+          Local.set('expires_in', expiresIn)
+          Local.set('expires_in_old', expiresIn)
+          let timestamp = expiresIn
+          clearInterval(window.interval)
+
+          window.interval = setInterval(() => {
+            timestamp = timestamp - 1
+            Local.set('expires_in', timestamp)
+          }, 1000)
+        }
+      })
+    } else {
+      if (Local.get('access_token') && Local.get('expires_in')) {
+        newRefreshToken(
+          Local.get('refresh_token'),
+          'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+        ).then((res) => {
+          if (res.data && res.data.code === 0) {
+            const { accessToken, refreshToken, expiresIn } = res.data.data
+            Local.set('access_token', accessToken)
+            Local.set('refresh_token', refreshToken)
+            Local.set('expires_in', expiresIn)
+            Local.set('expires_in_old', expiresIn)
+            let timestamp = expiresIn
+            clearInterval(window.interval)
+
+            window.interval = setInterval(() => {
+              timestamp = timestamp - 1
+              Local.set('expires_in', timestamp)
+            }, 1000)
+          }
+        })
+      }
+    }
+  }, (Local.get('expires_in_old') * 1000) / 4)
+}
 
 new Vue({
   el: '#app',

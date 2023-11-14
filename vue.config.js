@@ -1,31 +1,24 @@
 'use strict'
+const Run3DSource = './node_modules/@rjgf/run3d-engine/Source'
+const Run3DWorkers = '../Build/Cesium/Workers'
 const path = require('path')
-const defaultSettings = require('./src/settings.js')
+const webpack = require('webpack')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-// const px2rem = require('postcss-px2rem')
-// // 配置基本大小
-// const postcss = px2rem({
-//   //配置rem基准值 基准大小 baseSize
-//   remUnit: 192 // 设计稿尺寸1920/10
-// })
-// 本地环境
-// const devEnv = require('')
-// // 测试环境
-// const defaultSettings = require('')
-// 生产环境
-// const proEnv = require('')
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
+const productionGzipExtensions = ['js', 'css']
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const TerserPlugin = require("terser-webpack-plugin")
+const timeStamp = new Date().getTime()
 
 const assetsCDN = {
-  // webpack build externals
   externals: {
     vue: 'Vue',
     'vue-router': 'VueRouter',
     vuex: 'Vuex',
+    'ElementUI': 'ELEMENT',
     axios: 'axios'
   },
   css: [],
-  // https://unpkg.com/browse/vue@2.6.10/
   js: [
     '//cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js',
     '//cdn.jsdelivr.net/npm/vue-router@3.1.3/dist/vue-router.min.js',
@@ -33,35 +26,59 @@ const assetsCDN = {
     '//cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js'
   ]
 }
+
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || '后台管理系统' // page title
+// const name = defaultSettings.title || '后台管理系统'
 
-// If your port is set to 80,
-// use administrator privileges to execute the command line.
-// For example, Mac: sudo npm run
-// You can change the port by the following methods:
-// port = 9528 npm run dev OR npm run dev --port = 9528
-const port = process.env.port || process.env.npm_config_port || 8080 // dev port
+const port = process.env.port || process.env.npm_config_port || 8080
 
 // 转发配置数组
 const urls = [
-  // test 测试
-  {
-    target: 'http://xard-gbs-test.runjian.com:8080',
-    proxy: '/api'
 
+  // dev  本地
+
+  // {
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
+  //   proxy: '/api/utils-template'
+  // },
+  // {
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
+  //   proxy: '/api/alarm-manage'
+  // },
+  // {
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
+  //   proxy: '/api/expansion'
+  // },
+  // uat 测试
+  // {
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
+  //   proxy: '/api'
+
+  // }
+  {
+    target: 'https://xard-gbs-test.runjian.com:8080',
+    proxy: '/api'
   },
   // dev  本地
   // {
-  //   target: 'http://xard-gbs-dev.runjian.com:8080',
-  //   proxy: '/api'
+  //   target: 'http://116.205.143.13/tiles/gdhpjd',
+  //   proxy: 'map/api'
   // }
   // {
   //   target: 'http://xard-gbs-dev.runjian.com:8080',
   //   proxy: '/api'
+  // }
+  // 测试新接口
+  // {
+  //   target: 'http://172.20.0.75:9090',
+  //   proxy: '/rbac'
+  // },
+  // {
+  //   target: 'http://172.20.0.75:9090',
+  //   proxy: '/expansion'
   // }
 ]
 
@@ -88,107 +105,152 @@ function getProxys() {
   })
   return proxys
 }
-
-// All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
-  /**
-   * You will need to set publicPath if you plan to deploy your site under a sub path,
-   * for example GitHub Pages. If you plan to deploy your site to https://foo.github.io/bar/,
-   * then publicPath should be set to "/bar/".
-   * In most cases please use '/' !!!
-   * Detail: https://cli.vuejs.org/config/#publicpath
-   */
-  // publicPath: '/',
-  publicPath: './',
+  transpileDependencies: ['@wanglin1994/video-timeline'],
+  publicPath: '/',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: false,
   productionSourceMap: false,
   devServer: {
-    public: '192.192.192.88:8080',
     port: port,
     open: true,
-    overlay: {
-      warnings: false,
-      errors: true
+    historyApiFallback: {
+      index: '/index.html'
     },
     proxy: getProxys()
-    // before: require('./mock/mock-server.js')
   },
+
   configureWebpack: {
-    // provide the app's title in webpack's name field, so that
-    // it can be accessed in index.html to inject the correct title.
-    name: name,
-    plugins: [
-      new CopyWebpackPlugin([
-        {
-          from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml'
-        },
-        {
-          from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer.swf'
-        },
-        {
-          from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer-lib.min.js',
-          to: 'js/'
-        }
-      ])
-    ],
+    name: '',
+    output: {
+      sourcePrefix: "",
+      path: path.resolve(__dirname, 'dist'),
+      filename: `[name].${timeStamp}.js`
+    },
+    amd: {
+      toUrlUndefined: true,
+    },
+    module: {},
     resolve: {
+      fallback: {
+        "https": false,
+        "zlib": false,
+        "http": false,
+        "url": false,
+        "path": require.resolve("path-browserify"),
+      },
+      // fallback: {
+
+      //   "https": require.resolve("https-browserify"),
+      //   "zlib": require.resolve("browserify-zlib"),
+      //   "path": require.resolve("path-browserify"),
+      //   "url": require.resolve("url/")
+      // },
+      // extensions: [".ts", ".tsx", ".js", ".json",'cjs','mjs'],
       alias: {
-        '@': resolve('src')
-      }
-    }
+        // '@': path.resolve(__dirname, 'src/')
+        '@': resolve('src'),
+      },
+      mainFiles: ['index', 'Cesium']
+    },
+    plugins: [
+      new MiniCssExtractPlugin({
+        filename: '[name].css',
+        chunkFilename: '[id].css',
+      }),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, Run3DWorkers),
+        to: "Workers"
+      }, ]),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, "Assets"),
+        to: "Assets"
+      }], ),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, "Widgets"),
+        to: "Widgets"
+      }], ),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, "ThirdParty/Workers"),
+        to: "ThirdParty/Workers",
+      }, ], ),
+      new webpack.DefinePlugin({
+        CESIUM_BASE_URL: JSON.stringify(""),
+      }),
+      // new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+      // 配置compression-webpack-plugin压缩
+      new CompressionWebpackPlugin({
+        algorithm: 'gzip',
+        test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
+        threshold: 10240,
+        minRatio: 0.8,
+        deleteOriginalAssets: false
+      }),
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 20,
+        // minChunkSize: 100
+      }),
+
+      new CopyWebpackPlugin(
+        [{
+            from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml'
+          },
+          {
+            from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer.swf'
+          },
+          {
+            from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer-lib.min.js',
+            to: 'js/'
+          }
+        ]
+      ),
+      // new CopyWebpackPlugin([
+      //   {
+      //     from: 'node_modules/@easydarwin/easyplayer/dist/component/EasyPlayer.swf',
+      //     to: './libs/EasyPlayer/'
+      //   },
+      //   {
+      //     from: 'node_modules/@easydarwin/easyplayer/dist/component/crossdomain.xml',
+      //     to: './libs/EasyPlayer/'
+      //   },
+      //   {
+      //     from: 'node_modules/@easydarwin/easyplayer/dist/component/EasyPlayer-lib.min.js',
+      //     to: './libs/EasyPlayer/'
+      //   }
+      // ])
+    ]
   },
   chainWebpack(config) {
-    if (process.env.NODE_ENV === 'production') {
-      config
-        .plugin('html')
-        .use(HtmlWebpackPlugin)
-        .tap((args) => {
-          args[0].cdn = assetsCDN.assets
-          return args
-        })
-    }
-    // it can improve the speed of the first screen, it is recommended to turn on preload
-    config.plugin('preload').tap(() => [
-      {
-        rel: 'preload',
-        // to ignore runtime.js
-        // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-service/lib/config/app.js#L171
-        fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-        include: 'initial'
-      }
-    ])
-    // config.plugin("preload-index").tap(() => [
+
+    // config.plugin('preload').tap(() => [
     //   {
-    //     rel: "preload",
+    //     rel: 'preload',
     //     fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-    //     include: "initial",
-    //   },
-    // ]);
-    // config.plugin("preload-qr").tap(() => [
-    //   {
-    //     rel: "preload",
-    //     fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-    //     include: "initial",
-    //   },
+    //     include: 'initial'
+    //   }
     // ])
+    config.optimization.minimizer('terser').tap((args) => {
+      args[0].parallel = 4
+      args[0].terserOptions.compress.warnings = true
+      args[0].terserOptions.compress.drop_debugger = true
+      args[0].terserOptions.compress.drop_console = true
+      return args
+    })
 
-    // when there are many pages, it will cause too many meaningless requests
     config.plugins.delete('prefetch')
+    config.module
+      .rule('ignore')
+      .test(/\.cjs$/)
+      .exclude
+      .add(/node_modules/)
+      .end()
+      .use('ignore-loader')
+      .loader('ignore-loader')
+      .options({})
+      .end();
 
-    // set svg-sprite-loader
-    // config.module
-    //   .rule('css')
-    //   .test(/\.css$/)
-    //   .oneOf('vue')
-    //   .use('px2rem-loader')
-    //   .loader('px2rem-loader')
-    //   .options({
-    //     remUnit: 192,
-    //     remPrecision: 8
-    //   })
-    //   .end()
     config.module.rule('svg').exclude.add(resolve('src/icons')).end()
     config.module
       .rule('icons')
@@ -202,53 +264,63 @@ module.exports = {
       })
       .end()
 
-    config.when(process.env.NODE_ENV !== 'development', (config) => {
-      config
-        .plugin('ScriptExtHtmlWebpackPlugin')
-        .after('html')
-        .use('script-ext-html-webpack-plugin', [
-          {
-            // `runtime` must same as runtimeChunk name. default is `runtime`
-            inline: /runtime\..*\.js$/
-          }
-        ])
-        .end()
-      config.optimization.splitChunks({
-        chunks: 'all',
-        cacheGroups: {
-          libs: {
-            name: 'chunk-libs',
-            test: /[\\/]node_modules[\\/]/,
-            priority: 10,
-            chunks: 'initial' // only package third parties that are initially dependent
-          },
-          elementUI: {
-            name: 'chunk-elementUI', // split elementUI into a single package
-            priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
-            test: /[\\/]node_modules[\\/]_?element-ui(.*)/ // in order to adapt to cnpm
-          },
-          commons: {
-            name: 'chunk-commons',
-            test: resolve('src/components'), // can customize your rules
-            minChunks: 3, //  minimum common number
-            priority: 5,
-            reuseExistingChunk: true
-          }
+    // config.when(process.env.NODE_ENV !== 'development', (config) => {
+    config
+      .plugin('ScriptExtHtmlWebpackPlugin')
+      .after('html')
+      .use('script-ext-html-webpack-plugin', [{
+        inline: /runtime\..*\.js$/
+      }])
+      .end()
+    config.optimization.splitChunks({
+      chunks: 'all',
+      minSize: 10000,
+      minRemainingSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 50,
+      maxInitialRequests: 50,
+      enforceSizeThreshold: 50000,
+      cacheGroups: {
+        libs: {
+          name: 'chunk-libs',
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          reuseExistingChunk: true,
+          enforce: true
+        },
+        elementUI: {
+          name: 'chunk-elementUI',
+          priority: 3,
+          reuseExistingChunk: true,
+          enforce: true,
+          test: /[\\/]node_modules[\\/]_?element-ui(.*)/
+        },
+        commons: {
+          name: 'chunk-commons',
+          test: resolve('src/components'),
+          minChunks: 3,
+          priority: 5,
+          reuseExistingChunk: true
         }
-      })
-      // https:// webpack.js.org/configuration/optimization/#optimizationruntimechunk
-      config.optimization.runtimeChunk = {
-        name: (entrypoint) => `runtime~${entrypoint.name}`
       }
-      // config.optimization.runtimeChunk('single')
     })
+
+    config.optimization.runtimeChunk = {
+      name: (entrypoint) => `runtime~${entrypoint.name}`
+    }
+
+    // })
   },
   css: {
     loaderOptions: {
-      // 全局引入src/styles/variables.scss文件下的变量
+
       scss: {
-        prependData: `@import "~@/styles/variables.scss";@import "~@/styles/dom.scss";`
-      }
+        prependData: `@import "~@/styles/variables.scss";@import "~@/styles/dom.scss";`,
+        sassOptions: {
+          outputStyle: 'expanded'
+        } // fix: 解决 element-ui 图标 icon 偶现乱码问题
+      },
+
     }
   }
 }

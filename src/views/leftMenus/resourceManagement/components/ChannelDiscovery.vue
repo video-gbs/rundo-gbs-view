@@ -1,5 +1,5 @@
 <template>
-  <div class="activeDiscovery-content">
+  <div class="channelDiscovery-content">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
@@ -8,7 +8,7 @@
         >
       </div>
     </div>
-    <div class="activeDiscovery-transfer">
+    <div class="channelDiscovery-transfer">
       <div class="securityArea_container">
         <leftTree
           :treeData="treeList"
@@ -81,6 +81,13 @@
                   label="所属设备"
                   width="240"
                 />
+                <el-table-column prop="signState" label="状态" width="140">
+                  <template slot-scope="scope">
+                    <span>{{
+                      scope.row.signState === 1 ? '待添加' : '删除'
+                    }}</span>
+                  </template>
+                </el-table-column>
               </el-table>
 
               <pagination
@@ -109,13 +116,18 @@ import LineFont from '@/components/LineFont'
 import pagination from '@/components/Pagination/index.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 
-import { getFindChannelById, addChannel } from '@/api/method/channel'
+import {
+  getFindChannelById,
+  addChannel,
+  channelVideoAreaList
+} from '@/api/method/channel'
 
 import { getVideoAraeTree } from '@/api/method/role'
 
 export default {
   name: '',
   components: { LineFont, pagination, leftTree },
+  props: ['treeList'],
   data() {
     return {
       form: {},
@@ -127,10 +139,11 @@ export default {
       selectedObj: {},
       selectedData: [],
       leftSearchName: '',
-      areaNames: 'areaNames',
+      areaNames: 'resourceName',
       selectedList: [],
-      treeList: [],
+      // treeList: [],
       channelId: '',
+      treeValue: '',
       tableData: [
         {
           name: '球机192.168……',
@@ -171,21 +184,21 @@ export default {
     }
   },
   mounted() {
-    this.init()
-    this.getVideoAraeTree()
+    // this.init()
+    // this.getVideoAraeTree()
   },
   methods: {
-    async getVideoAraeTree() {
-      await getVideoAraeTree()
-        .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
+    // async getVideoAraeTree() {
+    //   await channelVideoAreaList()
+    //     .then((res) => {
+    //       if (res.data.code === 0) {
+    //         this.treeList = [res.data.data]
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.log(error)
+    //     })
+    // },
 
     handleSelectChange(selection) {
       // 全选取消，删除当前页所有数据
@@ -229,6 +242,7 @@ export default {
 
     childClickHandle(data) {
       this.channelId = data.id
+      this.treeValue = data.resourceValue
     },
     async init() {
       await getFindChannelById({
@@ -237,12 +251,12 @@ export default {
         nameOrOriginId: this.leftSearchName
       })
         .then((res) => {
-          if (res.code === 0) {
-            this.tableData = res.data.records
+          if (res.data.code === 0) {
+            this.tableData = res.data.data.records
             this.handleRowSelection(this.tableData)
-            this.params.total = res.data.total
-            this.params.pages = res.data.pages
-            this.params.current = res.data.current
+            this.params.total = res.data.data.total
+            this.params.pages = res.data.data.pages
+            this.params.current = res.data.data.current
           }
         })
         .catch((error) => {
@@ -258,7 +272,8 @@ export default {
       this.init()
     },
     goback() {
-      this.$router.push({ path: '/equipment' })
+      this.$emit('changeIsShow', 'channelDiscovery', false)
+      this.$emit('initChannelList')
     },
     //数组去重
     fn2(arr) {
@@ -302,8 +317,12 @@ export default {
             onlineState: item.onlineState
           })
         })
-        addChannel({ channelList, videoAreaId: this.channelId }).then((res) => {
-          if (res.code === 0) {
+        addChannel({
+          channelList,
+          videoAreaId: this.channelId,
+          pResourceValue: this.treeValue
+        }).then((res) => {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '添加通道成功'
@@ -318,6 +337,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table::before {
+  height: 0 !important;
+}
 ::v-deep .el-dialog {
   margin-top: 4vh !important;
 }
@@ -431,8 +453,8 @@ export default {
 ::v-deep .contont .el-checkbox {
   display: block;
 }
-.activeDiscovery-content {
-  // height: 90%;
+.channelDiscovery-content {
+  height: 100%;
   .panel-header-box {
     margin: 0;
     padding: 0 20px;
@@ -464,7 +486,7 @@ export default {
     }
   }
 
-  .activeDiscovery-transfer {
+  .channelDiscovery-transfer {
     // display: flex;
     // justify-content: space-between;
     height: calc(100% - 106px);

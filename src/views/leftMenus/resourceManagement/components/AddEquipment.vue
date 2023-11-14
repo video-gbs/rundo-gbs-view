@@ -1,5 +1,5 @@
 <template>
-  <div class="addEquipment-content">
+  <div class="addEquipment-content" v-if="isShow">
     <div class="panel-header-box">
       <div class="panel-header-box-border">
         <svg-icon icon-class="back-svg" class="back_svg" @click="goback" /><span
@@ -34,7 +34,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="设备类型">
+              <el-form-item label="设备类型" prop="deviceType">
                 <el-radio-group v-model="form.deviceType">
                   <el-radio label="1">DVR</el-radio>
                   <el-radio label="2">NVR</el-radio>
@@ -256,13 +256,17 @@
 </template>
 
 <script>
-import { getVideoAraeTree } from '@/api/method/role'
-import { addEncoder } from '@/api/method/encoder'
+import { addEncoder, deviceVideoAreaList } from '@/api/method/encoder'
+import { getGroupDictLists } from '@/api/method/dictionary'
 import { getAllGatewayLists } from '@/api/method/moduleManagement'
-import { getManufacturerDictionaryList } from '@/api/method/dictionary'
 export default {
   name: '',
   components: {},
+  props: [
+    'treeList',
+    'manufacturerTypeOptions',
+    'transportProtocolTypeOptions'
+  ],
   data() {
     const checkName = (rule, value, cb) => {
       const regName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
@@ -312,6 +316,8 @@ export default {
       }, 500)
     }
     return {
+      isShow: false,
+      treeValue: '',
       form: {
         model: '',
         username: '',
@@ -330,18 +336,16 @@ export default {
         ip: ''
       },
       isRequired: true,
-      treeList: [],
+      // treeList: [],
       List: '',
       Ids: [],
       Id: '',
       resAreaName: '',
       defaultProps: {
-        children: 'children',
-        label: 'areaName'
+        children: 'childList',
+        label: 'resourceName'
       },
       allNorthTypeOptions: [],
-      manufacturerTypeOptions: [],
-      transportProtocolTypeOptions: [],
       rules: {
         name: {
           required: true,
@@ -355,6 +359,9 @@ export default {
           { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         gatewayId: [
+          { required: true, message: '此为必填项。', trigger: 'change' }
+        ],
+        deviceType: [
           { required: true, message: '此为必填项。', trigger: 'change' }
         ],
         transport: [
@@ -400,52 +407,13 @@ export default {
     }
   },
   mounted() {
-    this.init()
     this.getAllGatewayLists()
-    // this.getAllGatewayLists1()
-    this.getManufacturerDictionaryList()
-    this.getManufacturerDictionaryList1()
   },
   methods: {
-    async init(id) {
-      await getVideoAraeTree()
-        .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    },
-    async getManufacturerDictionaryList() {
-      await getManufacturerDictionaryList('EquipmentCompany').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
-            let obj = {}
-            obj.label = item.itemName
-            obj.value = item.itemValue
-            this.manufacturerTypeOptions.push(obj)
-          })
-        }
-      })
-    },
-    async getManufacturerDictionaryList1() {
-      await getManufacturerDictionaryList('TransportProtocol').then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
-            let obj1 = {}
-            obj1.label = item.itemName
-            obj1.value = item.itemValue
-            this.transportProtocolTypeOptions.push(obj1)
-          })
-        }
-      })
-    },
     async getAllGatewayLists() {
       await getAllGatewayLists().then((res) => {
-        if (res.code === 0) {
-          res.data.map((item) => {
+        if (res.data.code === 0) {
+          res.data.data.map((item) => {
             let obj = {}
             obj.label = item.name
             obj.value = item.id
@@ -454,6 +422,9 @@ export default {
           })
         }
       })
+    },
+    changeIsShow(val) {
+      this.isShow = val
     },
     changeRequired(val) {
       if (val.protocol === 'GB28181') {
@@ -465,9 +436,10 @@ export default {
     },
     // 点击节点选中
     nodeClickHandle(data) {
-      this.form.videoAreaId = data.areaName
+      this.form.videoAreaId = data.resourceName
       this.Id = data.id
-      this.resAreaName = data.areaName
+      this.treeValue = data.resourceValue
+      this.resAreaName = data.resourceName
       this.$refs.selectTree.blur()
     },
     save() {
@@ -477,17 +449,48 @@ export default {
         this.$refs.form1.validate()
       ]).then(() => {
         const resGatewayId = this.form.gatewayId
-        this.form.videoAreaId = this.Id
+        // this.form.videoAreaId = this.Id
+        // this.form.videoAreaId = this.treeValue
         this.form.deviceType = Number(this.form.deviceType)
         this.form.gatewayId = this.form.gatewayId.value
-        addEncoder({ ...this.form, ...this.form1 })
+        const { videoAreaId, ...restObj } = this.form
+        // console.log('restObj', restObj)
+        // return
+        addEncoder({
+          pResourceValue: this.treeValue,
+          ...restObj,
+          ...this.form1
+        })
           .then((res) => {
-            if (res.code === 0) {
+            if (res.data.code === 0) {
               this.$message({
                 type: 'success',
                 message: '新建成功'
               })
+              ;(this.form = {
+                gatewayId: '',
+                model: '',
+                username: '',
+                deviceType: '1',
+                manufacturer: '',
+                videoAreaId: '',
+                deviceId: '',
+                name: '',
+                password: ''
+              }),
+                (this.form1 = {
+                  transport: '',
+                  longitude: '',
+                  longitude: '',
+                  port: '',
+                  ip: ''
+                }),
+                (this.isShow = false)
               this.goback()
+            } else {
+              this.form.deviceType = String(this.form.deviceType)
+              this.form.gatewayId = resGatewayId
+              this.form.videoAreaId = this.resAreaName
             }
           })
           .catch((error) => {
@@ -498,7 +501,9 @@ export default {
       })
     },
     goback() {
-      this.$router.push({ path: '/equipment' })
+      this.$emit('init', '编码器', true)
+      this.$emit('initEncoderList')
+      this.$emit('changeIsShow', 'addEquipment', false)
     }
   }
 }

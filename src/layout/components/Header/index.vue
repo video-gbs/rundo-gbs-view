@@ -13,24 +13,24 @@
           text-color="#000000"
           active-text-color="#3989fa"
           :default-active="activeIndex"
-          @select="handleSelect"
           class="top-menus"
         >
-          <el-menu-item
-            v-for="(item, index) in typeRouter"
-            :index="item.path"
-            :key="index"
-            class="top-menus-item"
-          >
-            <div class="top-menus-div" @click="clickRouter(item)">
-              <span slot="title" class="top-menus-span"
-                ><svg-icon
-                  class="top-menu-svg"
-                  :icon-class="item.meta.icon"
-                />{{ item.meta.title }}</span
-              >
-            </div>
-          </el-menu-item>
+          <template v-for="(item, index) in typeRouter">
+            <el-menu-item
+              :index="item.path"
+              :key="index"
+              class="top-menus-item"
+            >
+              <div class="top-menus-div" @click="clickRouter(item)">
+                <span slot="title" class="top-menus-span"
+                  ><svg-icon
+                    class="top-menu-svg"
+                    :icon-class="item.meta.icon"
+                  />{{ item.meta.title }}</span
+                >
+              </div>
+            </el-menu-item>
+          </template>
         </el-menu>
       </div>
       <div class="header-menu">
@@ -39,45 +39,12 @@
             <svg-icon icon-class="user3" class="user" />
             <span class="fs14 mr10">系统操作指南</span>
             <span class="user-line" />
-            <!-- <el-dropdown class trigger="click">
-              <div class="user-info">
-                <svg-icon icon-class="management" class="management" />
-
-                <span class="user-line" />
-              </div>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item divided @click.native="logout">
-                  <span style="display: block"
-                    ><svg-icon
-                      icon-class="peizhi"
-                      class="management1"
-                    />配置管理</span
-                  >
-                </el-dropdown-item>
-                <el-dropdown-item divided @click.native="logout">
-                  <span style="display: block"
-                    ><svg-icon
-                      icon-class="yunwei"
-                      class="management1"
-                    />运维管理</span
-                  >
-                </el-dropdown-item>
-                <el-dropdown-item divided @click.native="logout">
-                  <span style="display: block"
-                    ><svg-icon
-                      icon-class="zhinan"
-                      class="management1"
-                    />系统操作指南</span
-                  >
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown> -->
           </div>
           <el-dropdown class trigger="click">
             <div class="user-info">
               <svg-icon icon-class="user2" class="user" />
               <span class="fs14 mr10">
-                {{ userInfo.userName || '佚名用户' }}
+                {{ userName || '佚名用户' }}
               </span>
               <i class="el-icon-caret-bottom" />
             </div>
@@ -107,274 +74,96 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import { Local } from '@/utils/storage'
-import { logout } from '@/api/method/user'
+import { Local, Session } from '@/utils/storage'
+import { logout, newLogout } from '@/api/method/user'
 import store from '@/store/index'
+
+import { getHomeFunc } from '@/api/method/home'
+
+// import { resetRouter } from '@/router/index'
 export default {
-  components: {
-    // Message,
-    // NotTips,
-  },
   props: {
     isShowTopMenus: {
       type: Boolean,
       default: false
     }
-    // ,
-    // secondLevelRouters: {
-    //   type: Array,
-    //   default: [
-    //     { path: '/workTable', title: '首页', type: 1 },
-    //     { path: '/equipment', title: '应用1', type: 2 },
-    //     { path: '/test2', title: '菜单1', type: 3 },
-    //     { path: '/test3', title: '运维1', type: 1 },
-    //     { path: '/permission', title: '应用2', type: 2 },
-    //     { path: '/permission', title: '菜单2', type: 3 }
-    //   ]
-    // }
   },
   data() {
     return {
       activeIndex: store.state.user.activeIndex,
       showDrawer: false,
-      messageData: {},
-      messageCount: 0,
-      lastCount: 0,
-      show: false,
       userInfo: {},
       sideBarRouterList: [],
       sideBarRouterList1: [],
       sideBarRouterList2: [],
-      sideBarRouterList3: []
+      sideBarRouterList3: [],
+      userName: ''
     }
   },
   computed: {
     ...mapGetters(['routerLists', 'typeRouter']),
     changeTypeRouter() {
       return this.typeRouter
+    },
+    changeRouterLists() {
+      return this.routerLists
     }
   },
   watch: {
-    changeTypeRouter(newValue, oldValue) {
-      // this.isShowSidebar = newValue
-    }
+    changeTypeRouter(newValue, oldValue) {},
+    changeRouterLists(newValue, oldValue) {}
   },
-  created() {
-    // const homeRouters = [
-    //   {
-    //     path: '/workTable',
-    //     name: 'workTable',
-    //     component: () => import('@/views/leftMenus/workTable/index'),
-    //     meta: { title: '首页', icon: 'sy' }
-    //   }
-    // ]
-    this.userInfo.userName = localStorage.getItem('rj_userName') || '佚名用户'
-    this.userInfo.userName = this.userInfo.userName
-      .replace('"', '')
-      .replace('"', '')
-    // if (this.routerLists && this.routerLists.length > 0) {
-    //   if (Local.get('tree_type') === 1) {
-    //     this.routerLists.map((item) => {
-    //       if (item.children && item.children.length > 0) {
-    //         item.children.forEach((child) => {
-    //           let params = {}
-    //           params = {
-    //             path: child.path,
-    //             meta: child.meta,
-    //             name: child.name,
-    //             component: (resolve) =>
-    //               require([`@/views${child.component}`], resolve)
-    //           }
-    //           this.resRouterLists.push(params)
-    //         })
-    //       }
-    //     })
-    //     this.resRouterLists = homeRouters.concat(this.resRouterLists)
-    //     this.activeIndex = this.resRouterLists[1].path
-    //     console.log('this.resRouterLists', this.resRouterLists)
-    //   } else {
-    //     this.routerLists.map((item) => {
-    //       let params1 = {}
-    //       params1 = {
-    //         path: item.path,
-    //         meta: item.meta,
-    //         name: item.name,
-    //         component: (resolve) =>
-    //           require([`@/views${item.component}`], resolve)
-    //       }
-    //       this.resRouterLists.push(params1)
-    //       // 侧边栏路由
-    //       if (item.children && item.children.length > 0) {
-    //         item.children.forEach((child) => {
-    //           let params2 = {}
-    //           params2 = {
-    //             path: child.path,
-    //             meta: child.meta,
-    //             name: child.name,
-    //             component: (resolve) =>
-    //               require([`@/views${child.component}`], resolve)
-    //           }
-    //           this.sideBarRouterList.push(params2)
-    //         })
-    //       }
-    //     })
-    //     this.resRouterLists = homeRouters.concat(this.resRouterLists)
-    //     this.activeIndex = this.resRouterLists[1].path
-    //     console.log('this.resRouterLists~~~~~~~~~', this.resRouterLists)
-    //   }
-    // }
+  mounted() {
+    this.userName = Local.get('rj_userName') || '佚名用户'
+    // this.userName = this.userName.replace('"', '').replace('"', '')
   },
-  mounted() {},
   methods: {
     /**
      * 退出登录
      */
     logout() {
-      logout()
+      newLogout()
         .then((res) => {})
         .catch(() => {})
         .finally(() => {
           Local.setToken('')
-          Local.remove('rj_token')
+          Local.remove('access_token')
           Local.remove('rj_deptType')
-          Local.remove('rj_userName')
-          // Local.remove('rj__deptName')
+          clearInterval(window.interval)
           this.$router.push({ path: '/login' })
         })
     },
-    handleSelect(key, keyPath) {
-      // if (key === '/resourceManagement') {
-      //   this.$emit('changeSidebarLists', this.sideBarRouterList[0])
-      // } else if (key === '/management') {
-      //   this.$emit('changeSidebarLists', this.sideBarRouterList)
-      // } else {
-      //   this.$emit('changeSidebarLists', this.sideBarRouterList[1])
-      // }
-    },
     clickRouter(data) {
-      // console.log('data~~~~~~~~~~~~~~~~~~~~~~~~', data, this.routerLists)
-      this.sideBarRouterList1 = []
-      this.sideBarRouterList2 = []
-      this.sideBarRouterList3 = []
+      Session.set('resRouterName', data.name)
       const resArray =
         this.routerLists && this.routerLists.length > 0
           ? this.routerLists
-          : JSON.parse(Local.get('dynamicRouters'))
-      // console.log(
-      //   '~~~~~~~~~~~~~~~~~~~~~~~~',
-      //   JSON.parse(Local.get('dynamicRouters'))
-      // )
-      // console.log('resArray~~~~~~~~~~~~~~~~~~~~~~~~', resArray)
-      switch (data.path) {
-        case '/resourceManagement':
-          resArray.map((item) => {
-            if (
-              item.children &&
-              item.children.length > 0 &&
-              data.path === item.path
-            ) {
-              item.children.forEach((child) => {
-                let resourceManagement = {}
-                resourceManagement = {
-                  path: child.path,
-                  meta: child.meta,
-                  name: child.name,
-                  hidden: child.hidden === 1 ? true : false,
-                  component: (resolve) =>
-                    require([`@/views${child.component}`], resolve)
-                }
-
-                this.sideBarRouterList1.push(resourceManagement)
-              })
-            }
-            if (item.title === '资源管理') {
-              this.$router.push({ path: item.redirect })
-            }
-          })
-
-          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList1)
-          // this.$router.push({ path: resArray[0].redirect })
-
-          // console.log(1, this.sideBarRouterList1)
-          break
-        case '/systemManagement':
-          resArray.map((item) => {
-            if (
-              item.children &&
-              item.children.length > 0 &&
-              data.path === item.path
-            ) {
-              item.children.forEach((child) => {
-                let systemManagement = {}
-                systemManagement = {
-                  path: child.path,
-                  meta: child.meta,
-                  name: child.name,
-                  hidden: child.hidden === 1 ? true : false,
-                  component: (resolve) =>
-                    require([`@/views${child.component}`], resolve)
-                }
-
-                this.sideBarRouterList2.push(systemManagement)
-              })
-            }
-            if (item.title === '组织管理') {
-              this.$router.push({ path: item.redirect })
-            }
-          })
-
-          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList2)
-          // this.$router.push({ path: this.sideBarRouterList2[0].path })
-          // this.$router.push({ path: resArray[1].redirect })
-          // console.log(2, this.sideBarRouterList2)
-          break
-        case '/moduleManageMent':
-          resArray.map((item) => {
-            if (
-              item.children &&
-              item.children.length > 0 &&
-              data.path === item.path
-            ) {
-              item.children.forEach((child) => {
-                let moduleManageMent = {}
-                moduleManageMent = {
-                  path: child.path,
-                  meta: child.meta,
-                  name: child.name,
-                  hidden: child.hidden === 1 ? true : false,
-                  component: (resolve) =>
-                    require([`@/views${child.component}`], resolve)
-                }
-
-                this.sideBarRouterList3.push(moduleManageMent)
-              })
-            }
-            if (item.title === '服务管理') {
-              this.$router.push({ path: item.redirect })
-            }
-          })
-
-          store.dispatch('user/changeSidebarRouter', this.sideBarRouterList3)
-          // this.$router.push({ path: this.sideBarRouterList3[1].path })
-          // this.$router.push({ path: resArray[2].redirect })
-          break
-        default:
-          break
-      }
-      if (Local.get('tree_type') === 2 || Local.get('tree_type') === 3) {
-        if (data.path === '/workTable') {
-          this.$router.push({ path: data.path })
-          store.dispatch('user/changeRightWidth', false)
-          store.dispatch('user/changeShowSidebar', false)
-        } else {
-          store.dispatch('user/changeShowSidebar', true)
-        }
-      } else {
-        // if (item.path === '/workTable') {
+          : JSON.parse(Session.get('dynamicRouters'))
+      if (data.path === '/workTable') {
         this.$router.push({ path: data.path })
-        // }
+        // resetRouter()
+        store.dispatch('user/changeRightWidth', false)
         store.dispatch('user/changeShowSidebar', false)
+      } else {
+        // store.dispatch('user/changeShowSidebar', true)
       }
+
+      resArray.map((item) => {
+        if (item.name === data.name) {
+          store.dispatch('user/changeSidebarRouter', item.children)
+          store.dispatch('user/changeActiveIndex', item.path)
+          getHomeFunc({ menuId: item.children[0].id }).then((res) => {
+            if (res.data.code === 0) {
+              Session.set('permissionData', [])
+              Session.set('permissionMenuId', '')
+              Session.set('permissionData', res.data.data)
+              Session.set('permissionMenuId', item.children[0].id)
+
+              this.$router.push({ path: item.children[0].path })
+            }
+          })
+        }
+      })
     }
   }
 }

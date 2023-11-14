@@ -1,31 +1,19 @@
 <template>
-  <section class="app-main f1 fd-c ai-s" v-if="changeRouter">
+  <section class="app-main f1 fd-c ai-s">
     <div style="height: 100%" class="app-main-c f1 f">
       <transition name="fade-transform1" mode="out-in">
         <keep-alive>
-          <router-view v-if="$route.meta.keepAlive" :key="key" />
+          <router-view/>
         </keep-alive>
       </transition>
-      <transition name="fade-transform2" mode="out-in">
-        <router-view v-if="!$route.meta.keepAlive" :key="key" />
-      </transition>
+      <!-- <transition name="fade-transform2" mode="out-in">
+        <router-view v-if="!$route.path" :key="key" />
+      </transition> -->
     </div>
     <h2 v-if="showSidebar" class="company-title f jc-c ai-c">
       ©2023 润建股份有限公司 版权所有
     </h2>
   </section>
-  <!-- <section class="app-main-else f1 fd-c ai-s" style="height: 100%" v-else>
-    <div style="height: 100%" class="app-main-c f1 f">
-      <transition name="fade-transform1" mode="out-in">
-        <keep-alive>
-          <router-view v-if="$route.meta.keepAlive" :key="key" />
-        </keep-alive>
-      </transition>
-      <transition name="fade-transform2" mode="out-in">
-        <router-view v-if="!$route.meta.keepAlive" :key="key" />
-      </transition>
-    </div>
-  </section> -->
 </template>
 
 <script>
@@ -46,7 +34,6 @@ export default {
           this.changeRouter = true
         }
       },
-      // 深度观察监听
       deep: true
     },
     changeShowSidebar(newValue, oldValue) {}
@@ -59,15 +46,14 @@ export default {
     key() {
       return this.$route.path
     }
+  },
+  created() {
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .app-main {
-  /*50 = navbar  */
-  /* min-height: calc(100vh - 136px); */
-  // height: calc(100%);
   height: calc(100% - 56px);
   width: 100%;
   position: relative;
@@ -81,17 +67,10 @@ export default {
 }
 .app-main-c {
   > div {
-    // margin: 20px;
     width: 100%;
   }
 }
 .company-title {
-  /* text-align: center;
-  font-size: 14px;
-  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
-  font-weight: 400;
-  color: #8b8b8b; */
-
   position: absolute;
   text-align: center;
   font-size: 14px;
@@ -108,8 +87,8 @@ export default {
 </style>
 
 <style lang="scss">
-// fix css style bug in open el-dialog
 .el-popup-parent--hidden {
+  padding-right: 0 !important;
   .fixed-header {
     padding-right: 15px;
   }

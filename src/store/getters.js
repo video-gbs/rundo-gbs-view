@@ -8,6 +8,7 @@ const getters = {
   activeIndex: (state) => state.user.activeIndex,
   rightWidth: (state) => state.user.rightWidth,
   showSidebar: (state) => state.user.showSidebar,
+  thirdPartyLogin1: (state) => state.user.thirdPartyLogin1,
   typeRouter: (state) => state.user.typeRouter,
   sidebarRouter: (state) => state.user.sidebarRouter,
   // configTypeRouter: (state) => state.user.configTypeRouter,

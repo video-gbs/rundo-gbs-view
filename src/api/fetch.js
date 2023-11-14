@@ -1,7 +1,11 @@
 import request from '@/utils/request'
 import NProgress from 'nprogress'
-import { Message } from 'element-ui'
-import { authorizationValue } from '@/settings'
+import {
+  Message
+} from 'element-ui'
+import {
+  authorizationValue
+} from '@/settings'
 
 const methods = {
   login(url, params) {
@@ -22,7 +26,54 @@ const methods = {
       headers
     })
   },
+  get1(url, params) {
+    return request({
+      method: 'GET',
+      url,
+      params,
+      headers: {
+        Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+      }
+    })
+  },
+  get2(url, params, headers) {
+    console.log('params',params)
+    const resParams = Object.entries(params)
+      .map(([key, value]) => {
+        if (Array.isArray(value)) {
+          return value.map(item => `${key}=${item}`).join('&');
+        } else {
+          return `${key}=${value}`;
+        }
+      })
+      .join('&')
+      console.log('resParams',resParams)
+    return request({
+      method: 'GET',
+      url,
+      resParams,
+      headers
+    })
+  },
   post(url, data, headers) {
+    return request({
+      method: 'POST',
+      url,
+      data,
+      headers
+    })
+  },
+  post2(url, data, headers) {
+    return request({
+      method: 'POST',
+      url,
+      data,
+      headers: {
+        Authorization: 'Basic cnVuZG8tZ2JzLXZpZXc6cnVuZG84ODg='
+      }
+    })
+  },
+  post1(url, data, headers) {
     return request({
       method: 'POST',
       url,
@@ -39,10 +90,42 @@ const methods = {
     })
   },
   delete1(url, data, headers) {
+    const resUrl = url + data.map((item) => 'idList=' + item).join('&')
     return request({
       method: 'DELETE',
-      url,
-      data,
+      url: resUrl,
+      headers
+    })
+  },
+  delete2(url, data, headers) {
+    const resUrl = url + data.map((item) => 'templateIds=' + item).join('&')
+    return request({
+      method: 'DELETE',
+      url: resUrl,
+      headers
+    })
+  },
+  delete3(url, data, headers) {
+    const resUrl = url + data.map((item) => 'id=' + item).join('&')
+    return request({
+      method: 'DELETE',
+      url: resUrl,
+      headers
+    })
+  },
+  delete4(url, data, headers) {
+    const resUrl = url + data.map((item) => 'ids=' + item).join('&')
+    return request({
+      method: 'DELETE',
+      url: resUrl,
+      headers
+    })
+  },
+  delete5(url, data, headers) {
+    const resUrl = url + data.map((item) => 'idList=' + item).join('&')
+    return request({
+      method: 'DELETE',
+      url: resUrl,
       headers
     })
   },
@@ -59,7 +142,6 @@ const methods = {
         }
       }
     }
-    console.log('Object.is', _params, params)
     // return request.service.delete(`${url}${_params}`)
     return request({
       method: 'DELETE',
@@ -71,13 +153,13 @@ const methods = {
   download(url, params, filename) {
     NProgress.start()
     return request({
-      method: 'POST',
-      url,
-      params,
-      headers: {
-        responseType: 'blob'
-      }
-    })
+        method: 'POST',
+        url,
+        params,
+        headers: {
+          responseType: 'blob'
+        }
+      })
       .then((r) => {
         const content = r.data
         const blob = new Blob([content])

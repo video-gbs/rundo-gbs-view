@@ -36,8 +36,8 @@
                             :data="treeList"
                             class="tree"
                             :props="{
-                              children: 'children',
-                              label: 'areaNames'
+                              children: 'childList',
+                              label: 'resourceName'
                             }"
                             default-expand-all
                             :default-expanded-keys="['根节点']"
@@ -53,7 +53,7 @@
                             >
                               <span>
                                 <svg-icon
-                                  v-if="data.level === 1"
+                                  v-if="data.resourceType === 1"
                                   icon-class="tree1"
                                   class="tree1"
                                 />
@@ -62,7 +62,7 @@
                                   :icon-class="getIconType(data)"
                                   class="tree2"
                                 />
-                                {{ data.orgName || data.areaName }}
+                                {{ data.resourceName }}
                               </span>
                             </span>
                           </el-tree>
@@ -157,6 +157,10 @@
                       @showPlayerBoxMini="showPlayerBoxMini"
                       @videoClick="videoClick"
                     ></player>
+                    <!-- <EasyPlayer
+                      :ref="'player' + i"
+                      :videoUrl="videoUrl[i - 1]"
+                    /> -->
                     <div ref="rectArea" class="rect"></div>
 
                     <div
@@ -331,10 +335,17 @@ import monitorEquipmentGroup from './components/monitorEquipmentGroup.vue'
 import cloudControl from './components/cloudControl.vue'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 
-import { getPlayLists, getChannelPlayList } from '@/api/method/live'
-import { getVideoAraeTree } from '@/api/method/role'
+import {
+  getPlayLists,
+  getChannelPlayList,
+  playVideoAreaList
+} from '@/api/method/live'
 import { Local } from '@/utils/storage'
 import { ptzPresetLists } from '@/api/method/live'
+
+import { convertG711ToAAC } from '@/utils/index'
+
+import EasyPlayer from './components/EasyPlayer.vue'
 
 export default {
   name: 'live',
@@ -344,7 +355,8 @@ export default {
     PlayerTool,
     monitorEquipmentGroup,
     cloudControl,
-    leftTree
+    leftTree,
+    EasyPlayer
   },
   data() {
     return {
@@ -488,17 +500,6 @@ export default {
   },
   mounted() {
     this.init()
-    // document.addEventListener('mousedown', (event) => {
-    //   if (event.button !== 0) return // 只响应左键操作
-
-    //   this.startPoint = { x: event.clientX, y: event.clientY }
-
-    //   console.log('this.startPoint',this.startPoint)
-    //   this.dragRect = null
-
-    //   document.addEventListener('mousemove', this.onMouseMove)
-    //   document.addEventListener('mouseup', this.onMouseUp)
-    // })
 
     document.addEventListener('fullscreenchange', (e) => {
       // 监听到屏幕变化，更改全屏状态，该页面不能存在多个全屏元素
@@ -533,17 +534,10 @@ export default {
         return { width: '25%', height: '25%' }
       }
     }
-    // boxStyles() {
-    //   return {
-    //     top: `${Math.min(this.startY, this.endY)}px`,
-    //     left: `${Math.min(this.startX, this.endX)}px`,
-    //     width: `${Math.abs(this.endX - this.startX)}px`,
-    //     height: `${Math.abs(this.endY - this.startY)}px`
-    //   }
-    // }
   },
   watch: {
     filterText(val) {
+      console.log(111, val)
       this.$refs.liveTree.filter(val)
     },
     videoActiveArr(n) {
@@ -611,61 +605,13 @@ export default {
     document.removeEventListener('fullscreenchange', () => {})
   },
   methods: {
-    // onMouseDown(event) {
-    //   // 只在左键按下时响应事件
-    //   if (event.button === 0) {
-    //     this.startX = event.pageX;
-    //     this.startY = event.pageY;
-    //     document.addEventListener('mousemove', this.onMouseMove);
-    //     document.addEventListener('mouseup', this.onMouseUp);
-    //   }
-    // },
-    // onMouseMove(event) {
-    //   this.endX = event.pageX;
-    //   this.endY = event.pageY;
-    // },
-    // onMouseUp(event) {
-    //   document.removeEventListener('mousemove', this.onMouseMove);
-    //   document.removeEventListener('mouseup', this.onMouseUp);
-    // },
-    // onMouseMove(event) {
-
-    //     const testDom = document.getElementById('mydiv1')
-
-    //     const rect = testDom.getBoundingClientRect()
-    //   if (!this.startPoint) return
-
-    //   if (!this.dragRect) {
-    //     // 创建拖拽矩形
-    //     this.dragRect = {
-    //       left: Math.min(this.startPoint.x, event.clientX) - rect.left,
-    //       top: Math.min(this.startPoint.y, event.clientY) - rect.top,
-    //       width: 0,
-    //       height: 0,
-    //       background: 'red'
-    //     }
-    //   }
-    //   // 更新拖拽矩形的大小
-    //   this.dragRect.width = Math.abs(event.clientX - this.startPoint.x)
-    //   this.dragRect.height = Math.abs(event.clientY - this.startPoint.y)
-
-    //   // 更新样式
-    //   testDom.style.clipPath = `inset(${this.dragRect.top}px ${
-    //     rect.width - this.dragRect.left - this.dragRect.width
-    //   }px ${rect.height - this.dragRect.top - this.dragRect.height}px ${this.dragRect.left}px)`
-    // },
-
-    // onMouseUp() {
-    //   document.removeEventListener('mousemove', this.onMouseMove)
-    //   document.removeEventListener('mouseup', this.onMouseUp)
-    // },
     async init() {
-      await getVideoAraeTree()
+      await playVideoAreaList()
         .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
+          if (res.data.code === 0) {
+            this.treeList = [res.data.data]
 
-            this.initData = res.data
+            this.initData = [res.data.data]
           }
         })
         .catch((error) => {
@@ -687,9 +633,9 @@ export default {
     },
     async changeChildOptionLists(id, index) {
       await ptzPresetLists({ channelExpansionId: id }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.$nextTick(() => {
-            this.childOptionLists[index] = res.data
+            this.childOptionLists[index] = res.data.data
             this.$forceUpdate()
             this.$refs.cloudControl.getOptionLists(index)
           })
@@ -698,8 +644,8 @@ export default {
     },
     async getPtzPresetLists(id, index) {
       await ptzPresetLists({ channelExpansionId: id }).then((res) => {
-        if (res.code === 0) {
-          this.childOptionLists[index] = res.data
+        if (res.data.code === 0) {
+          this.childOptionLists[index] = res.data.data
 
           this.channelExpansionId[index] = id
         }
@@ -778,24 +724,28 @@ export default {
 
         // A(左上) part
         if (this.mouseX < this.downX && this.mouseY < this.downY) {
+          console.log('左上~~~~~', this.mouseX, this.downX)
           this.rect.style.left = this.mouseX - this.left + 'px'
           this.rect.style.top = this.mouseY - this.top + 'px'
           this.videoZoomFlag = false
         }
         // B(右上) part
         if (this.mouseX > this.downX && this.mouseY < this.downY) {
+          console.log('右上~~~~~', this.mouseX, this.downX)
           this.rect.style.left = this.downX - this.left + 'px'
           this.rect.style.top = this.mouseY - this.top + 'px'
           this.videoZoomFlag = false
         }
         // C(左下) part
         if (this.mouseX < this.downX && this.mouseY > this.downY) {
+          console.log('左下~~~~~', this.mouseX, this.downX)
           this.rect.style.left = this.mouseX - this.left + 'px'
           this.rect.style.top = this.downY - this.top + 'px'
           this.videoZoomFlag = false
         }
         // D(右下) part
         if (this.mouseX > this.downX && this.mouseY > this.downY) {
+          console.log('右下~~~~~', this.mouseX, this.downX)
           this.rect.style.left = this.downX - this.left + 'px'
           this.rect.style.top = this.downY - this.top + 'px'
           this.videoZoomFlag = true
@@ -954,7 +904,7 @@ export default {
       this.downY = 0
       this.mouseX = 0
       this.mouseY = 0
-      this.rect = null
+      this.rect = false
       this.rectInfo = {
         videoWidth: 0,
         videoHeight: 0,
@@ -1106,27 +1056,14 @@ export default {
       // if (this.defaultPropsName === 'orgName') {
       //   return data.orgName && data.orgName.indexOf(value) !== -1
       // } else {
-      return data.areaNames && data.areaNames.indexOf(value) !== -1
+      return data.resourceName && data.resourceName.indexOf(value) !== -1
       // }
-    },
-    recursionTree(arr, id, resArray) {
-      arr.forEach((item) => {
-        if (item.id === id) {
-          item.children
-            ? item.children.push(resArray)
-            : (item.children = resArray)
-        } else {
-          if ((item.children && item.children, length > 0)) {
-            this.recursionTree(item.children, id, resArray)
-          }
-        }
-      })
-      return arr
     },
     async handleNodeClick(data, node, self) {
       console.log(data, 111)
       if (!data.onlineState) {
         this.resArray = []
+        console.log(this.detailsId)
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
         } else {
@@ -1139,31 +1076,33 @@ export default {
           } else {
             await getChannelPlayList(data.id)
               .then((res) => {
-                if (res.code === 0) {
-                  if (res.data && res.data.length > 0) {
-                    res.data.map((item) => {
+                if (res.data.code === 0) {
+                  if (res.data.data && res.data.data.length > 0) {
+                    res.data.data.map((item) => {
                       this.resArray.push({
                         onlineState: item.onlineState,
-                        areaName: item.channelName,
-                        areaNames: item.channelName,
-                        areaPid: item.id,
+                        resourceName: item.channelName,
+                        resourceNames: item.channelName,
+                        areaPid: item.channelId,
                         id: item.id,
-                        ptzType: item.ptzType,
-                        children: []
+                        ptzType: item.ptzType
+                        // childList: []
                       })
                     })
 
                     this.detailsId.push(data.id)
                     let arr = []
                     if (data.id === '1') {
-                      arr = this.resArray.concat(this.initData[0].children)
+                      arr = this.resArray.concat(this.initData[0].childList)
                     } else {
-                      // console.log('else~~~~~~~~~~~~~~~~', data.children)
+                      // console.log('else~~~~~~~~~~~~~~~~', data.childList)
 
                       // console.log('1~~~~~~~~~~~~~~~~', this.resArray)
-                      arr = data.children
-                        ? this.resArray.concat(data.children)
+                      arr = data.childList
+                        ? this.resArray.concat(data.childList)
                         : this.resArray
+
+                      console.log('arr11111~~~~~~', arr)
 
                       const obj = {}
                       arr = arr.reduce((item, next) => {
@@ -1173,6 +1112,7 @@ export default {
                         return item
                       }, [])
                     }
+                    console.log('arr~~~~~~', arr, data.id)
                     this.$refs.liveTree.updateKeyChildren(data.id, arr)
                     this.defaultExpandedKeys = [data.id]
                   }
@@ -1312,7 +1252,7 @@ export default {
       Local.set('cloudId', id)
       await getPlayLists({ channelId: id })
         .then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
             // console.log(111111, res)
 
             let idxTmp = this.playerIdx
@@ -1323,15 +1263,15 @@ export default {
               this.playerIdx++
             }
 
-            var url = res.data.wsFlv
-            if (res.data.playProtocalType == 1) {
-              url = res.data.httpFlv
-            } else if (res.data.playProtocalType == 2) {
-              url = res.data.wssFlv
-            }
+            var url = res.data.data.httpsHls
+            // if (res.data.data.playProtocalType == 1) {
+            //   url = res.data.data.httpFlv
+            // } else if (res.data.data.playProtocalType == 2) {
+            //   url = res.data.data.wssFlv
+            // }
             this.setPlayUrl(url, idxTmp)
 
-            this.setStreamId(res.data.streamId, idxTmp)
+            this.setStreamId(res.data.data.streamId, idxTmp)
             this.setFlvCloudId(id, idxTmp)
             this.setLeftTopName(name, idxTmp)
 
@@ -1458,17 +1398,34 @@ export default {
       window.localStorage.setItem('playData', JSON.stringify(data))
     },
     videoClick(i) {
+      console.log('videoClick~~~~~~~~', i)
       this.$refs.cloudControl.$refs.directionControl.changeType(
         i - 1,
         this.isClicked.length
       )
       this.playerIdx = i - 1
+      this.rectAreaNum = i - 1
     },
     // 放大缩小视频容器
     toogleVideo(i) {
+      // console.log('双击',i)
+      const directionControlDom = document.getElementsByClassName(
+        'playtoolDirectionControl'
+      )
+        ? document.getElementsByClassName('playtoolDirectionControl')
+        : []
+
       if (this.fullPlayerIdx === -1) {
+        directionControlDom.forEach((item, index) => {
+          if (index !== i - 1) {
+            item.style.display = 'none'
+          }
+        })
         this.fullPlayerIdx = i
       } else {
+        directionControlDom.forEach((item, index) => {
+          item.style.display = 'block'
+        })
         this.fullPlayerIdx = -1
       }
     },
@@ -1526,6 +1483,10 @@ export default {
 //   position: absolute;
 //   border: 1px dashed #000;
 // }
+ //隐藏视频的载入动画
+::v-deep .easy-player-loading {
+  display: none !important;
+}
 .test-div {
   width: 16px;
   height: 18px;
@@ -1753,6 +1714,8 @@ export default {
   border: 2px solid #1890ff !important;
 }
 .play-box {
+  width: 100%;
+  height: 100%;
   position: relative;
   border: 2px solid #505050;
   box-sizing: border-box;

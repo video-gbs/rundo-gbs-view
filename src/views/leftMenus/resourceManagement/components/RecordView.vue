@@ -33,8 +33,8 @@
                           :data="treeList"
                           class="tree"
                           :props="{
-                            children: 'children',
-                            label: 'areaNames'
+                            children: 'childList',
+                            label: 'resourceName'
                           }"
                           default-expand-all
                           :default-expanded-keys="['根节点']"
@@ -50,7 +50,7 @@
                           >
                             <span>
                               <svg-icon
-                                v-if="data.level === 1"
+                                v-if="data.resourceType === 1"
                                 icon-class="tree1"
                                 class="tree1"
                               />
@@ -59,7 +59,7 @@
                                 :icon-class="getIconType(data)"
                                 class="tree2"
                               />
-                              {{ data.orgName || data.areaName }}
+                              {{ data.resourceName }}
                             </span>
                           </span>
                         </el-tree>
@@ -139,7 +139,7 @@
                     <cloud-player
                       :ref="'cloudPlayer' + [i - 1]"
                       :stretch="isFill"
-                      :tracks="tracks"
+                      :tracks="tracks[i - 1]"
                       :isShowStream="isShowStream[i - 1]"
                       :onChangePlayTime="handleChangeCurrentTime"
                       :onPlayEnded="handleDevicesPlayEnded"
@@ -170,7 +170,10 @@
 
             <!-- 时间进度条 -->
 
-            <div class="player-time">
+            <div
+              class="player-time"
+              v-permission="['/expansion/play/record/seek', 3]"
+            >
               <template v-if="tabsActiveName === 'device'">
                 <TimePlayer1
                   ref="TimePlayer"
@@ -248,6 +251,7 @@
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
                   type="datetime"
+                  :clearable="false"
                   :disabled="isClickCx"
                   key="datetime1"
                   placeholder="选择日期时间"
@@ -256,6 +260,11 @@
                 </el-date-picker>
 
                 <el-tooltip
+                  v-permission="
+                    play[playerIdx]
+                      ? ['/expansion/play/record/pause', 3]
+                      : ['/expansion/play/record/resume', 3]
+                  "
                   :content="play[playerIdx] ? '暂停' : '播放'"
                   placement="top"
                 >
@@ -271,7 +280,11 @@
                   />
                 </el-tooltip>
                 <div class="speed-box">
-                  <el-tooltip content="减速" placement="top">
+                  <el-tooltip
+                    v-permission="['/expansion/play/record/speed', 3]"
+                    content="减速"
+                    placement="top"
+                  >
                     <span
                       @click="
                         hasStreamId[playerIdx] ? handleChangeSpeed('sub') : ''
@@ -284,7 +297,11 @@
                   <span class="speed-text"
                     >{{ speedArr[currentSpeed[playerIdx]] }}x</span
                   >
-                  <el-tooltip content="快进" placement="top">
+                  <el-tooltip
+                    v-permission="['/expansion/play/record/speed', 3]"
+                    content="快进"
+                    placement="top"
+                  >
                     <span
                       @click="
                         hasStreamId[playerIdx] ? handleChangeSpeed('plus') : ''
@@ -403,22 +420,22 @@
 import moment from 'moment'
 import { Local } from '@/utils/storage'
 import dayjs from 'dayjs'
-import jPlayer from '../recordComponents/jessibuca.vue'
+// import jPlayer from '../recordComponents/jessibuca.vue'
 import cloudPlayer from '../recordComponents/cloudPlayer.vue'
 import TimePlayer from '../recordComponents/TimePlayer.vue'
 import TimePlayer1 from '../recordComponents/TimePlayer1.vue'
 import MonitorEquipmentGroup from './monitorEquipmentGroup'
 import DownloadVideoModal from '../recordComponents/DownloadVideoModal'
-import { getVideoAraeTree } from '@/api/method/role'
 import { getPlaybackList } from '@/api/method/moduleManagement'
 import {
   getPlayBackUrlLists,
-  getChannelPlayList,
+  getChannelPlayBackList,
   playStop,
   pauseRecordView,
   resumeRecordView,
   speedRecordView,
-  getStreamInfo
+  getStreamInfo,
+  playVideoAreaListRecord
 } from '@/api/method/live'
 
 const ZOOM_TYPE = {
@@ -429,7 +446,7 @@ const ZOOM_TYPE = {
 export default {
   name: 'recordView',
   components: {
-    jPlayer,
+    // jPlayer,
     cloudPlayer,
     TimePlayer,
     TimePlayer1,
@@ -440,6 +457,7 @@ export default {
   data() {
     return {
       // isChildChange:false,
+      stopWatching: true,
       isClickCx: true,
       spilt: 1, //分屏
       recordLeftTopName: [],
@@ -597,8 +615,10 @@ export default {
         date: '',
         searchHistoryResult: [] //媒体流历史记录搜索结果
       },
-      speedArr: [0.25, 0.5, 1.0, 2.0, 4.0],
-      currentSpeed: [2],
+      // speedArr: [0.25, 0.5, 1.0, 2.0, 4.0],
+      speedArr: [1.0, 2.0, 4.0],
+      //  currentSpeed: [2],
+      currentSpeed: [0],
       isFullScreen: false,
       cloudPlayerUrl: [''],
       resOnlineState: '',
@@ -640,12 +660,14 @@ export default {
     this.play = []
     this.isShowStream = []
     this.videoUrl = []
-    this.currentSpeed = [2]
+    // this.currentSpeed = [2]
+    this.currentSpeed = [0]
     this.hasStreamId = []
     for (let i = 0; i < this.spilt; i++) {
       this.videoUrl[i] = ''
       this.play[i] = false
-      this.currentSpeed[i] = 2
+      // this.currentSpeed[i] = 2
+      this.currentSpeed[i] = 0
       this.hasStreamId[i] = false
       this.isShowStream[i] = false
       this.timeSegments[i] = [
@@ -705,24 +727,25 @@ export default {
 
       // 转化为日期时间格式
       const dateFormat = 'YYYY-MM-DD HH:mm:ss'
-      console.log(
-        '最终时间',
-        merged.map((range) => ({
-          startTime: dayjs(range.startTime).format(dateFormat),
-          endTime: dayjs(range.endTime).format(dateFormat)
-        }))
-      )
+      // console.log(
+      //   '最终时间',
+      //   merged.map((range) => ({
+      //     startTime: dayjs(range.startTime).format(dateFormat),
+      //     endTime: dayjs(range.endTime).format(dateFormat)
+      //   }))
+      // )
       return merged.map((range) => ({
         startTime: dayjs(range.startTime).format(dateFormat),
         endTime: dayjs(range.endTime).format(dateFormat)
       }))
     },
     async init() {
-      await getVideoAraeTree()
+      await playVideoAreaListRecord()
         .then((res) => {
-          if (res.code === 0) {
-            this.treeList = res.data
-            this.initDatas = res.data
+          if (res.data.code === 0) {
+            this.treeList = [res.data.data]
+
+            this.initData = [res.data.data]
           }
         })
         .catch((error) => {
@@ -796,7 +819,7 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true
-      return data.areaNames && data.areaNames.indexOf(value) !== -1
+      return data.resourceName && data.resourceName.indexOf(value) !== -1
       // }
     },
 
@@ -812,9 +835,9 @@ export default {
         endTime: date[1]
       })
         .then((res) => {
-          if (res.code === 0) {
-            if (res.data && res.data.recordList.length > 0) {
-              listData = res.data.recordList.map((item) => {
+          if (res.data.code === 0) {
+            if (res.data.data && res.data.data.recordList.length > 0) {
+              listData = res.data.data.recordList.map((item) => {
                 const { startTime, endTime } = item
                 item.duration =
                   (new Date(endTime).getTime() -
@@ -824,31 +847,14 @@ export default {
               })
 
               // 处理时间聚合
-              // const testTime = [
-              //   {
-              //     startTime: '2023-06-06 00:00:00',
-              //     endTime: '2023-06-06 00:30:00'
-              //   },
-              //   {
-              //     startTime: '2023-06-06 01:00:00',
-              //     endTime: '2023-06-06 01:30:00'
-              //   },
-              //   {
-              //     startTime: '2023-06-06 01:00:00',
-              //     endTime: '2023-06-06 02:30:00'
-              //   },
-              //   {
-              //     startTime: '2023-06-06 04:00:00',
-              //     endTime: '2023-06-06 05:30:00'
-              //   }
-              // ]
-              // this.resTimeLists = []
+
               this.resTimeLists[this.playerIdx] =
                 this.mergeDatetimeRanges(listData)
 
               console.log(
                 'this.resTimeListsthis.resTimeLists',
-                this.resTimeLists
+                this.resTimeLists,
+                this.timeSegments
               )
               // 查询初始化时间
               Local.set(
@@ -868,7 +874,8 @@ export default {
 
               let params = {}
 
-              this.resTimeLists[this.playerIdx].forEach((item, index) => {
+              this.resTimeLists[this.playerIdx].forEach((item) => {
+                console.log(1111111111111, item)
                 params = {
                   name: '',
                   beginTime: new Date(item.startTime).getTime(),
@@ -879,14 +886,22 @@ export default {
                 }
                 array1.push(params)
               })
-
-              this.timeSegments[this.playerIdx] = array1
+              this.$nextTick(() => {
+                setTimeout(() => {
+                  this.timeSegments[this.playerIdx] = array1
+                }, 500)
+              })
 
               console.log(
                 ' this.timeSegments~~~~~~~~~~~~~~~~~~~',
                 this.timeSegments
               )
               this.hasStreamId[this.playerIdx] = true
+
+              console.log(
+                'this.resTimeLists~~~~~~~~~~~~~~~~~~~',
+                this.resTimeLists
+              )
 
               this.playRecord(1, date, [
                 this.resTimeLists[this.playerIdx][0].startTime,
@@ -974,7 +989,7 @@ export default {
     async getDeviceList(id) {
       await getPlayLists({ channelId: id })
         .then((res) => {
-          if (res.code === 0) {
+          if (res.data.code === 0) {
           }
         })
         .catch(function (error) {
@@ -995,29 +1010,29 @@ export default {
             })
             return
           } else {
-            await getChannelPlayList(data.id)
+            await getChannelPlayBackList(data.id)
               .then((res) => {
-                if (res.code === 0) {
-                  if (res.data && res.data.length > 0) {
-                    res.data.map((item) => {
+                if (res.data.code === 0) {
+                  if (res.data.data && res.data.data.length > 0) {
+                    res.data.data.map((item) => {
                       this.resArray.push({
                         onlineState: item.onlineState,
-                        areaName: item.channelName,
-                        areaNames: item.channelName,
-                        areaPid: item.id,
+                        resourceName: item.channelName,
+                        resourceNames: item.channelName,
+                        areaPid: item.channelId,
                         id: item.id,
                         ptzType: item.ptzType,
-                        children: []
+                        childList: []
                       })
                     })
 
                     this.detailsId.push(data.id)
                     let arr = []
                     if (data.id === '1') {
-                      arr = this.resArray.concat(this.initDatas[0].children)
+                      arr = this.resArray.concat(this.initDatas[0].childList)
                     } else {
-                      arr = data.children
-                        ? this.resArray.concat(data.children)
+                      arr = data.childList
+                        ? this.resArray.concat(data.childList)
                         : this.resArray
 
                       const obj = {}
@@ -1060,24 +1075,27 @@ export default {
       }
     },
     handleChangeTimePicker(val) {
-      console.log('handleChangeTimePicker', val)
-
       if (
         new Date(this.formData.date[0]).getTime() < new Date(val).getTime() &&
         new Date(val).getTime() < new Date(this.formData.date[1]).getTime()
       ) {
-        this.playRecord({}, [val, this.formData.date[1]])
+        this.playRecord({}, [], [val, this.formData.date[1]])
+        Local.set('playbackRate', 1)
+        // this.currentSpeed[this.playerIdx] = [2]
+        this.currentSpeed[this.playerIdx] = [0]
+        this.isClickCx = true
       } else {
         this.$message({
           message: '该时间段暂无录像',
           type: 'warning'
         })
         this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
-        // this.handleCloseVideo(this.playerIdx)
+        this.closeVideo(this.playerIdx)
         this.play[this.playerIdx] = false
         this.hasStreamId[this.playerIdx] = false
         this.stopPlayRecord()
-        this.videoUrl = ['']
+        this.videoUrl[this.playerIdx] = ''
+        this.isClickCx = true
       }
       if (this.play[this.playerIdx]) this.handlePauseOrPlay()
     },
@@ -1085,7 +1103,6 @@ export default {
       this.videoUrl.splice(i, 1, '')
       this.timeLists.splice(i, 1, [])
 
-      console.log('this.videoUrl~~~~~~~~~~~~~~', this.videoUrl)
       this.play[i] = false
       this.$nextTick(() => {
         this.timeSegments[i] = [
@@ -1116,6 +1133,8 @@ export default {
     handleCloseVideo() {
       this.play = []
       this.hasStreamId = []
+
+      this.isClickCx = true
       if (this.tabsActiveName === 'device') {
         this.stopPlayRecord()
         this.videoUrl = ['']
@@ -1123,7 +1142,10 @@ export default {
         this.timeLists = ['']
         this.timeLists = [...this.timeLists]
         this.currentList = ''
-        this.currentSpeed = [2]
+        for (let i = 0; i < this.spilt; i++) {
+          // this.currentSpeed[i] = [2]
+          this.currentSpeed[i] = [0]
+        }
       } else {
         this.cloudPlayerUrl = ['']
       }
@@ -1153,7 +1175,7 @@ export default {
     },
     // 查询视频
     handleSearch() {
-      if (this.channelId && this.channelId.length > 0) {
+      if (this.channelId) {
         if (this.resOnlineState === 0) {
           this.$message({
             message: '设备离线',
@@ -1173,6 +1195,15 @@ export default {
           })
           return
         }
+        if (this.videoUrl[this.playerIdx]) {
+          this.stopWatching = false
+          // this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
+          this.closeVideo(this.playerIdx)
+        }
+        Local.set('playbackRate', 1)
+        // this.currentSpeed[this.playerIdx] = [2]
+        this.currentSpeed[this.playerIdx] = [0]
+        this.isClickCx = true
 
         this.formData.loading = true
 
@@ -1188,8 +1219,6 @@ export default {
 
     setTimeLists(date, idx) {
       this.$set(this.timeLists, idx, date)
-
-      console.log('this.timeLists------------------', this.timeLists)
 
       this.$refs.TimePlayer.changePlayerTimes(this.timeLists[idx], idx)
 
@@ -1232,13 +1261,12 @@ export default {
 
     //获取码流信息
     async getStreamInfo() {
-      this.tracks = []
       await getStreamInfo({
         channelExpansionId: Local.get('recordCloudId')[this.playerIdx],
         streamId: Local.get('recordStreamId')[this.playerIdx]
       }).then((res) => {
-        if (res.code === 0) {
-          this.tracks = res.data.tracks
+        if (res.data.code === 0) {
+          this.tracks[this.playerIdx] = res.data.data.tracks
         } else {
           this.$message({
             showClose: true,
@@ -1329,7 +1357,10 @@ export default {
           } else {
             if (
               curTime >= new Date(range.endTime).getTime() &&
-              curTime <= new Date(this.resTimeLists[i + 1].startTime).getTime()
+              curTime <=
+                new Date(
+                  this.resTimeLists[this.playerIdx][i + 1]?.startTime
+                ).getTime()
             ) {
               // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
               this.playRecord(
@@ -1368,7 +1399,7 @@ export default {
           return
           // console.log('时间只有一段,拖拽的时间在中间')
         } else {
-          console.log('时间只有一段,拖拽的时间不在中间')
+          // console.log('时间只有一段,拖拽的时间不在中间')
           this.$message({
             message: '该时间段暂无录像',
             type: 'warning'
@@ -1401,7 +1432,7 @@ export default {
               'milliseconds'
             )
             if (lastPlayTime === currentTime) {
-              console.log('播放结束')
+              // console.log('播放结束')
               this.handleDevicesPlayEnded()
             }
             lastPlayTime = currentTime
@@ -1416,15 +1447,15 @@ export default {
     })(),
     //监听设备播放完毕,自动播放下一个视频
     handleDevicesPlayEnded(ref, event) {
-      console.log('监听设备播放完毕,自动播放下一个视频', this.playTime)
+      // console.log('监听设备播放完毕,自动播放下一个视频', this.playTime)
       let minDateRecord,
         maxDiff = -99999999999
       if (this.tabsActiveName === 'device') {
         const date = this.playTime.format('YYYY-MM-DD')
-        console.log(
-          '播放结束或者报错停止设备播放' +
-            this.playTime.format('YYYY-MM-DD HH:mm:ss')
-        )
+        // console.log(
+        //   '播放结束或者报错停止设备播放' +
+        //     this.playTime.format('YYYY-MM-DD HH:mm:ss')
+        // )
         // this.closeVideo(this.playerIdx)
         const [startTime, endTime] = this.currentList.split('_')
         if (this.playTime.isBetween(startTime, endTime)) {
@@ -1483,13 +1514,14 @@ export default {
       if (this.play[this.playerIdx]) {
         //暂停
 
-        console.log('点击暂停', this.$refs)
+        // console.log('点击暂停', this.$refs)
         this.play[this.playerIdx] = false
         // this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
         this.$refs['cloudPlayer' + this.playerIdx] &&
           this.$refs['cloudPlayer' + this.playerIdx][0].pause()
 
         this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+        this.gbPause()
         // if (cloudPlayerDom.length === 1) {
         //   this.$refs['cloudPlayer' + this.playerIdx][0].pause()
         // } else {
@@ -1511,13 +1543,14 @@ export default {
         this.tabsActiveName === 'device' ? this.videoUrl : this.cloudPlayerUrl
       ) {
         //播放
-        console.log('点击播放按钮', this.$refs)
+        // console.log('点击播放按钮', this.$refs)
         this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
         this.play[this.playerIdx] = true
         this.hasStreamId[this.playerIdx] = true
         // this.$refs.devicesPlayer && this.$refs.devicesPlayer.play()
         this.$refs['cloudPlayer' + this.playerIdx] &&
           this.$refs['cloudPlayer' + this.playerIdx][0].play()
+        this.gbPlay()
         // if (cloudPlayerDom.length === 1) {
         //   this.$refs['cloudPlayer' + this.playerIdx][0].play()
         // } else {
@@ -1545,9 +1578,16 @@ export default {
           this.gbScale(this.speedArr[this.currentSpeed[this.playerIdx]])
       } else if (type === 'sub' && this.currentSpeed[this.playerIdx]) {
         //减速
-        this.currentSpeed[this.playerIdx]--
-        if (this.tabsActiveName === 'device')
+        // console.log(this.currentSpeed)
+        // console.log(this.playerIdx)
+        // console.log(this.currentSpeed[this.playerIdx])
+        if (
+          this.tabsActiveName === 'device' &&
+          this.currentSpeed[this.playerIdx] > 0
+        ) {
+          this.currentSpeed[this.playerIdx]--
           this.gbScale(this.speedArr[this.currentSpeed[this.playerIdx]])
+        }
       }
     },
     toogleFullScreen() {
@@ -1618,50 +1658,97 @@ export default {
 
     playRecord: (function () {
       return async function (row, playTime, videoTime) {
-        await playStop({
-          streamId: this.channelId
-        }).then((res) => {
-          if (res.code === 0) {
-            getPlayBackUrlLists({
-              channelId: this.channelId,
-              startTime: row.startTime ? row.startTime : videoTime[0],
-              endTime: row.endTime ? row.endTime : videoTime[1]
-            })
-              .then((res) => {
-                if (res.code === 0) {
-                  // console.log(res.data.wsFlv.slice(5))
-                  var url = res.data.wsFlv
-                  if (res.data.playProtocalType == 1) {
-                    url = res.data.httpFlv
-                  } else if (res.data.playProtocalType == 2) {
-                    url = res.data.wssFlv
+        this.stopWatching = true
+        if (this.videoUrl[this.playerIdx]) {
+          await playStop({
+            streamId: this.channelId
+          }).then((res) => {
+            // console.log(2222, row, videoTime)
+            // this.selectTime = row.startTime ? row.startTime : videoTime[0]
+            if (res.data.code === 0) {
+              getPlayBackUrlLists({
+                channelId: this.channelId,
+                startTime: row.startTime ? row.startTime : videoTime[0],
+                endTime: row.endTime ? row.endTime : videoTime[1]
+              })
+                .then((res) => {
+                  if (res.data.code === 0) {
+                    var url = res.data.data.wsFlv
+                    if (res.data.data.playProtocalType == 1) {
+                      url = res.data.data.httpFlv
+                    } else if (res.data.data.playProtocalType == 2) {
+                      url = res.data.data.wssFlv
+                    }
+                    if (!this.isNext) {
+                      this.setTimeLists(videoTime, this.playerIdx)
+                      this.setRecordStreamId(
+                        res.data.data.streamId,
+                        this.playerIdx
+                      )
+                      this.setPlayUrl(url, this.playerIdx)
+                      this.setRecordCloudId(this.channelId, this.playerIdx)
+                    } else {
+                      this.setTimeLists(videoTime, this.playerIdx)
+                      this.setPlayUrl(url, this.playerIdx)
+                      this.setRecordStreamId(
+                        res.data.data.streamId,
+                        this.playerIdx
+                      )
+
+                      this.setRecordCloudId(this.channelId, this.playerIdx)
+                    }
+
+                    this.streamId = res.data.data.streamId
+
+                    this.play[this.playerIdx] = true
+
+                    this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
                   }
-                  if (!this.isNext) {
-                    this.setTimeLists(videoTime, this.playerIdx)
-                    this.setPlayUrl(url, this.playerIdx)
-                    this.setRecordStreamId(res.data.streamId, this.playerIdx)
-
-                    this.setRecordCloudId(this.channelId, this.playerIdx)
-                  } else {
-                    this.setTimeLists(videoTime, this.playerIdx)
-                    this.setPlayUrl(url, this.playerIdx)
-                    this.setRecordStreamId(res.data.streamId, this.playerIdx)
-
-                    this.setRecordCloudId(this.channelId, this.playerIdx)
-                  }
-
-                  this.streamId = res.data.streamId
-
-                  this.play[this.playerIdx] = true
-
-                  this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
+                })
+                .catch((error) => {
+                  console.log(error)
+                })
+            }
+          })
+        } else {
+          getPlayBackUrlLists({
+            channelId: this.channelId,
+            startTime: row.startTime ? row.startTime : videoTime[0],
+            endTime: row.endTime ? row.endTime : videoTime[1]
+          })
+            .then((res) => {
+              if (res.data.code === 0) {
+                var url = res.data.data.wsFlv
+                if (res.data.data.playProtocalType == 1) {
+                  url = res.data.data.httpFlv
+                } else if (res.data.data.playProtocalType == 2) {
+                  url = res.data.data.wssFlv
                 }
-              })
-              .catch((error) => {
-                console.log(error)
-              })
-          }
-        })
+                if (!this.isNext) {
+                  this.setTimeLists(videoTime, this.playerIdx)
+                  this.setPlayUrl(url, this.playerIdx)
+                  this.setRecordStreamId(res.data.data.streamId, this.playerIdx)
+
+                  this.setRecordCloudId(this.channelId, this.playerIdx)
+                } else {
+                  this.setTimeLists(videoTime, this.playerIdx)
+                  this.setPlayUrl(url, this.playerIdx)
+                  this.setRecordStreamId(res.data.data.streamId, this.playerIdx)
+
+                  this.setRecordCloudId(this.channelId, this.playerIdx)
+                }
+
+                this.streamId = res.data.data.streamId
+
+                this.play[this.playerIdx] = true
+
+                this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
+              }
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        }
       }
     })(),
     setPlayUrl(url, idx) {
@@ -1676,14 +1763,14 @@ export default {
       this.isNext = true
     },
     async gbPlay() {
-      console.log('前端控制：播放')
+      // console.log('前端控制：播放')
 
       await resumeRecordView({
         channelId: this.channelId,
         speed: this.speedArr[this.currentSpeed[this.playerIdx]],
         streamId: this.streamId
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.clickedPbPause = false
           this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
           this.isClickCx = true
@@ -1692,14 +1779,14 @@ export default {
     },
 
     async gbPause() {
-      console.log('前端控制：暂停', this.$refs.TimePlayer)
+      // console.log('前端控制：暂停', this.$refs.TimePlayer)
 
       await pauseRecordView({
         channelId: this.channelId,
         speed: this.speedArr[this.currentSpeed[this.playerIdx]],
         streamId: this.streamId
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.clickedPbPause = true
           this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
           this.isClickCx = false
@@ -1708,14 +1795,14 @@ export default {
     },
 
     async gbScale(command) {
-      console.log('前端控制：倍速 ' + command)
+      // console.log('前端控制：倍速 ' + command)
       this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
       await speedRecordView({
         channelId: this.channelId,
         speed: command,
         streamId: this.streamId
       }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           Local.set('playbackRate', command)
 
           this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
@@ -1725,8 +1812,21 @@ export default {
 
     videoClick(i) {
       this.playerIdx = i - 1
-      this.channelId = Local.get('recordCloudId')[this.playerIdx]
-      this.streamId = Local.get('recordStreamId')[this.playerIdx]
+
+      if (
+        this.play[this.playerIdx] === false &&
+        this.videoUrl[this.playerIdx]
+      ) {
+        this.isClickCx = false
+      } else {
+        this.isClickCx = true
+      }
+      this.channelId = Local.get('recordCloudId')
+        ? Local.get('recordCloudId')[this.playerIdx]
+        : ''
+      this.streamId = Local.get('recordStreamId')
+        ? Local.get('recordStreamId')[this.playerIdx]
+        : ''
       // if (!this.clickedPbPause) {
       //   this.$refs.TimePlayer.timeAutoPlay(this.playerIdx)
       //   // this.play = true
@@ -1753,54 +1853,58 @@ export default {
           this.resTimeLists[this.playerIdx].length - 1
         ].endTime
       ).getTime()
-
-      if (this.resTimeLists[this.playerIdx].length > 1) {
-        for (let i = 0; i < this.resTimeLists[this.playerIdx].length; i++) {
-          const range1 = this.resTimeLists[this.playerIdx][i]
-          const start1 = new Date(range1.startTime).getTime() // 转换时间段开始时间
-          const end1 = new Date(range1.endTime).getTime() // 转换时间段结束时间
-          if (selectNowTime > start1 && selectNowTime < end1) {
-          } else {
-            if (selectNowTime === new Date(range1.endTime).getTime()) {
-              // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
-              this.playRecord(
-                {},
-                [
-                  this.resTimeLists[this.playerIdx][i + 1].startTime,
-                  this.resTimeLists[this.playerIdx][
-                    this.resTimeLists[this.playerIdx].length - 1
-                  ].endTime
-                ],
-                [
-                  this.resTimeLists[this.playerIdx][i + 1].startTime,
-                  this.resTimeLists[this.playerIdx][
-                    this.resTimeLists[this.playerIdx].length - 1
-                  ].endTime
-                ]
-              )
-              return
+      if (this.stopWatching) {
+        if (this.resTimeLists.length > 1) {
+          for (let i = 0; i < this.resTimeLists[this.playerIdx].length; i++) {
+            const range1 = this.resTimeLists[this.playerIdx][i]
+            const start1 = new Date(range1.startTime).getTime() // 转换时间段开始时间
+            const end1 = new Date(range1.endTime).getTime() // 转换时间段结束时间
+            if (selectNowTime > start1 && selectNowTime < end1) {
+            } else {
+              if (selectNowTime === new Date(range1.endTime).getTime()) {
+                // 当前时间处于两个时间段之间，返回下一个时间段的开始时间
+                this.playRecord(
+                  {},
+                  [
+                    this.resTimeLists[this.playerIdx][i + 1].startTime,
+                    this.resTimeLists[this.playerIdx][
+                      this.resTimeLists[this.playerIdx].length - 1
+                    ].endTime
+                  ],
+                  [
+                    this.resTimeLists[this.playerIdx][i + 1].startTime,
+                    this.resTimeLists[this.playerIdx][
+                      this.resTimeLists[this.playerIdx].length - 1
+                    ].endTime
+                  ]
+                )
+                return
+              }
             }
           }
-        }
-      } else {
-        if (
-          selectNowTime >= selectStartTime &&
-          selectNowTime <= selectEndTime
-        ) {
         } else {
-          this.$nextTick(() => {
-            console.log('1111111111', newVal, this.resTimeLists, this.playerIdx)
-            this.$message({
-              message: '该时间段暂无录像',
-              type: 'warning'
-            })
-            this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
-            this.play[this.playerIdx] = false
-            this.hasStreamId[this.playerIdx] = false
-            this.stopPlayRecord()
-            this.videoUrl = ['']
+          if (
+            selectNowTime >= selectStartTime &&
+            selectNowTime <= selectEndTime
+          ) {
             return
-          })
+          } else {
+            this.$nextTick(() => {
+              // console.log('1111111111', newVal, this.resTimeLists, this.playerIdx)
+              this.$message({
+                message: '该时间段暂无录像',
+                type: 'warning'
+              })
+              this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
+              this.closeVideo(this.playerIdx)
+              this.play[this.playerIdx] = false
+              this.hasStreamId[this.playerIdx] = false
+              this.stopPlayRecord()
+              this.videoUrl[this.playerIdx] = ''
+              this.isClickCx = true
+              return
+            })
+          }
         }
       }
     },
@@ -1828,7 +1932,8 @@ export default {
       } else if (newValue > this.videoUrl.length) {
         for (let i = 0; i < newValue; i++) {
           if (i >= this.videoUrl.length) {
-            resCurrentSpeed.push(2)
+            // resCurrentSpeed.push(2)
+            resCurrentSpeed.push(0)
             resHasStreamId.push(false)
             resVideoUrl.push('')
             resTimeSegments.push([
@@ -1848,7 +1953,7 @@ export default {
         this.hasStreamId = this.hasStreamId.concat(resHasStreamId)
 
         this.timeSegments = this.timeSegments.concat(resTimeSegments)
-        console.log('this.$refs', this.$refs)
+        // console.log('this.$refs', this.$refs)
         // this.$refs.TimePlayer.spiltChangePlayerTimes(
         //   [this.timeSegments[this.playerIdx]],
         //   this.playerIdx
@@ -2080,6 +2185,8 @@ export default {
   border: 2px solid #1890ff !important;
 }
 .play-box {
+  width: 100%;
+  height: 100%;
   position: relative;
   border: 2px solid #505050;
   box-sizing: border-box;
@@ -2125,6 +2232,11 @@ export default {
     padding: 16px 24px 0 24px;
     list-style: none;
     cursor: pointer;
+  }
+
+  .is-disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 
   .el-main {

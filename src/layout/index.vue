@@ -1,22 +1,25 @@
 <template>
-  <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
-    <Header class="wrapper-header" :isShowTopMenus="isShowTopMenus" />
-    <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" />
+  <!-- <div class="app-wrapper" v-if="nowRouter[0].name === 'workTable'">
+    <Header
+      v-if="!resThirdPartyLogin"
+      class="wrapper-header header1"
+      :isShowTopMenus="isShowTopMenus"
+    />
     <div class="main-container f fd-c ai-s">
       <app-main />
     </div>
-  </div>
+  </div> -->
 
-  <div class="app-wrapper" v-else>
+  <div class="app-wrapper">
     <Header
-      class="wrapper-header"
+      v-if="!resThirdPartyLogin"
+      class="wrapper-header header2"
       :isShowTopMenus="!isShowTopMenus"
       @changeSidebarLists="changeSidebarLists"
     />
-    <div v-if="device === 'mobile' && sidebar.opened" class="drawer-bg" />
     <sidebar
       class="sidebar-container"
-      v-if="showSidebar"
+      v-if="showSidebar && !resThirdPartyLogin"
       :sidebarLists="sidebarLists"
     />
     <div
@@ -30,11 +33,11 @@
 </template>
 
 <script>
-import { Header, Sidebar, AppMain, Navbar, TagsView } from './components'
-// import resize from '@/utils/resize'
+import { Header, Sidebar, AppMain, Navbar } from './components'
 import Breadcrumb from '../components/Breadcrumb'
 import store from '@/store/index'
 import { mapGetters } from 'vuex'
+import { Local, Session } from '@/utils/storage'
 
 export default {
   name: 'Layout',
@@ -43,10 +46,8 @@ export default {
     AppMain,
     Header,
     Navbar,
-    TagsView,
     Breadcrumb
   },
-  // mixins: [resize],
   data() {
     return {
       nowWidth: '',
@@ -55,7 +56,8 @@ export default {
       isShowTopMenus: false,
       sidebarClass: true,
       sidebarLists: [],
-      windowWidth: null
+      windowWidth: null,
+      resThirdPartyLogin: false
     }
   },
   computed: {
@@ -63,6 +65,9 @@ export default {
     changeShowSidebar() {
       return this.showSidebar
     },
+    // changeThirdPartyLogin() {
+    //   return this.thirdPartyLogin1
+    // },
     sidebar() {
       return store.state.app.sidebar
     },
@@ -90,10 +95,13 @@ export default {
   },
   watch: {
     changeShowSidebar() {},
-    windowWidth: {
-      handler: function (val, oldVal) {
-        const h = document.getElementsByTagName('HTML')[0]
-        h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+    // changeThirdPartyLogin(oldValue, newValue) {
+    //   console.log('this.thirdPartyLogin~~~~~~111', oldValue, newValue)
+    // }
+    resThirdPartyLogin: {
+      handler: function (newVal, oldVal) {
+
+        this.resThirdPartyLogin = newVal
 
         this.$forceUpdate()
       },
@@ -101,13 +109,20 @@ export default {
     }
   },
   created() {
-    this.nowRouter = this.$route.matched.filter((item) => item.name)
-    this.setScale()
+    // this.nowRouter = this.$route.matched.filter((item) => item.name)
+    // console.log(this.nowRouter, this.nowRouter[0].name)
+
+    // this.setScale()
     this.initTabList()
   },
   mounted() {
-    this.windowWidth = document.documentElement.clientWidth
-    window.onresize = this.throttle(this.setScale, 500, 500)
+    // if (Session.get('isLoadingNum') > 1) return
+    this.resThirdPartyLogin =
+      Session.get('third_party_login') !== null &&
+      Session.get('third_party_login')
+        ? true
+        : false
+    // Session.set('isLoadingNum', 2)
   },
   methods: {
     // changeSidebarHiddenStatus(val) {
@@ -138,11 +153,11 @@ export default {
           }, delay)
         }
       }
-    },
-    setScale() {
-      // 以1920px为标准宽度
-      this.windowWidth = document.documentElement.clientWidth
     }
+    // setScale() {
+    //   // 以1920px为标准宽度
+    //   this.windowWidth = document.documentElement.clientWidth
+    // }
   }
 }
 </script>

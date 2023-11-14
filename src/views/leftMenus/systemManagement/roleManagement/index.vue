@@ -1,5 +1,8 @@
 <template>
-  <div class="role_container">
+  <div
+    class="role_container"
+    v-if="!isClickedUserDiscovery && !isClickedCreatingRole && isShow"
+  >
     <div class="panel-header-box">
       <div class="panel-header-box-border">角色管理</div>
     </div>
@@ -22,7 +25,7 @@
         </el-form-item>
         <el-form-item label="创建者:">
           <el-input
-            v-model="searchParams.userAccount"
+            v-model="searchParams.createBy"
             placeholder="请输入"
             clearable
             style="width: 240px"
@@ -38,6 +41,7 @@
             end-placeholder="结束日期"
             format="yyyy-MM-dd HH:mm:ss"
             value-format="yyyy-MM-dd HH:mm:ss"
+            :default-time="['00:00:00', '23:59:59']"
           >
           </el-date-picker>
         </el-form-item>
@@ -58,15 +62,19 @@
     </div>
     <div class="table-list">
       <div class="table-content-top">
-        <!-- <el-checkbox v-model="checked" class="table-content-top-check"
-          >包含下级组织</el-checkbox
-        > -->
         <div class="btn-lists">
-          <el-button @click="deteleAll($event)" style="width: 100px" plain
+          <el-button
+            v-permission="['/rbac/role/batch/delete', 4]"
+            @click="deteleAll($event)"
+            style="width: 100px"
+            plain
             ><svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span>
           </el-button>
-          <el-button type="primary" @click="goCreatingRole"
+          <el-button
+            v-permission="['/rbac/role/add', 2]"
+            type="primary"
+            @click="changeIsClicked('creatingRole', 1)"
             ><svg-icon class="svg-btn" icon-class="add" />
             <span class="btn-span">新建</span></el-button
           >
@@ -79,7 +87,7 @@
         class="role-table"
         border
         :header-cell-style="{
-          background: 'rgba(0, 75, 173, 0.06)',
+          background: '#F4F9FF',
           fontSize: '14px',
           fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
           fontWeight: 'bold',
@@ -95,18 +103,19 @@
           label="角色名称"
           :show-overflow-tooltip="true"
         />
-        <el-table-column prop="userAccount" label="创建者" />
-        <el-table-column prop="createdTime" label="创建时间" />
-        <el-table-column prop="updatedTime" label="更新时间" />
+        <el-table-column prop="createBy" label="创建者" />
+        <el-table-column prop="createTime" label="创建时间" />
+        <el-table-column prop="updateTime" label="更新时间" />
         <el-table-column
           prop="roleDesc"
           label="描述"
           :show-overflow-tooltip="true"
         />
-        <el-table-column prop="status" label="状态" width="80">
+        <el-table-column prop="disabled" label="启用状态" width="80">
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.status"
+              v-permission="['/rbac/role/update/disabled', 3]"
+              v-model="scope.row.disabled"
               active-color="#13ce66"
               inactive-color="#ff4949"
               :active-value="0"
@@ -118,13 +127,22 @@
         </el-table-column>
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" @click="goActiveDiscovery(scope.row.id)"
+            <el-button
+              v-permission="['/rbac/role/associate', 2]"
+              type="text"
+              @click="changeIsClicked('userDiscovery', 1, scope.row)"
               >关联用户
             </el-button>
-            <el-button type="text" @click="goEditRole(scope.row)"
+            <el-button
+              v-permission="['/rbac/role/update', 3]"
+              type="text"
+              @click="changeIsClicked('creatingRole', 2, scope.row)"
               >编辑</el-button
             >
-            <el-button type="text" @click="deleteRole(scope.row)"
+            <el-button
+              v-permission="['/rbac/role/batch/delete', 4]"
+              type="text"
+              @click="deleteRole(scope.row)"
               ><span class="delete-button">删除</span></el-button
             >
           </template>
@@ -137,27 +155,43 @@
       />
     </div>
   </div>
+  <CreatingRole
+    v-else-if="isClickedCreatingRole"
+    ref="creatingRole"
+    :creatingRoleRow="creatingRoleRow"
+    :nameType="nameType"
+    @changeIsClicked="changeIsClicked"
+    @getList="getList"
+  />
+  <UserDiscovery
+    v-else-if="isClickedUserDiscovery"
+    ref="userDiscovery"
+    :userDiscoveryRow="userDiscoveryRow"
+    @changeIsClicked="changeIsClicked"
+    @getList="getList"
+  />
 </template>
 
 <script>
 import {
-  addRoles,
-  editRoles,
-  deleteRoles,
-  deleteAllRoles,
-  changeRolesStatus,
-  permissionTree,
   getRoleLists,
-  setAppAuth,
-  getSysOrgTree
+  roleSearch,
+  roleDisable,
+  roleAdd,
+  roleUpdate,
+  roleDelete,
+  roleAssociate
 } from '@/api/method/role'
 import pagination from '@/components/Pagination/index.vue'
+import CreatingRole from '../../resourceManagement/components/CreatingRole.vue'
+import UserDiscovery from '../../resourceManagement/components/UserDiscovery.vue'
 import { Local } from '@/utils/storage'
 export default {
   name: '',
-  components: { pagination },
+  components: { pagination, CreatingRole, UserDiscovery },
   data() {
     return {
+      isShow: false,
       search: {
         userName: '',
         phone: '',
@@ -174,10 +208,16 @@ export default {
           value: 'ces'
         }
       ],
+      nameType: '',
+      isClickedCreatingRole: false,
+      isClickedUserDiscovery: false,
+      creatingRoleRow: {},
+      userDiscoveryRow: {},
+
       tableData: [],
       permissionTableData: [],
       searchParams: {
-        userAccount: '',
+        createBy: '',
         roleName: '',
         time: ''
       },
@@ -204,12 +244,10 @@ export default {
   },
   mounted() {
     this.getList()
-    // this.init()
-    console.log('this.$router~~~~~~~~~~~~~~', this.$router)
   },
   methods: {
     changeSwitch(row) {
-      let text = row.status === 0 ? '启用' : '停用'
+      let text = row.disabled === 0 ? '启用' : '停用'
 
       this.$confirm('确认要"' + text + '""' + row.roleName + '"吗?', '警告', {
         confirmButtonText: '确定',
@@ -217,14 +255,38 @@ export default {
         type: 'warning'
       })
         .then(function () {
-          changeRolesStatus({
-            id: row.id,
-            status: row.status
-          }).then((res) => {})
+          roleDisable({
+            roleId: row.id,
+            disabled: row.disabled
+          }).then((res) => {
+            if (res.data.code !== 0) {
+              row.disabled = row.disabled === 0 ? 1 : 0
+            }
+          })
         })
         .catch(function () {
-          row.status = row.status === 0 ? 1 : 0
+          row.disabled = row.disabled === 0 ? 1 : 0
         })
+    },
+    changeIsClicked(name, val, row) {
+      if (val === 1) {
+        if (name === 'creatingRole') {
+          this.nameType = 'add'
+          this.isClickedCreatingRole = true
+        } else {
+          this.isClickedUserDiscovery = true
+          this.userDiscoveryRow = row
+        }
+      } else {
+        if (name === 'creatingRole') {
+          this.nameType = 'edit'
+          this.creatingRoleRow = row
+          this.isClickedCreatingRole = true
+        } else {
+          this.isClickedCreatingRole = false
+          this.isClickedUserDiscovery = false
+        }
+      }
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
@@ -236,7 +298,7 @@ export default {
     },
     resetData(e) {
       this.searchParams = {
-        userAccount: '',
+        createBy: '',
         roleName: '',
         time: ''
       }
@@ -301,16 +363,17 @@ export default {
       Local.set('rolePageNum', this.params.pageNum)
       this.$router.push({ path: '/userDiscovery', query: { key: id } })
     },
-    goCreatingRole() {
-      this.$router.push({ path: '/creatingRole', query: { key: 'add' } })
-    },
     goEditRole(row) {
       Local.set('rolePageNum', this.params.pageNum)
       this.$router.push({
         path: '/creatingRole',
-        query: { key: 'edit', row: row.id }
+        query: { key: 'edit', row: row }
       })
     },
+    goCreatingRole() {
+      this.$router.push({ path: '/creatingRole', query: { key: 'add' } })
+    },
+
     checkMenu(list) {
       list.forEach((item) => {
         if (item.permissionType === 1) {
@@ -325,12 +388,12 @@ export default {
       this.buttonLoading = true
       // this.checkList = []
       this.buildTree('get')
-      setAppAuth({
+      roleAssociate({
         roleId: this.roleId,
         permissionIds: this.checkList
       }).then((res) => {
         this.buttonLoading = false
-        if (res.code === 10000) {
+        if (res.data.code === 10000) {
           this.$message({
             message: '保存成功！',
             type: 'success'
@@ -340,29 +403,32 @@ export default {
         }
       })
     },
-    getList() {
-      const createdTimeEnd = this.searchParams.time
+    async getList() {
+      const createTimeEnd = this.searchParams.time
         ? this.searchParams.time[1]
         : ''
-      const createdTimeStart = this.searchParams.time
+      const createTimeStart = this.searchParams.time
         ? this.searchParams.time[0]
         : ''
       const roleName = this.searchParams.roleName
-      const userAccount = this.searchParams.userAccount
-      getRoleLists({
-        current: this.params.pageNum,
-        pageSize: this.params.pageSize,
+      const createBy = this.searchParams.createBy
+      await getRoleLists({
+        page: this.params.pageNum,
+        num: this.params.pageSize,
         roleName,
-        createdTimeStart,
-        createdTimeEnd,
-        userAccount
-        // ...this.searchParams
+        createTimeStart,
+        createTimeEnd,
+        createBy
       }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data.records
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
+        if (res.data.code === 0) {
+          this.tableData = res.data.data.list
+          this.params.total = res.data.data.total
+          this.params.pages = res.data.data.pages
+          this.params.current = res.data.data.current
+
+          setTimeout(() => {
+            this.isShow = true
+          }, 500)
         }
       })
     },
@@ -402,8 +468,8 @@ export default {
         this.$refs.roleTable.selection.map((item) => {
           roleIds.push(item.id)
         })
-        deleteAllRoles(roleIds).then((res) => {
-          if (res.code === 0) {
+        roleDelete(roleIds).then((res) => {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -421,8 +487,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        deleteRoles(row.id).then((res) => {
-          if (res.code === 0) {
+        roleDelete(row.id).then((res) => {
+          if (res.data.code === 0) {
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -433,45 +499,14 @@ export default {
         })
       })
     }
-    // submit(formName) {
-    //   this.$refs[formName].validate((valid) => {
-    //     if (valid) {
-    //       switch (this.dialog.title) {
-    //         case '添加角色':
-    //           addRoles(this.dialog.params).then((res) => {
-    //             if (res.code === 10000) {
-    //               this.$message({
-    //                 type: 'success',
-    //                 message: '添加角色成功'
-    //               })
-    //               this.dialog.show = false
-    //               this.getList()
-    //             }
-    //           })
-    //           break
-    //         case '编辑角色':
-    //           editRoles({ id: this.editId, ...this.dialog.params }).then(
-    //             (res) => {
-    //               if (res.code === 10000) {
-    //                 this.$message.success('编辑成功')
-    //                 this.dialog.show = false
-    //                 this.getList()
-    //               }
-    //             }
-    //           )
-    //           break
-
-    //         default:
-    //           break
-    //       }
-    //     }
-    //   })
-    // }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table::before {
+  height: 0 !important;
+}
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid #eaeaea;
 }
@@ -482,7 +517,7 @@ export default {
   height: 100% !important;
 }
 ::v-deep .el-table--enable-row-transition {
-  height: 100% !important;
+  // height: 100% !important;
 }
 // 滚动条大小设置
 ::v-deep .role-table::-webkit-scrollbar {
@@ -535,7 +570,7 @@ export default {
   .search {
     width: calc(100% - 40px);
     // height: 80px;
-    min-height: 80px;
+    // min-height: 80px;
     margin: 20px;
     background: #ffffff;
     box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.1);

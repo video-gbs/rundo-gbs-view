@@ -151,3 +151,17 @@ export const antiShake = (fn, t) => {
     if (callNow) fn.apply(this, args)
   }
 }
+
+// 音频g711转成AAC
+export const convertG711ToAAC = (inputFile, outputFile) => {
+  try {
+    // 执行FFmpeg命令进行转换
+     ffmpeg({
+      arguments: ['-i', inputFile, '-acodec', 'aac', outputFile],
+    })
+
+    console.log('音频转换完成')
+  } catch (error) {
+    console.error('音频转换失败:', error)
+  }
+}

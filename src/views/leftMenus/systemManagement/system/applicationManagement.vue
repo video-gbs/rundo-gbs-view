@@ -59,7 +59,7 @@
         class="applicationManagement-table"
         border
         :header-cell-style="{
-          background: 'rgba(0, 75, 173, 0.06)',
+          background: '#F4F9FF',
           fontSize: '14px',
           fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
           fontWeight: 'bold',
@@ -244,12 +244,12 @@
 
 <script>
 import {
-  getAddApplicationList,
-  addApplication,
-  getAddApplicationById,
-  deleteApplication,
-  editApplication,
-  changeStatus
+  // getAddApplicationList,
+  // addApplication,
+  getAddApplicationById
+  // deleteApplication,
+  // editApplication,
+  // changeStatus
 } from '@/api/method/user'
 import pagination from '@/components/Pagination/index.vue'
 
@@ -357,14 +357,14 @@ export default {
   methods: {
     init() {
       getSysOrgTree({ id: 1 }).then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           this.treeData = res.data
         }
       })
     },
     async getManufacturerDictionaryList() {
       await getManufacturerDictionaryList('AppTypes').then((res) => {
-        if (res.code === 0) {
+        if (res.data.code === 0) {
           res.data.map((item) => {
             let obj = {}
             obj.label = item.itemName
@@ -404,22 +404,25 @@ export default {
       this.getList()
     },
     changeSwitch(row) {
-      let text = row.status === 0 ? '启用' : '停用'
-
-      this.$confirm('确认要"' + text + '""' + row.appName + '"吗?', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(function () {
-          changeStatus({
-            id: row.id,
-            status: row.status
-          }).then((res) => {})
-        })
-        .catch(function () {
-          row.status = row.status === 0 ? 1 : 0
-        })
+      // let text = row.status === 0 ? '启用' : '停用'
+      // this.$confirm('确认要"' + text + '""' + row.appName + '"吗?', '警告', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // })
+      //   .then(function () {
+      //     changeStatus({
+      //       id: row.id,
+      //       status: row.status
+      //     }).then((res) => {
+      //       if (res.data.code !== 0) {
+      //         row.status = row.status === 0 ? 1 : 0
+      //       }
+      //     })
+      //   })
+      //   .catch(function () {
+      //     row.status = row.status === 0 ? 1 : 0
+      //   })
     },
     goPage(path, query) {
       this.$router.push(path)
@@ -483,7 +486,7 @@ export default {
       this.permissionDialog.show = !this.permissionDialog.show
       this.roleId = id
       permissionTree(id).then((res) => {
-        if (res.code === 10000) {
+        if (res.data.code === 10000) {
           this.permissionTableData = res.data
         }
       })
@@ -502,79 +505,85 @@ export default {
       this.buttonLoading = true
       // this.checkList = []
       this.buildTree('get')
-      editApplication({
-        roleId: this.roleId,
-        permissionIds: this.checkList
-      }).then((res) => {
-        this.buttonLoading = false
-        if (res.code === 10000) {
-          this.$message({
-            message: '保存成功！',
-            type: 'success'
-          })
-          this.permissionDialog.show = !this.permissionDialog.show
-          // this.$router.go(-1)
-        }
-      })
+      // editApplication({
+      //   roleId: this.roleId,
+      //   permissionIds: this.checkList
+      // })
+      //   .then((res) => {
+      //     if (res.data.code === 10000) {
+      //       this.$message({
+      //         message: '保存成功！',
+      //         type: 'success'
+      //       })
+
+      //       this.buttonLoading = false
+      //       this.permissionDialog.show = !this.permissionDialog.show
+      //     } else {
+      //       this.buttonLoading = false
+      //     }
+      //   })
+      //   .catch(() => {
+      //     this.buttonLoading = false
+      //   })
     },
     getList() {
-      getAddApplicationList({
-        current: this.params.pageNum,
-        pageSize: this.params.pageSize,
-        ...this.searchParams
-      }).then((res) => {
-        if (res.code === 0) {
-          this.tableData = res.data.records
-          this.params.total = res.data.total
-          this.params.pages = res.data.pages
-          this.params.current = res.data.current
-        }
-      })
+      // getAddApplicationList({
+      //   current: this.params.pageNum,
+      //   pageSize: this.params.pageSize,
+      //   ...this.searchParams
+      // }).then((res) => {
+      //   if (res.data.code === 0) {
+      //     this.tableData = res.data.records
+      //     this.params.total = res.data.total
+      //     this.params.pages = res.data.pages
+      //     this.params.current = res.data.current
+      //   }
+      // })
     },
     deleteRole(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        deleteApplication(row.id).then((res) => {
-          if (res.code === 0) {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            })
-            this.params.pageNum = 1
-            this.getList()
-          }
-        })
-      })
+      // this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+      //   confirmButtonText: '确定',
+      //   cancelButtonText: '取消',
+      //   type: 'warning'
+      // }).then(() => {
+      //   deleteApplication(row.id).then((res) => {
+      //     if (res.data.code === 0) {
+      //       this.$message({
+      //         type: 'success',
+      //         message: '删除成功'
+      //       })
+      //       this.params.pageNum = 1
+      //       this.getList()
+      //     }
+      //   })
+      // })
     },
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (this.dialog.title) {
             case '新建':
-              addApplication(this.dialog.params).then((res) => {
-                if (res.code === 0) {
-                  this.$message({
-                    type: 'success',
-                    message: '新建成功'
-                  })
-                  this.dialog.show = false
-                  this.getList()
-                }
-              })
+              // addApplication(this.dialog.params).then((res) => {
+              //   if (res.data.code === 0) {
+              //     this.$message({
+              //       type: 'success',
+              //       message: '新建成功'
+              //     })
+              //     this.dialog.show = false
+              //     this.getList()
+              //   }
+              // })
               break
             case '编辑':
-              editApplication({ id: this.editId, ...this.dialog.params }).then(
-                (res) => {
-                  if (res.code === 0) {
-                    this.$message.success('编辑成功')
-                    this.dialog.show = false
-                    this.getList()
-                  }
-                }
-              )
+              // editApplication({ id: this.editId, ...this.dialog.params }).then(
+              //   (res) => {
+              //     if (res.data.code === 0) {
+              //       this.$message.success('编辑成功')
+              //       this.dialog.show = false
+              //       this.getList()
+              //     }
+              //   }
+              // )
               break
 
             default:
@@ -588,6 +597,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-table::before {
+  height: 0 !important;
+}
 ::v-deep .el-dialog__header {
   border-bottom: 1px solid #eaeaea;
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="home-page-content">
-    <Header class="wrapper-header" />
+    <Header class="wrapper-header header3" />
     <div class="page-container">
       <div class="container-top">
         <LineFont
@@ -20,22 +20,29 @@
           </li>
         </ul>
       </div>
-      <div class="container-middle">
-        <div class="container-middle-left">
+      <div class="container-middle" v-if="allDataLists.length > 0">
+        <div
+          class="container-middle-contnet"
+          v-for="(item, index) in allDataLists"
+          :key="index"
+        >
           <LineFont
             class="line-font"
-            :line-title="lineTitle2"
+            :line-title="{
+              title: item.name,
+              notShowSmallTitle: false
+            }"
             :text-style="textStyle"
             :line-blue-style="lineBlueStyle"
           />
           <ul class="home-ul-top">
             <li
-              v-for="(item1, index1) in appList"
+              v-for="(child, index1) in item.childList"
               :key="index1"
               class="top-li"
               @click="
                 !isGoContentListClicked
-                  ? goContentList('应用', item1, index1)
+                  ? goContentList(item.isFullScreen, item.childList, child)
                   : ''
               "
             >
@@ -43,72 +50,13 @@
                 v-cloak
                 class="top-li-div"
                 :style="{
-                  background: getBackground(item1)
+                  background: getBackground(child)
                 }"
               ></div>
-              <span class="top-li-span">{{ item1.appName }}</span>
+              <span class="top-li-span">{{ child.name }}</span>
             </li>
           </ul>
         </div>
-        <div class="container-middle-right">
-          <LineFont
-            class="line-font"
-            :line-title="lineTitle3"
-            :text-style="textStyle"
-            :line-blue-style="lineBlueStyle"
-          />
-          <ul class="home-ul-top">
-            <li
-              v-for="(item2, index2) in devOpsList"
-              :key="index2"
-              class="top-li"
-              @click="
-                !isGoContentListClicked
-                  ? goContentList('运维', item2, index2)
-                  : ''
-              "
-            >
-              <!-- :style="{ background: colorList2[index2] }" -->
-              <div
-                v-cloak
-                class="top-li-div"
-                :style="{
-                  background: getBackground(item2)
-                }"
-              ></div>
-              <span class="top-li-span">{{ item2.appName }}</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="container-bottom">
-        <LineFont
-          class="line-font"
-          :line-title="lineTitle4"
-          :text-style="textStyle"
-          :line-blue-style="lineBlueStyle"
-        />
-        <ul class="home-ul-top">
-          <li
-            v-for="(item3, index3) in configList"
-            :key="index3"
-            class="top-li"
-            @click="
-              !isGoContentListClicked
-                ? goContentList('配置', item3, index3)
-                : ''
-            "
-          >
-            <div
-              v-cloak
-              class="top-li-div"
-              :style="{
-                background: getBackground(item3)
-              }"
-            ></div>
-            <span class="top-li-span">{{ item3.appName }}</span>
-          </li>
-        </ul>
       </div>
     </div>
   </div>
@@ -117,10 +65,15 @@
 <script>
 import { Header } from '@/layout/components'
 import LineFont from '@/components/LineFont'
-import { getHomeLists, getTypeTreeMenus } from '@/api/method/home'
+import {
+  getHomeFunc
+} from '@/api/method/home'
+
+import { getMenuLists } from '@/api/method/user'
+
 import store from '@/store/index'
-import router from '../../../router/index'
-import { Local } from '@/utils/storage'
+import { Local, Session } from '@/utils/storage'
+import Layout from '@/layout/index'
 
 import { antiShake } from '@/utils/index.js'
 
@@ -131,16 +84,6 @@ export default {
   },
   data() {
     return {
-      params: {},
-      weatherListShow: false,
-      notificationShow: false,
-      todoListShow: false,
-      overviewShow: false,
-      statisticalShow: false,
-      weatherList: {},
-      homeLists: {},
-      notification: [],
-      statisticalData: [],
       colorList: [
         'linear-gradient(179deg, #00BCB6 0%, #009993 100%)',
         'linear-gradient(180deg, #F77062 0%, #FE5196 100%)',
@@ -182,82 +125,12 @@ export default {
           name: '功能功能'
         }
       ],
-      appList: [
-        {
-          name: '实时监控'
-        },
-        {
-          name: '功能功能'
-        },
-        {
-          name: '功能功能'
-        },
-        {
-          name: '功能功能'
-        },
-        {
-          name: '功能功能'
-        },
-        {
-          name: '功能功能'
-        }
-      ],
-      devOpsList: [
-        {
-          name: '系统管理'
-        },
-        {
-          name: '功能功能'
-        },
-        {
-          name: '功能功能'
-        },
-        {
-          name: '功能功能'
-        },
-        {
-          name: '功能功能'
-        },
-        {
-          name: '功能功能'
-        }
-      ],
-      configList: [
-        {
-          name: '组织管理'
-        },
-        {
-          name: '合同管理'
-        },
-        {
-          name: '功能功能'
-        },
-        {
-          name: '功能功能'
-        },
-        {
-          name: '功能功能'
-        },
-        {
-          name: '功能功能'
-        }
-      ],
+      allDataLists: [],
       lineTitle: {
         title: '常用',
         notShowSmallTitle: false
       },
-      lineTitle2: {
-        title: '应用',
-        notShowSmallTitle: false
-      },
-      lineTitle3: {
-        title: '运维',
-        notShowSmallTitle: false
-      },
-      lineTitle4: {
-        title: '配置',
-        notShowSmallTitle: false
-      },
+      // resThirdPartyLogin: false,
       textStyle: {
         fontSize: '24px',
         fontFamily: 'Microsoft YaHei-Regular, Microsoft YaHei',
@@ -272,53 +145,73 @@ export default {
           'linear-gradient(90deg, #FFFFFF 0%, rgba(255,255,255,0) 100%)'
       },
 
-      // 应用类型路由
-      appTypeRouter: [],
-      // 运维系统类型路由
-      systemTypeRouter: [],
-      // 配置类型路由
-      configTypeRouter: [],
-      // 侧边栏路由
-      sideBarRouterList: [],
-      sideBarRouterList1: [],
-      sideBarRouterList2: [],
-      sideBarRouterList3: [],
+      // 路由
+      routerLists: [],
       windowWidth: null,
       isGoContentListClicked: false
     }
   },
   watch: {
-    windowWidth: {
-      handler: function (val, oldVal) {
-        const h = document.getElementsByTagName('HTML')[0]
-        h.style.setProperty('--web-zoom', this.windowWidth / 1920)
-
-        this.$forceUpdate()
-      },
-      immediate: true
-    }
+    // windowWidth: {
+    //   handler: function (val, oldVal) {
+    //     const h = document.getElementsByTagName('HTML')[0]
+    //     h.style.setProperty('--web-zoom', this.windowWidth / 1920)
+    //     this.$forceUpdate()
+    //   },
+    //   immediate: true
+    // }
   },
-  created() {},
+  created() {
+    Session.set('permissionData', [])
+    Session.set('permissionMenuId', '')
+    // Session.set('isShowSideRouter', 0)
+    Local.set('equipmentActiveName', '编码器')
+    store.dispatch('user/changeThirdPartyLogin', false)
+    this.routerLists = []
+
+    Session.set('third_party_login', false)
+    // this.resThirdPartyLogin =
+    //   Session.get('third_party_login') !== null &&
+    //   Session.get('third_party_login')
+    //     ? true
+    //     : false
+  },
   mounted() {
-    this.init()
-    this.windowWidth = document.documentElement.clientWidth
-    window.onresize = this.throttle(this.setScale, 500, 500)
+    this.initMenuLists()
+    // this.windowWidth = document.documentElement.clientWidth
+    // window.onresize = this.throttle(this.setScale, 500, 500)
+    let timestamp = Local.get('expires_in')
+
+    clearInterval(window.interval)
+
+    window.interval = setInterval(() => {
+      timestamp = timestamp - 1
+      Local.set('expires_in', timestamp)
+    }, 1000)
   },
   methods: {
-    async init() {
-      await getHomeLists()
+    async getHomeMenu() {
+      await getHomeMenu()
         .then((res) => {
-          if (res.code === 0) {
-            const { appList, configList, devOpsList } = res.data
-            this.devOpsList = devOpsList
-            this.appList = appList
-            this.configList = configList
+          if (res.data.code === 0) {
           }
         })
         .catch((error) => {
           console.log(error)
         })
     },
+    async initMenuLists() {
+      await getMenuLists({ levelNumStart: 1, levelNumEnd: 3 })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.allDataLists = res.data.data
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+
     throttle(method, delay, duration) {
       var timer = null
       var begin = new Date()
@@ -337,279 +230,198 @@ export default {
         }
       }
     },
-    setScale() {
-      // 以1920px为标准宽度
-      this.windowWidth = document.documentElement.clientWidth
-    },
+    // setScale() {
+    //   // 以1920px为标准宽度
+    //   this.windowWidth = document.documentElement.clientWidth
+    // },
     getBackground(item) {
-      return item.appIcon
+      let result = false
+      let url = './' + item.icon + '.png'
+      // console.log('url~~~~~~~~~~',url)
+      // 获取所有图片地址
+      const files = require.context('../../../assets/imgs/', false, /\.png$/)
+
+      files.keys().forEach((item) => {
+        if (item === url) {
+          result = true
+        }
+      })
+      //  console.log('result~~~~~~~~~~',result)
+      return result
         ? 'url(' +
-            require('../../../assets/imgs/' + item.appIcon + '.png') +
+            require('../../../assets/imgs/' + item.icon + '.png') +
             ') center center no-repeat'
-        : ''
+        : 'none'
+    },
+
+    routerChild(data) {
+      let resRouterChildren = []
+      let childTemp = {}
+      data.forEach((item, i) => {
+        // 组装路由配置
+        childTemp = {
+          name: item.name,
+          path: item.path,
+          id: item.id,
+          meta: { icon: item.icon, title: item.name },
+          component: item.component
+        }
+        if (item.childList && item.childList.length > 0) {
+          const childArr = this.routerChild(item.childList)
+          childTemp.children = childArr
+        }
+        resRouterChildren.push(childTemp)
+      })
+      return resRouterChildren
+    },
+
+    routerChildren(data, arr) {
+      let childArr = []
+      data.forEach((datas, index) => {
+        arr.push({
+          path: datas.path,
+          name: datas.name,
+          types: datas.types,
+          hidden: datas.disabled === 1 ? true : false,
+          component:
+            datas.component === 'Layout'
+              ? Layout
+              : (resolve) => require([`@/views${datas.component}`], resolve),
+          meta: {
+            title: datas.name,
+            icon: datas.icon
+          },
+          id: datas.id,
+          // 子路由
+          children: []
+        })
+
+        if (datas.childList && datas.childList.length > 0) {
+          childArr = this.routerChildren(datas.childList, [])
+          arr[index].children = childArr
+        }
+      })
+      return arr
     },
 
     /**
      * 格式化树形结构数据   生成 vue-router 层级路由表
      */
 
-    saveComponents(val, data, name) {
-      // console.log('val~~~~~~~~~~~~~~~~~~~~~~~~', val)
-      if (data && data.length > 0) {
-        const homeRouters = [
-          {
-            path: '/workTable',
-            name: 'workTable',
-            component: () => import('@/views/leftMenus/workTable/index'),
-            meta: { title: '首页', icon: 'sy' }
-          }
-        ]
-        if (val === 1) {
-          data.map((item) => {
-            if (item.children && item.children.length > 0) {
-              item.children.forEach((child) => {
-                let params = {}
-                params = {
-                  path: child.path,
-                  meta: child.meta,
-                  name: child.name,
-                  hidden: child.hidden === 0 ? true : false,
-                  component: (resolve) =>
-                    require([`@/views${child.component}`], resolve)
-                }
-                this.appTypeRouter.push(params)
-              })
-            }
-          })
-          this.appTypeRouter = homeRouters.concat(this.appTypeRouter)
-
-          // console.log('this.appTypeRouter', this.appTypeRouter)
-        } else {
-          data.map((item4) => {
-            let params1 = {}
-            params1 = {
-              path: item4.path,
-              meta: item4.meta,
-              name: item4.name,
-              redirect: item4.redirect,
-              component: (resolve) =>
-                require([`@/views${item4.component}`], resolve)
-            }
-            this.systemTypeRouter.push(params1)
-            this.configTypeRouter.push(params1)
-            // 侧边栏路由
-            if (item4.children && item4.children.length > 0) {
-              item4.children.forEach((child) => {
-                let params2 = {}
-                params2 = {
-                  path: child.path,
-                  meta: child.meta,
-                  name: child.name,
-                  hidden: child.hidden === 1 ? true : false,
-                  component: (resolve) =>
-                    require([`@/views${child.component}`], resolve)
-                }
-
-                this.sideBarRouterList.push(params2)
-              })
-            }
-          })
-          switch (name) {
-            case '/resourceManagement':
-              data.map((item1) => {
-                console.log('item1', item1)
-                if (
-                  item1.children &&
-                  item1.children.length > 0 &&
-                  name === item1.path
-                ) {
-                  item1.children.forEach((child1) => {
-                    let resourceManagement = {}
-                    resourceManagement = {
-                      path: child1.path,
-                      meta: child1.meta,
-                      name: child1.name,
-                      hidden: child1.hidden === 1 ? true : false,
-                      component: (resolve) =>
-                        require([`@/views${child.component}`], resolve)
-                    }
-
-                    this.sideBarRouterList1.push(resourceManagement)
-                  })
-                }
-                if (item1.title === '资源管理') {
-                  this.$router.push({ path: item1.redirect })
-                }
-              })
-
-              store.dispatch(
-                'user/changeSidebarRouter',
-                this.sideBarRouterList1
-              )
-
-              // console.log(1, this.sideBarRouterList1, data)
-              break
-            case '/systemManagement':
-              data.map((item2) => {
-                if (
-                  item2.children &&
-                  item2.children.length > 0 &&
-                  name === item2.path
-                ) {
-                  item2.children.forEach((child2) => {
-                    let systemManagement = {}
-                    systemManagement = {
-                      path: child2.path,
-                      meta: child2.meta,
-                      name: child2.name,
-                      hidden: child2.hidden === 1 ? true : false,
-                      component: (resolve) =>
-                        require([`@/views${child.component}`], resolve)
-                    }
-
-                    this.sideBarRouterList2.push(systemManagement)
-                  })
-                }
-                if (item2.title === '组织管理') {
-                  this.$router.push({ path: item2.redirect })
-                }
-                // this.$router.push({ path: item2.redirect })
-              })
-
-              store.dispatch(
-                'user/changeSidebarRouter',
-                this.sideBarRouterList2
-              )
-              // console.log(2, this.sideBarRouterList2)
-              // this.$router.push({ path: this.sideBarRouterList2[0].path })
-              // this.$router.push({ path: data[1].redirect })
-              break
-            case '/moduleManageMent':
-              data.map((item3) => {
-                if (
-                  item3.children &&
-                  item3.children.length > 0 &&
-                  name === item3.path
-                ) {
-                  item3.children.forEach((child3) => {
-                    let moduleManageMent = {}
-                    moduleManageMent = {
-                      path: child3.path,
-                      meta: child3.meta,
-                      name: child3.name,
-                      hidden: child3.hidden === 1 ? true : false,
-                      component: (resolve) =>
-                        require([`@/views${child.component}`], resolve)
-                    }
-
-                    this.sideBarRouterList3.push(moduleManageMent)
-                  })
-                }
-                if (item3.title === '服务管理') {
-                  this.$router.push({ path: item3.redirect })
-                }
-                // this.$router.push({ path: item3.redirect })
-              })
-
-              store.dispatch(
-                'user/changeSidebarRouter',
-                this.sideBarRouterList3
-              )
-
-              // console.log(3, this.sideBarRouterList3)
-              // this.$router.push({ path: this.sideBarRouterList3[0].path })
-              // this.$router.push({ path: data[2].redirect })
-              break
-            default:
-              break
-          }
-          if (val === 3) {
-            this.systemTypeRouter = homeRouters.concat(this.systemTypeRouter)
-            store.dispatch(
-              'user/changeActiveIndex',
-              this.systemTypeRouter[1].path
-            )
-            store.dispatch('user/changeSidebarRouter', this.sideBarRouterList)
-          } else {
-            this.configTypeRouter = homeRouters.concat(this.configTypeRouter)
-            // console.log('this.configTypeRouter', this.configTypeRouter)
-          }
+    saveComponents(data, resName) {
+      // resetRouter()
+      const homeRouters = [
+        {
+          path: '/workTable',
+          name: 'workTable',
+          component: () => import('@/views/leftMenus/workTable/index'),
+          meta: { title: '首页', icon: 'sy' }
         }
+      ]
+
+      if (data && data.length > 0) {
+        let typeRouter = []
+        let resData = []
+
+        let params = {}
+        let params1 = {}
+        let params2 = {}
+
+        data.forEach((item) => {
+          params = {
+            path: item.path,
+            meta: { icon: item.icon, title: item.name },
+            name: item.name,
+            id: item.id,
+            component: Layout,
+            children: this.routerChildren(item.childList, [])
+          }
+          params1 = {
+            path: item.path,
+            meta: { icon: item.icon, title: item.name },
+            name: item.name,
+            id: item.id
+          }
+          params2 = {
+            path: item.path,
+            meta: { icon: item.icon, title: item.name },
+            name: item.name,
+            icon: item.icon,
+            id: item.id,
+            component: item.component,
+            children: this.routerChild(item.childList)
+          }
+
+          typeRouter.push(params1)
+          this.routerLists.push(params)
+          resData.push(params2)
+        })
+
+        store.dispatch('user/dynamicRouters', [])
+
+        store.dispatch('user/changeDynamicRouters', [])
+
+        store.dispatch('user/dynamicRouters', resData)
+
+        store.dispatch('user/changeDynamicRouters', resData)
+
+        this.routerLists.forEach((item1) => {
+          if (item1.name === resName) {
+            store.dispatch('user/changeSidebarRouter', item1.children)
+          }
+        })
+
+        store.dispatch('user/changeTypeRouter', [])
+
+        store.dispatch('user/changeTypeRouter', homeRouters.concat(typeRouter))
       }
     },
-    goContentList: antiShake(function (name, item, index) {
+    goContentList: antiShake(function (val, data, child) {
+      Session.set('third_party_login', false)
+      Session.set('resRouterName', child.name)
+      Session.set('isShowSideRouter', val)
+
       this.isGoContentListClicked = true
-      switch (name) {
-        case '应用':
-          Local.set('tree_type', 1)
-          getTypeTreeMenus(1).then((res1) => {
-            if (res1.code === 0) {
-              const resRouter1 = []
-              res1.data.map((item) => {
-                resRouter1.push(item)
-              })
 
-              store.dispatch('user/dynamicRouters', resRouter1)
-              store.dispatch('user/changeInit', false)
-              store.dispatch('user/changeRightWidth', false)
-              store.dispatch('user/changeShowSidebar', false)
-              // this.$emit('changeSidebarHiddenStatus', true)
+      // store.dispatch('user/changeInit', false)
 
-              this.saveComponents(1, resRouter1)
-              store.dispatch('user/changeTypeRouter', this.appTypeRouter)
-
-              store.dispatch('user/changeActiveIndex', item.appUrl)
-              this.$router.push({ path: item.appUrl })
-            }
-          })
-          break
-        case '运维':
-          Local.set('tree_type', 3)
-          getTypeTreeMenus(3).then((res2) => {
-            if (res2.code === 0) {
-              const resRouter2 = []
-              res2.data.map((item) => {
-                resRouter2.push(item)
-              })
-              store.dispatch('user/changeInit', false)
-              store.dispatch('user/dynamicRouters', resRouter2)
-              store.dispatch('user/changeRightWidth', true)
-              store.dispatch('user/changeShowSidebar', true)
-              // this.$emit('changeSidebarHiddenStatus', false)
-
-              this.saveComponents(3, resRouter2)
-              store.dispatch('user/changeTypeRouter', this.systemTypeRouter)
-
-              this.$router.push({ path: resRouter2[0].children[0].path })
-            }
-          })
-          break
-        case '配置':
-          Local.set('tree_type', 2)
-          getTypeTreeMenus(2).then((res3) => {
-            if (res3.code === 0) {
-              const resRouter3 = []
-              res3.data.map((item) => {
-                resRouter3.push(item)
-              })
-              store.dispatch('user/dynamicRouters', resRouter3)
-              store.dispatch('user/changeInit', false)
-              store.dispatch('user/changeRightWidth', true)
-              store.dispatch('user/changeShowSidebar', true)
-              // this.$emit('changeSidebarHiddenStatus', false)
-
-              store.dispatch('user/changeActiveIndex', item.appUrl)
-              this.saveComponents(2, resRouter3, item.appUrl)
-              store.dispatch('user/changeTypeRouter', this.configTypeRouter)
-            }
-          })
-          break
-        default:
-          break
+      if (val === 0) {
+        store.dispatch('user/changeRightWidth', true)
+        store.dispatch('user/changeShowSidebar', true)
+      } else {
+        store.dispatch('user/changeRightWidth', false)
+        store.dispatch('user/changeShowSidebar', false)
       }
+
+      store.dispatch('user/changeActiveIndex', child.path)
+      this.routerLists = []
+
+      this.saveComponents(data, child.name)
+      if (child.childList[0]) {
+        getHomeFunc({
+          menuId: child.childList[0] ? child.childList[0].id : ''
+        }).then((res) => {
+          if (res.data.code === 0) {
+            Session.set('permissionData', [])
+            Session.set('permissionData', res.data.data)
+            Session.set('permissionMenuId', '')
+            Session.set(
+              'permissionMenuId',
+              child.childList[0] ? child.childList[0].id : '0'
+            )
+            this.$router.push({ path: child.childList[0].path })
+          }
+        })
+      } else {
+        this.$message({
+          type: 'error',
+          message: '用户无权限:' + child.name + '目录下的页面未授权，无法跳转'
+        })
+      }
+
       setTimeout(() => {
         this.isGoContentListClicked = false
-      }, 10000)
+      }, 5000)
     })
   }
 }
@@ -678,13 +490,14 @@ export default {
     width: 100%;
     height: 184px;
     border-radius: 12px;
-    margin: 24px 24px 0 24px;
     display: flex;
     // justify-content: space-between;
     justify-content: flex-start;
-    .container-middle-left {
-    }
-    .container-middle-right {
+    flex-wrap: wrap;
+    .container-middle-contnet {
+      width: 45%;
+
+      margin: 12px;
     }
     .line-font {
       margin: 10px 0 0 35px;

@@ -1,5 +1,9 @@
 <template>
-  <div class="direction-control" @dblclick.stop>
+  <div
+    v-permission="['/expansion/ptz/operation', 3]"
+    class="direction-control"
+    @dblclick.stop
+  >
     <!--    方向盘-->
     <div
       :class="`steering-wheel ${hoverClass}`"
@@ -10,7 +14,7 @@
         v-for="item in DIRECTIONS_CLASS"
         :key="item.command"
         :class="item.className"
-        @mousedown="ptzCamera(item.command)"
+        @mousedown="ptzCamera($event, item.command)"
         @mouseup="ptzCameraStop(item.command)"
         @mouseout="handleMouseout"
         @mouseover="handleHoverWheel(item.className)"
@@ -160,7 +164,13 @@
               @mouseleave="changeHover(2, '移出')"
             />
           </el-tooltip>
-          <el-tooltip effect="dark" content="取消3D放大" placement="top" v-else>
+          <el-tooltip
+            v-permission="['/expansion/ptz/3d/zoom', 3]"
+            effect="dark"
+            content="取消3D放大"
+            placement="top"
+            v-else
+          >
             <svg-icon
               class="cloudBtn-right cloudBtn"
               icon-class="3Dfangda-h"
@@ -233,6 +243,7 @@ export default {
       hoverClass: '', //鼠标移动的位置
       DIRECTIONS_CLASS,
       resShowContent: [],
+      resNum: '',
       status: {
         up: 8,
         left: 2,
@@ -274,9 +285,8 @@ export default {
         this.$forceUpdate()
       })
     },
-    playerIdx(val) {
+    playerIdx(val, oldVal) {
       this.resPlayerIdx = val
-
       this.resShowContent.map((item, index) => {
         if (item && item !== '' && item.length > 0) {
           this.initTopType[index] = true
@@ -325,20 +335,21 @@ export default {
         this.is3DHover = false
       } else {
         this.type3d[index] = false
-        if (
-          this.lengthX > 0 &&
-          this.lengthY > 0 &&
-          this.midPointX &&
-          this.midPointY
-        ) {
-          this.ptzEnlarge(
-            2,
-            this.lengthX,
-            this.lengthY,
-            this.midPointX,
-            this.midPointY
-          )
-        }
+        this.$listeners.rectZoomInit(index, this.type3d[index], '3d')
+        // if (
+        //   this.lengthX > 0 &&
+        //   this.lengthY > 0 &&
+        //   this.midPointX &&
+        //   this.midPointY
+        // ) {
+        //   this.ptzEnlarge(
+        //     2,
+        //     this.lengthX,
+        //     this.lengthY,
+        //     this.midPointX,
+        //     this.midPointY
+        //   )
+        // }
       }
       this.$forceUpdate()
     },
@@ -363,10 +374,10 @@ export default {
         width: this.width3d,
         lengthX,
         lengthY,
-        midPointX,
-        midPointY
+        midPointX: Math.abs(midPointX),
+        midPointY: Math.abs(midPointY)
       }).then((res) => {
-        if (res.code === 0 && dragType === 2) {
+        if (res.data.code === 0 && dragType === 2) {
           this.lengthX = 0
           this.lengthY = 0
           this.midPointX = 0
@@ -776,19 +787,30 @@ export default {
       this.hoverClass = ''
     },
     // 云台控制
-    ptzCamera(cmdCode) {
+    ptzCamera(event, cmdCode) {
+      console.log(event.target.parentNode.parentNode.parentNode.__vue__.index)
+      if (event.target.parentNode.parentNode.parentNode.__vue__.index) {
+        this.resNum =
+          event.target.parentNode.parentNode.parentNode.__vue__.index
+        Local.set('resPlayerIdx', this.resNum)
+      }
+
+      // setTimeout(() => {
       ptzControl1({
         channelExpansionId: Local.get('flvCloudId')[Local.get('resPlayerIdx')],
         ptzOperationType: this.status[cmdCode],
         operationValue: this.speed
       })
+      // }, 500)
     },
     ptzCameraStop(cmdCode) {
+      // setTimeout(() => {
       ptzControl1({
         channelExpansionId: Local.get('flvCloudId')[Local.get('resPlayerIdx')],
         ptzOperationType: 0,
         operationValue: this.speed
       })
+      // }, 500)
     }
   }
 }
@@ -796,6 +818,10 @@ export default {
 
 <style lang="scss">
 .direction-control {
+  .is-disabled {
+    cursor: not-allowed !important;
+    opacity: 0.1;
+  }
   .speed-control {
     width: 214px;
     height: 46px;

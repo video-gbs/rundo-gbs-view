@@ -1,4 +1,8 @@
-﻿import { MessageBox, Message } from 'element-ui';
+﻿import {
+  MessageBox,
+  Message
+} from 'element-ui'
+import _ from 'lodash'
 (function () {
 
 
@@ -9,7 +13,7 @@
 
 
   //解决IE8之类不支持getElementsByClassName
-  function getElementsByClassName(className, root, tagName) {    //root：父节点，tagName：该节点的标签名。 这两个参数均可有可无
+  function getElementsByClassName(className, root, tagName) { //root：父节点，tagName：该节点的标签名。 这两个参数均可有可无
     if (root) {
       root = typeof root == "string" ? document.getElementById(root) ? document.getElementById(root) : document.body : root;
     } else {
@@ -22,7 +26,7 @@
       var tag = root.getElementsByTagName(tagName); //获取指定元素
       var tagAll = []; //用于存储符合条件的元素
       for (var i = 0; i < tag.length; i++) { //遍历获得的元素
-        for (var j = 0, n = tag[i].className.split(' '); j < n.length; j++) {//遍历此元素中所有class的值，如果包含指定的类名，就赋值给tagnameAll
+        for (var j = 0, n = tag[i].className.split(' '); j < n.length; j++) { //遍历此元素中所有class的值，如果包含指定的类名，就赋值给tagnameAll
           if (n[j] == className) {
             tagAll.push(tag[i]);
             break;
@@ -34,22 +38,20 @@
   }
 
   //解决IE8不支持textContent;
-  if (Object.defineProperty
-    && Object.getOwnPropertyDescriptor
-    && Object.getOwnPropertyDescriptor(Element.prototype, "textContent")
-    && !Object.getOwnPropertyDescriptor(Element.prototype, "textContent").get) {
+  if (Object.defineProperty &&
+    Object.getOwnPropertyDescriptor &&
+    Object.getOwnPropertyDescriptor(Element.prototype, "textContent") &&
+    !Object.getOwnPropertyDescriptor(Element.prototype, "textContent").get) {
     (function () {
       var innerText = Object.getOwnPropertyDescriptor(Element.prototype, "innerText");
-      Object.defineProperty(Element.prototype, "textContent",
-        {
-          get: function () {
-            return innerText.get.call(this);
-          },
-          set: function (s) {
-            return innerText.set.call(this, s);
-          }
+      Object.defineProperty(Element.prototype, "textContent", {
+        get: function () {
+          return innerText.get.call(this);
+        },
+        set: function (s) {
+          return innerText.set.call(this, s);
         }
-      );
+      });
     })();
   }
 
@@ -60,7 +62,8 @@
       constructor.prototype.firstElementChild == null) {
       Object.defineProperty(constructor.prototype, 'firstElementChild', {
         get: function () {
-          var node, nodes = this.childNodes, i = 0;
+          var node, nodes = this.childNodes,
+            i = 0;
           while (node = nodes[i++]) {
             if (node.nodeType === 1) {
               return node;
@@ -79,7 +82,10 @@
     var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
     var x = e.pageX || e.clientX + scrollX;
     var y = e.pageY || e.clientY + scrollY;
-    return {'x': x, 'y': y};
+    return {
+      'x': x,
+      'y': y
+    };
   }
 
   //将字符串转换为dom对象
@@ -136,15 +142,16 @@
     this.oneTimeBlockWidth = 0; //手动创建时间段的默认宽度
     this.oneHourWidth = 0; //每一个小时占的宽度
     this.oneMinWidth = 0; //每一个分钟占的宽度
+    this.oneSecondsWidth = 0; //每一个秒占的宽度
     this.timeBlockNums = 0; //时间段个数
     this.hasMove = false; //判断时间段是click事件还是move事件
     this.whichOne = 0; //目前操纵的时间段在坐标数组中的索引
     this.timeSliderNums = 0; //TimeSlider实例个数
     this.curTimeBlockId = null; //当前操作的时间段的ID
     this.mountedId = null; //当前挂载的真实DOM的ID
-    this.wrapperDivDiv = null;//时间轴所有元素的外部定位DOM
+    this.wrapperDivDiv = null; //时间轴所有元素的外部定位DOM
     this.curInfo = null; //当前时间段的信息
-    this.defaultOneTimeBlockTime = 30;//手动创建时间段的默认时间间隔(min)
+    this.defaultOneTimeBlockTime = 30; //手动创建时间段的默认时间间隔(min)
     this.minBlockTime = 1;
 
     // console.info("options.allInit1", options.allInit);
@@ -182,6 +189,10 @@
       self.minBlockTime = parseInt(options.minBlockTime) || self.minBlockTime;
       var mountedElement = document.getElementById(self.mountedId);
 
+      console.log('optionsoptionsoptionsoptions', options)
+      console.log('thithi', this)
+
+
       var wrapperDiv = document.createElement("div");
       wrapperDiv.className = "timeSlider";
       mountedElement.appendChild(wrapperDiv);
@@ -205,6 +216,7 @@
       // console.info("self.sliderLeftOffset", self.sliderLeftOffset);
       self.oneHourWidth = parseFloat((self.timeSliderWidth / 24).toFixed(4)); //每一个小时占的宽度
       self.oneMinWidth = parseFloat((self.timeSliderWidth / 24 / 60).toFixed(4)); //每一个分钟占的宽度
+      self.oneSecondsWidth = parseFloat((self.timeSliderWidth / 24 / 3600).toFixed(4)); //每一个秒占的宽度
       self.oneTimeBlockWidth = parseFloat((self.timeSliderWidth / 24 / 60 * self.minBlockTime).toFixed(4)); //手动创建时间段的默认宽度
 
       //创建0-24小时的标注
@@ -227,6 +239,7 @@
           labelDiv.style.left = self.oneHourWidth * i + "px";
           labelDiv.style.marginLeft = "-7px";
           wrapperDiv.appendChild(labelDiv);
+
         }
       }
 
@@ -245,6 +258,7 @@
       }
     },
     manualCreation: function (e) {
+      console.log(11111, e)
       var self = this;
 
       // 每次点击都设置下sliderLeftOffset，修复窗口变化后偏移bug
@@ -254,6 +268,8 @@
       var stopTimeCoordinate;
       var startHour = Math.floor(startTimeCoordinate / self.oneHourWidth);
       var startMin = Math.floor(startTimeCoordinate % self.oneHourWidth / self.oneMinWidth);
+
+      var startSeconds = Math.floor(startTimeCoordinate % self.oneHourWidth / self.oneSecondsWidth);
       //结束时间直接用开始时间加上设置的时间间隔更精确，不用再进行换算
       var stopMin = startMin + self.defaultOneTimeBlockTime;
       if (stopMin >= 60) {
@@ -290,11 +306,15 @@
     获取当前对应时间的坐标
  */
     time2Coordinate: function (time) {
+      console.log('time2Coordinatetime2Coordinate', time)
       var coordinate;
       var self = this;
       var hourCoordinate = parseInt(time.split(":")[0], 10) * self.oneHourWidth;
-      ;
       var minCoordinate = parseInt(time.split(":")[1], 10) * self.oneMinWidth;
+
+      var secondsCoordinate = parseInt(time.split(":")[1], 10) * self.oneMinWidth;
+
+      console.log(hourCoordinate, minCoordinate, secondsCoordinate)
       minCoordinate = parseFloat(minCoordinate.toFixed(4));
       coordinate = hourCoordinate + minCoordinate;
       return coordinate
@@ -543,7 +563,7 @@ time2[1]为结束时间
       startTimeShowDom.textContent = startTime;
       stopTimeShowDom.textContent = stopTime;
 
-      self.saveCurTimeBlockTime();//将创建好的时间段的时间存入数组中
+      self.saveCurTimeBlockTime(); //将创建好的时间段的时间存入数组中
       self.timeBlockNums++;
       /**************时间段时间显示区域创建end****************/
 
@@ -556,7 +576,7 @@ time2[1]为结束时间
       var startTimeCoordinate;
       /*当去移动时间段之前，先找到当前操作的时间段在数组中的位置*/
       self.whichOne = _.sortedIndex(self.startTimeArray, startTimeShowDom.textContent);
-      var oldStartTimeCoordinate = self.startTimeCoordinateArray[self.whichOne];//时间段的原始开始坐标
+      var oldStartTimeCoordinate = self.startTimeCoordinateArray[self.whichOne]; //时间段的原始开始坐标
       var mouseRelativeOffsetX = parseFloat((oldStartTimeCoordinate - (getMousePos(e).x - self.sliderLeftOffset)).toFixed(4));
       /*寻找边界*/
       var leftBorder = 0; //左边界；
@@ -574,7 +594,7 @@ time2[1]为结束时间
           startTimeCoordinate = parseFloat((getMousePos(e).x - self.sliderLeftOffset + mouseRelativeOffsetX).toFixed(4)); //偏移量
           if (startTimeCoordinate <= leftBorder) {
             startTimeCoordinate = leftBorder;
-          } else if (startTimeCoordinate >= self.stopTimeCoordinateArray[self.whichOne] - self.oneTimeBlockWidth) {//往右拉的限制范围
+          } else if (startTimeCoordinate >= self.stopTimeCoordinateArray[self.whichOne] - self.oneTimeBlockWidth) { //往右拉的限制范围
             startTimeCoordinate = self.stopTimeCoordinateArray[self.whichOne] - self.oneTimeBlockWidth;
           }
           var timeBlockWidth_present = parseFloat((self.stopTimeCoordinateArray[self.whichOne] - startTimeCoordinate).toFixed(4)); //时间段在移动过程中的宽度
@@ -632,7 +652,7 @@ time2[1]为结束时间
           stopTimeCoordinate = parseFloat((getMousePos(e).x - self.sliderLeftOffset - mouseRelativeOffsetX).toFixed(4));
           if (stopTimeCoordinate >= timeSliderWidth) {
             stopTimeCoordinate = timeSliderWidth;
-          } else if (stopTimeCoordinate <= self.startTimeCoordinateArray[self.whichOne] + self.oneTimeBlockWidth) {//往左拉的限制范围
+          } else if (stopTimeCoordinate <= self.startTimeCoordinateArray[self.whichOne] + self.oneTimeBlockWidth) { //往左拉的限制范围
             stopTimeCoordinate = self.startTimeCoordinateArray[self.whichOne] + self.oneTimeBlockWidth;
           }
           if (stopTimeCoordinate >= rightBorder) {
@@ -892,7 +912,13 @@ time2[1]为结束时间
       'timeStartLab': ["Start Time", "开始时间"][lan],
       'timeStopLab': ["Stop Time", "结束时间"][lan],
       'eventLab': ["Event Type", "事件类型"][lan],
-      'eventArray': [["Event1", "事件1"][lan], ["Event2", "事件2"][lan], ["Event3", "事件3"][lan], ["Event4", "事件4"][lan], ["Event5", "事件5"][lan]],
+      'eventArray': [
+        ["Event1", "事件1"][lan],
+        ["Event2", "事件2"][lan],
+        ["Event3", "事件3"][lan],
+        ["Event4", "事件4"][lan],
+        ["Event5", "事件5"][lan]
+      ],
       'setBtnName': ["Set", "设置"][lan],
       'delBtnName': ["Delete", "删除"][lan],
       'calBtnName': ["Cancel", "取消"][lan]
@@ -909,7 +935,7 @@ time2[1]为结束时间
     var stopMinInputDom = document.getElementById('stopM');
 
     // startHourInputDom.onkeyup = startMinInputDom.onkeyup = stopHourInputDom.onkeyup = stopMinInputDom.onkeyup = _.debounce(function () {
-      startHourInputDom.oninput = startMinInputDom.oninput = stopHourInputDom.oninput = stopMinInputDom.oninput = _.debounce(function () {
+    startHourInputDom.oninput = startMinInputDom.oninput = stopHourInputDom.oninput = stopMinInputDom.oninput = _.debounce(function () {
       var id = this.id;
       var maxTime;
       if (id == "startH") {
@@ -1058,8 +1084,7 @@ time2[1]为结束时间
         self.timeBlockNums--;
         modalDiv.style.display = 'none';
         fixedDiv.style.display = 'none';
-      }).catch(() => {
-      });
+      }).catch(() => {});
     }
 
 
@@ -1079,10 +1104,12 @@ time2[1]为结束时间
     //             <i class="el-icon-delete delImg" id="delImg"></i>\
     //             <img src="/static/images/edit.png" class="editImg"></img>\
     //             <img src="/static/images/del.png" class="delImg"></img>\
-    var editDivString = '\
+    var fuzhipng = require('../../images/timefuzhi.png')
+    var shanchupng = require('../../images/timeshanchu.png')
+    var editDivString = `\
             <div class="editWrap" id=<%="editDiv"+context.timeSliderNums%>>\
-                <img src="/static/images/edit.png" class="editImg"></img>\
-                <img src="/static/images/del.png" class="delImg"></img>\
+                <img src="${fuzhipng}" class="editImg"></img>\
+                <img src="${shanchupng}" class="delImg"></img>\
                 <div class="editContent" id=<%="editContent"+context.timeSliderNums%>>\
                     <div class="editHeader">\
                         <label class="editHeaderTitle"><%=editHeaderTitle%></label>\
@@ -1105,7 +1132,7 @@ time2[1]为结束时间
                       <button type="button" class="editBtn save"><%=saveName%></button>\
                     </div>\
                 </div>\
-            </div>';
+            </div>`;
 
 
 
@@ -1121,7 +1148,7 @@ time2[1]为结束时间
     ]
     var obj = {
       'context': context,
-      'editHeaderTitle': ["Copy To", "复制到"][lan],
+      'editHeaderTitle': ["Copy To", "将该预案复制到:"][lan],
       'editTextObj': editTextObj,
       'checkAllName': ["Check All", "全选"][lan],
       'saveName': ["Save", "保存"][lan],
@@ -1162,7 +1189,7 @@ time2[1]为结束时间
             type: 'warning'
           }).then(() => {
             removeAllTimeBlocks(context);
-          }).catch(()=>{});
+          }).catch(() => {});
         } else if (target.className == ('editCBox' + context.timeSliderNums)) {
           var checkedNums = 0;
           var domArray = getElementsByClassName('editCBox' + context.timeSliderNums);
@@ -1182,7 +1209,7 @@ time2[1]为结束时间
           document.getElementById('editContent' + context.timeSliderNums).style.display = 'none';
         } else if (target.className == "editBtn cancel") {
           document.getElementById('editContent' + context.timeSliderNums).style.display = 'none';
-        } else if (target.className == ('editCheckAll' + context.timeSliderNums)) {//全选
+        } else if (target.className == ('editCheckAll' + context.timeSliderNums)) { //全选
           var state = getElementsByClassName('editCheckAll' + context.timeSliderNums, '', 'input')[0].checked;
           var domArray = getElementsByClassName('editCBox' + context.timeSliderNums, '', 'input');
           for (var i = 0; i < domArray.length; i++) {
@@ -1242,7 +1269,7 @@ context为当前时间轴的this
     var doms = getElementsByClassName('timeSliderDiv', 'timeSlider' + self.timeSliderNums);
     var domsLen = doms.length;
     for (var i = 0; i < domsLen; i++) {
-      if (doms[i]) {//IE8获取的dom是放入一个临时数组中，可以按索引一个个删除;
+      if (doms[i]) { //IE8获取的dom是放入一个临时数组中，可以按索引一个个删除;
         doms[i].parentNode.removeChild(doms[i]);
       } else {
         doms[0].parentNode.removeChild(doms[0]);

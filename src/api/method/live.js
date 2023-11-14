@@ -1,11 +1,7 @@
 // 实施监控
 import request from '@/api/fetch'
 
-const expansion = '/expserver/expansion'
-
-const device = '/device-control'
-
-const streamanege = '/stream-manage'
+const expansion = '/expansion'
 
 export function getPlayLists(data) {
   // 网关列表
@@ -14,7 +10,7 @@ export function getPlayLists(data) {
 
 // 通道云台控制
 export function ptzControl(data) {
-  return request.put(`${device}/channel/north/ptz/control`, data)
+  return request.put(`${expansion}/channel/north/ptz/control`, data)
 }
 
 // 1.2通道云台控制
@@ -37,7 +33,9 @@ export function ptzPresetEdit(data) {
 // 预置位删除
 
 export function ptzPresetDelete(data) {
-  return request.delete1(`${expansion}/ptz/preset/delete`, data)
+  return request.delete(
+    `${expansion}/ptz/preset/delete?channelExpansionId=${data.channelExpansionId}&presetId=${data.presetId}`
+  )
 }
 
 // 预置位查询
@@ -46,9 +44,14 @@ export function ptzPresetLists(data) {
   return request.get(`${expansion}/ptz/preset/select`, data)
 }
 
-// 获取通道
+// 获取实施监控通道
 export function getChannelPlayList(id) {
-  return request.get(`${expansion}/channel/playList/?videoAreaId=${id}`)
+  return request.get(`${expansion}/channel/playList?videoAreaId=${id}`)
+}
+
+// 获取录像回放通道
+export function getChannelPlayBackList(id) {
+  return request.get(`${expansion}/channel/playBackList?videoAreaId=${id}`)
 }
 
 export function getPlayBackUrlLists(data) {
@@ -57,8 +60,8 @@ export function getPlayBackUrlLists(data) {
 }
 
 export function playStop(data) {
-  // 关闭流
-  return request.put(`${streamanege}/stream/north/play/stop`, data)
+  // 关闭流 新版
+  return request.put(`${expansion}/play/stop`, data)
 }
 
 export function pauseRecordView(data) {
@@ -80,10 +83,20 @@ export function speedRecordView(data) {
 
 export function getStreamInfo(data) {
   // 码流信息
-  return request.get(`${expansion}/play/streamId/info`, data)
+  return request.get(`${expansion}/play/back/streamId/info`, data)
 }
 
 export function ptz3dEnlarge(data) {
   // 3d放大
   return request.put(`${expansion}/ptz/3d/zoom`, data)
+}
+
+// 设备--实施监控通道列表
+export function playVideoAreaList(params) {
+  return request.get(`${expansion}/play/videoAreaList`, params)
+}
+
+// 设备--录像回放通道列表
+export function playVideoAreaListRecord(params) {
+  return request.get(`${expansion}/play/back/videoAreaList`, params)
 }

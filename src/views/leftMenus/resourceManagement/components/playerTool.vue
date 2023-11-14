@@ -21,7 +21,7 @@
     >
       <span
         :class="`icon-control-tool ${showControl ? 'show' : ''}`"
-        @click.stop="onOpenControl"
+        @click="openControl($event)"
       ></span>
     </el-tooltip>
     <el-tooltip effect="dark" content="截屏" placement="top">
@@ -90,7 +90,6 @@ export default {
     'idx',
     'player',
     'deviceData',
-    'onOpenControl',
     'showControl',
     'isShowStream',
     'hasAudio',
@@ -194,8 +193,14 @@ export default {
     //   this.player.endRecord();
     // },
     // 云台控制
-    ptzCamera(type) {
-      this.$bus.$emit('ptzCamera', type)
+    // ptzCamera(type) {
+    //   this.$bus.$emit('ptzCamera', type)
+    // },
+    openControl(event) {
+      this.$emit(
+        'handleOpenControl',
+        event.target.__vue__.$parent.boxSelectionNum
+      )
     },
     // 点击声音
     onVoice() {
@@ -205,16 +210,16 @@ export default {
     // 点击放大
     onBoxSelection(value) {
       this.isBoxSelection = !this.isBoxSelection
-      if (value === 1) {
-        this.$listeners.showPlayerBoxMini(this.$props.boxSelectionNum, true)
-      } else {
-        this.$listeners.showPlayerBoxMini(this.$props.boxSelectionNum, false)
-      }
+      // if (value === 1) {
+      //   this.$listeners.showPlayerBoxMini(this.$props.boxSelectionNum, true)
+      // } else {
+      //   this.$listeners.showPlayerBoxMini(this.$props.boxSelectionNum, false)
+      // }
     }
   },
   destroyed() {
     if (this.jessibuca) {
-      this.jessibuca.destroy()
+      // this.jessibuca.destroy()
     }
     this.playing = false
     this.loaded = false

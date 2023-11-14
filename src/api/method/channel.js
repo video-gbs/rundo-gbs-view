@@ -1,6 +1,6 @@
 import request from '@/api/fetch'
 
-const expansion = '/expserver/expansion'
+const expansion = '/expansion'
 // 通道
 // 新增通道
 export function addChannel(params) {
@@ -18,13 +18,13 @@ export function getChannelById(params) {
 }
 
 // 批量删除
-export function deleteChannels(params) {
-  return request.post(`${expansion}/channel/batchDelete`, params)
+export function deleteChannels(data) {
+  return request.delete1(`${expansion}/channel/batchDelete?`, data)
 }
 
 // 删除
 export function deleteChannel(id) {
-  return request.delete(`${expansion}/channel/delete/?id=${id}`)
+  return request.delete(`${expansion}/channel/delete?id=${id}`)
 }
 
 // 移动
@@ -37,7 +37,7 @@ export function editChannel(params) {
   return request.put(`${expansion}/channel/edit`, params)
 }
 
-// // 移动
-// export function moveChannel(params) {
-//   return request.put(`${expansion}/channel/move`,params)
-// }
+// 设备--通道列表
+export function channelVideoAreaList(params) {
+  return request.get(`${expansion}/channel/videoAreaList`, params)
+}
