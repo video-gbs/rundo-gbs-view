@@ -242,10 +242,11 @@
                       >下载图片</a
                     ></el-button
                   >
-                  <el-button type="text" v-if="scope.row.imageState === 3"
-                    ><a @click="handlePreView(scope.row)"
-                      >预览图片</a
-                    ></el-button
+                  <el-button
+                    type="text"
+                    v-if="scope.row.imageState === 3"
+                    @click="handlePreView(scope.row)"
+                    ><span>预览图片</span></el-button
                   >
                   <el-button
                     type="text"
@@ -274,6 +275,18 @@
         </div>
       </div>
     </div>
+    <div class="image__preview">
+      <el-dialog
+        title="正在预览图片"
+        :visible.sync="showImagePreview"
+        width="70%"
+        custom-class="formDialog"
+        style="text-align: left"
+      >
+        <el-image :src="url" :preview-src-list="srcList" style="margin:0 auto;"> </el-image>
+      </el-dialog>
+    </div>
+
     <div class="nowPlayVideo">
       <el-dialog
         title="正在播放视频"
@@ -309,6 +322,11 @@ export default {
   components: { pagination, leftTree, LineFont, player },
   data() {
     return {
+      showImagePreview: false,
+      srcList: [
+        'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+      ],
+      url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
       isShow: true,
       templateName: '',
       areaNames: 'resourceName',
@@ -416,7 +434,17 @@ export default {
         })
     },
     handlePreView(row) {
-      window.open(row.imageUrl, '_blank')
+      // // this.currentImageUrl = row.imageUrl
+      // this.srcList = [require(`${row.imageUrl}`)]
+      this.srcList = []
+      this.srcList.push(row.imageUrl)
+      this.url=''
+      this.url = row.imageUrl
+      this.showImagePreview = true
+      // window.open(row.imageUrl, '_blank')
+    },
+    closePreview() {
+      this.showImagePreview = false
     },
     getStatusText(status) {
       const option = this.allIncident.find((option) => option === status)
@@ -678,9 +706,9 @@ export default {
     alarmImageStateStateFormatter(row) {
       switch (row.imageState) {
         case -1:
-          return '异常'
+          return '失败'
         case 0:
-          return '初始化'
+          return '持续中'
         case 1:
           return '等待中'
         case 2:
@@ -694,9 +722,9 @@ export default {
     alarmVideoStateFormatter(row) {
       switch (row.videoState) {
         case -1:
-          return '异常'
+          return '失败'
         case 0:
-          return '初始化'
+          return '持续中'
         case 1:
           return '等待中'
         case 2:
@@ -784,7 +812,7 @@ export default {
       }
       target.blur()
       this.params.pageNum = 1
-      this.initList(this.resId)
+      this.initList()
     },
     cxData() {
       this.initList(this.resId)
@@ -923,6 +951,10 @@ export default {
 ::v-deep .el-table__header .has-gutter th.gutter {
   display: none !important;
 }
+.image__preview {
+  width: 800px;
+  height: 800px;
+}
 
 .encoder-content {
   height: 100%;
@@ -967,7 +999,7 @@ export default {
       }
     }
     .encoder-table {
-      height: calc(100% - 145px);
+      max-height: calc(100% - 145px);
       overflow-y: auto;
     }
   }
@@ -1068,7 +1100,24 @@ export default {
     padding: 16px 24px;
   }
 }
+::v-deep .image__preview {
+  .el-dialog__title {
+    font-size: 16px;
+    font-weight: bolder;
+  }
+}
+::v-deep .image__preview {
+  .el-dialog__header {
+    padding: 16px 24px;
+  }
+}
 ::v-deep .nowPlayVideo {
+  .el-dialog__body {
+    padding: 24px 24px 22px;
+    /*border: #e4e7ed solid 1px;*/
+  }
+}
+::v-deep .image__preview {
   .el-dialog__body {
     padding: 24px 24px 22px;
     /*border: #e4e7ed solid 1px;*/
