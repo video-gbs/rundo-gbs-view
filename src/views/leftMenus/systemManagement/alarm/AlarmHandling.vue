@@ -416,7 +416,7 @@ export default {
         })
     },
     handlePreView(row) {
-      window.open(row.imageUrl)
+      window.open(row.imageUrl, '_blank')
     },
     getStatusText(status) {
       const option = this.allIncident.find((option) => option === status)
@@ -686,9 +686,9 @@ export default {
         case 2:
           return '生成中'
         case 3:
-          return '生成成功'
+          return '成功'
         default:
-          return '无'
+          return '待配置'
       }
     },
     alarmVideoStateFormatter(row) {
@@ -702,9 +702,9 @@ export default {
         case 2:
           return '生成中'
         case 3:
-          return '生成成功'
+          return '成功'
         default:
-          return '无'
+          return '待配置'
       }
     },
 

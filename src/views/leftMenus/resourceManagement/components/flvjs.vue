@@ -1,6 +1,6 @@
 <template>
   <div class="video-box-container">
-    <video
+    <!-- <video
       ref="testVideo"
       class="video-player"
       autoplay
@@ -9,7 +9,9 @@
       muted="muted"
       width="100%"
       height="100%"
-    ></video>
+    ></video> -->
+    <EasyPlayer  :videoUrl="videoUrl" />
+
     <div class="player-header">
       <!-- <span class="head-left">{{
         deviceData.sourceType
@@ -76,13 +78,15 @@ import DirectionControl from './DirectionControl'
 import { getStreamInfo } from '@/api/method/live'
 import { Local } from '@/utils/storage'
 import moment from 'moment'
+import EasyPlayer from './EasyPlayer.vue'
 const IS_CONTROL_TYPES = [1, 4] //有云台功能的ptztype
 
 export default {
   name: 'jessibuca',
   components: {
     PlayerTool,
-    DirectionControl
+    DirectionControl,
+    EasyPlayer
   },
   data() {
     return {

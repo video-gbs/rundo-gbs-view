@@ -157,6 +157,10 @@
                       @showPlayerBoxMini="showPlayerBoxMini"
                       @videoClick="videoClick"
                     ></player>
+                    <!-- <EasyPlayer
+                      :ref="'player' + i"
+                      :videoUrl="videoUrl[i - 1]"
+                    /> -->
                     <div ref="rectArea" class="rect"></div>
 
                     <div
@@ -341,6 +345,8 @@ import { ptzPresetLists } from '@/api/method/live'
 
 import { convertG711ToAAC } from '@/utils/index'
 
+import EasyPlayer from './components/EasyPlayer.vue'
+
 export default {
   name: 'live',
   components: {
@@ -349,7 +355,8 @@ export default {
     PlayerTool,
     monitorEquipmentGroup,
     cloudControl,
-    leftTree
+    leftTree,
+    EasyPlayer
   },
   data() {
     return {
@@ -1056,7 +1063,7 @@ export default {
       console.log(data, 111)
       if (!data.onlineState) {
         this.resArray = []
-         console.log(this.detailsId)
+        console.log(this.detailsId)
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
         } else {
@@ -1256,12 +1263,12 @@ export default {
               this.playerIdx++
             }
 
-            var url = res.data.data.wsFlv
-            if (res.data.data.playProtocalType == 1) {
-              url = res.data.data.httpFlv
-            } else if (res.data.data.playProtocalType == 2) {
-              url = res.data.data.wssFlv
-            }
+            var url = res.data.data.httpsHls
+            // if (res.data.data.playProtocalType == 1) {
+            //   url = res.data.data.httpFlv
+            // } else if (res.data.data.playProtocalType == 2) {
+            //   url = res.data.data.wssFlv
+            // }
             this.setPlayUrl(url, idxTmp)
 
             this.setStreamId(res.data.data.streamId, idxTmp)
@@ -1476,6 +1483,10 @@ export default {
 //   position: absolute;
 //   border: 1px dashed #000;
 // }
+ //隐藏视频的载入动画
+::v-deep .easy-player-loading {
+  display: none !important;
+}
 .test-div {
   width: 16px;
   height: 18px;
