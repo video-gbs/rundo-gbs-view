@@ -53,7 +53,7 @@
 .timeSliderDiv {
   height: 20px;
   /* background: #004BAD; */
-  border-radius: 10px 10px 10px 10px;
+  /* border-radius: 10px 10px 10px 10px; */
   z-index: 4;
   top: 0px;
   position: absolute;
@@ -64,7 +64,7 @@
   /* position: relative; */
 }
 
-.timeSliderDiv::before {
+/* .timeSliderDiv::before {
   content: '';
   display: inline-block;
   width: 12px;
@@ -94,7 +94,7 @@
   position: absolute;
   right: 0px;
   top: -1px;
-}
+} */
 
 .trCanvas {
   width: 720px;
@@ -272,7 +272,7 @@
   border-right: 8px solid #dbdada;
   display: none; */
   position: absolute;
-  left: 0px;
+  left: -6px;
   top: -1px;
   content: '';
   display: inline-block;
@@ -292,7 +292,7 @@
   border-left: 8px solid #dbdada;
   display: none; */
   position: absolute;
-  right: 0px;
+  right: -6px;
   top: -1px;
   content: '';
   display: inline-block;
@@ -304,9 +304,12 @@
   z-index: 99999999;
 }
 
-.stopTimeBar:hover,
+/* .stopTimeBar:hover, */
 .startTimeBar:hover {
   cursor: e-resize;
+}
+.stopTimeBar:hover{
+  cursor: w-resize;
 }
 
 .startTimeShow {
