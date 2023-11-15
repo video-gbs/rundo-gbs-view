@@ -112,6 +112,7 @@ import _ from 'lodash'
 
   //将颜色从rgb转换为16进制格式
   function rgbToHex(rgb) {
+    console.log('rgb',rgb)
     var _rgb = rgb.match(/[^\(\)]+(?=\))/g)[0].split(",");
     if (_rgb) {
       var hex = "";
@@ -424,7 +425,6 @@ time2[1]为结束时间
         'id="timeS<%=sliderNum%>_<%=timeBlockNums%>"',
         'style=left:<%=startTimeCoordinate%>px;',
         'width:<%=timeBlockWidth%>px;',
-        'background-color:#<%=defalutColor%>;',
         '></div>'
       ].join("");
 
@@ -795,7 +795,7 @@ time2[1]为结束时间
           //IE11获取的是rgb值，IE8是hex值，所以需要区分一下；
           var color = self.curTimeBlockDom.style.backgroundColor;
           if (_.indexOf(color, "#") == -1) {
-            var colorHex = rgbToHex(color);
+            // var colorHex = rgbToHex(color);
           } else {
             var colorHex = color.replace('#', "");
           }

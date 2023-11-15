@@ -242,7 +242,12 @@ export default {
   data() {
     const checkName = (rule, value, cb) => {
       const regName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
-      if (value.length === 0) {
+      if (
+        value === '' ||
+        value === null ||
+        value !== undefined ||
+        value.length === 0
+      ) {
         return cb(new Error('此为必填项。'))
       }
       setTimeout(() => {
