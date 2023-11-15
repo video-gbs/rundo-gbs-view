@@ -123,7 +123,7 @@
       :title="dialog.title"
       :visible.sync="dialog.show"
       width="950px"
-      top="100px"
+      top="30px"
       :before-close="handleClose"
       :close-on-click-modal="false"
     >
@@ -245,7 +245,7 @@ export default {
       if (
         value === '' ||
         value === null ||
-        value !== undefined ||
+        value === undefined ||
         value.length === 0
       ) {
         return cb(new Error('此为必填项。'))

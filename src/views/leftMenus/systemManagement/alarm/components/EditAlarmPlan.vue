@@ -194,21 +194,22 @@ export default {
       })
     },
     next() {
-      if (this.active++ > 2) this.active = 0
+
+      if (this.active++ > 3) this.active = 0
     },
     last() {
       this.active--
       // if ( > 0) this.active = 0
     },
     submitStep() {
-      this.active = 0
+      // this.active = 0
       // this.goback()
     },
     saveAll(val) {
       this.$refs['alarmAccountForm'].validate((valid) => {
         if (valid) {
           this.step1DataId = val
-          if (this.active++ > 2) this.active = 0
+          if (this.active++ > 3) this.active = 0
         }
       })
     },
@@ -233,6 +234,7 @@ export default {
             message: '编辑成功！',
             type: 'success'
           })
+          this.active = 0
           this.goback()
           this.$emit('getList')
         }
