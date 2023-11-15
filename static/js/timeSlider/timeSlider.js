@@ -487,7 +487,7 @@ time2[1]为结束时间
       timeBlockDom.appendChild(stopTimeBarDom);
 
       startTimeBarDom.onmouseover = function (e) {
-        this.style.cursor = 'e-resize';
+        this.style.cursor = 'w-resize';
       }
 
       startTimeBarDom.onmousedown = function (event) {
