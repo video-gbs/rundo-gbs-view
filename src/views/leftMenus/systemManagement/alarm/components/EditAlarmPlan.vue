@@ -202,7 +202,7 @@ export default {
     },
     submitStep() {
       this.active = 0
-      this.goback()
+      // this.goback()
     },
     saveAll(val) {
       this.$refs['alarmAccountForm'].validate((valid) => {

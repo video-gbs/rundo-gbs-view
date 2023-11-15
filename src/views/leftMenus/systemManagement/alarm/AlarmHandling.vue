@@ -25,6 +25,7 @@
               default-expand-all
               :default-expanded-keys="['根节点']"
               :expand-on-click-node="false"
+              :current-node-key="resCurrentKey"
               node-key="id"
               highlight-current
               @node-click="handleNodeClick"
@@ -284,7 +285,8 @@
         custom-class="formDialog"
         style="text-align: left"
       >
-        <el-image :src="url" :preview-src-list="srcList" style="margin:0 auto;"> </el-image>
+        <el-image :src="url" :preview-src-list="srcList" style="margin: 0 auto">
+        </el-image>
       </el-dialog>
     </div>
 
@@ -335,6 +337,7 @@ export default {
       treeList: [],
       initData: [],
       tableLoading: false,
+      resCurrentKey: '',
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -418,6 +421,11 @@ export default {
           if (res.data.code === 0) {
             this.treeList = [res.data.data]
             this.initData = [res.data.data]
+            this.$nextTick(() => {
+              this.$refs.alarmTree.setCurrentKey(res.data.data.id)
+              this.resCurrentKey = res.data.data.id
+              this.$forceUpdate()
+            })
           }
         })
         .catch((error) => {
@@ -440,7 +448,7 @@ export default {
       // this.srcList = [require(`${row.imageUrl}`)]
       this.srcList = []
       this.srcList.push(row.imageUrl)
-      this.url=''
+      this.url = ''
       this.url = row.imageUrl
       this.showImagePreview = true
       // window.open(row.imageUrl, '_blank')
@@ -520,7 +528,6 @@ export default {
                     }, [])
                   }
                   this.$refs.alarmTree.updateKeyChildren(data.id, arr)
-                  this.defaultExpandedKeys = [data.id]
                 }
               }
             })
@@ -814,7 +821,10 @@ export default {
       }
       target.blur()
       this.params.pageNum = 1
-      this.initList()
+      this.resId = ''
+      this.initList(this.resId)
+      this.$refs.alarmTree.setCurrentKey(this.treeList[0].id)
+      this.resCurrentKey = this.treeList[0].id
     },
     cxData() {
       this.initList(this.resId)
