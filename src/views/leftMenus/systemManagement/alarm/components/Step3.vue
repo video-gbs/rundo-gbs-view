@@ -204,6 +204,7 @@ export default {
       allIncident: [],
       checkeLists: [],
       selectLists: [],
+      editLists: [],
       inputVisible: false,
       inputValue: '',
       textStyle: {
@@ -275,6 +276,7 @@ export default {
   },
   created() {
     if (Object.keys(Local.get('detailsData')).length > 0) {
+      // this.checkeLists = []
       let params = {}
       let params1 = {}
       Local.get('detailsData').alarmSchemeEventRelList.map((item) => {
@@ -296,6 +298,7 @@ export default {
           eventCode: item.eventCode
         }
         this.checkeLists.push(params1)
+        this.editLists.push(params1)
 
         this.stepform3.push({ isactive: item.eventLevel, ...params })
         this.intrusionLevel.push(['轻微', '中等', '严重', '非常严重'])
@@ -311,16 +314,16 @@ export default {
       await getAlarmEventLists1({ eventName: val })
         .then((res) => {
           if (res.data.code === 0) {
-            this.allIncident = res.data.data
-            // let resParams = {}
-            // res.data.data.map((item) => {
-            //     resParams = {
-            //       eventCode: item.eventCode,
-            //       eventName: item.eventName
-            //     }
+            // this.allIncident = res.data.data
+            let resParams = {}
+            res.data.data.map((item) => {
+              resParams = {
+                eventCode: item.eventCode,
+                eventName: item.eventName
+              }
 
-            //     this.allIncident.push(resParams)
-            //   })
+              this.allIncident.push(resParams)
+            })
           }
         })
         .catch((error) => {
@@ -336,16 +339,32 @@ export default {
     },
     testChange(val) {
       this.selectLists = []
-      this.selectLists = val
+      if (Object.keys(Local.get('detailsData')).length > 0) {
+        // let newItems = this.checkeLists.filter(item => !val.find(item2 => item2.eventCode === item.eventCode))
+        let newArray = val.filter((item1) => {
+          return !this.editLists.find(
+            (item2) => item2.eventCode === item1.eventCode
+          )
+        })
+        this.selectLists = newArray
+      } else {
+        this.selectLists = val
+      }
       this.checkeLists = this.removeDuplicates(val)
     },
-    handleCancel(){
-      this.checkeLists = this.checkeLists.filter(item => !this.selectLists.some(item2 => item2.eventCode === item.eventCode))
+    handleCancel() {
+      // if (Object.keys(Local.get('detailsData')).length > 0) {
+      // } else {
+      this.checkeLists = this.checkeLists.filter(
+        (item) =>
+          !this.selectLists.some((item2) => item2.eventCode === item.eventCode)
+      )
+      // }
       this.dialog.show = false
     },
 
     removeDuplicates(arr) {
-      this.checkeLists = []
+      // this.checkeLists = []
       var idSet = {}
       var result = []
 
@@ -376,12 +395,12 @@ export default {
       if (Object.keys(Local.get('detailsData')).length > 0) {
         this.$nextTick(() => {
           const myDiv = document.getElementsByClassName('allIncident-checkbox')
-
+          console.log('this.checkeLists', this.checkeLists)
           this.allIncident.forEach((item1, index) => {
             this.checkeLists.map((item) => {
               if (item.eventCode === item1.eventCode) {
-                this.checkeLists = []
-                this.checkeLists.push(item1)
+                // this.checkeLists = []
+                // this.checkeLists.push(item1)
                 myDiv[index].classList.add('is-checked')
                 myDiv[index].firstChild.classList.add('is-checked')
               }
@@ -476,7 +495,6 @@ export default {
         })
         Promise.all(resValidate).then(() => {
           if (this.isSpanRequire.every((item) => !item)) {
-
             this.$emit('submitStep')
 
             this.$emit('stepParams3', uniqueArr)
