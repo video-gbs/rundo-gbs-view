@@ -133,6 +133,19 @@
   margin: 150px auto;
 }
 
+.modal-dialog:after {
+  content: "";
+  position: absolute;
+  bottom: -9px;
+  left: 50px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #fff;
+  transform: translateX(-50%);
+}
+
 .modal-content {
   position: relative;
   background-color: #FFF;
@@ -308,7 +321,8 @@
 .startTimeBar:hover {
   cursor: e-resize;
 }
-.stopTimeBar:hover{
+
+.stopTimeBar:hover {
   cursor: w-resize;
 }
 

@@ -159,7 +159,7 @@
         </el-checkbox-group>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialog.show = false">取 消</el-button>
+        <el-button @click="handleCancel">取 消</el-button>
         <el-button type="primary" @click="dialog.show = false">确 定</el-button>
       </span>
     </el-dialog>
@@ -203,6 +203,7 @@ export default {
       form: {},
       allIncident: [],
       checkeLists: [],
+      selectLists: [],
       inputVisible: false,
       inputValue: '',
       textStyle: {
@@ -242,8 +243,6 @@ export default {
       this.initAlarmEventLists(val)
     },
     checkeLists(newValue) {
-      console.log('newValue', newValue)
-      console.log('newValue1', newValue)
       let resStepform3 = []
       let resStepform3Obj = {
         eventCode: {},
@@ -268,7 +267,6 @@ export default {
             this.isSpanRequire.push(false)
           }
         }
-        console.log('this.isSpanRequire', this.isSpanRequire)
         this.stepform3 = this.stepform3.concat(resStepform3)
       } else {
       }
@@ -303,8 +301,6 @@ export default {
         this.intrusionLevel.push(['轻微', '中等', '严重', '非常严重'])
         this.$forceUpdate()
       })
-
-      console.log('this.checkeLists', this.checkeLists, this.stepform3)
     }
   },
   mounted() {
@@ -339,9 +335,13 @@ export default {
       return obj1
     },
     testChange(val) {
-      console.log(val)
-      // this.checkeLists=[]
+      this.selectLists = []
+      this.selectLists = val
       this.checkeLists = this.removeDuplicates(val)
+    },
+    handleCancel(){
+      this.checkeLists = this.checkeLists.filter(item => !this.selectLists.some(item2 => item2.eventCode === item.eventCode))
+      this.dialog.show = false
     },
 
     removeDuplicates(arr) {
@@ -367,7 +367,6 @@ export default {
           }
         }
       }
-      console.log('resultresultresultresultresultresultresult', result)
       return result
     },
 
@@ -425,7 +424,6 @@ export default {
       this.$emit('goback')
     },
     submitStep3() {
-      console.log('this.$refs', this.$refs, this.checkeLists)
       if (this.$refs.stepForm) {
         const alarmSchemeEventReqList = []
 
@@ -477,15 +475,12 @@ export default {
           resValidate.push(this.$refs.stepForm[i].validate())
         })
         Promise.all(resValidate).then(() => {
-          console.log('this.isSpanRequire',this.isSpanRequire,this.isSpanRequire.every((itme) => !itme))
           if (this.isSpanRequire.every((item) => !item)) {
-            console.log('验证通过')
 
             this.$emit('submitStep')
 
             this.$emit('stepParams3', uniqueArr)
           } else {
-            console.log('验证不通过')
           }
         })
       } else {

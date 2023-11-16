@@ -298,6 +298,7 @@
         top="100px"
         custom-class="formDialog"
         style="text-align: left"
+        :before-close="handleClose"
       >
         <player ref="videoPlayer" :videoUrl="videoUrl" autoplay live></player>
       </el-dialog>
@@ -442,6 +443,10 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    handleClose(done) {
+      this.videoUrl = ''
+      done()
     },
     handlePreView(row) {
       // // this.currentImageUrl = row.imageUrl

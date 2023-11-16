@@ -865,7 +865,7 @@ export default {
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
     .dataDictionary-table {
-      height: calc(100% - 100px);
+      max-height: calc(100% - 100px);
       overflow-y: auto;
       font-size: 14px;
       font-family: Microsoft YaHei-Regular, Microsoft YaHei;
