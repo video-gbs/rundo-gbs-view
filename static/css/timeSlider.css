@@ -57,11 +57,21 @@
   z-index: 4;
   top: 0px;
   position: absolute;
-  background-color: #004BAD;
+  /* background-color: #004BAD; */
+  background-color: #4A7EC3;
   /* border-left: 1px solid #000; */
   /* background: #1890FF; */
   box-sizing: border-box;
   /* position: relative; */
+}
+.timeSliderDiv:hover {
+  background-color: #004BAD;
+}
+.timeSliderDiv:active {
+  background-color: #004BAD;
+}
+.timeSliderDiv:focus {
+  background-color: #004BAD;
 }
 
 /* .timeSliderDiv::before {
@@ -231,6 +241,15 @@
   font-weight: 500;
   color: #242B3A;
 }
+.time-input:active {
+  border: 1px solid #0270FF;
+}
+.time-input:hover {
+  border: 1px solid #0270FF;
+}
+.time-input:focus {
+  border: 1px solid #0270FF;
+}
 
 .time-lab {
   display: inline-block;
@@ -399,7 +418,7 @@
 
 .editWrap img {
   width: 20px;
-  margin-left: 15px;
+  /* margin-left: 15px; */
 }
 
 .editWrap i {
