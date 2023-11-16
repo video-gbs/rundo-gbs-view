@@ -8,7 +8,7 @@
   border: 0;
   display: block;
   z-index: 0;
-  margin-left: 60px;
+  margin-left: 56px;
   position: relative;
   /* height: 47px; */
   height: 36px;
@@ -97,7 +97,8 @@
 } */
 
 .trCanvas {
-  width: 720px;
+  /* width: 720px; */
+  width: 768px;
   height: 20px;
   background: rgba(2, 74, 168, 0.08);
   border-radius: 10px 10px 10px 10px;
@@ -390,8 +391,10 @@
   /* width: 100px; */
   height: 36px;
   line-height: 36px;
-  right: 24px;
-  top: 30px;
+  /* right: 24px;
+  top: 30px; */
+  right: 15px;
+  top: 28px;
 }
 
 .editWrap img {
