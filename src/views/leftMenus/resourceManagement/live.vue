@@ -1263,12 +1263,12 @@ export default {
               this.playerIdx++
             }
 
-            var url = res.data.data.httpsHls
-            // if (res.data.data.playProtocalType == 1) {
-            //   url = res.data.data.httpFlv
-            // } else if (res.data.data.playProtocalType == 2) {
-            //   url = res.data.data.wssFlv
-            // }
+            var url = res.data.data.wsFlv
+            if (res.data.data.playProtocalType == 1) {
+              url = res.data.data.httpFlv
+            } else if (res.data.data.playProtocalType == 2) {
+              url = res.data.data.wssFlv
+            }
             this.setPlayUrl(url, idxTmp)
 
             this.setStreamId(res.data.data.streamId, idxTmp)
