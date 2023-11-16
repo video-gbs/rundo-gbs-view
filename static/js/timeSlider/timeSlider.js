@@ -880,6 +880,13 @@ time2[1]为结束时间
                             <div class="time-start-div">\
                                <label class="time-lab"><%=timeStartLab%></label>\
                                <input type="text" maxlength="2" id="startH" class="time-input"> :\
+                               <div class="test-event-div" style="display: none;">\
+                                  <select class="test-event-select" id="testEventSelect">\
+                                    <%_.forEach(testEventArray,function(item,index){%>\
+                                    <option class="test-event-option" value=<%=index+1%>><%=item%></option>\
+                                  <%})%>\
+                               </select>\
+                              </div>\
                                <input type="text" maxlength="2" id="startM" class="time-input">\
                             </div>\
                             <span class="time-start-div-span">至</span>\
@@ -919,6 +926,13 @@ time2[1]为结束时间
         ["Event3", "事件3"][lan],
         ["Event4", "事件4"][lan],
         ["Event5", "事件5"][lan]
+      ],
+      'testEventArray': [
+        ["Event1", "a"][lan],
+        ["Event2", "aa"][lan],
+        ["Event3", "aaa"][lan],
+        ["Event4", "aaaa"][lan],
+        ["Event5", "aaaaa"][lan]
       ],
       'setBtnName': ["Set", "保存"][lan],
       'delBtnName': ["Delete", "删除"][lan],
