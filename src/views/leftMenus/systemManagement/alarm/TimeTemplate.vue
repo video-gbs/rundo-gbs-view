@@ -122,7 +122,7 @@
       v-if="dialog.show"
       :title="dialog.title"
       :visible.sync="dialog.show"
-      width="950px"
+      width="960px"
       top="30px"
       :before-close="handleClose"
       :close-on-click-modal="false"
@@ -153,7 +153,7 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="配置预案开启时段"> </el-form-item>
+        <el-form-item label="配置预案开启时段" class="template-title" style="width: 125px"> </el-form-item>
 
         <div class="timeSlider-container">
           <div
@@ -1037,5 +1037,10 @@ export default {
 }
 .marginR {
   margin: 0 16px 16px 0;
+}
+.template-title{
+  margin-bottom: -8px !important;
+  margin-left: -15px;
+  margin-top: 24px;
 }
 </style>

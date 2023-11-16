@@ -106,10 +106,12 @@
                 v-model="stepform3[index].videoLength"
                 style="width: 288px"
               >
-                <el-option label="0" :value="0"></el-option>
+                <!-- <el-option label="0" :value="0"></el-option> -->
                 <el-option label="15" :value="15"></el-option>
                 <el-option label="30" :value="30"></el-option>
                 <el-option label="60" :value="60"></el-option>
+                <el-option label="直到事件结束" :value="0"></el-option>
+
               </el-select>
             </el-form-item>
             <el-form-item
