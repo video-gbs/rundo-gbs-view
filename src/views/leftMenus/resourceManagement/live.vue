@@ -1272,7 +1272,7 @@ export default {
             //   url = res.data.data.wssFlv
             // }
               // var url = res.data.data.httpsHls
-              var url = res.data.data.httpsFmp4
+              var url = res.data.data.httpFmp4
               // var url = res.data.data.wsFlv
             this.setPlayUrl(url, idxTmp)
 
