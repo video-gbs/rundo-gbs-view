@@ -134,7 +134,7 @@
                 >
                   <div v-if="!videoUrl[i - 1]" class="empty-player"></div>
                   <div v-else class="player-box" ref="videoBox">
-                    <player
+                    <!-- <player
                       :ref="'player' + i"
                       :videoUrl="videoUrl[i - 1]"
                       :flvStreamId="flvStreamId[i - 1]"
@@ -157,11 +157,11 @@
                       @showPlayerBoxMini="showPlayerBoxMini"
                       @videoClick="videoClick"
                       @playerToolValue="playerToolValue"
-                    ></player>
-                    <!-- <EasyPlayer
+                    ></player> -->
+                    <EasyPlayer
                       :ref="'player' + i"
                       :videoUrl="videoUrl[i - 1]"
-                    /> -->
+                    />
                     <div ref="rectArea" class="rect"></div>
 
                     <div
@@ -1265,12 +1265,15 @@ export default {
               this.playerIdx++
             }
 
-            var url = res.data.data.wsFlv
-            if (res.data.data.playProtocalType == 1) {
-              url = res.data.data.httpFlv
-            } else if (res.data.data.playProtocalType == 2) {
-              url = res.data.data.wssFlv
-            }
+            // var url = res.data.data.wsFlv
+            // if (res.data.data.playProtocalType == 1) {
+            //   url = res.data.data.httpFlv
+            // } else if (res.data.data.playProtocalType == 2) {
+            //   url = res.data.data.wssFlv
+            // }
+              // var url = res.data.data.httpsHls
+              var url = res.data.data.httpsFmp4
+              // var url = res.data.data.wsFlv
             this.setPlayUrl(url, idxTmp)
 
             this.setStreamId(res.data.data.streamId, idxTmp)
@@ -1317,13 +1320,13 @@ export default {
     },
 
     setPlayUrl(url, idx) {
-      if (this.videoUrl.indexOf(url) > -1 && idx >= 1) {
-        this.$message({
-          message: '请选择不同的设备',
-          type: 'warning'
-        })
-        this.playerIdx = idx
-      } else {
+      // if (this.videoUrl.indexOf(url) > -1 && idx >= 1) {
+      //   this.$message({
+      //     message: '请选择不同的设备',
+      //     type: 'warning'
+      //   })
+      //   this.playerIdx = idx
+      // } else {
         console.log(11111111, idx)
         this.$set(this.videoUrl, idx, url)
         this.isLoading[idx] = false
@@ -1332,7 +1335,7 @@ export default {
           window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
         }, 100)
         this.showContent = true
-      }
+      // }
     },
     setStreamId(id, idx) {
       this.$set(this.flvStreamId, idx, id)
