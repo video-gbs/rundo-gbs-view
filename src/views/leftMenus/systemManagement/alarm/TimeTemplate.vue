@@ -122,8 +122,8 @@
       v-if="dialog.show"
       :title="dialog.title"
       :visible.sync="dialog.show"
-      width="950px"
-      top="100px"
+      width="960px"
+      top="30px"
       :before-close="handleClose"
       :close-on-click-modal="false"
     >
@@ -140,7 +140,11 @@
         :rules="rules"
         :model="dialog.params"
       >
-        <el-form-item label="模板名称" prop="templateName" class="time-template">
+        <el-form-item
+          label="模板名称"
+          prop="templateName"
+          class="time-template"
+        >
           <el-input
             class="item-input"
             v-model="dialog.params.templateName"
@@ -149,7 +153,7 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="配置预案开启时段"> </el-form-item>
+        <el-form-item label="配置预案开启时段" class="template-title" style="width: 125px"> </el-form-item>
 
         <div class="timeSlider-container">
           <div
@@ -216,6 +220,7 @@
         >
       </span>
     </el-dialog>
+    <!-- <TimeTest /> -->
   </div>
 </template>
 
@@ -230,13 +235,19 @@ import pagination from '@/components/Pagination/index.vue'
 import '../../../../../static/js/timeSlider/timeSlider'
 import '../../../../../static/css/timeSlider.css'
 import '../../../../../static/css/normalize.css'
+import TimeTest from './components/TimeTest.vue'
 export default {
   name: '',
-  components: { pagination },
+  components: { pagination, TimeTest },
   data() {
     const checkName = (rule, value, cb) => {
       const regName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
-      if (value.length === 0) {
+      if (
+        value === '' ||
+        value === null ||
+        value === undefined ||
+        value.length === 0
+      ) {
         return cb(new Error('此为必填项。'))
       }
       setTimeout(() => {
@@ -252,7 +263,7 @@ export default {
       }, 500)
     }
     return {
-      isShow: true,
+      isShow: false,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -854,7 +865,7 @@ export default {
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
     .dataDictionary-table {
-      height: calc(100% - 100px);
+      max-height: calc(100% - 100px);
       overflow-y: auto;
       font-size: 14px;
       font-family: Microsoft YaHei-Regular, Microsoft YaHei;
@@ -1026,5 +1037,10 @@ export default {
 }
 .marginR {
   margin: 0 16px 16px 0;
+}
+.template-title{
+  margin-bottom: -8px !important;
+  margin-left: -15px;
+  margin-top: 24px;
 }
 </style>

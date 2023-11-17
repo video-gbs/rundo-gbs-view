@@ -12,7 +12,6 @@
 
     <script src="<%= BASE_URL %>jessibuca.js"></script>
     <script src="<%= BASE_URL %>ZLMRTCClient.js"></script>
-    <script src="<%= BASE_URL %>EasyPlayer-lib.min.js"></script>
 
     <title><%= webpackConfig.name %></title>
   </head>
@@ -21,7 +20,9 @@
       <strong>We're sorry but <%= webpackConfig.name %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
 
-    <script src="<%= BASE_URL %>js/liveplayer-lib.min.js"></script>
+    <!-- <script src="<%= BASE_URL %>js/liveplayer-lib.min.js"></script> -->
+
+    <script src="<%= BASE_URL %>EasyPlayer-lib.min.js"></script>
     <div id="app"></div>
   </body>
 </html>

@@ -66,7 +66,7 @@
               </span>
 
               <span v-if="isSpanRequire[index]" class="span-require"
-                >此为必填项</span
+                >请选择入侵等级。</span
               >
             </el-form-item>
             <el-form-item label="间隔时间(秒)" prop="eventInterval">
@@ -106,10 +106,12 @@
                 v-model="stepform3[index].videoLength"
                 style="width: 288px"
               >
-                <el-option label="0" :value="0"></el-option>
+                <!-- <el-option label="0" :value="0"></el-option> -->
                 <el-option label="15" :value="15"></el-option>
                 <el-option label="30" :value="30"></el-option>
                 <el-option label="60" :value="60"></el-option>
+                <el-option label="直到事件结束" :value="0"></el-option>
+
               </el-select>
             </el-form-item>
             <el-form-item
@@ -159,7 +161,7 @@
         </el-checkbox-group>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialog.show = false">取 消</el-button>
+        <el-button @click="handleCancel">取 消</el-button>
         <el-button type="primary" @click="dialog.show = false">确 定</el-button>
       </span>
     </el-dialog>
@@ -203,6 +205,8 @@ export default {
       form: {},
       allIncident: [],
       checkeLists: [],
+      selectLists: [],
+      editLists: [],
       inputVisible: false,
       inputValue: '',
       textStyle: {
@@ -216,7 +220,6 @@ export default {
         width: '3px',
         height: '18px'
       },
-      isHas: false,
       rules: {
         eventLevel: [
           {
@@ -232,7 +235,7 @@ export default {
         },
         eventInterval: {
           required: true,
-          message: '此为必填项。',
+          message: '请选择时间间隔。',
           trigger: 'change'
         }
       }
@@ -243,8 +246,6 @@ export default {
       this.initAlarmEventLists(val)
     },
     checkeLists(newValue) {
-      console.log('newValue', newValue)
-      console.log('newValue1', newValue)
       let resStepform3 = []
       let resStepform3Obj = {
         eventCode: {},
@@ -269,7 +270,6 @@ export default {
             this.isSpanRequire.push(false)
           }
         }
-        console.log('this.isSpanRequire', this.isSpanRequire)
         this.stepform3 = this.stepform3.concat(resStepform3)
       } else {
       }
@@ -278,6 +278,7 @@ export default {
   },
   created() {
     if (Object.keys(Local.get('detailsData')).length > 0) {
+      // this.checkeLists = []
       let params = {}
       let params1 = {}
       Local.get('detailsData').alarmSchemeEventRelList.map((item) => {
@@ -299,13 +300,12 @@ export default {
           eventCode: item.eventCode
         }
         this.checkeLists.push(params1)
+        this.editLists.push(params1)
 
         this.stepform3.push({ isactive: item.eventLevel, ...params })
         this.intrusionLevel.push(['轻微', '中等', '严重', '非常严重'])
         this.$forceUpdate()
       })
-
-      console.log('this.checkeLists', this.checkeLists, this.stepform3)
     }
   },
   mounted() {
@@ -316,16 +316,16 @@ export default {
       await getAlarmEventLists1({ eventName: val })
         .then((res) => {
           if (res.data.code === 0) {
-            this.allIncident = res.data.data
-            // let resParams = {}
-            // res.data.data.map((item) => {
-            //     resParams = {
-            //       eventCode: item.eventCode,
-            //       eventName: item.eventName
-            //     }
+            // this.allIncident = res.data.data
+            let resParams = {}
+            res.data.data.map((item) => {
+              resParams = {
+                eventCode: item.eventCode,
+                eventName: item.eventName
+              }
 
-            //     this.allIncident.push(resParams)
-            //   })
+              this.allIncident.push(resParams)
+            })
           }
         })
         .catch((error) => {
@@ -340,13 +340,33 @@ export default {
       return obj1
     },
     testChange(val) {
-      console.log(val)
-      // this.checkeLists=[]
+      this.selectLists = []
+      if (Object.keys(Local.get('detailsData')).length > 0) {
+        // let newItems = this.checkeLists.filter(item => !val.find(item2 => item2.eventCode === item.eventCode))
+        let newArray = val.filter((item1) => {
+          return !this.editLists.find(
+            (item2) => item2.eventCode === item1.eventCode
+          )
+        })
+        this.selectLists = newArray
+      } else {
+        this.selectLists = val
+      }
       this.checkeLists = this.removeDuplicates(val)
+    },
+    handleCancel() {
+      // if (Object.keys(Local.get('detailsData')).length > 0) {
+      // } else {
+      this.checkeLists = this.checkeLists.filter(
+        (item) =>
+          !this.selectLists.some((item2) => item2.eventCode === item.eventCode)
+      )
+      // }
+      this.dialog.show = false
     },
 
     removeDuplicates(arr) {
-      this.checkeLists = []
+      // this.checkeLists = []
       var idSet = {}
       var result = []
 
@@ -368,7 +388,6 @@ export default {
           }
         }
       }
-      console.log('resultresultresultresultresultresultresult', result)
       return result
     },
 
@@ -378,12 +397,12 @@ export default {
       if (Object.keys(Local.get('detailsData')).length > 0) {
         this.$nextTick(() => {
           const myDiv = document.getElementsByClassName('allIncident-checkbox')
-
+          console.log('this.checkeLists', this.checkeLists)
           this.allIncident.forEach((item1, index) => {
             this.checkeLists.map((item) => {
               if (item.eventCode === item1.eventCode) {
-                this.checkeLists = []
-                this.checkeLists.push(item1)
+                // this.checkeLists = []
+                // this.checkeLists.push(item1)
                 myDiv[index].classList.add('is-checked')
                 myDiv[index].firstChild.classList.add('is-checked')
               }
@@ -426,7 +445,6 @@ export default {
       this.$emit('goback')
     },
     submitStep3() {
-      console.log('this.$refs', this.$refs, this.checkeLists)
       if (this.$refs.stepForm) {
         const alarmSchemeEventReqList = []
 
@@ -454,54 +472,37 @@ export default {
           alarmSchemeEventReqList.push(params)
         })
 
-        this.checkeLists.map((item1, i) => {
-          console.log('this.stepform3~~~~~~~~~~', this.stepform3[i].isactive)
-          if (
-            item1.isactive === '' ||
-            item1.isactive === null ||
-            item1.isactive === undefined
-          ) {
-            this.isSpanRequire[i] = true
-
-            console.log('this.isSpanRequire~~~~~~~~~~~~', this.isSpanRequire)
-
-            this.$forceUpdate()
-          }
-          if (
-            this.stepform3[i].isactive !== '' &&
-            this.stepform3[i].isactive !== null &&
-            this.stepform3[i].isactive !== undefined
-          ) {
-            // this.$refs.stepForm[i].resetFields()
-
-            this.isHas = true
-          } else {
-            this.isHas = true
-
-            // this.isSpanRequire[i] = false
-            // this.isSpanRequire = false
-
-            // this.$refs.stepForm[i].resetFields()
-            this.$refs.stepForm[i].validate((valid) => {
-              if (valid) {
-                console.log('stepform3~~~~~~~~', stepform3)
-                // this.isHas = true
-
-                this.$emit('submitStep')
-              }
-            })
-          }
-        })
-
         const uniqueArr = alarmSchemeEventReqList.filter(
           (item3, index) =>
             alarmSchemeEventReqList.findIndex(
               (i) => i.eventCode === item3.eventCode
             ) === index
         )
-        if (this.isHas) {
-          this.$emit('stepParams3', uniqueArr)
-        }
+        let resValidate = []
+
+        this.checkeLists.map((item1, i) => {
+          if (
+            this.stepform3[i].isactive === '' ||
+            this.stepform3[i].isactive === null ||
+            this.stepform3[i].isactive === undefined
+          ) {
+            this.isSpanRequire[i] = true
+            this.$forceUpdate()
+          } else {
+            this.isSpanRequire[i] = false
+            this.$forceUpdate()
+          }
+
+          resValidate.push(this.$refs.stepForm[i].validate())
+        })
+        Promise.all(resValidate).then(() => {
+          if (this.isSpanRequire.every((item) => !item)) {
+            this.$emit('submitStep')
+
+            this.$emit('stepParams3', uniqueArr)
+          } else {
+          }
+        })
       } else {
         this.$message({
           message: '请选择告警事件',

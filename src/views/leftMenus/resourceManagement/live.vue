@@ -134,7 +134,7 @@
                 >
                   <div v-if="!videoUrl[i - 1]" class="empty-player"></div>
                   <div v-else class="player-box" ref="videoBox">
-                    <player
+                    <!-- <player
                       :ref="'player' + i"
                       :videoUrl="videoUrl[i - 1]"
                       :flvStreamId="flvStreamId[i - 1]"
@@ -156,11 +156,12 @@
                       :playerIdx="playerIdx"
                       @showPlayerBoxMini="showPlayerBoxMini"
                       @videoClick="videoClick"
-                    ></player>
-                    <!-- <EasyPlayer
+                      @playerToolValue="playerToolValue"
+                    ></player> -->
+                    <EasyPlayer
                       :ref="'player' + i"
                       :videoUrl="videoUrl[i - 1]"
-                    /> -->
+                    />
                     <div ref="rectArea" class="rect"></div>
 
                     <div
@@ -495,7 +496,8 @@ export default {
       isMouseHover: false,
       isHoverNum: 0,
       cloudId: null,
-      childOptionLists: []
+      childOptionLists: [],
+      resPlayerToolValue: []
     }
   },
   mounted() {
@@ -1263,12 +1265,15 @@ export default {
               this.playerIdx++
             }
 
-            var url = res.data.data.httpsHls
+            // var url = res.data.data.wsFlv
             // if (res.data.data.playProtocalType == 1) {
             //   url = res.data.data.httpFlv
             // } else if (res.data.data.playProtocalType == 2) {
             //   url = res.data.data.wssFlv
             // }
+              // var url = res.data.data.httpsHls
+              var url = res.data.data.httpsFmp4
+              // var url = res.data.data.wsFlv
             this.setPlayUrl(url, idxTmp)
 
             this.setStreamId(res.data.data.streamId, idxTmp)
@@ -1315,13 +1320,13 @@ export default {
     },
 
     setPlayUrl(url, idx) {
-      if (this.videoUrl.indexOf(url) > -1 && idx >= 1) {
-        this.$message({
-          message: '请选择不同的设备',
-          type: 'warning'
-        })
-        this.playerIdx = idx
-      } else {
+      // if (this.videoUrl.indexOf(url) > -1 && idx >= 1) {
+      //   this.$message({
+      //     message: '请选择不同的设备',
+      //     type: 'warning'
+      //   })
+      //   this.playerIdx = idx
+      // } else {
         console.log(11111111, idx)
         this.$set(this.videoUrl, idx, url)
         this.isLoading[idx] = false
@@ -1330,7 +1335,7 @@ export default {
           window.localStorage.setItem('videoUrl', JSON.stringify(this.videoUrl))
         }, 100)
         this.showContent = true
-      }
+      // }
     },
     setStreamId(id, idx) {
       this.$set(this.flvStreamId, idx, id)
@@ -1406,28 +1411,45 @@ export default {
       this.playerIdx = i - 1
       this.rectAreaNum = i - 1
     },
+    playerToolValue(index, val) {
+      this.resPlayerToolValue[index] = val
+      console.log('this.resPlayerToolValue', index, this.resPlayerToolValue)
+    },
     // 放大缩小视频容器
     toogleVideo(i) {
       // console.log('双击',i)
-      const directionControlDom = document.getElementsByClassName(
-        'playtoolDirectionControl'
-      )
-        ? document.getElementsByClassName('playtoolDirectionControl')
-        : []
+      this.$nextTick(() => {
+        const directionControlDom = document.getElementsByClassName(
+          'playtoolDirectionControl'
+        )
+          ? document.getElementsByClassName('playtoolDirectionControl')
+          : []
 
-      if (this.fullPlayerIdx === -1) {
-        directionControlDom.forEach((item, index) => {
-          if (index !== i - 1) {
-            item.style.display = 'none'
+        if (this.fullPlayerIdx === -1) {
+          if (directionControlDom.length > 0) {
+            // directionControlDom.map((item, index) => {
+            //   console.log('item~~~~~~~~', item)
+            //   if (index !== i - 1) {
+            //     item.style.display = 'none'
+            //   }
+            // })
+            for (let k = 0; k < directionControlDom.length; k++) {
+              if (k !== i - 1) {
+                directionControlDom[k].style.display = 'none'
+              }
+            }
           }
-        })
-        this.fullPlayerIdx = i
-      } else {
-        directionControlDom.forEach((item, index) => {
-          item.style.display = 'block'
-        })
-        this.fullPlayerIdx = -1
-      }
+
+          this.fullPlayerIdx = i
+        } else {
+          for (let j = 0; j < directionControlDom.length; j++) {
+            if (this.resPlayerToolValue[j]) {
+              directionControlDom[j].style.display = 'block'
+            }
+          }
+          this.fullPlayerIdx = -1
+        }
+      })
     },
     // 点击分屏
     clickSpilt(item, i) {
@@ -1483,7 +1505,7 @@ export default {
 //   position: absolute;
 //   border: 1px dashed #000;
 // }
- //隐藏视频的载入动画
+//隐藏视频的载入动画
 ::v-deep .easy-player-loading {
   display: none !important;
 }

@@ -129,7 +129,7 @@
               />
               <el-table-column
                 prop="schemeName"
-                label="预案名称"
+                label="已关联预案"
                 :show-overflow-tooltip="true"
               />
               <!-- <el-table-column prop="schemeName" label="预案名称" width="100">
@@ -410,8 +410,21 @@ export default {
       this.selectedData.map((item) => {
         this.resIds2.push(item.channelId)
       })
-      this.$emit('stepParams2', this.resIds2)
-      this.$emit('next')
+      if (this.resIds2.length === 0) {
+        this.$confirm('没有勾选通道,是否继续下一步？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$emit('stepParams2', this.resIds2)
+          this.$emit('next')
+        })
+      } else {
+        this.$emit('stepParams2', this.resIds2)
+        this.$emit('next')
+      }
+      // this.$emit('stepParams2', this.resIds2)
+      // this.$emit('next')
     },
     goback() {
       this.$emit('goback')
@@ -675,7 +688,7 @@ export default {
       }
     }
     .encoder-table {
-      height: calc(100% - 145px);
+      max-height: calc(100% - 145px);
       overflow-y: auto;
     }
   }
