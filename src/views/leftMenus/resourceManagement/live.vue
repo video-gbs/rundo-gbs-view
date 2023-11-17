@@ -156,6 +156,7 @@
                       :playerIdx="playerIdx"
                       @showPlayerBoxMini="showPlayerBoxMini"
                       @videoClick="videoClick"
+                      @playerToolValue="playerToolValue"
                     ></player>
                     <!-- <EasyPlayer
                       :ref="'player' + i"
@@ -495,7 +496,8 @@ export default {
       isMouseHover: false,
       isHoverNum: 0,
       cloudId: null,
-      childOptionLists: []
+      childOptionLists: [],
+      resPlayerToolValue: []
     }
   },
   mounted() {
@@ -1406,28 +1408,45 @@ export default {
       this.playerIdx = i - 1
       this.rectAreaNum = i - 1
     },
+    playerToolValue(index, val) {
+      this.resPlayerToolValue[index] = val
+      console.log('this.resPlayerToolValue', index, this.resPlayerToolValue)
+    },
     // 放大缩小视频容器
     toogleVideo(i) {
       // console.log('双击',i)
-      const directionControlDom = document.getElementsByClassName(
-        'playtoolDirectionControl'
-      )
-        ? document.getElementsByClassName('playtoolDirectionControl')
-        : []
+      this.$nextTick(() => {
+        const directionControlDom = document.getElementsByClassName(
+          'playtoolDirectionControl'
+        )
+          ? document.getElementsByClassName('playtoolDirectionControl')
+          : []
 
-      if (this.fullPlayerIdx === -1) {
-        directionControlDom.forEach((item, index) => {
-          if (index !== i - 1) {
-            item.style.display = 'none'
+        if (this.fullPlayerIdx === -1) {
+          if (directionControlDom.length > 0) {
+            // directionControlDom.map((item, index) => {
+            //   console.log('item~~~~~~~~', item)
+            //   if (index !== i - 1) {
+            //     item.style.display = 'none'
+            //   }
+            // })
+            for (let k = 0; k < directionControlDom.length; k++) {
+              if (k !== i - 1) {
+                directionControlDom[k].style.display = 'none'
+              }
+            }
           }
-        })
-        this.fullPlayerIdx = i
-      } else {
-        directionControlDom.forEach((item, index) => {
-          item.style.display = 'block'
-        })
-        this.fullPlayerIdx = -1
-      }
+
+          this.fullPlayerIdx = i
+        } else {
+          for (let j = 0; j < directionControlDom.length; j++) {
+            if (this.resPlayerToolValue[j]) {
+              directionControlDom[j].style.display = 'block'
+            }
+          }
+          this.fullPlayerIdx = -1
+        }
+      })
     },
     // 点击分屏
     clickSpilt(item, i) {
@@ -1483,7 +1502,7 @@ export default {
 //   position: absolute;
 //   border: 1px dashed #000;
 // }
- //隐藏视频的载入动画
+//隐藏视频的载入动画
 ::v-deep .easy-player-loading {
   display: none !important;
 }
