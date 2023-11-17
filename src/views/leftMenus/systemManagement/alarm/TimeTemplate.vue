@@ -1031,6 +1031,9 @@ export default {
 ::v-deep div {
   box-sizing: unset;
 }
+.editWrap{
+  display: none;
+}
 .dialogRelation {
   display: flex;
   flex-wrap: wrap;
