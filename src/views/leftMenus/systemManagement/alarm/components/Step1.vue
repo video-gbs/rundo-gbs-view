@@ -60,14 +60,11 @@
       v-if="dialog.show"
       :title="dialog.title"
       :visible.sync="dialog.show"
-      width="950px"
+      width="960px"
+      top="30px"
       :before-close="handleClose"
     >
-      <el-form
-        :model="dialog.params"
-        ref="accountForm"
-        style="overflow-x: auto"
-      >
+      <el-form :model="dialog.params" ref="accountForm">
         <el-form-item
           label="模板名称"
           :rules="[
@@ -78,6 +75,7 @@
             class="item-input"
             v-model="dialog.params.templateName"
             :disabled="true"
+            style="width: 340px"
           ></el-input>
         </el-form-item>
 
@@ -586,6 +584,7 @@ export default {
 <style lang="scss" scoped>
 ::v-deep div {
   box-sizing: unset;
+  cursor: not-allowed;
 }
 .step1-content {
   height: calc(100% - 50px);

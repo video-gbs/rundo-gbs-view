@@ -1271,6 +1271,8 @@ export default {
             } else if (res.data.data.playProtocalType == 2) {
               url = res.data.data.wssFlv
             }
+              // var url = res.data.data.httpsHls
+              // var url = res.data.data.httpsFmp4
             this.setPlayUrl(url, idxTmp)
 
             this.setStreamId(res.data.data.streamId, idxTmp)
