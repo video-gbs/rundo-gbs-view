@@ -234,6 +234,8 @@ export default {
     handleOpenControl(i) {
       this.$emit('videoClick', i + 1)
       this.showControl = !this.showControl
+
+      this.$emit('playerToolValue', i,this.showControl)
       this.showContentList = Local.get('videoUrl')
     },
     createVideo() {
