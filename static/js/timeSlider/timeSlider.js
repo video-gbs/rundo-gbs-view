@@ -190,8 +190,8 @@ import _ from 'lodash'
       self.minBlockTime = parseInt(options.minBlockTime) || self.minBlockTime;
       var mountedElement = document.getElementById(self.mountedId);
 
-      console.log('optionsoptionsoptionsoptions', options)
-      console.log('thithi', this)
+      // console.log('optionsoptionsoptionsoptions', options)
+      // console.log('thithi', this)
 
 
       var wrapperDiv = document.createElement("div");
@@ -866,7 +866,7 @@ time2[1]为结束时间
 
   var popUpBoxDom;
 
-  function createPopUpBox() {
+  function createPopUpBox(context) {
     /* 利用_.template 模板引擎来渲染 */
     var popUpBoxString = '\
                <div class="modal" style="z-index: 9999;" id="modalDiv" data-number="">\
@@ -941,6 +941,9 @@ time2[1]为结束时间
     popUpBoxString = _.template(popUpBoxString);
     popUpBoxDom = createDOMFromString(popUpBoxString(obj));
     document.body.appendChild(popUpBoxDom);
+    // var self = this;
+    // console.log('contextcontext',context,self)
+    // document.getElementsByClassName('timeSliderDiv')[].appendChild(popUpBoxDom)
 
 
     /*绑定事件*/
