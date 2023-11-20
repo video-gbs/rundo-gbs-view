@@ -145,7 +145,7 @@
 }
 
 .modal-dialog:after {
-  content: "";
+  /* content: "";
   position: absolute;
   bottom: -9px;
   left: 50px;
@@ -154,7 +154,7 @@
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-top: 10px solid #fff;
-  transform: translateX(-50%);
+  transform: translateX(-50%); */
 }
 
 .modal-content {
