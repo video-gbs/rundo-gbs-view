@@ -111,7 +111,6 @@
                 <el-option label="30" :value="30"></el-option>
                 <el-option label="60" :value="60"></el-option>
                 <el-option label="直到事件结束" :value="0"></el-option>
-
               </el-select>
             </el-form-item>
             <el-form-item
@@ -162,7 +161,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleCancel">取 消</el-button>
-        <el-button type="primary" @click="dialog.show = false">确 定</el-button>
+        <el-button type="primary" @click="firmCommit">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -341,17 +340,17 @@ export default {
     },
     testChange(val) {
       this.selectLists = []
-      if (Object.keys(Local.get('detailsData')).length > 0) {
-        // let newItems = this.checkeLists.filter(item => !val.find(item2 => item2.eventCode === item.eventCode))
-        let newArray = val.filter((item1) => {
-          return !this.editLists.find(
-            (item2) => item2.eventCode === item1.eventCode
-          )
-        })
-        this.selectLists = newArray
-      } else {
-        this.selectLists = val
-      }
+      // if (Object.keys(Local.get('detailsData')).length > 0) {
+      // let newItems = this.checkeLists.filter(item => !val.find(item2 => item2.eventCode === item.eventCode))
+      let newArray = val.filter((item1) => {
+        return !this.editLists.find(
+          (item2) => item2.eventCode === item1.eventCode
+        )
+      })
+      this.selectLists = newArray
+      // } else {
+      //   this.selectLists = val
+      // }
       this.checkeLists = this.removeDuplicates(val)
     },
     handleCancel() {
@@ -362,6 +361,11 @@ export default {
           !this.selectLists.some((item2) => item2.eventCode === item.eventCode)
       )
       // }
+      this.dialog.show = false
+    },
+    firmCommit() {
+      this.editLists = []
+      this.editLists = this.checkeLists
       this.dialog.show = false
     },
 
