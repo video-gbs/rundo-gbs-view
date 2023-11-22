@@ -134,7 +134,7 @@
       :title="dialog.title"
       :visible.sync="dialog.show"
       width="720px"
-      :before-close="handleClose1"
+      :before-close="handleCancel"
     >
       <el-input
         placeholder="请输入搜索关键字"
@@ -148,7 +148,7 @@
         <el-checkbox-group
           v-model="checkeLists"
           class="allIncident-checkbox-group"
-          @change="testChange"
+          @change="checkedListedChange"
         >
           <el-checkbox
             v-for="incident in allIncident"
@@ -202,8 +202,10 @@ export default {
       filterText: '',
       intrusionLevel: [],
       form: {},
+      lastSelection: false,
       allIncident: [],
       checkeLists: [],
+      resCheckeLists: [],
       selectLists: [],
       editLists: [],
       inputVisible: false,
@@ -300,6 +302,7 @@ export default {
         }
         this.checkeLists.push(params1)
         this.editLists.push(params1)
+        this.resCheckeLists.push(params1)
 
         this.stepform3.push({ isactive: item.eventLevel, ...params })
         this.intrusionLevel.push(['轻微', '中等', '严重', '非常严重'])
@@ -338,35 +341,58 @@ export default {
       }
       return obj1
     },
-    testChange(val) {
+    checkedListedChange(val) {
+      console.log('val````````````````', val)
+      console.log('this.checkeLists````````````````', this.checkeLists)
+      console.log('this.resCheckeLists````````````````', this.resCheckeLists)
+      if (this.resCheckeLists.length > val.length) {
+        this.lastSelection = true
+      }
       this.selectLists = []
-      // if (Object.keys(Local.get('detailsData')).length > 0) {
-      // let newItems = this.checkeLists.filter(item => !val.find(item2 => item2.eventCode === item.eventCode))
       let newArray = val.filter((item1) => {
         return !this.editLists.find(
           (item2) => item2.eventCode === item1.eventCode
         )
       })
       this.selectLists = newArray
-      // } else {
-      //   this.selectLists = val
-      // }
       this.checkeLists = this.removeDuplicates(val)
     },
     handleCancel() {
       // if (Object.keys(Local.get('detailsData')).length > 0) {
       // } else {
-      this.checkeLists = this.checkeLists.filter(
-        (item) =>
-          !this.selectLists.some((item2) => item2.eventCode === item.eventCode)
-      )
+      console.log('this.checkeLists', this.checkeLists)
+      console.log('this.selectLists~~~~~~~~', this.selectLists)
+      if (!this.lastSelection) {
+        this.checkeLists = this.checkeLists.filter(
+          (item) =>
+            !this.selectLists.some(
+              (item2) => item2.eventCode === item.eventCode
+            )
+        )
+      } else {
+        this.checkeLists = this.resCheckeLists
+      }
       // }
       this.dialog.show = false
+      this.lastSelection = false
     },
+
+    // handleClose1() {
+
+    //   this.dialog.show = false
+    // },
     firmCommit() {
+      // if (Object.keys(Local.get('detailsData')).length > 0) {
+      // } else {
+
+      // }
       this.editLists = []
       this.editLists = this.checkeLists
+      this.selectLists = []
+      this.resCheckeLists = this.checkeLists
+
       this.dialog.show = false
+      this.lastSelection = false
     },
 
     removeDuplicates(arr) {
@@ -418,9 +444,6 @@ export default {
     },
     handleClose(tag) {
       this.checkeLists.splice(this.checkeLists.indexOf(tag), 1)
-    },
-    handleClose1() {
-      this.dialog.show = false
     },
 
     showInput() {
