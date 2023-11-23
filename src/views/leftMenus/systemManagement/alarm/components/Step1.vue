@@ -1,14 +1,14 @@
 <template>
   <div class="step1-content">
-    <!-- <div class="step-table-list"> -->
+    <!-- @selection-change="handleSelectChange" -->
     <el-table
       ref="timeTemTable"
       :data="tableData"
       class="dataDictionary-table"
       border
       row-key="id"
-      @selection-change="handleSelectChange"
       @select="handleSelect"
+      @select-all="handleSelectAll"
       :header-cell-style="{
         background: 'rgba(0, 75, 173, 0.06)',
         fontSize: '14px',
@@ -60,14 +60,11 @@
       v-if="dialog.show"
       :title="dialog.title"
       :visible.sync="dialog.show"
-      width="950px"
+      width="960px"
+      top="30px"
       :before-close="handleClose"
     >
-      <el-form
-        :model="dialog.params"
-        ref="accountForm"
-        style="overflow-x: auto"
-      >
+      <el-form :model="dialog.params" ref="accountForm">
         <el-form-item
           label="模板名称"
           :rules="[
@@ -78,6 +75,7 @@
             class="item-input"
             v-model="dialog.params.templateName"
             :disabled="true"
+            style="width: 340px"
           ></el-input>
         </el-form-item>
 
@@ -161,7 +159,6 @@ export default {
       tableData: [],
       selectedObj: {},
       selectedData: [],
-      allList: [],
       resIds: '',
       params: {
         pageNum: 1,
@@ -187,7 +184,9 @@ export default {
         timeS7: null
       },
       timeMergeList: [],
-      editId: ''
+      editId: '',
+      resData: [],
+      select: false
     }
   },
   created() {},
@@ -207,19 +206,19 @@ export default {
             this.params.total = res.data.data.total
             this.params.pages = res.data.data.pages
             this.params.current = res.data.data.pageSize
+
             this.tableData.map((item) => {
               if (
                 Local.get('detailsData') &&
                 Local.get('detailsData').templateId === item.id
               ) {
+                this.resData = [item]
+                if (!this.select) {
+                  this.selectedObj[item.id] = item
+                }
                 this.$refs.timeTemTable.toggleRowSelection(item)
                 this.$forceUpdate()
               }
-              this.allList.forEach((item1) => {
-                if (item.id === item1) {
-                  this.selectedObj[item1] = item
-                }
-              })
             })
             this.handleRowSelection(this.tableData)
           }
@@ -244,39 +243,58 @@ export default {
         }
       })
     },
-    handleSelectChange(selection) {
-      // 全选取消，删除当前页所有数据
-      if (selection.length === 0) {
-        this.tableData.forEach((item) => {
-          delete this.selectedObj[item.id]
-        })
-        this.tableData.forEach((item) => {
-          // console.log('~~~~~~~~~~~~~~', item)
-          this.allList = this.allList.filter((item1) => {
-            return item1 !== item.id
-          })
-        })
-      }
-      // 勾选数据 添加
-      selection.forEach((item) => {
-        this.selectedObj[item.id] = item
-      })
-      // 获取所有分页勾选的数据
-      this.selectedData = []
-      for (const key in this.selectedObj) {
-        this.selectedData.push(this.selectedObj[key])
-      }
-    },
+
+    // handleSelectChange(selection) {
+    //   console.log('selectionselection~~~~~~~~~~', selection)
+
+    //   // // 勾选数据 添加
+
+    //   this.selectedObj = {}
+
+    //   selection.forEach((item) => {
+    //     this.selectedObj[item.id] = item
+    //   })
+
+    //   console.log('this.selectedObj~~~~~~~~~~', this.selectedObj)
+    //   // 获取所有分页勾选的数据
+
+    //   for (const key in this.selectedObj) {
+    //     this.selectedData = [this.selectedObj[key]]
+    //   }
+    //   console.log('this.this.selectedData~~~~~~~~~~', this.selectedData)
+    // },
 
     handleSelect(selection, row) {
+      this.select = true
+      // console.log('selectionselection2222222', selection, row)
       // 取消单个勾选时，删除对应属性
       if (!selection.some((item) => item.id === row.id)) {
         delete this.selectedObj[row.id]
-        this.allList = this.allList.filter((item1) => {
-          return item1 !== row.id
+        this.resData = []
+      }
+      if (selection.length > 0) {
+        this.resData = [selection[selection.length - 1]] || []
+        this.selectedObj = {}
+        // console.log('this.resData', this.resData)
+        this.resData.forEach((item) => {
+          this.selectedObj[item.id] = item
         })
-      } else {
-        this.allList.push(row.id)
+
+        // 清除 所有勾选项
+        this.$refs.timeTemTable.clearSelection()
+
+        this.$refs.timeTemTable.toggleRowSelection(row, true)
+      }
+      // console.log('selectedObj', this.selectedObj)
+    },
+    handleSelectAll(selection) {
+      this.select = true
+      // 取消全选，因为我们只允许单选
+      this.$refs.timeTemTable.clearSelection()
+      // 设置第一个选中的行为选中状态
+      if (selection.length > 0) {
+        this.$refs.timeTemTable.toggleRowSelection(selection[0], true)
+        this.resData = [selection[0]]
       }
     },
     // 处理当前列表选中状态
@@ -450,20 +468,23 @@ export default {
     },
     clickNext() {
       this.resIds = ''
-      if (this.selectedData.length > 1) {
-        this.$message({
-          type: 'warning',
-          message: '模板只能选择一个'
+      console.log('this.resData~~~~~~~~~~~', this.resData)
+      this.resData.map((item) => {
+        this.resIds = item.id
+      })
+      if (this.resIds === '') {
+        this.$confirm('没有勾选模板,是否继续下一步？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$emit('saveAll', this.resIds)
         })
       } else {
-        this.selectedData.map((item) => {
-          this.resIds = item.id
-        })
-
         this.$emit('saveAll', this.resIds)
       }
 
-      // this.$emit('next')
+      console.log('this.resIds', this.resIds)
     },
     goback() {
       this.$emit('goback')
@@ -563,10 +584,11 @@ export default {
 <style lang="scss" scoped>
 ::v-deep div {
   box-sizing: unset;
+  cursor: not-allowed;
 }
-// .step-table-list {
-// margin: 20px;
-// background: #ffffff;
+.step1-content {
+  height: calc(100% - 50px);
+}
 .dataDictionary-table {
   height: calc(100% - 100px);
   width: calc(100% - 40px) !important;

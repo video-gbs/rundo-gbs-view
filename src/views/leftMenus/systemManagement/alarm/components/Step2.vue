@@ -129,7 +129,7 @@
               />
               <el-table-column
                 prop="schemeName"
-                label="预案名称"
+                label="已关联预案"
                 :show-overflow-tooltip="true"
               />
               <!-- <el-table-column prop="schemeName" label="预案名称" width="100">
@@ -259,10 +259,13 @@ export default {
       allList: [],
       areaNames: 'resourceName',
       dialogResourceValue: '',
-      resId: ''
+      resId: '',
+      priChannelIds: []
     }
   },
-  created() {},
+  created() {
+    this.priChannelIds = Local.get('priChannelIds') || []
+  },
   mounted() {
     this.initTree()
   },
@@ -282,12 +285,27 @@ export default {
         })
     },
     async initList(id) {
+      let params = {}
+      if (this.priChannelIds.length > 0) {
+        params = {
+          num: this.params.pageSize,
+          page: this.params.pageNum,
+          priChannelIds: this.priChannelIds,
+          videoAreaId: id,
+          includeEquipment: this.includeEquipment ? 1 : 0,
+          ...this.searchParams
+        }
+      } else {
+        params = {
+          num: this.params.pageSize,
+          page: this.params.pageNum,
+          videoAreaId: id,
+          includeEquipment: this.includeEquipment ? 1 : 0,
+          ...this.searchParams
+        }
+      }
       await getAlarmSchemeChannel({
-        num: this.params.pageSize,
-        page: this.params.pageNum,
-        videoAreaId: id,
-        includeEquipment: this.includeEquipment ? 1 : 0,
-        ...this.searchParams
+        ...params
       })
         .then((res) => {
           if (res.data.code === 0) {
@@ -392,8 +410,21 @@ export default {
       this.selectedData.map((item) => {
         this.resIds2.push(item.channelId)
       })
-      this.$emit('stepParams2', this.resIds2)
-      this.$emit('next')
+      if (this.resIds2.length === 0) {
+        this.$confirm('没有勾选通道,是否继续下一步？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$emit('stepParams2', this.resIds2)
+          this.$emit('next')
+        })
+      } else {
+        this.$emit('stepParams2', this.resIds2)
+        this.$emit('next')
+      }
+      // this.$emit('stepParams2', this.resIds2)
+      // this.$emit('next')
     },
     goback() {
       this.$emit('goback')
@@ -414,15 +445,15 @@ export default {
       })
     },
     changeOrganization() {
-      this.initList()
+      this.initList(this.resId)
     },
     sizeChange(pageSize) {
       this.params.pageSize = pageSize
-      this.initList()
+      this.initList(this.resId)
     },
     currentChange(proCount) {
       this.params.proCount = proCount
-      this.initList()
+      this.initList(this.resId)
     },
     deploymentData() {
       this.dialogShow1 = true
@@ -657,7 +688,7 @@ export default {
       }
     }
     .encoder-table {
-      height: calc(100% - 145px);
+      max-height: calc(100% - 145px);
       overflow-y: auto;
     }
   }

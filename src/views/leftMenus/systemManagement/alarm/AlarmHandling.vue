@@ -25,12 +25,13 @@
               default-expand-all
               :default-expanded-keys="['根节点']"
               :expand-on-click-node="false"
+              :current-node-key="resCurrentKey"
               node-key="id"
               highlight-current
               @node-click="handleNodeClick"
               :filter-node-method="filterNode"
             >
-              <span slot-scope="{ data }" class="custom-tree-node">
+              <span slot-scope="{ node, data }" class="custom-tree-node">
                 <span>
                   <svg-icon
                     v-if="data.resourceType === 1"
@@ -61,7 +62,7 @@
             >
               <el-form-item label="告警类型:">
                 <el-select
-                  v-model="searchParams.eventCode"
+                  v-model="searchParams.alarmDesc"
                   class="mr10"
                   clearable
                   placeholder="请选择"
@@ -69,8 +70,8 @@
                   <el-option
                     v-for="obj in allIncident"
                     :key="obj.id"
-                    :label="obj.eventName"
-                    :value="obj.id"
+                    :label="obj"
+                    :value="obj"
                   />
                 </el-select>
               </el-form-item>
@@ -184,11 +185,15 @@
                 </template>
               </el-table-column>
               <el-table-column
-                prop="alarmType"
-                label="告警类型"
+                prop="alarmDesc"
+                label="告警描述"
                 width="100"
                 :show-overflow-tooltip="true"
-              />
+              >
+                <!-- <template slot-scope="scope">
+                  <span>{{ getStatusText(scope.row.alarmDesc) }}</span>
+                </template> -->
+              </el-table-column>
 
               <el-table-column
                 prop="alarmStartTime"
@@ -197,8 +202,15 @@
                 :show-overflow-tooltip="true"
               />
               <el-table-column
+                prop="imageState"
+                label="图片生成状态"
+                width="160"
+                :formatter="alarmImageStateStateFormatter"
+              >
+              </el-table-column>
+              <el-table-column
                 prop="videoState"
-                label="分段视频生成状态"
+                label="视频生成状态"
                 width="160"
                 :formatter="alarmVideoStateFormatter"
               >
@@ -214,16 +226,40 @@
                   </el-button>
 
                   <!-- @click="register(scope.row)" -->
-                  <el-button
+                  <!-- <el-button
                     type="text"
                     v-else-if="scope.row.videoState === -1"
                     @click="playAlarm(scope.row)"
                     >重新录制
-                  </el-button>
+                  </el-button> -->
                   <el-button
                     type="text"
-                    @click="downAlarm(scope.row, scope.$index)"
-                    >下载</el-button
+                    v-if="scope.row.videoState === 3"
+                    @click="down(scope.row, scope.$index, '视频')"
+                    >下载视频</el-button
+                  >
+                  <el-button type="text" v-if="scope.row.imageState === 3"
+                    ><a :href="scope.row.imageUrl" download target="_blank"
+                      >下载图片</a
+                    ></el-button
+                  >
+                  <el-button
+                    type="text"
+                    v-if="scope.row.imageState === 3"
+                    @click="handlePreView(scope.row)"
+                    ><span>预览图片</span></el-button
+                  >
+                  <el-button
+                    type="text"
+                    v-if="scope.row.imageState === -1"
+                    @click="alarmRecover(scope.row, 1)"
+                    >恢复图片</el-button
+                  >
+                  <el-button
+                    type="text"
+                    v-if="scope.row.videoState === -1"
+                    @click="alarmRecover(scope.row, 2)"
+                    >恢复视频</el-button
                   >
                   <el-button type="text" @click="deleteRole(scope.row)"
                     ><span class="delete-button">删除</span></el-button
@@ -240,13 +276,29 @@
         </div>
       </div>
     </div>
+    <div class="image__preview">
+      <el-dialog
+        title="正在预览图片"
+        :visible.sync="showImagePreview"
+        width="70%"
+        top="100px"
+        custom-class="formDialog"
+        style="text-align: left"
+      >
+        <el-image :src="url" :preview-src-list="srcList" style="margin: 0 auto">
+        </el-image>
+      </el-dialog>
+    </div>
+
     <div class="nowPlayVideo">
       <el-dialog
         title="正在播放视频"
         :visible.sync="playVideoVisible"
         width="70%"
+        top="100px"
         custom-class="formDialog"
         style="text-align: left"
+        :before-close="handleClose"
       >
         <player ref="videoPlayer" :videoUrl="videoUrl" autoplay live></player>
       </el-dialog>
@@ -259,7 +311,8 @@ import {
   getAlarmVideoAreaList,
   getAlarmMsg,
   deleteNorthAlarmEvent,
-  getAlarmEventLists
+  getAlarmEventLists,
+  getAlarmRecover
 } from '@/api/method/alarm'
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import pagination from '@/components/Pagination/index.vue'
@@ -274,12 +327,18 @@ export default {
   components: { pagination, leftTree, LineFont, player },
   data() {
     return {
+      showImagePreview: false,
+      srcList: [
+        'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+      ],
+      url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
       isShow: true,
       templateName: '',
       areaNames: 'resourceName',
       treeList: [],
       initData: [],
       tableLoading: false,
+      resCurrentKey: '',
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -323,7 +382,7 @@ export default {
         height: '18px'
       },
       searchParams: {
-        eventCode: '',
+        alarmDesc: '',
         time: ''
       },
       query: {},
@@ -340,7 +399,7 @@ export default {
       detailsId: [],
       playVideoVisible: false,
       videoUrl: '',
-      allIncident:[]
+      allIncident: []
     }
   },
   watch: {
@@ -363,6 +422,11 @@ export default {
           if (res.data.code === 0) {
             this.treeList = [res.data.data]
             this.initData = [res.data.data]
+            this.$nextTick(() => {
+              this.$refs.alarmTree.setCurrentKey(res.data.data.id)
+              this.resCurrentKey = res.data.data.id
+              this.$forceUpdate()
+            })
           }
         })
         .catch((error) => {
@@ -380,6 +444,27 @@ export default {
           console.log(error)
         })
     },
+    handleClose(done) {
+      this.videoUrl = ''
+      done()
+    },
+    handlePreView(row) {
+      // // this.currentImageUrl = row.imageUrl
+      // this.srcList = [require(`${row.imageUrl}`)]
+      this.srcList = []
+      this.srcList.push(row.imageUrl)
+      this.url = ''
+      this.url = row.imageUrl
+      this.showImagePreview = true
+      // window.open(row.imageUrl, '_blank')
+    },
+    closePreview() {
+      this.showImagePreview = false
+    },
+    getStatusText(status) {
+      const option = this.allIncident.find((option) => option === status)
+      return option ? option : ''
+    },
     async initList(id) {
       const startTime = this.searchParams.time ? this.searchParams.time[0] : ''
       const endTime = this.searchParams.time ? this.searchParams.time[1] : ''
@@ -387,7 +472,7 @@ export default {
         num: this.params.pageSize,
         page: this.params.pageNum,
         channelId: id,
-        eventCode: this.searchParams.eventCode,
+        alarmDesc: this.searchParams.alarmDesc,
         startTime,
         endTime
       })
@@ -409,8 +494,7 @@ export default {
       // }
     },
     async handleNodeClick(data, node, self) {
-      console.log(data, 111)
-      if (!data.onlineState) {
+      if (!data.hasOwnProperty('onlineState')) {
         this.resArray = []
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
@@ -449,16 +533,13 @@ export default {
                     }, [])
                   }
                   this.$refs.alarmTree.updateKeyChildren(data.id, arr)
-                  this.defaultExpandedKeys = [data.id]
                 }
               }
             })
-            .catch((error) => {
-              // console.log(1111111,error)
-            })
+            .catch((error) => {})
         }
       } else {
-        if (!data.childList) {
+        if (!data.hasOwnProperty('childList')) {
           this.resId = data.areaPid
           this.initList(data.areaPid)
         }
@@ -524,38 +605,70 @@ export default {
         }
       }
     },
-    downAlarm(row, index) {
-      console.log(row, index)
-      const newList = JSON.parse(JSON.stringify(this.tableData))
-      Object.assign(newList[index], { isDownLoad: true })
-      this.tableData = newList
-      const this_ = this
-      const xhr = new XMLHttpRequest()
-      xhr.open('GET', row.videoUrl, true)
-      xhr.responseType = 'arraybuffer'
+    down(row, index, type) {
+      var xhr = new XMLHttpRequest()
+      let url = ''
+      if (type === '视频') {
+        url = row.videoUrl
+      } else if (type === '图片') {
+        url = row.imageUrl
+      }
+      xhr.open('GET', url, true)
+      xhr.responseType = 'arraybuffer' // 返回类型blob
       xhr.onload = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
           let blob = this.response
-          let u = window.URL.createObjectURL(
-            new Blob([blob], { type: 'video/mp4' })
-          )
+          // 转换一个blob链接
+          // 注: URL.createObjectURL() 静态方法会创建一个 DOMString(DOMString 是一个UTF-16字符串)，
+          // 其中包含一个表示参数中给出的对象的URL。这个URL的生命周期和创建它的窗口中的document绑定
+          let downLoadUrl = ''
+          if (type === '视频') {
+            downLoadUrl = window.URL.createObjectURL(
+              new Blob([blob], {
+                type: 'video/mp4'
+              })
+            )
+          } else if (type === '图片') {
+            downLoadUrl = url
+          }
+          // 视频的type是video/mp4，图片是image/jpeg
+          // 01.创建a标签
           let a = document.createElement('a')
-          a.download = '告警视频'
-          a.href = u
+          // 02.给a标签的属性download设定名称
+          a.download = row.channelName
+          // 03.设置下载的文件名
+          a.href = downLoadUrl
+          // 04.对a标签做一个隐藏处理
           a.style.display = 'none'
+          // 05.向文档中添加a标签
           document.body.appendChild(a)
+          // 06.启动点击事件
           a.click()
+          // 07.下载完毕删除此标签
           a.remove()
-          window.URL.revokeObjectURL(u)
         }
       }
+      xhr.send()
     },
     playAlarm(row) {
       this.playVideoVisible = true
       this.videoUrl = row.videoUrl
     },
+    async alarmRecover(row, type) {
+      await getAlarmRecover({
+        alarmMsgId: row.id,
+        alarmFileType: type
+      })
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.initList(this.resId)
+          }
+        })
+        .catch(() => {})
+    },
+
     deleteRole(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+      this.$confirm('删除后不可恢复，确认删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -604,20 +717,36 @@ export default {
         })
       })
     },
-    alarmVideoStateFormatter(row) {
-      switch (row.videoState) {
+    alarmImageStateStateFormatter(row) {
+      switch (row.imageState) {
         case -1:
-          return '异常'
+          return '失败'
         case 0:
-          return '初始化'
+          return '持续中'
         case 1:
           return '等待中'
         case 2:
           return '生成中'
         case 3:
-          return '生成成功'
+          return '成功'
         default:
-          return '异常'
+          return '待配置'
+      }
+    },
+    alarmVideoStateFormatter(row) {
+      switch (row.videoState) {
+        case -1:
+          return '失败'
+        case 0:
+          return '持续中'
+        case 1:
+          return '等待中'
+        case 2:
+          return '生成中'
+        case 3:
+          return '成功'
+        default:
+          return '待配置'
       }
     },
 
@@ -683,7 +812,7 @@ export default {
     },
     resetData(e) {
       this.searchParams = {
-        eventCode: '',
+        alarmDesc: '',
         time: ''
       }
       let target = e.target
@@ -697,7 +826,10 @@ export default {
       }
       target.blur()
       this.params.pageNum = 1
+      this.resId = ''
       this.initList(this.resId)
+      this.$refs.alarmTree.setCurrentKey(this.treeList[0].id)
+      this.resCurrentKey = this.treeList[0].id
     },
     cxData() {
       this.initList(this.resId)
@@ -836,6 +968,10 @@ export default {
 ::v-deep .el-table__header .has-gutter th.gutter {
   display: none !important;
 }
+.image__preview {
+  width: 800px;
+  height: 800px;
+}
 
 .encoder-content {
   height: 100%;
@@ -880,7 +1016,7 @@ export default {
       }
     }
     .encoder-table {
-      height: calc(100% - 145px);
+      max-height: calc(100% - 145px);
       overflow-y: auto;
     }
   }
@@ -981,7 +1117,24 @@ export default {
     padding: 16px 24px;
   }
 }
+::v-deep .image__preview {
+  .el-dialog__title {
+    font-size: 16px;
+    font-weight: bolder;
+  }
+}
+::v-deep .image__preview {
+  .el-dialog__header {
+    padding: 16px 24px;
+  }
+}
 ::v-deep .nowPlayVideo {
+  .el-dialog__body {
+    padding: 24px 24px 22px;
+    /*border: #e4e7ed solid 1px;*/
+  }
+}
+::v-deep .image__preview {
   .el-dialog__body {
     padding: 24px 24px 22px;
     /*border: #e4e7ed solid 1px;*/

@@ -8,12 +8,15 @@
   border: 0;
   display: block;
   z-index: 0;
-  margin-left: 50px;
+  margin-left: 56px;
   position: relative;
   /* height: 47px; */
   height: 36px;
+  top: 35px;
+  left: 16px;
 }
-/* 
+
+/*
 .label-week {
   margin-left: 20px;
   width: 100px;
@@ -32,35 +35,83 @@
 } */
 
 .timeSlider-container {
-  padding: 2px 0 24px 24px;
-  background: #FAFAFA;
+  /* padding: 2px 0 24px 24px; */
+  background: #fff;
 }
 
 .timeslider-box {
   position: relative;
-  height: 36px;
-  line-height: 36px;
+  /* height: 36px; */
+  height: 90px;
+  background: rgba(0, 0, 0, 0.02);
+  line-height: 90px;
   margin-top: 8px;
-  padding-top: 30px;
+  margin-bottom: 4px;
 }
 
 
 .timeSliderDiv {
-  /* height: 20px; */
-  height: 36px;
+  height: 20px;
+  /* background: #004BAD; */
+  /* border-radius: 10px 10px 10px 10px; */
   z-index: 4;
-  top: 0;
+  top: 0px;
   position: absolute;
-  border-left: 1px solid #000;
-  background: #1890FF;
+  /* background-color: #004BAD; */
+  background-color: #4A7EC3;
+  /* border-left: 1px solid #000; */
+  /* background: #1890FF; */
   box-sizing: border-box;
+  /* position: relative; */
+}
+.timeSliderDiv:hover {
+  background-color: #004BAD;
+}
+.timeSliderDiv:active {
+  background-color: #004BAD;
+}
+.timeSliderDiv:focus {
+  background-color: #004BAD;
 }
 
+/* .timeSliderDiv::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 5px solid #7EA4D5;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.timeSliderDiv::after {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 5px solid #7EA4D5;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.timeSliderDiv::before {
+  position: absolute;
+  left: 0px;
+  top: -1px;
+}
+
+.timeSliderDiv::after {
+  position: absolute;
+  right: 0px;
+  top: -1px;
+} */
+
 .trCanvas {
-  width: 720px;
-  /* height: 20px; */
-  height: 36px;
-  background: #fff;
+  /* width: 720px; */
+  width: 768px;
+  height: 20px;
+  background: rgba(2, 74, 168, 0.08);
+  border-radius: 10px 10px 10px 10px;
   position: relative;
 }
 
@@ -89,8 +140,21 @@
 
 .modal-dialog {
   position: relative;
-  width: 400px;
+  width: 310px;
   margin: 150px auto;
+}
+
+.modal-dialog:after {
+  /* content: "";
+  position: absolute;
+  bottom: -9px;
+  left: 50px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #fff;
+  transform: translateX(-50%); */
 }
 
 .modal-content {
@@ -113,33 +177,34 @@
   margin: 0;
   line-height: 1.42rem;
   font-weight: 500;
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #606266;
 }
 
 .modal-body {
   position: relative;
-  padding: 16px;
+  /* padding: 16px; */
 }
 
 
 .modal-footer {
-  padding: 0 16px 16px;
+  padding: 10px;
   text-align: right;
-  /* margin-top: 5px; */
-  /* border-top: 1px solid #e5e5e5; */
+
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .btnModal {
   font-size: 14px;
   line-height: 1.427;
-  /* height: 40px; */
-  /* width: 80px; */
-  padding: 5px 20px;
   text-align: center;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  background-color: #fff;
-  color: rgba(0,0,0,0.65);
-  margin: 2px;
-  border-radius: 2px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  margin-left: 24px;
 }
 
 .btnModal:hover {
@@ -148,29 +213,42 @@
 }
 
 .btnSave {
-  background-color: #1890ff;
-  border: 1px solid #1890ff;
-  color: #fff;
+  color: #004BAD;
 }
 
-.btnDel{
-  background-color: #FF4D4F;
-  border: 1px solid #FF4D4F;
-  color: #fff;
+.btnDel {
+
+  color: #B30000;
 }
 
 .time-div {
-  margin: 10px;
+  /* margin: 10px; */
+  height: 80px;
 }
 
 
 .time-input {
-  width: 40px;
   margin: 5px;
   padding: 5px 0;
   text-align: center;
+  width: 52px;
+  height: 40px;
+  background: #FFFFFF;
+  border-radius: 6px;
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 2px;
+  font-size: 16px;
+  font-family: DIN-Medium, DIN;
+  font-weight: 500;
+  color: #242B3A;
+}
+.time-input:active {
+  border: 1px solid #0270FF;
+}
+.time-input:hover {
+  border: 1px solid #0270FF;
+}
+.time-input:focus {
+  border: 1px solid #0270FF;
 }
 
 .time-lab {
@@ -195,11 +273,11 @@
 
 .coordinate {
   width: 1px;
-  height: 3px;
-  background-color: #C4C4C4;
+  height: 5px;
+  background-color: #ccc;
   position: absolute;
   z-index: -1;
-  top: -3px;
+  top: 22px;
 }
 
 .coordinateLabDiv {
@@ -207,65 +285,104 @@
   margin-left: -3px;
   line-height: 14px;
   /* top: 22px; */
-  top: -22px;
+  top: 30px;
   position: absolute;
   z-index: -1;
-  font-size: 14px;
-  color: rgba(0,0,0,0.65);
+  font-size: 12px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+
+  color: B1#B1B1;
   text-align: left;
 }
 
 
 .startTimeBar {
-  position: absolute;
+  /* position: absolute;
   left: -19px;
   top: 8px;
   border: 10px solid transparent;
   border-right: 8px solid #dbdada;
-  display: none;
+  display: none; */
+  position: absolute;
+  left: -6px;
+  top: -1px;
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 5px solid RGBA(126, 164, 213, 1);
+  border-radius: 50%;
+  background-color: #fff;
+  z-index: 99999999;
 }
 
 .stopTimeBar {
-  position: absolute;
+  /* position: absolute;
   right: -18px;
   top: 8px;
   border: 10px solid transparent;
   border-left: 8px solid #dbdada;
-  display: none;
+  display: none; */
+  position: absolute;
+  right: -6px;
+  top: -1px;
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 5px solid RGBA(126, 164, 213, 1);
+  border-radius: 50%;
+  background-color: #fff;
+  z-index: 99999999;
 }
 
-.stopTimeBar:hover,
+/* .stopTimeBar:hover, */
 .startTimeBar:hover {
   cursor: e-resize;
 }
 
+.stopTimeBar:hover {
+  cursor: w-resize;
+}
+
 .startTimeShow {
   background-color: #0084FF;
-  color: white;
   padding-left: 3px;
-  width: 44px;
-  height: 18px;
+  width: 58px;
+  height: 23px;
+  background: #C1DCFF;
+  box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
   position: absolute;
-  left: -44px;
   top: 28px;
+  left: -60px;
   text-align: center;
-  line-height: 18px;
-  font-size: .8em;
+  line-height: 23px;
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #242B3A;
   display: none;
 }
 
 .stopTimeShow {
   background-color: #0084FF;
-  color: white;
   padding-left: 3px;
-  width: 44px;
-  height: 18px;
+  width: 58px;
+  height: 23px;
+  background: #C1DCFF;
+  box-shadow: 0px 1px 2px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
   position: absolute;
   top: 28px;
-  right: -44px;
+  right: -60px;
   text-align: center;
-  line-height: 18px;
-  font-size: .8em;
+  line-height: 23px;
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #242B3A;
   display: none;
 }
 
@@ -278,9 +395,11 @@
 
 .label-week {
   float: left;
-  color: rgba(0,0,0,0.65);
-  font-size: 12px;
-  /* margin-left: 20px; */
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #606266;
+  margin-left: 16px;
 }
 
 
@@ -291,13 +410,15 @@
   /* width: 100px; */
   height: 36px;
   line-height: 36px;
-  right: 24px;
-  top: 30px;
+  /* right: 24px;
+  top: 30px; */
+  right: 15px;
+  top: 28px;
 }
 
-.editWrap img{
+.editWrap img {
   width: 20px;
-  margin-left: 15px;
+  /* margin-left: 15px; */
 }
 
 .editWrap i {
@@ -310,13 +431,14 @@
 }
 
 .editContent {
-  width: 180px;
+  width: 210px;
+  box-shadow: 0px 12px 32px 1px rgba(0, 0, 0, 0.2);
+
   position: fixed;
   left: 45%;
   top: 35vh;
   display: none;
   background-color: #fff;
-  box-shadow: 0 0 20px -5px ;
   border: 1px solid #e4e4e4;
   border-radius: 5px;
   z-index: 5;
@@ -333,6 +455,7 @@
   background-color: rgba(0, 0, 0, 0.15);
   z-index: -1;
 }
+
 .editContent::after {
   position: absolute;
   content: '';
@@ -347,16 +470,21 @@
 .editHeader {
   min-height: 16px;
   padding: 5px 16px;
-  border-bottom: 1px solid #e5e5e5;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .editHeaderTitle {
-  font-weight: 500;
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #606266;
 }
 
 .editBody {
   position: relative;
   padding: 16px;
+
+
 }
 
 .editUnit {
@@ -365,20 +493,26 @@
   width: 80px;
   *zoom: 1;
   *display: inline;
-  font-size: 14px;
   margin-bottom: 4px;
 }
+
 .editUnit input {
   width: 16px;
   height: 16px;
   margin-right: 8px;
 }
 
+.editUnit-label {
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #333333;
+}
+
 .editFotter {
   padding: 10px;
   text-align: right;
-  margin-top: 5px;
-  border-top: 1px solid #e5e5e5;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .delImg {
@@ -392,21 +526,17 @@
 }
 
 .editBtn {
-  font-size: 14px;
-  /* width: 55px;
-  height: 30px; */
   padding: 5px 16px;
   text-align: center;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  background-color: #fff;
-  color: rgba(0,0,0,0.65);
-  border-radius: 2px;
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  cursor: pointer;
 }
 
 .save {
-  background-color: #1890ff;
-  border: 1px solid #1890ff;
-  color: #fff;
+
+  color: #004BAD;
 }
 
 .editBtn:hover {
@@ -432,4 +562,22 @@
 .eventSelect {
   margin-left: 10px;
   width: 80px;
+}
+
+.time-start-div {
+  display: inline-block;
+  width: 140px;
+  margin-left: 5px;
+}
+
+.time-stop-div {
+  display: inline-block;
+  width: 140px;
+}
+
+.time-start-div-span {
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
+  color: #B1B1B1;
 }

@@ -156,7 +156,12 @@
                       :playerIdx="playerIdx"
                       @showPlayerBoxMini="showPlayerBoxMini"
                       @videoClick="videoClick"
+                      @playerToolValue="playerToolValue"
                     ></player>
+                    <!-- <EasyPlayer
+                      :ref="'player' + i"
+                      :videoUrl="videoUrl[i - 1]"
+                    /> -->
                     <div ref="rectArea" class="rect"></div>
 
                     <div
@@ -339,6 +344,10 @@ import {
 import { Local } from '@/utils/storage'
 import { ptzPresetLists } from '@/api/method/live'
 
+import { convertG711ToAAC } from '@/utils/index'
+
+import EasyPlayer from './components/EasyPlayer.vue'
+
 export default {
   name: 'live',
   components: {
@@ -347,7 +356,8 @@ export default {
     PlayerTool,
     monitorEquipmentGroup,
     cloudControl,
-    leftTree
+    leftTree,
+    EasyPlayer
   },
   data() {
     return {
@@ -486,7 +496,8 @@ export default {
       isMouseHover: false,
       isHoverNum: 0,
       cloudId: null,
-      childOptionLists: []
+      childOptionLists: [],
+      resPlayerToolValue: []
     }
   },
   mounted() {
@@ -1054,6 +1065,7 @@ export default {
       console.log(data, 111)
       if (!data.onlineState) {
         this.resArray = []
+        console.log(this.detailsId)
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
         } else {
@@ -1259,6 +1271,8 @@ export default {
             } else if (res.data.data.playProtocalType == 2) {
               url = res.data.data.wssFlv
             }
+              // var url = res.data.data.httpsHls
+              // var url = res.data.data.httpsFmp4
             this.setPlayUrl(url, idxTmp)
 
             this.setStreamId(res.data.data.streamId, idxTmp)
@@ -1396,28 +1410,45 @@ export default {
       this.playerIdx = i - 1
       this.rectAreaNum = i - 1
     },
+    playerToolValue(index, val) {
+      this.resPlayerToolValue[index] = val
+      console.log('this.resPlayerToolValue', index, this.resPlayerToolValue)
+    },
     // 放大缩小视频容器
     toogleVideo(i) {
       // console.log('双击',i)
-      const directionControlDom = document.getElementsByClassName(
-        'playtoolDirectionControl'
-      )
-        ? document.getElementsByClassName('playtoolDirectionControl')
-        : []
+      this.$nextTick(() => {
+        const directionControlDom = document.getElementsByClassName(
+          'playtoolDirectionControl'
+        )
+          ? document.getElementsByClassName('playtoolDirectionControl')
+          : []
 
-      if (this.fullPlayerIdx === -1) {
-        directionControlDom.forEach((item, index) => {
-          if (index !== i - 1) {
-            item.style.display = 'none'
+        if (this.fullPlayerIdx === -1) {
+          if (directionControlDom.length > 0) {
+            // directionControlDom.map((item, index) => {
+            //   console.log('item~~~~~~~~', item)
+            //   if (index !== i - 1) {
+            //     item.style.display = 'none'
+            //   }
+            // })
+            for (let k = 0; k < directionControlDom.length; k++) {
+              if (k !== i - 1) {
+                directionControlDom[k].style.display = 'none'
+              }
+            }
           }
-        })
-        this.fullPlayerIdx = i
-      } else {
-        directionControlDom.forEach((item, index) => {
-          item.style.display = 'block'
-        })
-        this.fullPlayerIdx = -1
-      }
+
+          this.fullPlayerIdx = i
+        } else {
+          for (let j = 0; j < directionControlDom.length; j++) {
+            if (this.resPlayerToolValue[j]) {
+              directionControlDom[j].style.display = 'block'
+            }
+          }
+          this.fullPlayerIdx = -1
+        }
+      })
     },
     // 点击分屏
     clickSpilt(item, i) {
@@ -1473,6 +1504,10 @@ export default {
 //   position: absolute;
 //   border: 1px dashed #000;
 // }
+//隐藏视频的载入动画
+::v-deep .easy-player-loading {
+  display: none !important;
+}
 .test-div {
   width: 16px;
   height: 18px;

@@ -39,12 +39,20 @@
     <div class="table-list">
       <div class="securityArea_container">
         <div class="btn-lists">
-          <el-button type="primary" @click="dialogShow(1)"
+          <el-button
+            v-permission="['/timer-utils/template/add', 2]"
+            type="primary"
+            @click="dialogShow(1)"
             ><svg-icon class="svg-btn" icon-class="add" /><span class="btn-span"
               >新建</span
             ></el-button
           >
-          <el-button @click="deteleAll($event)" style="width: 100px" plain>
+          <el-button
+            v-permission="['/timer-utils/template/delete', 4]"
+            @click="deteleAll($event)"
+            style="width: 100px"
+            plain
+          >
             <svg-icon class="svg-btn" icon-class="del" />
             <span class="btn-span">批量删除</span>
           </el-button>
@@ -57,7 +65,7 @@
         class="dataDictionary-table"
         border
         :header-cell-style="{
-          background: 'rgba(0, 75, 173, 0.06)',
+          background: '#F4F9FF',
           fontSize: '14px',
           fontFamily: 'Microsoft YaHei-Bold, Microsoft YaHei',
           fontWeight: 'bold',
@@ -71,23 +79,35 @@
         ></el-table-column>
         <el-table-column type="index" width="50" align="center" label="序号">
         </el-table-column>
-        <el-table-column prop="templateName" label="模板名称" />
+        <el-table-column
+          prop="templateName"
+          label="模板名称"
+          width="450"
+          :show-overflow-tooltip="true"
+        />
         <el-table-column
           prop="dateTypeStrList"
           label="模板详情"
-          width="350"
           :formatter="planDetailFormatter"
         />
-        <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column prop="updateTime" label="修改时间" />
+        <el-table-column prop="createTime" label="创建时间" width="180" />
+        <el-table-column prop="updateTime" label="修改时间" width="180" />
         <el-table-column width="200" label="操作">
           <template slot-scope="scope">
             <!-- v-permission="['/rbac/dict/update', 3]" -->
-            <el-button type="text" @click="dialogShow(0, scope.row)"
-              >编辑</el-button
+            <el-button
+              v-permission="['/timer-utils/template/update', 3]"
+              type="text"
+              @click="dialogShow(0, scope.row)"
+              ><span class="table-button-span">编辑</span></el-button
             >
-            <el-button type="text" @click="deleteRole(scope.row)"
-              ><span class="delete-button">删除</span></el-button
+            <el-button
+              v-permission="['/timer-utils/template/delete', 4]"
+              type="text"
+              @click="deleteRole(scope.row)"
+              ><span class="table-button-span delete-button"
+                >删除</span
+              ></el-button
             >
           </template>
         </el-table-column>
@@ -102,8 +122,10 @@
       v-if="dialog.show"
       :title="dialog.title"
       :visible.sync="dialog.show"
-      width="950px"
+      width="960px"
+      top="30px"
       :before-close="handleClose"
+      :close-on-click-modal="false"
     >
       <div slot="title">
         <div style="display: flex; justify-content: space-between">
@@ -113,24 +135,25 @@
         </div>
       </div>
       <el-form
-        :model="dialog.params"
         ref="accountForm"
-        style="overflow-x: auto"
+        label-width="140px"
+        :rules="rules"
+        :model="dialog.params"
       >
         <el-form-item
           label="模板名称"
-          :rules="[
-            { required: true, message: '模板名称不能为空', trigger: 'blur' }
-          ]"
+          prop="templateName"
+          class="time-template"
         >
           <el-input
             class="item-input"
             v-model="dialog.params.templateName"
             clearable
+            style="width: 340px"
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="配置预案开启时段"> </el-form-item>
+        <el-form-item label="配置预案开启时段" class="template-title" style="width: 125px"> </el-form-item>
 
         <div class="timeSlider-container">
           <div
@@ -197,6 +220,7 @@
         >
       </span>
     </el-dialog>
+    <!-- <TimeTest /> -->
   </div>
 </template>
 
@@ -211,12 +235,35 @@ import pagination from '@/components/Pagination/index.vue'
 import '../../../../../static/js/timeSlider/timeSlider'
 import '../../../../../static/css/timeSlider.css'
 import '../../../../../static/css/normalize.css'
+import TimeTest from './components/TimeTest.vue'
 export default {
   name: '',
-  components: { pagination },
+  components: { pagination, TimeTest },
   data() {
+    const checkName = (rule, value, cb) => {
+      const regName = /^((?!\\|\/|:|\*|\?|<|>|\||"|'|;|&|%|\s).){1,32}$/
+      if (
+        value === '' ||
+        value === null ||
+        value === undefined ||
+        value.length === 0
+      ) {
+        return cb(new Error('此为必填项。'))
+      }
+      setTimeout(() => {
+        if (regName.test(value)) {
+          return cb()
+        } else {
+          return cb(
+            new Error(
+              `1-32个字符，不能有空格,不能包含 \ / : * ? " < | ' & % > ; 特殊字符。 `
+            )
+          )
+        }
+      }, 500)
+    }
     return {
-      isShow: true,
+      isShow: false,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -237,6 +284,14 @@ export default {
       },
       searchParams: {
         templateName: ''
+      },
+      rules: {
+        templateName: {
+          required: true,
+          max: 32,
+          validator: checkName,
+          trigger: 'blur'
+        }
       },
       roleId: '',
       buttonLoading: false,
@@ -276,25 +331,25 @@ export default {
         row.dateTypeStrList.forEach((type, index) => {
           switch (index + 1) {
             case 1:
-              result += '星期一、'
+              result += `${type}、`
               break
             case 2:
-              result += '星期二、'
+              result += `${type}、`
               break
             case 3:
-              result += '星期三、'
+              result += `${type}、`
               break
             case 4:
-              result += '星期四、'
+              result += `${type}、`
               break
             case 5:
-              result += '星期五、'
+              result += `${type}、`
               break
             case 6:
-              result += '星期六、'
+              result += `${type}、`
               break
             case 7:
-              result += '星期日、'
+              result += `${type}、`
               break
             default:
               break
@@ -449,6 +504,7 @@ export default {
      * @param time
      */
     createPlanTime(time) {
+      console.log('time~~~~~~~', time)
       let startTimeAndEndTime = time.split('-')
       let newStartTime = startTimeAndEndTime[0]
       if (newStartTime.length < 6) {
@@ -554,7 +610,7 @@ export default {
       })
     },
     deleteRole(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+      this.$confirm(` 是否删除模板"${row.templateName}" ？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -574,40 +630,50 @@ export default {
     submit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          let resData = []
+          const resTimePeriodList = []
+
+          let params1 = {}
+          Object.values(this.timeSliderList).map((item, index) => {
+            if (index !== 0) {
+              resData.push(item)
+            }
+          })
+          // console.log('resData', resData)
+          resData.forEach((itemFirst) => {
+            if (itemFirst.startTimeArray.length > 0) {
+              itemFirst.startTimeArray.map((childFirst) => {
+                let bool = itemFirst.stopTimeArray.findIndex((it) => {
+                  return childFirst === it
+                })
+                if (bool !== -1) {
+                  itemFirst.startTimeArray = [itemFirst.startTimeArray[0]]
+                  itemFirst.stopTimeArray = [itemFirst.stopTimeArray[1]]
+                } else {
+                }
+              })
+            }
+          })
+          // console.log('resData~~~~~~~~~~~', resData)
+          resData.forEach((item1) => {
+            if (item1.startTimeArray.length > 0) {
+              item1.startTimeArray.map((child, index) => {
+                params1 = {
+                  startTime: `${child}:00`,
+                  dateType: item1.timeSliderNums,
+                  endTime:
+                    item1.stopTimeArray[index] === '24:00'
+                      ? '23:59:59'
+                      : `${item1.stopTimeArray[index]}:59`
+                }
+
+                resTimePeriodList.push(params1)
+              })
+            }
+          })
+          // return
           switch (this.dialog.title) {
             case '新建':
-              console.log(
-                'this.timeSliderListthis.timeSliderList',
-                this.timeSliderList,
-                this.dialog.params
-              )
-              const resData = []
-              const resTimePeriodList = []
-
-              let params1 = {}
-              Object.values(this.timeSliderList).map((item, index) => {
-                if (index !== 0) {
-                  resData.push(item)
-                }
-              })
-              console.log('resData', resData)
-              resData.forEach((item1) => {
-                console.log('item1', item1.timeSliderNums, item1.startTimeArray)
-
-                if (item1.startTimeArray.length > 0) {
-                  item1.startTimeArray.map((child, index) => {
-                    params1 = {
-                      startTime: `${child}:00`,
-                      dateType: item1.timeSliderNums,
-                      endTime: `${item1.stopTimeArray[index]}:59`
-                    }
-
-                    resTimePeriodList.push(params1)
-                  })
-                }
-              })
-              console.log('resTimePeriodList', resTimePeriodList)
-
               addTemplateAlarmEvent({
                 timePeriodList: resTimePeriodList,
                 templateName: this.dialog.params.templateName
@@ -627,7 +693,7 @@ export default {
               editTemplateAlarmEvent({
                 templateId: this.editId,
                 templateName: this.dialog.params.templateName,
-                timePeriodList: this.dialog.params.timePeriodList
+                timePeriodList: resTimePeriodList
               }).then((res) => {
                 if (res.data.code === 0) {
                   this.$message.success('编辑成功')
@@ -710,6 +776,9 @@ export default {
 ::v-deep .el-table::before {
   height: 0 !important;
 }
+::v-deep .time-template {
+  margin-left: -60px;
+}
 ::v-deep .el-table--border {
   border-bottom: 1px solid #eaeaea;
 }
@@ -789,19 +858,25 @@ export default {
   }
   .table-list {
     margin: 20px;
-    padding: 20px;
+    padding: 16px 20px 20px 20px;
     background: #ffffff;
     height: calc(100% - 240px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
     .dataDictionary-table {
-      height: calc(100% - 100px);
+      max-height: calc(100% - 100px);
       overflow-y: auto;
+      font-size: 14px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #333333;
     }
     .securityArea_container {
       margin-bottom: 20px;
       .btn-lists {
+        float: right;
+        margin-bottom: 17px;
         .btn-span {
           position: relative;
           top: -2px;
@@ -867,6 +942,11 @@ export default {
     top: -1px;
     left: -6px;
   }
+}
+.table-button-span {
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
 }
 .delete-button {
   color: red !important;
@@ -951,11 +1031,19 @@ export default {
 ::v-deep div {
   box-sizing: unset;
 }
+.editWrap{
+  display: none;
+}
 .dialogRelation {
   display: flex;
   flex-wrap: wrap;
 }
 .marginR {
   margin: 0 16px 16px 0;
+}
+.template-title{
+  margin-bottom: -8px !important;
+  margin-left: -15px;
+  margin-top: 24px;
 }
 </style>

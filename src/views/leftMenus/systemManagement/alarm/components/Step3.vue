@@ -13,15 +13,15 @@
       <div class="tag-group">
         <span class="tag-group__title">选择事件</span>
         <el-tag
-          :key="tag"
           v-for="tag in checkeLists"
+          :key="tag.eventName"
           closable
           :disable-transitions="false"
           @close="handleClose(tag)"
           size="medium"
           class="tag-btn"
         >
-          {{ tag }}
+          {{ tag.eventName }}
         </el-tag>
         <div class="button-new-tag" @click="showContent">+ 添加事件</div>
       </div>
@@ -29,13 +29,13 @@
       <div class="tag-group-content">
         <el-card
           v-for="(tag, index) in checkeLists"
-          :key="tag"
+          :key="tag.eventCode"
           class="box-card"
         >
           <div slot="header" class="clearfix">
             <LineFont
               :line-title="{
-                title: tag,
+                title: tag.eventName,
                 notShowSmallTitle: false
               }"
               :text-style="textStyle"
@@ -58,13 +58,16 @@
                 @click="onclick(index, i + 1)"
               >
                 {{ level }}
-                <!-- <el-input v-model="stepform3[index].isactive" type="hidden"></el-input> -->
                 <svg-icon
                   v-if="stepform3[index].isactive === i + 1"
                   :icon-class="`intrusionLevel${i + 1}`"
                   class="intrusionLevel_svg"
                 />
               </span>
+
+              <span v-if="isSpanRequire[index]" class="span-require"
+                >请选择入侵等级。</span
+              >
             </el-form-item>
             <el-form-item label="间隔时间(秒)" prop="eventInterval">
               <el-select
@@ -103,10 +106,11 @@
                 v-model="stepform3[index].videoLength"
                 style="width: 288px"
               >
-                <el-option label="0" :value="0"></el-option>
+                <!-- <el-option label="0" :value="0"></el-option> -->
                 <el-option label="15" :value="15"></el-option>
                 <el-option label="30" :value="30"></el-option>
                 <el-option label="60" :value="60"></el-option>
+                <el-option label="直到事件结束" :value="0"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item
@@ -130,7 +134,7 @@
       :title="dialog.title"
       :visible.sync="dialog.show"
       width="720px"
-      :before-close="handleClose"
+      :before-close="handleCancel"
     >
       <el-input
         placeholder="请输入搜索关键字"
@@ -144,19 +148,20 @@
         <el-checkbox-group
           v-model="checkeLists"
           class="allIncident-checkbox-group"
+          @change="checkedListedChange"
         >
           <el-checkbox
             v-for="incident in allIncident"
-            :label="incident.id"
-            :key="incident.id"
+            :label="incident"
+            :key="incident.eventCode"
             class="allIncident-checkbox"
             >{{ incident.eventName }}</el-checkbox
           >
         </el-checkbox-group>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialog.show = false">取 消</el-button>
-        <el-button type="primary" @click="dialog.show = false">确 定</el-button>
+        <el-button @click="handleCancel">取 消</el-button>
+        <el-button type="primary" @click="firmCommit">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -175,7 +180,7 @@
 </template>
 
 <script>
-import { getAlarmEventLists } from '@/api/method/alarm'
+import { getAlarmEventLists1 } from '@/api/method/alarm'
 import LineFont from '@/components/LineFont'
 import { Local } from '@/utils/storage'
 export default {
@@ -184,6 +189,7 @@ export default {
   props: [],
   data() {
     return {
+      isSpanRequire: [],
       isShowImg: true,
       dialog: {
         show: false,
@@ -196,8 +202,12 @@ export default {
       filterText: '',
       intrusionLevel: [],
       form: {},
+      lastSelection: false,
       allIncident: [],
       checkeLists: [],
+      resCheckeLists: [],
+      selectLists: [],
+      editLists: [],
       inputVisible: false,
       inputValue: '',
       textStyle: {
@@ -211,7 +221,6 @@ export default {
         width: '3px',
         height: '18px'
       },
-      isHas: true,
       rules: {
         eventLevel: [
           {
@@ -227,7 +236,7 @@ export default {
         },
         eventInterval: {
           required: true,
-          message: '此为必填项。',
+          message: '请选择时间间隔。',
           trigger: 'change'
         }
       }
@@ -240,7 +249,7 @@ export default {
     checkeLists(newValue) {
       let resStepform3 = []
       let resStepform3Obj = {
-        eventCode: '',
+        eventCode: {},
         eventLevel: 0,
         eventInterval: '',
         enableVideo: 0,
@@ -252,13 +261,14 @@ export default {
       if (newValue.length < this.stepform3.length) {
         this.stepform3 = this.stepform3.slice(0, newValue.length)
         this.intrusionLevel = this.intrusionLevel.slice(0, newValue.length)
+        this.isSpanRequire = this.isSpanRequire.slice(0, newValue.length)
       } else if (newValue.length > this.stepform3.length) {
         for (let i = 0; i < newValue.length; i++) {
           if (i >= this.stepform3.length) {
             resStepform3Obj.eventCode = newValue[i]
-            // resStepform3Obj.isactive ='轻微'
             resStepform3.push(resStepform3Obj)
             this.intrusionLevel.push(array)
+            this.isSpanRequire.push(false)
           }
         }
         this.stepform3 = this.stepform3.concat(resStepform3)
@@ -269,11 +279,12 @@ export default {
   },
   created() {
     if (Object.keys(Local.get('detailsData')).length > 0) {
+      // this.checkeLists = []
       let params = {}
+      let params1 = {}
       Local.get('detailsData').alarmSchemeEventRelList.map((item) => {
-        this.checkeLists.push(item.eventName)
         params = {
-          eventCode: item.eventName,
+          eventCode: item.eventCode,
           eventLevel: item.eventLevel,
 
           eventInterval: item.eventInterval,
@@ -285,11 +296,18 @@ export default {
 
           enableVideo: item.enableVideo === 1 ? true : false
         }
+        params1 = {
+          eventName: item.eventName,
+          eventCode: item.eventCode
+        }
+        this.checkeLists.push(params1)
+        this.editLists.push(params1)
+        this.resCheckeLists.push(params1)
+
         this.stepform3.push({ isactive: item.eventLevel, ...params })
         this.intrusionLevel.push(['轻微', '中等', '严重', '非常严重'])
         this.$forceUpdate()
       })
-      console.log('this.checkeLists', this.checkeLists, this.stepform3)
     }
   },
   mounted() {
@@ -297,19 +315,132 @@ export default {
   },
   methods: {
     async initAlarmEventLists(val) {
-      await getAlarmEventLists({ eventName: val })
+      await getAlarmEventLists1({ eventName: val })
         .then((res) => {
           if (res.data.code === 0) {
-            this.allIncident = res.data.data
+            // this.allIncident = res.data.data
+            let resParams = {}
+            res.data.data.map((item) => {
+              resParams = {
+                eventCode: item.eventCode,
+                eventName: item.eventName
+              }
+
+              this.allIncident.push(resParams)
+            })
           }
         })
         .catch((error) => {
           console.log(error)
         })
     },
+
+    compareObjectProperties(obj1, obj2) {
+      if (Object.keys(obj1).length !== Object.keys(obj2).length) {
+        return Object.keys(obj1).length > Object.keys(obj2).length ? obj1 : obj2
+      }
+      return obj1
+    },
+    checkedListedChange(val) {
+      console.log('val````````````````', val)
+      console.log('this.checkeLists````````````````', this.checkeLists)
+      console.log('this.resCheckeLists````````````````', this.resCheckeLists)
+      if (this.resCheckeLists.length > val.length) {
+        this.lastSelection = true
+      }
+      this.selectLists = []
+      let newArray = val.filter((item1) => {
+        return !this.editLists.find(
+          (item2) => item2.eventCode === item1.eventCode
+        )
+      })
+      this.selectLists = newArray
+      this.checkeLists = this.removeDuplicates(val)
+    },
+    handleCancel() {
+      // if (Object.keys(Local.get('detailsData')).length > 0) {
+      // } else {
+      console.log('this.checkeLists', this.checkeLists)
+      console.log('this.selectLists~~~~~~~~', this.selectLists)
+      if (!this.lastSelection) {
+        this.checkeLists = this.checkeLists.filter(
+          (item) =>
+            !this.selectLists.some(
+              (item2) => item2.eventCode === item.eventCode
+            )
+        )
+      } else {
+        this.checkeLists = this.resCheckeLists
+      }
+      // }
+      this.dialog.show = false
+      this.lastSelection = false
+    },
+
+    // handleClose1() {
+
+    //   this.dialog.show = false
+    // },
+    firmCommit() {
+      // if (Object.keys(Local.get('detailsData')).length > 0) {
+      // } else {
+
+      // }
+      this.editLists = []
+      this.editLists = this.checkeLists
+      this.selectLists = []
+      this.resCheckeLists = this.checkeLists
+
+      this.dialog.show = false
+      this.lastSelection = false
+    },
+
+    removeDuplicates(arr) {
+      // this.checkeLists = []
+      var idSet = {}
+      var result = []
+
+      for (var i = 0; i < arr.length; i++) {
+        var obj = arr[i]
+        var eventCode = obj.eventCode
+
+        if (!idSet[eventCode]) {
+          idSet[eventCode] = true
+          result.push(obj)
+        } else {
+          var prevObj = result.find(function (item) {
+            return item.eventCode === eventCode
+          })
+
+          if (Object.keys(obj).length > Object.keys(prevObj).length) {
+            var index = result.indexOf(prevObj)
+            result[index] = obj
+          }
+        }
+      }
+      return result
+    },
+
     showContent() {
       this.isShowImg = false
       this.dialog.show = !this.dialog.show
+      if (Object.keys(Local.get('detailsData')).length > 0) {
+        this.$nextTick(() => {
+          const myDiv = document.getElementsByClassName('allIncident-checkbox')
+          console.log('this.checkeLists', this.checkeLists)
+          this.allIncident.forEach((item1, index) => {
+            this.checkeLists.map((item) => {
+              if (item.eventCode === item1.eventCode) {
+                // this.checkeLists = []
+                // this.checkeLists.push(item1)
+                myDiv[index].classList.add('is-checked')
+                myDiv[index].firstChild.classList.add('is-checked')
+              }
+            })
+          })
+          this.$forceUpdate()
+        })
+      }
     },
     handleClose(tag) {
       this.checkeLists.splice(this.checkeLists.indexOf(tag), 1)
@@ -325,7 +456,10 @@ export default {
       console.log(this.checkeLists)
     },
     onclick(index, i) {
+      // console.log(2222,index,i)
       this.stepform3[index].isactive = i
+
+      this.isSpanRequire[index] = false
       this.$forceUpdate()
     },
     clickLast() {
@@ -338,47 +472,70 @@ export default {
       this.$emit('goback')
     },
     submitStep3() {
-      console.log('this.$refs', this.$refs)
-      this.checkeLists.map((item1, i) => {
-        if (this.stepform3[i].isactive && this.stepform3[i].isactive !== '') {
-          // this.$refs.stepForm[i].resetFields()
+      if (this.$refs.stepForm) {
+        const alarmSchemeEventReqList = []
 
-          // this.isHas = false
+        let params = {}
 
-          const alarmSchemeEventReqList = []
-          let params = {}
-          this.$refs.stepForm.map((item) => {
-            params = {
-              eventCode: item.model.eventCode,
+        this.$refs.stepForm.map((item) => {
+          params = {
+            eventCode:
+              Object.prototype.toString.call(item.model.eventCode) ===
+              '[object Object]'
+                ? item.model.eventCode.eventCode
+                : item.model.eventCode,
 
-              eventLevel: item.model.isactive,
+            eventLevel: item.model.isactive,
 
-              eventInterval: item.model.eventInterval,
+            eventInterval: item.model.eventInterval,
 
-              videoLength: item.model.videoLength,
+            videoLength: item.model.videoLength,
 
-              videoHasAudio: item.model.videoHasAudio ? 1 : 0,
-              enablePhoto: item.model.enablePhoto ? 1 : 0,
+            videoHasAudio: item.model.videoHasAudio ? 1 : 0,
+            enablePhoto: item.model.enablePhoto ? 1 : 0,
 
-              enableVideo: item.model.enableVideo ? 1 : 0
-            }
-            alarmSchemeEventReqList.push(params)
-          })
-          // console.log(1111111111, alarmSchemeEventReqList)
-          this.$emit('stepParams3', alarmSchemeEventReqList)
-        } else {
-          // this.isHas = true
+            enableVideo: item.model.enableVideo ? 1 : 0
+          }
+          alarmSchemeEventReqList.push(params)
+        })
 
-          // this.$refs.stepForm[i].resetFields()
-          this.$refs.stepForm[i].validate((valid) => {
-            if (valid) {
-              console.log('stepform3~~~~~~~~', stepform3)
+        const uniqueArr = alarmSchemeEventReqList.filter(
+          (item3, index) =>
+            alarmSchemeEventReqList.findIndex(
+              (i) => i.eventCode === item3.eventCode
+            ) === index
+        )
+        let resValidate = []
 
-              this.$emit('submitStep')
-            }
-          })
-        }
-      })
+        this.checkeLists.map((item1, i) => {
+          if (
+            this.stepform3[i].isactive === '' ||
+            this.stepform3[i].isactive === null ||
+            this.stepform3[i].isactive === undefined
+          ) {
+            this.isSpanRequire[i] = true
+            this.$forceUpdate()
+          } else {
+            this.isSpanRequire[i] = false
+            this.$forceUpdate()
+          }
+
+          resValidate.push(this.$refs.stepForm[i].validate())
+        })
+        Promise.all(resValidate).then(() => {
+          if (this.isSpanRequire.every((item) => !item)) {
+            this.$emit('submitStep')
+
+            this.$emit('stepParams3', uniqueArr)
+          } else {
+          }
+        })
+      } else {
+        this.$message({
+          message: '请选择告警事件',
+          type: 'warning'
+        })
+      }
     }
   }
 }
@@ -410,6 +567,8 @@ export default {
         flex-basis: calc(25% - 10px); /* 每个元素占据容器的25%宽度，减去间距 */
         margin-right: 10px;
         margin-bottom: 10px;
+        text-align: left;
+        margin-left: 50px;
       }
     }
   }
@@ -447,7 +606,7 @@ export default {
       margin-top: 20px;
       .box-card {
         flex-basis: calc(33% - 52px);
-        // min-width: 504px;
+        min-width: 504px;
         height: 450px;
         background: #fefefe;
         box-shadow: 0px 3px 6px 1px rgba(0, 0, 0, 0.1);
@@ -542,5 +701,13 @@ export default {
 }
 .demo-ruleForm {
   // margin-left: -20px;
+  position: relative;
+  .span-require {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    color: #e02016;
+    font-size: 12px;
+  }
 }
 </style>

@@ -72,13 +72,21 @@
       <div class="table-list">
         <div class="securityArea_container">
           <div class="btn-lists">
-            <el-button type="primary" @click="dialogShow(1)"
+            <el-button
+              v-permission="['/alarm-manage/scheme/add', 2]"
+              type="primary"
+              @click="dialogShow(1)"
               ><svg-icon class="svg-btn" icon-class="add" /><span
                 class="btn-span"
                 >新建</span
               ></el-button
             >
-            <el-button @click="deteleAll($event)" style="width: 100px" plain>
+            <el-button
+              v-permission="['/alarm-manage/scheme/delete', 4]"
+              @click="deteleAll($event)"
+              style="width: 100px"
+              plain
+            >
               <svg-icon class="svg-btn" icon-class="del" />
               <span class="btn-span">批量删除</span>
             </el-button>
@@ -103,7 +111,13 @@
           <el-table-column type="index" width="50" align="center" label="序号">
           </el-table-column>
           <el-table-column prop="schemeName" label="预案名称" />
-          <el-table-column prop="eventNameList" label="告警事件" />
+          <el-table-column
+            prop="eventNameList"
+            label="告警事件"
+            width="240"
+            :formatter="alarmsFormatter"
+            :show-overflow-tooltip="true"
+          />
           <el-table-column prop="createTime" label="创建时间" />
           <el-table-column prop="updateTime" label="修改时间" />
           <el-table-column
@@ -113,11 +127,12 @@
           >
             <template slot-scope="scope">
               <el-switch
+                v-permission="['/alarm-manage/scheme/update/disabled', 3]"
                 v-model="scope.row.disabled"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
-                :active-value="1"
-                :inactive-value="0"
+                inactive-color="#DCDFE6"
+                active-color="#004BAD"
+                :active-value="0"
+                :inactive-value="1"
                 @change="changeSwitch(scope.row)"
               >
               </el-switch>
@@ -125,14 +140,25 @@
           </el-table-column>
           <el-table-column width="200" label="操作">
             <template slot-scope="scope">
-              <el-button type="text" @click="dialogShowPassage(scope.row)"
-                >布防通道</el-button
+              <el-button
+                v-permission="['/alarm-manage/scheme/channel/defense', 3]"
+                type="text"
+                @click="dialogShowPassage(scope.row)"
+                ><span class="table-button-span">布防通道</span></el-button
               >
-              <el-button type="text" @click="dialogShow(0, scope.row)"
-                >编辑</el-button
+              <el-button
+                v-permission="['/alarm-manage/scheme/update', 3]"
+                type="text"
+                @click="dialogShow(0, scope.row)"
+                ><span class="table-button-span">编辑</span></el-button
               >
-              <el-button type="text" @click="deleteRole(scope.row)"
-                ><span class="delete-button">删除</span></el-button
+              <el-button
+                v-permission="['/alarm-manage/scheme/delete', 4]"
+                type="text"
+                @click="deleteRole(scope.row)"
+                ><span class="table-button-span delete-button"
+                  >删除</span
+                ></el-button
               >
             </template>
           </el-table-column>
@@ -193,7 +219,7 @@
                 <template slot-scope="scope">
                   <span
                     v-if="scope.row.deployState === 1"
-                    style="margin-left: 10px; color: #1FAD8C"
+                    style="margin-left: 10px; color: #1fad8c"
                     >成功</span
                   >
                   <span
@@ -232,6 +258,7 @@
       @changeEditIsShow="changeEditIsShow"
       :detailsData="detailsData"
       :editAlarmId="editAlarmId"
+      :priChannelIds="priChannelIds"
       @getList="getList"
     />
   </div>
@@ -258,7 +285,7 @@ export default {
       isAddAlarmPlanShow: false,
       isEditAlarmPlanShow: false,
       disabledOptionsList: [],
-      isShow: true,
+      isShow: false,
       params: {
         pageNum: 1,
         pageSize: 10,
@@ -290,12 +317,12 @@ export default {
       },
       optionsList: [
         {
-          label: '离线',
-          value: 0
+          label: '停用',
+          value: 1
         },
         {
-          label: '在线',
-          value: 1
+          label: '启用',
+          value: 0
         }
       ],
       searchParams: {
@@ -309,7 +336,8 @@ export default {
       buttonLoading: false,
       treeData: [],
       detailsData: [],
-      editAlarmId: ''
+      editAlarmId: '',
+      priChannelIds: []
     }
   },
   created() {},
@@ -335,6 +363,39 @@ export default {
     },
     cxData() {
       this.getList()
+    },
+    alarmsFormatter(row) {
+      if (row.eventNameList && row.eventNameList.length > 0) {
+        let result = ''
+        row.eventNameList.forEach((type, index) => {
+          switch (index + 1) {
+            case 1:
+              result += `${type}、`
+              break
+            case 2:
+              result += `${type}、`
+              break
+            case 3:
+              result += `${type}、`
+              break
+            case 4:
+              result += `${type}、`
+              break
+            case 5:
+              result += `${type}、`
+              break
+            case 6:
+              result += `${type}、`
+              break
+            case 7:
+              result += `${type}、`
+              break
+            default:
+              break
+          }
+        })
+        return result.substring(0, result.length - 1)
+      }
     },
 
     resetData(e) {
@@ -489,14 +550,18 @@ export default {
           if (res.data.code === 0) {
             this.detailsData = res.data.data
             this.editAlarmId = data.id
+            this.priChannelIds = res.data.data.channelIdList
             Local.set('editAlarmId', this.editAlarmId)
             Local.set('detailsData', this.detailsData)
+            Local.set('priChannelIds', this.priChannelIds)
             setTimeout(() => {
               this.isEditAlarmPlanShow = true
             }, 500)
           }
         })
       } else {
+        this.priChannelIds = []
+        Local.set('priChannelIds', [])
         Local.set('detailsData', [])
         this.isAddAlarmPlanShow = true
       }
@@ -566,7 +631,11 @@ export default {
         target = e.target
       }
       target.blur()
-      this.$confirm('删除后数据无法恢复，是否确认全部删除？', '提示', {
+      this.$confirm(`确认删除${
+          this.$refs.timeTemTable.selection.length > 0
+            ? this.$refs.timeTemTable.selection.length
+            : 0
+        }个预案？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -590,7 +659,7 @@ export default {
       })
     },
     deleteRole(row) {
-      this.$confirm('删除后数据无法恢复，是否确认删除？', '提示', {
+      this.$confirm(`确认删除预案${row.schemeName}？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -694,19 +763,25 @@ export default {
   }
   .table-list {
     margin: 20px;
-    padding: 20px;
+    padding: 16px 20px 20px 20px;
     background: #ffffff;
     height: calc(100% - 195px);
     -webkit-box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 10%);
     border-radius: 2px;
     .dataDictionary-table {
-      height: calc(100% - 100px);
+      max-height: calc(100% - 100px);
       overflow-y: auto;
+      font-size: 14px;
+      font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+      font-weight: 400;
+      color: #333333;
     }
     .securityArea_container {
       margin-bottom: 20px;
       .btn-lists {
+        float: right;
+        margin-bottom: 17px;
         .btn-span {
           position: relative;
           top: -2px;
@@ -772,6 +847,11 @@ export default {
     top: -1px;
     left: -6px;
   }
+}
+.table-button-span {
+  font-size: 14px;
+  font-family: Microsoft YaHei-Regular, Microsoft YaHei;
+  font-weight: 400;
 }
 .delete-button {
   color: red !important;

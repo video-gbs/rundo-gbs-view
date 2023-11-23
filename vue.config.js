@@ -53,15 +53,15 @@ const urls = [
   //   proxy: '/api/expansion'
   // },
   // uat 测试
-  {
-    target: 'http://xard-gbs-uat.runjian.com:8080',
-    proxy: '/api'
-
-  },
   // {
-  //   target: 'https://xard-gbs-test.runjian.com:8080',
+  //   target: 'http://xard-gbs-uat.runjian.com:8080',
   //   proxy: '/api'
-  // },
+
+  // }
+  {
+    target: 'https://xard-gbs-test.runjian.com:8080',
+    proxy: '/api'
+  },
   // dev  本地
   // {
   //   target: 'http://116.205.143.13/tiles/gdhpjd',
@@ -107,24 +107,20 @@ function getProxys() {
 }
 module.exports = {
   transpileDependencies: ['@wanglin1994/video-timeline'],
-  publicPath: './',
+  publicPath: '/',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: false,
   productionSourceMap: false,
   devServer: {
-    // public: '',
     port: port,
     open: true,
-    // overlay: {
-    //   warnings: false,
-    //   errors: true
-    // },
     historyApiFallback: {
-      index: '/index.html' //与output的publicPath
+      index: '/index.html'
     },
     proxy: getProxys()
   },
+
   configureWebpack: {
     name: '',
     output: {
@@ -135,10 +131,15 @@ module.exports = {
     amd: {
       toUrlUndefined: true,
     },
-    module: {
-    },
+    module: {},
     resolve: {
-      fallback: { "https": false, "zlib": false, "http": false, "url": false, "path": require.resolve("path-browserify"), },
+      fallback: {
+        "https": false,
+        "zlib": false,
+        "http": false,
+        "url": false,
+        "path": require.resolve("path-browserify"),
+      },
       // fallback: {
 
       //   "https": require.resolve("https-browserify"),
@@ -158,21 +159,22 @@ module.exports = {
         filename: '[name].css',
         chunkFilename: '[id].css',
       }),
-      new CopyWebpackPlugin([
-        { from: path.join(Run3DSource, Run3DWorkers), to: "Workers" },
-      ]
-      ),
-      new CopyWebpackPlugin([{ from: path.join(Run3DSource, "Assets"), to: "Assets" }],
-      ),
-      new CopyWebpackPlugin([{ from: path.join(Run3DSource, "Widgets"), to: "Widgets" }],
-      ),
-      new CopyWebpackPlugin([
-        {
-          from: path.join(Run3DSource, "ThirdParty/Workers"),
-          to: "ThirdParty/Workers",
-        },
-      ],
-      ),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, Run3DWorkers),
+        to: "Workers"
+      }, ]),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, "Assets"),
+        to: "Assets"
+      }], ),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, "Widgets"),
+        to: "Widgets"
+      }], ),
+      new CopyWebpackPlugin([{
+        from: path.join(Run3DSource, "ThirdParty/Workers"),
+        to: "ThirdParty/Workers",
+      }, ], ),
       new webpack.DefinePlugin({
         CESIUM_BASE_URL: JSON.stringify(""),
       }),
@@ -193,27 +195,29 @@ module.exports = {
 
       new CopyWebpackPlugin(
         [{
-          from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml'
-        },
-        {
-          from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer.swf'
-        },
-        {
-          from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer-lib.min.js',
-          to: 'js/'
-        }
+            from: 'node_modules/@liveqing/liveplayer/dist/component/crossdomain.xml'
+          },
+          {
+            from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer.swf'
+          },
+          {
+            from: 'node_modules/@liveqing/liveplayer/dist/component/liveplayer-lib.min.js',
+            to: 'js/'
+          }
         ]
       ),
       // new CopyWebpackPlugin([
       //   {
       //     from: 'node_modules/@easydarwin/easyplayer/dist/component/EasyPlayer.swf',
+      //     to: './libs/EasyPlayer/'
       //   },
       //   {
       //     from: 'node_modules/@easydarwin/easyplayer/dist/component/crossdomain.xml',
+      //     to: './libs/EasyPlayer/'
       //   },
       //   {
       //     from: 'node_modules/@easydarwin/easyplayer/dist/component/EasyPlayer-lib.min.js',
-      //     to: 'js/'
+      //     to: './libs/EasyPlayer/'
       //   }
       // ])
     ]
@@ -264,11 +268,9 @@ module.exports = {
     config
       .plugin('ScriptExtHtmlWebpackPlugin')
       .after('html')
-      .use('script-ext-html-webpack-plugin', [
-        {
-          inline: /runtime\..*\.js$/
-        }
-      ])
+      .use('script-ext-html-webpack-plugin', [{
+        inline: /runtime\..*\.js$/
+      }])
       .end()
     config.optimization.splitChunks({
       chunks: 'all',
@@ -313,8 +315,12 @@ module.exports = {
     loaderOptions: {
 
       scss: {
-        prependData: `@import "~@/styles/variables.scss";@import "~@/styles/dom.scss";`
-      }
+        prependData: `@import "~@/styles/variables.scss";@import "~@/styles/dom.scss";`,
+        sassOptions: {
+          outputStyle: 'expanded'
+        } // fix: 解决 element-ui 图标 icon 偶现乱码问题
+      },
+
     }
   }
 }
