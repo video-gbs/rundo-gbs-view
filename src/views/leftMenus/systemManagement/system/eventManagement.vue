@@ -125,7 +125,7 @@
             <el-input
               v-model="dialog.params.eventCode"
               clearable
-              :maxlength="20"
+              :maxlength="32"
               :disabled="true"
             />
           </el-form-item>
@@ -133,7 +133,7 @@
             <el-input
               v-model="dialog.params.eventSort"
               clearable
-              :maxlength="20"
+              :maxlength="32"
             />
           </el-form-item>
         </el-form>
@@ -185,8 +185,8 @@ export default {
         eventName: [
           { required: true, message: '请输入字典名称', trigger: 'change' },
           {
-            min: 0,
-            max: 20,
+            min: 3,
+            max: 32,
             message: '长度在 3 到 20 个字符',
             trigger: 'change'
           }
@@ -194,9 +194,9 @@ export default {
         eventCode: [
           { required: true, message: '请输入字典项Value', trigger: 'change' },
           {
-            min: 0,
-            max: 20,
-            message: '长度在 3 到 20 个字符',
+            min: 3,
+            max: 32,
+            message: '长度在 3 到 32 个字符',
             trigger: 'change'
           }
         ],
