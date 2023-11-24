@@ -111,14 +111,14 @@
             <el-input
               v-model="dialog.params.eventName"
               clearable
-              :maxlength="20"
+              :maxlength="32"
             />
           </el-form-item>
           <el-form-item v-if="isEdited" label="事件编码" prop="eventCode">
             <el-input
               v-model="dialog.params.eventCode"
               clearable
-              :maxlength="20"
+              :maxlength="32"
             />
           </el-form-item>
           <el-form-item v-else label="事件编码" prop="eventCode">
