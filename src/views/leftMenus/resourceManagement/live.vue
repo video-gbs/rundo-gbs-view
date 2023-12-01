@@ -610,172 +610,227 @@ export default {
     document.removeEventListener('fullscreenchange', () => {})
   },
   methods: {
+    recursionTreeData(data) {
+      this.$nextTick(() => {
+        setTimeout(() => {
+          const testDom = document.getElementsByClassName('custom-tree-node')
+
+          data.forEach((item1) => {
+            if (item1.childList.length === 0 && Number(item1.resourceNum) > 0) {
+              for (let i = 0; i < testDom.length; i++) {
+                const currentNode = testDom[i]
+                // 获取子节点列表
+                const childNodes = currentNode.childNodes
+
+                for (let j = 0; j < childNodes.length; j++) {
+                  const childNode = childNodes[j]
+                  if (childNode.nodeType === Node.ELEMENT_NODE) {
+                    // 确保子节点是元素节点
+                    const innerText = childNode.innerText // 获取子节点的内部文本
+                    if (item1.resourceName.trim() === innerText.trim()) {
+                      // 获取上一个元素兄弟节点
+                      let previousElementSibling =
+                        currentNode.previousElementSibling
+
+                      // 遍历上一个元素兄弟节点，直到找到上一个<span>标签或遍历完所有兄弟节点
+                      while (
+                        previousElementSibling &&
+                        previousElementSibling.tagName.toLowerCase() !== 'span'
+                      ) {
+                        previousElementSibling =
+                          previousElementSibling.previousElementSibling
+                      }
+
+                      if (
+                        previousElementSibling &&
+                        previousElementSibling.tagName.toLowerCase() === 'span'
+                      ) {
+                        // 在这里可以对上一个<span>标签进行处理
+                        console.log(previousElementSibling)
+                        previousElementSibling.classList.remove('is-leaf')
+                      } else {
+                        // console.log('当前节点没有上一个<span>标签')
+                      }
+                    }
+                  }
+                }
+              }
+            } else {
+              this.recursionTreeData(item1.childList)
+            }
+          })
+        }, 0)
+      })
+    },
     async init() {
       await playVideoAreaList()
         .then((res) => {
           if (res.data.code === 0) {
             const data = [res.data.data]
-            this.$nextTick(() => {
-              setTimeout(() => {
-                const testDom =
-                  document.getElementsByClassName('custom-tree-node')
+            // this.$nextTick(() => {
+            //   setTimeout(() => {
+            //     const testDom =
+            //       document.getElementsByClassName('custom-tree-node')
 
-                data.forEach((item1) => {
-                  if (
-                    item1.childList.length === 0 &&
-                    Number(item1.resourceNum) > 0
-                  ) {
-                    for (let i = 0; i < testDom.length; i++) {
-                          const currentNode = testDom[i]
-                          // 获取子节点列表
-                          const childNodes = currentNode.childNodes
+            //     data.forEach((item1) => {
+            //       if (
+            //         item1.childList.length === 0 &&
+            //         Number(item1.resourceNum) > 0
+            //       ) {
+            //         for (let i = 0; i < testDom.length; i++) {
+            //           const currentNode = testDom[i]
+            //           // 获取子节点列表
+            //           const childNodes = currentNode.childNodes
 
-                          for (let j = 0; j < childNodes.length; j++) {
-                            const childNode = childNodes[j]
-                            if (childNode.nodeType === Node.ELEMENT_NODE) {
-                              // 确保子节点是元素节点
-                              const innerText = childNode.innerText // 获取子节点的内部文本
-                              if (
-                                item1.resourceName.trim() === innerText.trim()
-                              ) {
-                                // 获取上一个元素兄弟节点
-                                let previousElementSibling =
-                                  currentNode.previousElementSibling
+            //           for (let j = 0; j < childNodes.length; j++) {
+            //             const childNode = childNodes[j]
+            //             if (childNode.nodeType === Node.ELEMENT_NODE) {
+            //               // 确保子节点是元素节点
+            //               const innerText = childNode.innerText // 获取子节点的内部文本
+            //               if (item1.resourceName.trim() === innerText.trim()) {
+            //                 // 获取上一个元素兄弟节点
+            //                 let previousElementSibling =
+            //                   currentNode.previousElementSibling
 
-                                // 遍历上一个元素兄弟节点，直到找到上一个<span>标签或遍历完所有兄弟节点
-                                while (
-                                  previousElementSibling &&
-                                  previousElementSibling.tagName.toLowerCase() !==
-                                    'span'
-                                ) {
-                                  previousElementSibling =
-                                    previousElementSibling.previousElementSibling
-                                }
+            //                 // 遍历上一个元素兄弟节点，直到找到上一个<span>标签或遍历完所有兄弟节点
+            //                 while (
+            //                   previousElementSibling &&
+            //                   previousElementSibling.tagName.toLowerCase() !==
+            //                     'span'
+            //                 ) {
+            //                   previousElementSibling =
+            //                     previousElementSibling.previousElementSibling
+            //                 }
 
-                                if (
-                                  previousElementSibling &&
-                                  previousElementSibling.tagName.toLowerCase() ===
-                                    'span'
-                                ) {
-                                  // 在这里可以对上一个<span>标签进行处理
-                                  console.log(previousElementSibling)
-                                  previousElementSibling.classList.remove('is-leaf')
-                                } else {
-                                  // console.log('当前节点没有上一个<span>标签')
-                                }
-                              }
-                            }
-                          }
-                        }
-                  } else {
-                    item1.childList.forEach((child) => {
-                      if (
-                        child.childList.length === 0 &&
-                        Number(child.resourceNum) > 0
-                      ) {
-                        for (let i = 0; i < testDom.length; i++) {
-                          const currentNode = testDom[i]
-                          // 获取子节点列表
-                          const childNodes = currentNode.childNodes
+            //                 if (
+            //                   previousElementSibling &&
+            //                   previousElementSibling.tagName.toLowerCase() ===
+            //                     'span'
+            //                 ) {
+            //                   // 在这里可以对上一个<span>标签进行处理
+            //                   console.log(previousElementSibling)
+            //                   previousElementSibling.classList.remove('is-leaf')
+            //                 } else {
+            //                   // console.log('当前节点没有上一个<span>标签')
+            //                 }
+            //               }
+            //             }
+            //           }
+            //         }
+            //       } else {
+            //         item1.childList.forEach((child) => {
+            //           if (
+            //             child.childList.length === 0 &&
+            //             Number(child.resourceNum) > 0
+            //           ) {
+            //             for (let i = 0; i < testDom.length; i++) {
+            //               const currentNode = testDom[i]
+            //               // 获取子节点列表
+            //               const childNodes = currentNode.childNodes
 
-                          for (let j = 0; j < childNodes.length; j++) {
-                            const childNode = childNodes[j]
-                            if (childNode.nodeType === Node.ELEMENT_NODE) {
-                              // 确保子节点是元素节点
-                              const innerText = childNode.innerText // 获取子节点的内部文本
-                              if (
-                                child.resourceName.trim() === innerText.trim()
-                              ) {
-                                // previousElementSibling
-                                console.log('进来')
-                                // 获取上一个元素兄弟节点
-                                let previousElementSibling =
-                                  currentNode.previousElementSibling
+            //               for (let j = 0; j < childNodes.length; j++) {
+            //                 const childNode = childNodes[j]
+            //                 if (childNode.nodeType === Node.ELEMENT_NODE) {
+            //                   // 确保子节点是元素节点
+            //                   const innerText = childNode.innerText // 获取子节点的内部文本
+            //                   if (
+            //                     child.resourceName.trim() === innerText.trim()
+            //                   ) {
+            //                     // previousElementSibling
+            //                     console.log('进来')
+            //                     // 获取上一个元素兄弟节点
+            //                     let previousElementSibling =
+            //                       currentNode.previousElementSibling
 
-                                // 遍历上一个元素兄弟节点，直到找到上一个<span>标签或遍历完所有兄弟节点
-                                while (
-                                  previousElementSibling &&
-                                  previousElementSibling.tagName.toLowerCase() !==
-                                    'span'
-                                ) {
-                                  previousElementSibling =
-                                    previousElementSibling.previousElementSibling
-                                }
+            //                     // 遍历上一个元素兄弟节点，直到找到上一个<span>标签或遍历完所有兄弟节点
+            //                     while (
+            //                       previousElementSibling &&
+            //                       previousElementSibling.tagName.toLowerCase() !==
+            //                         'span'
+            //                     ) {
+            //                       previousElementSibling =
+            //                         previousElementSibling.previousElementSibling
+            //                     }
 
-                                if (
-                                  previousElementSibling &&
-                                  previousElementSibling.tagName.toLowerCase() ===
-                                    'span'
-                                ) {
-                                  // 在这里可以对上一个<span>标签进行处理
-                                  console.log(previousElementSibling)
-                                  previousElementSibling.classList.remove('is-leaf')
-                                } else {
-                                  // console.log('当前节点没有上一个<span>标签')
-                                }
-                              }
-                            }
-                          }
-                        }
-                      } else {
-                        child.childList.forEach((sun) => {
-                          if (
-                            sun.childList.length === 0 &&
-                            Number(sun.resourceNum) > 0
-                          ) {
-                            for (let i = 0; i < testDom.length; i++) {
-                          const currentNode = testDom[i]
-                          // 获取子节点列表
-                          const childNodes = currentNode.childNodes
+            //                     if (
+            //                       previousElementSibling &&
+            //                       previousElementSibling.tagName.toLowerCase() ===
+            //                         'span'
+            //                     ) {
+            //                       // 在这里可以对上一个<span>标签进行处理
+            //                       console.log(previousElementSibling)
+            //                       previousElementSibling.classList.remove(
+            //                         'is-leaf'
+            //                       )
+            //                     } else {
+            //                       // console.log('当前节点没有上一个<span>标签')
+            //                     }
+            //                   }
+            //                 }
+            //               }
+            //             }
+            //           } else {
+            //             child.childList.forEach((sun) => {
+            //               if (
+            //                 sun.childList.length === 0 &&
+            //                 Number(sun.resourceNum) > 0
+            //               ) {
+            //                 for (let i = 0; i < testDom.length; i++) {
+            //                   const currentNode = testDom[i]
+            //                   // 获取子节点列表
+            //                   const childNodes = currentNode.childNodes
 
-                          for (let j = 0; j < childNodes.length; j++) {
-                            const childNode = childNodes[j]
-                            if (childNode.nodeType === Node.ELEMENT_NODE) {
-                              // 确保子节点是元素节点
-                              const innerText = childNode.innerText // 获取子节点的内部文本
-                              if (
-                                sun.resourceName.trim() === innerText.trim()
-                              ) {
-                                // previousElementSibling
-                                console.log('进来')
-                                // 获取上一个元素兄弟节点
-                                let previousElementSibling =
-                                  currentNode.previousElementSibling
+            //                   for (let j = 0; j < childNodes.length; j++) {
+            //                     const childNode = childNodes[j]
+            //                     if (childNode.nodeType === Node.ELEMENT_NODE) {
+            //                       // 确保子节点是元素节点
+            //                       const innerText = childNode.innerText // 获取子节点的内部文本
+            //                       if (
+            //                         sun.resourceName.trim() === innerText.trim()
+            //                       ) {
+            //                         // previousElementSibling
+            //                         console.log('进来')
+            //                         // 获取上一个元素兄弟节点
+            //                         let previousElementSibling =
+            //                           currentNode.previousElementSibling
 
-                                // 遍历上一个元素兄弟节点，直到找到上一个<span>标签或遍历完所有兄弟节点
-                                while (
-                                  previousElementSibling &&
-                                  previousElementSibling.tagName.toLowerCase() !==
-                                    'span'
-                                ) {
-                                  previousElementSibling =
-                                    previousElementSibling.previousElementSibling
-                                }
+            //                         // 遍历上一个元素兄弟节点，直到找到上一个<span>标签或遍历完所有兄弟节点
+            //                         while (
+            //                           previousElementSibling &&
+            //                           previousElementSibling.tagName.toLowerCase() !==
+            //                             'span'
+            //                         ) {
+            //                           previousElementSibling =
+            //                             previousElementSibling.previousElementSibling
+            //                         }
 
-                                if (
-                                  previousElementSibling &&
-                                  previousElementSibling.tagName.toLowerCase() ===
-                                    'span'
-                                ) {
-                                  // 在这里可以对上一个<span>标签进行处理
-                                  console.log(previousElementSibling)
-                                  previousElementSibling.classList.remove('is-leaf')
-                                } else {
-                                  // console.log('当前节点没有上一个<span>标签')
-                                }
-                              }
-                            }
-                          }
-                        }
-                          } else {
-                          }
-                        })
-                      }
-                    })
-                  }
-                })
-              }, 0)
-            })
+            //                         if (
+            //                           previousElementSibling &&
+            //                           previousElementSibling.tagName.toLowerCase() ===
+            //                             'span'
+            //                         ) {
+            //                           // 在这里可以对上一个<span>标签进行处理
+            //                           console.log(previousElementSibling)
+            //                           previousElementSibling.classList.remove(
+            //                             'is-leaf'
+            //                           )
+            //                         } else {
+            //                           // console.log('当前节点没有上一个<span>标签')
+            //                         }
+            //                       }
+            //                     }
+            //                   }
+            //                 }
+            //               } else {
+            //               }
+            //             })
+            //           }
+            //         })
+            //       }
+            //     })
+            //   }, 0)
+            // })
+            this.recursionTreeData(data)
             this.treeList = data
 
             this.initData = [res.data.data]
