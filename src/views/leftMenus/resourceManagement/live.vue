@@ -30,18 +30,20 @@
                           v-model="filterText"
                           clearable
                         ></el-input>
+
+                        <!-- default-expand-all -->
                         <div class="operation_box">
                           <el-tree
                             ref="liveTree"
                             :data="treeList"
                             class="tree"
                             :props="defaultProps"
-                            default-expand-all
                             :default-expanded-keys="['根节点']"
                             :expand-on-click-node="false"
                             node-key="id"
                             highlight-current
                             @node-click="handleNodeClick"
+                            @node-expand="handleNodeClick"
                             :filter-node-method="filterNode"
                           >
                             <span
@@ -616,17 +618,27 @@ export default {
           const testDom = document.getElementsByClassName('custom-tree-node')
 
           data.forEach((item1) => {
+          // console.log('item1~~~~~~~~~~~',item1)
             if (item1.childList.length === 0 && Number(item1.resourceNum) > 0) {
               for (let i = 0; i < testDom.length; i++) {
                 const currentNode = testDom[i]
+
+                // console.log('currentNode~~~~~~~~~~~',currentNode)
                 // 获取子节点列表
                 const childNodes = currentNode.childNodes
 
+                // console.log('childNodes~~~~~~~~~~~',childNodes)
+
                 for (let j = 0; j < childNodes.length; j++) {
                   const childNode = childNodes[j]
+
+                  console.log('childNodes~~~~~~~~~~~',childNodes,childNode.nodeType === Node.ELEMENT_NODE)
                   if (childNode.nodeType === Node.ELEMENT_NODE) {
                     // 确保子节点是元素节点
                     const innerText = childNode.innerText // 获取子节点的内部文本
+
+                    console.log('innerText~~~~~~~~~~~',innerText)
+
                     if (item1.resourceName.trim() === innerText.trim()) {
                       // 获取上一个元素兄弟节点
                       let previousElementSibling =
@@ -1296,11 +1308,11 @@ export default {
       // }
     },
     async handleNodeClick(data, node, self) {
-      console.log(data, 111)
+      // console.log(data, 111)
 
       if (!data.onlineState) {
         this.resArray = []
-        console.log(this.detailsId)
+        // console.log(this.detailsId)
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
         } else {
@@ -1339,7 +1351,7 @@ export default {
                         ? this.resArray.concat(data.childList)
                         : this.resArray
 
-                      console.log('arr11111~~~~~~', arr)
+                      // console.log('arr11111~~~~~~', arr)
 
                       const obj = {}
                       arr = arr.reduce((item, next) => {
@@ -1349,7 +1361,7 @@ export default {
                         return item
                       }, [])
                     }
-                    console.log('arr~~~~~~', arr, data.id)
+                    // console.log('arr~~~~~~', arr, data.id)
                     this.$refs.liveTree.updateKeyChildren(data.id, arr)
                     this.defaultExpandedKeys = [data.id]
                   }
