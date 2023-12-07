@@ -1573,8 +1573,8 @@ export default {
         // console.log('点击暂停', this.$refs)
         this.play[this.playerIdx] = false
         // this.$refs.devicesPlayer && this.$refs.devicesPlayer.pause()
-        this.$refs['cloudPlayer' + this.playerIdx] &&
-          this.$refs['cloudPlayer' + this.playerIdx][0].pause()
+        // this.$refs['cloudPlayer' + this.playerIdx] &&
+        //   this.$refs['cloudPlayer' + this.playerIdx][0].pause()
 
         this.$refs.TimePlayer.stopTimeAutoPlay(this.playerIdx)
         this.gbPause()
