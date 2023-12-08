@@ -108,14 +108,14 @@ export default {
         }
       }),
       childTimeSegments: [
-        // {
-        //   name: '',
-        //   beginTime: 0,
-        //   endTime: 0,
-        //   color: '#4797FF',
-        //   startRatio: 0.65,
-        //   endRatio: 0.9
-        // }
+        {
+          name: '',
+          beginTime: 0,
+          endTime: 0,
+          color: '#4797FF',
+          startRatio: 0.65,
+          endRatio: 0.9
+        }
       ],
       timeAutoPlays: [],
       setIntervalNum: 0
