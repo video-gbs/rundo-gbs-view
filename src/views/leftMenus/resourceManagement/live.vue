@@ -1330,8 +1330,6 @@ export default {
       }
     },
     async handleNodeClick(data, node, self, isClickTwo, dom) {
-      console.log(data, 111)
-      console.log(node, 88888888)
       this.recursionTreeData(data.childList || [])
       if (!data.onlineState) {
         this.resArray = []
@@ -1367,14 +1365,10 @@ export default {
                     if (data.id === '1') {
                       arr = this.resArray.concat(this.initData[0].childList)
                     } else {
-                      // console.log('else~~~~~~~~~~~~~~~~', data.childList)
-
-                      // console.log('1~~~~~~~~~~~~~~~~', this.resArray)
                       arr = data.childList
                         ? this.resArray.concat(data.childList)
                         : this.resArray
 
-                      // console.log('arr11111~~~~~~', arr)
 
                       const obj = {}
                       arr = arr.reduce((item, next) => {
@@ -1384,8 +1378,6 @@ export default {
                         return item
                       }, [])
                     }
-                    console.log('arr~~~~~~', arr, data.id)
-                    console.log('isClickTwo~~~~~~', isClickTwo)
                     this.recursionTreeData(arr)
                     if (isClickTwo) {
                       this.domHandleClick(data,'',true)
@@ -1803,6 +1795,7 @@ export default {
   -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
 }
+
 // 没有展开且有子节点
 ::v-deep .tree .el-icon-caret-right:before {
   background: url('~@/assets/imgs/treeOpen.png') no-repeat 0 0;
