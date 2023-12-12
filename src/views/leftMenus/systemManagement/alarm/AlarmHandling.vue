@@ -22,13 +22,12 @@
                 children: 'childList',
                 label: 'resourceName'
               }"
-              default-expand-all
               :default-expanded-keys="['根节点']"
-              :expand-on-click-node="false"
               :current-node-key="resCurrentKey"
               node-key="id"
               highlight-current
               @node-click="handleNodeClick"
+              @node-expand="handleNodeClick"
               :filter-node-method="filterNode"
             >
               <span slot-scope="{ node, data }" class="custom-tree-node">
@@ -308,12 +307,13 @@
 
 <script>
 import {
-  getAlarmVideoAreaList,
   getAlarmMsg,
   deleteNorthAlarmEvent,
   getAlarmEventLists,
   getAlarmRecover
 } from '@/api/method/alarm'
+import { playVideoAreaListRecord } from '@/api/method/live'
+
 import leftTree from '@/views/leftMenus/systemManagement//components/leftTree'
 import pagination from '@/components/Pagination/index.vue'
 import LineFont from '@/components/LineFont'
@@ -417,7 +417,7 @@ export default {
   },
   methods: {
     async initTree() {
-      await getAlarmVideoAreaList()
+      await playVideoAreaListRecord()
         .then((res) => {
           if (res.data.code === 0) {
             this.treeList = [res.data.data]
@@ -493,7 +493,82 @@ export default {
       return data.resourceName && data.resourceName.indexOf(value) !== -1
       // }
     },
+    domHandleClick(item, previousElementSibling, isClick) {
+      if (!isClick) {
+        this.handleNodeClick(item, '', '', true, previousElementSibling)
+      } else {
+      }
+    },
+    recursionTreeData(data) {
+      this.$nextTick(() => {
+        setTimeout(() => {
+          const testDom = document.getElementsByClassName('custom-tree-node')
+
+          data.forEach((item1) => {
+            if (
+              item1.childList !== null &&
+              typeof item1.childList !== 'undefined' &&
+              item1.childList.length === 0 &&
+              Number(item1.resourceNum) > 0
+            ) {
+              for (let i = 0; i < testDom.length; i++) {
+                const currentNode = testDom[i]
+
+                // 获取子节点列表
+                const childNodes = currentNode.childNodes
+
+                for (let j = 0; j < childNodes.length; j++) {
+                  const childNode = childNodes[j]
+                  if (childNode.nodeType === Node.ELEMENT_NODE) {
+                    // 确保子节点是元素节点
+                    const innerText = childNode.innerText // 获取子节点的内部文本
+
+                    if (item1.resourceName.trim() === innerText.trim()) {
+                      // 获取上一个元素兄弟节点
+                      let previousElementSibling =
+                        currentNode.previousElementSibling
+
+                      // 遍历上一个元素兄弟节点，直到找到上一个<span>标签或遍历完所有兄弟节点
+                      while (
+                        previousElementSibling &&
+                        previousElementSibling.tagName.toLowerCase() !== 'span'
+                      ) {
+                        previousElementSibling =
+                          previousElementSibling.previousElementSibling
+                      }
+
+                      if (
+                        previousElementSibling &&
+                        previousElementSibling.tagName.toLowerCase() === 'span'
+                      ) {
+                        // 在这里可以对上一个<span>标签进行处理
+                        console.log('!!!!!!!!', previousElementSibling)
+                        previousElementSibling.classList.remove('is-leaf')
+                        previousElementSibling.addEventListener(
+                          'click',
+                          this.domHandleClick(
+                            item1,
+                            previousElementSibling,
+                            false
+                          )
+                        )
+                      } else {
+                        // console.log('当前节点没有上一个<span>标签')
+                      }
+                    }
+                  }
+                }
+              }
+            } else {
+              this.recursionTreeData(item1.childList || [])
+            }
+          })
+        }, 0)
+      })
+    },
     async handleNodeClick(data, node, self) {
+      this.recursionTreeData(data.childList || [])
+
       if (!data.hasOwnProperty('onlineState')) {
         this.resArray = []
         if (this.detailsId.indexOf(data.id) !== -1) {
@@ -532,6 +607,7 @@ export default {
                       return item
                     }, [])
                   }
+                  this.recursionTreeData(arr)
                   this.$refs.alarmTree.updateKeyChildren(data.id, arr)
                 }
               }
@@ -1139,5 +1215,39 @@ export default {
     padding: 24px 24px 22px;
     /*border: #e4e7ed solid 1px;*/
   }
+}
+
+::v-deep .tree .el-tree-node__expand-icon.expanded {
+  -webkit-transform: rotate(0deg);
+  transform: rotate(0deg);
+  // margin:6px;
+}
+// 没有展开且有子节点
+::v-deep .tree .el-icon-caret-right:before {
+  background: url('~@/assets/imgs/treeOpen.png') no-repeat 0 0;
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  top: 1px;
+}
+// 已经展开且有子节点
+::v-deep .tree .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
+  background: url('~@/assets/imgs/treeClose.png') no-repeat 0 0;
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  position: relative;
+  top: 1px;
+}
+// 没有子节点
+::v-deep .tree .el-tree-node__expand-icon.is-leaf::before {
+  // background: url("~@/assets/imgs/tree+.png") no-repeat 0 3px;
+  content: '';
+  display: none;
+  width: 8px;
+  height: 8px;
 }
 </style>

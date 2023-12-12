@@ -37,7 +37,6 @@
                             label: 'resourceName'
                           }"
                           :default-expanded-keys="['根节点']"
-                          :expand-on-click-node="false"
                           node-key="id"
                           highlight-current
                           @node-click="handleNodeClick"
@@ -765,11 +764,10 @@ export default {
         }, 0)
       })
     },
-    domHandleClick(item,previousElementSibling,isClick) {
-      if(!isClick){
+    domHandleClick(item, previousElementSibling, isClick) {
+      if (!isClick) {
         this.handleNodeClick(item, '', '', true, previousElementSibling)
-      }else{
-
+      } else {
       }
     },
     mergeDatetimeRanges(datetimeRanges) {
@@ -1124,7 +1122,7 @@ export default {
                     }
                     this.recursionTreeData(arr)
                     if (isClickTwo) {
-                      this.domHandleClick(data,'',true)
+                      this.domHandleClick(data, '', true)
                     }
                     this.$refs.recordViewTree.updateKeyChildren(data.id, arr)
                     this.defaultExpandedKeys = [data.id]

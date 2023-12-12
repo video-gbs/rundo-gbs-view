@@ -39,7 +39,6 @@
                             class="tree"
                             :props="defaultProps"
                             :default-expanded-keys="['根节点']"
-                            :expand-on-click-node="false"
                             node-key="id"
                             highlight-current
                             @node-click="handleNodeClick"
@@ -664,7 +663,11 @@ export default {
                         previousElementSibling.classList.remove('is-leaf')
                         previousElementSibling.addEventListener(
                           'click',
-                          this.domHandleClick(item1,previousElementSibling,false)
+                          this.domHandleClick(
+                            item1,
+                            previousElementSibling,
+                            false
+                          )
                         )
                         // previousElementSibling.addEventListener('click', () => {
                         //   this.handleNodeClick(
@@ -1322,11 +1325,10 @@ export default {
       return data.resourceName && data.resourceName.indexOf(value) !== -1
       // }
     },
-    domHandleClick(item,previousElementSibling,isClick) {
-      if(!isClick){
+    domHandleClick(item, previousElementSibling, isClick) {
+      if (!isClick) {
         this.handleNodeClick(item, '', '', true, previousElementSibling)
-      }else{
-
+      } else {
       }
     },
     async handleNodeClick(data, node, self, isClickTwo, dom) {
@@ -1369,7 +1371,6 @@ export default {
                         ? this.resArray.concat(data.childList)
                         : this.resArray
 
-
                       const obj = {}
                       arr = arr.reduce((item, next) => {
                         obj[next.id]
@@ -1380,7 +1381,7 @@ export default {
                     }
                     this.recursionTreeData(arr)
                     if (isClickTwo) {
-                      this.domHandleClick(data,'',true)
+                      this.domHandleClick(data, '', true)
                     }
                     this.$refs.liveTree.updateKeyChildren(data.id, arr)
                     this.defaultExpandedKeys = [data.id]
