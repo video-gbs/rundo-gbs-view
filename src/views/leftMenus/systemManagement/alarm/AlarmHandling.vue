@@ -26,7 +26,6 @@
               :current-node-key="resCurrentKey"
               node-key="id"
               highlight-current
-              @node-click="handleNodeClick"
               @node-expand="handleNodeClick"
               :filter-node-method="filterNode"
             >
