@@ -41,7 +41,6 @@
                             :default-expanded-keys="['根节点']"
                             node-key="id"
                             highlight-current
-                            @node-click="handleNodeClick"
                             @node-expand="handleNodeClick"
                             :filter-node-method="filterNode"
                           >
