@@ -26,7 +26,7 @@
               :current-node-key="resCurrentKey"
               node-key="id"
               highlight-current
-              @node-expand="handleNodeClick"
+              @node-click="handleNodeClick"
               :filter-node-method="filterNode"
             >
               <span slot-scope="{ node, data }" class="custom-tree-node">
@@ -569,7 +569,6 @@ export default {
       this.recursionTreeData(data.childList || [])
 
       if (!data.hasOwnProperty('onlineState')) {
-        this.resArray = []
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
         } else {
@@ -577,6 +576,7 @@ export default {
             .then((res) => {
               if (res.data.code === 0) {
                 if (res.data.data && res.data.data.length > 0) {
+                  this.resArray = []
                   res.data.data.map((item) => {
                     this.resArray.push({
                       onlineState: item.onlineState,
