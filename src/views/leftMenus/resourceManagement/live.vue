@@ -41,7 +41,7 @@
                             :default-expanded-keys="['根节点']"
                             node-key="id"
                             highlight-current
-                            @node-expand="handleNodeClick"
+                            @node-click="handleNodeClick"
                             :filter-node-method="filterNode"
                           >
                             <span
@@ -1333,7 +1333,6 @@ export default {
     async handleNodeClick(data, node, self, isClickTwo, dom) {
       this.recursionTreeData(data.childList || [])
       if (!data.onlineState) {
-        this.resArray = []
         // console.log(this.detailsId)
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
@@ -1348,6 +1347,7 @@ export default {
             await getChannelPlayList(data.id)
               .then((res) => {
                 if (res.data.code === 0) {
+                  this.resArray = []
                   if (res.data.data && res.data.data.length > 0) {
                     res.data.data.map((item) => {
                       this.resArray.push({
