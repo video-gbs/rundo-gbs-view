@@ -39,7 +39,7 @@
                           :default-expanded-keys="['根节点']"
                           node-key="id"
                           highlight-current
-                          @node-expand="handleNodeClick"
+                          @node-click="handleNodeClick"
                           :filter-node-method="filterNode"
                         >
                           <span
@@ -1075,7 +1075,6 @@ export default {
       this.resOnlineState = data.onlineState ? data.onlineState : ''
       this.recursionTreeData(data.childList || [])
       if (!data.onlineState) {
-        this.resArray = []
         if (this.detailsId.indexOf(data.id) !== -1) {
           return
         } else {
@@ -1090,6 +1089,7 @@ export default {
               .then((res) => {
                 if (res.data.code === 0) {
                   if (res.data.data && res.data.data.length > 0) {
+                    this.resArray = []
                     res.data.data.map((item) => {
                       this.resArray.push({
                         onlineState: item.onlineState,
