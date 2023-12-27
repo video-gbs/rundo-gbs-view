@@ -323,9 +323,9 @@ export default {
         presetName
       }).then((res) => {
         if (res.data.code === 0) {
-          if (this.nowPreset !== '') {
-            this.nowPreset = presetName
-          }
+          // if (this.nowPreset !== '') {
+          //   this.nowPreset = presetName
+          // }
 
           if (
             this.nowPreset === '' ||
